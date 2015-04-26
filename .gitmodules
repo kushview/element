@@ -1,3 +1,6 @@
 [submodule "libs/element"]
 	path = libs/element
 	url = git@bitbucket.org:kushview/element.git
+[submodule "libs/libjuce"]
+	path = libs/libjuce
+	url = https://github.com/mfisher31/libjuce.git
