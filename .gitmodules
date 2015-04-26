@@ -1,0 +1,3 @@
+[submodule "libs/element"]
+	path = libs/element
+	url = git@bitbucket.org:kushview/element.git

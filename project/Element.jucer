@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.0.1"
+              bundleIdentifier="org.element-project.Element" includeBinaryInAppConfig="1"
+              jucerVersion="3.1.0" companyName="The Element Project">
+  <MAINGROUP id="z1aYPy" name="Element">
+    <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
+      <FILE id="meVC0a" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
+      <GROUP id="{9D81DCFF-DB26-1A72-3BD4-1BDA4F7ACD20}" name="element">
+        <FILE id="IodT8T" name="Juce.h" compile="0" resource="0" file="Source/element/Juce.h"/>
+      </GROUP>
+      <GROUP id="{F495F79F-E637-8DFE-A007-C11A7D50B049}" name="engine">
+        <FILE id="gSjo4d" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>
+        <FILE id="sJvW3S" name="AudioEngine.h" compile="0" resource="0" file="Source/engine/AudioEngine.h"/>
+        <FILE id="U5cj0u" name="EngineProcessor.h" compile="0" resource="0"
+              file="Source/engine/EngineProcessor.h"/>
+        <FILE id="oiYYp6" name="Interface.h" compile="0" resource="0" file="Source/engine/Interface.h"/>
+        <FILE id="OrXviX" name="InternalFormat.cpp" compile="1" resource="0"
+              file="Source/engine/InternalFormat.cpp"/>
+        <FILE id="EL0F9x" name="InternalFormat.h" compile="0" resource="0"
+              file="Source/engine/InternalFormat.h"/>
+        <FILE id="GQ8BYN" name="PreProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/PreProcessor.cpp"/>
+        <FILE id="PdRPcA" name="PreProcessor.h" compile="0" resource="0" file="Source/engine/PreProcessor.h"/>
+        <FILE id="E57z3S" name="Transport.cpp" compile="1" resource="0" file="Source/engine/Transport.cpp"/>
+        <FILE id="tudcrT" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
+      </GROUP>
+      <FILE id="aDemQ1" name="EngineControl.cpp" compile="1" resource="0"
+            file="Source/EngineControl.cpp"/>
+      <FILE id="jQ2DDS" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
+      <FILE id="djygWc" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
+      <FILE id="O9DyEs" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
+      <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
+        <GROUP id="{67202292-90BD-7BFB-9A42-F0230FF90AA1}" name="alerts">
+          <FILE id="SU6pR4" name="AlertBackground.cpp" compile="1" resource="0"
+                file="Source/gui/alerts/AlertBackground.cpp"/>
+          <FILE id="YE0xtg" name="AlertBackground.h" compile="0" resource="0"
+                file="Source/gui/alerts/AlertBackground.h"/>
+          <FILE id="DnzPh0" name="InfoAlertButtonBar.cpp" compile="1" resource="0"
+                file="Source/gui/alerts/InfoAlertButtonBar.cpp"/>
+          <FILE id="C1iCdW" name="InfoAlertButtonBar.h" compile="0" resource="0"
+                file="Source/gui/alerts/InfoAlertButtonBar.h"/>
+          <FILE id="waK8nI" name="OkCancelAlertButtonBar.cpp" compile="1" resource="0"
+                file="Source/gui/alerts/OkCancelAlertButtonBar.cpp"/>
+          <FILE id="SRkFzS" name="OkCancelAlertButtonBar.h" compile="0" resource="0"
+                file="Source/gui/alerts/OkCancelAlertButtonBar.h"/>
+          <FILE id="ESzd0e" name="YesNoCancelButtonBar.cpp" compile="1" resource="0"
+                file="Source/gui/alerts/YesNoCancelButtonBar.cpp"/>
+          <FILE id="FpwQRN" name="YesNoCancelButtonBar.h" compile="0" resource="0"
+                file="Source/gui/alerts/YesNoCancelButtonBar.h"/>
+        </GROUP>
+        <FILE id="q6ARgY" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
+        <FILE id="u5QRQK" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
+        <FILE id="b3ezcp" name="AssetTreeView.cpp" compile="1" resource="0"
+              file="Source/gui/AssetTreeView.cpp"/>
+        <FILE id="QAfFAU" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>
+        <FILE id="Uj4Mzm" name="Commands.h" compile="0" resource="0" file="Source/gui/Commands.h"/>
+        <FILE id="ssqV1U" name="ContentComponent.cpp" compile="1" resource="0"
+              file="Source/gui/ContentComponent.cpp"/>
+        <FILE id="anvyqd" name="ContentComponent.h" compile="0" resource="0"
+              file="Source/gui/ContentComponent.h"/>
+        <FILE id="t9BOSc" name="GraphEditorPanel.cpp" compile="1" resource="0"
+              file="Source/gui/GraphEditorPanel.cpp"/>
+        <FILE id="rtFQDr" name="GraphEditorPanel.h" compile="0" resource="0"
+              file="Source/gui/GraphEditorPanel.h"/>
+        <FILE id="nzVetO" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
+        <FILE id="MH01yi" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
+        <FILE id="dsnPTB" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
+        <GROUP id="{6820113F-0D75-668F-CD3F-9AE13CDEA59E}" name="layouts">
+          <FILE id="kC3NS8" name="NewSessionView.cpp" compile="1" resource="0"
+                file="Source/gui/layouts/NewSessionView.cpp"/>
+          <FILE id="Hs34Q7" name="NewSessionView.h" compile="0" resource="0"
+                file="Source/gui/layouts/NewSessionView.h"/>
+        </GROUP>
+        <FILE id="EzYpBN" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
+        <FILE id="W340hp" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
+        <FILE id="c2QXJ3" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
+        <FILE id="wMlJj5" name="Navigation.cpp" compile="1" resource="0" file="Source/gui/Navigation.cpp"/>
+        <FILE id="B6SpFi" name="Navigation.h" compile="0" resource="0" file="Source/gui/Navigation.h"/>
+        <FILE id="RTT1z1" name="NewFileWizard.cpp" compile="1" resource="0"
+              file="Source/gui/NewFileWizard.cpp"/>
+        <FILE id="USqCUI" name="NewFileWizard.h" compile="0" resource="0" file="Source/gui/NewFileWizard.h"/>
+        <FILE id="TlOEhX" name="PluginListWindow.h" compile="0" resource="0"
+              file="Source/gui/PluginListWindow.h"/>
+        <FILE id="SYfNKj" name="Preferences.cpp" compile="1" resource="0" file="Source/gui/Preferences.cpp"/>
+        <FILE id="j2MM6S" name="Preferences.h" compile="0" resource="0" file="Source/gui/Preferences.h"/>
+        <FILE id="gyy3Bo" name="PreferencesWidget.cpp" compile="1" resource="0"
+              file="Source/gui/PreferencesWidget.cpp"/>
+        <FILE id="QOyaRs" name="PreferencesWidget.h" compile="0" resource="0"
+              file="Source/gui/PreferencesWidget.h"/>
+        <GROUP id="{49EC061E-7260-D9E0-79C4-167BA10CEB0C}" name="sequencer">
+          <FILE id="Mz2q7f" name="MidiEditorComponent.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/MidiEditorComponent.cpp"/>
+          <FILE id="YYNkJa" name="MidiEditorComponent.h" compile="0" resource="0"
+                file="Source/gui/sequencer/MidiEditorComponent.h"/>
+          <FILE id="p9VHQK" name="SequencerClipItem.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/SequencerClipItem.cpp"/>
+          <FILE id="Dn9y1k" name="SequencerClipItem.h" compile="0" resource="0"
+                file="Source/gui/sequencer/SequencerClipItem.h"/>
+          <FILE id="U2k3WH" name="SequencerComponent.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/SequencerComponent.cpp"/>
+          <FILE id="uli3uX" name="SequencerComponent.h" compile="0" resource="0"
+                file="Source/gui/sequencer/SequencerComponent.h"/>
+        </GROUP>
+        <FILE id="l4H6lD" name="SessionDocument.cpp" compile="1" resource="0"
+              file="Source/gui/SessionDocument.cpp"/>
+        <FILE id="mmYTVp" name="SessionDocument.h" compile="0" resource="0"
+              file="Source/gui/SessionDocument.h"/>
+        <FILE id="IItgNC" name="SessionTreePanel.cpp" compile="1" resource="0"
+              file="Source/gui/SessionTreePanel.cpp"/>
+        <FILE id="IKDxM7" name="SessionTreePanel.h" compile="0" resource="0"
+              file="Source/gui/SessionTreePanel.h"/>
+        <FILE id="BWZsLB" name="Timeline.h" compile="0" resource="0" file="Source/gui/Timeline.h"/>
+        <FILE id="aG9Hev" name="TransportBar.cpp" compile="1" resource="0"
+              file="Source/gui/TransportBar.cpp"/>
+        <FILE id="SJEaZG" name="TransportBar.h" compile="0" resource="0" file="Source/gui/TransportBar.h"/>
+        <FILE id="zK0NDp" name="WidgetFactory.cpp" compile="1" resource="0"
+              file="Source/gui/WidgetFactory.cpp"/>
+        <FILE id="Y2m4iT" name="WidgetFactory.h" compile="0" resource="0" file="Source/gui/WidgetFactory.h"/>
+        <FILE id="s1wOhr" name="Window.cpp" compile="1" resource="0" file="Source/gui/Window.cpp"/>
+        <FILE id="TilznD" name="Window.h" compile="0" resource="0" file="Source/gui/Window.h"/>
+        <FILE id="jjTA67" name="WindowManager.cpp" compile="1" resource="0"
+              file="Source/gui/WindowManager.cpp"/>
+        <FILE id="nrEbkP" name="WindowManager.h" compile="0" resource="0" file="Source/gui/WindowManager.h"/>
+        <FILE id="vZJpkW" name="Workspace.cpp" compile="1" resource="0" file="Source/gui/Workspace.cpp"/>
+        <FILE id="hhM5Pk" name="Workspace.h" compile="0" resource="0" file="Source/gui/Workspace.h"/>
+      </GROUP>
+      <FILE id="moNtLr" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="G3RL4B" name="MediaManager.cpp" compile="1" resource="0"
+            file="Source/MediaManager.cpp"/>
+      <FILE id="jRNQNP" name="MediaManager.h" compile="0" resource="0" file="Source/MediaManager.h"/>
+      <GROUP id="{7E83EE43-F00D-510F-6D74-A0FE29898974}" name="models"/>
+      <GROUP id="{959D9C20-2195-B4BC-B551-03A49A96C76F}" name="session">
+        <FILE id="uRlZKO" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
+        <FILE id="w4bUo5" name="Session.h" compile="0" resource="0" file="Source/session/Session.h"/>
+        <FILE id="hjrKlX" name="SessionAssets.cpp" compile="1" resource="0"
+              file="Source/session/SessionAssets.cpp"/>
+        <FILE id="ZivC67" name="SessionAssets.h" compile="0" resource="0" file="Source/session/SessionAssets.h"/>
+        <FILE id="DmoZ07" name="SessionTrack.cpp" compile="1" resource="0"
+              file="Source/session/SessionTrack.cpp"/>
+      </GROUP>
+      <FILE id="laEfik" name="URIs.h" compile="0" resource="0" file="Source/URIs.h"/>
+      <FILE id="ZImDHV" name="wscript_build" compile="0" resource="0" file="Source/wscript_build"/>
+    </GROUP>
+    <GROUP id="{4C0CA2D9-7E14-3C17-C3F1-4FF581D4DAE9}" name="Templates">
+      <FILE id="qrZXVE" name="ElementTemplate.cpp" compile="0" resource="0"
+            file="Templates/ElementTemplate.cpp"/>
+      <FILE id="Ag660q" name="ElementTemplate.h" compile="0" resource="0"
+            file="Templates/ElementTemplate.h"/>
+    </GROUP>
+    <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
+  </MAINGROUP>
+  <EXPORTFORMATS>
+    <LINUX_MAKE targetFolder="Builds/Linux" userNotes="This exporter is here for reference.  Please use waf to build the project.&#10;&#10;$ ./waf configure&#10;$ ./waf build&#10;$ sudo ./waf install&#10;"
+                externalLibraries="">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
+                       targetName="Element"/>
+        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="2"
+                       targetName="Element"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../libs/juce/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="element_base" path="../modules"/>
+        <MODULEPATH id="element_models" path="../modules"/>
+        <MODULEPATH id="element_gui" path="../modules"/>
+        <MODULEPATH id="element_engines" path="../modules"/>
+        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/element/include&#10;/opt/element/include/lilv-0&#10;/opt/element/include/suil-0&#10;../../Source"
+                       cppLibType="libc++" libraryPath="/opt/element/lib"/>
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
+                       isDebug="0" optimisation="2" targetName="Element"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="element_base" path="../modules"/>
+        <MODULEPATH id="element_models" path="../modules"/>
+        <MODULEPATH id="element_gui" path="../modules"/>
+        <MODULEPATH id="element_engines" path="../modules"/>
+        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+      </MODULEPATHS>
+    </XCODE_MAC>
+    <XCODE_IPHONE targetFolder="Builds/iOS" externalLibraries="lilv-0&#10;suil-0&#10;sratom-0&#10;sord-0&#10;serd-0"
+                  postbuildCommand="libdir=&quot;/opt/element/ios/lib&quot;&#10;deplibs=&quot;liblilv-0.dylib libsuil-0.dylib libserd-0.dylib libsord-0.dylib libsratom-0.dylib&quot;&#10;&#10;exit 0&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;binary=&quot;$original/$EXECUTABLE_NAME&quot;&#10;frameworks=&quot;$original/Frameworks&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*.dylib&quot;&#10;&#10;echo &quot;Copying Libraries from $libdir&quot;&#10;&#10;for deplib in $deplibs; do&#10;  echo &quot;  $deplib&quot;&#10;  cp -f &quot;$libdir/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;&#10;  install_name_tool -id &quot;@loader_path/Frameworks/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;  install_name_tool -change &quot;$libdir/$deplib&quot; &quot;@loader_path/Frameworks/$deplib&quot; &quot;$binary&quot;&#10;&#10;  for dep in $deplibs; do&#10;    install_name_tool -change &quot;$libdir/$dep&quot; &quot;@loader_path/$dep&quot; &quot;$frameworks/$deplib&quot;&#10;  done&#10;&#10;done&#10;">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="1"
+                       targetName="Element" cppLibType="libc++" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
+                       libraryPath="/opt/element/arm/lib"/>
+        <CONFIGURATION name="Release" iosCompatibility="default" isDebug="0" optimisation="3"
+                       targetName="Element" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
+                       libraryPath="/opt/element/arm/lib" cppLibType="libc++"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="element_models" path="../modules"/>
+        <MODULEPATH id="element_gui" path="../modules"/>
+        <MODULEPATH id="element_engines" path="../modules"/>
+        <MODULEPATH id="element_base" path="../modules"/>
+        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+      </MODULEPATHS>
+    </XCODE_IPHONE>
+    <ANDROID targetFolder="Builds/Android" androidActivityClass="com.yourcompany.Element"
+             androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
+             androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
+             androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
+             androidKeyAliasPass="android">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
+                       optimisation="1" targetName="Element"/>
+        <CONFIGURATION name="Release" androidArchitectures="armeabi armeabi-v7a" isDebug="0"
+                       optimisation="2" targetName="Element"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="element_models" path="../modules"/>
+        <MODULEPATH id="element_gui" path="../modules"/>
+        <MODULEPATH id="element_engines" path="../modules"/>
+        <MODULEPATH id="element_base" path="../modules"/>
+      </MODULEPATHS>
+    </ANDROID>
+  </EXPORTFORMATS>
+  <MODULES>
+    <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="element_engines" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="element_gui" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="element_models" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_processors" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_audio_utils" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_events" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="lvtk_core" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="lvtk_plugins" showAllCode="1" useLocalCopy="0"/>
+  </MODULES>
+  <JUCEOPTIONS JUCE_JACK="disabled" JUCE_FORCE_DEBUG="disabled" JUCE_LOG_ASSERTIONS="disabled"
+               JUCE_CHECK_MEMORY_LEAKS="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
+               JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
+               JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
+               JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
+               JUCE_USE_CDBURNER="disabled"/>
+</JUCERPROJECT>

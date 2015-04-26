@@ -1,0 +1,11 @@
+project/Builds
+project/JuceLibraryCode/ReadMe.txt
+
+dst
+libs/vst*
+.waf-*
+.lock*
+build/
+*.pyc
+.DS_Store
+*.autosave
