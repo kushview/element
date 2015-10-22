@@ -75,8 +75,7 @@ namespace Element {
         return getNodeForId (id);
     }
 
-    bool
-    EngineControl::close()
+    bool EngineControl::close()
     {
         if (session.get() == nullptr) {
             // haven't been opened or close has been called more than once
@@ -90,14 +89,12 @@ namespace Element {
     }
 
 
-    InternalFormat*
-    EngineControl::internals() const
+    InternalFormat* EngineControl::internals() const
     {
         return engine.globals().plugins().format<InternalFormat>();
     }
 
-    bool
-    EngineControl::open (Session &s)
+    bool EngineControl::open (Session &s)
     {
         jassert (session == nullptr);
         session = s.makeRef();
@@ -140,32 +137,27 @@ namespace Element {
         return true;
     }
 
-    void
-    EngineControl::setPlaying (bool p)
+    void EngineControl::setPlaying (bool p)
     {
         engine.transport()->requestPlayState (p);
     }
 
-    Sequencer*
-    EngineControl::sequencer() const
+    Sequencer* EngineControl::sequencer() const
     {
         return seqNode != nullptr ? seqNode->processor<Sequencer>() : nullptr;
     }
 
-    void
-    EngineControl::setRecording (bool r)
+    void EngineControl::setRecording (bool r)
     {
         engine.transport()->requestRecordState (r);
     }
 
-    void
-    EngineControl::setTempo (double newTempo)
+    void EngineControl::setTempo (double newTempo)
     {
         engine.transport()->requestTempo (newTempo);
     }
 
-    bool
-    EngineControl::validateRequiredNodes()
+    bool EngineControl::validateRequiredNodes()
     {
         if (sequencer() == nullptr)
             return false;
@@ -186,40 +178,33 @@ namespace Element {
         return true;
     }
 
-    void
-    EngineControl::valueTreePropertyChanged (ValueTree& /*tree*/, const Identifier& /*prop*/)
+    void EngineControl::valueTreePropertyChanged (ValueTree& /*tree*/, const Identifier& /*prop*/)
     {
 
     }
 
-    void
-    EngineControl::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void EngineControl::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     {
 
     }
 
-    void
-    EngineControl::valueTreeChildRemoved (ValueTree& /*parent*/, ValueTree& child)
+    void EngineControl::valueTreeChildRemoved (ValueTree&, ValueTree& , int)
     {
 
     }
 
-    void
-    EngineControl::valueTreeChildOrderChanged (ValueTree& parent)
+    void EngineControl::valueTreeChildOrderChanged (ValueTree& parent, int, int)
     {
 
     }
 
-    void
-    EngineControl::valueTreeParentChanged (ValueTree& tree)
+    void EngineControl::valueTreeParentChanged (ValueTree& tree)
     {
 
     }
 
-    void
-    EngineControl::valueTreeRedirected (ValueTree& tree)
+    void EngineControl::valueTreeRedirected (ValueTree& tree)
     {
 
     }
-
 }

@@ -36,13 +36,14 @@ class Application  : public JUCEApplication, public Timer
 {
 
     Scoped<Globals>     world;
-    Shared<AudioEngine> engine;
+    AudioEnginePtr      engine;
     Scoped<Gui::GuiApp> gui;
 
 public:
 
    Application() { }
-
+   virtual ~Application() { }
+    
    const String getApplicationName()       { return "Element"; }
    const String getApplicationVersion()    { return ProjectInfo::versionString; }
    bool moreThanOneInstanceAllowed()       { return true; }
@@ -56,7 +57,7 @@ public:
        if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
             world->devices().initialise (16, 16, dxml.get(), true, "default", nullptr);
 
-       engine.reset (new AudioEngine (*world));
+       engine = new AudioEngine (*world);
        world->setEngine (engine); // this will also instantiate the session
 
        // global data is ready, so now we can start using it;
@@ -97,10 +98,8 @@ public:
            settings.getUserSettings()->setValue ("devices", el);
 
        engine->deactivate();
-       world->setEngine (Shared<Engine>());
-       engine.reset();
-
-       std::clog << "Going away with " << engine.use_count() << " AudioEngine refs out there\n";
+       world->setEngine (nullptr);
+       engine = nullptr;
        world = nullptr;
    }
 

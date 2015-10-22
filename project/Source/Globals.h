@@ -21,6 +21,7 @@
 #define ELEMENT_GLOBALS_H
 
 #include "element/Juce.h"
+#include "engine/AudioEngine.h"
 #include "URIs.h"
 
 namespace Element {
@@ -43,11 +44,9 @@ namespace Element {
 
     };
 
-
     class Globals : public WorldBase
     {
     public:
-
         ScopedPointer<const URIs> uris;
 
         Globals();
@@ -59,8 +58,9 @@ namespace Element {
         SymbolMap& symbols();
         MediaManager& media();
         Session& session();
+        AudioEnginePtr engine() const;
 
-        void setEngine (Shared<Engine> engine);
+        void setEngine (EnginePtr engine);
 
     private:
 

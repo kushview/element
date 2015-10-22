@@ -25,8 +25,6 @@
 
 namespace Element {
 
-
-    //==============================================================================
     InternalFormat::InternalFormat (AudioEngine& e)
         : engine (e)
     {

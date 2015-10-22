@@ -213,8 +213,8 @@ namespace Element {
         ValueTree projectState;
         virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
         virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
-        virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved);
-        virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved);
+        virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int);
+        virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved, int, int);
         virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
         virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
 

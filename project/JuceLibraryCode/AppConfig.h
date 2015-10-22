@@ -29,6 +29,7 @@
 #define JUCE_MODULE_AVAILABLE_element_base               1
 #define JUCE_MODULE_AVAILABLE_element_engines            1
 #define JUCE_MODULE_AVAILABLE_element_gui                1
+#define JUCE_MODULE_AVAILABLE_element_lv2                1
 #define JUCE_MODULE_AVAILABLE_element_models             1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics          1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices         1
@@ -43,14 +44,24 @@
 #define JUCE_MODULE_AVAILABLE_juce_gui_basics            1
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra             1
 #define JUCE_MODULE_AVAILABLE_juce_opengl                1
-#define JUCE_MODULE_AVAILABLE_lvtk_core                  1
-#define JUCE_MODULE_AVAILABLE_lvtk_plugins               1
+
+//==============================================================================
+#ifndef    JUCE_STANDALONE_APPLICATION
+ #define   JUCE_STANDALONE_APPLICATION 1
+#endif
 
 //==============================================================================
 // element_base flags:
 
 #ifndef    ELEMENT_OSC
  //#define ELEMENT_OSC
+#endif
+
+//==============================================================================
+// element_lv2 flags:
+
+#ifndef    ELEMENT_LV2_PLUGIN_HOST
+ //#define ELEMENT_LV2_PLUGIN_HOST
 #endif
 
 //==============================================================================
@@ -62,6 +73,10 @@
 
 #ifndef    JUCE_WASAPI
  #define   JUCE_WASAPI 0
+#endif
+
+#ifndef    JUCE_WASAPI_EXCLUSIVE
+ //#define JUCE_WASAPI_EXCLUSIVE
 #endif
 
 #ifndef    JUCE_DIRECTSOUND
@@ -188,13 +203,6 @@
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
  //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR
-#endif
-
-//==============================================================================
-// lvtk_core flags:
-
-#ifndef    LVTK_USE_CXX11
- //#define LVTK_USE_CXX11
 #endif
 
 

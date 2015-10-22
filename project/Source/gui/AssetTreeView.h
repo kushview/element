@@ -29,7 +29,6 @@ namespace Gui {
                                public ValueTree::Listener
     {
     public:
-
         AssetTreeViewItem (const AssetTree::Item& item);
         ~AssetTreeViewItem();
 
@@ -62,8 +61,8 @@ namespace Gui {
         // value tree
         void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
         void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
-        void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved) override;
-        void valueTreeChildOrderChanged (ValueTree& parentTree) override;
+        void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int) override;
+        void valueTreeChildOrderChanged (ValueTree& parentTree, int, int) override;
         void valueTreeParentChanged (ValueTree& tree) override;
 
         AssetTree::Item item;

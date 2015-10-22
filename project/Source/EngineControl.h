@@ -37,7 +37,7 @@ namespace Element {
     public:
 
         typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-        typedef GraphProcessor::Node::Ptr NodePtr;
+        typedef GraphNodePtr NodePtr;
 
         ~EngineControl();
 
@@ -77,12 +77,12 @@ namespace Element {
         bool validateRequiredNodes();
 
         friend class ValueTree;
-        virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
-        virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
-        virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved);
-        virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved);
-        virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged);
-        virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
+        void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override;
+        void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
+        void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int) override;
+        void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved, int, int) override;
+        void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
+        void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
     };
 
 }

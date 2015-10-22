@@ -61,7 +61,6 @@ namespace Element {
             setRootGraph (nullptr);
         }
 
-        //==============================================================================
         void setRootGraph (GraphProcessor* const nextGraph)
         {
             if (processor != nextGraph)
@@ -92,7 +91,6 @@ namespace Element {
             }
         }
 
-        //==============================================================================
         void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                     float** const outputChannelData, const int numOutputChannels,
                                     const int numSamples)
@@ -217,8 +215,6 @@ namespace Element {
         }
 
     private:
-
-        //==============================================================================
         GraphProcessor* processor;
         CriticalSection lock;
         double sampleRate;
@@ -292,30 +288,23 @@ namespace Element {
         c->addFilter (fmt->description (InternalFormat::midiInputDevice));
     }
 
-    AudioIODeviceCallback&
-    AudioEngine::callback()
-    {
-        assert (cb != nullptr);
-        return *cb;
-    }
-
-    ClipFactory&
-    AudioEngine::clips()
+    AudioIODeviceCallback&  AudioEngine::callback()              { assert (cb != nullptr); return *cb; }
+    MidiInputCallback&      AudioEngine::getMidiInputCallback()  { assert (cb != nullptr); return *cb; }
+    
+    ClipFactory& AudioEngine::clips()
     {
         assert (priv->clips != nullptr);
         return *priv->clips;
     }
 
-    Shared<EngineControl>
-    AudioEngine::controller()
+    Shared<EngineControl> AudioEngine::controller()
     {
         if (priv->controller == nullptr)
             priv->controller = Shared<EngineControl> (new EngineControl (*this));
         return priv->controller;
     }
 
-    void
-    AudioEngine::deactivate()
+    void AudioEngine::deactivate()
     {
         cb->setRootGraph (nullptr);
         globals().devices().removeMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
@@ -326,14 +315,12 @@ namespace Element {
 
     Globals& AudioEngine::globals() { return world; }
 
-    GraphProcessor&
-    AudioEngine::graph()
+    GraphProcessor& AudioEngine::graph()
     {
         return priv->graph;
     }
 
-    Transport*
-    AudioEngine::transport()
+    Transport* AudioEngine::transport()
     {
         return &priv->transport;
     }

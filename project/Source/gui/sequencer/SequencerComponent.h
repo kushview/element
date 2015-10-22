@@ -29,12 +29,11 @@ namespace Gui {
     class GuiApp;
     class SequencerClipItem;
 
-    class SequencerComponent : public TimelineBase,
+    class SequencerComponent : public TimelineComponent,
                                public DragAndDropTarget,
                                public ValueTree::Listener
     {
     public:
-
         SequencerComponent (GuiApp& gui);
         ~SequencerComponent();
 
@@ -73,8 +72,8 @@ namespace Gui {
         friend class ValueTree;
         void valueTreePropertyChanged (ValueTree& tree, const Identifier& property);
         void valueTreeChildAdded (ValueTree& parent, ValueTree& child);
-        void valueTreeChildRemoved (ValueTree& parent, ValueTree& child);
-        void valueTreeChildOrderChanged (ValueTree& parent);
+        void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int);
+        void valueTreeChildOrderChanged (ValueTree& parent, int, int);
         void valueTreeParentChanged (ValueTree& tree);
         void valueTreeRedirected (ValueTree &tree);
 

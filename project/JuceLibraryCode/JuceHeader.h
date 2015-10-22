@@ -17,6 +17,7 @@
 #include "modules/element_base/element_base.h"
 #include "modules/element_engines/element_engines.h"
 #include "modules/element_gui/element_gui.h"
+#include "modules/element_lv2/element_lv2.h"
 #include "modules/element_models/element_models.h"
 #include "modules/juce_audio_basics/juce_audio_basics.h"
 #include "modules/juce_audio_devices/juce_audio_devices.h"
@@ -31,8 +32,6 @@
 #include "modules/juce_gui_basics/juce_gui_basics.h"
 #include "modules/juce_gui_extra/juce_gui_extra.h"
 #include "modules/juce_opengl/juce_opengl.h"
-#include "modules/lvtk_core/lvtk_core.h"
-#include "modules/lvtk_plugins/lvtk_plugins.h"
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE
  // If your code uses a lot of JUCE classes, then this will obviously save you
@@ -40,11 +39,13 @@
  using namespace juce;
 #endif
 
+#if ! JUCE_DONT_DECLARE_PROJECTINFO
 namespace ProjectInfo
 {
     const char* const  projectName    = "Element";
     const char* const  versionString  = "0.0.1";
     const int          versionNumber  = 0x1;
 }
+#endif
 
 #endif   // __APPHEADERFILE_UNTEAW__

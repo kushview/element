@@ -22,15 +22,8 @@
 
 #include "element/Juce.h"
 
-namespace juce {
-
-    class AudioIODeviceCallback;
-
-}
 
 namespace Element {
-
-
     class Globals;
     class EngineControl;
     class PatternInterface;
@@ -56,8 +49,9 @@ namespace Element {
         Transport* transport();
 
         // Engine methods
-        AudioIODeviceCallback& callback();
-
+        AudioIODeviceCallback& callback() override;
+        MidiInputCallback& getMidiInputCallback() override;
+        
     private:
 
         class Callback;
@@ -68,6 +62,8 @@ namespace Element {
 
         Globals& world;
     };
+    
+    typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
 }
 
 #endif // ELEMENT_AUDIO_ENGINE_H

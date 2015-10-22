@@ -50,15 +50,13 @@ namespace Gui {
         session.reset();
     }
 
-    void
-    SequencerComponent::clipClicked (TimelineClip *clip, const MouseEvent&)
+    void SequencerComponent::clipClicked (TimelineClip *clip, const MouseEvent&)
     {
         //ContentComponent* cc = findParentComponentOfClass<ContentComponent>();
         // cc->stabilize();
     }
 
-    void
-    SequencerComponent::clipDoubleClicked (TimelineClip *clip, const MouseEvent &clipEvent)
+    void SequencerComponent::clipDoubleClicked (TimelineClip *clip, const MouseEvent &clipEvent)
     {
 #if 0
         if (SequencerClipItem* c = dynamic_cast<SequencerClipItem*> (clip))
@@ -79,43 +77,37 @@ namespace Gui {
     }
 
 
-    int
-    SequencerComponent::getNumTracks() const
+    int SequencerComponent::getNumTracks() const
     {
         return session->numTracks();
     }
 
-    bool
-    SequencerComponent::isInterestedInDragSource (const SourceDetails& details)
+    bool SequencerComponent::isInterestedInDragSource (const SourceDetails& details)
     {
         File file (details.description.toString());
         return file.existsAsFile();
     }
 
-    void
-    SequencerComponent::itemDragEnter (const SourceDetails& details)
+    void SequencerComponent::itemDragEnter (const SourceDetails& details)
     {
         dropTrack = trackAt (details.localPosition);
         if (dropTrack > session->numTracks())
             dropTrack = session->numTracks();
     }
 
-    void
-    SequencerComponent::itemDragMove (const SourceDetails& details)
+    void SequencerComponent::itemDragMove (const SourceDetails& details)
     {
         dropTrack = trackAt (details.localPosition);
         if (dropTrack > session->numTracks())
             dropTrack = session->numTracks();
     }
 
-    void
-    SequencerComponent::itemDragExit (const SourceDetails& details)
+    void SequencerComponent::itemDragExit (const SourceDetails& details)
     {
         dropTrack = -1;
     }
 
-    void
-    SequencerComponent::itemDropped (const SourceDetails& details)
+    void SequencerComponent::itemDropped (const SourceDetails& details)
     {
         const bool droppedOnHeader = details.localPosition.getX() < getTrackWidth();
 
@@ -136,8 +128,7 @@ namespace Gui {
     }
 
 
-    void
-    SequencerComponent::paintTrackHeader (Graphics &g, int track, const Rectangle<int> &area)
+    void SequencerComponent::paintTrackHeader (Graphics &g, int track, const Rectangle<int> &area)
     {
         Session::Track t (session->getTrack (track));
 
@@ -151,16 +142,14 @@ namespace Gui {
         }
     }
 
-    void
-    SequencerComponent::paintTrackLane (Graphics&, int /*track*/, const Rectangle<int>& /*area*/)
+    void SequencerComponent::paintTrackLane (Graphics&, int /*track*/, const Rectangle<int>& /*area*/)
     {
 
     }
 
 
 
-    void
-    SequencerComponent::timerCallback()
+    void SequencerComponent::timerCallback()
     {
         if (! pos)
             pos = session->playbackMonitor();
@@ -169,14 +158,12 @@ namespace Gui {
             indicator()->setPosition (pos->get(), false);
     }
 
-    void
-    SequencerComponent::timelineBodyClicked (const MouseEvent &ev, int track)
+    void SequencerComponent::timelineBodyClicked (const MouseEvent &ev, int track)
     {
 
     }
 
-    void
-    SequencerComponent::timelineTrackHeadersClicked (const MouseEvent &ev, int t)
+    void SequencerComponent::timelineTrackHeadersClicked (const MouseEvent &ev, int t)
     {
         if (t < session->numTracks())
         {
@@ -211,14 +198,12 @@ namespace Gui {
     }
 
 
-    void
-    SequencerComponent::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+    void SequencerComponent::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
 
     }
 
-    void
-    SequencerComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void SequencerComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     {
         if (parent.hasType (Slugs::sequence) && child.hasType (Slugs::track))
         {
@@ -254,8 +239,7 @@ namespace Gui {
         }
     }
 
-    void
-    SequencerComponent::valueTreeChildRemoved (ValueTree& parent, ValueTree& child)
+    void SequencerComponent::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
     {
         if (parent.hasType (Slugs::sequence) && child.hasType (Slugs::track))
         {
@@ -271,22 +255,19 @@ namespace Gui {
         }
     }
 
-    void
-    SequencerComponent::valueTreeChildOrderChanged (ValueTree& parent)
+    void SequencerComponent::valueTreeChildOrderChanged (ValueTree& parent, int, int)
     {
         if (parent == this->state) {
             valueTreeRedirected (parent);
         }
     }
 
-    void
-    SequencerComponent::valueTreeParentChanged (ValueTree& tree)
+    void SequencerComponent::valueTreeParentChanged (ValueTree& tree)
     {
 
     }
 
-    void
-    SequencerComponent::valueTreeRedirected (ValueTree &tree)
+    void SequencerComponent::valueTreeRedirected (ValueTree &tree)
     {
         if (tree != this->state)
             return;
@@ -307,8 +288,7 @@ namespace Gui {
         }
     }
 
-    void
-    SequencerComponent::recycleSequencerClip (SequencerClipItem* clip)
+    void SequencerComponent::recycleSequencerClip (SequencerClipItem* clip)
     {
         clipList.removeAllInstancesOf (clip);
         clip->reset();

@@ -23,8 +23,6 @@
 #include "MediaManager.h"
 #include "URIs.h"
 
-using namespace lvtk;
-
 namespace Element {
 
     Settings::Settings()
@@ -54,10 +52,11 @@ namespace Element {
             : owner(g), symbols()
         {
             lv2      = new LV2World();
-            plugins  = new PluginManager (*lv2);
+            plugins  = new PluginManager();
             devices  = new DeviceManager();
             media    = new MediaManager();
             settings = new Settings();
+            uridMap  = symbols.createMapFeature();
         }
 
         void freeAll()
@@ -74,23 +73,22 @@ namespace Element {
 
         Globals& owner;
         SymbolMap symbols;
-
+        
+        AudioEnginePtr               engine;
+        ScopedPointer<LV2Feature>    uridMap;
         ScopedPointer<DeviceManager> devices;
         ScopedPointer<LV2World>      lv2;
         ScopedPointer<MediaManager>  media;
         ScopedPointer<PluginManager> plugins;
         ScopedPointer<Settings>      settings;
         ScopedPointer<Session>       session;
-
-    private:
-
     };
 
     Globals::Globals()
     {
         impl = new Internal (*this);
-        uris = new URIs();
-        //uris = new Element::URIs (boost::bind (&SymbolMap::map, &impl->symbols, ::_1));
+        const LV2_Feature* f = impl->uridMap->getFeature();
+        uris = new URIs ((LV2_URID_Map*) f->data);
     }
 
     Globals::~Globals()
@@ -99,13 +97,15 @@ namespace Element {
         uris = nullptr;
     }
 
-    DeviceManager& Globals::devices() { return *impl->devices.get(); }
+    DeviceManager& Globals::devices() { return *impl->devices; }
     MediaManager& Globals::media()
     {
         assert (impl->media != nullptr);
         return *impl->media;
     }
 
+    AudioEnginePtr Globals::engine() const { return impl->engine; }
+    
     PluginManager& Globals::plugins()
     {
         assert (impl->plugins != nullptr);
@@ -119,28 +119,25 @@ namespace Element {
         return *impl->settings;
     }
 
-    SymbolMap&
-    Globals::symbols()
+    SymbolMap& Globals::symbols()
     {
         return impl->symbols;
     }
 
-    Session&
-    Globals::session()
+    Session& Globals::session()
     {
         assert (impl->session != nullptr);
         return *impl->session;
     }
 
-    void
-    Globals::setEngine (Shared<Engine> engine)
+    void Globals::setEngine (EnginePtr engine)
     {
-        WorldBase::setEngine (engine);
-
+        impl->engine = engine;
+        
         if (impl->session == nullptr) {
             impl->session = new Session (*this);
         }
-
+        
         devices().attach (engine);
     }
 }

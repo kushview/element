@@ -29,23 +29,19 @@
 
 
 namespace Element {
-
-
     class Session::Private
     {
     public:
-
         Private (Session& s, Globals& g)
             : session (s)
         {
-            engine = dynamicPtrCast<AudioEngine> (g.engine());
+            engine = g.engine();
             assert (engine != nullptr);
             playMonitor = engine->transport()->monitor();
             graph = engine->controller();
             assert (graph != nullptr);
 
             assets = new SessionAssets (session);
-            // assets->setFile (f);
         }
 
         ~Private() { }
@@ -75,15 +71,13 @@ namespace Element {
         }
 
     private:
-
         friend class Session;
         Session&                     session;
         ScopedPointer<SessionAssets> assets;
 
-        Shared<AudioEngine>     engine;
+        AudioEnginePtr          engine;
         Shared<EngineControl>   graph;
         Shared<PlaybackMonitor> playMonitor;
-
     };
 
     Session::Session (Globals& g)
@@ -144,8 +138,7 @@ namespace Element {
         return seq.isValid() ? seq.getNumChildren() : 0;
     }
 
-    Session::Track
-    Session::getTrack (int index)
+    Session::Track Session::getTrack (int index)
     {
         ValueTree track (ValueTree::invalid);
 
@@ -157,8 +150,7 @@ namespace Element {
 
     Shared<PlaybackMonitor> Session::playbackMonitor() { return priv->playMonitor; }
 
-    void
-    Session::clear()
+    void Session::clear()
     {
         clearTracks();
         close();
@@ -166,8 +158,7 @@ namespace Element {
         setMissingProperties (true);
     }
 
-    void
-    Session::clearTracks()
+    void Session::clearTracks()
     {
         sequenceNode().removeAllChildren (undoManager());
     }
@@ -183,21 +174,18 @@ namespace Element {
         controller()->close();
     }
 
-    Shared<EngineControl>
-    Session::controller()
+    Shared<EngineControl> Session::controller()
     {
         return priv->graph;
     }
 
-    MediaManager&
-    Session::media()
+    MediaManager& Session::media()
     {
         return globals().media();
     }
 
 
-    Globals&
-    Session::globals()
+    Globals& Session::globals()
     {
         return owner;
     }
@@ -243,23 +231,20 @@ namespace Element {
 
     }
 
-    void
-    Session::testSetTempo (double tempo)
+    void Session::testSetTempo (double tempo)
     {
         setProperty ("tempo", tempo);
         Shared<EngineControl> c (controller());
         c->setTempo (node().getProperty ("tempo", 120.0f));
     }
 
-    void
-    Session::testSetPlaying (bool isPlaying)
+    void Session::testSetPlaying (bool isPlaying)
     {
         Shared<EngineControl> c (controller());
         c->setPlaying (isPlaying);
     }
 
-    void
-    Session::testSetRecording (bool isRecording)
+    void Session::testSetRecording (bool isRecording)
     {
         Shared<EngineControl> c (controller());
         c->setRecording (isRecording);
@@ -270,8 +255,7 @@ namespace Element {
         std::clog << node().toXmlString() << std::endl;
     }
 
-    void
-    Session::polishXml (XmlElement &e)
+    void Session::polishXml (XmlElement &e)
     {
         // remove generated properties from the engine
         const char* sa[] = { "node", "block", nullptr };
@@ -283,8 +267,7 @@ namespace Element {
                     t->removeAttribute (a);
     }
 
-    void
-    Session::setMissingProperties (bool resetExisting)
+    void Session::setMissingProperties (bool resetExisting)
     {
         if (! node().hasProperty (Slugs::name) || resetExisting)
             setProperty (Slugs::name, "Untited Session");
@@ -298,14 +281,12 @@ namespace Element {
             seq.removeAllChildren (nullptr);
     }
 
-    void
-    Session::timerCallback()
+    void Session::timerCallback()
     {
 
     }
 
-    void
-    Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+    void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
         if (tree != projectState)
             return;
@@ -317,32 +298,27 @@ namespace Element {
         }
     }
 
-    void
-    Session::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
+    void Session::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
     {
         notifyChanged();
     }
 
-    void
-    Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child)
+    void Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
     {
         notifyChanged();
     }
 
-    void
-    Session::valueTreeChildOrderChanged (ValueTree& parent)
+    void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int)
     {
         notifyChanged();
     }
 
-    void
-    Session::valueTreeParentChanged (ValueTree& tree)
+    void Session::valueTreeParentChanged (ValueTree& tree)
     {
         notifyChanged();
     }
 
-    void
-    Session::valueTreeRedirected (ValueTree& tree)
+    void Session::valueTreeRedirected (ValueTree& tree)
     {
         if (tree != projectState)
             return;
@@ -351,22 +327,18 @@ namespace Element {
         notifyChanged();
     }
 
-    SequenceModel
-    Session::sequence() const {
+    SequenceModel Session::sequence() const {
         SequenceModel model (sequenceNode());
         return model;
     }
 
-
-    ValueTree
-    Session::sequenceNode() const
+    ValueTree Session::sequenceNode() const
     {
         return node().getChildWithName (Slugs::sequence);
     }
 
 
-    ValueTree
-    Session::trackNode (int trackIndex) const
+    ValueTree Session::trackNode (int trackIndex) const
     {
         if (isPositiveAndBelow (trackIndex, numTracks()))
             return sequenceNode().getChild (trackIndex);

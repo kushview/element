@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.0.1"
-              bundleIdentifier="org.element-project.Element" includeBinaryInAppConfig="1"
-              jucerVersion="3.1.0" companyName="The Element Project">
+              bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
+              jucerVersion="3.2.0" companyName="Kushview, LLC" companyWebsite="https://kushview.net"
+              companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
       <FILE id="meVC0a" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
@@ -160,56 +161,54 @@
                        targetName="Element"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="juce_audio_plugin_client" path="../libs/juce/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="element_base" path="../modules"/>
-        <MODULEPATH id="element_models" path="../modules"/>
-        <MODULEPATH id="element_gui" path="../modules"/>
-        <MODULEPATH id="element_engines" path="../modules"/>
-        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="default" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/element/include&#10;/opt/element/include/lilv-0&#10;/opt/element/include/suil-0&#10;../../Source"
-                       cppLibType="libc++" libraryPath="/opt/element/lib"/>
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.7 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source"
+                       cppLibType="libc++" libraryPath="/opt/kushview/lib"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="default" osxArchitecture="default"
                        isDebug="0" optimisation="2" targetName="Element"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="element_base" path="../modules"/>
-        <MODULEPATH id="element_models" path="../modules"/>
-        <MODULEPATH id="element_gui" path="../modules"/>
-        <MODULEPATH id="element_engines" path="../modules"/>
-        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" externalLibraries="lilv-0&#10;suil-0&#10;sratom-0&#10;sord-0&#10;serd-0"
@@ -223,32 +222,31 @@
                        libraryPath="/opt/element/arm/lib" cppLibType="libc++"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="element_models" path="../modules"/>
-        <MODULEPATH id="element_gui" path="../modules"/>
-        <MODULEPATH id="element_engines" path="../modules"/>
-        <MODULEPATH id="element_base" path="../modules"/>
-        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/modules"/>
+        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
     <ANDROID targetFolder="Builds/Android" androidActivityClass="com.yourcompany.Element"
              androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
              androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
              androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
-             androidKeyAliasPass="android">
+             androidKeyAliasPass="android" androidVersionCode="1" androidCpp11="1">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
                        optimisation="1" targetName="Element"/>
@@ -256,25 +254,24 @@
                        optimisation="2" targetName="Element"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="lvtk_plugins" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="lvtk_core" path="../../lvtk-juce/modules"/>
-        <MODULEPATH id="juce_opengl" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../libjuce/src/modules"/>
-        <MODULEPATH id="element_models" path="../modules"/>
-        <MODULEPATH id="element_gui" path="../modules"/>
-        <MODULEPATH id="element_engines" path="../modules"/>
-        <MODULEPATH id="element_base" path="../modules"/>
+        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/modules"/>
       </MODULEPATHS>
     </ANDROID>
   </EXPORTFORMATS>
@@ -282,6 +279,7 @@
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_engines" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_gui" showAllCode="1" useLocalCopy="0"/>
+    <MODULES id="element_lv2" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="element_models" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
@@ -296,8 +294,6 @@
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="lvtk_core" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="lvtk_plugins" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_FORCE_DEBUG="disabled" JUCE_LOG_ASSERTIONS="disabled"
                JUCE_CHECK_MEMORY_LEAKS="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"

@@ -20,19 +20,14 @@
 #ifndef ELEMENT_APP_URIS_H
 #define ELEMENT_APP_URIS_H
 
-#define BEATTHANG_URI "http://bketech.com/ns/beatthang"
+#define ELEMENT_URI "http://bketech.com/ns/beatthang"
 
-#define ELEMENT_ABOUT_BOX       BEATTHANG_URI "#aboutBox"
-#define ELEMENT_PREFERENCES     BEATTHANG_URI "#preferences"
-#define ELEMENT_LEGACY_WINDOW   BEATTHANG_URI "#legacyWindow"
-#define ELEMENT_PLUGIN_MANAGER  BEATTHANG_URI "#pluginManager"
+#define ELEMENT_ABOUT_BOX       ELEMENT_URI "#aboutBox"
+#define ELEMENT_PREFERENCES     ELEMENT_URI "#preferences"
+#define ELEMENT_LEGACY_WINDOW   ELEMENT_URI "#legacyWindow"
+#define ELEMENT_PLUGIN_MANAGER  ELEMENT_URI "#pluginManager"
 
 namespace Element {
-
-    class URIs {
-    public:
-        URIs() { }
-    };
     
 }
 
