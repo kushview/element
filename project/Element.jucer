@@ -6,7 +6,6 @@
               companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
-      <FILE id="meVC0a" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
       <GROUP id="{9D81DCFF-DB26-1A72-3BD4-1BDA4F7ACD20}" name="element">
         <FILE id="IodT8T" name="Juce.h" compile="0" resource="0" file="Source/element/Juce.h"/>
       </GROUP>
@@ -26,11 +25,6 @@
         <FILE id="E57z3S" name="Transport.cpp" compile="1" resource="0" file="Source/engine/Transport.cpp"/>
         <FILE id="tudcrT" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
       </GROUP>
-      <FILE id="aDemQ1" name="EngineControl.cpp" compile="1" resource="0"
-            file="Source/EngineControl.cpp"/>
-      <FILE id="jQ2DDS" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
-      <FILE id="djygWc" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
-      <FILE id="O9DyEs" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
         <GROUP id="{67202292-90BD-7BFB-9A42-F0230FF90AA1}" name="alerts">
           <FILE id="SU6pR4" name="AlertBackground.cpp" compile="1" resource="0"
@@ -50,6 +44,26 @@
           <FILE id="FpwQRN" name="YesNoCancelButtonBar.h" compile="0" resource="0"
                 file="Source/gui/alerts/YesNoCancelButtonBar.h"/>
         </GROUP>
+        <GROUP id="{6820113F-0D75-668F-CD3F-9AE13CDEA59E}" name="layouts">
+          <FILE id="kC3NS8" name="NewSessionView.cpp" compile="1" resource="0"
+                file="Source/gui/layouts/NewSessionView.cpp"/>
+          <FILE id="Hs34Q7" name="NewSessionView.h" compile="0" resource="0"
+                file="Source/gui/layouts/NewSessionView.h"/>
+        </GROUP>
+        <GROUP id="{49EC061E-7260-D9E0-79C4-167BA10CEB0C}" name="sequencer">
+          <FILE id="Mz2q7f" name="MidiEditorComponent.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/MidiEditorComponent.cpp"/>
+          <FILE id="YYNkJa" name="MidiEditorComponent.h" compile="0" resource="0"
+                file="Source/gui/sequencer/MidiEditorComponent.h"/>
+          <FILE id="p9VHQK" name="SequencerClipItem.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/SequencerClipItem.cpp"/>
+          <FILE id="Dn9y1k" name="SequencerClipItem.h" compile="0" resource="0"
+                file="Source/gui/sequencer/SequencerClipItem.h"/>
+          <FILE id="U2k3WH" name="SequencerComponent.cpp" compile="1" resource="0"
+                file="Source/gui/sequencer/SequencerComponent.cpp"/>
+          <FILE id="uli3uX" name="SequencerComponent.h" compile="0" resource="0"
+                file="Source/gui/sequencer/SequencerComponent.h"/>
+        </GROUP>
         <FILE id="q6ARgY" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
         <FILE id="u5QRQK" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
         <FILE id="b3ezcp" name="AssetTreeView.cpp" compile="1" resource="0"
@@ -67,12 +81,6 @@
         <FILE id="nzVetO" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
         <FILE id="MH01yi" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="dsnPTB" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
-        <GROUP id="{6820113F-0D75-668F-CD3F-9AE13CDEA59E}" name="layouts">
-          <FILE id="kC3NS8" name="NewSessionView.cpp" compile="1" resource="0"
-                file="Source/gui/layouts/NewSessionView.cpp"/>
-          <FILE id="Hs34Q7" name="NewSessionView.h" compile="0" resource="0"
-                file="Source/gui/layouts/NewSessionView.h"/>
-        </GROUP>
         <FILE id="EzYpBN" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="W340hp" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="c2QXJ3" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
@@ -89,20 +97,6 @@
               file="Source/gui/PreferencesWidget.cpp"/>
         <FILE id="QOyaRs" name="PreferencesWidget.h" compile="0" resource="0"
               file="Source/gui/PreferencesWidget.h"/>
-        <GROUP id="{49EC061E-7260-D9E0-79C4-167BA10CEB0C}" name="sequencer">
-          <FILE id="Mz2q7f" name="MidiEditorComponent.cpp" compile="1" resource="0"
-                file="Source/gui/sequencer/MidiEditorComponent.cpp"/>
-          <FILE id="YYNkJa" name="MidiEditorComponent.h" compile="0" resource="0"
-                file="Source/gui/sequencer/MidiEditorComponent.h"/>
-          <FILE id="p9VHQK" name="SequencerClipItem.cpp" compile="1" resource="0"
-                file="Source/gui/sequencer/SequencerClipItem.cpp"/>
-          <FILE id="Dn9y1k" name="SequencerClipItem.h" compile="0" resource="0"
-                file="Source/gui/sequencer/SequencerClipItem.h"/>
-          <FILE id="U2k3WH" name="SequencerComponent.cpp" compile="1" resource="0"
-                file="Source/gui/sequencer/SequencerComponent.cpp"/>
-          <FILE id="uli3uX" name="SequencerComponent.h" compile="0" resource="0"
-                file="Source/gui/sequencer/SequencerComponent.h"/>
-        </GROUP>
         <FILE id="l4H6lD" name="SessionDocument.cpp" compile="1" resource="0"
               file="Source/gui/SessionDocument.cpp"/>
         <FILE id="mmYTVp" name="SessionDocument.h" compile="0" resource="0"
@@ -126,10 +120,6 @@
         <FILE id="vZJpkW" name="Workspace.cpp" compile="1" resource="0" file="Source/gui/Workspace.cpp"/>
         <FILE id="hhM5Pk" name="Workspace.h" compile="0" resource="0" file="Source/gui/Workspace.h"/>
       </GROUP>
-      <FILE id="moNtLr" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="G3RL4B" name="MediaManager.cpp" compile="1" resource="0"
-            file="Source/MediaManager.cpp"/>
-      <FILE id="jRNQNP" name="MediaManager.h" compile="0" resource="0" file="Source/MediaManager.h"/>
       <GROUP id="{7E83EE43-F00D-510F-6D74-A0FE29898974}" name="models"/>
       <GROUP id="{959D9C20-2195-B4BC-B551-03A49A96C76F}" name="session">
         <FILE id="uRlZKO" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
@@ -140,6 +130,16 @@
         <FILE id="DmoZ07" name="SessionTrack.cpp" compile="1" resource="0"
               file="Source/session/SessionTrack.cpp"/>
       </GROUP>
+      <FILE id="meVC0a" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
+      <FILE id="aDemQ1" name="EngineControl.cpp" compile="1" resource="0"
+            file="Source/EngineControl.cpp"/>
+      <FILE id="jQ2DDS" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
+      <FILE id="djygWc" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
+      <FILE id="O9DyEs" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
+      <FILE id="moNtLr" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="G3RL4B" name="MediaManager.cpp" compile="1" resource="0"
+            file="Source/MediaManager.cpp"/>
+      <FILE id="jRNQNP" name="MediaManager.h" compile="0" resource="0" file="Source/MediaManager.h"/>
       <FILE id="laEfik" name="URIs.h" compile="0" resource="0" file="Source/URIs.h"/>
       <FILE id="ZImDHV" name="wscript_build" compile="0" resource="0" file="Source/wscript_build"/>
     </GROUP>
@@ -300,5 +300,5 @@
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
                JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
-               JUCE_USE_CDBURNER="disabled"/>
+               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled"/>
 </JUCERPROJECT>
