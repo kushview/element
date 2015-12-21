@@ -17,72 +17,131 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "JuceHeader.h"
+#include "element/Juce.h"
+#include "controllers/AppController.h"
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
-#include "session/Session.h"
 #include "gui/Alerts.h"
 #include "gui/GuiApp.h"
+#include "session/Session.h"
 #include "Globals.h"
-
-
-namespace juce {
-    extern void initEGL();
-}
+#include "Settings.h"
 
 namespace Element {
 
-class Application  : public JUCEApplication, public Timer
+class StartupThread :  public Thread
 {
-
-    Scoped<Globals>     world;
-    AudioEnginePtr      engine;
-    Scoped<Gui::GuiApp> gui;
-
 public:
+    StartupThread (Globals& w)
+        : Thread ("element_startup"),
+          world (w)
+    { }
 
+    ~StartupThread() { }
+
+    void run() override
+    {
+        Settings& settings (world.settings());
+        if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
+             world.devices().initialise (16, 16, dxml.get(), true, "default", nullptr);
+
+        AudioEnginePtr engine = new AudioEngine (world);
+        world.setEngine (engine); // this will also instantiate the session
+
+        // global data is ready, so now we can start using it;
+        PluginManager& plugins (world.plugins());
+        plugins.addDefaultFormats();
+        plugins.addFormat (new InternalFormat (*engine));
+        plugins.restoreUserPlugins (settings);
+
+        engine->activate();
+
+        world.loadModule ("test");
+        controller = new AppController (world);
+    }
+
+    void launchApplication()
+    {
+        if (world.cli.fullScreen)
+        {
+            Desktop::getInstance().setKioskModeComponent(&screen, false);
+            screen.setVisible (true);
+        }
+
+        startThread();
+
+        while (isThreadRunning()) {
+            MessageManager::getInstance()->runDispatchLoopUntil (30);
+        }
+
+        screen.removeFromDesktop();
+    }
+
+
+
+    ScopedPointer<AppController> controller;
+
+private:
+  class StartupScreen :  public TopLevelWindow
+  {
+  public:
+    StartupScreen()
+        : TopLevelWindow ("startup", true)
+    {
+        text.setText ("Loading Application", dontSendNotification);
+        text.setSize (100, 100);
+        text.setFont (Font (24.0f));
+        text.setJustificationType (Justification::centred);
+        text.setColour (Label::textColourId, Colours::white);
+        addAndMakeVisible (text);
+        centreWithSize (text.getWidth(), text.getHeight());
+    }
+
+    void resized() override {
+        text.setBounds (getLocalBounds());
+    }
+
+    void paint (Graphics& g) override {
+        g.fillAll (Colours::transparentBlack);
+    }
+
+  private:
+      Label text;
+  } screen;
+
+  Globals& world;
+};
+
+class Application  : public JUCEApplication
+{
+public:
    Application() { }
    virtual ~Application() { }
-    
+
    const String getApplicationName()       { return "Element"; }
-   const String getApplicationVersion()    { return ProjectInfo::versionString; }
+   const String getApplicationVersion()    { return ELEMENT_VERSION_STRING; }
    bool moreThanOneInstanceAllowed()       { return true; }
 
-
-   void initialise (const String& /* commandLine */)
+   void initialise (const String&  commandLine )
    {
-       world = new Globals();
+#if JUCE_DEBUG
+       const File path (File::getSpecialLocation (File::invokedExecutableFile));
+       const String ep = path.getParentDirectory().getChildFile("modules").getFullPathName();
+       DBG("path: " << ep);
+       setenv("ELEMENT_MODULE_PATH", ep.toRawUTF8(), 1);
+       DBG("module_path: " << getenv("ELEMENT_MODULE_PATH"));
+#endif
 
-       Settings& settings (world->settings());
-       if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
-            world->devices().initialise (16, 16, dxml.get(), true, "default", nullptr);
-
-       engine = new AudioEngine (*world);
-       world->setEngine (engine); // this will also instantiate the session
-
-       // global data is ready, so now we can start using it;
-       PluginManager& plugins (world->plugins());
-       plugins.addDefaultFormats();
-       plugins.addFormat (new InternalFormat (*engine));
-       plugins.restoreUserPlugins (settings);
+       world = new Globals (commandLine);
+       {
+           StartupThread startup (*world);
+           startup.launchApplication();
+           controller = startup.controller.release();
+           engine = world->engine();
+       }
 
        gui = Gui::GuiApp::create (*world);
-
-       engine->activate();
        gui->run();
-
-       Logger::writeToLog ("Gui is running...");
-   }
-
-
-   void timerCallback()
-   {
-        static bool hasQuit = false;
-        if (! hasQuit)
-        {
-            hasQuit = true;
-            quit();
-        }
    }
 
    void shutdown()
@@ -100,12 +159,12 @@ public:
        engine->deactivate();
        world->setEngine (nullptr);
        engine = nullptr;
+
+       world->unloadModules();
        world = nullptr;
    }
 
-   //==============================================================================
-   void
-   systemRequestedQuit()
+   void systemRequestedQuit()
    {
        if (gui->shutdownApp())
        {
@@ -114,13 +173,29 @@ public:
        }
    }
 
-   void
-   anotherInstanceStarted (const String& commandLine)
+   void anotherInstanceStarted (const String& /*commandLine*/)
    {
 
    }
 
+   bool perform (const InvocationInfo& info) override
+   {
+       switch (info.commandID) {
+           case Commands::quit: {
+               this->systemRequestedQuit();
+           } break;
+       }
+
+       return true;
+   }
+
+private:
+    ScopedPointer<Globals>  world;
+    AudioEnginePtr          engine;
+    Scoped<Gui::GuiApp>     gui;
+    ScopedPointer<AppController> controller;
 };
+
 }
 
 START_JUCE_APPLICATION (Element::Application)

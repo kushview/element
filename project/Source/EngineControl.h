@@ -24,7 +24,6 @@
 #include "session/Session.h"
 
 namespace Element {
-
     class AudioEngine;
     class Globals;
     class Instrument;
@@ -35,7 +34,6 @@ namespace Element {
                            public  ValueTree::Listener
     {
     public:
-
         typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
         typedef GraphNodePtr NodePtr;
 
@@ -53,12 +51,10 @@ namespace Element {
         GraphController* createSequenceController ();
 
     protected:
-
         friend class AudioEngine;
         EngineControl (AudioEngine& engine);
 
     private:
-
         /** Adds a plugin to the root graph */
         NodePtr addRootPlugin (IOProcessor::IODeviceType ioType);
         NodePtr addRootPlugin (InternalFormat::ID internal);
@@ -84,7 +80,6 @@ namespace Element {
         void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
         void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
     };
-
 }
 
 #endif // ELEMENT_ENGINECONTROL_H

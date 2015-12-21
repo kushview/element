@@ -26,49 +26,44 @@
 
 namespace Element {
 
-    class Instrument;
-    class MediaManager;
-    class Programs;
-    class SampleCache;
-    class SamplerWorld;
-    class Session;
-    class Writer;
+class CommandManager;
+class MediaManager;
+class Session;
+class Settings;
+class Writer;
 
+struct CommandLine {
+    explicit CommandLine (const String& cli = String::empty);
+    bool fullScreen;
+    bool port;
+};
 
-    class Settings :  public ApplicationProperties
-    {
-    public:
+class Globals :  public WorldBase
+{
+public:
+    explicit Globals (const String& commandLine = String::empty);
+    ~Globals();
 
-        Settings();
-        ~Settings();
+    const CommandLine cli;
 
-    };
+    CommandManager& getCommands();
+    DeviceManager& devices();
+    PluginManager& plugins();
+    Settings& settings();
+    SymbolMap& symbols();
+    MediaManager& media();
+    Session& session();
+    AudioEnginePtr engine() const;
 
-    class Globals : public WorldBase
-    {
-    public:
-        ScopedPointer<const URIs> uris;
+    const String& getAppName() const { return appName; }
+    void setEngine (EnginePtr engine);
 
-        Globals();
-        ~Globals();
-
-        DeviceManager& devices();
-        PluginManager& plugins();
-        Settings& settings();
-        SymbolMap& symbols();
-        MediaManager& media();
-        Session& session();
-        AudioEnginePtr engine() const;
-
-        void setEngine (EnginePtr engine);
-
-    private:
-
-        class Internal;
-        ScopedPointer<Internal> impl;
-
-    };
-
+private:
+    String appName;
+    friend class Application;
+    class Impl;
+    ScopedPointer<Impl> impl;
+};
 
 }
 

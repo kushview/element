@@ -17,69 +17,40 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gui/sequencer/SequencerComponent.h"
-#include "gui/Commands.h"
 #include "gui/ContentComponent.h"
-#include "gui/GraphEditorPanel.h"
-#include "gui/GuiApp.h"
-#include "gui/MainWindow.h"
-#include "gui/MainMenu.h"
-#include "gui/SessionTreePanel.h"
 #include "gui/Workspace.h"
-
-#include "session/Session.h"
-
-#include "EngineControl.h"
-#include "Globals.h"
 
 namespace Element {
 namespace Gui {
 
-    ContentComponent::ContentComponent (GuiApp& app_)
-        : gui(app_)
-    {
-        setOpaque (true);
-        addAndMakeVisible (workspace = new Workspace());
+ContentComponent::ContentComponent (GuiApp& app_)
+    : gui (app_)
+{
+    setOpaque (true);
+    addAndMakeVisible (display = new ScreenDisplay());
+    resized();
+}
 
-        Dock& dock (workspace->getDock());
-        DockItem* item = dock.createItem ("test2", "Test 2", Dock::BottomArea);
-        item->setContentOwned (new MidiEditorBody (keyboard));
+ContentComponent::~ContentComponent()
+{
+    toolTips = nullptr;
+}
 
-        item = dock.createItem ("test3", "Test 3", Dock::BottomArea);
-        item->setContentOwned (new MidiEditorBody (keyboard));
-        
-        item = dock.createItem ("test4", "Test 4", Dock::TopArea);
-        item->setContentOwned (new PluginListComponent (app_.globals().plugins().formats(),
-                                                        app_.globals().plugins().availablePlugins(),
-                                                        File::nonexistent, nullptr));
+void ContentComponent::childBoundsChanged (Component* child)
+{
+}
 
-        item = dock.createItem ("test5", "Test 5", Dock::TopArea);
-        item->setContentOwned (new SessionTreePanel (gui));
+void ContentComponent::paint (Graphics &g)
+{
+    g.fillAll (Colours::darkgrey);
+}
 
-        workspace->setMainComponent (new SequencerComponent (gui));
+void ContentComponent::resized()
+{
+    Rectangle<int> r (getLocalBounds());
+    display->setBounds (r.reduced (2));
+}
 
-        resized();
-    }
+GuiApp& ContentComponent::app() { return gui; }
 
-    ContentComponent::~ContentComponent()
-    {
-        toolTips = nullptr;
-    }
-
-    void ContentComponent::childBoundsChanged (Component* child)
-    {
-    }
-
-    void ContentComponent::paint (Graphics &g)
-    {
-        g.fillAll (Colours::darkgrey);
-    }
-
-    void ContentComponent::resized()
-    {
-        Rectangle<int> r (getLocalBounds());
-        workspace->setBounds (r.reduced (2));
-    }
-
-    GuiApp& ContentComponent::app() { return gui; }
 }}

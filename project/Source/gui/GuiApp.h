@@ -22,48 +22,35 @@
 
 #include "element/Juce.h"
 #include "session/Session.h"
+#include "gui/Preferences.h"
+#include "gui/WindowManager.h"
+#include "CommandManager.h"
 #include "URIs.h"
 
-#include "Preferences.h"
-#include "WindowManager.h"
-
 namespace Element {
-
     class EngineControl;
     class Globals;
 
 namespace Gui {
-
     class ContentComponent;
     class MainWindow;
     class SessionDocument;
 
-    class CommandManager :  public ApplicationCommandManager
+    class GuiApp : public ApplicationCommandTarget
     {
     public:
-
-        CommandManager() { }
-        ~CommandManager() { }
-    };
-
-    class GuiApp :  public AppController,
-                    public ApplicationCommandTarget
-    {
-    public:
-
         virtual ~GuiApp();
 
         static GuiApp* create (Globals& globals);
         void run();
 
-        CommandManager& commander() { return commandManager; }
+        CommandManager& commander();
 
         Globals& globals();
 
         /** Open an application window by uri
             Not fully operable, the widget factory needs implemented first */
         void openWindow (const String& uri);
-
         void openWindow (Component* c);
 
         void runDialog (const String& uri);
@@ -99,11 +86,10 @@ namespace Gui {
         virtual bool perform (const InvocationInfo& info);
 
     protected:
-
-        GuiApp (WorldBase&);
+        GuiApp (Globals&);
 
     private:
-
+        Globals& world;
         OpenGLContext render;
         SessionRef sessionRef;
         ScopedPointer<SessionDocument> sessionDoc;
@@ -112,7 +98,6 @@ namespace Gui {
         Scoped<MainWindow>        mainWindow;
         Scoped<ContentComponent>  content;
 
-        CommandManager            commandManager;
         Element::Style       lookAndFeel;
 
         class Dispatch;
@@ -121,9 +106,7 @@ namespace Gui {
         friend class Dispatch;
 
         void showSplash();
-
     };
-
 
 }} /* namespace Element::Gui */
 

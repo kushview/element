@@ -1,0 +1,5 @@
+{
+  "cmd": "python",
+  "args": ["waf", "build"],
+  "sh": false
+}

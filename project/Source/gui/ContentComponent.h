@@ -25,35 +25,29 @@
 namespace Element {
 namespace Gui {
 
-    class SessionRootTreeItem;
-    class SessionTreePanel;
-    class GuiApp;
-    class Workspace;
+class GuiApp;
+class Workspace;
 
-    class ContentComponent :  public Component,
-                              public DragAndDropContainer
-    {
-    public:
+class ContentComponent :  public Component,
+        public DragAndDropContainer
+{
+public:
+    ContentComponent (GuiApp& app);
+    ~ContentComponent();
 
-        ContentComponent (GuiApp& app);
-        ~ContentComponent();
+    void childBoundsChanged (Component* child);
+    void paint (Graphics &g);
+    void resized();
 
-        void childBoundsChanged (Component* child);
-        void paint (Graphics &g);
-        void resized();
+    GuiApp& app();
 
-        GuiApp& app();
+private:
+    GuiApp& gui;
+    ScopedPointer<ScreenDisplay> display;
+    ScopedPointer<Workspace>     workspace;
+    ScopedPointer<TooltipWindow> toolTips;
+};
 
-    private:
-
-        GuiApp& gui;
-        MidiKeyboardState keyboard;
-        ScopedPointer<Workspace>     workspace;
-        ScopedPointer<TooltipWindow> toolTips;
-
-    };
-
-
-}}  /* namespace Element::Gui */
+}}
 
 #endif // ELEMENT_CONTENT_COMPONENT_H

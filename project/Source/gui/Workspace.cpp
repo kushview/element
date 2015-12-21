@@ -23,41 +23,42 @@ namespace Element {
 namespace Gui {
 
 
-Workspace::Workspace ()
+Workspace::Workspace()
 {
-    addAndMakeVisible (dock = new Dock ());
+    addAndMakeVisible (dock = new Dock());
+    setMainComponent (new ScreenDisplay());
+    dock->getBottomArea().setVisible (false);
 }
 
-Workspace::~Workspace() { }
+Workspace::~Workspace()
+{
+    dock = nullptr;
+}
 
-Dock&
-Workspace::getDock()
+Dock& Workspace::getDock()
 {
     jassert (dock != nullptr);
     return *dock;
 }
 
-void
-Workspace::setMainComponent (Component* c)
+void Workspace::setMainComponent (Component* c)
 {
     DockItem* item = dock->createItem ("test", "Test Item", Dock::TopArea);
     item->setContentOwned (c);
+    item->setMaximized (true);
 }
 
-void
-Workspace::paint (Graphics& g)
+void Workspace::paint (Graphics& g)
+{
+    g.fillAll (Colours::black);
+}
+
+void Workspace::mouseDown (const MouseEvent& /*ev*/)
 {
 
 }
 
-void
-Workspace::mouseDown (const MouseEvent& ev)
-{
-
-}
-
-void
-Workspace::resized()
+void Workspace::resized()
 {
     Rectangle<int> b (getLocalBounds());
     dock->setBounds (b.reduced (3));

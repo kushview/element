@@ -20,13 +20,15 @@
 #ifndef ELEMENT_GUI_COMMANDS_H
 #define ELEMENT_GUI_COMMANDS_H
 
-#include <element/Juce.h>
+#include "element/Juce.h"
 
 namespace Element {
 namespace Commands {
+    using namespace StandardApplicationCommandIDs;
 
-    /** Command IDs that map to a BeatThang (gen 1) Hardware Device
-        some of these are also the same command id's as regular app commands */
+    /** Command IDs that map to an Element (gen 1) Hardware Device
+        some of these are also the same command id's as regular app commands
+     */
     enum DeviceButtons
     {
         deviceSong          = 0x8000,
@@ -77,7 +79,6 @@ namespace Commands {
         // Pads
         devicePadPress      = 0x8100,
         devicePadRelease    = 0x8120
-
     };
 
     enum AppCommands
@@ -138,9 +139,10 @@ namespace Commands {
 
    inline void getDeviceTrackCommands (Array<CommandID>& commands)
    {
-       for (int i = Commands::deviceTrack; i < Commands::deviceTrack + 16;) {
+       for (int i = Commands::deviceTrack; i < Commands::deviceTrack + 16;)
+       {
            commands.add (i);
-        ++i;
+           ++i;
        }
    }
 
@@ -157,15 +159,14 @@ namespace Commands {
        const int trackOffset = int(track) > 8 ? int(track) - 8 : int(track);
        ModifierKeys mkeys = int(track) <= 8 ? ModifierKeys::noModifiers : ModifierKeys::shiftModifier;
 
-       result.setInfo (String ("Beat Thang Track ") + track.toString(),
-                       "One of the track buttons on a Beat Thang device",
-                       "Beat Thang Hardware", 0);
+       result.setInfo (String ("Element Track ") + track.toString(),
+                       "One of the track buttons on an Element device",
+                       "Element Hardware", 0);
 
        result.addDefaultKeypress (pressOffset + trackOffset, mkeys);
 
        return true;
    }
-
 }}
 
 #endif /* ELEMENT_GUI_COMMANDS_H */

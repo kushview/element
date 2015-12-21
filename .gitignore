@@ -1,3 +1,4 @@
+*.pch
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
 

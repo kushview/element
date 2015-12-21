@@ -19,125 +19,130 @@
 
 #include "element/Juce.h"
 #include "session/Session.h"
+#include "CommandManager.h"
 #include "Globals.h"
 #include "MediaManager.h"
+#include "Settings.h"
 #include "URIs.h"
 
 namespace Element {
 
-    Settings::Settings()
+static void buildCommandLine (CommandLine& cli, const String& c) {
+    cli.fullScreen = c.contains ("--full-screen");
+
+    const var port = c.fromFirstOccurrenceOf("--port=", false, false)
+                      .upToFirstOccurrenceOf(" ", false, false);
+    if (port != var::null)
+        cli.port = (int) port;
+}
+
+CommandLine::CommandLine (const String& c)
+    : fullScreen (false),
+      port (3123)
+{
+    if (c.isNotEmpty())
+        buildCommandLine (*this, c);
+}
+
+class Globals::Impl
+{
+public:
+    Impl (Globals& g)
+        : owner (g)
     {
-        PropertiesFile::Options opts;
-        opts.applicationName     = "Element";
-        opts.filenameSuffix      = "conf";
-        opts.osxLibrarySubFolder = "Application Support";
-        opts.storageFormat       = PropertiesFile::storeAsXML;
-
-       #if JUCE_LINUX
-        opts.folderName          = ".config/element";
-       #else
-        opts.folderName          = opts.applicationName;
-       #endif
-
-        setStorageParameters (opts);
+        plugins  = new PluginManager();
+        devices  = new DeviceManager();
+        media    = new MediaManager();
+        settings = new Settings();
+        commands = new CommandManager();
     }
 
-    Settings::~Settings() { }
-
-    class Globals::Internal
+    void freeAll()
     {
-    public:
-
-        Internal (Globals& g)
-            : owner(g), symbols()
-        {
-            lv2      = new LV2World();
-            plugins  = new PluginManager();
-            devices  = new DeviceManager();
-            media    = new MediaManager();
-            settings = new Settings();
-            uridMap  = symbols.createMapFeature();
-        }
-
-        void freeAll()
-        {
-            session  = nullptr;
-            devices  = nullptr;
-            media    = nullptr;
-            plugins  = nullptr;
-            lv2      = nullptr;
-            settings = nullptr;
-        }
-
-        ~Internal() { }
-
-        Globals& owner;
-        SymbolMap symbols;
-        
-        AudioEnginePtr               engine;
-        ScopedPointer<LV2Feature>    uridMap;
-        ScopedPointer<DeviceManager> devices;
-        ScopedPointer<LV2World>      lv2;
-        ScopedPointer<MediaManager>  media;
-        ScopedPointer<PluginManager> plugins;
-        ScopedPointer<Settings>      settings;
-        ScopedPointer<Session>       session;
-    };
-
-    Globals::Globals()
-    {
-        impl = new Internal (*this);
-        const LV2_Feature* f = impl->uridMap->getFeature();
-        uris = new URIs ((LV2_URID_Map*) f->data);
+        commands = nullptr;
+        session  = nullptr;
+        devices  = nullptr;
+        media    = nullptr;
+        plugins  = nullptr;
+        settings = nullptr;
+        engine   = nullptr;
     }
 
-    Globals::~Globals()
-    {
-        impl->freeAll();
-        uris = nullptr;
+    ~Impl() { }
+
+    Globals& owner;
+    AudioEnginePtr                engine;
+    ScopedPointer<CommandManager> commands;
+    ScopedPointer<DeviceManager>  devices;
+    ScopedPointer<MediaManager>   media;
+    ScopedPointer<PluginManager>  plugins;
+    ScopedPointer<Settings>       settings;
+    ScopedPointer<Session>        session;
+};
+
+Globals::Globals (const String& _cli)
+    : WorldBase (this),
+      cli (_cli)
+{
+    appName = "Element";
+    impl = new Impl (*this);
+}
+
+Globals::~Globals()
+{
+    impl->freeAll();
+}
+
+CommandManager& Globals::getCommands() { assert(impl->commands); return *impl->commands; }
+
+DeviceManager& Globals::devices()
+{
+    assert (impl->devices != nullptr);
+    return *impl->devices;
+}
+
+MediaManager& Globals::media()
+{
+    assert (impl->media != nullptr);
+    return *impl->media;
+}
+
+AudioEnginePtr Globals::engine() const { return impl->engine; }
+
+PluginManager& Globals::plugins()
+{
+    assert (impl->plugins != nullptr);
+    return *impl->plugins;
+}
+
+Settings& Globals::settings()
+{
+    assert (impl->settings != nullptr);
+    return *impl->settings;
+}
+
+SymbolMap& Globals::symbols()
+{
+    auto* fmt = impl->plugins->format<LV2PluginFormat>();
+    jassert(fmt);
+    return fmt->getSymbolMap();
+}
+
+Session& Globals::session()
+{
+    assert (impl->session != nullptr);
+    return *impl->session;
+}
+
+void Globals::setEngine (EnginePtr engine)
+{
+    impl->engine = engine;
+
+    if (impl->session == nullptr) {
+        impl->session = new Session (*this);
     }
 
-    DeviceManager& Globals::devices() { return *impl->devices; }
-    MediaManager& Globals::media()
-    {
-        assert (impl->media != nullptr);
-        return *impl->media;
-    }
+    devices().attach (engine);
+}
 
-    AudioEnginePtr Globals::engine() const { return impl->engine; }
-    
-    PluginManager& Globals::plugins()
-    {
-        assert (impl->plugins != nullptr);
-        return *impl->plugins;
-    }
-
-    Settings&
-    Globals::settings()
-    {
-        assert (impl->settings != nullptr);
-        return *impl->settings;
-    }
-
-    SymbolMap& Globals::symbols()
-    {
-        return impl->symbols;
-    }
-
-    Session& Globals::session()
-    {
-        assert (impl->session != nullptr);
-        return *impl->session;
-    }
-
-    void Globals::setEngine (EnginePtr engine)
-    {
-        impl->engine = engine;
-        
-        if (impl->session == nullptr) {
-            impl->session = new Session (*this);
-        }
-        
-        devices().attach (engine);
-    }
 }

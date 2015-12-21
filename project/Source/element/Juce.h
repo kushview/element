@@ -20,6 +20,11 @@
 #ifndef ELEMENT_JUCE_H_INCLUDED
 #define ELEMENT_JUCE_H_INCLUDED
 
-#include "../../JuceLibraryCode/JuceHeader.h"
+#if HAVE_JUCE_CORE
+ #include <juce/juce.h>
+ #include <element/element.h>
+#else
+ #include "../../JuceLibraryCode/JuceHeader.h"
+#endif
 
 #endif  /* ELEMENT_JUCE_H_INCLUDED */
