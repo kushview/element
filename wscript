@@ -38,8 +38,6 @@ def configure (conf):
 
     conf.check_cfg (package="lv2", uselib_store="LV2", args='--cflags --libs', mandatory=True)
     conf.check_cfg (package="lilv-0", uselib_store="LILV", args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package="lvtk-plugin-1", uselib_store="LVTK_PLUGIN", args='--cflags --libs', mandatory=False)
-    conf.check_cfg (package="lvtk-ui-1", uselib_store="LVTK_UI", args='--cflags --libs', mandatory=False)
     conf.check_cfg (package="suil-0", uselib_store="SUIL", args='--cflags --libs', mandatory=True)
     conf.check_cfg (package="jack", uselib_store="JACK", args='--cflags --libs', mandatory=False)
     pkg_defs = ['HAVE_LILV', 'HAVE_JACK', 'HAVE_SUIL', 'HAVE_LV2', 'HAVE_LVTK_PLUGIN', 'HAVE_LVTK_UI']
@@ -62,8 +60,8 @@ def configure (conf):
 
     conf.env.DEBUG = conf.options.debug
     conf.env.INTERNAL_MODULES = conf.options.internal_modules
-    conf.env.ELEMENT_VERSION_STRING = version_string()
-    conf.define ("ELEMENT_VERSION_STRING", conf.env.VERSION_STRING)
+    conf.env.ELEMENT_VERSION_STRING = '0.0.1'
+    conf.define ("ELEMENT_VERSION_STRING", conf.env.ELEMENT_VERSION_STRING)
 
     if juce.is_mac():
         conf.env.MODULEDIR = "/Library/Application Support/Element/Plug-Ins"
@@ -77,12 +75,10 @@ def configure (conf):
     juce.display_header ("Element Build Summary")
     juce.display_msg (conf, "Installation Prefix", conf.env.PREFIX)
     juce.display_msg (conf, "Installed DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "Build Element (app)", conf.env.BUILD_ELEMENT_APP)
-    juce.display_msg (conf, "Build Introjucer", conf.env.BUILD_INTROJUCER)
     juce.display_msg (conf, "Jack Audio Support", conf.env.HAVE_JACK)
     juce.display_msg (conf, "LV2 Plugin Support", conf.env.HAVE_LILV)
-    juce.display_msg (conf, "LV2 Plugin GUI Support", conf.env.HAVE_SUIL)
-    juce.display_msg (conf, "Library Version", conf.env.VERSION_STRING)
+    juce.display_msg (conf, "LV2 Plugin UI Support", conf.env.HAVE_SUIL)
+    juce.display_msg (conf, "Library Version", conf.env.ELEMENT_VERSION_STRING)
     juce.display_msg (conf, "Module Install Dir", conf.env.MODULEDIR)
     juce.display_msg (conf, "Module Search Path", conf.env.MODULE_PATH)
 
@@ -205,7 +201,6 @@ def build_plugin (bld, name):
         install_path = bld.env.LIBDIR + '/element/%s' % bundle,
     )
 
-
 def build_plugins(bld):
     for name in 'test'.split():
         build_plugin (bld, name)
@@ -227,14 +222,14 @@ def build_linux (bld):
         source = bld.path.ant_glob ("project/Source/**/*.cpp"),
         includes = ['project/Source'],
         use = common_use_flags(),
-        target = 'element',
+        target = 'bin/element',
         linkflags = '-Wl,-rpath,$ORIGIN'
     )
 
     if bld.env.INTERNAL_MODULES:
         obj.includes += ['libs/element', 'libs/element/element']
         obj.use += internal_library_use_flags (bld)
-        obj.linkflags += ' -Wl,-rpath,$ORIGIN/libs/element'
+        obj.linkflags += ' -Wl,-rpath,$ORIGIN/../libs/element'
 
 def build (bld):
     if cross.is_windows (bld):
@@ -242,25 +237,8 @@ def build (bld):
     else:
         build_linux (bld)
 
-def check(ctx):
-    call (["bash", "tools/run-tests"])
+    for subdir in 'tests'.split():
+        bld.recurse (subdir)
 
-def patch(bld):
-    call (["bash", "tools/patch-namespace", "juce", "Element"])
-
-def unpatch(bld):
-    call (["bash", "tools/patch-namespace", "Element", "juce"])
-
-def version(bld):
-    call (["bash", "tools/version", "verbose"])
-
-## Helpers ##
-def version_string():
-    p2 = Popen (["bash", "tools/version", "standard"], stdout=PIPE)
-    return p2.communicate()[0].strip()
-
-def wipe_mac_packages (bld):
-    if element.is_mac():
-        call (["rm", "-rf", "build/Frameworks"])
-        call (["rm", "-rf", "build/Applications"])
-        call (["rm", "-rf", "build/Plug-Ins"])
+def check (ctx):
+    call (["build/tests/tests"])

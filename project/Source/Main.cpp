@@ -64,130 +64,137 @@ public:
     {
         if (world.cli.fullScreen)
         {
-            Desktop::getInstance().setKioskModeComponent(&screen, false);
+            Desktop::getInstance().setKioskModeComponent (&screen, false);
             screen.setVisible (true);
         }
 
         startThread();
 
-        while (isThreadRunning()) {
+        while (isThreadRunning())
             MessageManager::getInstance()->runDispatchLoopUntil (30);
-        }
 
-        screen.removeFromDesktop();
+        if (screen.isOnDesktop())
+            screen.removeFromDesktop();
     }
-
-
 
     ScopedPointer<AppController> controller;
 
 private:
-  class StartupScreen :  public TopLevelWindow
-  {
-  public:
-    StartupScreen()
-        : TopLevelWindow ("startup", true)
+    class StartupScreen :  public TopLevelWindow
     {
-        text.setText ("Loading Application", dontSendNotification);
-        text.setSize (100, 100);
-        text.setFont (Font (24.0f));
-        text.setJustificationType (Justification::centred);
-        text.setColour (Label::textColourId, Colours::white);
-        addAndMakeVisible (text);
-        centreWithSize (text.getWidth(), text.getHeight());
-    }
+    public:
+        StartupScreen()
+            : TopLevelWindow ("startup", true)
+        {
+            text.setText ("Loading Application", dontSendNotification);
+            text.setSize (100, 100);
+            text.setFont (Font (24.0f));
+            text.setJustificationType (Justification::centred);
+            text.setColour (Label::textColourId, Colours::white);
+            addAndMakeVisible (text);
+            centreWithSize (text.getWidth(), text.getHeight());
+        }
 
-    void resized() override {
-        text.setBounds (getLocalBounds());
-    }
+        void resized() override {
+            text.setBounds (getLocalBounds());
+        }
 
-    void paint (Graphics& g) override {
-        g.fillAll (Colours::transparentBlack);
-    }
+        void paint (Graphics& g) override {
+            g.fillAll (Colours::transparentBlack);
+        }
 
-  private:
-      Label text;
-  } screen;
+    private:
+        Label text;
+    } screen;
 
-  Globals& world;
+    Globals& world;
 };
 
 class Application  : public JUCEApplication
 {
 public:
-   Application() { }
-   virtual ~Application() { }
+    Application() { }
+    virtual ~Application() { }
 
-   const String getApplicationName()       { return "Element"; }
-   const String getApplicationVersion()    { return ELEMENT_VERSION_STRING; }
-   bool moreThanOneInstanceAllowed()       { return true; }
+    const String getApplicationName()       { return "Element"; }
+    const String getApplicationVersion()    { return ELEMENT_VERSION_STRING; }
+    bool moreThanOneInstanceAllowed()       { return true; }
 
-   void initialise (const String&  commandLine )
-   {
-#if JUCE_DEBUG
-       const File path (File::getSpecialLocation (File::invokedExecutableFile));
-       const String ep = path.getParentDirectory().getChildFile("modules").getFullPathName();
-       DBG("path: " << ep);
-       setenv("ELEMENT_MODULE_PATH", ep.toRawUTF8(), 1);
-       DBG("module_path: " << getenv("ELEMENT_MODULE_PATH"));
-#endif
+    void initialise (const String&  commandLine )
+    {
+      initializeModulePath();
 
-       world = new Globals (commandLine);
-       {
-           StartupThread startup (*world);
-           startup.launchApplication();
-           controller = startup.controller.release();
-           engine = world->engine();
-       }
+      world = new Globals (commandLine);
+      launchApplication();
 
-       gui = Gui::GuiApp::create (*world);
-       gui->run();
-   }
+      gui = Gui::GuiApp::create (*world);
+      gui->run();
+    }
 
-   void shutdown()
-   {
-       if (gui != nullptr)
-           gui = nullptr;
+    void launchApplication()
+    {
+        StartupThread startup (*world);
+        startup.launchApplication();
+        controller = startup.controller.release();
+        engine = world->engine();
+    }
 
-       PluginManager& plugins (world->plugins());
-       Settings& settings (world->settings());
-       plugins.saveUserPlugins (settings);
+    void initializeModulePath()
+    {
+        const File path (File::getSpecialLocation (File::invokedExecutableFile));
+        File modDir = path.getParentDirectory().getParentDirectory()
+                            .getChildFile("lib/element").getFullPathName();
+       #if JUCE_DEBUG
+        if (! modDir.exists()) {
+           modDir = path.getParentDirectory().getParentDirectory()
+                        .getChildFile ("modules");
+        }
+       #endif
+        setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
+        Logger::writeToLog (String("[element] module path: ") + String(getenv ("ELEMENT_MODULE_PATH")));
+    }
 
-       if (ScopedXml el = world->devices().createStateXml())
-           settings.getUserSettings()->setValue ("devices", el);
+    void shutdown()
+    {
+        if (gui != nullptr)
+            gui = nullptr;
 
-       engine->deactivate();
-       world->setEngine (nullptr);
-       engine = nullptr;
+        PluginManager& plugins (world->plugins());
+        Settings& settings (world->settings());
+        plugins.saveUserPlugins (settings);
 
-       world->unloadModules();
-       world = nullptr;
-   }
+        if (ScopedXml el = world->devices().createStateXml())
+            settings.getUserSettings()->setValue ("devices", el);
 
-   void systemRequestedQuit()
-   {
-       if (gui->shutdownApp())
-       {
-           gui = nullptr;
-           this->quit();
-       }
-   }
+        engine->deactivate();
+        world->setEngine (nullptr);
+        engine = nullptr;
 
-   void anotherInstanceStarted (const String& /*commandLine*/)
-   {
+        world->unloadModules();
+        world = nullptr;
+    }
 
-   }
+    void systemRequestedQuit()
+    {
+        if (gui->shutdownApp())
+        {
+            gui = nullptr;
+            this->quit();
+        }
+    }
 
-   bool perform (const InvocationInfo& info) override
-   {
-       switch (info.commandID) {
-           case Commands::quit: {
-               this->systemRequestedQuit();
-           } break;
-       }
+    void anotherInstanceStarted (const String& /*commandLine*/) { }
 
-       return true;
-   }
+    bool perform (const InvocationInfo& info) override
+    {
+        switch (info.commandID) {
+            case Commands::quit: {
+                this->systemRequestedQuit();
+            } break;
+        }
+
+        return true;
+    }
 
 private:
     ScopedPointer<Globals>  world;

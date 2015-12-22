@@ -1,5 +1,5 @@
 /*
-    Runner.cpp - This file is part of Element
+    WorldBase.h - This file is part of Element
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,7 +17,34 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-int main() {
+#ifndef ELEMENT_WORLD_BASE_H
+#define ELEMENT_WORLD_BASE_H
 
-  return 0;
+#include "element/Juce.h"
+
+namespace Element {
+
+/** A global collection of an appilcation/plugin's data */
+class WorldBase {
+public:
+    explicit WorldBase (void* host = nullptr);
+    virtual ~WorldBase();
+
+    virtual bool loadModule (const char* moduleName);
+    virtual int executeModule (const char* entryModule);
+
+    void setAppName (const String& name) { appName = name; }
+    virtual const String& getAppName() const { return appName; }
+
+protected:
+    void unloadModules();
+
+private:
+    class Private;
+    Scoped<Private> priv;
+    String appName;
+};
+
 }
+
+#endif // ELEMENT_WORLD_H

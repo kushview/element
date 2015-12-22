@@ -1,5 +1,5 @@
 /*
-    test_Dummy.cpp - This file is part of Element
+    Module.h - This file is part of Element
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,19 +17,45 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "Tests.h"
+#ifndef ELEMENT_MODULE_H
+#define ELEMENT_MODULE_H
 
-class DummyTest : public UnitTest
+namespace Element {
+
+typedef void* ModuleHandle;
+typedef void* ModuleLibrary;
+typedef void* ModuleHost;
+
+/** Abstract base class for all Element modules */
+class Module
 {
 public:
-
-    DummyTest() : UnitTest ("dummy") { }
-    virtual ~DummyTest() { }
-
-    void runTest()
+    static inline const char* extension()
     {
-        expect (true);
+        #if __APPLE__
+         static const char* ext = ".dylib";
+        #elif _MSC_VER
+         static const char* ext = ".dll";
+        #else
+         static const char* ext = ".so";
+        #endif
+        return ext;
     }
+
+    Module() { }
+    virtual ~Module() { }
+
+    virtual void load (ModuleHost) = 0;
+    virtual void unload() { }
 };
 
-static DummyTest dummy_test;
+}
+
+extern "C" {
+
+/** Entry point for element modules */
+Element::Module* element_module_load();
+
+}
+
+#endif // ELEMENT_MODULE_H

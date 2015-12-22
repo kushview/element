@@ -1,5 +1,5 @@
 /*
-    test_JackDevice.cpp - This file is part of Element
+    test_Dummy.cpp - This file is part of Element
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -19,24 +19,16 @@
 
 #include "Tests.h"
 
-class JackDeviceTest : public UnitTest
+class DummyTest : public UnitTest
 {
 public:
-
-    JackDeviceTest() : UnitTest ("JackDeviceDriver") { }
-    ~JackDeviceTest() { }
+    DummyTest() : UnitTest ("dummy") { }
+    virtual ~DummyTest() { }
 
     void runTest()
     {
-        World* world = test_world();
-
-        if (world)
-         {
-            bool loaded = world->loadModule ("jack-device");
-            expect (loaded);
-         }
+        expect (true);
     }
 };
 
-JackDeviceTest jackTest;
-
+static DummyTest sDummyTest;

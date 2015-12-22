@@ -23,6 +23,7 @@
 #include "element/Juce.h"
 #include "engine/AudioEngine.h"
 #include "URIs.h"
+#include "WorldBase.h"
 
 namespace Element {
 
