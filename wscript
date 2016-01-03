@@ -24,7 +24,10 @@ def check_modules (conf):
             conf.define('ELEMENT_USE_LIBJUCE', 1)
     elif juce.is_linux() and cross.is_windows(conf):
         conf.check_cfg(package='juce', uselib_store='JUCE', args='--cflags --libs', mandatory=True)
+        conf.recurse('libs/element')
         conf.define('HAVE_JUCE_CORE', True)
+        if not conf.is_defined('ELEMENT_USE_LIBJUCE'):
+            conf.define('ELEMENT_USE_LIBJUCE', 1)
 
 def configure (conf):
     cross.setup_compiler (conf)
@@ -44,7 +47,7 @@ def configure (conf):
     conf.check_cfg (package="lilv-0", uselib_store="LILV", args='--cflags --libs', mandatory=True)
     conf.check_cfg (package="suil-0", uselib_store="SUIL", args='--cflags --libs', mandatory=True)
     conf.check_cfg (package="jack", uselib_store="JACK", args='--cflags --libs', mandatory=False)
-    pkg_defs = ['HAVE_LILV', 'HAVE_JACK', 'HAVE_SUIL', 'HAVE_LV2', 'HAVE_LVTK_PLUGIN', 'HAVE_LVTK_UI']
+    pkg_defs = ['HAVE_LILV', 'HAVE_JACK', 'HAVE_SUIL', 'HAVE_LV2']
 
     if juce.is_linux() and not cross.is_windows (conf):
         conf.check_cfg (package="alsa", uselib_store="ALSA", args='--cflags --libs', mandatory=True)
@@ -132,11 +135,16 @@ def internal_library_use_flags(bld):
 
 def build_mingw (bld):
     bld.program(
-        source = bld.path.ant_glob('project/Source/**/*.cpp'),
+        source = bld.path.ant_glob('project/Source/**/*.cpp') + \
+                    ['libs/element/element/modules/element_base/element_base.cpp',
+                     'libs/element/element/modules/element_engines/element_engines.cpp',
+                     'libs/element/element/modules/element_lv2/element_lv2.cpp',
+                     'libs/element/element/modules/element_gui/element_gui.cpp',
+                     'libs/element/element/modules/element_models/element_models.cpp'],
         target = 'Element',
         name = 'Element',
         includes = ['libs/element', 'src', 'project/Source'],
-        use = ['JUCE']
+        use = ['JUCE', 'LILV', 'SUIL']
     )
 
 def build_internal_library (bld):
@@ -200,7 +208,7 @@ def build_linux (bld):
 
 def build (bld):
     if cross.is_windows (bld):
-        build_mingw (bld)
+        return build_mingw (bld)
     else:
         build_linux (bld)
 

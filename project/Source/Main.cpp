@@ -143,15 +143,21 @@ public:
     {
         const File path (File::getSpecialLocation (File::invokedExecutableFile));
         File modDir = path.getParentDirectory().getParentDirectory()
-                            .getChildFile("lib/element").getFullPathName();
+                          .getChildFile("lib/element").getFullPathName();
        #if JUCE_DEBUG
         if (! modDir.exists()) {
            modDir = path.getParentDirectory().getParentDirectory()
                         .getChildFile ("modules");
         }
        #endif
+
+       #if JUCE_WINDOWS
+        String putEnv = "ELEMENT_MODEUL_PATH="; putEnv << modDir.getFullPathName();
+        putenv (putEnv.toRawUTF8());
+       #else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
         Logger::writeToLog (String("[element] module path: ") + String(getenv ("ELEMENT_MODULE_PATH")));
+       #endif
     }
 
     void shutdown()
