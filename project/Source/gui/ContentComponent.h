@@ -26,6 +26,7 @@ namespace Element {
 namespace Gui {
 
 class GuiApp;
+class SequencerComponent;
 class Workspace;
 
 class ContentComponent :  public Component,
@@ -44,6 +45,7 @@ public:
 private:
     GuiApp& gui;
     ScopedPointer<ScreenDisplay> display;
+    ScopedPointer<SequencerComponent> seq;
     ScopedPointer<Workspace>     workspace;
     ScopedPointer<TooltipWindow> toolTips;
 };

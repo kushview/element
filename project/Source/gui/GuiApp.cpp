@@ -19,7 +19,7 @@
 
 #include "engine/AudioEngine.h"
 
-#include "gui/layouts/NewSessionView.h"
+#include "gui/NewSessionView.h"
 #include "gui/Alerts.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"

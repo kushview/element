@@ -13,19 +13,23 @@ def options (opt):
     opt.recurse('libs/element')
 
 def check_modules (conf):
-    if not conf.options.internal_modules:
+    if juce.is_linux() and not cross.is_windows(conf) and not conf.options.internal_modules:
         conf.check_juce_cfg(['audio-processors', 'audio-devices', 'core', 'cryptography', \
                              'audio-utils', 'gui-basics', 'gui-extra', 'graphics', 'opengl'])
         conf.check_juce_cfg(['base', 'engines', 'lv2', 'models', 'gui'], 0, 'element_', True)
-    else:
+    elif juce.is_linux() and not cross.is_windows(conf):
         conf.recurse('libs/element')
         conf.define('HAVE_JUCE_CORE', len(conf.env.LIB_JUCE_CORE) > 0)
         if not conf.is_defined('ELEMENT_USE_LIBJUCE'):
             conf.define('ELEMENT_USE_LIBJUCE', 1)
+    elif juce.is_linux() and cross.is_windows(conf):
+        conf.check_cfg(package='juce', uselib_store='JUCE', args='--cflags --libs', mandatory=True)
+        conf.define('HAVE_JUCE_CORE', True)
 
 def configure (conf):
     cross.setup_compiler (conf)
-    conf.prefer_clang()
+    if not conf.options.cross:
+        conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx cross juce")
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share')
 
@@ -61,7 +65,8 @@ def configure (conf):
     conf.env.DEBUG = conf.options.debug
     conf.env.INTERNAL_MODULES = conf.options.internal_modules
     conf.env.ELEMENT_VERSION_STRING = '0.0.1'
-    conf.define ("ELEMENT_VERSION_STRING", conf.env.ELEMENT_VERSION_STRING)
+    conf.define ('ELEMENT_VERSION_STRING', conf.env.ELEMENT_VERSION_STRING)
+    conf.define ('ELEMENT_USE_JACK', len(conf.env.LIB_JACK) > 0)
 
     if juce.is_mac():
         conf.env.MODULEDIR = "/Library/Application Support/Element/Plug-Ins"
@@ -126,50 +131,12 @@ def internal_library_use_flags(bld):
         else ['element-base-debug-0', 'element-gui-debug-0', 'element-engines-debug-0', 'element-lv2-debug-0']
 
 def build_mingw (bld):
-    node = bld.path.find_resource ('project/Element.jucer')
-    proj = juce.IntrojucerProject (bld, node.relpath())
-
-    if not proj.isValid():
-        exit (1)
-
-    w64libs = 'gdi32 uuid wsock32 wininet version ole32 ws2_32 oleaut32 imm32 comdlg32 shlwapi rpcrt4 winmm opengl32'.split()
-    w64env = bld.env.derive();
-    w64use = []
-    linkflags = ['-mwindows']
-    for lib in w64libs:
-        key = 'LIB_' + lib.upper()
-        w64env[key] = lib
-        w64use.append (lib.upper())
-
-    ''' Tack on the use vars, order is important here in case of static linking'''
-    w64use += ['OPENCV_HIGHGUI', 'OPENCV_IMGPROC', 'OPENCV_CORE', \
-               'ILMIMF', 'TIFF', 'ZLIB', 'PNG', 'JPEG', 'JASPER', 'OPENJP2']
-
-    obj = bld.shlib (
-        source   = proj.getLibraryCode(),
-        includes = ['project/JuceLibraryCode'],
-        name = 'libelement',
-        target = 'element',
-        use = ['LILV', 'SUIL', 'ALSA', 'FREETYPE2'] + w64use,
-        vnum = '0.0.1',
-        env = w64env,
-        cxxflags = ['-DJUCE_DLL']
-    )
-
-    use_egl = False
-    if use_egl:
-        pass
-    else:
-        obj.use += ['GL']
-
-    bld.add_group()
-
-    obj = bld.program (
-        source = proj.getProjectCode(),
-        includes = ['project/JuceLibraryCode', 'project/Source'],
-        use = ['libelement'],
-        target = 'element',
-        linkflags = ['-mwindows']
+    bld.program(
+        source = bld.path.ant_glob('project/Source/**/*.cpp'),
+        target = 'Element',
+        name = 'Element',
+        includes = ['libs/element', 'src', 'project/Source'],
+        use = ['JUCE']
     )
 
 def build_internal_library (bld):

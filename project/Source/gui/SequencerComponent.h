@@ -50,7 +50,6 @@ namespace Gui {
         bool shouldDrawDragImageWhenOver() { return false; }
 
     protected:
-
         void timerCallback();
 
         void clipClicked (TimelineClip *clip, const MouseEvent &clipEvent);
@@ -59,7 +58,6 @@ namespace Gui {
         void timelineTrackHeadersClicked (const MouseEvent &ev, int track);
 
     private:
-
         GuiApp& gui;
         SessionRef session;
         ValueTree state;

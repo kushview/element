@@ -27,19 +27,16 @@
 
 namespace Element {
 
-    class EngineProcessor :  public Processor
+class EngineProcessor :  public Processor
+{
+public:
+    inline Transport* getTransport()
     {
-    public:
-
-        inline
-        Transport* getTransport()
-        {
-            if (AudioPlayHead* ph = getPlayHead())
-                return dynamic_cast<Transport*> (ph);
-            return nullptr;
-        }
-
-    };
+        if (AudioPlayHead* ph = getPlayHead())
+            return dynamic_cast<Transport*> (ph);
+        return nullptr;
+    }
+};
 
 }
 

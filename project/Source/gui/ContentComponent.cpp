@@ -1,6 +1,6 @@
 /*
     ContentComponent.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2015  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 */
 
 #include "gui/ContentComponent.h"
+#include "gui/SequencerComponent.h"
 #include "gui/Workspace.h"
 
 namespace Element {
@@ -27,7 +28,11 @@ ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
     setOpaque (true);
+   #if 0
     addAndMakeVisible (display = new ScreenDisplay());
+   #else
+    addAndMakeVisible (seq = new SequencerComponent (gui));
+   #endif
     resized();
 }
 
@@ -47,8 +52,12 @@ void ContentComponent::paint (Graphics &g)
 
 void ContentComponent::resized()
 {
-    Rectangle<int> r (getLocalBounds());
+    const Rectangle<int> r (getLocalBounds());
+   #if 1
+    seq->setBounds (r.reduced (2));
+   #else
     display->setBounds (r.reduced (2));
+   #endif
 }
 
 GuiApp& ContentComponent::app() { return gui; }
