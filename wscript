@@ -139,6 +139,7 @@ def copy_mingw_libs(bld):
         call (["cp", "-f", '%s/lib/%s.dll' % (bld.env.PREFIX, dll), 'build/mingw32/'])
 
 def build_mingw (bld):
+    mingwEnv = bld.env.derive()
     bld.shlib (
         source = ['libs/element/element/modules/element_base/element_base.cpp',
                   'libs/element/element/modules/element_engines/element_engines.cpp',
@@ -148,7 +149,8 @@ def build_mingw (bld):
         includes = ['libs/element', 'src', 'project/Source'],
         target   = 'mingw32/element-0',
         name     = 'libelement',
-        use      = ['JUCE', 'LILV', 'SUIL']
+        use      = ['JUCE', 'LILV', 'SUIL'],
+        env      = mingwEnv
     )
 
     bld.program (
@@ -157,7 +159,8 @@ def build_mingw (bld):
         target      = 'mingw32/Element',
         name        = 'Element',
         linkflags   = ['-mwindows'],
-        use         = ['libelement']
+        use         = ['libelement'],
+        env         mingwEnv
     )
 
     bld.add_post_fun (copy_mingw_libs)
