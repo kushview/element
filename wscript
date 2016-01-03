@@ -160,7 +160,7 @@ def build_mingw (bld):
         use         = ['libelement']
     )
 
-    bld.add_post_fun(copy_mingw_libs)
+    bld.add_post_fun (copy_mingw_libs)
 
 def build_internal_library (bld):
     libEnv = bld.env.derive()
