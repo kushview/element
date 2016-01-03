@@ -133,19 +133,34 @@ def internal_library_use_flags(bld):
     return ['element-base-0', 'element-gui-0', 'element-engines-0', 'element-lv2-0'] if not debug \
         else ['element-base-debug-0', 'element-gui-debug-0', 'element-engines-debug-0', 'element-lv2-debug-0']
 
+def copy_mingw_libs(bld):
+    call (["bash", "libs/libjuce/tools/copy-cross-mingw32-libs.sh", "build/mingw32"])
+    for dll in 'juce-4 serd-0 sord-0 sratom-0-0 lilv-0 suil-0-0'.split():
+        call (["cp", "-f", '%s/lib/%s.dll' % (bld.env.PREFIX, dll), 'build/mingw32/'])
+
 def build_mingw (bld):
-    bld.program(
-        source = bld.path.ant_glob('project/Source/**/*.cpp') + \
-                    ['libs/element/element/modules/element_base/element_base.cpp',
-                     'libs/element/element/modules/element_engines/element_engines.cpp',
-                     'libs/element/element/modules/element_lv2/element_lv2.cpp',
-                     'libs/element/element/modules/element_gui/element_gui.cpp',
-                     'libs/element/element/modules/element_models/element_models.cpp'],
-        target = 'Element',
-        name = 'Element',
+    bld.shlib (
+        source = ['libs/element/element/modules/element_base/element_base.cpp',
+                  'libs/element/element/modules/element_engines/element_engines.cpp',
+                  'libs/element/element/modules/element_lv2/element_lv2.cpp',
+                  'libs/element/element/modules/element_gui/element_gui.cpp',
+                  'libs/element/element/modules/element_models/element_models.cpp'],
         includes = ['libs/element', 'src', 'project/Source'],
-        use = ['JUCE', 'LILV', 'SUIL']
+        target   = 'mingw32/element-0',
+        name     = 'libelement',
+        use      = ['JUCE', 'LILV', 'SUIL']
     )
+
+    bld.program (
+        source      = bld.path.ant_glob('project/Source/**/*.cpp'),
+        includes    = ['libs/element', 'src', 'project/Source'],
+        target      = 'mingw32/Element',
+        name        = 'Element',
+        linkflags   = ['-mwindows'],
+        use         = ['libelement']
+    )
+
+    bld.add_post_fun(copy_mingw_libs)
 
 def build_internal_library (bld):
     libEnv = bld.env.derive()
