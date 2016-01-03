@@ -160,7 +160,7 @@ def build_mingw (bld):
         name        = 'Element',
         linkflags   = ['-mwindows'],
         use         = ['libelement'],
-        env         mingwEnv
+        env         = mingwEnv
     )
 
     bld.add_post_fun (copy_mingw_libs)
