@@ -8,6 +8,7 @@ import cross, juce
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
+    if juce.is_mac(): opt.load('framework')
     opt.add_option ('--internal-modules', default=False, action='store_true', \
         dest='internal_modules', help='Compile Intrenal Element Modules [ Default: False ]')
     opt.recurse('libs/element')
@@ -28,12 +29,15 @@ def check_modules (conf):
         conf.define('HAVE_JUCE_CORE', True)
         if not conf.is_defined('ELEMENT_USE_LIBJUCE'):
             conf.define('ELEMENT_USE_LIBJUCE', 1)
+    elif juce.is_mac():
+        pass
 
 def configure (conf):
     cross.setup_compiler (conf)
     if not conf.options.cross:
         conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx cross juce")
+    if juce.is_mac(): conf.load('framework')
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share')
 
     print
@@ -128,12 +132,12 @@ def common_use_flags():
     return ['JUCE_AUDIO_UTILS', 'JUCE_GUI_EXTRA', 'JUCE_OPENGL', 'ELEMENT_GUI', \
             'ELEMENT_ENGINES', 'ELEMENT_MODELS', 'ELEMENT_LV2', 'LILV', 'SUIL']
 
-def internal_library_use_flags(bld):
+def internal_library_use_flags (bld):
     debug = bld.env.DEBUG
     return ['element-base-0', 'element-gui-0', 'element-engines-0', 'element-lv2-0'] if not debug \
         else ['element-base-debug-0', 'element-gui-debug-0', 'element-engines-debug-0', 'element-lv2-debug-0']
 
-def copy_mingw_libs(bld):
+def copy_mingw_libs (bld):
     call (["bash", "libs/libjuce/tools/copy-cross-mingw32-libs.sh", "build/mingw32"])
     for dll in 'juce-4 serd-0 sord-0 sratom-0-0 lilv-0 suil-0-0'.split():
         call (["cp", "-f", '%s/lib/%s.dll' % (bld.env.PREFIX, dll), 'build/mingw32/'])
@@ -167,7 +171,7 @@ def build_mingw (bld):
 
 def build_internal_library (bld):
     libEnv = bld.env.derive()
-    bld.recurse('libs/element')
+    bld.recurse ('libs/element')
 
 def build_plugin (bld, name):
     bundle = '%s.element' % name
@@ -194,7 +198,7 @@ def build_plugin (bld, name):
         install_path = bld.env.LIBDIR + '/element/%s' % bundle,
     )
 
-def build_plugins(bld):
+def build_plugins (bld):
     for name in 'test'.split():
         build_plugin (bld, name)
     bld.add_group()
@@ -224,9 +228,45 @@ def build_linux (bld):
         obj.use += internal_library_use_flags (bld)
         obj.linkflags += ' -Wl,-rpath,$ORIGIN/../libs/element'
 
+def build_mac (bld):
+    frameworkEnv = bld.env.derive()
+    frameworkSrc = []
+    moduleBase = 'libs/libjuce/src/modules'
+    for mod in ['core']:
+        frameworkSrc.append('%s/juce_%s/juce_%s.mm' % (moduleBase, mod, mod))
+
+    moduleBase = 'libs/element/element/modules'
+    for mod in ['base', 'engines', 'lv2', 'gui', 'models']:
+        frameworkSrc.append ('%s/element_%s/element_%s.mm' % (moduleBase, mod, mod))
+
+    bld (
+        features = 'cxx cxxshlib',
+        source   = frameworkSrc,
+        includes = ['src', 'project/Source', 'project/JuceLibraryCode'],
+        target   = 'Frameworks/Element',
+        name     = 'ELEMENT',
+        use      = ['LILV', 'SUIL'],
+        env      = frameworkEnv,
+        mac_framework = True
+    )
+    bld.add_group()
+    return
+    appEnv = bld.env.derive()
+    bld.program (
+        source      = bld.path.ant_glob('project/Source/**/*.cpp'),
+        includes    = ['libs/element', 'src', 'project/Source'],
+        target      = 'Applications/Element',
+        name        = 'Element',
+        use         = ['ELEMENT'],
+        env         = appEnv,
+        mac_bundle  = True
+    )
+
 def build (bld):
     if cross.is_windows (bld):
         return build_mingw (bld)
+    elif juce.is_mac():
+        return build_mac (bld)
     else:
         build_linux (bld)
 

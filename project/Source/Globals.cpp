@@ -50,6 +50,9 @@ public:
     Impl (Globals& g)
         : owner (g)
     {
+       #if !ELEMENT_LV2_PLUGIN_HOST
+        symbols  = new SymbolMap();
+       #endif
         plugins  = new PluginManager();
         devices  = new DeviceManager();
         media    = new MediaManager();
@@ -78,6 +81,9 @@ public:
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
     ScopedPointer<Session>        session;
+   #if !ELEMENT_LV2_PLUGIN_HOST
+    ScopedPointer<SymbolMap>      symbols;
+   #endif
 };
 
 Globals::Globals (const String& _cli)
@@ -123,9 +129,14 @@ Settings& Globals::settings()
 
 SymbolMap& Globals::symbols()
 {
+   #if ELEMENT_LV2_PLUGIN_HOST
     auto* fmt = impl->plugins->format<LV2PluginFormat>();
     jassert(fmt);
     return fmt->getSymbolMap();
+   #else
+    assert(impl->symbols);
+    return *impl->symbols;
+   #endif
 }
 
 Session& Globals::session()

@@ -17,11 +17,11 @@
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
-//#include <cassert>
 
-#define JUCE_USE_XEVENTS 0
-#define JUCE_USE_X11 0
-#define JUCE_USE_EGL 1
+#ifndef ELEMENT_VERSION_STRING
+ // This is for systems that don't use Waf to build the project
+ #define ELEMENT_VERSION_STRING ProjectInfo::versionString
+#endif
 
 // [END_USER_CODE_SECTION]
 
@@ -51,17 +51,17 @@
 #endif
 
 //==============================================================================
-// element_base flags:
+// element_engines flags:
 
-#ifndef    ELEMENT_OSC
- //#define ELEMENT_OSC
+#ifndef    ELEMENT_LV2_PLUGIN_HOST
+ #define   ELEMENT_LV2_PLUGIN_HOST 0
 #endif
 
 //==============================================================================
 // element_lv2 flags:
 
 #ifndef    ELEMENT_LV2_PLUGIN_HOST
- //#define ELEMENT_LV2_PLUGIN_HOST
+ #define   ELEMENT_LV2_PLUGIN_HOST 0
 #endif
 
 //==============================================================================
@@ -162,6 +162,10 @@
 
 #ifndef    JUCE_INCLUDE_ZLIB_CODE
  //#define JUCE_INCLUDE_ZLIB_CODE
+#endif
+
+#ifndef    JUCE_USE_CURL
+ //#define JUCE_USE_CURL
 #endif
 
 //==============================================================================
