@@ -231,13 +231,9 @@ def build_linux (bld):
 def build_mac (bld):
     frameworkEnv = bld.env.derive()
     frameworkSrc = []
-    moduleBase = 'libs/libjuce/src/modules'
-    for mod in ['core']:
-        frameworkSrc.append('%s/juce_%s/juce_%s.mm' % (moduleBase, mod, mod))
 
-    moduleBase = 'libs/element/element/modules'
-    for mod in ['base', 'engines', 'lv2', 'gui', 'models']:
-        frameworkSrc.append ('%s/element_%s/element_%s.mm' % (moduleBase, mod, mod))
+    project = juce.IntrojucerProject(bld, 'project/Element.jucer')
+    frameworkSrc = project.getLibraryCode()
 
     bld (
         features = 'cxx cxxshlib',
@@ -245,21 +241,21 @@ def build_mac (bld):
         includes = ['src', 'project/Source', 'project/JuceLibraryCode'],
         target   = 'Frameworks/Element',
         name     = 'ELEMENT',
-        use      = ['LILV', 'SUIL'],
+        use      = ['LILV', 'SUIL', 'CORE_AUDIO_KIT', 'AUDIO_UNIT'] + project.getUseFlags(),
         env      = frameworkEnv,
         mac_framework = True
     )
     bld.add_group()
-    return
+
     appEnv = bld.env.derive()
     bld.program (
-        source      = bld.path.ant_glob('project/Source/**/*.cpp'),
-        includes    = ['libs/element', 'src', 'project/Source'],
+        source      = bld.path.ant_glob ('project/Source/**/*.cpp'),
+        includes    = ['/opt/kushview/include', 'src', 'project/Source', 'project/JuceLibraryCode'],
         target      = 'Applications/Element',
         name        = 'Element',
-        use         = ['ELEMENT'],
+        linkflags   = ['-F', './Frameworks', '-framework', 'Element'],
         env         = appEnv,
-        mac_bundle  = True
+        mac_app     = True
     )
 
 def build (bld):
