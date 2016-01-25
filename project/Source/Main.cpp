@@ -116,11 +116,11 @@ public:
     Application() { }
     virtual ~Application() { }
 
-    const String getApplicationName()       { return "Element"; }
-    const String getApplicationVersion()    { return ELEMENT_VERSION_STRING; }
-    bool moreThanOneInstanceAllowed()       { return true; }
+    const String getApplicationName()    override      { return "Element"; }
+    const String getApplicationVersion() override      { return ELEMENT_VERSION_STRING; }
+    bool moreThanOneInstanceAllowed()    override      { return true; }
 
-    void initialise (const String&  commandLine )
+    void initialise (const String&  commandLine ) override
     {
       initializeModulePath();
 
@@ -160,7 +160,7 @@ public:
        #endif
     }
 
-    void shutdown()
+    void shutdown() override
     {
         if (gui != nullptr)
             gui = nullptr;
@@ -180,7 +180,7 @@ public:
         world = nullptr;
     }
 
-    void systemRequestedQuit()
+    void systemRequestedQuit() override
     {
         if (gui->shutdownApp())
         {
@@ -189,7 +189,7 @@ public:
         }
     }
 
-    void anotherInstanceStarted (const String& /*commandLine*/) { }
+    void anotherInstanceStarted (const String& /*commandLine*/) override { }
 
     bool perform (const InvocationInfo& info) override
     {

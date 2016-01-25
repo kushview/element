@@ -32,22 +32,22 @@ namespace Gui {
         AssetTreeViewItem (const AssetTree::Item& item);
         ~AssetTreeViewItem();
 
-        virtual bool mightContainSubItems();
-        virtual String getRenamingName() const;
-        virtual String getDisplayName() const;
-        virtual String getUniqueName() const;
-        virtual void setName (const String& newName);
-        virtual bool isMissing();
-        virtual void showPopupMenu();
-        virtual void handlePopupMenuResult (int);
-        virtual Icon getIcon() const;
+        virtual bool mightContainSubItems() override;
+        virtual String getRenamingName() const override;
+        virtual String getDisplayName() const override;
+        virtual String getUniqueName() const override;
+        virtual void setName (const String& newName) override;
+        virtual bool isMissing() override;
+        virtual void showPopupMenu() override;
+        virtual void handlePopupMenuResult (int) override;
+        virtual Icon getIcon() const override;
 
         //void addSubItem();
         bool isRootAsset() const;
-        void itemOpennessChanged (bool isNowOpen);
+        void itemOpennessChanged (bool isNowOpen) override;
 
         // dragging stuff
-        File getDraggableFile() const
+        File getDraggableFile() const override
         {
             std::clog << "get draggable file\n";
 
@@ -69,7 +69,7 @@ namespace Gui {
 
     protected:
 
-        void addSubItems();
+        void addSubItems() override;
         virtual AssetTreeViewItem* createAssetSubItem (const AssetTree::Item&) { return nullptr; }
         virtual void treeChildrenChanged (const ValueTree& parentTree);
         virtual void triggerAsyncAssetRename (const AssetTree::Item& item);
