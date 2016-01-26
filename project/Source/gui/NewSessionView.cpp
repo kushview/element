@@ -1,20 +1,20 @@
 /*
-  ==============================================================================
+    NewSessionView.cpp - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
-  This is an automatically generated GUI class created by the Introjucer!
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Introjucer version: 4.1.0
-
-  ------------------------------------------------------------------------------
-
-  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 //[Headers] You can add your own extra header files here...
@@ -23,15 +23,14 @@
 #include "NewSessionView.h"
 
 
+namespace Element {
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
 NewSessionView::NewSessionView (Session& s)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
     setName ("NewSessionView");
     addAndMakeVisible (properties = new PropertyPanel());
     properties->setName ("properties");
@@ -98,7 +97,7 @@ void NewSessionView::resized()
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="NewSessionView" template="../../../project/Templates/BTV.cpp"
+<JUCER_COMPONENT documentType="Component" className="NewSessionView" template="../../Templates/ElementTemplate.cpp"
                  componentName="NewSessionView" parentClasses="public Component"
                  constructorParams="Session&amp; s" variableInitialisers="" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
@@ -116,3 +115,5 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
+} /* namespace Element */
