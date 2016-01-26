@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Introjucer version: 3.1.0
+  Created with Introjucer version: 4.1.0
 
   ------------------------------------------------------------------------------
 
   The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-13 by Raw Material Software Ltd.
+  Copyright (c) 2015 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -23,15 +23,15 @@
 #include "NewSessionView.h"
 
 
-namespace Element {
-namespace Gui {
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
 NewSessionView::NewSessionView (Session& s)
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
     setName ("NewSessionView");
     addAndMakeVisible (properties = new PropertyPanel());
     properties->setName ("properties");
@@ -75,6 +75,9 @@ void NewSessionView::paint (Graphics& g)
 
 void NewSessionView::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     properties->setBounds (8, 8, getWidth() - 16, getHeight() - 16);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -113,5 +116,3 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-
-}} /* namespace Element::Gui */
