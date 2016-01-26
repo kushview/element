@@ -30,19 +30,14 @@ namespace Element {
 class RootGraph : public GraphProcessor
 {
 public:
-
     RootGraph() { }
     ~RootGraph() { }
-
 };
 
 class  AudioEngine::Callback : public AudioIODeviceCallback,
                                public MidiInputCallback
 {
-    AudioEngine* engine;
-
 public:
-
     Callback (AudioEngine* e)
         : engine (e),
           processor (nullptr),
@@ -94,10 +89,9 @@ public:
                                 const int numSamples)
     {
         engine->transport()->preProcess (numSamples);
-
         jassert (sampleRate > 0 && blockSize > 0);
-
         incomingMidi.clear();
+        
         messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
         int totalNumChans = 0;
 
@@ -140,8 +134,6 @@ public:
             }
         }
 
-        AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-
         const ScopedLock sl (lock);
 
         if (processor != nullptr)
@@ -155,6 +147,7 @@ public:
             }
             else if (engine->transport()->getRemainingFrames() >= numSamples)
             {
+                AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
                 processor->processBlock (buffer, incomingMidi);
             }
         }
@@ -213,6 +206,7 @@ public:
     }
 
 private:
+    AudioEngine* engine;
     GraphProcessor* processor;
     CriticalSection lock;
     double sampleRate;
