@@ -51,9 +51,10 @@ namespace Element {
     public:
         explicit SessionRef (Session* s = nullptr)
             : boost::intrusive_ptr<Session> (s) { }
-
-    private:
-
+        
+        SessionRef (const SessionRef& o) {
+            boost::intrusive_ptr<Session>::operator= (o);
+        }
     };
 
     /** Session, the main interface to the Audio Engine */
