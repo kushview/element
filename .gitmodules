@@ -5,3 +5,6 @@
 [submodule "libs/libjuce"]
 	path = libs/libjuce
 	url = https://github.com/mfisher31/libjuce.git
+[submodule "libs/lv2"]
+	path = libs/lv2
+	url = http://lv2plug.in/git/lv2.git
