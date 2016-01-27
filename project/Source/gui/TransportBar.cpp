@@ -1,67 +1,66 @@
 /*
-  ==============================================================================
+    TransportBar.cpp - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
-  This is an automatically generated GUI class created by the Introjucer!
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Introjucer version: 3.1.0
-
-  ------------------------------------------------------------------------------
-
-  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-13 by Raw Material Software Ltd.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 //[Headers] You can add your own extra header files here...
-#include "../session/Session.h"
+#include "session/Session.h"
 //[/Headers]
 
 #include "TransportBar.h"
 
 
 namespace Element {
-namespace Gui {
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-TransportBar::TransportBar (Session& sess)
+TransportBar::TransportBar (SessionRef sess)
     : session(sess)
 {
     addAndMakeVisible (play = new TextButton ("play"));
-    play->setButtonText ("Play");
+    play->setButtonText (TRANS("Play"));
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
 
     addAndMakeVisible (stop = new TextButton ("stop"));
-    stop->setButtonText ("Stop");
+    stop->setButtonText (TRANS("Stop"));
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
     addAndMakeVisible (seekZero = new TextButton ("seek-zero"));
-    seekZero->setButtonText ("<<");
+    seekZero->setButtonText (TRANS("<<"));
     seekZero->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     seekZero->addListener (this);
 
     addAndMakeVisible (stepForward = new TextButton ("stepForward"));
-    stepForward->setButtonText (">");
+    stepForward->setButtonText (TRANS(">"));
     stepForward->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stepForward->addListener (this);
 
     addAndMakeVisible (stepBack = new TextButton ("step-back"));
-    stepBack->setButtonText ("<");
+    stepBack->setButtonText (TRANS("<"));
     stepBack->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stepBack->addListener (this);
 
     addAndMakeVisible (record = new TextButton ("record"));
-    record->setButtonText ("Rec");
+    record->setButtonText (TRANS("Rec"));
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
     record->setColour (TextButton::buttonOnColourId, Colours::red);
@@ -106,6 +105,9 @@ void TransportBar::paint (Graphics& g)
 
 void TransportBar::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     play->setBounds (112, 0, 32, 16);
     stop->setBounds (80, 0, 32, 16);
     seekZero->setBounds (0, 0, 24, 16);
@@ -125,13 +127,13 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_play] -- add your button handler code here..
         play->setToggleState (! play->getToggleState(), dontSendNotification);
-        session.testSetPlaying (play->getToggleState());
+        session->testSetPlaying (play->getToggleState());
         //[/UserButtonCode_play]
     }
     else if (buttonThatWasClicked == stop)
     {
         //[UserButtonCode_stop] -- add your button handler code here..
-        session.testSetPlaying (false);
+        session->testSetPlaying (false);
         play->setToggleState (false, dontSendNotification);
         //[/UserButtonCode_stop]
     }
@@ -154,7 +156,7 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_record] -- add your button handler code here..
         record->setToggleState (! record->getToggleState(), dontSendNotification);
-        session.testSetRecording (record->getToggleState());
+        session->testSetRecording (record->getToggleState());
         //[/UserButtonCode_record]
     }
 
@@ -177,10 +179,10 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="TransportBar" template="../../project/Templates/BTV.cpp"
-                 componentName="" parentClasses="public Component" constructorParams="Session&amp; sess"
+<JUCER_COMPONENT documentType="Component" className="TransportBar" template="../../Templates/ElementTemplate.cpp"
+                 componentName="" parentClasses="public Component" constructorParams="SessionRef sess"
                  variableInitialisers="session(sess)" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.33" fixedSize="1" initialWidth="168"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="168"
                  initialHeight="16">
   <BACKGROUND backgroundColour="ffffff"/>
   <TEXTBUTTON name="play" id="b5aa83743c763018" memberName="play" virtualName=""
@@ -211,4 +213,4 @@ END_JUCER_METADATA
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace Element::Gui */
+} /* namespace Element */

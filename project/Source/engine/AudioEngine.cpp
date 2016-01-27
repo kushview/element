@@ -30,19 +30,14 @@ namespace Element {
 class RootGraph : public GraphProcessor
 {
 public:
-
     RootGraph() { }
     ~RootGraph() { }
-
 };
 
 class  AudioEngine::Callback : public AudioIODeviceCallback,
                                public MidiInputCallback
 {
-    AudioEngine* engine;
-
 public:
-
     Callback (AudioEngine* e)
         : engine (e),
           processor (nullptr),
@@ -84,8 +79,10 @@ public:
                 isPrepared = true;
             }
 
-            if (oldOne != nullptr)
+            if (oldOne != nullptr) {
+                oldOne->setPlayHead (nullptr);
                 oldOne->releaseResources();
+            }
         }
     }
 
@@ -94,11 +91,9 @@ public:
                                 const int numSamples)
     {
         engine->transport()->preProcess (numSamples);
-
         jassert (sampleRate > 0 && blockSize > 0);
-
         incomingMidi.clear();
-        messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+        
         int totalNumChans = 0;
 
         if (numInputChannels > numOutputChannels)
@@ -140,12 +135,11 @@ public:
             }
         }
 
-        AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-
         const ScopedLock sl (lock);
 
         if (processor != nullptr)
         {
+            const int remainingFrames = engine->transport()->getRemainingFrames();
             const ScopedLock sl2 (processor->getCallbackLock());
 
             if (processor->isSuspended())
@@ -155,12 +149,31 @@ public:
             }
             else if (engine->transport()->getRemainingFrames() >= numSamples)
             {
+                DBG("hello");
+                messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+                AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
                 processor->processBlock (buffer, incomingMidi);
+                if (engine->transport()->isPlaying()) {
+                    engine->transport()->advance (numSamples);
+                }
             }
-        }
-
-        if (engine->transport()->isPlaying()) {
-            engine->transport()->advance (numSamples);
+            else
+            {
+                AudioSampleBuffer buffer1 (channels, totalNumChans, 0, remainingFrames);
+                messageCollector.removeNextBlockOfMessages (incomingMidi, remainingFrames);
+                processor->processBlock (buffer1, incomingMidi);
+                incomingMidi.clear();
+                if (engine->transport()->isPlaying()) {
+                    engine->transport()->advance (remainingFrames);
+                }
+                
+                AudioSampleBuffer buffer2 (channels, totalNumChans, remainingFrames, numSamples - remainingFrames);
+                messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples - remainingFrames);
+                processor->processBlock (buffer2, incomingMidi);
+                if (engine->transport()->isPlaying()) {
+                    engine->transport()->advance (numSamples - remainingFrames);
+                }
+            }
         }
 
         engine->transport()->postProcess (numSamples);
@@ -213,6 +226,7 @@ public:
     }
 
 private:
+    AudioEngine* engine;
     GraphProcessor* processor;
     CriticalSection lock;
     double sampleRate;

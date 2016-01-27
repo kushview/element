@@ -1,20 +1,20 @@
 /*
-  ==============================================================================
+    NewSessionView.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
-  This is an automatically generated GUI class created by the Introjucer!
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Introjucer version: 3.1.0
-
-  ------------------------------------------------------------------------------
-
-  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-13 by Raw Material Software Ltd.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef __JUCE_HEADER_C8F4A1A75D11B38A__
@@ -28,8 +28,7 @@
 
 
 namespace Element {
-namespace Gui {
-//==============================================================================
+
 /**
                                                                     //[Comments]
     An auto-generated component, created by the Introjucer.
@@ -68,6 +67,6 @@ private:
 //[EndFile] You can add extra defines here...
 //[/EndFile]
 
-}} /* namespace Element::Gui */
+} /* namespace Element */
 
 #endif   // __JUCE_HEADER_C8F4A1A75D11B38A__

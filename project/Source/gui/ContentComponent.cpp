@@ -17,8 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "gui/GuiApp.h"
 #include "gui/ContentComponent.h"
 #include "gui/SequencerComponent.h"
+#include "gui/TransportBar.h"
 #include "gui/Workspace.h"
 
 namespace Element {
@@ -28,6 +30,8 @@ ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
     setOpaque (true);
+    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
+
    #if 0
     addAndMakeVisible (display = new ScreenDisplay());
    #else
@@ -52,11 +56,12 @@ void ContentComponent::paint (Graphics &g)
 
 void ContentComponent::resized()
 {
-    const Rectangle<int> r (getLocalBounds());
+    const Rectangle<int> r (getLocalBounds().reduced (2));
    #if 1
-    seq->setBounds (r.reduced (2));
+    transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
+    seq->setBounds (r.withTrimmedTop (transport->getHeight()));
    #else
-    display->setBounds (r.reduced (2));
+    display->setBounds (r);
    #endif
 }
 

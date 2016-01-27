@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Introjucer version: 3.1.0
+  Created with Introjucer version: 4.1.0
 
   ------------------------------------------------------------------------------
 
   The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright 2004-13 by Raw Material Software Ltd.
+  Copyright (c) 2015 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -123,11 +123,14 @@ namespace Gui {
 PreferencesWidget::PreferencesWidget (GuiApp& gui_)
     : gui (gui_)
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
     addAndMakeVisible (pageList = new PageList (*this));
     pageList->setName ("Page List");
 
     addAndMakeVisible (groupComponent = new GroupComponent ("new group",
-                                                            "group"));
+                                                            TRANS("group")));
     groupComponent->setColour (GroupComponent::outlineColourId, Colour (0x66666666));
     groupComponent->setColour (GroupComponent::textColourId, Colour (0xffeeeeee));
 
@@ -176,6 +179,9 @@ void PreferencesWidget::paint (Graphics& g)
 
 void PreferencesWidget::resized()
 {
+    //[UserPreResize] Add your own custom resize code here..
+    //[/UserPreResize]
+
     pageList->setBounds (8, 8, 184, 480);
     groupComponent->setBounds (200, 8, 392, 480);
     pageComponent->setBounds (208, 32, 376, 448);
@@ -232,7 +238,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="PreferencesWidget" componentName=""
                  parentClasses="public Component" constructorParams="GuiApp&amp; gui_"
                  variableInitialisers="gui (gui_)" snapPixels="4" snapActive="1"
-                 snapShown="1" overlayOpacity="0.33" fixedSize="1" initialWidth="600"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">
   <BACKGROUND backgroundColour="ffffff"/>
   <GENERICCOMPONENT name="Page List" id="c2205f1e30617b7c" memberName="pageList"

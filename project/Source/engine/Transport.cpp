@@ -58,8 +58,7 @@ namespace Element {
         return playPos;
     }
 
-    void
-    Transport::postProcess (int nframes)
+    void Transport::postProcess (int nframes)
     {
         if (getTempo() != nextTempo.get())
         {

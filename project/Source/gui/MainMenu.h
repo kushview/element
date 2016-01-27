@@ -1,6 +1,6 @@
 /*
     MainMenu.h - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2016  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,27 +48,25 @@ public:
 
     void setupMenu()
     {
-#if JUCE_MAC
-       {
-           macMenu = new PopupMenu();
-           macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About BTV...");
-           macMenu->addSeparator();
-           macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
-           MenuBarModel::setMacMainMenu (this, macMenu.get());
-       }
-#else
-       owner.setMenuBar (this);
-#endif
+      #if JUCE_MAC
+        macMenu = new PopupMenu();
+        macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element...");
+        macMenu->addSeparator();
+        macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
+        MenuBarModel::setMacMainMenu (this, macMenu.get());
+       #else
+        owner.setMenuBar (this);
+       #endif
     }
 
     ~MainMenu()
     {
-#if JUCE_MAC
-      MainMenu::setMacMainMenu (nullptr);
-      macMenu = nullptr;
-#else
-      owner.setMenuBar (nullptr);
-#endif
+       #if JUCE_MAC
+        MainMenu::setMacMainMenu (nullptr);
+        macMenu = nullptr;
+       #else
+        owner.setMenuBar (nullptr);
+       #endif
     }
 
     StringArray getMenuBarNames()
@@ -79,39 +77,39 @@ public:
 
     PopupMenu getMenuForIndex (int id, const String&)
     {
-       PopupMenu menu;
-       if (id == File)        buildFileMenu (menu);
-       else if (id == Edit)   buildEditMenu (menu);
-       else if (id == View)   buildViewMenu (menu);
-       else if (id == Workspace) buildWindowMenu (menu);
-       else if (id == Help)   buildHelpMenu (menu);
-       else  { };
-       return menu;
+        PopupMenu menu;
+        if (id == File)        buildFileMenu (menu);
+        else if (id == Edit)   buildEditMenu (menu);
+        else if (id == View)   buildViewMenu (menu);
+        else if (id == Workspace) buildWindowMenu (menu);
+        else if (id == Help)   buildHelpMenu (menu);
+        else  { };
+        return menu;
     }
 
-   void buildFileMenu (PopupMenu& menu)
-   {
-       ApplicationCommandManager* acm = &owner.app().commander();
-       menu.addCommandItem (acm, Commands::mediaSave, "Save");
-       menu.addCommandItem (acm, Commands::sessionNew, "New Session");
-       menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
-       menu.addItem (1, "Open Recent...");
-       menu.addCommandItem (acm, Commands::sessionClose, "Close Session");
-       menu.addSeparator();
-       menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
-       menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-       menu.addSeparator();
-       menu.addCommandItem (acm, Commands::exportAudio, "Export Audio");
+    void buildFileMenu (PopupMenu& menu)
+    {
+        ApplicationCommandManager* acm = &owner.app().commander();
+        menu.addCommandItem (acm, Commands::mediaSave, "Save");
+        menu.addCommandItem (acm, Commands::sessionNew, "New Session");
+        menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
+        menu.addItem (1, "Open Recent...");
+        menu.addCommandItem (acm, Commands::sessionClose, "Close Session");
+        menu.addSeparator();
+        menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
+        menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
+        menu.addSeparator();
+        menu.addCommandItem (acm, Commands::exportAudio, "Export Audio");
+        
+       #if ! JUCE_MAC
+        menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
+        menu.addSeparator();
+        menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
+       #endif
+    }
 
-#if ! JUCE_MAC
-       menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
-       menu.addSeparator();
-       menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
-#endif
-   }
-
-   void buildEditMenu (PopupMenu& menu)
-   {
+    void buildEditMenu (PopupMenu& menu)
+    {
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, StandardApplicationCommandIDs::undo, "Undo");
         menu.addCommandItem (acm, StandardApplicationCommandIDs::redo, "Redo");
@@ -121,58 +119,55 @@ public:
         menu.addCommandItem (acm, StandardApplicationCommandIDs::paste, "Paste");
         menu.addSeparator();
         menu.addCommandItem (acm, StandardApplicationCommandIDs::selectAll, "Select All");
-   }
-
-   void buildViewMenu (PopupMenu& menu)
-   {
+    }
+    
+    void buildViewMenu (PopupMenu& menu)
+    {
         menu.addCommandItem (&owner.app().commander(), Commands::showLegacyView, "Legacy View");
-   }
+    }
+    
+    void buildWindowMenu (PopupMenu& menu)
+    {
+        menu.addCommandItem (&owner.app().commander(), Commands::showPluginManager);
+    }
+    
+    void buildHelpMenu (PopupMenu& menu)
+    {
+    }
+    
+    void menuItemSelected (int index, int menu)
+    {
+    }
 
-   void buildWindowMenu (PopupMenu& menu)
-   {
-       menu.addCommandItem (&owner.app().commander(), Commands::showPluginManager);
-   }
-
-   void buildHelpMenu (PopupMenu& menu)
-   {
-   }
-
-   void menuItemSelected (int index, int menu)
-   {
-   }
-
-   // Command Target
-
-   ApplicationCommandTarget* getNextCommandTarget() { return &owner.app(); }
-
-   void getAllCommands (Array <CommandID>& commands)
-   {
-      // const CommandID ids[] = {
-
-       //};
-   }
-
-   void getCommandInfo (CommandID command, ApplicationCommandInfo& result)
-   {
-       switch (command) { }
-   }
-
-   bool perform (const InvocationInfo& info)
-   {
-       switch (info.commandID)
-       {
-
-       case 0: break;
-       }
-
-       return false;
-   }
-
+    // Command Target
+    
+    ApplicationCommandTarget* getNextCommandTarget() { return &owner.app(); }
+    
+    void getAllCommands (Array <CommandID>& commands)
+    {
+        // const CommandID ids[] = {
+        
+        //};
+    }
+    
+    void getCommandInfo (CommandID command, ApplicationCommandInfo& result)
+    {
+        switch (command) { }
+    }
+    
+    bool perform (const InvocationInfo& info)
+    {
+        switch (info.commandID)
+        {
+                
+            case 0: break;
+        }
+        
+        return false;
+    }
 
 private:
-
     MainWindow& owner;
-
 };
 
 }}

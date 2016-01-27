@@ -122,21 +122,25 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
-      initializeModulePath();
+        DBG("Starting Application");
+        initializeModulePath();
+        world = new Globals (commandLine);
+        launchApplication();
 
-      world = new Globals (commandLine);
-      launchApplication();
-
-      gui = Gui::GuiApp::create (*world);
-      gui->run();
+        
     }
 
     void launchApplication()
     {
+        if (nullptr != gui)
+            return;
+        
         StartupThread startup (*world);
         startup.launchApplication();
         controller = startup.controller.release();
         engine = world->engine();
+        gui = Gui::GuiApp::create (*world);
+        gui->run();
     }
 
     void initializeModulePath()

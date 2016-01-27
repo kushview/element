@@ -23,14 +23,15 @@
 #include "element/Juce.h"
 
 namespace Element {
-namespace Gui {
+class TransportBar;
 
+namespace Gui {
 class GuiApp;
 class SequencerComponent;
 class Workspace;
 
 class ContentComponent :  public Component,
-        public DragAndDropContainer
+                          public DragAndDropContainer
 {
 public:
     ContentComponent (GuiApp& app);
@@ -47,6 +48,7 @@ private:
     ScopedPointer<ScreenDisplay> display;
     ScopedPointer<SequencerComponent> seq;
     ScopedPointer<Workspace>     workspace;
+    ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
 };
 

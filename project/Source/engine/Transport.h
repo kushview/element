@@ -24,11 +24,9 @@
 
 namespace Element
 {
-
     class Transport : public Shuttle
     {
     public:
-
         Transport();
         ~Transport();
 
@@ -42,13 +40,10 @@ namespace Element
         Shared<Monitor> monitor();
 
     private:
-
         AtomicValue<bool> playState, recordState;
         AtomicValue<double> nextTempo;
         Shared<Monitor> playPos;
-
     };
-
 }
 
 #endif // ELEMENT_TRANSPORT_H
