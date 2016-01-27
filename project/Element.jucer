@@ -286,6 +286,35 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </ANDROID>
+    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Element" binaryPath=""
+                       headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="../../Source"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+      </MODULEPATHS>
+    </VS2013>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
