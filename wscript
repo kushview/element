@@ -143,27 +143,30 @@ def copy_mingw_libs (bld):
         call (["cp", "-f", '%s/lib/%s.dll' % (bld.env.PREFIX, dll), 'build/mingw32/'])
 
 def build_mingw (bld):
+    project = juce.IntrojucerProject(bld, 'project/Element.jucer')
+    mingwSrc = project.getLibraryCode() + bld.path.ant_glob('project/Source/**/*.cpp')
+
     mingwEnv = bld.env.derive()
-    bld.shlib (
-        source = ['libs/element/element/modules/element_base/element_base.cpp',
-                  'libs/element/element/modules/element_engines/element_engines.cpp',
-                  'libs/element/element/modules/element_lv2/element_lv2.cpp',
-                  'libs/element/element/modules/element_gui/element_gui.cpp',
-                  'libs/element/element/modules/element_models/element_models.cpp'],
-        includes = ['libs/element', 'src', 'project/Source'],
-        target   = 'mingw32/element-0',
-        name     = 'libelement',
-        use      = ['JUCE', 'LILV', 'SUIL'],
-        env      = mingwEnv
-    )
+    # bld.shlib (
+    #     source = ['libs/element/element/modules/element_base/element_base.cpp',
+    #               'libs/element/element/modules/element_engines/element_engines.cpp',
+    #               'libs/element/element/modules/element_lv2/element_lv2.cpp',
+    #               'libs/element/element/modules/element_gui/element_gui.cpp',
+    #               'libs/element/element/modules/element_models/element_models.cpp'],
+    #     includes = ['libs/element', 'src', 'project/Source'],
+    #     target   = 'mingw32/element-0',
+    #     name     = 'libelement',
+    #     use      = ['JUCE', 'LILV', 'SUIL'],
+    #     env      = mingwEnv
+    # )
 
     bld.program (
-        source      = bld.path.ant_glob('project/Source/**/*.cpp'),
-        includes    = ['libs/element', 'src', 'project/Source'],
+        source      = mingwSrc,
+        includes    = ['libs/element', 'src', 'project/Source', 'project/JuceLibraryCode']],
         target      = 'mingw32/Element',
         name        = 'Element',
         linkflags   = ['-mwindows'],
-        use         = ['libelement'],
+        use         = ['LILV', 'SUIL'],
         env         = mingwEnv
     )
 
