@@ -162,7 +162,7 @@ def build_mingw (bld):
 
     bld.program (
         source      = mingwSrc,
-        includes    = ['libs/element', 'src', 'project/Source', 'project/JuceLibraryCode']],
+        includes    = ['libs/element', 'src', 'project/Source', 'project/JuceLibraryCode'],
         target      = 'mingw32/Element',
         name        = 'Element',
         linkflags   = ['-mwindows'] + project.getLinkFlags(),
