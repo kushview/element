@@ -176,7 +176,7 @@
           <FILE id="JVpSHI" name="Panels.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Panels.h"/>
           <FILE id="Do8mIU" name="PianoRoll.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/PianoRoll.cpp"/>
           <FILE id="RJ3UFy" name="PianoRoll.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PianoRoll.h"/>
-          <FILE id="vuMUUY" name="ProgramEditor.cpp" compile="1" resource="0"
+          <FILE id="vuMUUY" name="ProgramEditor.cpp" compile="0" resource="0"
                 file="../libs/ksp1/src/editor/ProgramEditor.cpp"/>
           <FILE id="uHO9TQ" name="ProgramEditor.h" compile="0" resource="0" file="../libs/ksp1/src/editor/ProgramEditor.h"/>
           <FILE id="NOZqZB" name="ProgramsListBox.cpp" compile="1" resource="0"
