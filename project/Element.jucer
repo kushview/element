@@ -123,6 +123,192 @@
         <FILE id="vY0OlN" name="Workspace.cpp" compile="1" resource="0" file="Source/gui/Workspace.cpp"/>
         <FILE id="zZaXn1" name="Workspace.h" compile="0" resource="0" file="Source/gui/Workspace.h"/>
       </GROUP>
+      <GROUP id="{836DDB2F-1E02-5D2B-5EC9-A763BCB3E0F6}" name="ksp1">
+        <GROUP id="{DEA916E9-1A5F-3B53-A24C-B91ED5878C99}" name="editor">
+          <FILE id="mUTMKr" name="AmpControls.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/AmpControls.cpp"/>
+          <FILE id="kLhpc5" name="AmpControls.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AmpControls.h"/>
+          <FILE id="JAsIbE" name="ArticulationControls.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/ArticulationControls.cpp"/>
+          <FILE id="cABiJM" name="ArticulationControls.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/ArticulationControls.h"/>
+          <FILE id="kfHetX" name="AssetsListBox.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/AssetsListBox.cpp"/>
+          <FILE id="cu2Skg" name="AssetsListBox.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AssetsListBox.h"/>
+          <FILE id="CFEfNL" name="AudioPeaks.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/AudioPeaks.cpp"/>
+          <FILE id="S6GbUY" name="AudioPeaks.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AudioPeaks.h"/>
+          <FILE id="BGn5dm" name="Banks.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Banks.h"/>
+          <FILE id="IKoaH9" name="BrowseScreen.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/BrowseScreen.cpp"/>
+          <FILE id="wHdUpL" name="BrowseScreen.h" compile="0" resource="0" file="../libs/ksp1/src/editor/BrowseScreen.h"/>
+          <FILE id="yA2q5L" name="ComponentMixin.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/ComponentMixin.h"/>
+          <FILE id="TtLjH2" name="DisplayView.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/DisplayView.cpp"/>
+          <FILE id="EgEryX" name="DisplayView.h" compile="0" resource="0" file="../libs/ksp1/src/editor/DisplayView.h"/>
+          <FILE id="AYk5Zz" name="EditScreen.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/EditScreen.cpp"/>
+          <FILE id="ME4hSd" name="EditScreen.h" compile="0" resource="0" file="../libs/ksp1/src/editor/EditScreen.h"/>
+          <FILE id="ccpEkT" name="FilterControls.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/FilterControls.cpp"/>
+          <FILE id="QppDwz" name="FilterControls.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/FilterControls.h"/>
+          <FILE id="cK2vDi" name="Keyboard.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Keyboard.cpp"/>
+          <FILE id="H2KXZH" name="Keyboard.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Keyboard.h"/>
+          <FILE id="aHdGZi" name="LayerCell.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LayerCell.cpp"/>
+          <FILE id="bsPom2" name="LayerCell.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LayerCell.h"/>
+          <FILE id="c9ZW9c" name="LayersListBox.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/LayersListBox.cpp"/>
+          <FILE id="Soktwl" name="LayersListBox.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LayersListBox.h"/>
+          <FILE id="DNc81f" name="LevelMeter.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LevelMeter.cpp"/>
+          <FILE id="uDzetl" name="LevelMeter.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LevelMeter.h"/>
+          <FILE id="BGWYUK" name="LV2Editor.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LV2Editor.cpp"/>
+          <FILE id="D6XE3D" name="LV2Editor.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LV2Editor.h"/>
+          <FILE id="gT1ifc" name="MenuButton.h" compile="0" resource="0" file="../libs/ksp1/src/editor/MenuButton.h"/>
+          <FILE id="l2M2OI" name="MidiFilterScreen.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/MidiFilterScreen.cpp"/>
+          <FILE id="cnFbIf" name="MidiFilterScreen.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/MidiFilterScreen.h"/>
+          <FILE id="kSgn7p" name="MidiKeyboardComponent.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/MidiKeyboardComponent.cpp"/>
+          <FILE id="zIApwM" name="MidiKeyboardComponent.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/MidiKeyboardComponent.h"/>
+          <FILE id="p4ppm3" name="MidiNoteSliderPropertyComponent.h" compile="0"
+                resource="0" file="../libs/ksp1/src/editor/MidiNoteSliderPropertyComponent.h"/>
+          <FILE id="I9DesV" name="PanelButton.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PanelButton.h"/>
+          <FILE id="JVpSHI" name="Panels.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Panels.h"/>
+          <FILE id="Do8mIU" name="PianoRoll.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/PianoRoll.cpp"/>
+          <FILE id="RJ3UFy" name="PianoRoll.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PianoRoll.h"/>
+          <FILE id="vuMUUY" name="ProgramEditor.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/ProgramEditor.cpp"/>
+          <FILE id="uHO9TQ" name="ProgramEditor.h" compile="0" resource="0" file="../libs/ksp1/src/editor/ProgramEditor.h"/>
+          <FILE id="NOZqZB" name="ProgramsListBox.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/ProgramsListBox.cpp"/>
+          <FILE id="MOvDAs" name="ProgramsListBox.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/ProgramsListBox.h"/>
+          <FILE id="X8DRGp" name="PropertiesScreen.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/PropertiesScreen.cpp"/>
+          <FILE id="wp4nkY" name="PropertiesScreen.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/PropertiesScreen.h"/>
+          <FILE id="yX9wOo" name="PropertyPage.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PropertyPage.h"/>
+          <FILE id="vPed3P" name="QuickBrowser.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/QuickBrowser.cpp"/>
+          <FILE id="ZAPG7c" name="QuickBrowser.h" compile="0" resource="0" file="../libs/ksp1/src/editor/QuickBrowser.h"/>
+          <FILE id="OBMkZW" name="SamplerDisplay.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/SamplerDisplay.cpp"/>
+          <FILE id="Ee5x2N" name="SamplerDisplay.h" compile="0" resource="0"
+                file="../libs/ksp1/src/editor/SamplerDisplay.h"/>
+          <FILE id="fxbDGd" name="SamplerView.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/SamplerView.cpp"/>
+          <FILE id="etOcFa" name="SamplerView.h" compile="0" resource="0" file="../libs/ksp1/src/editor/SamplerView.h"/>
+          <FILE id="n05yfM" name="ScreenManager.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/ScreenManager.cpp"/>
+          <FILE id="sQqwRl" name="ScreenManager.h" compile="0" resource="0" file="../libs/ksp1/src/editor/ScreenManager.h"/>
+          <FILE id="B8jPXs" name="Screens.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Screens.cpp"/>
+          <FILE id="GbEUFq" name="Screens.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Screens.h"/>
+          <FILE id="SHbCSL" name="SendsControls.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/editor/SendsControls.cpp"/>
+          <FILE id="gbhmxu" name="SendsControls.h" compile="0" resource="0" file="../libs/ksp1/src/editor/SendsControls.h"/>
+          <FILE id="QMb7IU" name="Views.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Views.h"/>
+          <FILE id="bhPR4g" name="Waveform.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Waveform.cpp"/>
+          <FILE id="Kg1INq" name="Waveform.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Waveform.h"/>
+          <FILE id="gEpQOc" name="Workspace.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Workspace.h"/>
+        </GROUP>
+        <GROUP id="{AB19AE57-030C-CFF5-2A5A-59FF696F5CB3}" name="engine">
+          <FILE id="gkUWY3" name="ADSR.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/ADSR.cpp"/>
+          <FILE id="rBzTUQ" name="ADSR.h" compile="0" resource="0" file="../libs/ksp1/src/engine/ADSR.h"/>
+          <FILE id="rXMbJm" name="Articulator.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/Articulator.cpp"/>
+          <FILE id="B2PXBx" name="Articulator.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Articulator.h"/>
+          <FILE id="Jc502a" name="Disposable.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Disposable.h"/>
+          <FILE id="dWZU0h" name="Jobs.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/Jobs.cpp"/>
+          <FILE id="NvAm6G" name="Jobs.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Jobs.h"/>
+          <FILE id="sJz1kj" name="LayerData.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/LayerData.cpp"/>
+          <FILE id="zUv5B7" name="LayerData.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LayerData.h"/>
+          <FILE id="aDZxVp" name="LayeringMode.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LayeringMode.h"/>
+          <FILE id="szTUui" name="LowPassFilter.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/engine/LowPassFilter.cpp"/>
+          <FILE id="JJmu1P" name="LowPassFilter.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LowPassFilter.h"/>
+          <FILE id="UuNHWF" name="LV2Plugin.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/LV2Plugin.cpp"/>
+          <FILE id="k3xBiG" name="LV2Plugin.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LV2Plugin.h"/>
+          <FILE id="z3TDV3" name="MidiFilter.h" compile="0" resource="0" file="../libs/ksp1/src/engine/MidiFilter.h"/>
+          <FILE id="voWBnz" name="SampleCache.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/SampleCache.cpp"/>
+          <FILE id="LeKv4Q" name="SampleCache.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SampleCache.h"/>
+          <FILE id="oatSOv" name="SamplerKeys.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerKeys.h"/>
+          <FILE id="szTGEt" name="SamplerSounds.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/engine/SamplerSounds.cpp"/>
+          <FILE id="AQb7sh" name="SamplerSounds.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerSounds.h"/>
+          <FILE id="slT585" name="SamplerSynth.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/engine/SamplerSynth.cpp"/>
+          <FILE id="eD4xMH" name="SamplerSynth.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerSynth.h"/>
+          <FILE id="JzbqLo" name="SamplerVoice.cpp" compile="1" resource="0"
+                file="../libs/ksp1/src/engine/SamplerVoice.cpp"/>
+          <FILE id="XMmWtZ" name="SamplerVoice.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerVoice.h"/>
+          <FILE id="U9BPM2" name="SqlQuery.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SqlQuery.h"/>
+        </GROUP>
+        <FILE id="aANtq7" name="Articulation.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/Articulation.cpp"/>
+        <FILE id="yFXieu" name="Articulation.h" compile="0" resource="0" file="../libs/ksp1/src/Articulation.h"/>
+        <FILE id="vmRkRB" name="BeatThangKitLoader.h" compile="0" resource="0"
+              file="../libs/ksp1/src/BeatThangKitLoader.h"/>
+        <FILE id="NipJ0P" name="BeatThangPatternLoader.h" compile="0" resource="0"
+              file="../libs/ksp1/src/BeatThangPatternLoader.h"/>
+        <FILE id="EpJNYX" name="ContentScanner.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/ContentScanner.cpp"/>
+        <FILE id="Of8pLx" name="ContentScanner.h" compile="0" resource="0"
+              file="../libs/ksp1/src/ContentScanner.h"/>
+        <FILE id="bJneyv" name="Controller.cpp" compile="1" resource="0" file="../libs/ksp1/src/Controller.cpp"/>
+        <FILE id="sEv7AC" name="Controller.h" compile="0" resource="0" file="../libs/ksp1/src/Controller.h"/>
+        <FILE id="uawFqg" name="Database.cpp" compile="1" resource="0" file="../libs/ksp1/src/Database.cpp"/>
+        <FILE id="OvNICg" name="Database.h" compile="0" resource="0" file="../libs/ksp1/src/Database.h"/>
+        <FILE id="Y67XNp" name="DataPath.cpp" compile="1" resource="0" file="../libs/ksp1/src/DataPath.cpp"/>
+        <FILE id="KM2zSK" name="DataPath.h" compile="0" resource="0" file="../libs/ksp1/src/DataPath.h"/>
+        <FILE id="mikJkQ" name="Filesystem.cpp" compile="1" resource="0" file="../libs/ksp1/src/Filesystem.cpp"/>
+        <FILE id="qMn1r5" name="Filesystem.h" compile="0" resource="0" file="../libs/ksp1/src/Filesystem.h"/>
+        <FILE id="kfLTj2" name="Forge.h" compile="0" resource="0" file="../libs/ksp1/src/Forge.h"/>
+        <FILE id="x8eGbj" name="H2DrumkitLoader.h" compile="0" resource="0"
+              file="../libs/ksp1/src/H2DrumkitLoader.h"/>
+        <FILE id="haVmSK" name="Instrument.cpp" compile="1" resource="0" file="../libs/ksp1/src/Instrument.cpp"/>
+        <FILE id="FgR4C3" name="Instrument.h" compile="0" resource="0" file="../libs/ksp1/src/Instrument.h"/>
+        <FILE id="dzxHhF" name="InstrumentLoader.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/InstrumentLoader.cpp"/>
+        <FILE id="uMJzGw" name="InstrumentLoader.h" compile="0" resource="0"
+              file="../libs/ksp1/src/InstrumentLoader.h"/>
+        <FILE id="GhIssJ" name="KeyItem.cpp" compile="1" resource="0" file="../libs/ksp1/src/KeyItem.cpp"/>
+        <FILE id="byF2gC" name="KSP1.cpp" compile="1" resource="0" file="../libs/ksp1/jucer/Source/KSP1.cpp"/>
+        <FILE id="NGp16F" name="KSP1.h" compile="0" resource="0" file="../libs/ksp1/src/KSP1.h"/>
+        <FILE id="Va8MFX" name="LayerItem.cpp" compile="1" resource="0" file="../libs/ksp1/src/LayerItem.cpp"/>
+        <FILE id="xcLxLX" name="Locations.cpp" compile="1" resource="0" file="../libs/ksp1/src/Locations.cpp"/>
+        <FILE id="vhAdZL" name="Locations.h" compile="0" resource="0" file="../libs/ksp1/src/Locations.h"/>
+        <FILE id="MWY40q" name="MediaLibrary.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/MediaLibrary.cpp"/>
+        <FILE id="SRXjQa" name="MediaLibrary.h" compile="0" resource="0" file="../libs/ksp1/src/MediaLibrary.h"/>
+        <FILE id="P1jvhh" name="MediaObject.h" compile="0" resource="0" file="../libs/ksp1/src/MediaObject.h"/>
+        <FILE id="MMlRZK" name="Monitor.h" compile="0" resource="0" file="../libs/ksp1/src/Monitor.h"/>
+        <FILE id="CgJRjx" name="PatternClip.h" compile="0" resource="0" file="../libs/ksp1/src/PatternClip.h"/>
+        <FILE id="Z9z6iI" name="PatternLoader.h" compile="0" resource="0" file="../libs/ksp1/src/PatternLoader.h"/>
+        <FILE id="Z5C7CA" name="PluginConfig.h" compile="0" resource="0" file="../libs/ksp1/jucer/Source/PluginConfig.h"/>
+        <FILE id="OHHCDe" name="PluginEditor.cpp" compile="1" resource="0"
+              file="../libs/ksp1/jucer/Source/PluginEditor.cpp"/>
+        <FILE id="FL4xpf" name="PluginEditor.h" compile="0" resource="0" file="../libs/ksp1/jucer/Source/PluginEditor.h"/>
+        <FILE id="tCGOXi" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="../libs/ksp1/jucer/Source/PluginProcessor.cpp"/>
+        <FILE id="U6U5SE" name="PluginProcessor.h" compile="0" resource="0"
+              file="../libs/ksp1/jucer/Source/PluginProcessor.h"/>
+        <FILE id="So4LBq" name="Ports.h" compile="0" resource="0" file="../libs/ksp1/src/Ports.h"/>
+        <FILE id="z16Dts" name="PortWriter.cpp" compile="1" resource="0" file="../libs/ksp1/src/PortWriter.cpp"/>
+        <FILE id="xttAvG" name="PortWriter.h" compile="0" resource="0" file="../libs/ksp1/src/PortWriter.h"/>
+        <FILE id="TnSNV8" name="PortWriterInterface.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/PortWriterInterface.cpp"/>
+        <FILE id="Z7wtnz" name="PortWriterInterface.h" compile="0" resource="0"
+              file="../libs/ksp1/src/PortWriterInterface.h"/>
+        <FILE id="w3Jrnd" name="Programming.cpp" compile="1" resource="0" file="../libs/ksp1/src/Programming.cpp"/>
+        <FILE id="TXDWX9" name="Programming.h" compile="0" resource="0" file="../libs/ksp1/src/Programming.h"/>
+        <FILE id="GZReJy" name="SamplerInterface.cpp" compile="1" resource="0"
+              file="../libs/ksp1/src/SamplerInterface.cpp"/>
+        <FILE id="D0blHT" name="SamplerInterface.h" compile="0" resource="0"
+              file="../libs/ksp1/src/SamplerInterface.h"/>
+        <FILE id="LymnjA" name="StandardLoader.h" compile="0" resource="0"
+              file="../libs/ksp1/src/StandardLoader.h"/>
+        <FILE id="DqGK1m" name="Types.h" compile="0" resource="0" file="../libs/ksp1/src/Types.h"/>
+        <FILE id="IHzK5B" name="URIs.cpp" compile="1" resource="0" file="../libs/ksp1/src/URIs.cpp"/>
+        <FILE id="gtdarN" name="URIs.h" compile="0" resource="0" file="../libs/ksp1/src/URIs.h"/>
+      </GROUP>
       <GROUP id="{B9118D49-09C0-7ADA-2A2D-6D0A76656BF1}" name="session">
         <FILE id="ywwtsx" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
         <FILE id="Y5cDGZ" name="Session.h" compile="0" resource="0" file="Source/session/Session.h"/>
@@ -191,10 +377,11 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0">
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
+               extraLinkerFlags="-lsqlite3">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
                        cppLibType="libc++" libraryPath="/opt/kushview/lib" binaryPath="../build"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="default"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
