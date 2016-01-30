@@ -126,8 +126,6 @@ public:
         initializeModulePath();
         world = new Globals (commandLine);
         launchApplication();
-
-        
     }
 
     void launchApplication()
