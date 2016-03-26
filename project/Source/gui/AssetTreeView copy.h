@@ -20,15 +20,12 @@
 #ifndef ELEMENT_TREEVIEW_TYPES_H
 #define ELEMENT_TREEVIEW_TYPES_H
 
-#include "SessionTreePanel.h"
-
-namespace Element {
-
-class AssetTreeViewItem :  public TreeItemBase,
+class AssetTreeViewItem :  public Element::TreeItemBase,
                            public ValueTree::Listener
 {
 public:
-    AssetTreeViewItem (const AssetTree::Item& item);
+
+    AssetTreeViewItem (const AssetItem& item);
     ~AssetTreeViewItem();
 
     virtual bool mightContainSubItems() override;
@@ -39,7 +36,7 @@ public:
     virtual bool isMissing() override;
     virtual void showPopupMenu() override;
     virtual void handlePopupMenuResult (int) override;
-    virtual Icon getIcon() const override;
+    virtual Element::Icon getIcon() const override;
 
     //void addSubItem();
     bool isRootAsset() const;
@@ -48,11 +45,8 @@ public:
     // dragging stuff
     File getDraggableFile() const override
     {
-        std::clog << "get draggable file\n";
-
         if (item.isFile())
             return item.getFile();
-
 
         return TreeItemBase::getDraggableFile();
     }
@@ -60,18 +54,18 @@ public:
     // value tree
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
     void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
-    void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int) override;
-    void valueTreeChildOrderChanged (ValueTree& parentTree, int, int) override;
+    void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int indexFromWhichChildWasRemoved) override;
+    void valueTreeChildOrderChanged (ValueTree& parentTree, int oldIndex, int newIndex) override;
     void valueTreeParentChanged (ValueTree& tree) override;
 
-    AssetTree::Item item;
+    AssetItem item;
 
 protected:
 
     void addSubItems() override;
-    virtual AssetTreeViewItem* createAssetSubItem (const AssetTree::Item&) { return nullptr; }
+    virtual AssetTreeViewItem* createAssetSubItem (const AssetItem&) { return nullptr; }
     virtual void treeChildrenChanged (const ValueTree& parentTree);
-    virtual void triggerAsyncAssetRename (const AssetTree::Item& item);
+    virtual void triggerAsyncAssetRename (const AssetItem& item);
 
 };
 
@@ -79,11 +73,11 @@ class PlainTextFileTreeViewItem   : public AssetTreeViewItem
 {
 public:
 
-    PlainTextFileTreeViewItem (const AssetTree::Item& item);
+    PlainTextFileTreeViewItem (const AssetItem& item);
     ~PlainTextFileTreeViewItem();
     bool acceptsFileDrop (const StringArray&) const { return false; }
-    bool acceptsDragItems (const OwnedArray <AssetTree::Item>&) { return false; }
-    AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
+    bool acceptsDragItems (const OwnedArray <AssetItem>&) { return false; }
+    AssetTreeViewItem* createAssetSubItem (const AssetItem& child);
     void showDocument();
     void showPopupMenu();
     void handlePopupMenuResult (int resultCode);
@@ -95,15 +89,14 @@ public:
 class GroupTreeViewItem   : public AssetTreeViewItem
 {
 public:
-
-    GroupTreeViewItem (const AssetTree::Item& item);
+    GroupTreeViewItem (const AssetItem& item);
     virtual ~GroupTreeViewItem();
 
     bool isRootAsset() const { return item.isRoot(); }
     bool acceptsFileDrop (const StringArray&) const { return true; }
-    bool acceptsDragItems (const OwnedArray <AssetTree::Item>& selectedNodes);
+    bool acceptsDragItems (const OwnedArray <AssetItem>& selectedNodes);
     void checkFileStatus();
-    void moveSelectedItemsTo (OwnedArray <AssetTree::Item>& selectedNodes, int insertIndex);
+    void moveSelectedItemsTo (OwnedArray <AssetItem>& selectedNodes, int insertIndex);
 
     virtual void showDocument();
     virtual void showPopupMenu();
@@ -119,10 +112,9 @@ public:
 
 protected:
 
-    AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
+    AssetTreeViewItem* createAssetSubItem (const AssetItem& child);
 
 };
 
-}
-
 #endif   // ELEMENT_TREEVIEW_TYPES_H
+

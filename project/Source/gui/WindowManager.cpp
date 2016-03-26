@@ -20,11 +20,11 @@
 #include "WindowManager.h"
 
 namespace Element {
-    namespace Gui {
-        WindowManager::WindowManager (GuiApp& gui_)
-            : gui (gui_)
-        {
-            //gui.commander().registerAllCommandsForTarget (this);
-        }
-    }
+
+WindowManager::WindowManager (GuiApp& gui_)
+    : gui (gui_)
+{
+    //gui.commander().registerAllCommandsForTarget (this);
+}
+    
 }

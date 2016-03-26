@@ -1,6 +1,7 @@
 *.pch
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
+data/*.ai
 
 dst
 libs/vst*

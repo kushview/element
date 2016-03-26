@@ -20,11 +20,10 @@
 #ifndef ELEMENT_PLUGINLIST_WINDOW_H
 #define ELEMENT_PLUGINLIST_WINDOW_H
 
-#include "../Globals.h"
-#include "Window.h"
+#include "Globals.h"
+#include "gui/Window.h"
 
 namespace Element {
-namespace Gui {
 
     class PluginListWindow  : public Window
     {
@@ -65,7 +64,6 @@ namespace Gui {
         }
 
     private:
-
         KnownPluginList& pluginList;
         PluginManager&   pluginManager;
         PluginListComponent* listComponent;
@@ -74,5 +72,5 @@ namespace Gui {
     };
 
 }
-}
+
 #endif // ELEMENT_PLUGINLIST_WINDOW_H

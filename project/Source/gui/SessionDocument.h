@@ -26,7 +26,6 @@ namespace Element {
 
     class Session;
 
-namespace Gui {
 
     class SessionDocument :  public FileBasedDocument
     {
@@ -52,6 +51,6 @@ namespace Gui {
 
     };
 
-}}
+}
 
 #endif // ELEMENT_SESSION_DOCUMENT_H

@@ -23,16 +23,14 @@
 #include "element/Juce.h"
 
 namespace Element {
-namespace Gui {
 
 class MidiEditorComponent :  public MidiEditorBody
 {
 public:
-
     MidiEditorComponent (MidiKeyboardState& keyboard);
     virtual ~MidiEditorComponent ();
 };
 
-}}
+}
 
 #endif // ELEMENT_STEP_SEQUENCER_BODY_H

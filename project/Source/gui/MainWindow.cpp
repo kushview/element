@@ -22,8 +22,6 @@
 #include "MainWindow.h"
 
 namespace Element {
-namespace Gui {
-
 
     MainWindow::MainWindow (GuiApp& gui_)
         : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
@@ -52,4 +50,4 @@ namespace Gui {
     }
 
 
-}} /* namespace Element::Gui */
+}

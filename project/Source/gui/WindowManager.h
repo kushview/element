@@ -25,7 +25,6 @@
 #include "Window.h"
 
 namespace Element {
-namespace Gui {
 
     class GuiApp;
 
@@ -100,6 +99,6 @@ namespace Gui {
 
     };
 
-}}
+}
 
 #endif

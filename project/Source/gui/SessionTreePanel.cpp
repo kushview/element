@@ -17,15 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "GuiCommon.h"
-#include "AssetTreeView.h"
-#include "ContentComponent.h"
-#include "NewFileWizard.h"
-#include "SessionTreePanel.h"
+#include "gui/GuiCommon.h"
+#include "gui/AssetTreeView.h"
+#include "gui/ContentComponent.h"
+#include "gui/NewFileWizard.h"
+#include "gui/SessionTreePanel.h"
 
 namespace Element {
-namespace Gui {
-
 
 class PatternTreeItem :  public AssetTreeViewItem
 {
@@ -202,10 +200,9 @@ void SessionTreePanel::mouseDown (const MouseEvent &ev)
 
 }
 
-Session&
-SessionTreePanel::session()
+Session& SessionTreePanel::session()
 {
     return gui.globals().session();
 }
 
-}}
+}

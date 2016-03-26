@@ -19,16 +19,15 @@
 
 #include "engine/InternalFormat.h"
 #include "gui/GuiCommon.h"
-#include "gui/GraphEditorPanel.h"
+#include "gui/GraphEditorView.h"
 #include "gui/GuiApp.h"
 
 namespace Element {
-namespace Gui {
 
     typedef InternalFormat Internals;
     
     GraphEditorPanel::GraphEditorPanel (GuiApp& gui, GraphController& ctl)
-        : GraphEditorBase (ctl)
+            : GraphEditorBase (ctl)
     { }
 
     GraphEditorPanel::~GraphEditorPanel()
@@ -90,4 +89,4 @@ namespace Gui {
         }
 
     }
-}}
+}

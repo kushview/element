@@ -24,7 +24,6 @@
 #include "GuiApp.h"
 
 namespace Element {
-namespace Gui {
 
 class MainMenu;
 
@@ -43,6 +42,6 @@ private:
 };
 
 
-}}
+}
 
 #endif /* ELEMENT_MAINWINDOW_H */

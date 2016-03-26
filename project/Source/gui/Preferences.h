@@ -24,22 +24,20 @@
 #include "PreferencesWidget.h"
 
 namespace Element {
-namespace Gui {
 
-    class GuiApp;
+class GuiApp;
 
-    class PreferencesComponent :  public PreferencesWidget
-    {
-    public:
+class PreferencesComponent :  public PreferencesWidget
+{
+public:
 
-        PreferencesComponent (GuiApp& gui);
-        ~PreferencesComponent();
+    PreferencesComponent (GuiApp& gui);
+    ~PreferencesComponent();
 
-        virtual void resized();
+    virtual void resized();
 
-    };
+};
 
-}}
-
+}
 
 #endif  /* ELEMENT_PREFERENCES_H */

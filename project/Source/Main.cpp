@@ -137,7 +137,7 @@ public:
         startup.launchApplication();
         controller = startup.controller.release();
         engine = world->engine();
-        gui = Gui::GuiApp::create (*world);
+        gui = GuiApp::create (*world);
         gui->run();
     }
 
@@ -207,7 +207,7 @@ public:
 private:
     ScopedPointer<Globals>  world;
     AudioEnginePtr          engine;
-    Scoped<Gui::GuiApp>     gui;
+    Scoped<GuiApp>     gui;
     ScopedPointer<AppController> controller;
 };
 

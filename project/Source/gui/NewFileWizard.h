@@ -5,7 +5,6 @@
 #include "gui/GuiCommon.h"
 
 namespace Element {
-namespace Gui {
 
 class NewFileWizard : private DeletedAtShutdown
 {
@@ -38,6 +37,6 @@ private:
 };
 
 
-}}
+}
 
 #endif   // ELEMENT_NEW_FILE_WIZARD_H

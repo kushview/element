@@ -26,7 +26,6 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
-namespace Gui {
 
 
     class PreferencesWidget::PageList :  public ListBox,
@@ -222,7 +221,7 @@ void PreferencesWidget::setPage (const String& uri)
     addAndMakeVisible (pageComponent);
 }
 
-}} /* namespace Element::gui */
+} /* namespace Element */
 //[/MiscUserCode]
 
 

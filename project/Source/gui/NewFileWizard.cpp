@@ -5,7 +5,6 @@ namespace {
 }
 
 namespace Element {
-namespace Gui {
 
 
 class NewPatternWizard  : public NewFileWizard::Type
@@ -100,4 +99,4 @@ void NewFileWizard::registerWizard (Type* newWizard)
     wizards.add (newWizard);
 }
 
-}}
+}

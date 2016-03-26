@@ -34,7 +34,7 @@
 #include "Settings.h"
 
 namespace Element {
-namespace Gui {
+
 class GuiApp::Dispatch : public Timer
 {
 public:
@@ -125,8 +125,7 @@ Globals& GuiApp::globals()
    return world;
 }
 
-void
-GuiApp::openWindow (const String& uri)
+void GuiApp::openWindow (const String& uri)
 {
     if (uri == ELEMENT_PLUGIN_MANAGER) {
         windowManager->push (new PluginListWindow (globals()));
@@ -549,4 +548,4 @@ bool GuiApp::perform (const InvocationInfo& info)
     return result;
 }
 
-}}
+}

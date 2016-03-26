@@ -24,7 +24,6 @@
 #include "gui/Timeline.h"
 
 namespace Element {
-namespace Gui {
 
     class GuiApp;
     class SequencerClipItem;
@@ -78,6 +77,6 @@ namespace Gui {
         void recycleSequencerClip (SequencerClipItem* clip);
     };
 
-}}
+}
 
 #endif /* ELEMENT_SEQUENCER_COMPONENT_H */

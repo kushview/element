@@ -30,8 +30,6 @@
 namespace Element {
     class EngineControl;
     class Globals;
-
-namespace Gui {
     class ContentComponent;
     class MainWindow;
     class SessionDocument;
@@ -108,6 +106,6 @@ namespace Gui {
         void showSplash();
     };
 
-}} /* namespace Element::Gui */
-
+}
+    
 #endif /* ELEMENT_GUIAPP_H */

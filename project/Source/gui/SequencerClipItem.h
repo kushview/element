@@ -23,7 +23,6 @@
 #include "gui/Timeline.h"
 
 namespace Element {
-namespace Gui {
 
 class SequencerComponent;
 
@@ -81,6 +80,6 @@ private:
 
 };
 
-}}
+}
 
 #endif /* ELEMENT_SEQUENCER_CLIP_ITEM_H */

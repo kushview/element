@@ -23,7 +23,6 @@
 #include "element/Juce.h"
 
 namespace Element {
-namespace Gui {
 
     class Workspace :  public Component
     {
@@ -47,6 +46,6 @@ namespace Gui {
 
     };
 
-}}
+}
 
 #endif /* ELEMENT_WORKSPACE_H */

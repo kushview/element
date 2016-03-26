@@ -21,8 +21,6 @@
 #include "Window.h"
 
 namespace Element {
-namespace Gui {
-
 
     Dialog::Dialog (const String& name, GuiApp& gui_)
         : DialogWindow (name, Colours::darkgrey, true, true),
@@ -68,4 +66,4 @@ namespace Gui {
         closedSignal();
     }
 
-}}  /* namespace Element::gui */
+}  /* namespace Element */

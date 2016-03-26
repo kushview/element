@@ -17,10 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "MidiEditorComponent.h"
+#include "gui/MidiEditorComponent.h"
 
 namespace Element {
-namespace Gui {
 
 MidiEditorComponent::MidiEditorComponent (MidiKeyboardState& k)
     : MidiEditorBody (k)
@@ -29,4 +28,4 @@ MidiEditorComponent::MidiEditorComponent (MidiKeyboardState& k)
 MidiEditorComponent::~MidiEditorComponent()
 { }
 
-}}
+}

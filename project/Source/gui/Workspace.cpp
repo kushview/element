@@ -20,8 +20,6 @@
 #include "Workspace.h"
 
 namespace Element {
-namespace Gui {
-
 
 Workspace::Workspace()
 {
@@ -64,4 +62,4 @@ void Workspace::resized()
     dock->setBounds (b.reduced (3));
 }
 
-}}
+}

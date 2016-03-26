@@ -21,7 +21,6 @@
 #include "SessionDocument.h"
 
 namespace Element {
-namespace Gui {
 
     SessionDocument::SessionDocument (Session& s)
         : FileBasedDocument (".bts", "*.bts;*.xml", "Open Session", "Save Session"),
@@ -89,4 +88,4 @@ namespace Gui {
     {
         changed();
     }
-}}
+}

@@ -18,12 +18,10 @@
 */
 
 #include "element/Juce.h"
-
-#include "GuiApp.h"
-#include "Preferences.h"
+#include "gui/GuiApp.h"
+#include "gui/Preferences.h"
 
 namespace Element {
-namespace Gui {
 
     PreferencesComponent::PreferencesComponent (GuiApp& gui)
         : PreferencesWidget (gui)
@@ -40,7 +38,7 @@ namespace Gui {
     {
         Component::resized();
     }
-}}
+}
 
 
 

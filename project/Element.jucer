@@ -5,6 +5,9 @@
               jucerVersion="4.1.0" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
+    <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="Resources">
+      <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
+    </GROUP>
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
       <GROUP id="{236A2727-1B08-2691-57CF-437D4122A18C}" name="controllers">
         <FILE id="iXbind" name="AppController.cpp" compile="1" resource="0"
@@ -56,6 +59,10 @@
         </GROUP>
         <FILE id="lSY9NC" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
         <FILE id="KB9gFt" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
+        <FILE id="b5G3vT" name="AssetTreeView copy.cpp" compile="0" resource="0"
+              file="Source/gui/AssetTreeView copy.cpp"/>
+        <FILE id="CPsuul" name="AssetTreeView copy.h" compile="0" resource="0"
+              file="Source/gui/AssetTreeView copy.h"/>
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
               file="Source/gui/AssetTreeView.cpp"/>
         <FILE id="KsEoBI" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>
@@ -64,13 +71,20 @@
               file="Source/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
               file="Source/gui/ContentComponent.h"/>
-        <FILE id="vFNIgd" name="GraphEditorPanel.cpp" compile="1" resource="0"
-              file="Source/gui/GraphEditorPanel.cpp"/>
-        <FILE id="dqN1CW" name="GraphEditorPanel.h" compile="0" resource="0"
-              file="Source/gui/GraphEditorPanel.h"/>
+        <FILE id="N6IdK1" name="GraphEditorComponent.cpp" compile="1" resource="0"
+              file="Source/gui/GraphEditorComponent.cpp"/>
+        <FILE id="RZD4Q9" name="GraphEditorComponent.h" compile="0" resource="0"
+              file="Source/gui/GraphEditorComponent.h"/>
+        <FILE id="vFNIgd" name="GraphEditorView.cpp" compile="1" resource="0"
+              file="Source/gui/GraphEditorView.cpp"/>
+        <FILE id="dqN1CW" name="GraphEditorView.h" compile="0" resource="0"
+              file="Source/gui/GraphEditorView.h"/>
         <FILE id="VY02a4" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
         <FILE id="oKKgS7" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="cPWpB0" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
+        <FILE id="UYQNVW" name="IconButton.h" compile="0" resource="0" file="Source/gui/IconButton.h"/>
+        <FILE id="qOKTw2" name="Icons.cpp" compile="1" resource="0" file="Source/gui/Icons.cpp"/>
+        <FILE id="ksQT0O" name="Icons.h" compile="0" resource="0" file="Source/gui/Icons.h"/>
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
@@ -87,6 +101,9 @@
               file="Source/gui/NewSessionView.h"/>
         <FILE id="BKStDb" name="PluginListWindow.h" compile="0" resource="0"
               file="Source/gui/PluginListWindow.h"/>
+        <FILE id="dQixGq" name="PluginWindow.cpp" compile="1" resource="0"
+              file="Source/gui/PluginWindow.cpp"/>
+        <FILE id="apg1Kn" name="PluginWindow.h" compile="0" resource="0" file="Source/gui/PluginWindow.h"/>
         <FILE id="Kql61f" name="Preferences.cpp" compile="1" resource="0" file="Source/gui/Preferences.cpp"/>
         <FILE id="Fk6kww" name="Preferences.h" compile="0" resource="0" file="Source/gui/Preferences.h"/>
         <FILE id="OyaYz3" name="PreferencesWidget.cpp" compile="1" resource="0"
@@ -113,6 +130,9 @@
         <FILE id="qYfDuN" name="TransportBar.cpp" compile="1" resource="0"
               file="Source/gui/TransportBar.cpp"/>
         <FILE id="dhbPTG" name="TransportBar.h" compile="0" resource="0" file="Source/gui/TransportBar.h"/>
+        <FILE id="LKLsgk" name="TreeviewBase.cpp" compile="1" resource="0"
+              file="Source/gui/TreeviewBase.cpp"/>
+        <FILE id="TWN09g" name="TreeviewBase.h" compile="0" resource="0" file="Source/gui/TreeviewBase.h"/>
         <FILE id="TJ8hvg" name="Window.cpp" compile="1" resource="0" file="Source/gui/Window.cpp"/>
         <FILE id="WfFCIC" name="Window.h" compile="0" resource="0" file="Source/gui/Window.h"/>
         <FILE id="qis1vl" name="WindowManager.cpp" compile="1" resource="0"
@@ -376,7 +396,7 @@
       </MODULEPATHS>
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
-               extraLinkerFlags="-lsqlite3">
+               extraLinkerFlags="-lsqlite3" bigIcon="eG1U6B" smallIcon="eG1U6B">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"

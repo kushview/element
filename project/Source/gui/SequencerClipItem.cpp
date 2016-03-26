@@ -21,8 +21,6 @@
 #include "SequencerComponent.h"
 
 namespace Element {
-namespace Gui {
-
 
 SequencerClipItem::SequencerClipItem (SequencerComponent& owner,
                                       const ClipModel& m)
@@ -68,5 +66,4 @@ SequencerClipItem::setModel (const ClipModel& clip)
     repaint();
 }
 
-}
 }

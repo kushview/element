@@ -20,39 +20,37 @@
 #ifndef ELEMENT_SESSION_TREE_PANEL_H
 #define ELEMENT_SESSION_TREE_PANEL_H
 
+#include "gui/TreeViewBase.h"
 #include "session/Session.h"
 
 namespace Element {
 
-    class Session;
+class Session;
+class GuiApp;
 
-namespace Gui {
+class SessionTreePanel : public TreePanelBase
+{
+public:
 
-    class GuiApp;
+    explicit SessionTreePanel (GuiApp& gui);
+    virtual ~SessionTreePanel();
 
-    class SessionTreePanel : public TreePanelBase
-    {
-    public:
+    void mouseDown (const MouseEvent &event);
 
-        explicit SessionTreePanel (GuiApp& gui);
-        virtual ~SessionTreePanel();
+    Session& session();
 
-        void mouseDown (const MouseEvent &event);
+private:
 
-        Session& session();
+    GuiApp& gui;
 
-    private:
-
-        GuiApp& gui;
-
-    };
+};
 
 
-    class SessionMediaTreePanel :  public TreePanelBase
-    {
+class SessionMediaTreePanel :  public TreePanelBase
+{
 
-    };
+};
 
-}}
+}
 
 #endif // ELEMENT_SESSION_TREE_PANEL_H

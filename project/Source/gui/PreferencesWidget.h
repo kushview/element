@@ -24,9 +24,7 @@
 #include <element/Juce.h>
 
 namespace Element {
-namespace Gui {
-
-    class GuiApp;
+class GuiApp;
 
 //[/Headers]
 
@@ -75,7 +73,7 @@ private:
 };
 
 //[EndFile] You can add extra defines here...
-}}  /* namnespace Element::Gui */
+}
 //[/EndFile]
 
 #endif   // __JUCE_HEADER_66D14F855D7E86CC__

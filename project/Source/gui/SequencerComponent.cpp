@@ -24,7 +24,6 @@
 #include "session/Session.h"
 
 namespace Element {
-namespace Gui {
 
 SequencerComponent::SequencerComponent (GuiApp &g)
     : gui (g)
@@ -292,4 +291,4 @@ void SequencerComponent::recycleSequencerClip (SequencerClipItem* clip)
     recycleClip (clip);
 }
 
-}}
+}

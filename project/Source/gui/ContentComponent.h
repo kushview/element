@@ -23,11 +23,10 @@
 #include "element/Juce.h"
 
 namespace Element {
-class TransportBar;
 
-namespace Gui {
-class GuiApp;
 class GraphEditorPanel;
+class TransportBar;
+class GuiApp;
 class SequencerComponent;
 class Workspace;
 
@@ -54,6 +53,6 @@ private:
     ScopedPointer<GraphEditorPanel> graph;
 };
 
-}}
+}
 
 #endif // ELEMENT_CONTENT_COMPONENT_H

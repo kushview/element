@@ -20,11 +20,12 @@
 #ifndef ELEMENT_GRAPHEDITORCOMPONENT_H
 #define ELEMENT_GRAPHEDITORCOMPONENT_H
 
-namespace Element {
-namespace Gui {
-    class GuiApp;
+#include "gui/GraphEditorComponent.h"
 
-    class GraphEditorPanel : public GraphEditorBase
+namespace Element {
+
+    class GuiApp;
+    class GraphEditorPanel : public GraphEditorComponent
     {
     public:
         GraphEditorPanel (GuiApp& gui, GraphController& ctl);
@@ -32,7 +33,7 @@ namespace Gui {
 
         void mouseDown (const MouseEvent &e);
     };
-}}
+}
 
 
 #endif // ELEMENT_GRAPHEDITORCOMPONENT_H

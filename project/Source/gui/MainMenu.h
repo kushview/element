@@ -20,14 +20,10 @@
 #ifndef ELEMENT_MAIN_MENU_H
 #define ELEMENT_MAIN_MENU_H
 
-#include "../URIs.h"
-
-#include "MainWindow.h"
+#include "URIs.h"
+#include "gui/MainWindow.h"
 
 namespace Element {
-namespace Gui {
-
-    class MainWindow;
 
 class MainMenu : public MenuBarModel,
                  public ApplicationCommandTarget
@@ -80,9 +76,9 @@ public:
     {
         PopupMenu menu;
         if (id == File)        buildFileMenu (menu);
-        else if (id == Edit)   buildEditMenu (menu);
+        /* else if (id == Edit)   buildEditMenu (menu);
         else if (id == View)   buildViewMenu (menu);
-        else if (id == Workspace) buildWindowMenu (menu);
+        else if (id == Workspace) buildWindowMenu (menu); */
         else if (id == Help)   buildHelpMenu (menu);
         else  { };
         return menu;
@@ -171,6 +167,6 @@ private:
     MainWindow& owner;
 };
 
-}}
+}
 
 #endif // ELEMENT_MAIN_MENU_H
