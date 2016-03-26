@@ -37,7 +37,7 @@ class MainMenu : public MenuBarModel,
 public:
 
     enum RootNames {
-        File, Edit, View, Workspace, Help, NumMenus
+        File, /* Edit, View, Workspace,*/ Help, NumMenus
     };
 
     MainMenu (MainWindow& parent)
@@ -71,7 +71,8 @@ public:
 
     StringArray getMenuBarNames()
     {
-        const char* const names[] = { "File", "Edit", "View", "Workspace", "Help", nullptr };
+        // const char* const names[] = { "File", "Edit", "View", "Workspace", "Help", nullptr };
+        const char* const names[] = { "File", "Help", nullptr };
         return StringArray (names);
     }
 

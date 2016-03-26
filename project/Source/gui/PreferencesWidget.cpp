@@ -145,9 +145,9 @@ PreferencesWidget::PreferencesWidget (GuiApp& gui_)
 
 
     //[Constructor] You can add your own custom stuff here..
-    pageList->addItem ("Application",  "element://gui/application");
+    // pageList->addItem ("Application",  "element://gui/application");
     pageList->addItem ("Audio Engine", "element://gui/audioEngine");
-    pageList->addItem ("MIDI Devices", "element://gui/midiDevices");
+    // pageList->addItem ("MIDI Devices", "element://gui/midiDevices");
     pageList->selectRow (1);
     setPage ("element://gui/audioEngine");
     //[/Constructor]

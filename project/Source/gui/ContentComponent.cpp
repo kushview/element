@@ -17,7 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "EngineControl.h"
 #include "gui/GuiApp.h"
+#include "gui/GraphEditorPanel.h"
 #include "gui/ContentComponent.h"
 #include "gui/SequencerComponent.h"
 #include "gui/TransportBar.h"
@@ -30,12 +32,16 @@ ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
     setOpaque (true);
-    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
+    // addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
 
    #if 0
     addAndMakeVisible (display = new ScreenDisplay());
    #else
-    addAndMakeVisible (seq = new SequencerComponent (gui));
+    // addAndMakeVisible (seq = new SequencerComponent (gui));
+    AudioEnginePtr engine = gui.globals().engine();
+    Shared<EngineControl> ctl = engine->controller();
+    
+    addAndMakeVisible (graph = new GraphEditorPanel (gui, *ctl));
    #endif
     resized();
 }
@@ -57,12 +63,13 @@ void ContentComponent::paint (Graphics &g)
 void ContentComponent::resized()
 {
     const Rectangle<int> r (getLocalBounds().reduced (2));
-   #if 1
+    graph->setBounds (r);
+   /* #if 1
     transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
-    seq->setBounds (r.withTrimmedTop (transport->getHeight()));
+    graph->setBounds (r.withTrimmedTop (transport->getHeight()));
    #else
     display->setBounds (r);
-   #endif
+   #endif */
 }
 
 GuiApp& ContentComponent::app() { return gui; }

@@ -22,19 +22,16 @@
 
 namespace Element {
 namespace Gui {
-
     class GuiApp;
 
     class GraphEditorPanel : public GraphEditorBase
     {
     public:
-
         GraphEditorPanel (GuiApp& gui, GraphController& ctl);
         ~GraphEditorPanel();
 
         void mouseDown (const MouseEvent &e);
     };
-
 }}
 
 

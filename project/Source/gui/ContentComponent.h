@@ -27,6 +27,7 @@ class TransportBar;
 
 namespace Gui {
 class GuiApp;
+class GraphEditorPanel;
 class SequencerComponent;
 class Workspace;
 
@@ -50,6 +51,7 @@ private:
     ScopedPointer<Workspace>     workspace;
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
+    ScopedPointer<GraphEditorPanel> graph;
 };
 
 }}

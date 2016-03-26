@@ -17,12 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-
-#include "../engine/InternalFormat.h"
-
-#include "GuiCommon.h"
-#include "GraphEditorPanel.h"
-#include "GuiApp.h"
+#include "engine/InternalFormat.h"
+#include "gui/GuiCommon.h"
+#include "gui/GraphEditorPanel.h"
+#include "gui/GuiApp.h"
 
 namespace Element {
 namespace Gui {
@@ -36,8 +34,7 @@ namespace Gui {
     GraphEditorPanel::~GraphEditorPanel()
     { }
 
-    void
-    GraphEditorPanel::mouseDown(const MouseEvent &e)
+    void GraphEditorPanel::mouseDown(const MouseEvent &e)
     {
         if (! e.mods.isPopupMenu())
         {

@@ -26,12 +26,11 @@
 namespace Element {
 namespace Gui {
 
-    class MainMenu;
+class MainMenu;
 
 class MainWindow : public DocumentWindow
 {
 public:
-
     MainWindow (GuiApp& gui_);
     virtual ~MainWindow();
 
@@ -39,10 +38,8 @@ public:
     void closeButtonPressed();
 
 private:
-
     GuiApp& gui;
     ScopedPointer<MainMenu> mainMenu;
-
 };
 
 
