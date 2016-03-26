@@ -59,10 +59,6 @@
         </GROUP>
         <FILE id="lSY9NC" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
         <FILE id="KB9gFt" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
-        <FILE id="b5G3vT" name="AssetTreeView copy.cpp" compile="0" resource="0"
-              file="Source/gui/AssetTreeView copy.cpp"/>
-        <FILE id="CPsuul" name="AssetTreeView copy.h" compile="0" resource="0"
-              file="Source/gui/AssetTreeView copy.h"/>
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
               file="Source/gui/AssetTreeView.cpp"/>
         <FILE id="KsEoBI" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>

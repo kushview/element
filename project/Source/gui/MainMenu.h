@@ -1,6 +1,6 @@
 /*
     MainMenu.h - This file is part of Element
-    Copyright (C) 2014-2016  Kushview, LLC.  All rights reserved.
+    -2016  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class MainMenu : public MenuBarModel,
 public:
 
     enum RootNames {
-        File, /* Edit, View, Workspace,*/ Help, NumMenus
+        File, /* Edit, View, Workspace,*/ Window, Help, NumMenus
     };
 
     MainMenu (MainWindow& parent)
@@ -68,7 +68,7 @@ public:
     StringArray getMenuBarNames()
     {
         // const char* const names[] = { "File", "Edit", "View", "Workspace", "Help", nullptr };
-        const char* const names[] = { "File", "Help", nullptr };
+        const char* const names[] = { "File", "Window", "Help", nullptr };
         return StringArray (names);
     }
 
@@ -79,6 +79,7 @@ public:
         /* else if (id == Edit)   buildEditMenu (menu);
         else if (id == View)   buildViewMenu (menu);
         else if (id == Workspace) buildWindowMenu (menu); */
+        else if (id == Window) buildWindowMenu (menu);
         else if (id == Help)   buildHelpMenu (menu);
         else  { };
         return menu;

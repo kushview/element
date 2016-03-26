@@ -1,6 +1,6 @@
 /*
     EngineControl.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -105,7 +105,7 @@ namespace Element {
             if (IOProcessor* io = node->processor<IOProcessor>())
                 ioNodes.set (io->getType(), node);
         }
-
+#if 0
         if (seqNode == nullptr) {
             seqNode = addRootPlugin (InternalFormat::sequenceProcessor);
         }
@@ -128,11 +128,15 @@ namespace Element {
 
         assert (seq->numTracks() == session->numTracks());
         assert (seq->tracksArePresent());
+#endif
 
         NodePtr output = ioNodes.getUnchecked (IOProcessor::audioOutputNode);
+        
+#if 0
         getGraph().connectChannels (PortType::Audio, seqNode->nodeId, 0, output->nodeId, 0);
         getGraph().connectChannels (PortType::Audio, seqNode->nodeId, 1, output->nodeId, 1);
-
+#endif
+        
         session->node().addListener (this);
         return true;
     }
@@ -159,9 +163,10 @@ namespace Element {
 
     bool EngineControl::validateRequiredNodes()
     {
+#if 0
         if (sequencer() == nullptr)
             return false;
-
+#endif
         for (int i = 0; i < IOProcessor::numDeviceTypes; ++i)
         {
             NodePtr ptr = ioNodes.getUnchecked (i);

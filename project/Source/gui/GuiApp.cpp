@@ -1,6 +1,6 @@
 /*
     GuiApp.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -129,8 +129,6 @@ void GuiApp::openWindow (const String& uri)
 {
     if (uri == ELEMENT_PLUGIN_MANAGER) {
         windowManager->push (new PluginListWindow (globals()));
-    } else if (uri == ELEMENT_LEGACY_WINDOW) {
-        //windowManager->push (new ABeatThangWindow (*this));
     }
 }
 
