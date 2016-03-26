@@ -18,17 +18,17 @@
 */
 
 
-#include "../session/Session.h"
-#include "../MediaManager.h"
+#include "session/Sequence.h"
+#include "MediaManager.h"
 
 
 namespace Element {
 
-    ClipModel
-    Session::Track::addClip (const File &file, double startTime)
+    ClipModel Sequence::Track::addClip (const File &file, double startTime)
     {
-        ClipModel invalid (ValueTree::invalid);
 
+        ClipModel invalid (ValueTree::invalid);
+#if 0
         if (! supportsFile (file))
             return invalid;
 
@@ -54,42 +54,42 @@ namespace Element {
             return clip;
         }
     #endif
-
+#endif
         return invalid;
     }
 
-    Session::Track Session::Track::next() const
+    Sequence::Track Sequence::Track::next() const
     {
-        return Track (session.get(), session->sequenceNode().getChild (
-                          session->sequenceNode().indexOf (trackData) + 1));
+        return Track (session, session->node().getChild (
+                      session->node().indexOf (trackData) + 1));
     }
 
-    Session::Track Session::Track::previous() const
+    Sequence::Track Sequence::Track::previous() const
     {
-        return Track (session.get(), session->sequenceNode().getChild (
-                      session->sequenceNode().indexOf (trackData) - 1));
+        return Track (session, session->node().getChild (
+                      session->node().indexOf (trackData) - 1));
     }
 
     void
-    Session::Track::removeFromSession()
+    Sequence::Track::removeFromSession()
     {        
         trackData.removeAllChildren (undoManager());
         session->sequenceNode().removeChild (trackData, undoManager());
     }
 
-    bool Session::Track::supportsAsset (const AssetItem &asset) const
+    bool Sequence::Track::supportsAsset (const AssetItem &asset) const
     {
         return supportsFile (asset.getFile());
     }
 
     bool
-    Session::Track::supportsClip (const ClipModel &clip) const
+    Sequence::Track::supportsClip (const ClipModel &clip) const
     {
         return clip.node().getProperty("media").equals (trackData.getProperty ("type"));
     }
 
     bool
-    Session::Track::supportsFile (const File &file) const
+    Sequence::Track::supportsFile (const File &file) const
     {
         return session->media().canOpenFile (file);
     }

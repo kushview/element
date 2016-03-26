@@ -26,11 +26,9 @@ namespace Element {
 
     class Session;
 
-
     class SessionDocument :  public FileBasedDocument
     {
     public:
-
         SessionDocument (Session& session);
         ~SessionDocument();
 
@@ -41,16 +39,12 @@ namespace Element {
         void setLastDocumentOpened (const File& file);
 
     private:
-
         Session& session;
         File lastSession;
-        boost::signals2::connection connection;
 
         friend class Session;
         void onSessionChanged();
-
     };
-
 }
 
 #endif // ELEMENT_SESSION_DOCUMENT_H

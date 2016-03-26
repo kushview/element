@@ -91,6 +91,7 @@ namespace Element {
         else if (desc.name == "Sequencer")
         {
             Sequencer* seq = new Sequencer (engine.clips());
+#if 0
             seq->setModel (s->sequence());
 
             if (! seq->model().node().isValid())
@@ -103,7 +104,7 @@ namespace Element {
             {
                 assert (seq->model().node() == s->sequence().node());
             }
-
+#endif
             return seq;
         }
 

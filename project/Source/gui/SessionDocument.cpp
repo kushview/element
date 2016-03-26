@@ -25,14 +25,9 @@ namespace Element {
     SessionDocument::SessionDocument (Session& s)
         : FileBasedDocument (".bts", "*.bts;*.xml", "Open Session", "Save Session"),
           session (s)
-    {
-        connection = session.signalChanged().connect (boost::bind (&SessionDocument::onSessionChanged, this));
-    }
+    { }
 
-    SessionDocument::~SessionDocument()
-    {
-        connection.disconnect();
-    }
+    SessionDocument::~SessionDocument() { }
 
     String
     SessionDocument::getDocumentTitle()

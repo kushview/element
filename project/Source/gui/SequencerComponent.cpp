@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
+
 #include "gui/SequencerClipItem.h"
 #include "gui/SequencerComponent.h"
 #include "gui/GuiCommon.h"
@@ -292,3 +294,5 @@ void SequencerComponent::recycleSequencerClip (SequencerClipItem* clip)
 }
 
 }
+
+#endif
