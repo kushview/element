@@ -196,6 +196,7 @@ void GuiApp::run()
     if (sess.existsAsFile()) {
         sessionDoc->loadFrom (sess, true);
         mainWindow->setName (sessionDoc->getDocumentTitle());
+        content->stabilize();
     }
 }
 
