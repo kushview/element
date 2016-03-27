@@ -258,7 +258,7 @@ void GuiApp::openSession()
 {
     if (sessionDoc->loadFromUserSpecifiedFile (true)) {
         mainWindow->setName (sessionDoc->getDocumentTitle());
-        // content->stabilize();
+        content->stabilize();
     }
 }
 

@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "../session/Session.h"
-#include "SessionDocument.h"
+#include "session/Session.h"
+#include "gui/SessionDocument.h"
 
 namespace Element {
 
@@ -29,15 +29,13 @@ namespace Element {
 
     SessionDocument::~SessionDocument() { }
 
-    String
-    SessionDocument::getDocumentTitle()
+    String SessionDocument::getDocumentTitle()
     {
         SessionRef sr = session.makeRef();
         return sr->name();
     }
 
-    Result
-    SessionDocument::loadDocument (const File& file)
+    Result SessionDocument::loadDocument (const File& file)
     {
         SessionRef sr = session.makeRef();
 
@@ -60,8 +58,7 @@ namespace Element {
         return Result::fail ("Could not read session file");
     }
 
-    Result
-    SessionDocument::saveDocument (const File& file)
+    Result SessionDocument::saveDocument (const File& file)
     {
         SessionRef sr = session.makeRef();
 

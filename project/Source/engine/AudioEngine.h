@@ -33,13 +33,15 @@ namespace Element {
     class AudioEngine : public Engine
     {
     public:
-
         AudioEngine (Globals&);
         ~AudioEngine();
 
         void activate();
         void deactivate();
 
+        ValueTree createGraphTree();
+        void restoreFromGraphTree (const ValueTree&);
+        
         Shared<EngineControl> controller();
 
         // Member access

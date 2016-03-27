@@ -41,6 +41,8 @@ public:
     void paint (Graphics &g);
     void resized();
 
+    void stabilize();
+    
     GuiApp& app();
 
 private:

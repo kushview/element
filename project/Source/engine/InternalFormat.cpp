@@ -31,11 +31,13 @@ namespace Element {
         {
             GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
             p.fillInPluginDescription (audioOutDesc);
+            audioOutDesc.name = "audio.output";
         }
 
         {
             GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::audioInputNode);
             p.fillInPluginDescription (audioInDesc);
+            audioInDesc.name = "audio.input";
         }
 
         {
@@ -68,19 +70,19 @@ namespace Element {
         Globals& g (engine.globals());
         SessionRef s (g.session().makeRef());
 
-        if (desc.name == audioOutDesc.name)
+        if (desc.fileOrIdentifier == audioOutDesc.fileOrIdentifier)
         {
             return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
         }
-        else if (desc.name == audioInDesc.name)
+        else if (desc.fileOrIdentifier == audioInDesc.fileOrIdentifier)
         {
             return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::audioInputNode);
         }
-        else if (desc.name == midiInDesc.name)
+        else if (desc.fileOrIdentifier == midiInDesc.fileOrIdentifier)
         {
             return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::midiInputNode);
         }
-        else if (desc.name == midiOutDesc.name)
+        else if (desc.fileOrIdentifier == midiOutDesc.fileOrIdentifier)
         {
             return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::midiOutputNode);
         }

@@ -158,8 +158,14 @@ namespace Element {
     {
         clear();
         projectState = ObjectModel::setData (data);
-
+        
         ValueTree nd = node().getOrCreateChildWithName ("assets", nullptr);
+        
+        if (auto engine = globals().engine()) {
+            const ValueTree gd = node().getOrCreateChildWithName ("graph", nullptr);
+            engine->restoreFromGraphTree (gd);
+        }
+        
         assets().setAssetsNode (nd);
         boost::function<void(const AssetItem&)> assetAdded =
                 boost::bind (&SessionAssets::assetAdded, priv->assets.get(), ::_1);
@@ -172,8 +178,17 @@ namespace Element {
 
     XmlElement* Session::createXml()
     {
-        XmlElement* e = node().createXml();
-
+        ValueTree saveData = node().createCopy();
+        const ValueTree d = saveData.getChildWithName ("graph");
+        if (d.isValid())
+            saveData.removeChild (d, nullptr);
+        
+        if (auto engine = globals().engine()) {
+            ValueTree graph = engine->createGraphTree();
+            saveData.addChild (graph, -1, nullptr);
+        }
+        
+        XmlElement* e = saveData.createXml();
         if (nullptr != e)
             polishXml (*e);
 

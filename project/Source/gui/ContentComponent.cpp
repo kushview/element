@@ -73,4 +73,8 @@ void ContentComponent::resized()
 
 GuiApp& ContentComponent::app() { return gui; }
 
+    void ContentComponent::stabilize()
+    {
+        graph->resized();
+    }
 }
