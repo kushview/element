@@ -384,7 +384,7 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             result.setInfo ("Open Session", "Open an existing session", "Session", 0);
             break;
         case Commands::sessionSave:
-            //result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
             result.setInfo ("Save Session", "Save the current session", "Session", 0);
             break;
         case Commands::sessionSaveAs:

@@ -88,10 +88,10 @@ public:
     void buildFileMenu (PopupMenu& menu)
     {
         ApplicationCommandManager* acm = &owner.app().commander();
-        menu.addCommandItem (acm, Commands::mediaSave, "Save");
+        // menu.addCommandItem (acm, Commands::mediaSave, "Save");
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
         menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
-        menu.addItem (1, "Open Recent...");
+        // menu.addItem (1, "Open Recent...");
         menu.addCommandItem (acm, Commands::sessionClose, "Close Session");
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
