@@ -154,9 +154,9 @@ public:
 
             PopupMenu menu;
 
-            if (! node->isSubgraph()) {
+            /* if (! node->isSubgraph()) {
                 menu.addItem (100, "Not a subgraph");
-            }
+            } */
 
             menu.addItem (1, "Remove this block...");
             menu.addItem (2, "Disconnect all ports");
@@ -234,6 +234,7 @@ public:
                                    (pos.getY() + getHeight() / 2) / (double) getParentHeight());
 #endif
             getGraphPanel()->updateComponents();
+            update();
         }
     }
 
@@ -441,6 +442,9 @@ public:
             sourceFilterChannel = sourceFilterChannel_;
             update();
         }
+        else {
+            DBG("Not valid source")
+        }
     }
 
     void setOutput (const uint32 destFilterID_, const int destFilterChannel_)
@@ -450,6 +454,10 @@ public:
             destFilterID = destFilterID_;
             destFilterChannel = destFilterChannel_;
             update();
+        }
+        else
+        {
+            DBG("not valid destination");
         }
     }
 
@@ -750,6 +758,35 @@ void GraphEditorBase::onGraphChanged()
 
 void GraphEditorBase::updateComponents()
 {
+    for (int i = graph.getNumConnections(); --i >= 0;)
+    {
+        const GraphProcessor::Connection* const c = graph.getConnection (i);
+        ConnectorComponent* connector = getComponentForConnection (*c);
+        
+        if (connector == nullptr)
+        {
+            connector = new ConnectorComponent (graph);
+            addAndMakeVisible (connector);
+        }
+        
+        connector->setInput (c->sourceNode, c->sourcePort);
+        connector->setOutput (c->destNode, c->destPort);
+        connector->update();
+    }
+    
+    for (int i = graph.getNumFilters(); --i >= 0;)
+    {
+        const GraphNodePtr f (graph.getNode (i));
+        FilterComponent* comp = getComponentForFilter (f->nodeId);
+        if (comp == nullptr)
+        {
+            comp = new FilterComponent (graph, f->nodeId);
+            addAndMakeVisible (comp);
+        }
+        
+        comp->update();
+    }
+    
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
@@ -771,34 +808,6 @@ void GraphEditorBase::updateComponents()
             {
                 cc->update();
             }
-        }
-    }
-
-#if 1
-    for (int i = graph.getNumFilters(); --i >= 0;)
-    {
-        const GraphNodePtr f (graph.getNode (i));
-
-        if (getComponentForFilter (f->nodeId) == 0)
-        {
-            FilterComponent* const comp = new FilterComponent (graph, f->nodeId);
-            addAndMakeVisible (comp);
-            comp->update();
-        }
-    }
-#endif
-
-    for (int i = graph.getNumConnections(); --i >= 0;)
-    {
-        const GraphProcessor::Connection* const c = graph.getConnection (i);
-
-        if (getComponentForConnection (*c) == 0)
-        {
-            ConnectorComponent* const comp = new ConnectorComponent (graph);
-            addAndMakeVisible (comp);
-
-            comp->setInput (c->sourceNode, c->sourcePort);
-            comp->setOutput (c->destNode, c->destPort);
         }
     }
 }
