@@ -334,6 +334,13 @@
         <FILE id="H3r9zD" name="SessionTrack.cpp" compile="1" resource="0"
               file="Source/session/SessionTrack.cpp"/>
       </GROUP>
+      <GROUP id="{161B7D7D-21F6-7798-618E-0A21C7F2C3B5}" name="sqlite3">
+        <FILE id="rU5alL" name="readme.txt" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/readme.txt"/>
+        <FILE id="qOiAd4" name="shell.c" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/shell.c"/>
+        <FILE id="jD9cnD" name="sqlite3.c" compile="1" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3.c"/>
+        <FILE id="G5LoB4" name="sqlite3.h" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3.h"/>
+        <FILE id="BJ7oJ6" name="sqlite3ext.h" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3ext.h"/>
+      </GROUP>
       <FILE id="qVj5DJ" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
       <FILE id="IVf5gW" name="CommandManager.h" compile="0" resource="0"
             file="Source/CommandManager.h"/>
@@ -489,13 +496,14 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </ANDROID>
-    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp">
+    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
+            smallIcon="eG1U6B" bigIcon="eG1U6B">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath=""
-                       headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+                       headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="../../Source"/>
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
