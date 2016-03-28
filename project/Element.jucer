@@ -406,9 +406,9 @@
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
                        cppLibType="libc++" libraryPath="/opt/kushview/lib" binaryPath="../build"/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="default"
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
-                       binaryPath="../build" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source"
+                       binaryPath="../build" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
                        libraryPath="/opt/kushview/lib" cppLibType="libc++" cppLanguageStandard="c++11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

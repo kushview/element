@@ -161,7 +161,7 @@ public:
             menu.addItem (1, "Remove this block...");
             menu.addItem (2, "Disconnect all ports");
             menu.addSeparator();
-            menu.addItem (5, "Embed plugin UI");
+            // menu.addItem (5, "Embed plugin UI");
             menu.addItem (3, "Show plugin UI");
             menu.addItem (4, "Show generic UI");
 
@@ -329,6 +329,9 @@ public:
         numIns = numOuts = 0;
         for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
         {
+            if (PortType::Control == f->getProcessor()->getPortType(i))
+                continue;
+            
             if (f->getProcessor()->isPortInput (i))
                 ++numIns;
             else
@@ -368,6 +371,9 @@ public:
             for (i = 0; i < f->getProcessor()->getNumPorts(); ++i)
             {
                 const PortType t (f->getProcessor()->getPortType (i));
+                if (t ==PortType::Control)
+                    continue;
+                
                 const bool isInput (f->getProcessor()->isPortInput (i));
                 addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
             }
