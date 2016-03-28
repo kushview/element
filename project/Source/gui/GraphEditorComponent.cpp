@@ -154,14 +154,14 @@ public:
 
             PopupMenu menu;
 
-            if (! node->isSubgraph()) {
+            /* if (! node->isSubgraph()) {
                 menu.addItem (100, "Not a subgraph");
-            }
+            } */
 
             menu.addItem (1, "Remove this block...");
             menu.addItem (2, "Disconnect all ports");
             menu.addSeparator();
-            menu.addItem (5, "Embed plugin UI");
+            // menu.addItem (5, "Embed plugin UI");
             menu.addItem (3, "Show plugin UI");
             menu.addItem (4, "Show generic UI");
 
@@ -234,6 +234,7 @@ public:
                                    (pos.getY() + getHeight() / 2) / (double) getParentHeight());
 #endif
             getGraphPanel()->updateComponents();
+            update();
         }
     }
 
@@ -328,6 +329,9 @@ public:
         numIns = numOuts = 0;
         for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
         {
+            if (PortType::Control == f->getProcessor()->getPortType(i))
+                continue;
+            
             if (f->getProcessor()->isPortInput (i))
                 ++numIns;
             else
@@ -367,6 +371,9 @@ public:
             for (i = 0; i < f->getProcessor()->getNumPorts(); ++i)
             {
                 const PortType t (f->getProcessor()->getPortType (i));
+                if (t ==PortType::Control)
+                    continue;
+                
                 const bool isInput (f->getProcessor()->isPortInput (i));
                 addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
             }
@@ -441,6 +448,9 @@ public:
             sourceFilterChannel = sourceFilterChannel_;
             update();
         }
+        else {
+            DBG("Not valid source")
+        }
     }
 
     void setOutput (const uint32 destFilterID_, const int destFilterChannel_)
@@ -450,6 +460,10 @@ public:
             destFilterID = destFilterID_;
             destFilterChannel = destFilterChannel_;
             update();
+        }
+        else
+        {
+            DBG("not valid destination");
         }
     }
 
@@ -750,6 +764,35 @@ void GraphEditorBase::onGraphChanged()
 
 void GraphEditorBase::updateComponents()
 {
+    for (int i = graph.getNumConnections(); --i >= 0;)
+    {
+        const GraphProcessor::Connection* const c = graph.getConnection (i);
+        ConnectorComponent* connector = getComponentForConnection (*c);
+        
+        if (connector == nullptr)
+        {
+            connector = new ConnectorComponent (graph);
+            addAndMakeVisible (connector);
+        }
+        
+        connector->setInput (c->sourceNode, c->sourcePort);
+        connector->setOutput (c->destNode, c->destPort);
+        connector->update();
+    }
+    
+    for (int i = graph.getNumFilters(); --i >= 0;)
+    {
+        const GraphNodePtr f (graph.getNode (i));
+        FilterComponent* comp = getComponentForFilter (f->nodeId);
+        if (comp == nullptr)
+        {
+            comp = new FilterComponent (graph, f->nodeId);
+            addAndMakeVisible (comp);
+        }
+        
+        comp->update();
+    }
+    
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
@@ -771,34 +814,6 @@ void GraphEditorBase::updateComponents()
             {
                 cc->update();
             }
-        }
-    }
-
-#if 1
-    for (int i = graph.getNumFilters(); --i >= 0;)
-    {
-        const GraphNodePtr f (graph.getNode (i));
-
-        if (getComponentForFilter (f->nodeId) == 0)
-        {
-            FilterComponent* const comp = new FilterComponent (graph, f->nodeId);
-            addAndMakeVisible (comp);
-            comp->update();
-        }
-    }
-#endif
-
-    for (int i = graph.getNumConnections(); --i >= 0;)
-    {
-        const GraphProcessor::Connection* const c = graph.getConnection (i);
-
-        if (getComponentForConnection (*c) == 0)
-        {
-            ConnectorComponent* const comp = new ConnectorComponent (graph);
-            addAndMakeVisible (comp);
-
-            comp->setInput (c->sourceNode, c->sourcePort);
-            comp->setOutput (c->destNode, c->destPort);
         }
     }
 }

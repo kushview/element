@@ -137,6 +137,9 @@ public:
         startup.launchApplication();
         controller = startup.controller.release();
         engine = world->engine();
+		
+		Logger::writeToLog(world->settings().getCommonSettings(true)->getFile().getFullPathName());
+
         gui = GuiApp::create (*world);
         gui->run();
     }
