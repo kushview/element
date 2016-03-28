@@ -96,8 +96,8 @@ public:
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-        menu.addSeparator();
-        menu.addCommandItem (acm, Commands::exportAudio, "Export Audio");
+        // menu.addSeparator();
+        // menu.addCommandItem (acm, Commands::exportAudio, "Export Audio");
         
        #if ! JUCE_MAC
         menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
