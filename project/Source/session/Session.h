@@ -31,7 +31,7 @@ namespace Element {
     class MediaManager;
     class Pattern;
 
-    typedef Monitor PlaybackMonitor;
+    // typedef Monitor PlaybackMonitor;
 
     void intrusive_ptr_add_ref (Session * p);
     void intrusive_ptr_release (Session * p);
@@ -75,7 +75,7 @@ namespace Element {
         /** Get Monitors */
         void getMonitors (const Array<int>& path, Array<Shared<Monitor> >& monitors);
         void getMonitors (const ObjectModel& object, Array<Shared<Monitor> >& monitors);
-        Shared<PlaybackMonitor> playbackMonitor();
+        Shared<Monitor> getPlaybackMonitor();
 
         AssetTree& assets();
         Shared<EngineControl> controller();

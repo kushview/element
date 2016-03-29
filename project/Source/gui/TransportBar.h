@@ -46,6 +46,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void setBeatTime (const float t);
     //[/UserMethods]
 
     void paint (Graphics& g);

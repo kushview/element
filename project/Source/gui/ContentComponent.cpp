@@ -34,7 +34,9 @@ ContentComponent::ContentComponent (GuiApp& app_)
     addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
     AudioEnginePtr engine = gui.globals().engine();
     Shared<EngineControl> ctl = engine->controller();
+    playbackMonitor = gui.session()->getPlaybackMonitor();
     addAndMakeVisible (graph = new GraphEditorPanel (gui, *ctl));
+    startTimer (17);
     resized();
 }
 
@@ -56,13 +58,21 @@ void ContentComponent::resized()
 {
     const Rectangle<int> r (getLocalBounds().reduced (2));
     transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
-    graph->setBounds (r.withTrimmedTop (transport->getHeight()));
+    graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
 }
 
 GuiApp& ContentComponent::app() { return gui; }
 
-    void ContentComponent::stabilize()
-    {
-        graph->resized();
-    }
+void ContentComponent::stabilize()
+{
+    graph->resized();
 }
+
+void ContentComponent::timerCallback()
+{
+    transport->setBeatTime (playbackMonitor->get());
+}
+    
+}
+
+

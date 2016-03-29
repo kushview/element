@@ -214,6 +214,14 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
+void TransportBar::setBeatTime (const float t)
+{
+    const int bars = std::floor (t);
+    String text = String (bars + 1);
+    barLabel->setText (text, dontSendNotification);
+    text = String (1 + std::floor (4.f * (t - static_cast<float> (bars))));
+    beatLabel->setText (text, dontSendNotification);
+}
 //[/EndFile]
 
 } /* namespace Element */

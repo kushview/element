@@ -76,10 +76,9 @@ namespace Element {
         friend class Session;
         Session&                     session;
         ScopedPointer<SessionAssets> assets;
-
         AudioEnginePtr          engine;
         Shared<EngineControl>   graph;
-        Shared<PlaybackMonitor> playMonitor;
+        Shared<Monitor> playMonitor;
     };
 
     Session::Session (Globals& g)
@@ -111,7 +110,7 @@ namespace Element {
         }
     }
 
-    Shared<PlaybackMonitor> Session::playbackMonitor() { return priv->playMonitor; }
+    Shared<Monitor> Session::getPlaybackMonitor() { return priv->playMonitor; }
 
     AssetTree& Session::assets()
     {
