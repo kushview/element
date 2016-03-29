@@ -35,7 +35,8 @@ public:
 
     GuiApp& app() { return gui; }
     void closeButtonPressed();
-
+    
+    void refreshMenu();
 private:
     GuiApp& gui;
     ScopedPointer<MainMenu> mainMenu;

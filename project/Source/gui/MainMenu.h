@@ -75,7 +75,11 @@ public:
         return menu;
     }
 
-    void menuItemSelected (int index, int menu) override { }
+    void menuItemSelected (int index, int menu) override
+    {
+        if (index == 999)
+            owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
+    }
     
     
     // Command Target
@@ -125,10 +129,14 @@ private:
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&owner.app().commander(), Commands::showPluginManager);
+        const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
+        menu.addItem (999, "Plugin Manager", true, isOpen);
     }
     
-    void buildHelpMenu (PopupMenu& menu) { }
+    void buildHelpMenu (PopupMenu& menu)
+    {
+        // menu.addItem (111, "Do it", true, true);
+    }
 };
 
 }
