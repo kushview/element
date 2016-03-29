@@ -23,17 +23,14 @@
 namespace Element {
 
 WindowManager::WindowManager (GuiApp& gui_)
-    : gui (gui_)
+    : gui (gui_) { }
+    
+void WindowManager::onWindowClosed (Window* c)
 {
-    //gui.commander().registerAllCommandsForTarget (this);
+    jassert (activeWindows.contains (c));
+    c->setVisible (false);
+    activeWindows.removeObject (c, true);
+    gui.getMainWindow()->refreshMenu();
 }
-    
-    
-    void WindowManager::onWindowClosed (Window* c)
-    {
-        jassert (activeWindows.contains (c));
-        c->setVisible (false);
-        activeWindows.removeObject (c, true);
-        gui.getMainWindow()->refreshMenu();
-    }
+
 }
