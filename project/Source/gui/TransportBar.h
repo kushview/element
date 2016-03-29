@@ -1,6 +1,6 @@
 /*
     TransportBar.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,10 +62,10 @@ private:
     //==============================================================================
     ScopedPointer<TextButton> play;
     ScopedPointer<TextButton> stop;
-    ScopedPointer<TextButton> seekZero;
-    ScopedPointer<TextButton> stepForward;
-    ScopedPointer<TextButton> stepBack;
     ScopedPointer<TextButton> record;
+    ScopedPointer<Label> barLabel;
+    ScopedPointer<Label> subLabel;
+    ScopedPointer<Label> beatLabel;
 
 
     //==============================================================================
