@@ -77,11 +77,18 @@ TransportBar::TransportBar (SessionRef sess)
     beatLabel->setColour (TextEditor::textColourId, Colours::black);
     beatLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (bpmSlider = new Slider ("bpmSlider"));
+    bpmSlider->setRange (20, 240, 1);
+    bpmSlider->setSliderStyle (Slider::IncDecButtons);
+    bpmSlider->setTextBoxStyle (Slider::TextBoxRight, false, 80, 16);
+    bpmSlider->addListener (this);
+
 
     //[UserPreSize]
+    
     //[/UserPreSize]
 
-    setSize (168, 16);
+    setSize (260, 16);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -99,6 +106,7 @@ TransportBar::~TransportBar()
     barLabel = nullptr;
     subLabel = nullptr;
     beatLabel = nullptr;
+    bpmSlider = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -120,12 +128,13 @@ void TransportBar::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    play->setBounds (136, 0, 32, 16);
-    stop->setBounds (104, 0, 32, 16);
-    record->setBounds (72, 0, 32, 16);
-    barLabel->setBounds (0, 0, 24, 16);
-    subLabel->setBounds (48, 0, 24, 16);
-    beatLabel->setBounds (24, 0, 24, 16);
+    play->setBounds (225, 0, 32, 16);
+    stop->setBounds (193, 0, 32, 16);
+    record->setBounds (161, 0, 32, 16);
+    barLabel->setBounds (89, 0, 24, 16);
+    subLabel->setBounds (137, 0, 24, 16);
+    beatLabel->setBounds (113, 0, 24, 16);
+    bpmSlider->setBounds (0, 0, 80, 16);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -161,9 +170,28 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
+void TransportBar::sliderValueChanged (Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == bpmSlider)
+    {
+        //[UserSliderCode_bpmSlider] -- add your slider handling code here..
+        //[/UserSliderCode_bpmSlider]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+    void TransportBar::stabilize()
+    {
+        bpmSlider->getValueObject().referTo(session->getPropertyAsValue (Slugs::tempo));
+    }
 //[/MiscUserCode]
 
 
@@ -179,33 +207,37 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="TransportBar" template="../../Templates/ElementTemplate.cpp"
                  componentName="" parentClasses="public Component" constructorParams="SessionRef sess"
                  variableInitialisers="session(sess)" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="168"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="260"
                  initialHeight="16">
   <BACKGROUND backgroundColour="ffffff"/>
   <TEXTBUTTON name="play" id="b5aa83743c763018" memberName="play" virtualName=""
-              explicitFocusOrder="0" pos="136 0 32 16" bgColOn="ff7fff00" buttonText="Play"
+              explicitFocusOrder="0" pos="225 0 32 16" bgColOn="ff7fff00" buttonText="Play"
               connectedEdges="15" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="stop" id="5baf0f92435f13e3" memberName="stop" virtualName=""
-              explicitFocusOrder="0" pos="104 0 32 16" buttonText="Stop" connectedEdges="15"
+              explicitFocusOrder="0" pos="193 0 32 16" buttonText="Stop" connectedEdges="15"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="record" id="f6593182ab136999" memberName="record" virtualName=""
-              explicitFocusOrder="0" pos="72 0 32 16" bgColOn="ffff0000" buttonText="Rec"
+              explicitFocusOrder="0" pos="161 0 32 16" bgColOn="ffff0000" buttonText="Rec"
               connectedEdges="15" needsCallback="1" radioGroupId="0"/>
   <LABEL name="barLabel" id="383e21280d077b4a" memberName="barLabel" virtualName=""
-         explicitFocusOrder="0" pos="0 0 24 16" textCol="ffffffff" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="89 0 24 16" textCol="ffffffff" edTextCol="ff000000"
          edBkgCol="0" labelText="0" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          bold="0" italic="0" justification="33"/>
   <LABEL name="subLabel" id="3d1ad303b55f2919" memberName="subLabel" virtualName=""
-         explicitFocusOrder="0" pos="48 0 24 16" textCol="ffffffff" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="137 0 24 16" textCol="ffffffff" edTextCol="ff000000"
          edBkgCol="0" labelText="0" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          bold="0" italic="0" justification="33"/>
   <LABEL name="beatLabel" id="7ee24b93825298ab" memberName="beatLabel"
-         virtualName="" explicitFocusOrder="0" pos="24 0 24 16" textCol="ffffffff"
+         virtualName="" explicitFocusOrder="0" pos="113 0 24 16" textCol="ffffffff"
          edTextCol="ff000000" edBkgCol="0" labelText="0" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15" bold="0" italic="0" justification="33"/>
+  <SLIDER name="bpmSlider" id="6a1f8c1a830748e6" memberName="bpmSlider"
+          virtualName="" explicitFocusOrder="0" pos="0 0 80 16" min="20"
+          max="240" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="16" skewFactor="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

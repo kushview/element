@@ -66,6 +66,7 @@ GuiApp& ContentComponent::app() { return gui; }
 void ContentComponent::stabilize()
 {
     graph->resized();
+    transport->stabilize();
 }
 
 void ContentComponent::timerCallback()

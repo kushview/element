@@ -37,7 +37,8 @@ namespace Element {
                                                                     //[/Comments]
 */
 class TransportBar  : public Component,
-                      public ButtonListener
+                      public ButtonListener,
+                      public SliderListener
 {
 public:
     //==============================================================================
@@ -47,11 +48,13 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setBeatTime (const float t);
+    void stabilize();
     //[/UserMethods]
 
     void paint (Graphics& g);
     void resized();
     void buttonClicked (Button* buttonThatWasClicked);
+    void sliderValueChanged (Slider* sliderThatWasMoved);
 
 
 
@@ -67,6 +70,7 @@ private:
     ScopedPointer<Label> barLabel;
     ScopedPointer<Label> subLabel;
     ScopedPointer<Label> beatLabel;
+    ScopedPointer<Slider> bpmSlider;
 
 
     //==============================================================================
