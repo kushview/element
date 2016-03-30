@@ -122,7 +122,6 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
-        DBG("Starting Application");
         initializeModulePath();
         world = new Globals (commandLine);
         launchApplication();
@@ -137,8 +136,6 @@ public:
         startup.launchApplication();
         controller = startup.controller.release();
         engine = world->engine();
-		
-		Logger::writeToLog(world->settings().getCommonSettings(true)->getFile().getFullPathName());
 
         gui = GuiApp::create (*world);
         gui->run();
@@ -157,7 +154,7 @@ public:
        #endif
 
        #if JUCE_WINDOWS
-        String putEnv = "ELEMENT_MODEUL_PATH="; putEnv << modDir.getFullPathName();
+        String putEnv = "ELEMENT_MODULE_PATH="; putEnv << modDir.getFullPathName();
         putenv (putEnv.toRawUTF8());
        #else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);

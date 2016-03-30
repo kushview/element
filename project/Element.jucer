@@ -551,8 +551,7 @@
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_JACK="disabled" JUCE_FORCE_DEBUG="disabled" JUCE_LOG_ASSERTIONS="disabled"
-               JUCE_CHECK_MEMORY_LEAKS="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
+  <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
                JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"

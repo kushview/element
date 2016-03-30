@@ -7,13 +7,15 @@ namespace Element {
 
 class MidiSequenceProcessor : public Processor {
 public:
-    MidiSequenceProcessor() { }
+    MidiSequenceProcessor();
     ~MidiSequenceProcessor() { }
     
     const String getName() const { return "MIDI Sequencer"; }
-    void prepareToPlay (double sampleRate, int estimatedBlockSize) { }
-    void releaseResources() { }
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) { }
+    
+    void prepareToPlay (double sampleRate, int estimatedBlockSize);
+    void releaseResources();
+    void processBlock (AudioSampleBuffer&, MidiBuffer&);
+    
     const String getInputChannelName (int channelIndex) const { return String::empty; }
     const String getOutputChannelName (int channelIndex) const { return String::empty; }
     bool isInputChannelStereoPair (int index) const { return false; }
@@ -25,7 +27,7 @@ public:
     bool producesMidi() const { return true; }
     
     bool hasEditor() const                          { return true; }
-    AudioProcessorEditor* createEditor()            { return nullptr; }
+    AudioProcessorEditor* createEditor();
     
     int getNumParameters()                          { return 0; }
     const String getParameterName (int)             { return String::empty; }
@@ -44,11 +46,15 @@ public:
     
     void fillInPluginDescription (PluginDescription& d) const {
         d.fileOrIdentifier = "element.midiSequence";
-        d.name = "MIDI Sequence";
+        d.name = getName();
         d.pluginFormatName = "Internal";
         d.manufacturerName = "Element";
         d.version = "1.0";
     }
+    
+private:
+    MidiSequencePlayer player;
+    MidiMessageSequence seq;
 };
     
 }
