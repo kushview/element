@@ -41,6 +41,7 @@ namespace Element {
             ValueTree plugin = node.getChildWithName ("plugin");
             PluginDescription desc;
             desc.pluginFormatName = plugin.getProperty ("format");
+            desc.name = plugin.getProperty("name");
             desc.category = plugin.getProperty ("category");
             desc.manufacturerName = plugin.getProperty ("manufacturer");
             desc.version = plugin.getProperty ("version");
@@ -56,7 +57,7 @@ namespace Element {
             Processor* instance = plugins.createPlugin (desc, errorMessage);
             
             if (instance == nullptr) {
-                DBG(errorMessage);
+                Logger::writeToLog(errorMessage);
                 return nullptr;
             }
             
@@ -64,6 +65,10 @@ namespace Element {
             /* TODO: Prevent memory leaks. Unlikely, but the Processor instance here could leak
              memory if the node wasn't created - MRF */
             
+            if (desc.fileOrIdentifier == "element.midiSequence") {
+                Logger::writeToLog("Doing midiSequence node");
+                
+            }
             if (nodePtr)
             {
                 ValueTree meta = node.getChildWithName ("metadata");
@@ -95,6 +100,10 @@ namespace Element {
                     if (! ignore.contains (node.getPropertyName (i)))
                         nodePtr->properties.set (node.getPropertyName(i), node.getProperty (node.getPropertyName(i)));
             }
+            else
+            {
+                Logger::writeToLog("Could not create plugin");
+            }
             
             return nodePtr;
         }
@@ -119,7 +128,7 @@ namespace Element {
                 plugin->fillInPluginDescription (pd);
                 
                 ValueTree p ("plugin");
-                p.setProperty (Element::Slugs::name, pd.name, nullptr);
+                p.setProperty (Slugs::name, pd.name, nullptr);
                 if (pd.descriptiveName != pd.name)
                     p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
                 
@@ -167,6 +176,7 @@ public:
             ValueTree c (nodes.getChild(i));
             if (! c.hasType ("node"))
                 continue;
+            Logger::writeToLog(c.toXmlString());
             
             EngineHelpers::createNodeFromValueTreeNode (*this, c, plugins);
         }
@@ -537,8 +547,9 @@ ValueTree AudioEngine::createGraphTree()
 
 void AudioEngine::restoreFromGraphTree (const ValueTree& tree)
 {
-    if (priv)
-        priv->graph.restoreFromValueTree (tree, world.plugins());
+    if (priv) {
+        priv->graph.restoreFromValueTree (tree, world.plugins());        
+    }
 }
 
 }

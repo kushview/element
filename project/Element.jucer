@@ -32,6 +32,10 @@
               file="Source/engine/InternalFormat.cpp"/>
         <FILE id="NbNubd" name="InternalFormat.h" compile="0" resource="0"
               file="Source/engine/InternalFormat.h"/>
+        <FILE id="aMLMSs" name="MidiSequenceProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/MidiSequenceProcessor.cpp"/>
+        <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
+              file="Source/engine/MidiSequenceProcessor.h"/>
         <FILE id="SXdT3p" name="PreProcessor.cpp" compile="1" resource="0"
               file="Source/engine/PreProcessor.cpp"/>
         <FILE id="VLZcbL" name="PreProcessor.h" compile="0" resource="0" file="Source/engine/PreProcessor.h"/>
