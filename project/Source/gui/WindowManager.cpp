@@ -16,15 +16,21 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
-#include "GuiApp.h"
-#include "WindowManager.h"
+#include "gui/GuiApp.h"
+#include "gui/MainWindow.h"
+#include "gui/WindowManager.h"
 
 namespace Element {
 
 WindowManager::WindowManager (GuiApp& gui_)
-    : gui (gui_)
-{
-    //gui.commander().registerAllCommandsForTarget (this);
-}
+    : gui (gui_) { }
     
+void WindowManager::onWindowClosed (Window* c)
+{
+    jassert (activeWindows.contains (c));
+    c->setVisible (false);
+    activeWindows.removeObject (c, true);
+    gui.getMainWindow()->refreshMenu();
+}
+
 }

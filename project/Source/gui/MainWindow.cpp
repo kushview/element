@@ -49,5 +49,8 @@ namespace Element {
         app->systemRequestedQuit();
     }
 
-
+    void MainWindow::refreshMenu()
+    {
+        if (mainMenu) mainMenu->menuItemsChanged();
+    }
 }

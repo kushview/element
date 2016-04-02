@@ -40,6 +40,7 @@ namespace Element {
             audioOutputDevice,
             midiInputDevice,
             midiOutputDevice,
+            midiSequence,
             audioInputPort,
             audioOutputPort,
             atomInputPort,
@@ -57,7 +58,7 @@ namespace Element {
             internalTypesEnd
         };
 
-        InternalFormat (AudioEngine& g);
+        InternalFormat (AudioEngine&);
         ~InternalFormat() { }
 
         const PluginDescription* description (const InternalFormat::ID type);
@@ -67,7 +68,7 @@ namespace Element {
         String getName() const                                      { return "Internal"; }
         bool fileMightContainThisPluginType (const String&)         { return false; }
         FileSearchPath getDefaultLocationsToSearch()                { return FileSearchPath(); }
-        bool canScanForPlugins() const                              { return false; }
+        bool canScanForPlugins() const                              { return true; }
         void findAllTypesForFile (OwnedArray <PluginDescription>&, const String&) { }
         bool doesPluginStillExist (const PluginDescription&)        { return true; }
         String getNameOfPluginFromIdentifier (const String& fileOrIdentifier)   { return fileOrIdentifier; }
@@ -76,7 +77,6 @@ namespace Element {
         AudioPluginInstance* createInstanceFromDescription (const PluginDescription& desc, double rate, int block);
 
     private:
-
         AudioEngine& engine;
         PluginDescription audioInDesc;
         PluginDescription audioOutDesc;
@@ -85,9 +85,8 @@ namespace Element {
         PluginDescription samplerDesc;
         PluginDescription sequencerDesc;
         PluginDescription patternDesc;
-
+        PluginDescription metroDesc;
     };
-
 }
 
 #endif   // ELEMENT_INTERNAL_FORMAT_H

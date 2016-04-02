@@ -51,23 +51,24 @@ namespace Element {
             if (! internals)
                 return;
 
-            plugs.addToMenu (m, KnownPluginList::sortByManufacturer);
-
+            PopupMenu plugmenu;
+            plugs.addToMenu (plugmenu, KnownPluginList::sortByManufacturer);
+            m.addSubMenu ("Plugins", plugmenu);
+            
             m.addSectionHeader ("Internals");
-            m.addItem (3, "BTSP-1");
-            m.addItem (4, "Pattern");
+            m.addItem (3, "MIDI Sequence");
+            //m.addItem (4, "Pattern");
 
             m.addSeparator();
 
             m.addItem (1, "Audio Input Device");
             m.addItem (2, "Audio Output Device");
-            m.addItem (5, "MIDI Device");
+            m.addItem (5, "MIDI Input");
 
             int res = m.show();
 
             if (res == 1)
             {
-
                 createNewPlugin (internals->description (InternalFormat::audioInputDevice), e.x, e.y);
             }
             else if (res == 2)
@@ -76,11 +77,15 @@ namespace Element {
             }
             else if (res == 3)
             {
-                createNewPlugin (internals->description (InternalFormat::samplerProcessor), e.x, e.y);
+                createNewPlugin (internals->description (InternalFormat::midiSequence), e.x, e.y);
             }
             else if (res == 4)
             {
 
+            }
+            else if (res == 5)
+            {
+                createNewPlugin (internals->description (InternalFormat::midiInputDevice), e.x, e.y);
             }
             else if (const PluginDescription* desc = plugs.getType (plugs.getIndexChosenByMenu (res)))
             {

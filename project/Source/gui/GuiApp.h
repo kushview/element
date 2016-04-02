@@ -50,7 +50,10 @@ namespace Element {
             Not fully operable, the widget factory needs implemented first */
         void openWindow (const String& uri);
         void openWindow (Component* c);
-
+        bool isWindowOpen (const String& uri);
+        
+        MainWindow* getMainWindow() const { return mainWindow.get(); }
+        
         void runDialog (const String& uri);
         void runDialog (Component* c, const String& title = String::empty);
 

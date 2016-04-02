@@ -18,6 +18,7 @@
 */
 
 #include "element/Juce.h"
+#include "engine/InternalFormat.h"
 #include "session/Session.h"
 #include "CommandManager.h"
 #include "Globals.h"
@@ -54,6 +55,7 @@ public:
         symbols  = new SymbolMap();
        #endif
         plugins  = new PluginManager();
+        //plugins->addFormat (new InternalFormat());
         devices  = new DeviceManager();
         media    = new MediaManager();
         settings = new Settings();
@@ -148,7 +150,6 @@ Session& Globals::session()
 void Globals::setEngine (EnginePtr engine)
 {
     impl->engine = engine;
-
     if (impl->session == nullptr) {
         impl->session = new Session (*this);
     }

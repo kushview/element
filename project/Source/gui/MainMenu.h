@@ -1,6 +1,6 @@
 /*
     MainMenu.h - This file is part of Element
-    -2016  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,19 +28,13 @@ namespace Element {
 class MainMenu : public MenuBarModel,
                  public ApplicationCommandTarget
 {
-
-    ScopedPointer<PopupMenu> macMenu;
 public:
-
     enum RootNames {
-        File, /* Edit, View, Workspace,*/ Window, Help, NumMenus
+        File, Window, Help, NumMenus
     };
 
     MainMenu (MainWindow& parent)
-        : owner (parent)
-    {
-
-    }
+        : owner (parent) { }
 
     void setupMenu()
     {
@@ -65,39 +59,48 @@ public:
        #endif
     }
 
-    StringArray getMenuBarNames()
+    StringArray getMenuBarNames() override
     {
-        // const char* const names[] = { "File", "Edit", "View", "Workspace", "Help", nullptr };
         const char* const names[] = { "File", "Window", "Help", nullptr };
         return StringArray (names);
     }
 
-    PopupMenu getMenuForIndex (int id, const String&)
+    PopupMenu getMenuForIndex (int id, const String&) override
     {
         PopupMenu menu;
         if (id == File)        buildFileMenu (menu);
-        /* else if (id == Edit)   buildEditMenu (menu);
-        else if (id == View)   buildViewMenu (menu);
-        else if (id == Workspace) buildWindowMenu (menu); */
         else if (id == Window) buildWindowMenu (menu);
         else if (id == Help)   buildHelpMenu (menu);
         else  { };
         return menu;
     }
 
+    void menuItemSelected (int index, int menu) override
+    {
+        if (index == 999)
+            owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
+    }
+    
+    
+    // Command Target
+    ApplicationCommandTarget* getNextCommandTarget() override { return &owner.app(); }
+    void getAllCommands (Array <CommandID>&) override { }
+    void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    bool perform (const InvocationInfo& info) override { return false; }
+
+private:
+    MainWindow& owner;
+    ScopedPointer<PopupMenu> macMenu;
+    
     void buildFileMenu (PopupMenu& menu)
     {
         ApplicationCommandManager* acm = &owner.app().commander();
-        // menu.addCommandItem (acm, Commands::mediaSave, "Save");
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
         menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
-        // menu.addItem (1, "Open Recent...");
         menu.addCommandItem (acm, Commands::sessionClose, "Close Session");
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-        // menu.addSeparator();
-        // menu.addCommandItem (acm, Commands::exportAudio, "Export Audio");
         
        #if ! JUCE_MAC
         menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
@@ -105,7 +108,7 @@ public:
         menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
        #endif
     }
-
+    
     void buildEditMenu (PopupMenu& menu)
     {
         ApplicationCommandManager* acm = &owner.app().commander();
@@ -126,46 +129,14 @@ public:
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&owner.app().commander(), Commands::showPluginManager);
+        const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
+        menu.addItem (999, "Plugin Manager", true, isOpen);
     }
     
     void buildHelpMenu (PopupMenu& menu)
     {
+        // menu.addItem (111, "Do it", true, true);
     }
-    
-    void menuItemSelected (int index, int menu)
-    {
-    }
-
-    // Command Target
-    
-    ApplicationCommandTarget* getNextCommandTarget() { return &owner.app(); }
-    
-    void getAllCommands (Array <CommandID>& commands)
-    {
-        // const CommandID ids[] = {
-        
-        //};
-    }
-    
-    void getCommandInfo (CommandID command, ApplicationCommandInfo& result)
-    {
-        switch (command) { }
-    }
-    
-    bool perform (const InvocationInfo& info)
-    {
-        switch (info.commandID)
-        {
-                
-            case 0: break;
-        }
-        
-        return false;
-    }
-
-private:
-    MainWindow& owner;
 };
 
 }

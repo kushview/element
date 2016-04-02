@@ -31,17 +31,12 @@ ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
     setOpaque (true);
-    // addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
-
-   #if 0
-    addAndMakeVisible (display = new ScreenDisplay());
-   #else
-    // addAndMakeVisible (seq = new SequencerComponent (gui));
+    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
     AudioEnginePtr engine = gui.globals().engine();
     Shared<EngineControl> ctl = engine->controller();
+    playbackMonitor = gui.session()->getPlaybackMonitor();
     addAndMakeVisible (graph = new GraphEditorPanel (gui, *ctl));
-   #endif
-    
+    startTimer (17);
     resized();
 }
 
@@ -62,19 +57,23 @@ void ContentComponent::paint (Graphics &g)
 void ContentComponent::resized()
 {
     const Rectangle<int> r (getLocalBounds().reduced (2));
-    graph->setBounds (r);
-   /* #if 1
     transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
-    graph->setBounds (r.withTrimmedTop (transport->getHeight()));
-   #else
-    display->setBounds (r);
-   #endif */
+    graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
 }
 
 GuiApp& ContentComponent::app() { return gui; }
 
-    void ContentComponent::stabilize()
-    {
-        graph->resized();
-    }
+void ContentComponent::stabilize()
+{
+    graph->resized();
+    transport->stabilize();
 }
+
+void ContentComponent::timerCallback()
+{
+    transport->setBeatTime (playbackMonitor->get());
+}
+    
+}
+
+

@@ -18,49 +18,41 @@
 */
 
 #include "element/Juce.h"
+#include "engine/AudioEngine.h"
+#include "engine/InternalFormat.h"
+#include "engine/MidiSequenceProcessor.h"
 #include "session/Session.h"
-#include "AudioEngine.h"
-#include "InternalFormat.h"
 #include "Globals.h"
 
 namespace Element {
-
+    typedef GraphProcessor::AudioGraphIOProcessor IOP;
+    
     InternalFormat::InternalFormat (AudioEngine& e)
         : engine (e)
     {
         {
-            GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
+            IOP p (IOP::audioOutputNode);
             p.fillInPluginDescription (audioOutDesc);
-            audioOutDesc.name = "audio.output";
         }
 
         {
-            GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::audioInputNode);
+            IOP p (IOP::audioInputNode);
             p.fillInPluginDescription (audioInDesc);
-            audioInDesc.name = "audio.input";
         }
 
         {
-            GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::midiInputNode);
+            IOP p (IOP::midiOutputNode);
+            p.fillInPluginDescription (midiOutDesc);
+        }
+        
+        {
+            IOP p (IOP::midiInputNode);
             p.fillInPluginDescription (midiInDesc);
         }
-
+        
         {
-            GraphProcessor::AudioGraphIOProcessor p (GraphProcessor::AudioGraphIOProcessor::midiOutputNode);
-            p.fillInPluginDescription (midiInDesc);
-        }
-
-        {
-           // Element::SamplerProcessor p;
-         //   p.fillInPluginDescription (samplerDesc);
-        }
-
-        {
-            patternDesc.name = "Pattern";
-        }
-
-        {
-            sequencerDesc.name = "Sequencer";
+            MidiSequenceProcessor p (engine);
+            p.fillInPluginDescription (metroDesc);
         }
     }
 
@@ -72,49 +64,37 @@ namespace Element {
 
         if (desc.fileOrIdentifier == audioOutDesc.fileOrIdentifier)
         {
-            return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
+            return new IOP (IOP::audioOutputNode);
         }
         else if (desc.fileOrIdentifier == audioInDesc.fileOrIdentifier)
         {
-            return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::audioInputNode);
+            return new IOP (IOP::audioInputNode);
         }
         else if (desc.fileOrIdentifier == midiInDesc.fileOrIdentifier)
         {
-            return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::midiInputNode);
+            return new IOP (IOP::midiInputNode);
         }
         else if (desc.fileOrIdentifier == midiOutDesc.fileOrIdentifier)
         {
-            return new GraphProcessor::AudioGraphIOProcessor (GraphProcessor::AudioGraphIOProcessor::midiOutputNode);
+            return new IOP (IOP::midiOutputNode);
         }
         else if (desc.name == samplerDesc.name)
         {
-            // return new BTSP1::PluginProcessor (engine.globals());
+            return nullptr;
+        }
+        else if (desc.fileOrIdentifier == metroDesc.fileOrIdentifier)
+        {
+            return new MidiSequenceProcessor (engine);
         }
         else if (desc.name == "Sequencer")
         {
-            Sequencer* seq = new Sequencer (engine.clips());
-#if 0
-            seq->setModel (s->sequence());
-
-            if (! seq->model().node().isValid())
-            {
-                Logger::writeToLog ("Internal Format: created sequence is invalid");
-                delete seq;
-                seq = nullptr;
-            }
-            else
-            {
-                assert (seq->model().node() == s->sequence().node());
-            }
-#endif
-            return seq;
+            return nullptr;
         }
 
         return nullptr;
     }
 
-    const PluginDescription*
-    InternalFormat::description (const InternalFormat::ID type)
+    const PluginDescription* InternalFormat::description (const InternalFormat::ID type)
     {
         switch (type)
         {
@@ -125,17 +105,16 @@ namespace Element {
             case samplerProcessor:      return &samplerDesc;
             case sequenceProcessor:     return &sequencerDesc;
             case patternProcessor:      return &patternDesc;
+            case midiSequence:          return &metroDesc;
             default:                    break;
         }
 
         return nullptr;
     }
 
-    void
-    InternalFormat::getAllTypes (OwnedArray <PluginDescription>& results)
+    void InternalFormat::getAllTypes (OwnedArray <PluginDescription>& results)
     {
         for (int i = 0; i < (int) audioOutputPort; ++i)
             results.add (new PluginDescription (*description ((InternalFormat::ID) i)));
     }
-
 }

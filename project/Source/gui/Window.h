@@ -88,7 +88,5 @@ namespace Element {
     protected:
         GuiApp& gui;
     };
-
-
 }
 #endif

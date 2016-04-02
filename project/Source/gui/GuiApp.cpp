@@ -128,7 +128,16 @@ Globals& GuiApp::globals()
 void GuiApp::openWindow (const String& uri)
 {
     if (uri == ELEMENT_PLUGIN_MANAGER) {
+        for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;) {
+            if (PluginListWindow* w = dynamic_cast<PluginListWindow*>(DocumentWindow::getTopLevelWindow (i))) {
+                w->closeButtonPressed();
+                mainWindow->refreshMenu();
+                return;
+            }
+        }
+        
         windowManager->push (new PluginListWindow (globals()));
+        mainWindow->refreshMenu();
     }
 }
 
@@ -139,6 +148,14 @@ void GuiApp::openWindow (Component* c)
     windowManager->push (win);
 }
 
+bool GuiApp::isWindowOpen (const String&)
+{
+    for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;)
+        if (PluginListWindow* w = dynamic_cast<PluginListWindow*>(DocumentWindow::getTopLevelWindow (i)))
+            return w->isShowing();
+    return false;
+}
+    
 void GuiApp::runDialog (const String& uri)
 {
     if (uri == ELEMENT_PREFERENCES)
@@ -393,9 +410,10 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             result.setInfo ("Save Session As", "Save the current session with a new name", "Session", 0);
             break;
         case Commands::showPreferences:
-            result.addDefaultKeypress (',', ModifierKeys::commandModifier);
             result.setInfo ("Show Preferences", "BTV Preferences", "Application", 0);
+            result.addDefaultKeypress (',', ModifierKeys::commandModifier);
             break;
+        
         case Commands::showAbout:
             result.setInfo ("Show About", "About this program", "Application", 0);
             break;
@@ -405,6 +423,7 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
         case Commands::showPluginManager:
             result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
             break;
+        
         case Commands::quit:
             result.setActive (false);
             result.setInfo("Quit", "Quit the app", "Application", 0);

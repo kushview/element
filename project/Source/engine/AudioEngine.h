@@ -55,7 +55,6 @@ namespace Element {
         MidiInputCallback& getMidiInputCallback() override;
         
     private:
-
         class Callback;
         Callback* cb;
 

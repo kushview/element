@@ -23,6 +23,7 @@
 #include "engine/InternalFormat.h"
 #include "gui/Alerts.h"
 #include "gui/GuiApp.h"
+#include "gui/PluginWindow.h"
 #include "session/Session.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -60,18 +61,24 @@ public:
         controller = new AppController (world);
     }
 
-    void launchApplication()
+    void launchApplication (const bool useThread = false)
     {
         if (world.cli.fullScreen)
         {
             Desktop::getInstance().setKioskModeComponent (&screen, false);
             screen.setVisible (true);
         }
-
-        startThread();
-
-        while (isThreadRunning())
-            MessageManager::getInstance()->runDispatchLoopUntil (30);
+        
+        if (useThread)
+        {
+            startThread();
+            while (isThreadRunning())
+                MessageManager::getInstance()->runDispatchLoopUntil (30);
+        }
+        else
+        {
+            this->run();
+        }
 
         if (screen.isOnDesktop())
             screen.removeFromDesktop();
@@ -122,7 +129,6 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
-        DBG("Starting Application");
         initializeModulePath();
         world = new Globals (commandLine);
         launchApplication();
@@ -137,8 +143,6 @@ public:
         startup.launchApplication();
         controller = startup.controller.release();
         engine = world->engine();
-		
-		Logger::writeToLog(world->settings().getCommonSettings(true)->getFile().getFullPathName());
 
         gui = GuiApp::create (*world);
         gui->run();
@@ -157,7 +161,7 @@ public:
        #endif
 
        #if JUCE_WINDOWS
-        String putEnv = "ELEMENT_MODEUL_PATH="; putEnv << modDir.getFullPathName();
+        String putEnv = "ELEMENT_MODULE_PATH="; putEnv << modDir.getFullPathName();
         putenv (putEnv.toRawUTF8());
        #else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
@@ -167,8 +171,10 @@ public:
 
     void shutdown() override
     {
-        if (gui != nullptr)
+        if (gui != nullptr) {
+            PluginWindow::closeAllCurrentlyOpenWindows();
             gui = nullptr;
+        }
 
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
@@ -189,7 +195,8 @@ public:
     {
         if (gui->shutdownApp())
         {
-            gui = nullptr;
+/*            PluginWindow::closeAllCurrentlyOpenWindows();
+            gui = nullptr; */
             this->quit();
         }
     }

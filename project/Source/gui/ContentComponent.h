@@ -31,15 +31,16 @@ class SequencerComponent;
 class Workspace;
 
 class ContentComponent :  public Component,
-                          public DragAndDropContainer
+                          public DragAndDropContainer,
+                          private Timer
 {
 public:
     ContentComponent (GuiApp& app);
     ~ContentComponent();
 
-    void childBoundsChanged (Component* child);
-    void paint (Graphics &g);
-    void resized();
+    void childBoundsChanged (Component* child) override;
+    void paint (Graphics &g) override;
+    void resized() override;
 
     void stabilize();
     
@@ -53,6 +54,10 @@ private:
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
     ScopedPointer<GraphEditorPanel> graph;
+    Shared<Monitor> playbackMonitor;
+    
+    friend class Timer;
+    void timerCallback() override;
 };
 
 }

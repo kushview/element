@@ -19,6 +19,7 @@
 
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
+#include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
 
 #include "EngineControl.h"
@@ -27,12 +28,12 @@
 
 namespace Element {
 
-    namespace EngineHelpers
-    {
+    namespace EngineHelpers {
+        
         GraphNodePtr createNodeFromValueTreeNode (GraphProcessor& graph, const ValueTree& node,
                                                   PluginManager& plugins)
         {
-            const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch);
+            /* const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch); */
             const bool restorePluginGain     = true; // ! filters.contains (Snapshot::filterPluginGain);
             const bool restorePluginSettings = true; // ! filters.contains (Snapshot::filterPluginSettings);
             const bool restoreBypassState    = true; // ! filters.contains (Snapshot::filterBypassState);
@@ -41,6 +42,7 @@ namespace Element {
             ValueTree plugin = node.getChildWithName ("plugin");
             PluginDescription desc;
             desc.pluginFormatName = plugin.getProperty ("format");
+            desc.name = plugin.getProperty("name");
             desc.category = plugin.getProperty ("category");
             desc.manufacturerName = plugin.getProperty ("manufacturer");
             desc.version = plugin.getProperty ("version");
@@ -51,58 +53,63 @@ namespace Element {
             desc.numInputChannels = (int) plugin.getProperty ("numInputs");
             desc.numOutputChannels = (int) plugin.getProperty ("numOutputs");
             desc.hasSharedContainer = (bool) plugin.getProperty ("isShell");
-            
+
             String errorMessage;
             Processor* instance = plugins.createPlugin (desc, errorMessage);
-            
+
             if (instance == nullptr) {
-                DBG(errorMessage);
+                DBG (errorMessage);
                 return nullptr;
             }
-            
+
             GraphNodePtr nodePtr (graph.addNode (instance, (uint32)(int) node.getProperty ("id")));
             /* TODO: Prevent memory leaks. Unlikely, but the Processor instance here could leak
              memory if the node wasn't created - MRF */
+
             
             if (nodePtr)
             {
                 ValueTree meta = node.getChildWithName ("metadata");
                 if (meta.isValid())
                     nodePtr->setMetadata (meta, true);
-                
+
                 if (node.hasProperty("gain") && restorePluginGain) {
                     nodePtr->setGain ((float) node.getProperty("gain"));
                 }
-                
+
                 if (plugin.hasProperty ("state") && restorePluginSettings)
                 {
                     MemoryBlock m;
                     m.fromBase64Encoding (plugin.getProperty("state").toString());
                     nodePtr->getAudioPluginInstance()->setStateInformation (m.getData(), (int) m.getSize());
                 }
-                
+
                 if (plugin.hasProperty("isSuspended") && restoreBypassState)
                     nodePtr->getAudioPluginInstance()->suspendProcessing ((bool) plugin.getProperty ("isSuspended", false));
-                
+
                 // set misc properties from the node property store
                 Array<Identifier> ignore;
                 if (! restoreWindowLayout) {
                     ignore.add (Identifier("uiLastX"));
                     ignore.add (Identifier("uiLastY"));
                 }
-                
+
                 for (int i = 0; i < node.getNumProperties(); ++i)
                     if (! ignore.contains (node.getPropertyName (i)))
                         nodePtr->properties.set (node.getPropertyName(i), node.getProperty (node.getPropertyName(i)));
             }
-            
+            else
+            {
+                DBG ("Could not create plugin");
+            }
+
             return nodePtr;
         }
-        
+
         ValueTree createValueTreeForNode (GraphNodePtr node, Identifier valueTreeType = "node")
         {
             ValueTree result (valueTreeType);
-            
+
             result.setProperty ("id", static_cast<int> (node->nodeId), nullptr);
             for (int i = 0; i < node->properties.size(); ++i)
             {
@@ -110,19 +117,19 @@ namespace Element {
                                     node->properties.getValueAt(i),
                                     nullptr);
             }
-            
+
             result.setProperty ("gain", node->getGain(), nullptr);
-            
+
             if (AudioPluginInstance* plugin = dynamic_cast<AudioPluginInstance*> (node->getAudioPluginInstance()))
             {
                 PluginDescription pd;
                 plugin->fillInPluginDescription (pd);
-                
+
                 ValueTree p ("plugin");
-                p.setProperty (Element::Slugs::name, pd.name, nullptr);
+                p.setProperty (Slugs::name, pd.name, nullptr);
                 if (pd.descriptiveName != pd.name)
                     p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
-                
+
                 p.setProperty ("format",       pd.pluginFormatName, nullptr);
                 p.setProperty ("category",     pd.category, nullptr);
                 p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
@@ -135,31 +142,31 @@ namespace Element {
                 p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
                 p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
                 p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
-                
+
                 MemoryBlock m;
                 node->getProcessor()->getStateInformation (m);
                 p.setProperty ("state", m.toBase64Encoding(), nullptr);
-                
+
                 result.addChild (p, -1, nullptr);
-                
+
                 ValueTree meta (node->getMetadata().createCopy());
                 result.addChild (meta, -1, nullptr);
             }
-            
+
             return result;
         }
     }
-    
+
 class RootGraph : public GraphProcessor
 {
 public:
     RootGraph() { }
     ~RootGraph() { }
-    
+
     void restoreFromValueTree (const ValueTree& data, PluginManager& plugins)
     {
         clear();
-        
+
         ValueTree arcs  = data.getChildWithName ("arcs");
         ValueTree nodes = data.getChildWithName ("nodes");
         for (int i = 0; i < nodes.getNumChildren(); ++i)
@@ -170,7 +177,7 @@ public:
             
             EngineHelpers::createNodeFromValueTreeNode (*this, c, plugins);
         }
-        
+
         // if (! filters.contains (Snapshot::filterAudioPatch))
         {
             for (int i = 0; i < arcs.getNumChildren(); ++i)
@@ -184,48 +191,48 @@ public:
                                    (uint32)(int) c.getProperty ("destPort"));
                 }
             }
-            
+
             removeIllegalConnections();
         }
     }
-    
+
     ValueTree createValueTree() const
     {
         ValueTree graph (Element::Slugs::graph);
-        
+
         ValueTree nodes ("nodes");
         for (int i = 0; i < getNumNodes(); ++i)
         {
             GraphNodePtr node = getNode (i);
-            
+
             AudioPluginInstance* plugin = dynamic_cast <AudioPluginInstance*> (node->getProcessor());
             if (plugin == nullptr)
             {
                 jassertfalse;
                 return ValueTree::invalid;
             }
-            
+
             ValueTree n (EngineHelpers::createValueTreeForNode (node));
             if (n.isValid()) nodes.addChild (n, -1, nullptr);
         }
         graph.addChild (nodes, -1, nullptr);
-        
+
         ValueTree arcs ("arcs");
         for (int i = 0; i < getNumConnections(); ++i)
         {
             const GraphProcessor::Connection* const fc = getConnection(i);
             ValueTree arc ("arc");
-            
+
             arc.setProperty ("sourceNode", (int) fc->sourceNode, nullptr);
             arc.setProperty ("sourcePort", (int) fc->sourcePort, nullptr);
             arc.setProperty ("destNode",   (int) fc->destNode,   nullptr);
             arc.setProperty ("destPort",   (int) fc->destPort,   nullptr);
-            
+
             arcs.addChild (arc, -1, nullptr);
         }
-        
+
         graph.addChild (arcs, -1, nullptr);
-        
+
         return graph;
     }
 };
@@ -289,7 +296,7 @@ public:
         engine->transport()->preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
         incomingMidi.clear();
-        
+
         int totalNumChans = 0;
 
         if (numInputChannels > numOutputChannels)
@@ -345,7 +352,6 @@ public:
             }
             else if (engine->transport()->getRemainingFrames() >= numSamples)
             {
-                DBG("hello");
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
                 AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
                 processor->processBlock (buffer, incomingMidi);
@@ -362,7 +368,7 @@ public:
                 if (engine->transport()->isPlaying()) {
                     engine->transport()->advance (remainingFrames);
                 }
-                
+
                 AudioSampleBuffer buffer2 (channels, totalNumChans, remainingFrames, numSamples - remainingFrames);
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples - remainingFrames);
                 processor->processBlock (buffer2, incomingMidi);
@@ -448,6 +454,7 @@ public:
     {
         graph.setPlayHead (&transport);
         clips = new ClipFactory (e);
+        clips->registerType (createMidiClipType());
     }
 
     ~Private()
@@ -537,8 +544,9 @@ ValueTree AudioEngine::createGraphTree()
 
 void AudioEngine::restoreFromGraphTree (const ValueTree& tree)
 {
-    if (priv)
+    if (priv) {
         priv->graph.restoreFromValueTree (tree, world.plugins());
+    }
 }
 
 }

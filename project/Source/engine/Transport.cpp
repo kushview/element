@@ -34,10 +34,8 @@ namespace Element {
     Transport::~Transport() { }
 
 
-    void
-    Transport::preProcess (int nframes)
+    void Transport::preProcess (int nframes)
     {
-
         if (recording != recordState.get()) {
             recording = recordState.get();
         }
@@ -47,13 +45,11 @@ namespace Element {
         }
 
         if (playing) {
-            playPos->set (getPositionSeconds());
+            playPos->set (getPositionBeats());
         }
-
     }
 
-    Shared<Monitor>
-    Transport::monitor()
+    Shared<Monitor> Transport::monitor()
     {
         return playPos;
     }

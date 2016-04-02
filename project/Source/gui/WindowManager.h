@@ -22,7 +22,7 @@
 
 #include "element/Juce.h"
 #include "Commands.h"
-#include "Window.h"
+#include "gui/Window.h"
 
 namespace Element {
 
@@ -58,8 +58,7 @@ namespace Element {
             Another option would be to inherrit Component only, but provide
             yourself the required  Signal& signalClosed()  method */
 
-        inline void
-        push (Window* window)
+        inline void push (Window* window)
         {
             activeWindows.addIfNotAlreadyThere (window);
             window->addToDesktop();
@@ -68,8 +67,7 @@ namespace Element {
                         boost::bind (&WindowManager::onWindowClosed, this, window));
         }
 
-        inline void
-        push (DialogWindow* dialog)
+        inline void push (DialogWindow* dialog)
         {
             if (! activeDialogs.contains (dialog))
             {
@@ -84,19 +82,11 @@ namespace Element {
         }
 
     private:
-
-        void onWindowClosed (Window* c)
-        {
-            jassert (activeWindows.contains (c));
-            c->setVisible (false);
-            activeWindows.removeObject (c, true);
-        }
-
         OwnedArray<Window> activeWindows;
         OwnedArray<DialogWindow> activeDialogs;
-
         GuiApp& gui;
-
+        
+        void onWindowClosed (Window* c);
     };
 
 }
