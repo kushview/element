@@ -41,9 +41,6 @@ namespace Element {
     void MidiSequenceProcessor::prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
         setPlayConfigDetails (0, 0, sampleRate, estimatedBlockSize);
-        // ClipModel clip (0.0, (double) Shuttle::PPQ * 8.0, 0.0);
-        // clip.node().setProperty("type", "midi", nullptr);
-        
         if (ClipSource* s = engine.clips().createSource (clip))
         {
             source = s;

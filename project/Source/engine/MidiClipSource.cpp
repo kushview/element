@@ -19,6 +19,9 @@ public:
     ~MidiClipData ()
     {
         state.removeListener (this);
+        eventMap.clear();
+        midi.clear();
+        state = ValueTree::invalid;
     }
     
     bool addNote (const Note& note)
@@ -212,6 +215,8 @@ private:
     Array<int32> expiredIds;
     EventMap eventMap;
     ValueTree state;
+    
+    JUCE_LEAK_DETECTOR (MidiClipData);
 };
 
 class MidiClipSource :  public ClipSource
@@ -253,6 +258,8 @@ public:
     
 private:
     int32 blockSize;
+    
+    JUCE_LEAK_DETECTOR (MidiClipSource);
 };
 
     
@@ -277,6 +284,9 @@ public:
     bool canCreateFrom (const File&) { return false; }
     ClipSource* createSource (Engine&, const File&) { return nullptr; }
     ClipSource* createSource (Engine&, const ClipModel&) { return new MidiClipSource(); }
+    
+private:
+    JUCE_LEAK_DETECTOR (MidiClipType);
 };
 
 ClipType* createMidiClipType()
