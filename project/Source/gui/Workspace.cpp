@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if ELEMENT_DOCKING_WINDOWS
+
 #include "Workspace.h"
 
 namespace Element {
@@ -63,3 +65,5 @@ void Workspace::resized()
 }
 
 }
+
+#endif

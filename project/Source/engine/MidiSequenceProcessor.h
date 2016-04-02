@@ -13,41 +13,42 @@ public:
     explicit MidiSequenceProcessor (AudioEngine&);
     ~MidiSequenceProcessor() { }
     
-    const String getName() const { return "MIDI Sequencer"; }
+    const String getName() const override { return "MIDI Sequencer"; }
     
-    void prepareToPlay (double sampleRate, int estimatedBlockSize);
-    void releaseResources();
-    void processBlock (AudioSampleBuffer&, MidiBuffer&);
+    void prepareToPlay (double sampleRate, int estimatedBlockSize) override;
+    void releaseResources() override;
+    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    const String getInputChannelName (int channelIndex) const { return String::empty; }
-    const String getOutputChannelName (int channelIndex) const { return String::empty; }
-    bool isInputChannelStereoPair (int index) const { return false; }
-    bool isOutputChannelStereoPair (int index) const { return false; }
-    bool silenceInProducesSilenceOut() const { return false; }
-    double getTailLengthSeconds() const { return 0.0f; }
+    const String getInputChannelName (int channelIndex) const override { return String::empty; }
+    const String getOutputChannelName (int channelIndex) const override { return String::empty; }
+    bool isInputChannelStereoPair (int index) const override { return false; }
+    bool isOutputChannelStereoPair (int index) const override { return false; }
+    bool silenceInProducesSilenceOut() const override { return false; }
+    double getTailLengthSeconds() const override { return 0.0f; }
     
-    bool acceptsMidi() const { return false; }
-    bool producesMidi() const { return true; }
+    bool acceptsMidi() const override { return false; }
+    bool producesMidi() const override { return true; }
     
-    bool hasEditor() const                          { return true; }
-    AudioProcessorEditor* createEditor();
+    bool hasEditor() const override                 { return true; }
+    AudioProcessorEditor* createEditor() override;
     
-    int getNumParameters()                          { return 0; }
-    const String getParameterName (int)             { return String::empty; }
-    float getParameter (int)                        { return 0; }
-    const String getParameterText (int)             { return String::empty; }
-    void setParameter (int, float)                  { }
+    int getNumParameters() override                       { return 0; }
+    const String getParameterName (int) override          { return String::empty; }
+    float getParameter (int) override                     { return 0; }
+    const String getParameterText (int) override          { return String::empty; }
+    void setParameter (int, float) override               { }
     
-    int getNumPrograms()                            { return 0; }
-    int getCurrentProgram()                         { return 0; }
-    void setCurrentProgram (int)                    { }
-    const String getProgramName (int)               { return String::empty; }
-    void changeProgramName (int, const String&)     { }
+    int getNumPrograms() override                         { return 0; }
+    int getCurrentProgram() override                      { return 0; }
+    void setCurrentProgram (int) override                 { }
+    const String getProgramName (int) override            { return String::empty; }
+    void changeProgramName (int, const String&) override  { }
     
-    void getStateInformation (MemoryBlock&) { }
-    void setStateInformation (const void* data, int sizeInBytes) { }
+    void getStateInformation (MemoryBlock&) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
     
-    void fillInPluginDescription (PluginDescription& d) const {
+    void fillInPluginDescription (PluginDescription& d) const override
+    {
         d.fileOrIdentifier = "element.midiSequence";
         d.name = getName();
         d.pluginFormatName = "Internal";

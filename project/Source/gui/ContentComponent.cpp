@@ -23,7 +23,6 @@
 #include "gui/ContentComponent.h"
 #include "gui/SequencerComponent.h"
 #include "gui/TransportBar.h"
-#include "gui/Workspace.h"
 
 namespace Element {
 

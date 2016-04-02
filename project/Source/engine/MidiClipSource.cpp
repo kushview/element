@@ -12,7 +12,7 @@ public:
     MidiClipData (const ClipModel& model)
     {
         eventMap.set (0, nullptr);
-        state = model.node().getChildWithName ("notes");
+        clipModelChanged (model);
         state.addListener (this);
     }
     
@@ -22,6 +22,11 @@ public:
         eventMap.clear();
         midi.clear();
         state = ValueTree::invalid;
+    }
+    
+    void clipModelChanged (const ClipModel& model) override
+    {
+        state = model.node().getChildWithName ("notes");
     }
     
     bool addNote (const Note& note)
@@ -167,7 +172,7 @@ public:
         return false;
     }
 
-    void valueTreePropertyChanged (ValueTree& parent, const Identifier& prop)
+    void valueTreePropertyChanged (ValueTree& parent, const Identifier& prop) override
     {
         if (parent.hasType (Slugs::note))
         {
@@ -176,7 +181,7 @@ public:
         }
     }
     
-    void valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
         if (parent == state && parent.hasType("notes") && child.hasType(Slugs::note))
         {
@@ -185,7 +190,7 @@ public:
         }
     }
     
-    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index)
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
         if (parent == state && parent.hasType("notes") && child.hasType(Slugs::note))
         {
@@ -195,7 +200,7 @@ public:
         }
     }
 
-    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex)
+    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
     {
         if (parent == state)
         {
@@ -205,8 +210,8 @@ public:
         }
     }
     
-    void valueTreeParentChanged (ValueTree& child) { }
-    void valueTreeRedirected (ValueTree&) { }
+    void valueTreeParentChanged (ValueTree& child) override { }
+    void valueTreeRedirected (ValueTree&) override { }
     
 private:
     typedef MidiMessageSequence::MidiEventHolder EventHolder;

@@ -8,7 +8,7 @@ namespace Element {
     class MidiSequenceEditor : public AudioProcessorEditor {
     public:
         MidiSequenceEditor (MidiSequenceProcessor* p, const MidiClip& clip)
-        : AudioProcessorEditor(p), proc(p)
+            : AudioProcessorEditor(p), proc(p)
         {
             addAndMakeVisible (ed = new MidiEditorComponent (keyboard));
             const NoteSequence notes (clip.node().getChildWithName ("notes"));
@@ -55,7 +55,10 @@ namespace Element {
         player.prepareToPlay (sampleRate, estimatedBlockSize);
     }
     
-    void MidiSequenceProcessor::releaseResources() {
+    void MidiSequenceProcessor::releaseResources()
+    {
+        seq.clear();
+        source = nullptr;
     }
     
     void MidiSequenceProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
@@ -77,8 +80,36 @@ namespace Element {
         }
     }
     
+    void MidiSequenceProcessor::getStateInformation (MemoryBlock& block)
+    {
+        const ValueTree data = clip.node();
+        MemoryOutputStream output (block, false);
+        data.writeToStream (output);
+    }
+    
+    void MidiSequenceProcessor::setStateInformation (const void* data, int size)
+    {
+        MemoryInputStream input (data, static_cast<size_t> (size), false);
+        const ValueTree newData (ValueTree::readFromStream (input));
+        if (newData.isValid())
+        {
+            clip.setData (newData);
+            if (auto* s = engine.clips().createSource (clip)) {
+                source = s;
+                if (ClipData* clipData = const_cast<ClipData*> (source->getClipData())) {
+                    clipData->midi.clear();
+                    clip.addNotesTo (clipData->midi);
+                }
+            }
+        }
+    }
+    
     AudioProcessorEditor* MidiSequenceProcessor::createEditor()
     {
+        const ValueTree vt1 = source->getModel().node();
+        const ValueTree vt2 = clip.node();
+        const bool sameData = vt1 == vt2;
+        
         return new MidiSequenceEditor (this, clip);
     }
 }

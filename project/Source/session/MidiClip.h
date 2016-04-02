@@ -11,8 +11,9 @@ namespace Element {
     public:
         MidiClip();
         ~MidiClip();
+        
+        void addNotesTo (MidiMessageSequence&) const;
     };
-    
 }
 
 
