@@ -130,9 +130,10 @@ namespace Element {
         assert (seq->tracksArePresent());
 #endif
 
+#if 0
         NodePtr output = ioNodes.getUnchecked (IOProcessor::audioOutputNode);
         
-#if 0
+
         getGraph().connectChannels (PortType::Audio, seqNode->nodeId, 0, output->nodeId, 0);
         getGraph().connectChannels (PortType::Audio, seqNode->nodeId, 1, output->nodeId, 1);
 #endif

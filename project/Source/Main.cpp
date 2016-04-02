@@ -60,18 +60,24 @@ public:
         controller = new AppController (world);
     }
 
-    void launchApplication()
+    void launchApplication (const bool useThread = false)
     {
         if (world.cli.fullScreen)
         {
             Desktop::getInstance().setKioskModeComponent (&screen, false);
             screen.setVisible (true);
         }
-
-        startThread();
-
-        while (isThreadRunning())
-            MessageManager::getInstance()->runDispatchLoopUntil (30);
+        
+        if (useThread)
+        {
+            startThread();
+            while (isThreadRunning())
+                MessageManager::getInstance()->runDispatchLoopUntil (30);
+        }
+        else
+        {
+            this->run();
+        }
 
         if (screen.isOnDesktop())
             screen.removeFromDesktop();

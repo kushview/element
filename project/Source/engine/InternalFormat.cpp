@@ -51,7 +51,7 @@ namespace Element {
         }
         
         {
-            MidiSequenceProcessor p;
+            MidiSequenceProcessor p (engine);
             p.fillInPluginDescription (metroDesc);
         }
     }
@@ -84,7 +84,7 @@ namespace Element {
         }
         else if (desc.fileOrIdentifier == metroDesc.fileOrIdentifier)
         {
-            return new MidiSequenceProcessor();
+            return new MidiSequenceProcessor (engine);
         }
         else if (desc.name == "Sequencer")
         {

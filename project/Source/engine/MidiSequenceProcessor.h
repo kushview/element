@@ -2,12 +2,15 @@
 #define EL_MIDI_SEQUENCE_PROCESSOR_H
 
 #include "element/Juce.h"
+#include "session/MidiClip.h"
 
 namespace Element {
 
+class AudioEngine;
+    
 class MidiSequenceProcessor : public Processor {
 public:
-    MidiSequenceProcessor();
+    explicit MidiSequenceProcessor (AudioEngine&);
     ~MidiSequenceProcessor() { }
     
     const String getName() const { return "MIDI Sequencer"; }
@@ -53,8 +56,11 @@ public:
     }
     
 private:
+    AudioEngine& engine;
     MidiSequencePlayer player;
     MidiMessageSequence seq;
+    MidiClip clip;
+    ClipSource* source;
 };
     
 }

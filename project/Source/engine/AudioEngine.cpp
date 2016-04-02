@@ -19,6 +19,7 @@
 
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
+#include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
 
 #include "EngineControl.h"
@@ -27,12 +28,12 @@
 
 namespace Element {
 
-    namespace EngineHelpers
-    {
+    namespace EngineHelpers {
+        
         GraphNodePtr createNodeFromValueTreeNode (GraphProcessor& graph, const ValueTree& node,
                                                   PluginManager& plugins)
         {
-            const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch);
+            /* const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch); */
             const bool restorePluginGain     = true; // ! filters.contains (Snapshot::filterPluginGain);
             const bool restorePluginSettings = true; // ! filters.contains (Snapshot::filterPluginSettings);
             const bool restoreBypassState    = true; // ! filters.contains (Snapshot::filterBypassState);
@@ -57,7 +58,7 @@ namespace Element {
             Processor* instance = plugins.createPlugin (desc, errorMessage);
 
             if (instance == nullptr) {
-                Logger::writeToLog(errorMessage);
+                DBG (errorMessage);
                 return nullptr;
             }
 
@@ -65,10 +66,7 @@ namespace Element {
             /* TODO: Prevent memory leaks. Unlikely, but the Processor instance here could leak
              memory if the node wasn't created - MRF */
 
-            if (desc.fileOrIdentifier == "element.midiSequence") {
-                Logger::writeToLog("Doing midiSequence node");
-
-            }
+            
             if (nodePtr)
             {
                 ValueTree meta = node.getChildWithName ("metadata");
@@ -102,7 +100,7 @@ namespace Element {
             }
             else
             {
-                Logger::writeToLog("Could not create plugin");
+                DBG ("Could not create plugin");
             }
 
             return nodePtr;
@@ -176,8 +174,7 @@ public:
             ValueTree c (nodes.getChild(i));
             if (! c.hasType ("node"))
                 continue;
-            Logger::writeToLog(c.toXmlString());
-
+            
             EngineHelpers::createNodeFromValueTreeNode (*this, c, plugins);
         }
 
@@ -457,6 +454,7 @@ public:
     {
         graph.setPlayHead (&transport);
         clips = new ClipFactory (e);
+        clips->registerType (createMidiClipType());
     }
 
     ~Private()
