@@ -12,8 +12,8 @@ public:
     MidiClipData (const ClipModel& model)
     {
         eventMap.set (0, nullptr);
-        clipModelChanged (model);
         state.addListener (this);
+        clipModelChanged (model);
     }
     
     ~MidiClipData ()
@@ -211,7 +211,21 @@ public:
     }
     
     void valueTreeParentChanged (ValueTree& child) override { }
-    void valueTreeRedirected (ValueTree&) override { }
+    void valueTreeRedirected (ValueTree& data) override
+    {
+        lock();
+        midi.clear();
+        unlock();
+        
+        for (int i = 0; i < data.getNumChildren(); ++i)
+        {
+            const ValueTree child (data.getChild(i));
+            if (! child.hasType(Slugs::note))
+                continue;
+            const Note note (child);
+            addNote (note);
+        }
+    }
     
 private:
     typedef MidiMessageSequence::MidiEventHolder EventHolder;

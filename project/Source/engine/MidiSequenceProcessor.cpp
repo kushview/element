@@ -96,20 +96,16 @@ namespace Element {
             clip.setData (newData);
             if (auto* s = engine.clips().createSource (clip)) {
                 source = s;
-                if (ClipData* clipData = const_cast<ClipData*> (source->getClipData())) {
-                    clipData->midi.clear();
-                    clip.addNotesTo (clipData->midi);
-                }
+            }
+            else
+            {
+                source = nullptr;
             }
         }
     }
     
     AudioProcessorEditor* MidiSequenceProcessor::createEditor()
     {
-        const ValueTree vt1 = source->getModel().node();
-        const ValueTree vt2 = clip.node();
-        const bool sameData = vt1 == vt2;
-        
         return new MidiSequenceEditor (this, clip);
     }
 }
