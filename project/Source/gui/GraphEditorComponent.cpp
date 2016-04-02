@@ -434,9 +434,7 @@ public:
         setAlwaysOnTop (true);
     }
 
-    ~ConnectorComponent()
-    {
-    }
+    ~ConnectorComponent() { }
 
     bool isDragging() const { return dragging; }
 
@@ -949,16 +947,20 @@ void GraphEditorBase::endDraggingConnector (const MouseEvent& e)
 
 PluginWindow* GraphEditorBase::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
 {
-    PluginWindow* w = PluginWindow::getWindowFor (f);
+    if (PluginWindow* window = PluginWindow::getWindowFor (f))
+        return window;
     
-    if (! w)
-    {
-        ScopedPointer<Component> c (createContainerForNode (f, useGeneric));
-        if (c)
-        {
+    PluginWindow* w = PluginWindow::getFirstWindow();
+    ScopedPointer<Component> c (createContainerForNode (f, useGeneric));
+    
+    if (! w && c) {
             w = PluginWindow::createWindowFor (f, c.get());
-            if (w) c.release();
-        }
+            if (w)
+                c.release();
+    }
+    else if (w && c)
+    {
+        w->updateGraphNode (f, c.release());
     }
 
     return w;

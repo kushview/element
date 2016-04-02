@@ -138,6 +138,18 @@ PluginWindow* PluginWindow::getWindowFor (GraphNode* node)
     return nullptr;
 }
 
+PluginWindow* PluginWindow::getFirstWindow()
+{
+    return activePluginWindows.getFirst();
+}
+    
+void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
+{
+    jassert(nullptr != newNode && nullptr != newEditor);
+    owner = newNode;
+    setContentOwned (newEditor, true);
+}
+    
 PluginWindow* PluginWindow::createWindowFor (GraphNode* node)
 {
     AudioPluginInstance* plug (node->getAudioPluginInstance());

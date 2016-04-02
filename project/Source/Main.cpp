@@ -23,6 +23,7 @@
 #include "engine/InternalFormat.h"
 #include "gui/Alerts.h"
 #include "gui/GuiApp.h"
+#include "gui/PluginWindow.h"
 #include "session/Session.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -170,8 +171,10 @@ public:
 
     void shutdown() override
     {
-        if (gui != nullptr)
+        if (gui != nullptr) {
+            PluginWindow::closeAllCurrentlyOpenWindows();
             gui = nullptr;
+        }
 
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
@@ -192,7 +195,8 @@ public:
     {
         if (gui->shutdownApp())
         {
-            gui = nullptr;
+/*            PluginWindow::closeAllCurrentlyOpenWindows();
+            gui = nullptr; */
             this->quit();
         }
     }

@@ -19,6 +19,7 @@ public:
     static PluginWindow* createWindowFor (GraphNode* node);
     static PluginWindow* createWindowFor (GraphNode* node, Component* editor);
     static PluginWindow* getOrCreateWindowFor (GraphNode* node);
+    static PluginWindow* getFirstWindow();
     
     static void closeCurrentlyOpenWindowsFor (GraphNode* const node);
     static void closeCurrentlyOpenWindowsFor (const uint32 nodeId);
@@ -27,6 +28,7 @@ public:
     ~PluginWindow();
 
     Toolbar* getToolbar() const;
+    void updateGraphNode (GraphNode* newNode, Component* newEditor);
     
     // component/document window
     void moved();
@@ -36,7 +38,6 @@ public:
 private:
     PluginWindow (Component* const uiComp, GraphNode* node);
     GraphNode* owner;
-
 };
 
 }
