@@ -39,11 +39,13 @@ public:
         {
             String tip;
 
+          #if 0
             if (isInput)
-                tip = node->getProcessor()->getInputChannelName (index_);
+                tip = bus.inputBuses.getReference(index_).name;
             else
-                tip = node->getProcessor()->getOutputChannelName (index_);
-
+                tip = bus.outputBuses.getReference(index_).name;
+          #endif
+            
             if (tip.isEmpty())
             {
                 if (false) //XXX index_ == GraphController::midiChannelNumber)

@@ -38,9 +38,9 @@ public:
     ContentComponent (GuiApp& app);
     ~ContentComponent();
 
-    void childBoundsChanged (Component* child);
-    void paint (Graphics &g);
-    void resized();
+    void childBoundsChanged (Component* child) override;
+    void paint (Graphics &g) override;
+    void resized() override;
 
     void stabilize();
     
