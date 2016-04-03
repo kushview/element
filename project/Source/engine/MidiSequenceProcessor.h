@@ -20,10 +20,10 @@ public:
     void releaseResources() override;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     
-    const String getInputChannelName (int channelIndex) const override { return String::empty; }
-    const String getOutputChannelName (int channelIndex) const override { return String::empty; }
-    bool isInputChannelStereoPair (int index) const override { return false; }
-    bool isOutputChannelStereoPair (int index) const override { return false; }
+    const String getInputChannelName (int) const override { return String::empty; }
+    const String getOutputChannelName (int) const override { return String::empty; }
+    bool isInputChannelStereoPair (int) const override { return false; }
+    bool isOutputChannelStereoPair (int) const override { return false; }
     bool silenceInProducesSilenceOut() const override { return false; }
     double getTailLengthSeconds() const override { return 0.0f; }
     

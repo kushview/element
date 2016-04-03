@@ -177,7 +177,7 @@ public:
         return false;
     }
 
-    void valueTreePropertyChanged (ValueTree& parent, const Identifier& prop) override
+    void valueTreePropertyChanged (ValueTree& parent, const Identifier&) override
     {
         if (parent.hasType (Slugs::note))
         {
@@ -205,7 +205,7 @@ public:
         }
     }
 
-    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
+    void valueTreeChildOrderChanged (ValueTree& parent, int /*oldIndex*/, int /*newIndex*/) override
     {
         if (parent == state)
         {
@@ -215,7 +215,7 @@ public:
         }
     }
     
-    void valueTreeParentChanged (ValueTree& child) override { }
+    void valueTreeParentChanged (ValueTree&) override { }
     void valueTreeRedirected (ValueTree& data) override
     {
         lock();
@@ -263,13 +263,11 @@ public:
         DBG ("MidiClipSource::close()");
     }
     
-    void renderClip (const Position& pos, AudioSourceChannelInfo&)
+    void renderClip (const Position&, AudioSourceChannelInfo&)
     {
-        DBG ("render: " << pos.timeInSeconds);
     }
     
-    void seekLocalFrame (const int64& frame) {
-        DBG("Dummy Clip Seek: " << frame);
+    void seekLocalFrame (const int64&) {
     }
     
     void prepareToPlay (int block, double) { blockSize = block; }

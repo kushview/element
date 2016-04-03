@@ -39,7 +39,7 @@ public:
     MidiMessageSequence midi;
 
 protected:
-    virtual void clipModelChanged (const ClipModel& model) { }
+    virtual void clipModelChanged (const ClipModel&) { }
     
 private:
     friend class ClipFactory;

@@ -81,7 +81,7 @@ MidiEditorBody::addNote (int note, float start, float length, int channel)
 }
 
 
-void MidiEditorBody::addSequence (const MidiMessageSequence& seq)
+void MidiEditorBody::addSequence (const MidiMessageSequence&)
 {
 }
 
