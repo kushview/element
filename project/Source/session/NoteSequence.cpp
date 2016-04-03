@@ -1,6 +1,6 @@
 /*
-    MidiEditorComponent.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    NoteSequence.cpp - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +17,31 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_STEP_SEQUENCER_BODY_H
-#define ELEMENT_STEP_SEQUENCER_BODY_H
-
-#include "element/Juce.h"
-#include "gui/MidiEditorBody.h"
+#include "session/Note.h"
+#include "session/NoteSequence.h"
 
 namespace Element {
 
-class MidiEditorComponent :  public MidiEditorBody
+Note NoteSequence::addNote (const ValueTree& tree)
 {
-public:
-    MidiEditorComponent (MidiKeyboardState& keyboard);
-    virtual ~MidiEditorComponent ();
-};
-
+    if (tree.hasType (Slugs::note))
+        return Note::make (ValueTree::invalid);
+    
+    if (tree.getParent().isValid())
+    {
+        ValueTree p = tree.getParent();
+        p.removeChild (tree, nullptr);
+    }
+    
+    Note nt = Note::make (tree);
+    node().addChild (nt.node(), -1, nullptr);
+    
+    return nt;
 }
 
-#endif // ELEMENT_STEP_SEQUENCER_BODY_H
+int32 NoteSequence::ppq() const
+{
+    return objectData.getProperty (Slugs::ppq, 1920);
+}
+
+}

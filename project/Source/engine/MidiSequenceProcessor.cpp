@@ -3,6 +3,7 @@
 #include "engine/ClipSource.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/Transport.h"
+#include "session/NoteSequence.h"
 #include "gui/MidiEditorComponent.h"
 
 namespace Element {

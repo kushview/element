@@ -4,6 +4,8 @@
 #include "engine/Engine.h"
 #include "engine/MidiClipSource.h"
 #include "session/MidiClip.h"
+#include "session/Note.h"
+#include "session/NoteSequence.h"
 
 namespace Element {
 

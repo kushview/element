@@ -20,6 +20,7 @@
 #include "engine/Engine.h"
 #include "engine/ClipFactory.h"
 #include "engine/ClipSource.h"
+#include "session/ClipModel.h"
 
 namespace Element {
 

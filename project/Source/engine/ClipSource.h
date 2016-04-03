@@ -25,6 +25,7 @@
 namespace Element {
 
 class ClipFactory;
+class ClipModel;
 
 class ClipData
 {

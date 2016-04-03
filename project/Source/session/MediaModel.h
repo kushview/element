@@ -1,6 +1,6 @@
 /*
-    MidiEditorComponent.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    MediaModel.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +17,28 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_STEP_SEQUENCER_BODY_H
-#define ELEMENT_STEP_SEQUENCER_BODY_H
+#ifndef ELEMENT_MEDIA_MODEL_H
+#define ELEMENT_MEDIA_MODEL_H
 
 #include "element/Juce.h"
-#include "gui/MidiEditorBody.h"
 
 namespace Element {
 
-class MidiEditorComponent :  public MidiEditorBody
+class MediaModel :  public ObjectModel
 {
 public:
-    MidiEditorComponent (MidiKeyboardState& keyboard);
-    virtual ~MidiEditorComponent ();
+
+    inline MediaModel () : ObjectModel() { }
+    inline MediaModel (const Identifier& type) : ObjectModel (type) { }
+    inline MediaModel (const ValueTree& data) : ObjectModel (data) { }
+
+    virtual void setFile (const File&) { }
+    virtual File getFile() const { return File::nonexistent; }
+    virtual void getRelatedFiles (Array<File>&) { }
 };
+
+typedef Shared<MediaModel> MediaPtr;
 
 }
 
-#endif // ELEMENT_STEP_SEQUENCER_BODY_H
+#endif // ELEMENT_MEDIA_MODEL_H

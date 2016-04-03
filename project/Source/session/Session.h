@@ -24,6 +24,7 @@
 #include <boost/intrusive_ptr.hpp>
 
 namespace Element {
+    class AssetTree;
     class Session;
     class EngineControl;
     class Globals;

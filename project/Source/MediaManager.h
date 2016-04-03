@@ -22,146 +22,145 @@
 #ifndef ELEMENT_MEDIA_MANAGER_H
 #define ELEMENT_MEDIA_MANAGER_H
 
-#include "element/Juce.h"
+#include "session/MediaModel.h"
 
 namespace Element {
 
-    class Session;
+class Session;
 
-    class MediaType {
-    public:
+class MediaType {
+public:
 
-        enum ID {
-            Audio,
-            MidiFile,
-            PatternFile,
-            Instrument,
-            Unsupported
-        };
-
-    private:
-        ID type;
+    enum ID {
+        Audio,
+        MidiFile,
+        PatternFile,
+        Instrument,
+        Unsupported
     };
 
-    class MediaManager
+private:
+    ID type;
+};
+
+class MediaManager
+{
+public:
+
+    MediaManager();
+    virtual ~MediaManager();
+
+    class Document
     {
     public:
 
-        MediaManager();
-        virtual ~MediaManager();
+        inline Document() { }
+        virtual ~Document() { }
+        virtual MediaPtr getMediaObject() = 0;
+        virtual void fileHasBeenRenamed (const File& newFile) = 0;
+        virtual File getFile() const = 0;
+        virtual String getName() const = 0;
+        virtual Session* getSession() const = 0;
+        virtual String getState() const = 0;
+        virtual String getType() const = 0;
 
-        class Document
-        {
-        public:
+        virtual bool hasFileBeenModifiedExternally() = 0;
 
-            inline Document() { }
-            virtual ~Document() { }
-            virtual MediaPtr getMediaObject() = 0;
-            virtual void fileHasBeenRenamed (const File& newFile) = 0;
-            virtual File getFile() const = 0;
-            virtual String getName() const = 0;
-            virtual Session* getSession() const = 0;
-            virtual String getState() const = 0;
-            virtual String getType() const = 0;
+        virtual bool isForFile (const File& file) const = 0;
+        virtual bool isForNode (const ValueTree& node) const = 0;
 
-            virtual bool hasFileBeenModifiedExternally() = 0;
-
-            virtual bool isForFile (const File& file) const = 0;
-            virtual bool isForNode (const ValueTree& node) const = 0;
-
-            virtual bool loadedOk() const = 0;
-            virtual bool needsSaving() const = 0;
-            virtual bool save() = 0;
-            virtual bool saveAs() = 0;
-            virtual void reloadFromFile() = 0;
-            virtual bool refersToSession (Session& session) const = 0;
-            virtual void restoreState (const String& state) = 0;
-        };
-
-        bool canOpenFile (const File& file);
-        Document* openFile (Session* session, const File& file);
-        MediaPtr createObject (Session* session, const File& file);
-
-        int getNumOpenDocuments() const;
-        Document* getOpenDocument (int index) const;
-        void clear();
-
-        bool closeDocument (int index, bool saveIfNeeded);
-        bool closeDocument (Document* document, bool saveIfNeeded);
-        bool closeAll (bool askUserToSave);
-        bool closeAllDocumentsUsingSession (Session& Session, bool saveIfNeeded);
-        void closeFile (const File& f, bool saveIfNeeded);
-
-        bool anyFilesNeedSaving() const;
-        bool saveAll();
-        FileBasedDocument::SaveResult saveIfNeededAndUserAgrees (Document* doc);
-
-        void fileHasBeenRenamed (const File& oldFile, const File& newFile);
-        void reloadModifiedFiles();
-
-        class DocumentCloseListener
-        {
-        public:
-            DocumentCloseListener() { }
-            virtual ~DocumentCloseListener() { }
-            virtual void documentAboutToClose (Document* document) = 0;
-        };
-
-        void addListener (DocumentCloseListener*);
-        void removeListener (DocumentCloseListener*);
-
-        class DocumentType
-        {
-        public:
-
-            DocumentType() { }
-            virtual ~DocumentType() { }
-            virtual bool canOpenFile (const File& file) = 0;
-            virtual Document* openFile (Session* session, const File& file) = 0;
-
-        };
-
-        void registerType (DocumentType* type);
-
-    private:
-
-        OwnedArray <Document> documents;
-        OwnedArray <DocumentType> types;
-        Array <DocumentCloseListener*> listeners;
-
+        virtual bool loadedOk() const = 0;
+        virtual bool needsSaving() const = 0;
+        virtual bool save() = 0;
+        virtual bool saveAs() = 0;
+        virtual void reloadFromFile() = 0;
+        virtual bool refersToSession (Session& session) const = 0;
+        virtual void restoreState (const String& state) = 0;
     };
 
-    class RecentDocumentList    : private MediaManager::DocumentCloseListener
+    bool canOpenFile (const File& file);
+    Document* openFile (Session* session, const File& file);
+    MediaPtr createObject (Session* session, const File& file);
+
+    int getNumOpenDocuments() const;
+    Document* getOpenDocument (int index) const;
+    void clear();
+
+    bool closeDocument (int index, bool saveIfNeeded);
+    bool closeDocument (Document* document, bool saveIfNeeded);
+    bool closeAll (bool askUserToSave);
+    bool closeAllDocumentsUsingSession (Session& Session, bool saveIfNeeded);
+    void closeFile (const File& f, bool saveIfNeeded);
+
+    bool anyFilesNeedSaving() const;
+    bool saveAll();
+    FileBasedDocument::SaveResult saveIfNeededAndUserAgrees (Document* doc);
+
+    void fileHasBeenRenamed (const File& oldFile, const File& newFile);
+    void reloadModifiedFiles();
+
+    class DocumentCloseListener
+    {
+    public:
+        DocumentCloseListener() { }
+        virtual ~DocumentCloseListener() { }
+        virtual void documentAboutToClose (Document* document) = 0;
+    };
+
+    void addListener (DocumentCloseListener*);
+    void removeListener (DocumentCloseListener*);
+
+    class DocumentType
     {
     public:
 
-        RecentDocumentList();
-        ~RecentDocumentList();
-
-        void clear();
-
-        void newDocumentOpened (MediaManager::Document* document);
-
-        MediaManager::Document* getCurrentDocument() const       { return previousDocs.getLast(); }
-
-        bool canGoToPrevious() const;
-        bool canGoToNext() const;
-
-        MediaManager::Document* getPrevious();
-        MediaManager::Document* getNext();
-
-        MediaManager::Document* getClosestPreviousDocOtherThan (MediaManager::Document* oneToAvoid) const;
-
-        void restoreFromXml (Session& session, const XmlElement& xml);
-        XmlElement* createXml() const;
-
-    private:
-
-        void documentAboutToClose (MediaManager::Document*);
-        Array <MediaManager::Document*> previousDocs, nextDocs;
+        DocumentType() { }
+        virtual ~DocumentType() { }
+        virtual bool canOpenFile (const File& file) = 0;
+        virtual Document* openFile (Session* session, const File& file) = 0;
 
     };
 
+    void registerType (DocumentType* type);
+
+private:
+
+    OwnedArray <Document> documents;
+    OwnedArray <DocumentType> types;
+    Array <DocumentCloseListener*> listeners;
+
+};
+
+class RecentDocumentList    : private MediaManager::DocumentCloseListener
+{
+public:
+
+    RecentDocumentList();
+    ~RecentDocumentList();
+
+    void clear();
+
+    void newDocumentOpened (MediaManager::Document* document);
+
+    MediaManager::Document* getCurrentDocument() const       { return previousDocs.getLast(); }
+
+    bool canGoToPrevious() const;
+    bool canGoToNext() const;
+
+    MediaManager::Document* getPrevious();
+    MediaManager::Document* getNext();
+
+    MediaManager::Document* getClosestPreviousDocOtherThan (MediaManager::Document* oneToAvoid) const;
+
+    void restoreFromXml (Session& session, const XmlElement& xml);
+    XmlElement* createXml() const;
+
+private:
+
+    void documentAboutToClose (MediaManager::Document*);
+    Array <MediaManager::Document*> previousDocs, nextDocs;
+
+};
 
 }
 

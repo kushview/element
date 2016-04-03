@@ -1,6 +1,6 @@
 /*
-    MidiEditorComponent.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    GraphModel.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +17,22 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_STEP_SEQUENCER_BODY_H
-#define ELEMENT_STEP_SEQUENCER_BODY_H
+#ifndef ELEMENT_GRAPH_MODEL_H
+#define ELEMENT_GRAPH_MODEL_H
 
-#include "element/Juce.h"
-#include "gui/MidiEditorBody.h"
+#include "session/BlockModel.h"
 
 namespace Element {
-
-class MidiEditorComponent :  public MidiEditorBody
+    
+class GraphModel :  public BlockModel
 {
 public:
-    MidiEditorComponent (MidiKeyboardState& keyboard);
-    virtual ~MidiEditorComponent ();
+    GraphModel();
+    ~GraphModel();
+    void addPlugin();
+    void addSubGraph (const GraphModel& graph);
 };
 
 }
 
-#endif // ELEMENT_STEP_SEQUENCER_BODY_H
+#endif // ELEMENT_GRAPH_MODEL_H

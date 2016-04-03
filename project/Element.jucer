@@ -135,6 +135,10 @@
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
+        <FILE id="WYlZVN" name="MidiEditorBody.cpp" compile="1" resource="0"
+              file="Source/gui/MidiEditorBody.cpp"/>
+        <FILE id="MgYNsj" name="MidiEditorBody.h" compile="0" resource="0"
+              file="Source/gui/MidiEditorBody.h"/>
         <FILE id="JZPQYE" name="MidiEditorComponent.cpp" compile="1" resource="0"
               file="Source/gui/MidiEditorComponent.cpp"/>
         <FILE id="YSTMmW" name="MidiEditorComponent.h" compile="0" resource="0"
@@ -146,6 +150,7 @@
               file="Source/gui/NewSessionView.cpp"/>
         <FILE id="jydhsn" name="NewSessionView.h" compile="0" resource="0"
               file="Source/gui/NewSessionView.h"/>
+        <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
         <FILE id="BKStDb" name="PluginListWindow.h" compile="0" resource="0"
               file="Source/gui/PluginListWindow.h"/>
         <FILE id="dQixGq" name="PluginWindow.cpp" compile="1" resource="0"
@@ -375,16 +380,34 @@
         <FILE id="gtdarN" name="URIs.h" compile="0" resource="0" file="../libs/ksp1/src/URIs.h"/>
       </GROUP>
       <GROUP id="{B9118D49-09C0-7ADA-2A2D-6D0A76656BF1}" name="session">
+        <FILE id="qXGab1" name="Asset.cpp" compile="1" resource="0" file="Source/session/Asset.cpp"/>
+        <FILE id="kwbUr7" name="Asset.h" compile="0" resource="0" file="Source/session/Asset.h"/>
+        <FILE id="CFkl6z" name="AssetTree.cpp" compile="1" resource="0" file="Source/session/AssetTree.cpp"/>
+        <FILE id="nXWsbL" name="AssetTree.h" compile="0" resource="0" file="Source/session/AssetTree.h"/>
+        <FILE id="La8Q6S" name="AssetType.h" compile="0" resource="0" file="Source/session/AssetType.h"/>
+        <FILE id="ty2bp0" name="BlockModel.cpp" compile="1" resource="0" file="Source/session/BlockModel.cpp"/>
+        <FILE id="zkZsrO" name="BlockModel.h" compile="0" resource="0" file="Source/session/BlockModel.h"/>
+        <FILE id="IsKejY" name="ClipModel.h" compile="0" resource="0" file="Source/session/ClipModel.h"/>
         <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
               file="Source/session/DeviceManager.cpp"/>
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
+        <FILE id="L3dN2b" name="GraphModel.cpp" compile="1" resource="0" file="Source/session/GraphModel.cpp"/>
+        <FILE id="vWMbjH" name="GraphModel.h" compile="0" resource="0" file="Source/session/GraphModel.h"/>
+        <FILE id="M2406w" name="MediaModel.h" compile="0" resource="0" file="Source/session/MediaModel.h"/>
         <FILE id="M0yKZu" name="MediaStorage.h" compile="0" resource="0" file="Source/session/MediaStorage.h"/>
         <FILE id="Z8fHex" name="MidiClip.cpp" compile="1" resource="0" file="Source/session/MidiClip.cpp"/>
         <FILE id="dIrbHz" name="MidiClip.h" compile="0" resource="0" file="Source/session/MidiClip.h"/>
         <FILE id="nB7y30" name="Module.h" compile="0" resource="0" file="Source/session/Module.h"/>
+        <FILE id="QI9jCi" name="NodeModel.h" compile="0" resource="0" file="Source/session/NodeModel.h"/>
+        <FILE id="o4zGK5" name="Note.cpp" compile="1" resource="0" file="Source/session/Note.cpp"/>
+        <FILE id="gswGU9" name="Note.h" compile="0" resource="0" file="Source/session/Note.h"/>
+        <FILE id="hi8aY2" name="NoteSequence.cpp" compile="1" resource="0"
+              file="Source/session/NoteSequence.cpp"/>
+        <FILE id="jEsGSx" name="NoteSequence.h" compile="0" resource="0" file="Source/session/NoteSequence.h"/>
         <FILE id="r3Ufcg" name="PluginManager.cpp" compile="1" resource="0"
               file="Source/session/PluginManager.cpp"/>
         <FILE id="KgUf2F" name="PluginManager.h" compile="0" resource="0" file="Source/session/PluginManager.h"/>
+        <FILE id="Cw8Aee" name="PortModel.h" compile="0" resource="0" file="Source/session/PortModel.h"/>
         <FILE id="Xwhlg4" name="Sequence.cpp" compile="1" resource="0" file="Source/session/Sequence.cpp"/>
         <FILE id="GZJ2EU" name="Sequence.h" compile="0" resource="0" file="Source/session/Sequence.h"/>
         <FILE id="ywwtsx" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
@@ -394,6 +417,8 @@
         <FILE id="wN8TOl" name="SessionAssets.h" compile="0" resource="0" file="Source/session/SessionAssets.h"/>
         <FILE id="H3r9zD" name="SessionTrack.cpp" compile="1" resource="0"
               file="Source/session/SessionTrack.cpp"/>
+        <FILE id="o0jdbc" name="TempoMap.h" compile="0" resource="0" file="Source/session/TempoMap.h"/>
+        <FILE id="vWLdgY" name="TrackModel.h" compile="0" resource="0" file="Source/session/TrackModel.h"/>
       </GROUP>
       <GROUP id="{161B7D7D-21F6-7798-618E-0A21C7F2C3B5}" name="sqlite3">
         <FILE id="rU5alL" name="readme.txt" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/readme.txt"/>

@@ -1,6 +1,6 @@
 /*
-    MidiEditorComponent.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    NodeModel.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,21 +17,24 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_STEP_SEQUENCER_BODY_H
-#define ELEMENT_STEP_SEQUENCER_BODY_H
+#ifndef ELEMENT_NODE_MODEL_H
+#define ELEMENT_NODE_MODEL_H
 
 #include "element/Juce.h"
-#include "gui/MidiEditorBody.h"
 
 namespace Element {
 
-class MidiEditorComponent :  public MidiEditorBody
+class NodeModel : public ObjectModel
 {
 public:
-    MidiEditorComponent (MidiKeyboardState& keyboard);
-    virtual ~MidiEditorComponent ();
+    NodeModel (const ValueTree& data)
+        : ObjectModel (data) { }
+
+    NodeModel (const Identifier& nodeType)
+        : ObjectModel (nodeType) { }
+
 };
 
 }
 
-#endif // ELEMENT_STEP_SEQUENCER_BODY_H
+#endif // ELEMENT_NODE_MODEL_H
