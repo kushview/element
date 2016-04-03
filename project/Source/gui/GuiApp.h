@@ -99,7 +99,7 @@ namespace Element {
         Scoped<MainWindow>        mainWindow;
         Scoped<ContentComponent>  content;
 
-        Element::Style       lookAndFeel;
+        LookAndFeel_E1            lookAndFeel;
 
         class Dispatch;
         ScopedPointer<Dispatch>   dispatch;
