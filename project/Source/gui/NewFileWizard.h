@@ -1,6 +1,7 @@
 #ifndef ELEMENT_NEW_FILE_WIZARD_H
 #define ELEMENT_NEW_FILE_WIZARD_H
 
+#include "session/AssetTree.h"
 #include "session/Session.h"
 #include "gui/GuiCommon.h"
 

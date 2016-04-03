@@ -18,9 +18,14 @@
 */
 
 #include "engine/AudioEngine.h"
+#include "engine/ClipFactory.h"
+#include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
+
+#include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 
 #include "EngineControl.h"
 #include "Globals.h"
@@ -291,7 +296,7 @@ public:
 
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
-                                const int numSamples)
+                                const int numSamples) override
     {
         engine->transport()->preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
@@ -381,7 +386,7 @@ public:
         engine->transport()->postProcess (numSamples);
     }
 
-    void audioDeviceAboutToStart (AudioIODevice* const device)
+    void audioDeviceAboutToStart (AudioIODevice* const device) override
     {
         const double newSampleRate = device->getCurrentSampleRate();
         const int newBlockSize     = device->getCurrentBufferSizeSamples();

@@ -23,6 +23,28 @@
  #define ELEMENT_VERSION_STRING ProjectInfo::versionString
 #endif
 
+#if _MSC_VER
+// unused method parameters
+#pragma warning( disable : 4100 )
+
+// previous method not overridden
+#pragma warning( disable : 4373 )
+
+// possible loss of data from casting
+#pragma warning( disable : 4244 )
+
+// const conditional
+#pragma warning( disable : 4127 )
+
+// signed/unsigned mismatch
+#pragma warning( disable : 4389 )
+#pragma warning( disable : 4018 )
+#pragma warning( disable : 4245 )
+
+// local var not used
+#pragma warning( disable : 4189 )
+
+#endif
 // [END_USER_CODE_SECTION]
 
 //==============================================================================
@@ -53,8 +75,15 @@
 //==============================================================================
 // element_engines flags:
 
-#ifndef    ELEMENT_LV2_PLUGIN_HOST
- #define   ELEMENT_LV2_PLUGIN_HOST 0
+#ifndef    ELEMENT_USE_JACK
+ //#define ELEMENT_USE_JACK
+#endif
+
+//==============================================================================
+// element_gui flags:
+
+#ifndef    ELEMENT_DOCKING_WINDOWS
+ //#define ELEMENT_DOCKING_WINDOWS
 #endif
 
 //==============================================================================

@@ -1,6 +1,9 @@
 #include "engine/AudioEngine.h"
+#include "engine/ClipFactory.h"
+#include "engine/ClipSource.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/Transport.h"
+#include "session/NoteSequence.h"
 #include "gui/MidiEditorComponent.h"
 
 namespace Element {
@@ -8,7 +11,7 @@ namespace Element {
     class MidiSequenceEditor : public AudioProcessorEditor {
     public:
         MidiSequenceEditor (MidiSequenceProcessor* p, const MidiClip& clip)
-        : AudioProcessorEditor(p), proc(p)
+            : AudioProcessorEditor(p), proc(p)
         {
             addAndMakeVisible (ed = new MidiEditorComponent (keyboard));
             const NoteSequence notes (clip.node().getChildWithName ("notes"));
@@ -55,7 +58,10 @@ namespace Element {
         player.prepareToPlay (sampleRate, estimatedBlockSize);
     }
     
-    void MidiSequenceProcessor::releaseResources() {
+    void MidiSequenceProcessor::releaseResources()
+    {
+        seq.clear();
+        source = nullptr;
     }
     
     void MidiSequenceProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& midi)
@@ -71,8 +77,33 @@ namespace Element {
                 if (pos.isPlaying) {
                     const ClipData* data = source->getClipData();
                     Midi::renderSequence (midi, data->midi, playhead->getTimeScale(),
-                                          pos.timeInSamples, audio.getNumSamples());
+                                          static_cast<int32> (pos.timeInSamples), 
+										  audio.getNumSamples());
                 }
+            }
+        }
+    }
+    
+    void MidiSequenceProcessor::getStateInformation (MemoryBlock& block)
+    {
+        const ValueTree data = clip.node();
+        MemoryOutputStream output (block, false);
+        data.writeToStream (output);
+    }
+    
+    void MidiSequenceProcessor::setStateInformation (const void* data, int size)
+    {
+        MemoryInputStream input (data, static_cast<size_t> (size), false);
+        const ValueTree newData (ValueTree::readFromStream (input));
+        if (newData.isValid())
+        {
+            clip.setData (newData);
+            if (auto* s = engine.clips().createSource (clip)) {
+                source = s;
+            }
+            else
+            {
+                source = nullptr;
             }
         }
     }

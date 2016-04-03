@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.1.0"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.1.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               jucerVersion="4.1.0" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net">
@@ -18,31 +18,74 @@
               file="Source/controllers/EngineController.cpp"/>
         <FILE id="zhBGLF" name="EngineController.h" compile="0" resource="0"
               file="Source/controllers/EngineController.h"/>
+        <FILE id="v3pZuF" name="GraphController.cpp" compile="1" resource="0"
+              file="Source/controllers/GraphController.cpp"/>
+        <FILE id="oF4cif" name="GraphController.h" compile="0" resource="0"
+              file="Source/controllers/GraphController.h"/>
       </GROUP>
       <GROUP id="{8C407BCF-7BF0-F9A3-29AB-83E56A6CB994}" name="element">
         <FILE id="o1FZqB" name="Juce.h" compile="0" resource="0" file="Source/element/Juce.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
+        <FILE id="BnMPIm" name="AtomBuffer.cpp" compile="0" resource="0" file="Source/engine/AtomBuffer.cpp"/>
+        <FILE id="XSEiim" name="AtomBuffer.h" compile="0" resource="0" file="Source/engine/AtomBuffer.h"/>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="Source/engine/AudioEngine.h"/>
+        <FILE id="V0jXER" name="Buffer.cpp" compile="0" resource="0" file="Source/engine/Buffer.cpp"/>
+        <FILE id="ndMomL" name="Buffer.h" compile="0" resource="0" file="Source/engine/Buffer.h"/>
+        <FILE id="vT7kmd" name="BufferFactory.cpp" compile="0" resource="0"
+              file="Source/engine/BufferFactory.cpp"/>
+        <FILE id="U8cCtg" name="BufferFactory.h" compile="0" resource="0" file="Source/engine/BufferFactory.h"/>
+        <FILE id="t21hS7" name="ClipFactory.cpp" compile="1" resource="0" file="Source/engine/ClipFactory.cpp"/>
+        <FILE id="xp1iJH" name="ClipFactory.h" compile="0" resource="0" file="Source/engine/ClipFactory.h"/>
+        <FILE id="fZkHE0" name="ClipSource.cpp" compile="1" resource="0" file="Source/engine/ClipSource.cpp"/>
+        <FILE id="K1qC5U" name="ClipSource.h" compile="0" resource="0" file="Source/engine/ClipSource.h"/>
+        <FILE id="kBJmQL" name="DataType.h" compile="0" resource="0" file="Source/engine/DataType.h"/>
+        <FILE id="q8nmE2" name="Engine.h" compile="0" resource="0" file="Source/engine/Engine.h"/>
+        <FILE id="kvWn2k" name="EngineBase.cpp" compile="1" resource="0" file="Source/engine/EngineBase.cpp"/>
         <FILE id="EldMb9" name="EngineProcessor.h" compile="0" resource="0"
               file="Source/engine/EngineProcessor.h"/>
+        <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>
+        <FILE id="UpjKzL" name="GraphNode.h" compile="0" resource="0" file="Source/engine/GraphNode.h"/>
+        <FILE id="W7RYnx" name="GraphPlayer.cpp" compile="0" resource="0" file="Source/engine/GraphPlayer.cpp"/>
+        <FILE id="JXs4yK" name="GraphPlayer.h" compile="0" resource="0" file="Source/engine/GraphPlayer.h"/>
+        <FILE id="kWMX9N" name="GraphPort.cpp" compile="0" resource="0" file="Source/engine/GraphPort.cpp"/>
+        <FILE id="In9kWA" name="GraphPort.h" compile="0" resource="0" file="Source/engine/GraphPort.h"/>
+        <FILE id="KPs4qR" name="GraphProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/GraphProcessor.cpp"/>
+        <FILE id="gcdKJK" name="GraphProcessor.h" compile="0" resource="0"
+              file="Source/engine/GraphProcessor.h"/>
         <FILE id="pzAoJk" name="Interface.h" compile="0" resource="0" file="Source/engine/Interface.h"/>
         <FILE id="Cx0ehM" name="InternalFormat.cpp" compile="1" resource="0"
               file="Source/engine/InternalFormat.cpp"/>
         <FILE id="NbNubd" name="InternalFormat.h" compile="0" resource="0"
               file="Source/engine/InternalFormat.h"/>
+        <FILE id="RbzE8D" name="lv2_evbuf.h" compile="0" resource="0" file="Source/engine/lv2_evbuf.h"/>
         <FILE id="LAe9tF" name="MidiClipSource.cpp" compile="1" resource="0"
               file="Source/engine/MidiClipSource.cpp"/>
         <FILE id="MVLD5m" name="MidiClipSource.h" compile="0" resource="0"
               file="Source/engine/MidiClipSource.h"/>
+        <FILE id="r5MLNe" name="MidiDataBase.cpp" compile="0" resource="0"
+              file="Source/engine/MidiDataBase.cpp"/>
+        <FILE id="ww06U1" name="MidiDataBase.h" compile="0" resource="0" file="Source/engine/MidiDataBase.h"/>
         <FILE id="aMLMSs" name="MidiSequenceProcessor.cpp" compile="1" resource="0"
               file="Source/engine/MidiSequenceProcessor.cpp"/>
         <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
               file="Source/engine/MidiSequenceProcessor.h"/>
-        <FILE id="SXdT3p" name="PreProcessor.cpp" compile="1" resource="0"
+        <FILE id="bSmXUq" name="PluginWrapper.h" compile="0" resource="0" file="Source/engine/PluginWrapper.h"/>
+        <FILE id="SXdT3p" name="PreProcessor.cpp" compile="0" resource="0"
               file="Source/engine/PreProcessor.cpp"/>
         <FILE id="VLZcbL" name="PreProcessor.h" compile="0" resource="0" file="Source/engine/PreProcessor.h"/>
+        <FILE id="erSmKq" name="SequenceCursor.cpp" compile="0" resource="0"
+              file="Source/engine/SequenceCursor.cpp"/>
+        <FILE id="zhtJ2H" name="SequenceCursor.h" compile="0" resource="0"
+              file="Source/engine/SequenceCursor.h"/>
+        <FILE id="uyaCOe" name="Sequencer.cpp" compile="0" resource="0" file="Source/engine/Sequencer.cpp"/>
+        <FILE id="Oopebn" name="Sequencer.h" compile="0" resource="0" file="Source/engine/Sequencer.h"/>
+        <FILE id="C9XKe4" name="SequencerTrack.cpp" compile="0" resource="0"
+              file="Source/engine/SequencerTrack.cpp"/>
+        <FILE id="UMM39Z" name="SequencerTrack.h" compile="0" resource="0"
+              file="Source/engine/SequencerTrack.h"/>
         <FILE id="NCc172" name="Transport.cpp" compile="1" resource="0" file="Source/engine/Transport.cpp"/>
         <FILE id="gEA8Kx" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
       </GROUP>
@@ -65,6 +108,10 @@
           <FILE id="HslPdQ" name="YesNoCancelButtonBar.h" compile="0" resource="0"
                 file="Source/gui/alerts/YesNoCancelButtonBar.h"/>
         </GROUP>
+        <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
+              file="Source/gui/AboutComponent.cpp"/>
+        <FILE id="rBDuhD" name="AboutComponent.h" compile="0" resource="0"
+              file="Source/gui/AboutComponent.h"/>
         <FILE id="lSY9NC" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
         <FILE id="KB9gFt" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
@@ -92,6 +139,10 @@
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
+        <FILE id="WYlZVN" name="MidiEditorBody.cpp" compile="1" resource="0"
+              file="Source/gui/MidiEditorBody.cpp"/>
+        <FILE id="MgYNsj" name="MidiEditorBody.h" compile="0" resource="0"
+              file="Source/gui/MidiEditorBody.h"/>
         <FILE id="JZPQYE" name="MidiEditorComponent.cpp" compile="1" resource="0"
               file="Source/gui/MidiEditorComponent.cpp"/>
         <FILE id="YSTMmW" name="MidiEditorComponent.h" compile="0" resource="0"
@@ -103,6 +154,7 @@
               file="Source/gui/NewSessionView.cpp"/>
         <FILE id="jydhsn" name="NewSessionView.h" compile="0" resource="0"
               file="Source/gui/NewSessionView.h"/>
+        <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
         <FILE id="BKStDb" name="PluginListWindow.h" compile="0" resource="0"
               file="Source/gui/PluginListWindow.h"/>
         <FILE id="dQixGq" name="PluginWindow.cpp" compile="1" resource="0"
@@ -114,11 +166,11 @@
               file="Source/gui/PreferencesWidget.cpp"/>
         <FILE id="ZVdKzn" name="PreferencesWidget.h" compile="0" resource="0"
               file="Source/gui/PreferencesWidget.h"/>
-        <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="1" resource="0"
+        <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="0" resource="0"
               file="Source/gui/SequencerClipItem.cpp"/>
         <FILE id="Daatdg" name="SequencerClipItem.h" compile="0" resource="0"
               file="Source/gui/SequencerClipItem.h"/>
-        <FILE id="i2Qfj5" name="SequencerComponent.cpp" compile="1" resource="0"
+        <FILE id="i2Qfj5" name="SequencerComponent.cpp" compile="0" resource="0"
               file="Source/gui/SequencerComponent.cpp"/>
         <FILE id="qvSqR4" name="SequencerComponent.h" compile="0" resource="0"
               file="Source/gui/SequencerComponent.h"/>
@@ -332,8 +384,34 @@
         <FILE id="gtdarN" name="URIs.h" compile="0" resource="0" file="../libs/ksp1/src/URIs.h"/>
       </GROUP>
       <GROUP id="{B9118D49-09C0-7ADA-2A2D-6D0A76656BF1}" name="session">
+        <FILE id="qXGab1" name="Asset.cpp" compile="1" resource="0" file="Source/session/Asset.cpp"/>
+        <FILE id="kwbUr7" name="Asset.h" compile="0" resource="0" file="Source/session/Asset.h"/>
+        <FILE id="CFkl6z" name="AssetTree.cpp" compile="1" resource="0" file="Source/session/AssetTree.cpp"/>
+        <FILE id="nXWsbL" name="AssetTree.h" compile="0" resource="0" file="Source/session/AssetTree.h"/>
+        <FILE id="La8Q6S" name="AssetType.h" compile="0" resource="0" file="Source/session/AssetType.h"/>
+        <FILE id="ty2bp0" name="BlockModel.cpp" compile="1" resource="0" file="Source/session/BlockModel.cpp"/>
+        <FILE id="zkZsrO" name="BlockModel.h" compile="0" resource="0" file="Source/session/BlockModel.h"/>
+        <FILE id="IsKejY" name="ClipModel.h" compile="0" resource="0" file="Source/session/ClipModel.h"/>
+        <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
+              file="Source/session/DeviceManager.cpp"/>
+        <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
+        <FILE id="L3dN2b" name="GraphModel.cpp" compile="1" resource="0" file="Source/session/GraphModel.cpp"/>
+        <FILE id="vWMbjH" name="GraphModel.h" compile="0" resource="0" file="Source/session/GraphModel.h"/>
+        <FILE id="M2406w" name="MediaModel.h" compile="0" resource="0" file="Source/session/MediaModel.h"/>
+        <FILE id="M0yKZu" name="MediaStorage.h" compile="0" resource="0" file="Source/session/MediaStorage.h"/>
         <FILE id="Z8fHex" name="MidiClip.cpp" compile="1" resource="0" file="Source/session/MidiClip.cpp"/>
         <FILE id="dIrbHz" name="MidiClip.h" compile="0" resource="0" file="Source/session/MidiClip.h"/>
+        <FILE id="nB7y30" name="Module.h" compile="0" resource="0" file="Source/session/Module.h"/>
+        <FILE id="QI9jCi" name="NodeModel.h" compile="0" resource="0" file="Source/session/NodeModel.h"/>
+        <FILE id="o4zGK5" name="Note.cpp" compile="1" resource="0" file="Source/session/Note.cpp"/>
+        <FILE id="gswGU9" name="Note.h" compile="0" resource="0" file="Source/session/Note.h"/>
+        <FILE id="hi8aY2" name="NoteSequence.cpp" compile="1" resource="0"
+              file="Source/session/NoteSequence.cpp"/>
+        <FILE id="jEsGSx" name="NoteSequence.h" compile="0" resource="0" file="Source/session/NoteSequence.h"/>
+        <FILE id="r3Ufcg" name="PluginManager.cpp" compile="1" resource="0"
+              file="Source/session/PluginManager.cpp"/>
+        <FILE id="KgUf2F" name="PluginManager.h" compile="0" resource="0" file="Source/session/PluginManager.h"/>
+        <FILE id="Cw8Aee" name="PortModel.h" compile="0" resource="0" file="Source/session/PortModel.h"/>
         <FILE id="Xwhlg4" name="Sequence.cpp" compile="1" resource="0" file="Source/session/Sequence.cpp"/>
         <FILE id="GZJ2EU" name="Sequence.h" compile="0" resource="0" file="Source/session/Sequence.h"/>
         <FILE id="ywwtsx" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
@@ -343,6 +421,8 @@
         <FILE id="wN8TOl" name="SessionAssets.h" compile="0" resource="0" file="Source/session/SessionAssets.h"/>
         <FILE id="H3r9zD" name="SessionTrack.cpp" compile="1" resource="0"
               file="Source/session/SessionTrack.cpp"/>
+        <FILE id="o0jdbc" name="TempoMap.h" compile="0" resource="0" file="Source/session/TempoMap.h"/>
+        <FILE id="vWLdgY" name="TrackModel.h" compile="0" resource="0" file="Source/session/TrackModel.h"/>
       </GROUP>
       <GROUP id="{161B7D7D-21F6-7798-618E-0A21C7F2C3B5}" name="sqlite3">
         <FILE id="rU5alL" name="readme.txt" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/readme.txt"/>

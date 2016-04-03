@@ -20,7 +20,8 @@
 #ifndef ELEMENT_TREEVIEW_TYPES_H
 #define ELEMENT_TREEVIEW_TYPES_H
 
-#include "SessionTreePanel.h"
+#include "gui/SessionTreePanel.h"
+#include "session/AssetTree.h"
 
 namespace Element {
 
@@ -118,9 +119,7 @@ public:
     Icon getIcon() const { return Icon (getIcons().folder, Colours::red); }
 
 protected:
-
     AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
-
 };
 
 }

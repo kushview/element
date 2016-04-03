@@ -21,6 +21,7 @@
 #define ELEMENT_STEP_SEQUENCER_BODY_H
 
 #include "element/Juce.h"
+#include "gui/MidiEditorBody.h"
 
 namespace Element {
 

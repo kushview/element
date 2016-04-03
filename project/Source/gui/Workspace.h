@@ -17,9 +17,11 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if ELEMENT_DOCKING_WINDOWS
+
 #ifndef ELEMENT_WORKSPACE_H
 #define ELEMENT_WORKSPACE_H
-
+xxx
 #include "element/Juce.h"
 
 namespace Element {
@@ -49,3 +51,4 @@ namespace Element {
 }
 
 #endif /* ELEMENT_WORKSPACE_H */
+#endif

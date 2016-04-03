@@ -17,10 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "controllers/GraphController.h"
 #include "engine/InternalFormat.h"
 #include "gui/GuiCommon.h"
 #include "gui/GraphEditorView.h"
 #include "gui/GuiApp.h"
+#include "session/PluginManager.h"
 
 namespace Element {
 

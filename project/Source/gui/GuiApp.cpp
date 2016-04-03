@@ -20,6 +20,7 @@
 #include "engine/AudioEngine.h"
 
 #include "gui/NewSessionView.h"
+#include "gui/AboutComponent.h"
 #include "gui/Alerts.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
@@ -525,9 +526,22 @@ bool GuiApp::perform (const InvocationInfo& info)
             saveSession (true);
             return true;
             break;
-        case Commands::showAbout:
+        case Commands::showAbout: {
+            if (! about) {
+                about = new AboutComponent (*this);
+                about->centreWithSize(about->getWidth(), about->getHeight());
+                about->setVisible(true);
+                about->addToDesktop(0);
+            }
+            else
+            {
+                about->setVisible(false);
+                about->removeFromDesktop();
+                about = nullptr;
+            }
             return true;
             break;
+        }
         case Commands::showLegacyView:
             openWindow (ELEMENT_LEGACY_WINDOW);
             return true;

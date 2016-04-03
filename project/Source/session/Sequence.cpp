@@ -327,16 +327,10 @@ namespace Element {
         notifyChanged();
     }
 
-    SequenceModel Sequence::sequence() const {
-        SequenceModel model (sequenceNode());
-        return model;
-    }
-
     ValueTree Sequence::sequenceNode() const
     {
         return node().getChildWithName (Slugs::sequence);
     }
-
 
     ValueTree Sequence::trackNode (int trackIndex) const
     {

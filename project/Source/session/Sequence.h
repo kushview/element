@@ -21,6 +21,9 @@
 #define EL_SEQUENCE_H
 
 #include "element/Juce.h"
+#include "session/AssetTree.h"
+#include "session/ClipModel.h"
+#include "session/TrackModel.h"
 
 namespace Element {
     class Session;
@@ -139,8 +142,6 @@ namespace Element {
         inline String name() const { return node().getProperty (Slugs::name, "Invalid Session"); }
         inline Value namevalue() { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
-
-        SequenceModel sequence() const;
 
         void appendTrack (const String& mediaType = "pattern");
         Track getTrack (int index);

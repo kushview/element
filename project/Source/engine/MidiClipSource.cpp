@@ -1,6 +1,11 @@
 
+#include "engine/ClipFactory.h"
+#include "engine/ClipSource.h"
+#include "engine/Engine.h"
 #include "engine/MidiClipSource.h"
 #include "session/MidiClip.h"
+#include "session/Note.h"
+#include "session/NoteSequence.h"
 
 namespace Element {
 
@@ -12,8 +17,8 @@ public:
     MidiClipData (const ClipModel& model)
     {
         eventMap.set (0, nullptr);
-        state = model.node().getChildWithName ("notes");
         state.addListener (this);
+        clipModelChanged (model);
     }
     
     ~MidiClipData ()
@@ -22,6 +27,11 @@ public:
         eventMap.clear();
         midi.clear();
         state = ValueTree::invalid;
+    }
+    
+    void clipModelChanged (const ClipModel& model) override
+    {
+        state = model.node().getChildWithName ("notes");
     }
     
     bool addNote (const Note& note)
@@ -167,7 +177,7 @@ public:
         return false;
     }
 
-    void valueTreePropertyChanged (ValueTree& parent, const Identifier& prop)
+    void valueTreePropertyChanged (ValueTree& parent, const Identifier&) override
     {
         if (parent.hasType (Slugs::note))
         {
@@ -176,7 +186,7 @@ public:
         }
     }
     
-    void valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override
     {
         if (parent == state && parent.hasType("notes") && child.hasType(Slugs::note))
         {
@@ -185,7 +195,7 @@ public:
         }
     }
     
-    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index)
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override
     {
         if (parent == state && parent.hasType("notes") && child.hasType(Slugs::note))
         {
@@ -195,7 +205,7 @@ public:
         }
     }
 
-    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex)
+    void valueTreeChildOrderChanged (ValueTree& parent, int /*oldIndex*/, int /*newIndex*/) override
     {
         if (parent == state)
         {
@@ -205,8 +215,22 @@ public:
         }
     }
     
-    void valueTreeParentChanged (ValueTree& child) { }
-    void valueTreeRedirected (ValueTree&) { }
+    void valueTreeParentChanged (ValueTree&) override { }
+    void valueTreeRedirected (ValueTree& data) override
+    {
+        lock();
+        midi.clear();
+        unlock();
+        
+        for (int i = 0; i < data.getNumChildren(); ++i)
+        {
+            const ValueTree child (data.getChild(i));
+            if (! child.hasType(Slugs::note))
+                continue;
+            const Note note (child);
+            addNote (note);
+        }
+    }
     
 private:
     typedef MidiMessageSequence::MidiEventHolder EventHolder;
@@ -239,13 +263,11 @@ public:
         DBG ("MidiClipSource::close()");
     }
     
-    void renderClip (const Position& pos, AudioSourceChannelInfo&)
+    void renderClip (const Position&, AudioSourceChannelInfo&)
     {
-        DBG ("render: " << pos.timeInSeconds);
     }
     
-    void seekLocalFrame (const int64& frame) {
-        DBG("Dummy Clip Seek: " << frame);
+    void seekLocalFrame (const int64&) {
     }
     
     void prepareToPlay (int block, double) { blockSize = block; }

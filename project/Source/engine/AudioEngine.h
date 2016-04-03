@@ -21,50 +21,54 @@
 #define ELEMENT_AUDIO_ENGINE_H
 
 #include "element/Juce.h"
-
+#include "engine/Engine.h"
 
 namespace Element {
-    class Globals;
-    class EngineControl;
-    class PatternInterface;
-    class Pattern;
-    class Transport;
 
-    class AudioEngine : public Engine
-    {
-    public:
-        AudioEngine (Globals&);
-        ~AudioEngine();
+class Globals;
+class ClipFactory;
+class EngineControl;
+class GraphProcessor;
+class PatternInterface;
+class Pattern;
+class Transport;
 
-        void activate();
-        void deactivate();
+class AudioEngine : public Engine
+{
+public:
+    AudioEngine (Globals&);
+    ~AudioEngine();
 
-        ValueTree createGraphTree();
-        void restoreFromGraphTree (const ValueTree&);
-        
-        Shared<EngineControl> controller();
+    void activate();
+    void deactivate();
 
-        // Member access
-        ClipFactory& clips();
-        Globals& globals();
-        GraphProcessor& graph();
-        Transport* transport();
-
-        // Engine methods
-        AudioIODeviceCallback& callback() override;
-        MidiInputCallback& getMidiInputCallback() override;
-        
-    private:
-        class Callback;
-        Callback* cb;
-
-        class Private;
-        ScopedPointer<Private> priv;
-
-        Globals& world;
-    };
+    ValueTree createGraphTree();
+    void restoreFromGraphTree (const ValueTree&);
     
-    typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
+    Shared<EngineControl> controller();
+
+    // Member access
+    ClipFactory& clips();
+    Globals& globals();
+    GraphProcessor& graph();
+    Transport* transport();
+
+    // Engine methods
+    AudioIODeviceCallback& callback() override;
+    MidiInputCallback& getMidiInputCallback() override;
+    
+private:
+    class Callback;
+    Callback* cb;
+
+    class Private;
+    ScopedPointer<Private> priv;
+
+    Globals& world;
+};
+
+typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
+
 }
 
 #endif // ELEMENT_AUDIO_ENGINE_H

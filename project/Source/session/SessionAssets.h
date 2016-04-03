@@ -20,6 +20,9 @@
 #ifndef ELEMENT_SESSION_ASSETS_H
 #define ELEMENT_SESSION_ASSETS_H
 
+#include "session/AssetTree.h"
+#include "session/MediaModel.h"
+
 namespace Element {
 
 class MediaManager;

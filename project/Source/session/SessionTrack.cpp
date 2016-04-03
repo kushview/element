@@ -21,7 +21,6 @@
 #include "session/Sequence.h"
 #include "MediaManager.h"
 
-
 namespace Element {
 
     ClipModel Sequence::Track::addClip (const File &file, double startTime)

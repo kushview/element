@@ -22,17 +22,17 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
     return nullptr;
 }
 
-void AppController::getAllCommands (Array<CommandID>& commands)
+void AppController::getAllCommands (Array<CommandID>&)
 {
 
 }
 
-void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+void AppController::getCommandInfo (CommandID, ApplicationCommandInfo&)
 {
 
 }
 
-bool AppController::perform (const InvocationInfo& info)
+bool AppController::perform (const InvocationInfo&)
 {
     return false;
 }

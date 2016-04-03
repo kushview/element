@@ -50,7 +50,6 @@ private:
     GuiApp& gui;
     ScopedPointer<ScreenDisplay> display;
     ScopedPointer<SequencerComponent> seq;
-    ScopedPointer<Workspace>     workspace;
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
     ScopedPointer<GraphEditorPanel> graph;

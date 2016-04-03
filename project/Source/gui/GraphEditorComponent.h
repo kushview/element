@@ -20,7 +20,11 @@
 #ifndef EL_GRAPH_EDITOR_COMPONENT_H
 #define EL_GRAPH_EDITOR_COMPONENT_H
 
+#include "element/Juce.h"
+#include "engine/GraphProcessor.h"
+
 namespace Element {
+
 class GraphController;
 class FilterComponent;
 class ConnectorComponent;

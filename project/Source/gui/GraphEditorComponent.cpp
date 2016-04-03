@@ -18,8 +18,10 @@
 */
 
 #include "element/Juce.h"
+#include "controllers/GraphController.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/PluginWindow.h"
+#include "session/PluginManager.h"
 
 namespace Element {
 class PinComponent   : public Component,

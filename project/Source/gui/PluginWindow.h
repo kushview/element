@@ -5,6 +5,8 @@
 
 namespace Element {
 
+class GraphNode;
+    
 /** A desktop window containing a plugin's UI. */
 class PluginWindow : public DocumentWindow
 {
