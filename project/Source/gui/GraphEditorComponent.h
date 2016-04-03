@@ -76,6 +76,7 @@ protected:
     GraphController& graph;
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
     
+    
 private:
     friend class FilterComponent;
     ScopedPointer<ConnectorComponent> draggingConnector;
@@ -83,7 +84,7 @@ private:
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
-    
+    void updateConnectorComponents();
 };
     
 typedef GraphEditorBase GraphEditorComponent;

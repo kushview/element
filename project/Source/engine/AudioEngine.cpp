@@ -414,7 +414,7 @@ public:
         }
     }
 
-    void audioDeviceStopped()
+    void audioDeviceStopped() override
     {
         const ScopedLock sl (lock);
 
@@ -427,7 +427,7 @@ public:
         tempBuffer.setSize (1, 1);
     }
 
-    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
+    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         messageCollector.addMessageToQueue (message);
     }

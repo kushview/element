@@ -224,22 +224,29 @@ public:
         }
     }
 
+    void updatePosition()
+    {
+        double x = 0.0f, y = 0.0f;
+        graph.getNodePosition (filterID, x, y);
+        setCentreRelative ((float) x, (float) y);
+        getGraphPanel()->updateConnectorComponents();
+    }
+    
     void mouseDrag (const MouseEvent& e)
     {
-        if (! e.mods.isPopupMenu())
-        {
-            Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
-
-            if (getParentComponent() != nullptr)
-                pos = getParentComponent()->getLocalPoint (nullptr, pos);
-#if 1
-            graph.setNodePosition (filterID,
-                                   (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-                                   (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-#endif
-            getGraphPanel()->updateComponents();
-            update();
-        }
+        if (e.mods.isPopupMenu())
+            return;
+        
+        Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
+        
+        if (getParentComponent() != nullptr)
+            pos = getParentComponent()->getLocalPoint (nullptr, pos);
+        
+        graph.setNodePosition (filterID,
+                               (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+        
+        updatePosition();
     }
 
     void mouseUp (const MouseEvent& e)
@@ -286,16 +293,12 @@ public:
 
     void resized()
     {
-        if (embedded)
-            setSize (embedded->getWidth(), embedded->getHeight());
-
         int indexIn = 0, indexOut = 0;
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
             {
                 const int total = pc->isInput ? numIns : numOuts;
-                //const int index = pc->port == GraphController::midiChannelNumber ? (total - 1) : pc->port;
                 const int index = pc->isInput ? indexIn++ : indexOut++;
                 pc->setBounds (proportionOfWidth ((1 + index) / (total + 1.0f)) - pinSize / 2,
                                pc->isInput ? 0 : (getHeight() - pinSize),
@@ -370,9 +373,7 @@ public:
 
             deleteAllChildren();
 
-            uint32 i;
-#if 1
-            for (i = 0; i < f->getProcessor()->getNumPorts(); ++i)
+            for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
             {
                 const PortType t (f->getProcessor()->getPortType (i));
                 if (t ==PortType::Control)
@@ -381,19 +382,7 @@ public:
                 const bool isInput (f->getProcessor()->isPortInput (i));
                 addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
             }
-#else
-            for (i = 0; i < f->getProcessor()->getNumInputChannels(); ++i)
-                addAndMakeVisible (new PinComponent (graph, filterID, i, true));
 
-            if (f->getProcessor()->acceptsMidi())
-                addAndMakeVisible (new PinComponent (graph, filterID, GraphController::midiChannelNumber, true));
-
-            for (i = 0; i < f->getProcessor()->getNumOutputChannels(); ++i)
-                addAndMakeVisible (new PinComponent (graph, filterID, i, false));
-
-            if (f->getProcessor()->producesMidi())
-                addAndMakeVisible (new PinComponent (graph, filterID, GraphController::midiChannelNumber, false));
-#endif
             resized();
         }
     }
@@ -411,9 +400,9 @@ private:
     ScopedPointer<Component> embedded;
 
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     FilterComponent (const FilterComponent&);
@@ -450,9 +439,6 @@ public:
             sourceFilterChannel = sourceFilterChannel_;
             update();
         }
-        else {
-            DBG("Not valid source");
-        }
     }
 
     void setOutput (const uint32 destFilterID_, const int destFilterChannel_)
@@ -462,10 +448,6 @@ public:
             destFilterID = destFilterID_;
             destFilterChannel = destFilterChannel_;
             update();
-        }
-        else
-        {
-            DBG("not valid destination");
         }
     }
 
@@ -507,11 +489,7 @@ public:
                                         (int) fabsf (x1 - x2) + 8,
                                         (int) fabsf (y1 - y2) + 8);
 
-        if (newBounds != getBounds())
-            setBounds (newBounds);
-        else
-            resized();
-
+        setBounds (newBounds);
         repaint();
     }
 
@@ -522,7 +500,7 @@ public:
         x2 = lastOutputX;
         y2 = lastOutputY;
 
-        if (GraphEditorBase* const hostPanel = getGraphPanel())
+        if (GraphEditorComponent* const hostPanel = getGraphPanel())
         {
             if (FilterComponent* srcFilterComp = hostPanel->getComponentForFilter (sourceFilterID))
                 srcFilterComp->getPinPos (sourceFilterChannel, false, x1, y1);
@@ -534,16 +512,7 @@ public:
 
     void paint (Graphics& g)
     {
-        if (sourceFilterChannel == GraphProcessor::midiChannelIndex
-             || destFilterChannel == GraphProcessor::midiChannelIndex)
-        {
-            g.setColour (Colours::red);
-        }
-        else
-        {
-            g.setColour (Colours::green);
-        }
-
+        g.setColour (Colours::black.brighter());
         g.fillPath (linePath);
     }
 
@@ -764,6 +733,27 @@ void GraphEditorBase::onGraphChanged()
     updateComponents();
 }
 
+void GraphEditorBase::updateConnectorComponents()
+{
+    for (int i = getNumChildComponents(); --i >= 0;)
+    {
+        ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
+        
+        if (cc != nullptr && cc != draggingConnector)
+        {
+            if (graph.getConnectionBetween (cc->sourceFilterID, cc->sourceFilterChannel,
+                                            cc->destFilterID, cc->destFilterChannel) == nullptr)
+            {
+                delete cc;
+            }
+            else
+            {
+                cc->update();
+            }
+        }
+    }
+}
+    
 void GraphEditorBase::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
