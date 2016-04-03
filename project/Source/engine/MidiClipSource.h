@@ -4,8 +4,8 @@
 #include "element/Juce.h"
 
 namespace Element {
+    class ClipType;
     ClipType* createMidiClipType();
 }
-
 
 #endif  // MIDICLIPSOURCE_H_INCLUDED

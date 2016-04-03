@@ -20,6 +20,7 @@
 #ifndef ELEMENT_ENGINECONTROL_H
 #define ELEMENT_ENGINECONTROL_H
 
+#include "controllers/GraphController.h"
 #include "engine/InternalFormat.h"
 #include "session/Session.h"
 
@@ -29,6 +30,7 @@ namespace Element {
     class Instrument;
     class InternalFormat;
     class Pattern;
+    class Sequencer;
 
     class EngineControl :  public  GraphController,
                            public  ValueTree::Listener

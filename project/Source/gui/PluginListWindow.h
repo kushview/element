@@ -22,6 +22,7 @@
 
 #include "Globals.h"
 #include "gui/Window.h"
+#include "session/PluginManager.h"
 
 namespace Element {
 

@@ -24,6 +24,8 @@
 #include "gui/Alerts.h"
 #include "gui/GuiApp.h"
 #include "gui/PluginWindow.h"
+#include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 #include "session/Session.h"
 #include "Globals.h"
 #include "Settings.h"

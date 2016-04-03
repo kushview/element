@@ -19,6 +19,7 @@
 
 #include "engine/AudioEngine.h"
 #include "engine/Transport.h"
+#include "session/PluginManager.h"
 
 #include "EngineControl.h"
 #include "Globals.h"
@@ -43,13 +44,15 @@ namespace Element {
     GraphController*
     EngineControl::createSequenceController()
     {
+#if 0
+        // not supported. saved for reference.
         if (seqNode == nullptr) {
             seqNode = addRootPlugin (InternalFormat::sequenceProcessor);
         }
 
         if (sequencer() != nullptr)
             return new GraphController (*sequencer(), engine.globals().plugins());
-
+#endif
         return nullptr;
     }
 
@@ -149,7 +152,7 @@ namespace Element {
 
     Sequencer* EngineControl::sequencer() const
     {
-        return seqNode != nullptr ? seqNode->processor<Sequencer>() : nullptr;
+        return nullptr;
     }
 
     void EngineControl::setRecording (bool r)

@@ -19,6 +19,8 @@
 
 #include "element/Juce.h"
 #include "engine/InternalFormat.h"
+#include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 #include "session/Session.h"
 #include "CommandManager.h"
 #include "Globals.h"

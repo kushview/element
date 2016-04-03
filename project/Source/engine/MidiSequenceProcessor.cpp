@@ -1,4 +1,6 @@
 #include "engine/AudioEngine.h"
+#include "engine/ClipFactory.h"
+#include "engine/ClipSource.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/Transport.h"
 #include "gui/MidiEditorComponent.h"

@@ -7,7 +7,8 @@
 namespace Element {
 
 class AudioEngine;
-    
+class ClipSource;
+
 class MidiSequenceProcessor : public Processor {
 public:
     explicit MidiSequenceProcessor (AudioEngine&);

@@ -18,7 +18,8 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "GuiApp.h"
+#include "gui/GuiApp.h"
+#include "session/DeviceManager.h"
 //[/Headers]
 
 #include "PreferencesWidget.h"

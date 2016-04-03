@@ -28,7 +28,9 @@
 namespace Element {
 
 class CommandManager;
+class DeviceManager;
 class MediaManager;
+class PluginManager;
 class Session;
 class Settings;
 class Writer;

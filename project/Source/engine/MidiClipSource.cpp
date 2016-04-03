@@ -1,4 +1,7 @@
 
+#include "engine/ClipFactory.h"
+#include "engine/ClipSource.h"
+#include "engine/Engine.h"
 #include "engine/MidiClipSource.h"
 #include "session/MidiClip.h"
 

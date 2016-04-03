@@ -19,6 +19,7 @@
 
 #include "element/Juce.h"
 #include "engine/AudioEngine.h"
+#include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "session/Session.h"

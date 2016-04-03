@@ -53,8 +53,15 @@
 //==============================================================================
 // element_engines flags:
 
-#ifndef    ELEMENT_LV2_PLUGIN_HOST
- #define   ELEMENT_LV2_PLUGIN_HOST 0
+#ifndef    ELEMENT_USE_JACK
+ //#define ELEMENT_USE_JACK
+#endif
+
+//==============================================================================
+// element_gui flags:
+
+#ifndef    ELEMENT_DOCKING_WINDOWS
+ //#define ELEMENT_DOCKING_WINDOWS
 #endif
 
 //==============================================================================

@@ -18,9 +18,14 @@
 */
 
 #include "engine/AudioEngine.h"
+#include "engine/ClipFactory.h"
+#include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
+
+#include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 
 #include "EngineControl.h"
 #include "Globals.h"
