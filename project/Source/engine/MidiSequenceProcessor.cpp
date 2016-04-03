@@ -77,7 +77,8 @@ namespace Element {
                 if (pos.isPlaying) {
                     const ClipData* data = source->getClipData();
                     Midi::renderSequence (midi, data->midi, playhead->getTimeScale(),
-                                          pos.timeInSamples, audio.getNumSamples());
+                                          static_cast<int32> (pos.timeInSamples), 
+										  audio.getNumSamples());
                 }
             }
         }

@@ -43,8 +43,8 @@
 namespace ProjectInfo
 {
     const char* const  projectName    = "Element";
-    const char* const  versionString  = "0.1.0";
-    const int          versionNumber  = 0x100;
+    const char* const  versionString  = "0.1.1";
+    const int          versionNumber  = 0x101;
 }
 #endif
 
