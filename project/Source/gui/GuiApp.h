@@ -28,6 +28,7 @@
 #include "URIs.h"
 
 namespace Element {
+    class AboutComponent;
     class EngineControl;
     class Globals;
     class ContentComponent;
@@ -98,6 +99,7 @@ namespace Element {
         Scoped<WindowManager>     windowManager;
         Scoped<MainWindow>        mainWindow;
         Scoped<ContentComponent>  content;
+        Scoped<AboutComponent>    about;
 
         LookAndFeel_E1            lookAndFeel;
 

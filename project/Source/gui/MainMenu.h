@@ -40,7 +40,7 @@ public:
     {
       #if JUCE_MAC
         macMenu = new PopupMenu();
-        macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element...");
+        macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
         macMenu->addSeparator();
         macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
@@ -135,6 +135,9 @@ private:
     
     void buildHelpMenu (PopupMenu& menu)
     {
+#if ! JUCE_MAC
+        menu.addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
+#endif
         // menu.addItem (111, "Do it", true, true);
     }
 };

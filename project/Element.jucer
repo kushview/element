@@ -108,6 +108,10 @@
           <FILE id="HslPdQ" name="YesNoCancelButtonBar.h" compile="0" resource="0"
                 file="Source/gui/alerts/YesNoCancelButtonBar.h"/>
         </GROUP>
+        <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
+              file="Source/gui/AboutComponent.cpp"/>
+        <FILE id="rBDuhD" name="AboutComponent.h" compile="0" resource="0"
+              file="Source/gui/AboutComponent.h"/>
         <FILE id="lSY9NC" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
         <FILE id="KB9gFt" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
