@@ -29,12 +29,21 @@ namespace Element {
 ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
-    setOpaque (true);
-    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
     AudioEnginePtr engine = gui.globals().engine();
     Shared<EngineControl> ctl = engine->controller();
     playbackMonitor = gui.session()->getPlaybackMonitor();
+    
+    setOpaque (true);
+    
+    addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layoutVertical, 1, false));
+    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
     addAndMakeVisible (graph = new GraphEditorPanel (gui, *ctl));
+    addAndMakeVisible (component = new Component());
+    
+    layoutVertical.setItemLayout (0, 300.0f, -1.0f, 500.0f);
+    layoutVertical.setItemLayout (1, 4, 4, 4);
+    layoutVertical.setItemLayout (2, 300.0f, 300.0f, 300.0f);
+    
     startTimer (17);
     resized();
 }
@@ -57,7 +66,19 @@ void ContentComponent::resized()
 {
     const Rectangle<int> r (getLocalBounds().reduced (2));
     transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
+
+#if 0
     graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
+#else
+    Component* comps[3] = { graph.get(), bar1.get(), component.get() };
+    layoutVertical.layOutComponents (comps, 3,
+                                     0,
+                                     2 + transport->getHeight(),
+                                     getWidth(),
+                                     getHeight() - 2 + transport->getHeight(),
+                                     true, true);
+    
+#endif
 }
 
 GuiApp& ContentComponent::app() { return gui; }

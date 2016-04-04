@@ -53,6 +53,9 @@ private:
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
     ScopedPointer<GraphEditorPanel> graph;
+    StretchableLayoutManager layoutVertical;
+    ScopedPointer<StretchableLayoutResizerBar> bar1;
+    ScopedPointer<Component> component;
     Shared<Monitor> playbackMonitor;
     
     friend class Timer;
