@@ -95,7 +95,6 @@ private:
     void invokeShowDocument();
 };
 
-//==============================================================================
 class TreePanelBase   : public Component
 {
 public:
@@ -165,7 +164,6 @@ private:
     String opennessStateKey, emptyTreeMessage;
 };
 
-//==============================================================================
 class TreeItemComponent   : public Component
 {
 public:

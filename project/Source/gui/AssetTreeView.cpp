@@ -411,4 +411,11 @@ void PlainTextFileTreeViewItem::handlePopupMenuResult (int resultCode)
 #endif
 }
 
+
+AssetTreeView::AssetTreeView (const AssetTree::Item& root)
+    : TreePanelBase ("assets")
+{
+    setRoot (new AssetTreeViewItem (root));
+}
+
 }

@@ -24,6 +24,7 @@
 
 namespace Element {
 
+class ContentContainer;
 class GraphEditorView;
 class TransportBar;
 class GuiApp;
@@ -50,6 +51,7 @@ public:
 
 private:
     GuiApp& gui;
+    ScopedPointer<ContentContainer> top;
     ScopedPointer<ScreenDisplay> display;
     ScopedPointer<SequencerComponent> seq;
     ScopedPointer<TransportBar>  transport;

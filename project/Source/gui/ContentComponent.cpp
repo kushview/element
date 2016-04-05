@@ -17,15 +17,60 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "gui/AssetTreeView.h"
 #include "gui/GuiApp.h"
 #include "gui/GraphEditorView.h"
 #include "gui/ContentComponent.h"
 #include "gui/RackView.h"
 #include "gui/SequencerComponent.h"
 #include "gui/TransportBar.h"
+#include "session/Session.h"
 #include "EngineControl.h"
 
 namespace Element {
+
+class ContentContainer : public Component
+{
+public:
+    ContentContainer (GuiApp& gui)
+    {
+        AudioEnginePtr engine = gui.globals().engine();
+        Shared<EngineControl> ctl = engine->controller();
+        SessionRef session = gui.session();
+        const AssetTree::Item root (session->assets().root());
+        
+        vertical = false;
+        addAndMakeVisible (assets = new AssetTreeView (session->assets().root()));
+        addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, ! vertical));
+        addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
+        updateLayout();
+        resized();
+    }
+    
+    virtual ~ContentContainer() { }
+    
+    bool isVertical() const { return vertical; }
+    
+    void resized() override
+    {
+        Component* comps[] = { assets.get(), bar.get(), graph.get() };
+        layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), vertical, true);
+    }
+    
+private:
+    StretchableLayoutManager layout;
+    ScopedPointer<AssetTreeView> assets;
+    ScopedPointer<StretchableLayoutResizerBar> bar;
+    ScopedPointer<GraphEditorView> graph;
+    bool vertical;
+    
+    void updateLayout()
+    {
+        layout.setItemLayout (0, 200, 300, 200);
+        layout.setItemLayout (1, 4, 4, 4);
+        layout.setItemLayout (2, 0, -1.0, 500);
+    }
+};
 
 ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
@@ -38,8 +83,9 @@ ContentComponent::ContentComponent (GuiApp& app_)
     
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layoutVertical, 1, false));
     addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
-    addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
+    // addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
     addAndMakeVisible (rack = new RackView());
+    addAndMakeVisible (top = new ContentContainer (gui));
     
     layoutVertical.setItemLayout (0, 300.0f, -1.0f, 500.0f);
     layoutVertical.setItemLayout (1, 4, 4, 4);
@@ -71,7 +117,7 @@ void ContentComponent::resized()
 #if 0
     graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
 #else
-    Component* comps[3] = { graph.get(), bar1.get(), rack.get() };
+    Component* comps[3] = { top.get(), bar1.get(), rack.get() };
     layoutVertical.layOutComponents (comps, 3,
                                      0,
                                      2 + transport->getHeight(),
@@ -91,7 +137,7 @@ GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize()
 {
-    graph->resized();
+    if (graph) graph->resized();
     transport->stabilize();
 }
 

@@ -96,7 +96,6 @@ public:
 class GroupTreeViewItem   : public AssetTreeViewItem
 {
 public:
-
     GroupTreeViewItem (const AssetTree::Item& item);
     virtual ~GroupTreeViewItem();
 
@@ -122,6 +121,12 @@ protected:
     AssetTreeViewItem* createAssetSubItem (const AssetTree::Item& child);
 };
 
-}
+class AssetTreeView :  public TreePanelBase
+{
+public:
+    AssetTreeView (const AssetTree::Item& root);
+    ~AssetTreeView() { }
+};
 
+}
 #endif   // ELEMENT_TREEVIEW_TYPES_H
