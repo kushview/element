@@ -23,15 +23,12 @@ RackView::~RackView()
 
 void RackView::paint (Graphics& g)
 {
-    g.fillAll (Colours::white);   // clear the background
-
-    g.setColour (Element::LookAndFeel_E1::backgroundColor);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    g.setColour (Colours::lightblue);
+    g.fillAll (Element::LookAndFeel_E1::backgroundColor);
+    
+    g.setColour (Element::LookAndFeel_E1::elementBlue);
     g.setFont (14.0f);
-    g.drawText ("RackView", getLocalBounds(),
-                Justification::centred, true);   // draw some placeholder text
+    g.drawText ("No Selection...", getLocalBounds(),
+                Justification::centred, true);
 }
 
 void RackView::resized()
@@ -44,9 +41,19 @@ void RackView::resized()
 
 void RackView::setMainComponent (Component* comp)
 {
-    main = comp;
-    if (main)
-        addAndMakeVisible (comp);
+    if (comp != nullptr && comp == main.get())
+    {
+        // this clears the component if it equals main
+        // FIXME: hack EL-54, better GUI management
+        main = nullptr;
+    }
+    else
+    {
+        main = comp;
+        if (main)
+            addAndMakeVisible (comp);
+    }
+    
     resized();
 }
 

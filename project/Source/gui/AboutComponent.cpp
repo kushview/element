@@ -103,7 +103,7 @@ void AboutComponent::resized()
     //[/UserPreResize]
 
     label->setBounds ((getWidth() / 2) - (302 / 2), 40, 302, 72);
-    label2->setBounds (8, 208, 336, 24);
+    label2->setBounds (8, 208, 224, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -149,7 +149,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Arial Black"
          fontsize="86.5" bold="1" italic="0" justification="36"/>
   <LABEL name="new label" id="8a84133becd36d77" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="8 208 336 24" textCol="ffe6e6e6"
+         explicitFocusOrder="0" pos="8 208 224 24" textCol="ffe6e6e6"
          edTextCol="ff000000" edBkgCol="0" labelText="Element v0.1.1 (build 1)"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="14" bold="0" italic="0" justification="33"/>

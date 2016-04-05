@@ -153,27 +153,33 @@ public:
 
         if (e.mods.isPopupMenu())
         {
-
             GraphNodePtr node = graph.getNodeForId (filterID);
+            auto* instance = node->getAudioPluginInstance();
+            const PluginDescription desc (instance->getPluginDescription());
 
             PopupMenu menu;
-
-            /* if (! node->isSubgraph()) {
-                menu.addItem (100, "Not a subgraph");
-            } */
-
             menu.addItem (1, "Remove this block...");
             menu.addItem (2, "Disconnect all ports");
             menu.addSeparator();
-            // menu.addItem (5, "Embed plugin UI");
-            menu.addItem (3, "Show plugin UI");
-            menu.addItem (4, "Show generic UI");
-
+            
+            if (desc.pluginFormatName != "Internal")
+            {
+                menu.addItem (3, "Show plugin UI");
+                menu.addItem (4, "Show generic UI");
+            }
+            
             const int r = menu.show();
 
             if (r == 1)
             {
                 PluginWindow::closeCurrentlyOpenWindowsFor (filterID);
+                
+                // FIXME: Hack gui management: Fix in EL-54
+                auto* cc = findParentComponentOfClass<ContentComponent>();
+                if (GraphNodePtr gnp = graph.getNodeForId (filterID))
+                    if (auto* i = gnp->getAudioPluginInstance())
+                        if (auto* c = i->getActiveEditor())
+                            cc->setRackViewComponent (c);
                 embedded = nullptr;
                 graph.removeFilter (filterID);
                 return;
@@ -188,37 +194,6 @@ public:
                 {
                     if (PluginWindow* win = getGraphPanel()->getOrCreateWindowForNode (f, r == 4))
                         win->toFront (true);
-                }
-            }
-            else if (r == 5)
-            {
-                if (GraphNodePtr f = graph.getNodeForId (filterID))
-                {
-                    AudioProcessorEditor* ui = nullptr;
-                    bool useGenericView      = false;
-
-                    if (! useGenericView)
-                    {
-                        ui = f->getProcessor()->createEditorIfNeeded();
-                        if (ui == nullptr)
-                            useGenericView = true;
-                    }
-
-                    if (useGenericView)
-                        ui = new GenericAudioProcessorEditor (f->getProcessor());
-
-                    if (ui) delete ui;
-                    if (ui != nullptr)
-                    {
-//                        PluginWindow::closeCurrentlyOpenWindowsFor (filterID);
-//                        embedded = ui;
-//
-//                        if (AudioPluginInstance* const plugin = dynamic_cast <AudioPluginInstance*> (f->getProcessor()))
-//                            ui->setName (plugin->getName());
-//
-//                        setSize (ui->getWidth(), ui->getHeight());
-//                        addAndMakeVisible (ui);
-                    }
                 }
             }
         }
