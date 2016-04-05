@@ -58,6 +58,8 @@ AboutComponent::AboutComponent (GuiApp& g)
     String versionText = ProjectInfo::projectName;
     versionText << " v" << ProjectInfo::versionString << " (build 1)";
     label2->setText (versionText, dontSendNotification);
+    label2->setInterceptsMouseClicks(false, true);
+    label->setInterceptsMouseClicks(false, true);
     //[/UserPreSize]
 
     setSize (524, 460);
@@ -109,6 +111,7 @@ void AboutComponent::resized()
 void AboutComponent::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
+    DBG("DOWNL");
     if (isOnDesktop() || isVisible())
         gui.commander().invokeDirectly (Commands::showAbout, true);
     //[/UserCode_mouseDown]
