@@ -57,6 +57,12 @@ public:
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), vertical, true);
     }
     
+    void stabilize()
+    {
+        graph->resized();
+        assets->resized();
+    }
+    
 private:
     StretchableLayoutManager layout;
     ScopedPointer<AssetTreeView> assets;
@@ -138,6 +144,7 @@ GuiApp& ContentComponent::app() { return gui; }
 void ContentComponent::stabilize()
 {
     if (graph) graph->resized();
+    if (top) top->stabilize();
     transport->stabilize();
 }
 
