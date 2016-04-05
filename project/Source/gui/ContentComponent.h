@@ -24,9 +24,10 @@
 
 namespace Element {
 
-class GraphEditorPanel;
+class GraphEditorView;
 class TransportBar;
 class GuiApp;
+class RackView;
 class SequencerComponent;
 class Workspace;
 
@@ -42,6 +43,7 @@ public:
     void paint (Graphics &g) override;
     void resized() override;
 
+    void setRackViewComponent (Component* comp);
     void stabilize();
     
     GuiApp& app();
@@ -52,10 +54,10 @@ private:
     ScopedPointer<SequencerComponent> seq;
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
-    ScopedPointer<GraphEditorPanel> graph;
+    ScopedPointer<GraphEditorView> graph;
     StretchableLayoutManager layoutVertical;
     ScopedPointer<StretchableLayoutResizerBar> bar1;
-    ScopedPointer<Component> component;
+    ScopedPointer<RackView> rack;
     Shared<Monitor> playbackMonitor;
     
     friend class Timer;

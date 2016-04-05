@@ -17,12 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "EngineControl.h"
 #include "gui/GuiApp.h"
 #include "gui/GraphEditorView.h"
 #include "gui/ContentComponent.h"
+#include "gui/RackView.h"
 #include "gui/SequencerComponent.h"
 #include "gui/TransportBar.h"
+#include "EngineControl.h"
 
 namespace Element {
 
@@ -37,8 +38,8 @@ ContentComponent::ContentComponent (GuiApp& app_)
     
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layoutVertical, 1, false));
     addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
-    addAndMakeVisible (graph = new GraphEditorPanel (gui, *ctl));
-    addAndMakeVisible (component = new Component());
+    addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
+    addAndMakeVisible (rack = new RackView());
     
     layoutVertical.setItemLayout (0, 300.0f, -1.0f, 500.0f);
     layoutVertical.setItemLayout (1, 4, 4, 4);
@@ -70,7 +71,7 @@ void ContentComponent::resized()
 #if 0
     graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
 #else
-    Component* comps[3] = { graph.get(), bar1.get(), component.get() };
+    Component* comps[3] = { graph.get(), bar1.get(), rack.get() };
     layoutVertical.layOutComponents (comps, 3,
                                      0,
                                      2 + transport->getHeight(),
@@ -79,6 +80,11 @@ void ContentComponent::resized()
                                      true, true);
     
 #endif
+}
+
+void ContentComponent::setRackViewComponent (Component* comp)
+{
+    rack->setMainComponent(comp);
 }
 
 GuiApp& ContentComponent::app() { return gui; }

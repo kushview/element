@@ -19,6 +19,7 @@
 
 #include "element/Juce.h"
 #include "controllers/GraphController.h"
+#include "gui/ContentComponent.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/PluginWindow.h"
 #include "session/PluginManager.h"
@@ -113,9 +114,9 @@ public:
 private:
     GraphController& graph;
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
@@ -148,7 +149,6 @@ public:
     void mouseDown (const MouseEvent& e)
     {
         originalPos = localPointToGlobal (Point<int>());
-
         toFront (true);
 
         if (e.mods.isPopupMenu())
@@ -249,13 +249,33 @@ public:
         updatePosition();
     }
 
+    void makeEditorActive()
+    {
+        const GraphNodePtr f = graph.getNodeForId (filterID);
+        if (! f) return;
+        
+        auto* instance = f->getAudioPluginInstance();
+        if (! instance) return;
+        
+        const PluginDescription desc (instance->getPluginDescription());
+        
+        if (desc.pluginFormatName != "Internal")
+        {
+            if (PluginWindow* const w = getGraphPanel()->getOrCreateWindowForNode (f, false))
+                w->toFront (true);
+        }
+        else if (ScopedPointer<Component> ed = instance->createEditorIfNeeded())
+        {
+            if (ContentComponent* content = findParentComponentOfClass<ContentComponent>())
+                content->setRackViewComponent (ed.release());
+        }
+    }
+    
     void mouseUp (const MouseEvent& e)
     {
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
-            if (const GraphNodePtr f = graph.getNodeForId (filterID))
-                if (PluginWindow* const w = getGraphPanel()->getOrCreateWindowForNode (f, false))
-                    w->toFront (true);
+            makeEditorActive();
         }
         else if (! e.mouseWasClicked())
         {
@@ -619,9 +639,9 @@ private:
     Path linePath, hitPath;
     bool dragging;
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     void getDistancesFromEnds (int x, int y, double& distanceFromStart, double& distanceFromEnd) const
@@ -636,26 +656,26 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConnectorComponent)
 };
 
-GraphEditorBase::GraphEditorBase (GraphController& graph_)
+GraphEditorComponent::GraphEditorComponent (GraphController& graph_)
     :  graph (graph_)
 {
     graph.addChangeListener (this);
     setOpaque (true);
 }
 
-GraphEditorBase::~GraphEditorBase()
+GraphEditorComponent::~GraphEditorComponent()
 {
     graph.removeChangeListener (this);
     draggingConnector = nullptr;
     deleteAllChildren();
 }
 
-void GraphEditorBase::paint (Graphics& g)
+void GraphEditorComponent::paint (Graphics& g)
 {
     g.fillAll (Colour (0xff303030));
 }
 
-void GraphEditorBase::mouseDown (const MouseEvent& e)
+void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
@@ -671,12 +691,12 @@ void GraphEditorBase::mouseDown (const MouseEvent& e)
     }
 }
 
-void GraphEditorBase::createNewPlugin (const PluginDescription* desc, int x, int y)
+void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
 {
     graph.addFilter (desc, x / (double) getWidth(), y / (double) getHeight());
 }
 
-FilterComponent* GraphEditorBase::getComponentForFilter (const uint32 filterID) const
+FilterComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -688,7 +708,7 @@ FilterComponent* GraphEditorBase::getComponentForFilter (const uint32 filterID) 
     return nullptr;
 }
 
-ConnectorComponent* GraphEditorBase::getComponentForConnection (const Arc& arc) const
+ConnectorComponent* GraphEditorComponent::getComponentForConnection (const Arc& arc) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -703,7 +723,7 @@ ConnectorComponent* GraphEditorBase::getComponentForConnection (const Arc& arc) 
     return nullptr;
 }
 
-PinComponent* GraphEditorBase::findPinAt (const int x, const int y) const
+PinComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -718,22 +738,22 @@ PinComponent* GraphEditorBase::findPinAt (const int x, const int y) const
     return nullptr;
 }
 
-void GraphEditorBase::resized()
+void GraphEditorComponent::resized()
 {
     updateComponents();
 }
 
-void GraphEditorBase::changeListenerCallback (ChangeBroadcaster*)
+void GraphEditorComponent::changeListenerCallback (ChangeBroadcaster*)
 {
     updateComponents();
 }
 
-void GraphEditorBase::onGraphChanged()
+void GraphEditorComponent::onGraphChanged()
 {
     updateComponents();
 }
 
-void GraphEditorBase::updateConnectorComponents()
+void GraphEditorComponent::updateConnectorComponents()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -754,7 +774,7 @@ void GraphEditorBase::updateConnectorComponents()
     }
 }
     
-void GraphEditorBase::updateComponents()
+void GraphEditorComponent::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
     {
@@ -810,7 +830,7 @@ void GraphEditorBase::updateComponents()
     }
 }
 
-void GraphEditorBase::beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
+void GraphEditorComponent::beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
                                           const uint32 destFilterID, const int destFilterChannel,
                                           const MouseEvent& e)
 {
@@ -827,7 +847,7 @@ void GraphEditorBase::beginConnectorDrag (const uint32 sourceFilterID, const int
     dragConnector (e);
 }
 
-void GraphEditorBase::dragConnector (const MouseEvent& e)
+void GraphEditorComponent::dragConnector (const MouseEvent& e)
 {
     const MouseEvent e2 (e.getEventRelativeTo (this));
 
@@ -872,7 +892,7 @@ void GraphEditorBase::dragConnector (const MouseEvent& e)
     }
 }
 
-Component* GraphEditorBase::createContainerForNode (GraphNodePtr node, bool useGenericEditor)
+Component* GraphEditorComponent::createContainerForNode (GraphNodePtr node, bool useGenericEditor)
 {
     if (AudioProcessorEditor* ed = createEditorForNode (node, useGenericEditor))
         if (Component* comp = wrapAudioProcessorEditor (ed, node))
@@ -880,9 +900,9 @@ Component* GraphEditorBase::createContainerForNode (GraphNodePtr node, bool useG
     return nullptr;
 }
 
-Component* GraphEditorBase::wrapAudioProcessorEditor(AudioProcessorEditor* ed, GraphNodePtr) { return ed; }
+Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* ed, GraphNodePtr) { return ed; }
 
-AudioProcessorEditor* GraphEditorBase::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
+AudioProcessorEditor* GraphEditorComponent::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
 {
     ScopedPointer<AudioProcessorEditor> ui = nullptr;
     
@@ -900,7 +920,7 @@ AudioProcessorEditor* GraphEditorBase::createEditorForNode (GraphNodePtr node, b
     return (nullptr != ui) ? ui.release() : nullptr;
 }
 
-void GraphEditorBase::endDraggingConnector (const MouseEvent& e)
+void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
 {
     if (draggingConnector == nullptr)
         return;
@@ -939,7 +959,7 @@ void GraphEditorBase::endDraggingConnector (const MouseEvent& e)
     }
 }
 
-PluginWindow* GraphEditorBase::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
+PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
 {
     if (PluginWindow* window = PluginWindow::getWindowFor (f))
         return window;

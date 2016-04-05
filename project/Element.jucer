@@ -166,6 +166,8 @@
               file="Source/gui/PreferencesWidget.cpp"/>
         <FILE id="ZVdKzn" name="PreferencesWidget.h" compile="0" resource="0"
               file="Source/gui/PreferencesWidget.h"/>
+        <FILE id="WpP2mo" name="RackView.cpp" compile="1" resource="0" file="Source/gui/RackView.cpp"/>
+        <FILE id="Wenhme" name="RackView.h" compile="0" resource="0" file="Source/gui/RackView.h"/>
         <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="0" resource="0"
               file="Source/gui/SequencerClipItem.cpp"/>
         <FILE id="Daatdg" name="SequencerClipItem.h" compile="0" resource="0"
@@ -189,6 +191,8 @@
         <FILE id="LKLsgk" name="TreeviewBase.cpp" compile="1" resource="0"
               file="Source/gui/TreeviewBase.cpp"/>
         <FILE id="TWN09g" name="TreeviewBase.h" compile="0" resource="0" file="Source/gui/TreeviewBase.h"/>
+        <FILE id="hfURVC" name="ViewHelpers.cpp" compile="1" resource="0" file="Source/gui/ViewHelpers.cpp"/>
+        <FILE id="bkdWVL" name="ViewHelpers.h" compile="0" resource="0" file="Source/gui/ViewHelpers.h"/>
         <FILE id="TJ8hvg" name="Window.cpp" compile="1" resource="0" file="Source/gui/Window.cpp"/>
         <FILE id="WfFCIC" name="Window.h" compile="0" resource="0" file="Source/gui/Window.h"/>
         <FILE id="qis1vl" name="WindowManager.cpp" compile="1" resource="0"

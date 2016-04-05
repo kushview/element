@@ -1,5 +1,5 @@
 /*
-    GraphEditorBase.cpp - This file is part of Element
+    GraphEditorComponent.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -32,13 +32,13 @@ class PinComponent;
 class PluginWindow;
 
 /** A panel that displays and edits a GraphProcessor. */
-class GraphEditorBase   : public Component,
+class GraphEditorComponent   : public Component,
                           public ChangeListener,
                           public DragAndDropTarget
 {
 public:
-    GraphEditorBase (GraphController&);
-    virtual ~GraphEditorBase();
+    GraphEditorComponent (GraphController&);
+    virtual ~GraphEditorComponent();
 
     void paint (Graphics& g);
 
@@ -80,14 +80,15 @@ protected:
 private:
     friend class FilterComponent;
     ScopedPointer<ConnectorComponent> draggingConnector;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorBase)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorComponent)
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
     void updateConnectorComponents();
 };
     
-typedef GraphEditorBase GraphEditorComponent;
+typedef GraphEditorComponent GraphEditorBase;
+
 }
 
 #endif // EL_GRAPH_EDITOR_COMPONENT_H
