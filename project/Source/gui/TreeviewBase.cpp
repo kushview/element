@@ -20,6 +20,22 @@
 #include "gui/TreeviewBase.h"
 
 namespace Element {
+
+TreePanelBase::TreePanelBase (const String& treeviewID)
+    : opennessStateKey (treeviewID)
+{
+    addAndMakeVisible (&tree);
+    tree.setRootItemVisible (false);
+    tree.setDefaultOpenness (true);
+    tree.setColour (TreeView::backgroundColourId, LookAndFeel_E1::backgroundColor);
+    tree.setIndentSize (14);
+    tree.getViewport()->setScrollBarThickness (14);
+}
+
+TreePanelBase::~TreePanelBase()
+{
+    tree.setRootItem (nullptr);
+}
     
 void TreePanelBase::setRoot (TreeItemBase* root)
 {
@@ -29,22 +45,6 @@ void TreePanelBase::setRoot (TreeItemBase* root)
         tree.setRootItem (root);
         tree.getRootItem()->setOpen (true);
     }
-
-#if 0
-    if (project != nullptr)
-    {
-        const ScopedPointer<XmlElement> treeOpenness (project->getStoredProperties()
-                                                          .getXmlValue (opennessStateKey));
-        if (treeOpenness != nullptr)
-        {
-            tree.restoreOpennessState (*treeOpenness, true);
-
-            for (int i = tree.getNumSelectedItems(); --i >= 0;)
-                if (JucerTreeViewBase* item = dynamic_cast<JucerTreeViewBase*> (tree.getSelectedItem (i)))
-                    item->cancelDelayedSelectionTimer();
-        }
-    }
-#endif
 }
 
 void TreePanelBase::saveOpenness()
@@ -62,7 +62,6 @@ void TreePanelBase::saveOpenness()
 #endif
 }
 
-//==============================================================================
 TreeItemBase::TreeItemBase()  : textX (0)
 {
     setLinesDrawnForSubItems (false);
@@ -80,14 +79,12 @@ void TreeItemBase::refreshSubItems()
     addSubItems();
 }
 
-Font
-TreeItemBase::getFont() const
+Font TreeItemBase::getFont() const
 {
     return Font (getItemHeight() * 0.7f);
 }
 
-void
-TreeItemBase::paintItem (Graphics& g, int /*width*/, int /*height*/)
+void TreeItemBase::paintItem (Graphics& g, int /*width*/, int /*height*/)
 {
     if (isSelected())
         g.fillAll (Colours::aqua);
@@ -115,8 +112,7 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& ar
     g.fillPath (p);
 }
 
-Colour
-TreeItemBase::getBackgroundColour() const
+Colour TreeItemBase::getBackgroundColour() const
 {
 #if 0
     Colour background (getOwnerView()->findColour (gui::mainBackgroundColourId));
@@ -157,7 +153,6 @@ Component* TreeItemBase::createItemComponent()
     return new TreeItemComponent (*this);
 }
 
-//==============================================================================
 class RenameTreeItemCallback  : public ModalComponentManager::Callback,
                                 public TextEditorListener
 {
@@ -242,7 +237,6 @@ void TreeItemBase::handlePopupMenuResult (int)
 {
 }
 
-//==============================================================================
 class TreeItemBase::ItemSelectionTimer  : public Timer
 {
 public:

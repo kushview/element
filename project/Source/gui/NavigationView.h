@@ -20,7 +20,11 @@ public:
 private:
     ScopedPointer<NavigationList> navList;
     ScopedPointer<NavigationTree> navTree;
+    ScopedPointer<StretchableLayoutResizerBar> navBar;
+    StretchableLayoutManager layout;
 
+    void updateLayout();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
 

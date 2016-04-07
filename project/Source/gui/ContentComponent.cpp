@@ -129,7 +129,7 @@ void ContentComponent::resized()
 
 void ContentComponent::setRackViewComponent (Component* comp)
 {
-    rack->setMainComponent(comp);
+    rack->setMainComponent (comp);
 }
 
 GuiApp& ContentComponent::app() { return gui; }

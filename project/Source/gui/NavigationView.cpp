@@ -1,5 +1,5 @@
-
 #include "gui/NavigationView.h"
+#include "gui/TreeViewBase.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {
@@ -15,7 +15,8 @@ public:
         numRootTypes
     };
     
-    NavigationList()
+    NavigationList (NavigationView* v)
+        : view (v)
     {
         setModel (this);
         updateContent();
@@ -43,7 +44,7 @@ public:
                            bool selected) override
     {
         const String& name (getRootItemName (row));
-        ViewHelpers::drawBasicTextRow(name, g, width, height, selected);
+        ViewHelpers::drawBasicTextRow (name, g, width, height, selected);
     }
 
     Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
@@ -52,34 +53,22 @@ public:
         return ListBoxModel::refreshComponentForRow(rowNumber, isRowSelected, existingComponentToUpdate);
     }
 
-    void listBoxItemClicked (int row, const MouseEvent&) override { }
-
-    void listBoxItemDoubleClicked (int row, const MouseEvent&) override { }
-
-    void backgroundClicked (const MouseEvent&) override
+    void listBoxItemClicked (int row, const MouseEvent&) override
     {
-    
+        jassert (isPositiveAndBelow (row, (int) numRootTypes));
     }
+
+    void listBoxItemDoubleClicked (int, const MouseEvent&) override { }
+    void backgroundClicked (const MouseEvent&) override { }
 
     void selectedRowsChanged (int lastRowSelected) override
     {
     
     }
 
-    void deleteKeyPressed (int lastRowSelected) override
-    {
-    
-    }
-    
-    void returnKeyPressed (int lastRowSelected) override
-    {
-    
-    }
-
-    void listWasScrolled() override
-    {
-    
-    }
+    void deleteKeyPressed (int) override { }
+    void returnKeyPressed (int) override { }
+    void listWasScrolled() override { }
 
     virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override
     {
@@ -91,28 +80,42 @@ public:
         return "Tip";
     }
 
+private:
+    NavigationView* view;
 };
 
-class NavigationTree
+class NavigationTree :  public TreePanelBase
 {
 public:
-    NavigationTree()
+    NavigationTree (NavigationView* v)
+        : TreePanelBase ("navigation"),
+          view (v)
     {
+        setEmptyTreeMessage ("Empty...");
+        setRoot (nullptr);
     }
     
     ~NavigationTree() { }
+    
+private:
+    NavigationView* view;
 };
 
 
 NavigationView::NavigationView()
 {
-    addAndMakeVisible (navList = new NavigationList());
-    navList->updateContent();
-    
+    addAndMakeVisible (navList = new NavigationList (this));
+    addAndMakeVisible (navBar = new StretchableLayoutResizerBar (&layout, 1, true));
+    addAndMakeVisible (navTree = new NavigationTree (this));
+    updateLayout();
+    resized();
 }
 
 NavigationView::~NavigationView()
 {
+    navTree = nullptr;
+    navBar = nullptr;
+    navList = nullptr;
 }
 
 void NavigationView::paint (Graphics& g)
@@ -122,7 +125,15 @@ void NavigationView::paint (Graphics& g)
 
 void NavigationView::resized()
 {
-    navList->setBounds (getLocalBounds());
+    Component* comps[] = { navList.get(), navBar.get(), navTree.get() };
+    layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), false, true);
+}
+
+void NavigationView::updateLayout()
+{
+    layout.setItemLayout (0, 50.0, 200.0, 100.0);
+    layout.setItemLayout (1, 3, 3, 3);
+    layout.setItemLayout (2, 50.0, 200.0, 100.0);
 }
 
 }
