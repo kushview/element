@@ -147,6 +147,10 @@
               file="Source/gui/MidiEditorComponent.cpp"/>
         <FILE id="YSTMmW" name="MidiEditorComponent.h" compile="0" resource="0"
               file="Source/gui/MidiEditorComponent.h"/>
+        <FILE id="sD0Gu6" name="NavigationView.cpp" compile="1" resource="0"
+              file="Source/gui/NavigationView.cpp"/>
+        <FILE id="nbrl8E" name="NavigationView.h" compile="0" resource="0"
+              file="Source/gui/NavigationView.h"/>
         <FILE id="ZVkvZh" name="NewFileWizard.cpp" compile="1" resource="0"
               file="Source/gui/NewFileWizard.cpp"/>
         <FILE id="AP7kUF" name="NewFileWizard.h" compile="0" resource="0" file="Source/gui/NewFileWizard.h"/>

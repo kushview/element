@@ -1,18 +1,17 @@
-/*
-  ==============================================================================
 
-    ViewHelpers.h
-    Created: 4 Apr 2016 6:49:51pm
-    Author:  Michael Fisher
+#ifndef EL_VIEW_HELPERS_H
+#define EL_VIEW_HELPERS_H
 
-  ==============================================================================
-*/
+#include "element/Juce.h"
 
-#ifndef VIEWHELPERS_H_INCLUDED
-#define VIEWHELPERS_H_INCLUDED
+namespace Element {
+namespace ViewHelpers {
 
+void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding = 10);
 
-
+}
+}
 
 
-#endif  // VIEWHELPERS_H_INCLUDED
+
+#endif  // EL_VIEW_HELPERS_H

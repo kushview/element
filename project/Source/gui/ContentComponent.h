@@ -17,20 +17,18 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_CONTENT_COMPONENT_H
-#define ELEMENT_CONTENT_COMPONENT_H
+#ifndef EL_CONTENT_COMPONENT_H
+#define EL_CONTENT_COMPONENT_H
 
 #include "element/Juce.h"
 
 namespace Element {
 
 class ContentContainer;
-class GraphEditorView;
-class TransportBar;
 class GuiApp;
+class GraphEditorView;
 class RackView;
-class SequencerComponent;
-class Workspace;
+class TransportBar;
 
 class ContentComponent :  public Component,
                           public DragAndDropContainer,
@@ -52,11 +50,8 @@ public:
 private:
     GuiApp& gui;
     ScopedPointer<ContentContainer> top;
-    ScopedPointer<ScreenDisplay> display;
-    ScopedPointer<SequencerComponent> seq;
     ScopedPointer<TransportBar>  transport;
     ScopedPointer<TooltipWindow> toolTips;
-    ScopedPointer<GraphEditorView> graph;
     StretchableLayoutManager layoutVertical;
     ScopedPointer<StretchableLayoutResizerBar> bar1;
     ScopedPointer<RackView> rack;

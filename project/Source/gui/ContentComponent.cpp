@@ -21,8 +21,8 @@
 #include "gui/GuiApp.h"
 #include "gui/GraphEditorView.h"
 #include "gui/ContentComponent.h"
+#include "gui/NavigationView.h"
 #include "gui/RackView.h"
-#include "gui/SequencerComponent.h"
 #include "gui/TransportBar.h"
 #include "session/Session.h"
 #include "EngineControl.h"
@@ -40,7 +40,7 @@ public:
         const AssetTree::Item root (session->assets().root());
         
         vertical = false;
-        addAndMakeVisible (assets = new AssetTreeView (session->assets().root()));
+        addAndMakeVisible (navView = new NavigationView());
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, ! vertical));
         addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
         updateLayout();
@@ -53,19 +53,19 @@ public:
     
     void resized() override
     {
-        Component* comps[] = { assets.get(), bar.get(), graph.get() };
+        Component* comps[] = { navView.get(), bar.get(), graph.get() };
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), vertical, true);
     }
     
     void stabilize()
     {
         graph->resized();
-        assets->resized();
+        navView->resized();
     }
     
 private:
     StretchableLayoutManager layout;
-    ScopedPointer<AssetTreeView> assets;
+    ScopedPointer<NavigationView> navView;
     ScopedPointer<StretchableLayoutResizerBar> bar;
     ScopedPointer<GraphEditorView> graph;
     bool vertical;
@@ -89,7 +89,6 @@ ContentComponent::ContentComponent (GuiApp& app_)
     
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layoutVertical, 1, false));
     addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
-    // addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
     addAndMakeVisible (rack = new RackView());
     addAndMakeVisible (top = new ContentContainer (gui));
     
@@ -117,12 +116,8 @@ void ContentComponent::paint (Graphics &g)
 
 void ContentComponent::resized()
 {
-    const Rectangle<int> r (getLocalBounds().reduced (2));
     transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
 
-#if 0
-    graph->setBounds (r.withTrimmedTop (transport->getHeight() + 2));
-#else
     Component* comps[3] = { top.get(), bar1.get(), rack.get() };
     layoutVertical.layOutComponents (comps, 3,
                                      0,
@@ -130,8 +125,6 @@ void ContentComponent::resized()
                                      getWidth(),
                                      getHeight() - 2 + transport->getHeight(),
                                      true, true);
-    
-#endif
 }
 
 void ContentComponent::setRackViewComponent (Component* comp)
@@ -143,7 +136,6 @@ GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize()
 {
-    if (graph) graph->resized();
     if (top) top->stabilize();
     transport->stabilize();
 }
