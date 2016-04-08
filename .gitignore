@@ -1,6 +1,8 @@
 *.pch
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
+project/JuceLibraryCode/juce_*.*
+project/JuceLIbraryCode/element_*.*
 data/*.ai
 
 dst
