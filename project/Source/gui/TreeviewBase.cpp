@@ -41,7 +41,8 @@ void TreePanelBase::setRoot (TreeItemBase* root)
 {
     tree.setRootItem (nullptr);
     rootItem = root;
-    if (root != nullptr) {
+    if (root != nullptr)
+    {
         tree.setRootItem (root);
         tree.getRootItem()->setOpen (true);
     }

@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"

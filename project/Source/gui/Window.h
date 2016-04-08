@@ -21,6 +21,7 @@
 #define ELEMENT_WINDOW_H
 
 #include "element/Juce.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -49,15 +50,12 @@ namespace Element {
     class WindowHook
     {
     public:
-
         WindowHook() { }
         virtual ~WindowHook() { Logger::writeToLog("~WindowHook()"); }
         inline Signal& signalClosed() { return closedSignal; }
 
     protected:
-
         Signal  closedSignal;
-
     };
 
     /** A juce DialogWindow that emits a closed signal */

@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <boost/bind.hpp>
 #include "session/NoteSequence.h"
 #include "gui/MidiEditorBody.h"
 

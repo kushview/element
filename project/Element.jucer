@@ -5,7 +5,8 @@
               jucerVersion="4.1.0" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
-    <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="Resources">
+    <GROUP id="{673C919F-33AE-A122-4B55-133029ACFB0C}" name="libs"/>
+    <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
     </GROUP>
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
@@ -454,6 +455,7 @@
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="Source/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="Source/Settings.cpp"/>
       <FILE id="WhwWGx" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>
+      <FILE id="Eg6hYr" name="Signals.h" compile="0" resource="0" file="Source/Signals.h"/>
       <FILE id="dCZvEA" name="URIs.h" compile="0" resource="0" file="Source/URIs.h"/>
       <FILE id="DsnYel" name="World.h" compile="0" resource="0" file="Source/World.h"/>
       <FILE id="zSi9fC" name="WorldBase.cpp" compile="1" resource="0" file="Source/WorldBase.cpp"/>
