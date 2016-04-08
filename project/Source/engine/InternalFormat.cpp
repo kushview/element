@@ -57,8 +57,7 @@ namespace Element {
         }
     }
 
-    AudioPluginInstance*
-    InternalFormat::createInstanceFromDescription (const PluginDescription& desc, double, int)
+    AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
     {
         Globals& g (engine.globals());
         SessionRef s (g.session().makeRef());
@@ -117,5 +116,18 @@ namespace Element {
     {
         for (int i = 0; i < (int) audioOutputPort; ++i)
             results.add (new PluginDescription (*description ((InternalFormat::ID) i)));
+    }
+    
+    void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
+                                               int initialBufferSize, void* userData,
+                                               void (*callback) (void*, AudioPluginInstance*, const String&))
+    {
+        if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
+            callback (userData, i, String::empty);
+    }
+    
+    bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
+    {
+        return false;
     }
 }

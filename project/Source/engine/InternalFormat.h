@@ -65,17 +65,23 @@ namespace Element {
         void getAllTypes (OwnedArray <PluginDescription>& results);
 
         // AudioPluginFormat
-        String getName() const                                      { return "Internal"; }
-        bool fileMightContainThisPluginType (const String&)         { return false; }
-        FileSearchPath getDefaultLocationsToSearch()                { return FileSearchPath(); }
-        bool canScanForPlugins() const                              { return true; }
-        void findAllTypesForFile (OwnedArray <PluginDescription>&, const String&) { }
-        bool doesPluginStillExist (const PluginDescription&)        { return true; }
-        String getNameOfPluginFromIdentifier (const String& fileOrIdentifier)   { return fileOrIdentifier; }
-        bool pluginNeedsRescanning (const PluginDescription&)       { return false; }
-        StringArray searchPathsForPlugins (const FileSearchPath&, bool) { return StringArray(); }
-        AudioPluginInstance* createInstanceFromDescription (const PluginDescription& desc, double rate, int block);
+        String getName() const                                      override { return "Internal"; }
+        bool fileMightContainThisPluginType (const String&)         override { return true; }
+        FileSearchPath getDefaultLocationsToSearch()                override { return FileSearchPath(); }
+        bool canScanForPlugins() const                              override { return false; }
+        void findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String&) override { }
+        bool doesPluginStillExist (const PluginDescription&)        override { return true; }
+        String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
+        bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
+        StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override { return StringArray(); }
+        
 
+    protected:
+        void createPluginInstance (const PluginDescription&, double initialSampleRate,
+                                   int initialBufferSize, void* userData,
+                                   void (*callback) (void*, AudioPluginInstance*, const String&)) override;
+        bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
+    
     private:
         AudioEngine& engine;
         PluginDescription audioInDesc;
@@ -86,6 +92,8 @@ namespace Element {
         PluginDescription sequencerDesc;
         PluginDescription patternDesc;
         PluginDescription metroDesc;
+        
+        AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
     };
 }
 

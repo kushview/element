@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.1.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="4.1.0" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="4.2.0" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{673C919F-33AE-A122-4B55-133029ACFB0C}" name="libs"/>
@@ -533,7 +533,8 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <XCODE_IPHONE targetFolder="Builds/iOS" externalLibraries="lilv-0&#10;suil-0&#10;sratom-0&#10;sord-0&#10;serd-0"
-                  postbuildCommand="libdir=&quot;/opt/element/ios/lib&quot;&#10;deplibs=&quot;liblilv-0.dylib libsuil-0.dylib libserd-0.dylib libsord-0.dylib libsratom-0.dylib&quot;&#10;&#10;exit 0&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;binary=&quot;$original/$EXECUTABLE_NAME&quot;&#10;frameworks=&quot;$original/Frameworks&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*.dylib&quot;&#10;&#10;echo &quot;Copying Libraries from $libdir&quot;&#10;&#10;for deplib in $deplibs; do&#10;  echo &quot;  $deplib&quot;&#10;  cp -f &quot;$libdir/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;&#10;  install_name_tool -id &quot;@loader_path/Frameworks/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;  install_name_tool -change &quot;$libdir/$deplib&quot; &quot;@loader_path/Frameworks/$deplib&quot; &quot;$binary&quot;&#10;&#10;  for dep in $deplibs; do&#10;    install_name_tool -change &quot;$libdir/$dep&quot; &quot;@loader_path/$dep&quot; &quot;$frameworks/$deplib&quot;&#10;  done&#10;&#10;done&#10;">
+                  postbuildCommand="libdir=&quot;/opt/element/ios/lib&quot;&#10;deplibs=&quot;liblilv-0.dylib libsuil-0.dylib libserd-0.dylib libsord-0.dylib libsratom-0.dylib&quot;&#10;&#10;exit 0&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;binary=&quot;$original/$EXECUTABLE_NAME&quot;&#10;frameworks=&quot;$original/Frameworks&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*.dylib&quot;&#10;&#10;echo &quot;Copying Libraries from $libdir&quot;&#10;&#10;for deplib in $deplibs; do&#10;  echo &quot;  $deplib&quot;&#10;  cp -f &quot;$libdir/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;&#10;  install_name_tool -id &quot;@loader_path/Frameworks/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;  install_name_tool -change &quot;$libdir/$deplib&quot; &quot;@loader_path/Frameworks/$deplib&quot; &quot;$binary&quot;&#10;&#10;  for dep in $deplibs; do&#10;    install_name_tool -change &quot;$libdir/$dep&quot; &quot;@loader_path/$dep&quot; &quot;$frameworks/$deplib&quot;&#10;  done&#10;&#10;done&#10;"
+                  iosScreenOrientation="portraitlandscape">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="1"
                        targetName="Element" cppLibType="libc++" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
@@ -568,7 +569,7 @@
              androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
              androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
              androidKeyAliasPass="android" androidVersionCode="1" androidCpp11="1"
-             androidBluetoothNeeded="1">
+             androidBluetoothNeeded="1" androidScreenOrientation="unspecified">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
                        optimisation="1" targetName="Element"/>
