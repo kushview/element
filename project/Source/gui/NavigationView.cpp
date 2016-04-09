@@ -1,6 +1,10 @@
+
+#include "gui/ContentComponent.h"
+#include "gui/GuiApp.h"
 #include "gui/NavigationView.h"
 #include "gui/TreeViewBase.h"
 #include "gui/ViewHelpers.h"
+#include "session/PluginManager.h"
 
 namespace Element {
 
@@ -56,6 +60,7 @@ public:
     void listBoxItemClicked (int row, const MouseEvent&) override
     {
         jassert (isPositiveAndBelow (row, (int) numRootTypes));
+        view->setRootItem (row);
     }
 
     void listBoxItemDoubleClicked (int, const MouseEvent&) override { }
@@ -84,6 +89,51 @@ private:
     NavigationView* view;
 };
 
+class PluginTreeItem : public TreeItemBase
+{
+public:
+    PluginTreeItem (const PluginDescription& d) : desc(d) { }
+    ~PluginTreeItem() { }
+    bool mightContainSubItems() { return false; }
+    virtual String getRenamingName() const { return desc.name; }
+    virtual String getDisplayName()  const { return desc.name; }
+    virtual void setName (const String&) {  }
+    virtual bool isMissing() { return false; }
+    virtual Icon getIcon() const { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    const PluginDescription desc;
+};
+
+class PluginsNavigationItem : public TreeItemBase
+{
+public:
+    PluginsNavigationItem() { }
+    ~PluginsNavigationItem() { }
+    bool mightContainSubItems() { return true; }
+    String getRenamingName() const { return "Plugins"; }
+    String getDisplayName() const { return "Plugins"; }
+    virtual void setName (const String&) {  }
+    virtual bool isMissing() { return false; }
+    virtual Icon getIcon() const { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    virtual void addSubItems()
+    {
+        ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
+        if (! cc)
+            return;
+            
+        PluginManager& plugins (cc->app().globals().plugins());
+        KnownPluginList& known (plugins.availablePlugins());
+
+        for (int i = 0; i < known.getNumTypes(); ++i)
+            addSubItem (new PluginTreeItem (*known.getType (i)));
+    }
+    
+    void itemOpennessChanged (bool isOpen)
+    {
+        if (isOpen)
+            addSubItems();
+    }
+};
+
 class NavigationTree :  public TreePanelBase
 {
 public:
@@ -92,13 +142,33 @@ public:
           view (v)
     {
         setEmptyTreeMessage ("Empty...");
-        setRoot (nullptr);
+        auto* item = new PluginsNavigationItem();
+        setRoot (item);
+        item->setOpen (true);
+    }
+    
+    void rootItemChanged (int item) {
+        if (item == rootItem)
+            return;
+        
+        switch (item)
+        {
+            case NavigationList::pluginsItem:
+                setRoot (new PluginsNavigationItem());
+                break;
+            default:
+                setRoot(nullptr);
+                break;
+        }
+        
+        rootItem = item;
     }
     
     ~NavigationTree() { }
     
 private:
     NavigationView* view;
+    int rootItem;
 };
 
 
@@ -127,6 +197,13 @@ void NavigationView::resized()
 {
     Component* comps[] = { navList.get(), navBar.get(), navTree.get() };
     layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), false, true);
+}
+
+void NavigationView::setRootItem (int item)
+{
+    if (navList->getSelectedRow() != item)
+        return navList->selectRow (item);
+    navTree->rootItemChanged (item);
 }
 
 void NavigationView::updateLayout()

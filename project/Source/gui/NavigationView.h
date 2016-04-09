@@ -23,7 +23,10 @@ private:
     ScopedPointer<StretchableLayoutResizerBar> navBar;
     StretchableLayoutManager layout;
 
+    friend class NavigationList;
+    friend class NavigationTree;
     void updateLayout();
+    void setRootItem (int item);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
