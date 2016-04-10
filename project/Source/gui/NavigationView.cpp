@@ -1,4 +1,5 @@
 
+#include "engine/GraphProcessor.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiApp.h"
 #include "gui/NavigationView.h"
@@ -13,8 +14,8 @@ class NavigationList : public ListBox,
 {
 public:
     enum RootType {
-        instrumentsItem = 0,
-        pluginsItem,
+//        instrumentsItem = 0,
+        pluginsItem = 0,
         sessionItem,
         numRootTypes
     };
@@ -34,8 +35,7 @@ public:
     static const String& getRootItemName (const int t)
     {
         jassert (t < numRootTypes);
-        static const String _names [numRootTypes] = {
-            "Instruments", "Plugins", "Session" };
+        static const String _names [numRootTypes] = { "Plugins", "Session" };
         return _names [t];
     }
     
@@ -65,24 +65,31 @@ public:
 
     void listBoxItemDoubleClicked (int, const MouseEvent&) override { }
     void backgroundClicked (const MouseEvent&) override { }
-
-    void selectedRowsChanged (int lastRowSelected) override
-    {
-    
-    }
-
+    void selectedRowsChanged (int lastRowSelected) override { }
     void deleteKeyPressed (int) override { }
     void returnKeyPressed (int) override { }
     void listWasScrolled() override { }
 
-    virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override
+    var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override
     {
         return var::null;
     }
 
     String getTooltipForRow (int row) override
     {
-        return "Tip";
+        switch (row)
+        {
+//            case instrumentsItem:
+//                return "Built-in instruments";
+//                break;
+            case pluginsItem:
+                return "Available system plugins";
+                break;
+            case sessionItem:
+                return "Current session resources";
+                break;
+        }
+        return "Invalid Item";
     }
 
 private:
@@ -119,13 +126,14 @@ class PluginsNavigationItem : public TreeItemBase
 public:
     PluginsNavigationItem() { }
     ~PluginsNavigationItem() { }
-    bool mightContainSubItems() { return true; }
-    String getRenamingName() const { return "Plugins"; }
-    String getDisplayName() const { return "Plugins"; }
-    virtual void setName (const String&) {  }
-    virtual bool isMissing() { return false; }
-    virtual Icon getIcon() const { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
-    virtual void addSubItems()
+    
+    bool mightContainSubItems() override { return true; }
+    String getRenamingName() const override { return "Plugins"; }
+    String getDisplayName() const override { return "Plugins"; }
+    void setName (const String&) override {  }
+    bool isMissing() override { return false; }
+    Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    void addSubItems() override
     {
         ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
         if (! cc)
@@ -138,11 +146,102 @@ public:
             addSubItem (new PluginTreeItem (*known.getType (i)));
     }
     
-    void itemOpennessChanged (bool isOpen)
+    void itemOpennessChanged (bool isOpen) override
     {
         if (isOpen)
             addSubItems();
+        else
+            clearSubItems();
     }
+};
+
+class SessionNavigationItem : public TreeItemBase
+{
+public:
+    SessionNavigationItem() { }
+    ~SessionNavigationItem() { }
+    bool mightContainSubItems() override { return true; }
+    String getRenamingName() const override { return "Session"; }
+    String getDisplayName() const override { return "Session"; }
+    virtual void setName (const String&) override { }
+    virtual bool isMissing() override { return false; }
+    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    virtual void addSubItems() override
+    {
+        addSubItem (new EngineItem());
+    }
+    
+    void itemOpennessChanged (bool isOpen) override
+    {
+        if (isOpen)
+            addSubItems();
+        else
+            clearSubItems();
+    }
+    
+private:
+    class EngineItem :  public TreeItemBase
+    {
+    public:
+        EngineItem() { }
+        ~EngineItem() { }
+        
+        bool mightContainSubItems() override { return true; }
+        String getRenamingName() const override { return "Engine"; }
+        String getDisplayName()  const override { return "Engine"; }
+        void setName (const String&)  override { }
+        bool isMissing() override { return false; }
+        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    
+        void addSubItems() override
+        {
+            ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
+            if (! cc)
+                return;
+                
+            AudioEnginePtr e = cc->app().globals().engine();
+            GraphProcessor& graph (e->graph());
+            ReferenceCountedArray<Element::GraphNode> nodes;
+            graph.getOrderedNodes (nodes);
+            
+            for (int i = 0; i < nodes.size(); ++i)
+                addSubItem (new PluginInstanceItem (nodes.getUnchecked (i)));
+        }
+        
+        void itemOpennessChanged (bool isOpen) override
+        {
+            if (isOpen)
+                addSubItems();
+            else
+                clearSubItems();
+        }
+    };
+    
+    class PluginInstanceItem :  public TreeItemBase
+    {
+    public:
+        PluginInstanceItem (GraphNodePtr n) : node (n)
+        {
+            jassert (node != nullptr);
+            instance = node->getAudioPluginInstance();
+        }
+        
+        ~PluginInstanceItem()
+        {
+            instance = nullptr;
+            node = nullptr;
+        }
+        
+        bool mightContainSubItems() override { return false; }
+        String getRenamingName() const override { return (instance) ? instance->getName() : "Invalid"; }
+        String getDisplayName()  const override { return getRenamingName(); }
+        void setName (const String&)  override { }
+        bool isMissing() override { return false; }
+        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    
+        GraphNodePtr node;
+        AudioPluginInstance* instance;
+    };
 };
 
 class NavigationTree :  public TreePanelBase
@@ -153,22 +252,23 @@ public:
           view (v)
     {
         setEmptyTreeMessage ("Empty...");
-        auto* item = new PluginsNavigationItem();
-        setRoot (item);
-        item->setOpen (true);
     }
     
-    void rootItemChanged (int item) {
+    void rootItemChanged (int item)
+    {
         if (item == rootItem)
             return;
         
         switch (item)
         {
             case NavigationList::pluginsItem:
-                setRoot (new PluginsNavigationItem());
+                setRoot (new PluginsNavigationItem ());
+                break;
+            case NavigationList::sessionItem:
+                setRoot (new SessionNavigationItem ());
                 break;
             default:
-                setRoot(nullptr);
+                setRoot (nullptr);
                 break;
         }
         
