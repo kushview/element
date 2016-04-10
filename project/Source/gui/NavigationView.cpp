@@ -94,12 +94,23 @@ class PluginTreeItem : public TreeItemBase
 public:
     PluginTreeItem (const PluginDescription& d) : desc(d) { }
     ~PluginTreeItem() { }
-    bool mightContainSubItems() { return false; }
-    virtual String getRenamingName() const { return desc.name; }
-    virtual String getDisplayName()  const { return desc.name; }
-    virtual void setName (const String&) {  }
-    virtual bool isMissing() { return false; }
-    virtual Icon getIcon() const { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    bool mightContainSubItems() override { return false; }
+    virtual String getRenamingName() const override { return desc.name; }
+    virtual String getDisplayName()  const override { return desc.name; }
+    virtual void setName (const String&)  override {  }
+    virtual bool isMissing() override { return false; }
+    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    
+    var getDragSourceDescription() override
+    {
+        var dd;
+        dd.append ("element://dnd/plugin");
+        dd.append (desc.pluginFormatName);
+        dd.append (desc.fileOrIdentifier);
+        
+        return dd;
+    }
+    
     const PluginDescription desc;
 };
 

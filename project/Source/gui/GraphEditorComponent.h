@@ -33,8 +33,8 @@ class PluginWindow;
 
 /** A panel that displays and edits a GraphProcessor. */
 class GraphEditorComponent   : public Component,
-                          public ChangeListener,
-                          public DragAndDropTarget
+                               public ChangeListener,
+                               public DragAndDropTarget
 {
 public:
     GraphEditorComponent (GraphController&);
@@ -61,14 +61,11 @@ public:
     void dragConnector (const MouseEvent& e);
     void endDraggingConnector (const MouseEvent& e);
 
-    virtual bool isInterestedInDragSource (const SourceDetails& /*details*/) { return true; }
+    virtual bool isInterestedInDragSource (const SourceDetails& /*details*/);
     //virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
     //virtual void itemDragMove (const SourceDetails& dragSourceDetails);
     //virtual void itemDragExit (const SourceDetails& dragSourceDetails);
-    void itemDropped (const SourceDetails& details)
-    {
-        Logger::writeToLog (details.description);
-    }
+    void itemDropped (const SourceDetails& details);
 
     virtual bool shouldDrawDragImageWhenOver() { return true; }
 

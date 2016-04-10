@@ -955,6 +955,38 @@ PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bo
     return w;
 }
 
+
+bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& details)
+{
+    if (! details.description.isArray())
+        return false;
+    
+    if (auto* a = details.description.getArray())
+    {
+        const var type (a->getFirst());
+        return type == var ("element://dnd/plugin");
+    }
+    
+    return false;
+}
+
+void GraphEditorComponent::itemDropped (const SourceDetails& details)
+{
+    if (const auto* a = details.description.getArray())
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = a->getUnchecked (1);
+        desc.fileOrIdentifier = a->getUnchecked (2);
+        createNewPlugin (&desc, details.localPosition.x, details.localPosition.y);
+    }
+}
+
+bool shouldDrawDragImageWhenOver()
+{
+    return true;
+}
+    
+
 class TooltipBar   : public Component,
                      private Timer
 {
