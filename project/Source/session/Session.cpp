@@ -122,6 +122,7 @@ namespace Element {
     
     void Session::clear()
     {
+        controller()->clear();
         clearTracks();
         close();
         priv->clearSessionMedia();
@@ -302,8 +303,6 @@ namespace Element {
     {
         if (tree != projectState)
             return;
-
-        Logger::writeToLog ("Session redirected");
         notifyChanged();
     }
 

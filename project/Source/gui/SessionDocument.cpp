@@ -62,11 +62,10 @@ namespace Element {
     {
         SessionRef sr = session.makeRef();
 
-        if (XmlElement* e = sr->createXml())
+        if (ScopedPointer<XmlElement> e = sr->createXml())
         {
-            Result res = e->writeToFile (file, String::empty)
-                    ? Result::ok() : Result::fail ("Error writing session file");
-            delete e;
+            Result res (e->writeToFile (file, String::empty)
+                    ? Result::ok() : Result::fail ("Error writing session file"));
             return res;
         }
 
