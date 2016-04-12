@@ -20,7 +20,7 @@
 #ifndef EL_CONTENT_COMPONENT_H
 #define EL_CONTENT_COMPONENT_H
 
-#include "element/Juce.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 
@@ -43,6 +43,7 @@ public:
     void resized() override;
 
     void setRackViewComponent (Component* comp);
+    void setRackViewNode (GraphNodePtr node);
     void stabilize();
     
     GuiApp& app();

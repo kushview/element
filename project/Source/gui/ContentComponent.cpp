@@ -132,6 +132,16 @@ void ContentComponent::setRackViewComponent (Component* comp)
     rack->setMainComponent (comp);
 }
 
+void ContentComponent::setRackViewNode (GraphNodePtr node)
+{
+    jassert(node);
+    auto* instance = node->getAudioPluginInstance();
+    jassert(instance);
+    const PluginDescription desc (instance->getPluginDescription());
+    if (desc.pluginFormatName == "Internal")
+        setRackViewComponent (instance->createEditorIfNeeded());
+}
+
 GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize()

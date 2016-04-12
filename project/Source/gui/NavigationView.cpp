@@ -108,6 +108,8 @@ public:
     virtual bool isMissing() override { return false; }
     virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
     
+    void itemDoubleClicked (const MouseEvent& ev) override { }
+    
     var getDragSourceDescription() override
     {
         var dd;
@@ -239,6 +241,17 @@ private:
         bool isMissing() override { return false; }
         Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
     
+        void itemDoubleClicked (const MouseEvent& ev) override
+        {
+            if (! node || ! instance)
+                return;
+            
+            PluginDescription desc;
+            instance->fillInPluginDescription (desc);
+            auto* cc = this->getOwnerView()->findParentComponentOfClass<ContentComponent>();
+            cc->setRackViewNode (node);
+        }
+        
         GraphNodePtr node;
         AudioPluginInstance* instance;
     };
