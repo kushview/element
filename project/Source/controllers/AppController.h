@@ -1,6 +1,6 @@
 
-#ifndef ELEMENT_APP_CONTROLLER_H
-#define ELEMENT_APP_CONTROLLER_H
+#ifndef EL_APP_CONTROLLER_H
+#define EL_APP_CONTROLLER_H
 
 #include "controllers/Controller.h"
 #include "CommandManager.h"

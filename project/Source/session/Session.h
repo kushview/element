@@ -144,7 +144,7 @@ namespace Element {
         friend void intrusive_ptr_add_ref (Session*);
         friend void intrusive_ptr_release (Session*);
         
-        void notifyChanged() { DBG("Session::notifyChanged()"); }
+        void notifyChanged() { }
     };
 }
 

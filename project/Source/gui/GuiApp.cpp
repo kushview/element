@@ -282,33 +282,16 @@ void GuiApp::openSession()
 
 void GuiApp::newSession()
 {
-    if (sessionDoc->hasChangedSinceSaved()) {
+    if (sessionDoc->hasChangedSinceSaved())
         sessionDoc->save (true, true);
-        // content->stabilize();
-    }
 
-#if 0
-    DialogWindow::LaunchOptions opts;
-    opts.dialogBackgroundColour = Colours::darkgrey;
-    opts.content.set (new NewSessionView (globals().session()), true);
-    opts.dialogTitle = "Create a New Session";
-    opts.resizable = false;
-    opts.useBottomRightCornerResizer = false;
-    opts.useNativeTitleBar = true;
-    opts.componentToCentreAround = (Component*) mainWindow.get();
-
-    if (DialogWindow* dw = opts.create())
-#endif
-    {
-        // windowManager->push (dw);
-
-        sessionDoc->setFile (File::nonexistent);
-        globals().session().clear();
-        globals().session().open();
-        sessionDoc->setChangedFlag (false);
-    }
+    sessionDoc->setFile (File::nonexistent);
+    globals().session().clear();
+    globals().session().open();
+    sessionDoc->setChangedFlag (false);
+    
     content->stabilize();
-    mainWindow->setName (session()->getProperty(Slugs::name));
+    mainWindow->setName (session()->getProperty (Slugs::name));
 }
 
 void GuiApp::saveSession (bool saveAs)

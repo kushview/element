@@ -17,12 +17,13 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_TRACK_MODEL_H
-#define ELEMENT_TRACK_MODEL_H
+#ifndef EL_TRACK_MODEL_H
+#define EL_TRACK_MODEL_H
 
 #include "element/Juce.h"
 
 namespace Element {
+
 class TrackModel
 {
 public:
@@ -82,4 +83,4 @@ protected:
 };
 }
 
-#endif // ELEMENT_TRACK_MODEL_H
+#endif // EL_TRACK_MODEL_H

@@ -208,6 +208,7 @@
         <FILE id="iXbind" name="AppController.cpp" compile="1" resource="0"
               file="Source/controllers/AppController.cpp"/>
         <FILE id="dUnv0f" name="AppController.h" compile="0" resource="0" file="Source/controllers/AppController.h"/>
+        <FILE id="zrLMkT" name="Controller.cpp" compile="1" resource="0" file="Source/controllers/Controller.cpp"/>
         <FILE id="fTUDgM" name="Controller.h" compile="0" resource="0" file="Source/controllers/Controller.h"/>
         <FILE id="RWYfG0" name="EngineController.cpp" compile="1" resource="0"
               file="Source/controllers/EngineController.cpp"/>
@@ -653,5 +654,6 @@
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
                JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
-               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"/>
+               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
+               JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"/>
 </JUCERPROJECT>

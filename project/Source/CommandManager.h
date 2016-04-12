@@ -5,6 +5,10 @@
 
 namespace Element {
 
+namespace Commands {
+
+}
+
 class CommandManager :  public ApplicationCommandManager
 {
 public:

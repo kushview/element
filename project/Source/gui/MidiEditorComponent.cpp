@@ -23,7 +23,10 @@ namespace Element {
 
 MidiEditorComponent::MidiEditorComponent (MidiKeyboardState& k)
     : MidiEditorBody (k)
-{ }
+{
+    if (auto* const i = indicator())
+        i->setVisible (false);
+}
 
 MidiEditorComponent::~MidiEditorComponent()
 { }

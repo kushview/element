@@ -985,7 +985,7 @@ bool shouldDrawDragImageWhenOver()
 {
     return true;
 }
-    
+
 
 class TooltipBar   : public Component,
                      private Timer
