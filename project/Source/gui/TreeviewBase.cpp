@@ -18,6 +18,7 @@
 */
 
 #include "gui/TreeviewBase.h"
+#include "gui/ViewHelpers.h"
 
 namespace Element {
 
@@ -85,10 +86,11 @@ Font TreeItemBase::getFont() const
     return Font (getItemHeight() * 0.7f);
 }
 
-void TreeItemBase::paintItem (Graphics& g, int /*width*/, int /*height*/)
+void TreeItemBase::paintItem (Graphics& g, int w, int h)
 {
-    if (isSelected())
-        g.fillAll (Colours::aqua);
+    if (isSelected()) {
+       ViewHelpers::drawBasicTextRow (String::empty, g, w, w, true);
+    }
 }
 
 float TreeItemBase::getIconSize() const
@@ -116,16 +118,12 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& ar
 Colour TreeItemBase::getBackgroundColour() const
 {
 #if 0
-    Colour background (getOwnerView()->findColour (gui::mainBackgroundColourId));
+    Colour background (LookAndFeel_E1::backgroundColor);
 
     if (isSelected())
-        background = background.overlaidWith (getOwnerView()->findColour (gui::treeviewHighlightColourId));
+        background = background.overlaidWith (LookAndFeel_E1::elementBlue.darker(0.600006f));
 #else
-    Colour background (Colours::transparentBlack);
-
-    if (isSelected())
-        background = background.overlaidWith (Colours::aqua.darker());
-
+    const Colour background (0x000000);
 #endif
     return background;
 }
@@ -144,7 +142,7 @@ void TreeItemBase::paintContent (Graphics& g, const Rectangle<int>& area)
 {
     g.setFont (getFont());
     g.setColour (isMissing() ? getContrastingColour (Colours::red, 0.8f)
-                             : getContrastingColour (0.8f));
+                             : LookAndFeel_E1::textColor);
 
     g.drawFittedText (getDisplayName(), area, Justification::centredLeft, 1, 0.8f);
 }
