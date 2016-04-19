@@ -17,7 +17,9 @@
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
-// (You can add your own code in this section, and the Projucer will not overwrite it)
+#ifdef _MSC_VER
+ #pragma warning( disable : 4018 4099 4100 4127 4172 4244 4305 4373 4512 4706 4996 )
+#endif
 
 // [END_USER_CODE_SECTION]
 
@@ -77,7 +79,7 @@
 // juce_audio_devices flags:
 
 #ifndef    JUCE_ASIO
- #define   JUCE_ASIO 0
+ #define   JUCE_ASIO 1
 #endif
 
 #ifndef    JUCE_WASAPI
@@ -85,7 +87,7 @@
 #endif
 
 #ifndef    JUCE_WASAPI_EXCLUSIVE
- //#define JUCE_WASAPI_EXCLUSIVE
+ #define   JUCE_WASAPI_EXCLUSIVE 0
 #endif
 
 #ifndef    JUCE_DIRECTSOUND

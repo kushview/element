@@ -24,7 +24,7 @@
  #include <juce/juce.h>
  #include <element/element.h>
 #else
- #include "../../JuceLibraryCode/JuceHeader.h"
+ #include "JuceHeader.h"
 #endif
 
 #endif  /* ELEMENT_JUCE_H_INCLUDED */
