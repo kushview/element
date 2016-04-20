@@ -303,6 +303,8 @@ NavigationView::NavigationView()
     addAndMakeVisible (navTree = new NavigationTree (this));
     updateLayout();
     resized();
+
+    setRootItem (NavigationList::sessionItem);
 }
 
 NavigationView::~NavigationView()
@@ -326,7 +328,7 @@ void NavigationView::resized()
 void NavigationView::setRootItem (int item)
 {
     if (navList->getSelectedRow() != item)
-        return navList->selectRow (item);
+        navList->selectRow (item);
     navTree->rootItemChanged (item);
 }
 
