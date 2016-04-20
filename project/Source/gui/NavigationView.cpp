@@ -327,9 +327,16 @@ void NavigationView::resized()
 
 void NavigationView::setRootItem (int item)
 {
+    static bool stopRecursion = false;
+
+    if (stopRecursion)
+        return;
+
+    stopRecursion = true;
     if (navList->getSelectedRow() != item)
         navList->selectRow (item);
     navTree->rootItemChanged (item);
+    stopRecursion = false;
 }
 
 void NavigationView::updateLayout()
