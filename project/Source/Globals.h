@@ -38,7 +38,7 @@ class Writer;
 struct CommandLine {
     explicit CommandLine (const String& cli = String::empty);
     bool fullScreen;
-    bool port;
+    int port;
 };
 
 class Globals :  public WorldBase

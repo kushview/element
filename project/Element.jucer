@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.1.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="4.2.0" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="4.3.1" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{673C919F-33AE-A122-4B55-133029ACFB0C}" name="libs">
@@ -599,12 +599,12 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </ANDROID>
-    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1"
+    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
             smallIcon="eG1U6B" bigIcon="eG1U6B">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath=""
-                       headerPath="C:\KushviewSDK\include&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
+                       headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" headerPath="C:\KushviewSDK\include&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
       </CONFIGURATIONS>
