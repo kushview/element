@@ -156,10 +156,8 @@ public:
     XmlElement* createXml() const;
 
 private:
-
     void documentAboutToClose (MediaManager::Document*);
     Array <MediaManager::Document*> previousDocs, nextDocs;
-
 };
 
 }

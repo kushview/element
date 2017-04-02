@@ -286,29 +286,26 @@ namespace Element {
         return nextDocs.size() > 0;
     }
 
-    MediaManager::Document*
-    RecentDocumentList::getPrevious()
+    MediaManager::Document* RecentDocumentList::getPrevious()
     {
         if (! canGoToPrevious())
             return nullptr;
 
-        nextDocs.insert (0, previousDocs.remove (previousDocs.size() - 1));
+        nextDocs.insert (0, previousDocs.removeAndReturn (previousDocs.size() - 1));
         return previousDocs.getLast();
     }
 
-    MediaManager::Document*
-    RecentDocumentList::getNext()
+    MediaManager::Document* RecentDocumentList::getNext()
     {
         if (! canGoToNext())
             return nullptr;
 
-        MediaManager::Document* d = nextDocs.remove (0);
+        MediaManager::Document* d = nextDocs.removeAndReturn (0);
         previousDocs.add (d);
         return d;
     }
 
-    MediaManager::Document*
-    RecentDocumentList::getClosestPreviousDocOtherThan (MediaManager::Document* oneToAvoid) const
+    MediaManager::Document* RecentDocumentList::getClosestPreviousDocOtherThan (MediaManager::Document* oneToAvoid) const
     {
         for (int i = previousDocs.size(); --i >= 0;)
             if (previousDocs.getUnchecked(i) != oneToAvoid)
@@ -317,8 +314,7 @@ namespace Element {
         return nullptr;
     }
 
-    void
-    RecentDocumentList::documentAboutToClose (MediaManager::Document* document)
+    void RecentDocumentList::documentAboutToClose (MediaManager::Document* document)
     {
         previousDocs.removeAllInstancesOf (document);
         nextDocs.removeAllInstancesOf (document);
