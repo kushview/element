@@ -8,6 +8,3 @@
 [submodule "libs/lv2"]
 	path = libs/lv2
 	url = http://lv2plug.in/git/lv2.git
-[submodule "libs/ksp1"]
-	path = libs/ksp1
-	url = https://github.com/kushview/ksp1
