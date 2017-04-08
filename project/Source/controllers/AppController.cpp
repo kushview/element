@@ -12,10 +12,7 @@ AppController::AppController (Globals& g)
     g.getCommands().registerAllCommandsForTarget (this);
 }
 
-AppController::~AppController()
-{
-
-}
+AppController::~AppController() { }
 
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {

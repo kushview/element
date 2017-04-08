@@ -1,5 +1,5 @@
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef EL_SETTINGS_H
+#define EL_SETTINGS_H
 
 #include "element/Juce.h"
 
@@ -14,4 +14,4 @@ public:
 
 }
 
-#endif // SETTINGS_H
+#endif // EL_SETTINGS_H
