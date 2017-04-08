@@ -57,7 +57,6 @@ public:
         symbols  = new SymbolMap();
        #endif
         plugins  = new PluginManager();
-        //plugins->addFormat (new InternalFormat());
         devices  = new DeviceManager();
         media    = new MediaManager();
         settings = new Settings();
