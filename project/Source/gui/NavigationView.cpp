@@ -3,7 +3,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/GuiApp.h"
 #include "gui/NavigationView.h"
-#include "gui/TreeViewBase.h"
+#include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
 
