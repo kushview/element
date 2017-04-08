@@ -1,20 +1,6 @@
 /*
     Main.cpp - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
 #include "element/Juce.h"
@@ -136,41 +122,7 @@ public:
         launchApplication();
     }
 
-    void launchApplication()
-    {
-        if (nullptr != gui)
-            return;
-        
-        StartupThread startup (*world);
-        startup.launchApplication();
-        controller = startup.controller.release();
-        engine = world->engine();
-
-        gui = GuiApp::create (*world);
-        gui->run();
-    }
-
-    void initializeModulePath()
-    {
-        const File path (File::getSpecialLocation (File::invokedExecutableFile));
-        File modDir = path.getParentDirectory().getParentDirectory()
-                          .getChildFile("lib/element").getFullPathName();
-       #if JUCE_DEBUG
-        if (! modDir.exists()) {
-           modDir = path.getParentDirectory().getParentDirectory()
-                        .getChildFile ("modules");
-        }
-       #endif
-
-       #if JUCE_WINDOWS
-        String putEnv = "ELEMENT_MODULE_PATH="; putEnv << modDir.getFullPathName();
-        putenv (putEnv.toRawUTF8());
-       #else
-        setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
-        Logger::writeToLog (String("[element] module path: ") + String(getenv ("ELEMENT_MODULE_PATH")));
-       #endif
-    }
-
+    
     void shutdown() override
     {
         if (gui != nullptr) {
@@ -219,8 +171,43 @@ public:
 private:
     ScopedPointer<Globals>  world;
     AudioEnginePtr          engine;
-    Scoped<GuiApp>     gui;
+    ScopedPointer<GuiApp>   gui;
     ScopedPointer<AppController> controller;
+    
+    void launchApplication()
+    {
+        if (nullptr != gui)
+            return;
+        
+        StartupThread startup (*world);
+        startup.launchApplication();
+        controller = startup.controller.release();
+        engine = world->engine();
+        
+        gui = GuiApp::create (*world);
+        gui->run();
+    }
+    
+    void initializeModulePath()
+    {
+        const File path (File::getSpecialLocation (File::invokedExecutableFile));
+        File modDir = path.getParentDirectory().getParentDirectory()
+                          .getChildFile("lib/element").getFullPathName();
+       #if JUCE_DEBUG
+        if (! modDir.exists()) {
+            modDir = path.getParentDirectory().getParentDirectory()
+            .getChildFile ("modules");
+        }
+       #endif
+        
+       #if JUCE_WINDOWS
+        String putEnv = "ELEMENT_MODULE_PATH="; putEnv << modDir.getFullPathName();
+        putenv (putEnv.toRawUTF8());
+       #else
+        setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
+        Logger::writeToLog (String("[element] module path: ") + String(getenv ("ELEMENT_MODULE_PATH")));
+       #endif
+    }
 };
 
 }
