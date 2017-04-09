@@ -119,6 +119,10 @@
               file="Source/gui/AssetTreeView.cpp"/>
         <FILE id="KsEoBI" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>
         <FILE id="Eyh8a2" name="Commands.h" compile="0" resource="0" file="Source/gui/Commands.h"/>
+        <FILE id="sg07lP" name="ConnectionGrid.cpp" compile="1" resource="0"
+              file="Source/gui/ConnectionGrid.cpp"/>
+        <FILE id="EZVC8d" name="ConnectionGrid.h" compile="0" resource="0"
+              file="Source/gui/ConnectionGrid.h"/>
         <FILE id="acDBYH" name="ContentComponent.cpp" compile="1" resource="0"
               file="Source/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
@@ -308,14 +312,14 @@
       </MODULEPATHS>
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
-               extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B">
+               extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID="K7JD899TJ4">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../Source&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build"/>
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
-                       binaryPath="../build" headerPath="/opt/kushview/include&#10;../../Source&#10;"
+                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -462,4 +466,7 @@
                JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
                JUCE_WASAPI_EXCLUSIVE="disabled"/>
+  <LIVE_SETTINGS>
+    <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

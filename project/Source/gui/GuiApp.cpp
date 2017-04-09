@@ -29,6 +29,8 @@
 #include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"
 
+#include "gui/ConnectionGrid.h"
+
 #include "EngineControl.h"
 #include "MediaManager.h"
 #include "Globals.h"
@@ -191,11 +193,19 @@ void GuiApp::run()
 
     globals().session().open();
     sessionDoc = new SessionDocument (globals().session());
+    
 
     content = new ContentComponent (*this);
+#if 0
     content->setSize (800, 600);
     mainWindow = new MainWindow (*this);
     mainWindow->setContentNonOwned (content.get(), true);
+#else
+    ConnectionGrid* grid = new ConnectionGrid();
+    grid->setSize (800, 600);
+    mainWindow = new MainWindow (*this);
+    mainWindow->setContentOwned (grid, true);
+#endif
 
     PropertiesFile* pf = globals().settings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
