@@ -98,11 +98,6 @@ GuiApp::~GuiApp()
     PropertiesFile* pf = globals().settings().getUserSettings();
     pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
 
-    File f (sessionDoc->getFile());
-    if (f.existsAsFile()) {
-        pf->setValue ("lastSession", f.getFullPathName());
-    }
-
     render.detach();
 
     mainWindow->setVisible (false);
@@ -188,44 +183,17 @@ void GuiApp::runDispatch() { }
 
 void GuiApp::run()
 {
-   // commander().registerAllCommandsForTarget (JUCEApplication::getInstance());
-    commander().registerAllCommandsForTarget (this);
-
-    globals().session().open();
-    sessionDoc = new SessionDocument (globals().session());
-    
-
     content = new ContentComponent (*this);
-#if 0
     content->setSize (800, 600);
-    mainWindow = new MainWindow (*this);
+    mainWindow = new MainWindow();
     mainWindow->setContentNonOwned (content.get(), true);
-#else
-    ConnectionGrid* grid = new ConnectionGrid();
-    grid->setSize (800, 600);
-    mainWindow = new MainWindow (*this);
-    mainWindow->setContentOwned (grid, true);
-#endif
+    mainWindow->centreWithSize (content->getWidth(), content->getHeight());
 
     PropertiesFile* pf = globals().settings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (commander().getKeyMappings());
-
-   #if JUCE_IOS || JUCE_ANDROID
-    Desktop& d = Desktop::getInstance();
-    d.setKioskModeComponent (mainWindow);
-   #endif
-
     mainWindow->addToDesktop();
     mainWindow->setVisible (true);
-    dispatch->startTimer (250);
-
-    File sess (pf->getValue ("lastSession"));
-    if (sess.existsAsFile()) {
-        sessionDoc->loadFrom (sess, true);
-        mainWindow->setName (sessionDoc->getDocumentTitle());
-        content->stabilize();
-    }
 }
 
 bool GuiApp::shutdownApp()

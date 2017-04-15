@@ -23,17 +23,12 @@
 
 namespace Element {
 
-    MainWindow::MainWindow (GuiApp& gui_)
-        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
-          gui (gui_)
+    MainWindow::MainWindow()
+        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false)
     {
         setUsingNativeTitleBar (true);
         setResizable (true, false);
-
         mainMenu = new MainMenu (*this);
-        gui.commander().registerAllCommandsForTarget (mainMenu);
-        gui.commander().setFirstCommandTarget (mainMenu);
-        addKeyListener (gui.commander().getKeyMappings());
         mainMenu->setupMenu();
     }
 

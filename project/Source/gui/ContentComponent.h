@@ -17,11 +17,10 @@ class RackView;
 class TransportBar;
 
 class ContentComponent :  public Component,
-                          public DragAndDropContainer,
-                          private Timer
+                          public DragAndDropContainer
 {
 public:
-    ContentComponent (GuiApp& app);
+    ContentComponent(GuiApp& app);
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;
@@ -36,16 +35,13 @@ public:
 
 private:
     GuiApp& gui;
-    ScopedPointer<ContentContainer> top;
-    ScopedPointer<TransportBar>  transport;
+    ScopedPointer<Component> nav;
+    ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;
-    StretchableLayoutManager layoutVertical;
+    StretchableLayoutManager layout;
     ScopedPointer<StretchableLayoutResizerBar> bar1;
-    ScopedPointer<RackView> rack;
-    Shared<Monitor> playbackMonitor;
     
-    friend class Timer;
-    void timerCallback() override;
+    void updateLayout();
 };
 
 }

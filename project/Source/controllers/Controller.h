@@ -1,8 +1,9 @@
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
-    class Controller {
+    class Controller
+    {
     public:
         Controller() : parent (nullptr) { }
         virtual ~Controller()
@@ -11,9 +12,20 @@ namespace Element {
         }
         
         inline Controller* getParent() const { return parent; }
+        inline Controller* getRoot() const
+        {
+            Controller* c = const_cast<Controller*> (this);
+            while (c != nullptr) {
+                if (nullptr == c->getParent())
+                    break;
+                c = c->getParent();
+            }
+            return c;
+        }
         
-        template<class T> inline T* findParent() {
-            auto* ctl = this;
+        template<class T> inline T* findParent() const
+        {
+            Controller* ctl = const_cast<Controller*> (this);
             while (nullptr != ctl)
             {
                 if (auto* parent = dynamic_cast<T*> (ctl->parent))
@@ -36,7 +48,7 @@ namespace Element {
             if (auto* added = children.add (c))
                 added->parent = this;
         }
-        
+
     private:
         OwnedArray<Controller> children;
         Controller* parent;

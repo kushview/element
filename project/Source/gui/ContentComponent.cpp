@@ -17,15 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gui/AssetTreeView.h"
-#include "gui/GuiApp.h"
-#include "gui/GraphEditorView.h"
+#include "gui/LookAndFeel.h"
 #include "gui/ContentComponent.h"
-#include "gui/NavigationView.h"
-#include "gui/RackView.h"
-#include "gui/TransportBar.h"
-#include "session/Session.h"
-#include "EngineControl.h"
 
 namespace Element {
 
@@ -34,69 +27,49 @@ class ContentContainer : public Component
 public:
     ContentContainer (GuiApp& gui)
     {
-        AudioEnginePtr engine = gui.globals().engine();
-        Shared<EngineControl> ctl = engine->controller();
-        SessionRef session = gui.session();
-        const AssetTree::Item root (session->assets().root());
-        
-        vertical = false;
-        addAndMakeVisible (navView = new NavigationView());
-        addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, ! vertical));
-        addAndMakeVisible (graph = new GraphEditorView (gui, *ctl));
+        addAndMakeVisible (dummy1);
+        addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
+        addAndMakeVisible (dummy2 = new Component());
         updateLayout();
         resized();
     }
     
     virtual ~ContentContainer() { }
     
-    bool isVertical() const { return vertical; }
-    
     void resized() override
     {
-        Component* comps[] = { navView.get(), bar.get(), graph.get() };
-        layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), vertical, true);
+        Component* comps[] = { dummy1.get(), bar.get(), dummy2.get() };
+        layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
     }
     
     void stabilize()
     {
-        graph->resized();
-        navView->resized();
+
     }
     
 private:
     StretchableLayoutManager layout;
-    ScopedPointer<NavigationView> navView;
     ScopedPointer<StretchableLayoutResizerBar> bar;
-    ScopedPointer<GraphEditorView> graph;
-    bool vertical;
+    ScopedPointer<Component> dummy1, dummy2;
     
     void updateLayout()
     {
-        layout.setItemLayout (0, 200, 300, 200);
+        layout.setItemLayout (0, 200, -1.0, 200);
         layout.setItemLayout (1, 4, 4, 4);
-        layout.setItemLayout (2, 0, -1.0, 500);
+        layout.setItemLayout (2, 60, -1.0, 500);
     }
 };
 
 ContentComponent::ContentComponent (GuiApp& app_)
     : gui (app_)
 {
-    AudioEnginePtr engine = gui.globals().engine();
-    Shared<EngineControl> ctl = engine->controller();
-    playbackMonitor = gui.session()->getPlaybackMonitor();
-    
     setOpaque (true);
     
-    addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layoutVertical, 1, false));
-    addAndMakeVisible (transport = new Element::TransportBar (gui.session()));
-    addAndMakeVisible (rack = new RackView());
-    addAndMakeVisible (top = new ContentContainer (gui));
+    addAndMakeVisible (nav = new Component());
+    addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
+    addAndMakeVisible (container = new ContentContainer (app_));
     
-    layoutVertical.setItemLayout (0, 300.0f, -1.0f, 500.0f);
-    layoutVertical.setItemLayout (1, 4, 4, 4);
-    layoutVertical.setItemLayout (2, 300.0f, 300.0f, 300.0f);
-    
-    startTimer (17);
+    updateLayout();
     resized();
 }
 
@@ -111,50 +84,36 @@ void ContentComponent::childBoundsChanged (Component* child)
 
 void ContentComponent::paint (Graphics &g)
 {
-    g.fillAll (Colours::darkgrey);
+    g.fillAll (LookAndFeel::backgroundColor);
 }
 
 void ContentComponent::resized()
 {
-    transport->setBounds (2, 2, transport->getWidth(), transport->getHeight());
-
-    Component* comps[3] = { top.get(), bar1.get(), rack.get() };
-    layoutVertical.layOutComponents (comps, 3,
-                                     0,
-                                     2 + transport->getHeight(),
-                                     getWidth(),
-                                     getHeight() - 2 + transport->getHeight(),
-                                     true, true);
+    Component* comps[3] = { nav.get(), bar1.get(), container.get() };
+    layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), false, true);
 }
 
 void ContentComponent::setRackViewComponent (Component* comp)
 {
-    rack->setMainComponent (comp);
+    
 }
 
 void ContentComponent::setRackViewNode (GraphNodePtr node)
 {
-    jassert (node);
-    auto* instance = node->getAudioPluginInstance();
-    jassert (instance);
-    const PluginDescription desc (instance->getPluginDescription());
-    if (desc.pluginFormatName == "Internal")
-        setRackViewComponent (instance->createEditorIfNeeded());
+    
 }
 
 GuiApp& ContentComponent::app() { return gui; }
 
-void ContentComponent::stabilize()
+void ContentComponent::stabilize() { }
+
+void ContentComponent::updateLayout()
 {
-    if (top) top->stabilize();
-    transport->stabilize();
+    layout.setItemLayout (0, 60, 400, 200);
+    layout.setItemLayout (1, 4, 4, 4);
+    layout.setItemLayout (2, 0, -1.0, 500);
 }
 
-void ContentComponent::timerCallback()
-{
-    transport->setBeatTime (playbackMonitor->get());
-}
-    
 }
 
 

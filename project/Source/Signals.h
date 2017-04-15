@@ -24,12 +24,14 @@
 #include <boost/intrusive/list.hpp>
 #include <boost/intrusive/slist_hook.hpp>
 #include <boost/signals2/signal.hpp>
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
+
 typedef boost::signals2::signal<void()> Signal;
 typedef boost::signals2::signal<void(float)> FloatSignal;
 typedef boost::signals2::signal<void(const String&)> StringSignal;
+
 }
 
 #endif

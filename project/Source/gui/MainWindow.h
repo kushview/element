@@ -20,8 +20,7 @@
 #ifndef ELEMENT_MAINWINDOW_H
 #define ELEMENT_MAINWINDOW_H
 
-#include <element/Juce.h>
-#include "GuiApp.h"
+#include "ElementApp.h"
 
 namespace Element {
 
@@ -30,15 +29,14 @@ class MainMenu;
 class MainWindow : public DocumentWindow
 {
 public:
-    MainWindow (GuiApp& gui_);
+    MainWindow();
     virtual ~MainWindow();
 
-    GuiApp& app() { return gui; }
     void closeButtonPressed();
     
     void refreshMenu();
+
 private:
-    GuiApp& gui;
     ScopedPointer<MainMenu> mainMenu;
 };
 

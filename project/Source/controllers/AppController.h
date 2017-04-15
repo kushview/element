@@ -7,6 +7,7 @@
 
 namespace Element {
 class Globals;
+class GuiApp;
 
 class AppController :  public Controller,
                        protected ApplicationCommandTarget
@@ -26,9 +27,13 @@ protected:
     bool perform (const InvocationInfo& info) override;
 
 private:
+    friend class Application;
     Globals& world;
     CommandManager commands;
+    ScopedPointer<GuiApp> gui;
+    void run();
 };
+
 }
 
 #endif

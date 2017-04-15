@@ -20,7 +20,6 @@
 #include "engine/AudioEngine.h"
 #include "engine/Transport.h"
 #include "session/PluginManager.h"
-
 #include "EngineControl.h"
 #include "Globals.h"
 
@@ -41,8 +40,7 @@ namespace Element {
         seqNode = nullptr;
     }
 
-    GraphController*
-    EngineControl::createSequenceController()
+    GraphController* EngineControl::createSequenceController()
     {
 #if 0
         // not supported. saved for reference.

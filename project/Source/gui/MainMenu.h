@@ -39,11 +39,13 @@ public:
     void setupMenu()
     {
       #if JUCE_MAC
+#if 0
         macMenu = new PopupMenu();
         macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
         macMenu->addSeparator();
         macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
+#endif
        #else
         owner.setMenuBar (this);
        #endif
@@ -77,13 +79,14 @@ public:
 
     void menuItemSelected (int index, int menu) override
     {
+#if 0
         if (index == 999)
             owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
+#endif
     }
     
-    
     // Command Target
-    ApplicationCommandTarget* getNextCommandTarget() override { return &owner.app(); }
+    ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; /* &owner.app(); */ }
     void getAllCommands (Array <CommandID>&) override { }
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
     bool perform (const InvocationInfo& info) override { return false; }
@@ -94,6 +97,7 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
+#if 0
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
         menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
@@ -107,10 +111,12 @@ private:
         menu.addSeparator();
         menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
        #endif
+#endif
     }
     
     void buildEditMenu (PopupMenu& menu)
     {
+#if 0
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, StandardApplicationCommandIDs::undo, "Undo");
         menu.addCommandItem (acm, StandardApplicationCommandIDs::redo, "Redo");
@@ -120,23 +126,24 @@ private:
         menu.addCommandItem (acm, StandardApplicationCommandIDs::paste, "Paste");
         menu.addSeparator();
         menu.addCommandItem (acm, StandardApplicationCommandIDs::selectAll, "Select All");
+#endif
     }
     
     void buildViewMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&owner.app().commander(), Commands::showLegacyView, "Legacy View");
+        // menu.addCommandItem (&owner.app().commander(), Commands::showLegacyView, "Legacy View");
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
-        menu.addItem (999, "Plugin Manager", true, isOpen);
+        // const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
+        // menu.addItem (999, "Plugin Manager", true, isOpen);
     }
     
     void buildHelpMenu (PopupMenu& menu)
     {
 #if ! JUCE_MAC
-        menu.addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
+       // menu.addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
 #endif
         // menu.addItem (111, "Do it", true, true);
     }

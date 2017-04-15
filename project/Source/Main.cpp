@@ -3,22 +3,15 @@
     Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
+
 #include "controllers/AppController.h"
-#include "engine/AudioEngine.h"
-#include "engine/InternalFormat.h"
-#include "gui/Alerts.h"
-#include "gui/GuiApp.h"
-#include "gui/PluginWindow.h"
-#include "session/DeviceManager.h"
-#include "session/PluginManager.h"
-#include "session/Session.h"
+#include "Commands.h"
 #include "Globals.h"
-#include "Settings.h"
 
 namespace Element {
 
-class StartupThread :  public Thread
+class StartupThread : public Thread
 {
 public:
     StartupThread (Globals& w)
@@ -30,6 +23,7 @@ public:
 
     void run() override
     {
+#if 0
         Settings& settings (world.settings());
         if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
              world.devices().initialise (16, 16, dxml.get(), true, "default", nullptr);
@@ -47,6 +41,7 @@ public:
 
         world.loadModule ("test");
         controller = new AppController (world);
+#endif
     }
 
     void launchApplication (const bool useThread = false)
@@ -125,6 +120,7 @@ public:
     
     void shutdown() override
     {
+#if 0
         if (gui != nullptr) {
             PluginWindow::closeAllCurrentlyOpenWindows();
             gui = nullptr;
@@ -132,7 +128,6 @@ public:
 
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
-        plugins.saveUserPlugins (settings);
 
         if (ScopedXml el = world->devices().createStateXml())
             settings.getUserSettings()->setValue ("devices", el);
@@ -140,22 +135,21 @@ public:
         engine->deactivate();
         world->setEngine (nullptr);
         engine = nullptr;
-
+#endif
+        controller = nullptr;
         world->unloadModules();
         world = nullptr;
     }
 
     void systemRequestedQuit() override
     {
-        if (gui->shutdownApp())
-        {
-/*            PluginWindow::closeAllCurrentlyOpenWindows();
-            gui = nullptr; */
-            this->quit();
-        }
+        Application::quit();
     }
 
-    void anotherInstanceStarted (const String& /*commandLine*/) override { }
+    void anotherInstanceStarted (const String& /*commandLine*/) override
+    {
+    
+    }
 
     bool perform (const InvocationInfo& info) override
     {
@@ -169,23 +163,16 @@ public:
     }
 
 private:
-    ScopedPointer<Globals>  world;
-    AudioEnginePtr          engine;
-    ScopedPointer<GuiApp>   gui;
+    ScopedPointer<Globals>       world;
     ScopedPointer<AppController> controller;
     
     void launchApplication()
     {
-        if (nullptr != gui)
+        if (nullptr != controller)
             return;
         
-        StartupThread startup (*world);
-        startup.launchApplication();
-        controller = startup.controller.release();
-        engine = world->engine();
-        
-        gui = GuiApp::create (*world);
-        gui->run();
+        controller = new AppController (*world);
+        controller->run();
     }
     
     void initializeModulePath()

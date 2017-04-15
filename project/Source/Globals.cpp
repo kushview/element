@@ -112,7 +112,7 @@ PluginManager& Globals::plugins()
 
 Settings& Globals::settings()
 {
-    assert (impl->settings != nullptr);
+    jassert (impl->settings != nullptr);
     return *impl->settings;
 }
 

@@ -141,6 +141,8 @@
         <FILE id="UYQNVW" name="IconButton.h" compile="0" resource="0" file="Source/gui/IconButton.h"/>
         <FILE id="qOKTw2" name="Icons.cpp" compile="1" resource="0" file="Source/gui/Icons.cpp"/>
         <FILE id="ksQT0O" name="Icons.h" compile="0" resource="0" file="Source/gui/Icons.h"/>
+        <FILE id="Twc6WL" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/gui/LookAndFeel.cpp"/>
+        <FILE id="ysuQQn" name="LookAndFeel.h" compile="0" resource="0" file="Source/gui/LookAndFeel.h"/>
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
@@ -254,6 +256,7 @@
       <FILE id="qVj5DJ" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
       <FILE id="IVf5gW" name="CommandManager.h" compile="0" resource="0"
             file="Source/CommandManager.h"/>
+      <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="Source/ElementApp.h"/>
       <FILE id="Zs6mUU" name="EngineControl.cpp" compile="1" resource="0"
             file="Source/EngineControl.cpp"/>
       <FILE id="FLLIFn" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
@@ -312,7 +315,7 @@
       </MODULEPATHS>
     </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
-               extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID="K7JD899TJ4">
+               extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../Source&#10;"

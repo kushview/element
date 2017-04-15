@@ -16,11 +16,11 @@ GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcep
     jassert (proc != nullptr);
 }
 
-void GraphNode::setInputGain(const float f) {
+void GraphNode::setInputGain (const float f) {
     inputGain.set(f);
 }
 
-void GraphNode::setGain(const float f) {
+void GraphNode::setGain (const float f) {
     gain.set(f);
 }
 
