@@ -136,6 +136,8 @@ Session& Globals::session()
 
 void Globals::setEngine (EnginePtr engine)
 {
+    if (impl->engine)
+        impl->engine->deactivate();
     impl->engine = engine;
     if (impl->session == nullptr) {
         impl->session = new Session (*this);

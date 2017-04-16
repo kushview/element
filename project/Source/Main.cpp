@@ -6,53 +6,30 @@
 #include "ElementApp.h"
 
 #include "controllers/AppController.h"
+#include "engine/InternalFormat.h"
+#include "session/DeviceManager.h"
+#include "PluginManager.h"
 #include "Commands.h"
+
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
 
-class StartupThread : public Thread
+class Startup : private Thread
 {
 public:
-    StartupThread (Globals& w)
-        : Thread ("element_startup"),
-          world (w)
+    Startup (Globals& w, const bool useThread = false, const bool splash = false)
+        : Thread ("ElementStartup"),
+          world (w), usingThread (useThread),
+          showSplash (splash)
     { }
 
-    ~StartupThread() { }
+    ~Startup() { }
 
-    void run() override
+    void launchApplication()
     {
-#if 0
-        Settings& settings (world.settings());
-        if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
-             world.devices().initialise (16, 16, dxml.get(), true, "default", nullptr);
-
-        AudioEnginePtr engine = new AudioEngine (world);
-        world.setEngine (engine); // this will also instantiate the session
-
-        // global data is ready, so now we can start using it;
-        PluginManager& plugins (world.plugins());
-        plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine));
-        plugins.restoreUserPlugins (settings);
-
-        engine->activate();
-
-        world.loadModule ("test");
-        controller = new AppController (world);
-#endif
-    }
-
-    void launchApplication (const bool useThread = false)
-    {
-        if (world.cli.fullScreen)
-        {
-            Desktop::getInstance().setKioskModeComponent (&screen, false);
-            screen.setVisible (true);
-        }
-        
-        if (useThread)
+        if (usingThread)
         {
             startThread();
             while (isThreadRunning())
@@ -60,47 +37,78 @@ public:
         }
         else
         {
+            if (showSplash)
+                (new StartupScreen())->deleteAfterDelay (RelativeTime::seconds(5), true);
             this->run();
         }
-
-        if (screen.isOnDesktop())
-            screen.removeFromDesktop();
     }
 
     ScopedPointer<AppController> controller;
+    
+    const bool isUsingThread() const { return usingThread; }
 
 private:
-    class StartupScreen :  public TopLevelWindow
+    Globals& world;
+    const bool usingThread;
+    const bool showSplash;
+    
+    class StartupScreen :  public SplashScreen
     {
     public:
         StartupScreen()
-            : TopLevelWindow ("startup", true)
+            : SplashScreen ("Element", 600, 400, true)
         {
+            addAndMakeVisible (text);
             text.setText ("Loading Application", dontSendNotification);
-            text.setSize (100, 100);
+            text.setSize (600, 400);
             text.setFont (Font (24.0f));
             text.setJustificationType (Justification::centred);
             text.setColour (Label::textColourId, Colours::white);
-            addAndMakeVisible (text);
-            centreWithSize (text.getWidth(), text.getHeight());
         }
 
         void resized() override {
+            SplashScreen::resized();
             text.setBounds (getLocalBounds());
         }
 
         void paint (Graphics& g) override {
-            g.fillAll (Colours::transparentBlack);
+            SplashScreen::paint (g);
+            g.fillAll (Colours::aliceblue);
         }
 
     private:
         Label text;
-    } screen;
+    };
 
-    Globals& world;
+    void run() override
+    {
+        Settings& settings (world.settings());
+        DeviceManager& devices (world.devices());
+        PluginManager& plugins (world.plugins());
+        
+        if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
+            devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
+            
+        AudioEnginePtr engine = new AudioEngine (world);
+        world.setEngine (engine); // this will also instantiate the session
+        
+        // global data is ready, so now we can start using it;
+        
+        plugins.addDefaultFormats();
+        plugins.addFormat (new InternalFormat (*engine));
+        plugins.restoreUserPlugins (settings);
+        
+        world.loadModule ("test");
+        controller = new AppController (world);
+        
+        if (usingThread)
+        {
+            // post a message to finish launching
+        }
+    }
 };
 
-class Application  : public JUCEApplication
+class Application : public JUCEApplication
 {
 public:
     Application() { }
@@ -117,7 +125,6 @@ public:
         launchApplication();
     }
 
-    
     void shutdown() override
     {
 #if 0
@@ -132,11 +139,11 @@ public:
         if (ScopedXml el = world->devices().createStateXml())
             settings.getUserSettings()->setValue ("devices", el);
 
-        engine->deactivate();
         world->setEngine (nullptr);
         engine = nullptr;
 #endif
         controller = nullptr;
+        world->setEngine (nullptr);
         world->unloadModules();
         world = nullptr;
     }
@@ -162,17 +169,30 @@ public:
         return true;
     }
 
+    void finishLaunching()
+    {
+        if (nullptr != controller || nullptr == startup)
+            return;
+        
+        controller = startup->controller.release();
+        startup = nullptr;
+        controller->run();
+    }
+    
 private:
     ScopedPointer<Globals>       world;
     ScopedPointer<AppController> controller;
+    ScopedPointer<Startup> startup;
     
     void launchApplication()
     {
         if (nullptr != controller)
             return;
         
-        controller = new AppController (*world);
-        controller->run();
+        startup = new Startup (*world, false, false);
+        startup->launchApplication();
+        if (! startup->isUsingThread())
+            finishLaunching();
     }
     
     void initializeModulePath()
