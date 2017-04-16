@@ -21,13 +21,14 @@ class Session;
 class Settings;
 class Writer;
 
-struct CommandLine {
+struct CommandLine
+{
     explicit CommandLine (const String& cli = String::empty);
     bool fullScreen;
     int port;
 };
 
-class Globals :  public WorldBase
+class Globals : public WorldBase
 {
 public:
     explicit Globals (const String& commandLine = String::empty);
@@ -36,7 +37,8 @@ public:
     const CommandLine cli;
 
     CommandManager& getCommands();
-    DeviceManager& devices();
+    DeviceManager& getDeviceManager();
+
     PluginManager& plugins();
     Settings& settings();
     SymbolMap& symbols();
@@ -46,6 +48,8 @@ public:
 
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
+
+    JUCE_DEPRECATED(DeviceManager& devices());
 
 private:
     String appName;

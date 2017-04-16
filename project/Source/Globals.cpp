@@ -90,12 +90,14 @@ Globals::~Globals()
 
 CommandManager& Globals::getCommands() { assert(impl->commands); return *impl->commands; }
 
-DeviceManager& Globals::devices()
+DeviceManager& Globals::getDeviceManager()
 {
     assert (impl->devices != nullptr);
     return *impl->devices;
 }
-
+    
+DeviceManager& Globals::devices() { return getDeviceManager(); }
+    
 MediaManager& Globals::media()
 {
     assert (impl->media != nullptr);
@@ -143,7 +145,7 @@ void Globals::setEngine (EnginePtr engine)
         impl->session = new Session (*this);
     }
 
-    devices().attach (engine);
+    getDeviceManager().attach (engine);
 }
 
 }

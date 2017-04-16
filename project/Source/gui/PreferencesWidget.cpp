@@ -110,7 +110,7 @@ namespace Element {
     {
     public:
         AudioSettingsComponent (GuiApp& gui)
-            : DevicesComponent (gui.globals().devices(), 2, 2, 2, 2,
+            : DevicesComponent (gui.globals().getDeviceManager(), 2, 2, 2, 2,
                                 true, true, true, false)
         {
             setSize (300, 400);

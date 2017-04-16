@@ -83,7 +83,7 @@ private:
     void run() override
     {
         Settings& settings (world.settings());
-        DeviceManager& devices (world.devices());
+        DeviceManager& devices (world.getDeviceManager());
         PluginManager& plugins (world.plugins());
         
         if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
