@@ -1,17 +1,17 @@
 /*
   ==============================================================================
 
-  This is an automatically generated GUI class created by the Introjucer!
+  This is an automatically generated GUI class created by the Projucer!
 
   Be careful when adding custom code to these files, as only the code within
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Introjucer version: 4.1.0
+  Created with Projucer version: 4.3.1
 
   ------------------------------------------------------------------------------
 
-  The Introjucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
   Copyright (c) 2015 - ROLI Ltd.
 
   ==============================================================================
@@ -131,14 +131,15 @@ PreferencesWidget::PreferencesWidget (GuiApp& gui_)
 
     addAndMakeVisible (groupComponent = new GroupComponent ("new group",
                                                             TRANS("group")));
-    groupComponent->setColour (GroupComponent::outlineColourId, Colour (0x66666666));
-    groupComponent->setColour (GroupComponent::textColourId, Colour (0xffeeeeee));
+    groupComponent->setColour (GroupComponent::outlineColourId, Colour (0xff888888));
+    groupComponent->setColour (GroupComponent::textColourId, Colours::white);
 
     addAndMakeVisible (pageComponent = new Component());
     pageComponent->setName ("new component");
 
 
     //[UserPreSize]
+    groupComponent->setVisible (false);
     //[/UserPreSize]
 
     setSize (600, 500);
@@ -172,6 +173,8 @@ void PreferencesWidget::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
+
+    g.fillAll (Colour (0xff3b3b3b));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -228,9 +231,9 @@ void PreferencesWidget::setPage (const String& uri)
 
 //==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
@@ -240,13 +243,13 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="gui (gui_)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">
-  <BACKGROUND backgroundColour="ffffff"/>
+  <BACKGROUND backgroundColour="ff3b3b3b"/>
   <GENERICCOMPONENT name="Page List" id="c2205f1e30617b7c" memberName="pageList"
                     virtualName="" explicitFocusOrder="0" pos="8 8 184 480" class="PageList"
                     params="*this"/>
   <GROUPCOMPONENT name="new group" id="8e138086820b2998" memberName="groupComponent"
-                  virtualName="" explicitFocusOrder="0" pos="200 8 392 480" outlinecol="66666666"
-                  textcol="ffeeeeee" title="group"/>
+                  virtualName="" explicitFocusOrder="0" pos="200 8 392 480" outlinecol="ff888888"
+                  textcol="ffffffff" title="group"/>
   <GENERICCOMPONENT name="new component" id="8b11ff6707734770" memberName="pageComponent"
                     virtualName="" explicitFocusOrder="0" pos="208 32 376 448" class="Component"
                     params=""/>

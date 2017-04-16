@@ -18,16 +18,34 @@
 */
 
 #include "gui/LookAndFeel.h"
+#include "gui/ConnectionGrid.h"
 #include "gui/ContentComponent.h"
 
 namespace Element {
 
+    class NavigationPanel : public ConcertinaPanel {
+    public:
+        NavigationPanel() {
+            updateContent();
+        }
+        
+        void updateContent()
+        {
+            addPanel (0, new Component(), true);
+            addPanel (0, new Component(), true);
+            addPanel (0, new Component(), true);
+            addPanel (0, new Component(), true);
+            addPanel (0, new Component(), true);
+            addPanel (0, new Component(), true);
+        }
+    };
+    
 class ContentContainer : public Component
 {
 public:
     ContentContainer (GuiApp& gui)
     {
-        addAndMakeVisible (dummy1);
+        addAndMakeVisible (dummy1 = new ConnectionGrid());
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
         addAndMakeVisible (dummy2 = new Component());
         updateLayout();
@@ -55,8 +73,8 @@ private:
     void updateLayout()
     {
         layout.setItemLayout (0, 200, -1.0, 200);
-        layout.setItemLayout (1, 4, 4, 4);
-        layout.setItemLayout (2, 60, -1.0, 500);
+        layout.setItemLayout (1, 0, 0, 0);
+        layout.setItemLayout (2, 0, -1.0, 0);
     }
 };
 
@@ -65,7 +83,7 @@ ContentComponent::ContentComponent (GuiApp& app_)
 {
     setOpaque (true);
     
-    addAndMakeVisible (nav = new Component());
+    addAndMakeVisible (nav = new NavigationPanel());
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (app_));
     
@@ -109,9 +127,9 @@ void ContentComponent::stabilize() { }
 
 void ContentComponent::updateLayout()
 {
-    layout.setItemLayout (0, 60, 400, 200);
+    layout.setItemLayout (0, 220, 220, 220);
     layout.setItemLayout (1, 4, 4, 4);
-    layout.setItemLayout (2, 0, -1.0, 500);
+    layout.setItemLayout (2, 300, -1, 400);
 }
 
 }
