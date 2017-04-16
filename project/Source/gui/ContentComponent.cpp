@@ -1,20 +1,6 @@
 /*
     ContentComponent.cpp - This file is part of Element
-    Copyright (C) 2015  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (C) 2015-2017  Kushview, LLC.  All rights reserved.
 */
 
 #include "gui/LookAndFeel.h"
@@ -23,22 +9,93 @@
 
 namespace Element {
 
-    class NavigationPanel : public ConcertinaPanel {
-    public:
-        NavigationPanel() {
-            updateContent();
-        }
-        
-        void updateContent()
+class NavigationConcertinaPanel : public ConcertinaPanel {
+public:
+    NavigationConcertinaPanel()
+        : headerHeight (30),
+          defaultPanelHeight (80)
+    {
+        setLookAndFeel (&lookAndFeel);
+        updateContent();
+    }
+    
+    ~NavigationConcertinaPanel()
+    {
+        setLookAndFeel (nullptr);
+    }
+    
+    void clearPanels()
+    {
+        Array<Component*> comps;
+        for (int i = 0; i < getNumPanels(); ++i)
+            comps.add (getPanel (i));
+        for (int i = 0; i < comps.size(); ++i)
         {
-            addPanel (0, new Component(), true);
-            addPanel (0, new Component(), true);
-            addPanel (0, new Component(), true);
-            addPanel (0, new Component(), true);
-            addPanel (0, new Component(), true);
-            addPanel (0, new Component(), true);
+            removePanel (comps[i]);
+            this->removePanel(0);
         }
-    };
+        names.clear();
+        comps.clear();
+    }
+    
+    void updateContent()
+    {
+        clearPanels();
+        
+        names.add ("Audio");
+        names.add ("MIDI");
+        names.add ("Presets");
+
+        for (int i = 0; i < names.size(); ++i)
+        {
+            auto* c = new Component (names [i]);
+            c->setSize (getWidth(), 160);
+            addPanel (1, c, true);
+            setPanelHeaderSize (c, headerHeight);
+            setPanelSize (c, defaultPanelHeight, false);
+        }
+    }
+    
+    const StringArray& getNames() const { return names; }
+    const int getHeaderHeight() const { return headerHeight; }
+    void setHeaderHeight (const int newHeight)
+    {
+        jassert (newHeight > 0);
+        headerHeight = newHeight;
+        updateContent();
+    }
+    
+private:
+    typedef Element::LookAndFeel ELF;
+    
+    StringArray names;
+    int headerHeight;
+    int defaultPanelHeight;
+    
+    class LookAndFeel : public Element::LookAndFeel
+    {
+    public:
+        LookAndFeel() { }
+        ~LookAndFeel() { }
+        
+        void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
+                                        bool isMouseOver, bool isMouseDown,
+                                        ConcertinaPanel& panel, Component& comp)
+        {
+            auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
+            int i = p->getNumPanels();
+            while (--i >= 0) {
+                if (p->getPanel(i) == &comp)
+                    break;
+            }
+            ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
+            g.setColour (Colours::white);
+            Rectangle<int> r (area.withTrimmedLeft (20));
+            g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
+                        Justification::centredLeft);
+        }
+    } lookAndFeel;
+};
     
 class ContentContainer : public Component
 {
@@ -83,7 +140,7 @@ ContentComponent::ContentComponent (GuiApp& app_)
 {
     setOpaque (true);
     
-    addAndMakeVisible (nav = new NavigationPanel());
+    addAndMakeVisible (nav = new NavigationConcertinaPanel());
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (app_));
     

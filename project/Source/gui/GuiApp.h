@@ -8,6 +8,7 @@
 
 #include "element/Juce.h"
 #include "session/Session.h"
+#include "gui/LookAndFeel.h"
 #include "gui/Preferences.h"
 #include "gui/WindowManager.h"
 #include "CommandManager.h"
@@ -87,7 +88,7 @@ namespace Element {
         Scoped<ContentComponent>  content;
         Scoped<AboutComponent>    about;
 
-        LookAndFeel_E1            lookAndFeel;
+        Element::LookAndFeel      lookAndFeel;
 
         class Dispatch;
         ScopedPointer<Dispatch>   dispatch;

@@ -11,6 +11,10 @@ class LookAndFeel : public LookAndFeel_E1
 public:
     LookAndFeel() { }
     ~LookAndFeel() { }
+    
+    virtual void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
+                                            bool isMouseOver, bool isMouseDown,
+                                            ConcertinaPanel&, Component&);
 };
 
 }
