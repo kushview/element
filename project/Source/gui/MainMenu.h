@@ -20,8 +20,10 @@
 #ifndef ELEMENT_MAIN_MENU_H
 #define ELEMENT_MAIN_MENU_H
 
-#include "URIs.h"
 #include "gui/MainWindow.h"
+#include "Commands.h"
+#include "CommandManager.h"
+#include "URIs.h"
 
 namespace Element {
 
@@ -33,19 +35,17 @@ public:
         File, Window, Help, NumMenus
     };
 
-    MainMenu (MainWindow& parent)
-        : owner (parent) { }
+    MainMenu (MainWindow& parent, CommandManager& c)
+        : owner (parent), cmd(c) { }
 
     void setupMenu()
     {
       #if JUCE_MAC
-#if 0
         macMenu = new PopupMenu();
-        macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
+        macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
         macMenu->addSeparator();
-        macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
+        macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
-#endif
        #else
         owner.setMenuBar (this);
        #endif
@@ -97,6 +97,11 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
+       #if ! JUCE_MAC
+        menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
+       #endif
 #if 0
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
@@ -106,11 +111,7 @@ private:
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
         
-       #if ! JUCE_MAC
-        menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
-        menu.addSeparator();
-        menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
-       #endif
+
 #endif
     }
     
@@ -147,6 +148,9 @@ private:
 #endif
         // menu.addItem (111, "Do it", true, true);
     }
+    
+private:
+    CommandManager& cmd;
 };
 
 }

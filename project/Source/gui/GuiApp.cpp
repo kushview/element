@@ -91,6 +91,7 @@ GuiApp::GuiApp (Globals& w)
     dispatch = new Dispatch (*this);
     LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     windowManager = new WindowManager (*this);
+    commander().registerAllCommandsForTarget (this);
 }
 
 GuiApp::~GuiApp()
@@ -185,7 +186,7 @@ void GuiApp::run()
 {
     content = new ContentComponent (*this);
     content->setSize (800, 600);
-    mainWindow = new MainWindow();
+    mainWindow = new MainWindow (commander());
     mainWindow->setContentNonOwned (content.get(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
 
@@ -327,7 +328,6 @@ void GuiApp::getAllCommands (Array <CommandID>& commands)
 
 void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
-
     if (Commands::devicePadPress <= commandID && (Commands::devicePadPress + 13) > commandID)
     {
         result.setInfo (("Pad Press"), "Triggers sounds.", "Beat Thang Hardware", ApplicationCommandInfo::dontTriggerVisualFeedback);

@@ -24,22 +24,20 @@
 
 namespace Element {
 
+class CommandManager;
 class MainMenu;
 
 class MainWindow : public DocumentWindow
 {
 public:
-    MainWindow();
+    MainWindow (CommandManager&);
     virtual ~MainWindow();
-
     void closeButtonPressed();
-    
     void refreshMenu();
 
 private:
     ScopedPointer<MainMenu> mainMenu;
 };
-
 
 }
 

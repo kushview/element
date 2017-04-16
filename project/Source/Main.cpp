@@ -158,17 +158,6 @@ public:
     
     }
 
-    bool perform (const InvocationInfo& info) override
-    {
-        switch (info.commandID) {
-            case Commands::quit: {
-                this->systemRequestedQuit();
-            } break;
-        }
-
-        return true;
-    }
-
     void finishLaunching()
     {
         if (nullptr != controller || nullptr == startup)
@@ -182,7 +171,7 @@ public:
 private:
     ScopedPointer<Globals>       world;
     ScopedPointer<AppController> controller;
-    ScopedPointer<Startup> startup;
+    ScopedPointer<Startup>       startup;
     
     void launchApplication()
     {

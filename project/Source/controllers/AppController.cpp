@@ -10,8 +10,11 @@ AppController::AppController (Globals& g)
     : world (g)
 {
     gui = GuiApp::create (g);
+    
     addChild (new EngineController());
+    
     g.getCommands().registerAllCommandsForTarget (this);
+    g.getCommands().setFirstCommandTarget (this);
 }
 
 AppController::~AppController() { }
@@ -23,19 +26,11 @@ void AppController::run()
     
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
-    return nullptr;
+    return gui.get();
 }
 
-void AppController::getAllCommands (Array<CommandID>&)
-{
-
-}
-
-void AppController::getCommandInfo (CommandID, ApplicationCommandInfo&)
-{
-
-}
-
+void AppController::getAllCommands (Array<CommandID>&) { }
+void AppController::getCommandInfo (CommandID, ApplicationCommandInfo&) { }
 bool AppController::perform (const InvocationInfo&)
 {
     return false;
