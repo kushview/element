@@ -3,8 +3,10 @@
     Copyright (C) 2015-2017  Kushview, LLC.  All rights reserved.
 */
 
-#include "gui/LookAndFeel.h"
+#include "gui/AudioIOPanelView.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/LookAndFeel.h"
+
 #include "gui/ContentComponent.h"
 
 namespace Element {
@@ -48,7 +50,8 @@ public:
 
         for (int i = 0; i < names.size(); ++i)
         {
-            auto* c = new Component (names [i]);
+            auto* c = i > 0 ? new Component (names [i])
+                            : new AudioIOPanelView();
             c->setSize (getWidth(), 160);
             addPanel (1, c, true);
             setPanelHeaderSize (c, headerHeight);

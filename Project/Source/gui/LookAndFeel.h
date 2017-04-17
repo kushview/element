@@ -6,6 +6,14 @@
 
 namespace Element {
 
+struct Colors
+{
+    static const Colour elemental;
+    static const Colour toggleBlue;
+    static const Colour toggleGreen;
+    static const Colour toggleOrange;
+};
+
 class LookAndFeel : public LookAndFeel_E1
 {
 public:
