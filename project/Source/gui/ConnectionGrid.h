@@ -19,11 +19,19 @@ public:
     void resized() override;
     
 private:
+    friend class PatchMatrix;
     class PatchMatrix; PatchMatrix* matrix;
+    
+    friend class Controls;
     class Controls; Controls* controls;
+    
+    friend class Sources;
     class Sources; Sources* sources;
+    
+    friend class Destinations;
     class Destinations; Destinations* destinations;
-    class ViewPort; ViewPort* view; // not used
+    
+    friend class Quads;
     class Quads; ScopedPointer<QuadrantLayout> quads;
 };
 

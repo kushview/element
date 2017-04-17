@@ -48,17 +48,6 @@ namespace Element {
         MatrixState matrix;
     };
     
-    class ConnectionGrid::ViewPort : public Viewport
-    {
-    public:
-        ViewPort()
-        {
-            setScrollBarsShown (false, false, true, true);
-        }
-        
-        ~ViewPort() { }
-    };
-    
     class ConnectionGrid::Sources : public ListBox,
                                     public ListBoxModel
     {
@@ -168,14 +157,11 @@ namespace Element {
     
     ConnectionGrid::ConnectionGrid()
     {
-        view = nullptr;
-        
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());
         quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
         quads->setQuadrantComponent (Quads::Q3, controls = new Controls());
         quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
-        
         resized();
     }
     
@@ -185,7 +171,6 @@ namespace Element {
         sources = nullptr;
         controls = nullptr;
         destinations = nullptr;
-        view = nullptr;
         quads = nullptr;
     }
     
