@@ -142,6 +142,10 @@
         <FILE id="VY02a4" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
         <FILE id="oKKgS7" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="cPWpB0" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
+        <FILE id="VrN10k" name="HorizontalListBox.cpp" compile="1" resource="0"
+              file="Source/gui/HorizontalListBox.cpp"/>
+        <FILE id="b3pdvd" name="HorizontalListBox.h" compile="0" resource="0"
+              file="Source/gui/HorizontalListBox.h"/>
         <FILE id="UYQNVW" name="IconButton.h" compile="0" resource="0" file="Source/gui/IconButton.h"/>
         <FILE id="qOKTw2" name="Icons.cpp" compile="1" resource="0" file="Source/gui/Icons.cpp"/>
         <FILE id="ksQT0O" name="Icons.h" compile="0" resource="0" file="Source/gui/Icons.h"/>

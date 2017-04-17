@@ -8,7 +8,8 @@ namespace Element {
 namespace ViewHelpers {
 
 void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding = 10);
-
+void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool selected);
+    
 }
 }
 
