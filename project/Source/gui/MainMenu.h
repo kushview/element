@@ -18,7 +18,7 @@ class MainMenu : public MenuBarModel,
 {
 public:
     enum RootNames {
-        File, Window, Help, NumMenus
+        File, Edit, Window, Help, NumMenus
     };
 
     MainMenu (MainWindow& parent, CommandManager& c)
@@ -96,15 +96,12 @@ private:
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-        
-
 #endif
     }
     
     void buildEditMenu (PopupMenu& menu)
     {
-#if 0
-        ApplicationCommandManager* acm = &owner.app().commander();
+        ApplicationCommandManager* acm = &cmd;
         menu.addCommandItem (acm, StandardApplicationCommandIDs::undo, "Undo");
         menu.addCommandItem (acm, StandardApplicationCommandIDs::redo, "Redo");
         menu.addSeparator();
@@ -113,26 +110,23 @@ private:
         menu.addCommandItem (acm, StandardApplicationCommandIDs::paste, "Paste");
         menu.addSeparator();
         menu.addCommandItem (acm, StandardApplicationCommandIDs::selectAll, "Select All");
-#endif
     }
     
     void buildViewMenu (PopupMenu& menu)
     {
-        // menu.addCommandItem (&owner.app().commander(), Commands::showLegacyView, "Legacy View");
+
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        // const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
         menu.addCommandItem (&cmd, Commands::showPluginManager);
     }
     
     void buildHelpMenu (PopupMenu& menu)
     {
-#if ! JUCE_MAC
-       // menu.addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
-#endif
-        // menu.addItem (111, "Do it", true, true);
+       #if ! JUCE_MAC
+        menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
+       #endif
     }
     
 private:
