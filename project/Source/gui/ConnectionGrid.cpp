@@ -67,13 +67,11 @@ namespace Element {
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                        bool rowIsSelected) override
         {
-            if (rowIsSelected) {
-                g.setColour (Colours::black);
-                g.fillRect (0, 0, width, height - 1);
-            }
-            g.setColour (Colours::white);
+            g.setColour (LookAndFeel_E1::widgetBackgroundColor);
+            g.fillRect (0, 0, width - 1, height - 1);
             
-            g.drawText ("Hello There " + String(rowNumber), 0, 0, width, height, Justification::centredLeft);
+            g.setColour (Colours::white);
+            g.drawText ("Hello There " + String(rowNumber), 0, 0, width - 1, height - 1, Justification::centredLeft);
         }
         
         void listWasScrolled() override
@@ -172,6 +170,11 @@ namespace Element {
         controls = nullptr;
         destinations = nullptr;
         quads = nullptr;
+    }
+    
+    void ConnectionGrid::paint (Graphics& g)
+    {
+        g.fillAll (LookAndFeel_E1::contentBackgroundColor);
     }
     
     void ConnectionGrid::resized()
