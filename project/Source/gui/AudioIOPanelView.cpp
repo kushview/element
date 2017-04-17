@@ -1,20 +1,6 @@
 /*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 4.3.1
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
-
-  ==============================================================================
+    AudioIOPanelView.cpp - This file is part of Element
+    Copyright (C) 2017 Kushview, LLC.  All rights reserved.
 */
 
 //[Headers] You can add your own extra header files here...
@@ -23,15 +9,15 @@
 #include "AudioIOPanelView.h"
 
 
+namespace Element {
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
 AudioIOPanelView::AudioIOPanelView ()
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
+    setName ("audioIOPanelView");
     addAndMakeVisible (inputGainDial = new Slider ("inputGainDial"));
     inputGainDial->setRange (0, 10, 0);
     inputGainDial->setSliderStyle (Slider::RotaryVerticalDrag);
@@ -167,17 +153,18 @@ void AudioIOPanelView::sliderValueChanged (Slider* sliderThatWasMoved)
 
 //==============================================================================
 #if 0
-/*  -- Projucer information section --
+/*  -- Introjucer information section --
 
-    This is where the Projucer stores the metadata that describe this GUI layout, so
+    This is where the Introjucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="AudioIOPanelView" componentName=""
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="16" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="220" initialHeight="100">
+<JUCER_COMPONENT documentType="Component" className="AudioIOPanelView" template="../../Templates/ElementTemplate.cpp"
+                 componentName="audioIOPanelView" parentClasses="public Component"
+                 constructorParams="" variableInitialisers="" snapPixels="16"
+                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
+                 initialWidth="220" initialHeight="100">
   <BACKGROUND backgroundColour="ff3b3b3b"/>
   <SLIDER name="inputGainDial" id="ad10f98d10a1ba0f" memberName="inputGainDial"
           virtualName="" explicitFocusOrder="0" pos="7 4 48 48" rotarysliderfill="ff4ed23f"
@@ -219,3 +206,5 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
+} /* namespace Element */

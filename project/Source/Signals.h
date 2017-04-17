@@ -21,4 +21,3 @@ typedef boost::signals2::signal<void(const String&)> StringSignal;
 }
 
 #endif
-
