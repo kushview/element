@@ -44,24 +44,21 @@ namespace Element {
 
 
     Window::Window (const String& name, GuiApp& app_)
-        : DocumentWindow (name, Colours::darkgrey,
-                                DocumentWindow::closeButton |
-                                DocumentWindow::minimiseButton,
-                                true),
+        : DocumentWindow (name, LookAndFeel_E1::widgetBackgroundColor,
+                          DocumentWindow::closeButton | DocumentWindow::minimiseButton, true),
           gui (app_)
     {
-#if JUCE_IOS
+       #if JUCE_IOS
         setUsingNativeTitleBar (false);
-#else
+       #else
         setUsingNativeTitleBar (true);
-#endif
+       #endif
         setResizable (true, false);
     }
 
     Window::~Window() {}
 
-    void
-    Window::closeButtonPressed()
+    void Window::closeButtonPressed()
     {
         closedSignal();
     }

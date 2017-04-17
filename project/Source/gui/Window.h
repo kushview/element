@@ -75,7 +75,7 @@ namespace Element {
 
     /** A juce DocumentWindow that emits a closed signal */
     class Window : public DocumentWindow,
-            public WindowHook
+                   public WindowHook
     {
     public:
         Window (const String& name, GuiApp&);

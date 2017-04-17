@@ -128,7 +128,7 @@ void GuiApp::openWindow (const String& uri)
 {
     if (uri == ELEMENT_PLUGIN_MANAGER) {
         for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;) {
-            if (PluginListWindow* w = dynamic_cast<PluginListWindow*>(DocumentWindow::getTopLevelWindow (i))) {
+            if (PluginListWindow* w = dynamic_cast<PluginListWindow*> (DocumentWindow::getTopLevelWindow (i))) {
                 w->closeButtonPressed();
                 mainWindow->refreshMenu();
                 return;

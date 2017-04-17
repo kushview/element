@@ -18,7 +18,7 @@ class MainMenu : public MenuBarModel,
 {
 public:
     enum RootNames {
-        File, Edit, Window, Help, NumMenus
+        File, Window, Help, NumMenus
     };
 
     MainMenu (MainWindow& parent, CommandManager& c)
