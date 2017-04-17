@@ -1,3 +1,8 @@
+/*
+    Settings.cpp - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+*/
+
 #include "Settings.h"
 
 namespace Element {

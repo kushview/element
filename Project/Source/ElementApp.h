@@ -1,3 +1,7 @@
+/*
+    Signals.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+*/
 
 #ifndef ELEMENT_APP_H
 #define ELEMENT_APP_H

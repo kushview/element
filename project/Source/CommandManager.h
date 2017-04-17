@@ -1,5 +1,10 @@
-#ifndef ELEMENT_COMMAND_MANAGER_H
-#define ELEMENT_COMMAND_MANAGER_H
+/*
+    Signals.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+*/
+
+#ifndef EL_COMMAND_MANAGER_H
+#define EL_COMMAND_MANAGER_H
 
 #include "element/Juce.h"
 
@@ -18,5 +23,4 @@ public:
 
 }
 
-#endif // ELEMENT_COMMAND_MANAGER_H
-
+#endif  /* EL_COMMAND_MANAGER_H */

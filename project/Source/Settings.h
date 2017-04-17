@@ -1,3 +1,8 @@
+/*
+    Settings.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+*/
+
 #ifndef EL_SETTINGS_H
 #define EL_SETTINGS_H
 
