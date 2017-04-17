@@ -24,6 +24,7 @@ public:
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;
+    void mouseDown (const MouseEvent&) override;
     void paint (Graphics &g) override;
     void resized() override;
 

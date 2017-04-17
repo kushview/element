@@ -160,6 +160,11 @@ void ContentComponent::childBoundsChanged (Component* child)
 {
 }
 
+void ContentComponent::mouseDown (const MouseEvent& ev)
+{
+    Component::mouseDown (ev);
+}
+
 void ContentComponent::paint (Graphics &g)
 {
     g.fillAll (LookAndFeel::backgroundColor);

@@ -1,5 +1,4 @@
 
-
 #ifndef EL_CONNECTION_GRID_H
 #define EL_CONNECTION_GRID_H
 
@@ -7,20 +6,18 @@
 
 namespace Element {
     
-    class ConnectionGrid :  public PatchMatrixComponent
+    class ConnectionGrid : public Component
     {
     public:
         ConnectionGrid();
         ~ConnectionGrid();
-        
-        void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override;
-        void paintMatrixCell (Graphics& g, const int width, const int height,
-                              const int row, const int column) override;
-        int getNumColumns() override;
-        int getNumRows() override;
 
+        void resized() override;
+        
     private:
-        MatrixState matrix;
+        class PatchMatrix; PatchMatrix* matrix;
+        class ViewPort; ViewPort* view;
+        class Quads; ScopedPointer<QuadrantLayout> quads;
     };
 }
 
