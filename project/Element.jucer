@@ -234,6 +234,9 @@
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
         <FILE id="L3dN2b" name="GraphModel.cpp" compile="1" resource="0" file="Source/session/GraphModel.cpp"/>
         <FILE id="vWMbjH" name="GraphModel.h" compile="0" resource="0" file="Source/session/GraphModel.h"/>
+        <FILE id="EePoMm" name="MediaManager.cpp" compile="1" resource="0"
+              file="Source/session/MediaManager.cpp"/>
+        <FILE id="iPEraJ" name="MediaManager.h" compile="0" resource="0" file="Source/session/MediaManager.h"/>
         <FILE id="M2406w" name="MediaModel.h" compile="0" resource="0" file="Source/session/MediaModel.h"/>
         <FILE id="M0yKZu" name="MediaStorage.h" compile="0" resource="0" file="Source/session/MediaStorage.h"/>
         <FILE id="Z8fHex" name="MidiClip.cpp" compile="1" resource="0" file="Source/session/MidiClip.cpp"/>
@@ -271,9 +274,6 @@
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
       <FILE id="dEn8dF" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="k33Zf2" name="MediaManager.cpp" compile="1" resource="0"
-            file="Source/MediaManager.cpp"/>
-      <FILE id="dEMrlS" name="MediaManager.h" compile="0" resource="0" file="Source/MediaManager.h"/>
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="Source/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="Source/Settings.cpp"/>
       <FILE id="WhwWGx" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>

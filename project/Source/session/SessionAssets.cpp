@@ -17,12 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "../session/Session.h"
-#include "../Globals.h"
-#include "../MediaManager.h"
-#include "../EngineControl.h"
+#include "session/Session.h"
+#include "session/MediaManager.h"
+#include "EngineControl.h"
+#include "Globals.h"
 
-#include "SessionAssets.h"
+#include "session/SessionAssets.h"
 
 namespace Element {
 
