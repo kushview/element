@@ -284,6 +284,7 @@
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
       <FILE id="dEn8dF" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="QrURzP" name="Messages.h" compile="0" resource="0" file="Source/Messages.h"/>
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="Source/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="Source/Settings.cpp"/>
       <FILE id="WhwWGx" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>

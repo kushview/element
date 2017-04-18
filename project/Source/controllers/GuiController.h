@@ -1,6 +1,6 @@
 
-#ifndef UICONTROLLER_H_INCLUDED
-#define UICONTROLLER_H_INCLUDED
+#ifndef EL_GUI_CONTROLLER_H
+#define EL_GUI_CONTROLLER_H
 
 #include "controllers/Controller.h"
 
@@ -14,4 +14,4 @@ namespace Element {
     };
 }
 
-#endif  // UICONTROLLER_H_INCLUDED
+#endif  // EL_GUI_CONTROLLER_H

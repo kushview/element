@@ -7,7 +7,10 @@
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiApp.h"
+#include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
+#include "Messages.h"
+
 #include "gui/ConnectionGrid.h"
 
 #define NUM_DUMMY_NODES 16
@@ -197,9 +200,6 @@ namespace Element {
         PluginDescription desc;
         desc.pluginFormatName = sd.description[1];
         desc.fileOrIdentifier = sd.description[2];
-        
-        DBG("DROPPED: " << desc.pluginFormatName << " : " << desc.fileOrIdentifier);
-        
-        
+        ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
     }
 }

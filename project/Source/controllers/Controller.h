@@ -1,4 +1,7 @@
 
+#ifndef EL_CONTROLLER_H
+#define EL_CONTROLLER_H
+
 #include "ElementApp.h"
 
 namespace Element {
@@ -54,3 +57,5 @@ namespace Element {
         Controller* parent;
     };
 }
+
+#endif  // EL_CONTROLLER_H

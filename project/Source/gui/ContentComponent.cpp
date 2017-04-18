@@ -3,6 +3,7 @@
     Copyright (C) 2015-2017  Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/AppController.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
@@ -187,6 +188,11 @@ void ContentComponent::setRackViewNode (GraphNodePtr node)
     
 }
 
+void ContentComponent::post (Message* message)
+{
+    gui.getAppController().postMessage(message);
+}
+    
 GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize() { }

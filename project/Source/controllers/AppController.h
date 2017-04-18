@@ -10,7 +10,8 @@ class Globals;
 class GuiApp;
 
 class AppController :  public Controller,
-                       protected ApplicationCommandTarget
+                       protected ApplicationCommandTarget,
+                       public MessageListener
 {
 public:
     AppController (Globals&);
@@ -25,7 +26,9 @@ protected:
     void getAllCommands (Array<CommandID>& commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
-
+    
+    void handleMessage (const Message&) override;
+    
 private:
     friend class Application;
     Globals& world;

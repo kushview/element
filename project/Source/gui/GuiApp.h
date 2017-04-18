@@ -16,6 +16,7 @@
 
 namespace Element {
     class AboutComponent;
+    class AppController;
     class EngineControl;
     class Globals;
     class ContentComponent;
@@ -27,11 +28,13 @@ namespace Element {
     public:
         virtual ~GuiApp();
 
-        static GuiApp* create (Globals& globals);
+        static GuiApp* create (Globals&, AppController&);
         void run();
 
         CommandManager& commander();
 
+        AppController& getAppController() const { return controller; }
+        
         Globals& globals();
 
         /** Open an application window by uri
@@ -75,9 +78,10 @@ namespace Element {
         virtual bool perform (const InvocationInfo& info);
 
     protected:
-        GuiApp (Globals&);
+        GuiApp (Globals&, AppController&);
 
     private:
+        AppController& controller;
         Globals& world;
         OpenGLContext render;
         SessionRef sessionRef;

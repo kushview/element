@@ -32,6 +32,8 @@ public:
     void setRackViewNode (GraphNodePtr node);
     void stabilize();
     
+    void post (Message*);
+    
     JUCE_DEPRECATED(GuiApp& app());
 
 private:
