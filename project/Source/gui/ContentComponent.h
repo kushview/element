@@ -32,7 +32,7 @@ public:
     void setRackViewNode (GraphNodePtr node);
     void stabilize();
     
-    GuiApp& app();
+    JUCE_DEPRECATED(GuiApp& app());
 
 private:
     GuiApp& gui;
