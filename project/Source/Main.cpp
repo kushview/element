@@ -98,6 +98,10 @@ private:
         plugins.addFormat (new InternalFormat (*engine));
         plugins.restoreUserPlugins (settings);
         
+        for (int i = plugins.availablePlugins().getNumTypes(); --i >= 0;) {
+            DBG("PLUGIN: " << plugins.availablePlugins().getType(i)->name);
+        }
+        
         world.loadModule ("test");
         controller = new AppController (world);
         

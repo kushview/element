@@ -55,7 +55,7 @@ public:
         setPanelHeaderSize (c, headerHeight);
         
         names.add ("Plugins");
-        c = new PluginsNavigationPanel (globals.plugins());
+        c = new PluginsPanelView (globals.plugins());
         addPanel (-1, c, true);
         setPanelHeaderSize (c, headerHeight);
     }

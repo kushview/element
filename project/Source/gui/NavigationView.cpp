@@ -126,7 +126,9 @@ public:
 class PluginsNavigationItem : public TreeItemBase
 {
 public:
-    PluginsNavigationItem() { }
+    PluginManager& plugins;
+    
+    PluginsNavigationItem (PluginManager& pm) : plugins(pm) { }
     ~PluginsNavigationItem() { }
     
     bool mightContainSubItems() override { return true; }
@@ -137,13 +139,6 @@ public:
     Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
     void addSubItems() override
     {
-        ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
-        if (! cc) {
-            DBG("PluginsNavigationItem: did not get content component");
-            return;
-        }
-        
-        PluginManager& plugins (cc->app().globals().plugins());
         KnownPluginList& known (plugins.availablePlugins());
         for (int i = 0; i < known.getNumTypes(); ++i)
             addSubItem (new PluginTreeItem (*known.getType (i)));
@@ -276,7 +271,7 @@ public:
         switch (item)
         {
             case NavigationList::pluginsItem:
-                setRoot (new PluginsNavigationItem ());
+                // FIXME: setRoot (new PluginsNavigationItem ());
                 break;
             case NavigationList::sessionItem:
                 setRoot (new SessionNavigationItem ());
@@ -298,21 +293,22 @@ private:
 
     
     
-PluginTreeView::PluginTreeView()
-    : TreePanelBase ("plugins")
+PluginTreeView::PluginTreeView (PluginManager& pm)
+    : TreePanelBase ("plugins"),
+      plugins (pm)
 {
     setEmptyTreeMessage ("Empty...");
 }
 
+PluginTreeView::~PluginTreeView() { }
+    
 void PluginTreeView::rootItemChanged (int item)
 {
-    setRoot (new PluginsNavigationItem ());
+    setRoot (new PluginsNavigationItem (plugins));
     rootItem = item;
 }
 
-PluginTreeView::~PluginTreeView() { }
 
-    
 
 NavigationView::NavigationView()
 {

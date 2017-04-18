@@ -5,28 +5,29 @@
 #include "gui/PluginsPanelView.h"
 
 namespace Element {
-    PluginsNavigationPanel::PluginsNavigationPanel (PluginManager& pm)
+    PluginsPanelView::PluginsPanelView (PluginManager& pm)
     {
-        addAndMakeVisible (pluginTree = new PluginTreeView());
+        addAndMakeVisible (pluginTree = new PluginTreeView (pm));
         pluginTree->rootItemChanged (0);
         pm.availablePlugins().addChangeListener (this);
     }
     
-    PluginsNavigationPanel::~PluginsNavigationPanel()
+    PluginsPanelView::~PluginsPanelView()
     {
+        pluginTree = nullptr;
     }
 
-    void PluginsNavigationPanel::resized()
+    void PluginsPanelView::resized()
     {
         pluginTree->setBounds (getLocalBounds());
     }
     
-    void PluginsNavigationPanel::paint (Graphics& g)
+    void PluginsPanelView::paint (Graphics& g)
     {
         g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
     }
     
-    void PluginsNavigationPanel::changeListenerCallback (ChangeBroadcaster* src)
+    void PluginsPanelView::changeListenerCallback (ChangeBroadcaster* src)
     {
         pluginTree->rootItemChanged (0);
     }

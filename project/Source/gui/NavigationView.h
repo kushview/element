@@ -8,6 +8,7 @@ namespace Element {
 
 class NavigationList;
 class NavigationTree;
+class PluginManager;
 
 class NavigationView    : public Component
 {
@@ -32,17 +33,20 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
 
+
 class PluginTreeView : public TreePanelBase
 {
 public:
-    PluginTreeView();
+    PluginTreeView (PluginManager&);
     ~PluginTreeView();
     
     void rootItemChanged (int item);
+    
 private:
     int rootItem;
+    PluginManager& plugins;
 };
-    
+
 
 }
 
