@@ -1,7 +1,8 @@
 #ifndef EL_NAVIGATION_VIEW_H
 #define EL_NAVIGATION_VIEW_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
+#include "gui/TreeViewBase.h"
 
 namespace Element {
 
@@ -30,6 +31,18 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
+
+class PluginTreeView : public TreePanelBase
+{
+public:
+    PluginTreeView();
+    ~PluginTreeView();
+    
+    void rootItemChanged (int item);
+private:
+    int rootItem;
+};
+    
 
 }
 

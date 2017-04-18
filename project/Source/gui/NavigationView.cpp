@@ -138,12 +138,13 @@ public:
     void addSubItems() override
     {
         ContentComponent* cc = getOwnerView()->findParentComponentOfClass<ContentComponent>();
-        if (! cc)
+        if (! cc) {
+            DBG("PluginsNavigationItem: did not get content component");
             return;
-            
+        }
+        
         PluginManager& plugins (cc->app().globals().plugins());
         KnownPluginList& known (plugins.availablePlugins());
-
         for (int i = 0; i < known.getNumTypes(); ++i)
             addSubItem (new PluginTreeItem (*known.getType (i)));
     }
@@ -295,6 +296,23 @@ private:
     int rootItem;
 };
 
+    
+    
+PluginTreeView::PluginTreeView()
+    : TreePanelBase ("plugins")
+{
+    setEmptyTreeMessage ("Empty...");
+}
+
+void PluginTreeView::rootItemChanged (int item)
+{
+    setRoot (new PluginsNavigationItem ());
+    rootItem = item;
+}
+
+PluginTreeView::~PluginTreeView() { }
+
+    
 
 NavigationView::NavigationView()
 {

@@ -20,7 +20,7 @@ class ContentComponent :  public Component,
                           public DragAndDropContainer
 {
 public:
-    ContentComponent(GuiApp& app);
+    ContentComponent (GuiApp& app);
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;

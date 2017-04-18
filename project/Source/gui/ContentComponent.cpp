@@ -4,17 +4,21 @@
 */
 
 #include "gui/AudioIOPanelView.h"
+#include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/GuiApp.h"
 #include "gui/LookAndFeel.h"
 
 #include "gui/ContentComponent.h"
+#include "Globals.h"
 
 namespace Element {
 
 class NavigationConcertinaPanel : public ConcertinaPanel {
 public:
-    NavigationConcertinaPanel()
-        : headerHeight (30),
+    NavigationConcertinaPanel (Globals& g)
+        : globals(g),
+          headerHeight (30),
           defaultPanelHeight (80)
     {
         setLookAndFeel (&lookAndFeel);
@@ -45,18 +49,15 @@ public:
         clearPanels();
         
         names.add ("Audio");
-        names.add ("MIDI");
-        names.add ("Presets");
-
-        for (int i = 0; i < names.size(); ++i)
-        {
-            auto* c = i > 0 ? new Component (names [i])
-                            : new AudioIOPanelView();
-            c->setSize (getWidth(), 160);
-            addPanel (1, c, true);
-            setPanelHeaderSize (c, headerHeight);
-            setPanelSize (c, defaultPanelHeight, false);
-        }
+        Component* c = new AudioIOPanelView();
+        addPanel (-1, c, true);
+        setMaximumPanelSize (c, 160);
+        setPanelHeaderSize (c, headerHeight);
+        
+        names.add ("Plugins");
+        c = new PluginsNavigationPanel (globals.plugins());
+        addPanel (-1, c, true);
+        setPanelHeaderSize (c, headerHeight);
     }
     
     const StringArray& getNames() const { return names; }
@@ -70,7 +71,7 @@ public:
     
 private:
     typedef Element::LookAndFeel ELF;
-    
+    Globals& globals;
     StringArray names;
     int headerHeight;
     int defaultPanelHeight;
@@ -143,7 +144,7 @@ ContentComponent::ContentComponent (GuiApp& app_)
 {
     setOpaque (true);
     
-    addAndMakeVisible (nav = new NavigationConcertinaPanel());
+    addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (app_));
     
