@@ -20,13 +20,11 @@
 #ifndef ELEMENT_SEQUENCER_TRACK_H
 #define ELEMENT_SEQUENCER_TRACK_H
 
-
 class Sequencer;
 
 class SequencerTrack :  public Processor
 {
 public:
-
     SequencerTrack (Sequencer& o, const TrackModel& t);
     virtual ~SequencerTrack();
 
