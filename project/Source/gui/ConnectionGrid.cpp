@@ -5,6 +5,9 @@
 
 #include "gui/HorizontalListBox.h"
 #include "gui/ViewHelpers.h"
+#include "gui/ContentComponent.h"
+#include "gui/GuiApp.h"
+#include "session/PluginManager.h"
 #include "gui/ConnectionGrid.h"
 
 #define NUM_DUMMY_NODES 16
@@ -180,5 +183,23 @@ namespace Element {
     void ConnectionGrid::resized()
     {
         quads->setBounds (getLocalBounds());
+    }
+    
+    bool ConnectionGrid::isInterestedInDragSource (const SourceDetails& sd)
+    {
+        return sd.description.isArray() &&
+               sd.description.size() == 3 &&
+               sd.description[0].toString() == "element://dnd/plugin";
+    }
+    
+    void ConnectionGrid::itemDropped (const SourceDetails& sd)
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = sd.description[1];
+        desc.fileOrIdentifier = sd.description[2];
+        
+        DBG("DROPPED: " << desc.pluginFormatName << " : " << desc.fileOrIdentifier);
+        
+        
     }
 }

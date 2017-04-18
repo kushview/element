@@ -10,7 +10,8 @@
 
 namespace Element {
     
-class ConnectionGrid : public Component
+class ConnectionGrid : public Component,
+                       public DragAndDropTarget
 {
 public:
     ConnectionGrid();
@@ -18,6 +19,16 @@ public:
 
     void paint (Graphics&) override;
     void resized() override;
+    
+    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
+    void itemDropped (const SourceDetails& dragSourceDetails) override;
+    
+#if 0
+    void itemDragEnter (const SourceDetails& dragSourceDetails) override;
+    void itemDragMove (const SourceDetails& dragSourceDetails) override;
+    void itemDragExit (const SourceDetails& dragSourceDetails) override;
+    bool shouldDrawDragImageWhenOver() override;
+#endif
     
 private:
     friend class PatchMatrix;
