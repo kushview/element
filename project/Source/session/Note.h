@@ -20,7 +20,7 @@
 #ifndef ELEMENT_NOTE_H
 #define ELEMENT_NOTE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

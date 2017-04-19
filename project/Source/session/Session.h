@@ -20,7 +20,7 @@
 #ifndef ELEMENT_SESSION_H
 #define ELEMENT_SESSION_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include <boost/intrusive_ptr.hpp>
 
 namespace Element {

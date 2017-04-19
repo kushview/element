@@ -6,7 +6,7 @@
 #ifndef ELEMENT_AUDIO_ENGINE_H
 #define ELEMENT_AUDIO_ENGINE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/Engine.h"
 
 namespace Element {

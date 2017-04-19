@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "controllers/GraphController.h"
 #include "gui/ContentComponent.h"
 #include "gui/GraphEditorComponent.h"

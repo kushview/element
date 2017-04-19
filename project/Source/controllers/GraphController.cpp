@@ -23,7 +23,6 @@
 */
 
 #include "controllers/GraphController.h"
-#include "engine/GraphProcessor.h"
 #include "session/PluginManager.h"
 
 namespace Element {

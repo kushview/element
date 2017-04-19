@@ -20,7 +20,7 @@
 #ifndef EL_ICONS_H
 #define EL_ICONS_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

@@ -20,7 +20,7 @@
 #ifndef ELEMENT_WINDOW_H
 #define ELEMENT_WINDOW_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "Signals.h"
 
 namespace Element {

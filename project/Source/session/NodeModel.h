@@ -20,7 +20,7 @@
 #ifndef ELEMENT_NODE_MODEL_H
 #define ELEMENT_NODE_MODEL_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

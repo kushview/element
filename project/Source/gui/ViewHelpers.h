@@ -2,7 +2,7 @@
 #ifndef EL_VIEW_HELPERS_H
 #define EL_VIEW_HELPERS_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 namespace ViewHelpers {

@@ -6,6 +6,6 @@
 #ifndef ELEMENT_TIMELINE_H
 #define ELEMENT_TIMELINE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 #endif // TIMELINE_H

@@ -38,10 +38,10 @@ namespace Element {
             return nullptr;
         }
         
-        template<class T> inline T* findChild()
+        template<class T> inline T* findChild() const
         {
             for (auto const* c : children)
-                if (T const* t = dynamic_cast<T*> (c))
+                if (T* t = const_cast<T*> (dynamic_cast<const T*> (c)))
                     return t;
             return nullptr;
         }

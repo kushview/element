@@ -9,8 +9,8 @@ namespace Element {
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:
-    LoadPluginMessage (const PluginDescription& pd) : desc(pd) { }
-    const PluginDescription desc;
+    LoadPluginMessage (const PluginDescription& d) : description (d) { }
+    const PluginDescription description;
 };
     
 }

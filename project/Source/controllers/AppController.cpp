@@ -23,6 +23,7 @@ AppController::~AppController() { }
 
 void AppController::run()
 {
+    findChild<EngineController>()->activate();
     gui->run();
 }
 
@@ -31,10 +32,12 @@ void AppController::handleMessage (const Message& msg)
     bool handled = true;
 
     if (const auto* m = dynamic_cast<const LoadPluginMessage*> (&msg)) {
-        DBG("LOad it!!!! " << m->desc.fileOrIdentifier);
+        if (auto* ec = findChild<EngineController>())
+            ec->addPlugin (m->description);
     } else {
         handled = false;
     }
+    
     
     if (! handled)
     {

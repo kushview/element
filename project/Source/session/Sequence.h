@@ -20,7 +20,7 @@
 #ifndef EL_SEQUENCE_H
 #define EL_SEQUENCE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/AssetTree.h"
 #include "session/ClipModel.h"
 #include "session/TrackModel.h"

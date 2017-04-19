@@ -20,7 +20,7 @@
 #ifndef ELEMENT_NOTESEQUENCE_H
 #define ELEMENT_NOTESEQUENCE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Note.h"
 
 namespace Element {

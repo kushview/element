@@ -11,7 +11,7 @@
 #ifndef RACKVIEW_H_INCLUDED
 #define RACKVIEW_H_INCLUDED
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

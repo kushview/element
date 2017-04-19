@@ -20,7 +20,7 @@
 #ifndef EL_DEVICE_MANAGER_H
 #define EL_DEVICE_MANAGER_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/Engine.h"
 
 namespace Element {

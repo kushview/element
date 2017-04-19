@@ -3,7 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/InternalFormat.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"

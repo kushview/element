@@ -6,7 +6,7 @@
 #ifndef ELEMENT_GUIAPP_H
 #define ELEMENT_GUIAPP_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Session.h"
 #include "gui/LookAndFeel.h"
 #include "gui/Preferences.h"

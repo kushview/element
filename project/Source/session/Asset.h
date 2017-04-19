@@ -20,7 +20,7 @@
 #ifndef ELEMENT_ASSET_H
 #define ELEMENT_ASSET_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/AssetTree.h"
 
 namespace Element {

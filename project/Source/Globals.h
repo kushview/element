@@ -6,7 +6,7 @@
 #ifndef EL_GLOBALS_H
 #define EL_GLOBALS_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/AudioEngine.h"
 #include "URIs.h"
 #include "WorldBase.h"

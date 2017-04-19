@@ -1,7 +1,7 @@
 #ifndef ELEMENT_PLUGIN_WINDOW_H
 #define ELEMENT_PLUGIN_WINDOW_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

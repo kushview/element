@@ -6,7 +6,7 @@
 #ifndef ELEMENT_WORLD_BASE_H
 #define ELEMENT_WORLD_BASE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

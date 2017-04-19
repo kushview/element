@@ -6,7 +6,7 @@
 #ifndef EL_SETTINGS_H
 #define EL_SETTINGS_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

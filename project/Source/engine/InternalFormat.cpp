@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"

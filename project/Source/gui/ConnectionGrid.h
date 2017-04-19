@@ -6,7 +6,7 @@
 #ifndef EL_CONNECTION_GRID_H
 #define EL_CONNECTION_GRID_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
     

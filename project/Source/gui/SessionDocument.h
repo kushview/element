@@ -20,7 +20,7 @@
 #ifndef ELEMENT_SESSION_DOCUMENT_H
 #define ELEMENT_SESSION_DOCUMENT_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

@@ -20,7 +20,7 @@
 #ifndef ELEMENT_CLIPFACTORY_H
 #define ELEMENT_CLIPFACTORY_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

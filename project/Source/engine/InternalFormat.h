@@ -20,7 +20,7 @@
 #ifndef ELEMENT_INTERNAL_FORMAT_H
 #define ELEMENT_INTERNAL_FORMAT_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

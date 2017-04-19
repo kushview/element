@@ -20,7 +20,7 @@
 #ifndef EL_TRACK_MODEL_H
 #define EL_TRACK_MODEL_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

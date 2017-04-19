@@ -1,7 +1,7 @@
 #ifndef EL_GRAPH_NODE_H
 #define EL_GRAPH_NODE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
     

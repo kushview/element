@@ -22,7 +22,7 @@
 #ifndef ELEMENT_GRAPH_PROCESSOR_H
 #define ELEMENT_GRAPH_PROCESSOR_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/GraphNode.h"
 
 namespace Element {

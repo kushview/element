@@ -6,7 +6,7 @@
 #ifndef EL_COMMAND_MANAGER_H
 #define EL_COMMAND_MANAGER_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

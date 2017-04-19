@@ -21,7 +21,7 @@
 #define __JUCE_HEADER_EEC99E9977A4A1D4__
 
 //[Headers]     -- You can add your own extra header files here --
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Session.h"
 //[/Headers]
 
