@@ -15,7 +15,7 @@
 
 #include "EngineControl.h"
 #include "Globals.h"
-#include "MediaManager.h"
+#include "session/MediaManager.h"
 
 namespace Element {
 

@@ -122,7 +122,7 @@ public:
         }
         else
         {
-            assert (false);
+            jassert (false);
         }
     }
 

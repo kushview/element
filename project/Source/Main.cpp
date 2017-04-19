@@ -8,8 +8,8 @@
 #include "controllers/AppController.h"
 #include "engine/InternalFormat.h"
 #include "session/DeviceManager.h"
-#include "PluginManager.h"
-#include "Commands.h"
+#include "session/PluginManager.h"
+#include "gui/Commands.h"
 
 #include "Globals.h"
 #include "Settings.h"

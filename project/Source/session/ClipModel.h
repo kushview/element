@@ -32,8 +32,8 @@ public:
     ClipModel (ValueTree& data, double start, double length, double offset = 0.0f)
         : ObjectModel (data)
     {
-        assert (data.isValid());
-        assert (node().hasType (Slugs::clip));
+        jassert (data.isValid());
+        jassert (node().hasType (Slugs::clip));
         node().setProperty ("start", start, nullptr);
         node().setProperty ("length", length, nullptr);
         node().setProperty ("offset", offset, nullptr);

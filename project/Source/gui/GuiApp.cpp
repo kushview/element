@@ -18,7 +18,7 @@
 #include "gui/ConnectionGrid.h"
 
 #include "EngineControl.h"
-#include "MediaManager.h"
+#include "session/MediaManager.h"
 #include "Globals.h"
 #include "Settings.h"
 

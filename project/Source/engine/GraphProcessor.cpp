@@ -387,16 +387,16 @@ private:
                     channelsToUse [portType.id()].add (bufIndex);
                     const uint32 outPort = proc->getNthPort (portType, outputChan, false, false);
 
-                    assert (bufIndex != 0);
-                    assert (outPort == port);
-                    assert (outPort < proc->getNumPorts());
+                    jassert (bufIndex != 0);
+                    jassert (outPort == port);
+                    jassert (outPort < proc->getNumPorts());
 
                     markBufferAsContaining (bufIndex, portType, node->nodeId, outPort);
                 }
                 continue;
             }
 
-            assert (proc->isPortInput(port));
+            jassert (proc->isPortInput(port));
 
             const int inputChan = proc->getChannelPort (port);
 
@@ -422,7 +422,7 @@ private:
                 if (inputChan >= (int)numOuts)
                 {
                     bufIndex = getReadOnlyEmptyBuffer();
-                    assert (bufIndex >= 0);
+                    jassert (bufIndex >= 0);
                 }
                 else
                 {
@@ -616,7 +616,7 @@ private:
 
     int32 getFreeBuffer (PortType type)
     {
-        assert (type.id() < PortType::Unknown);
+        jassert (type.id() < PortType::Unknown);
 
         Array<uint32>& nodes = allNodes [type.id()];
         for (int i = 1; i < nodes.size(); ++i)

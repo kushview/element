@@ -32,7 +32,7 @@ namespace Alerts {
 
     void prepareAlert (AlertWindow& alert, Component* buttons)
     {
-        assert (nullptr != buttons);
+        jassert (nullptr != buttons);
 
         alert.addCustomComponent (buttons);
 

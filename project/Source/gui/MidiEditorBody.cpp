@@ -77,7 +77,7 @@ MidiEditorBody::~MidiEditorBody()
 void
 MidiEditorBody::addNote (int note, float start, float length, int channel)
 {
-    assert (sequence.get() != nullptr);
+    jassert (sequence.get() != nullptr);
     sequence->addNote (note, start, length, channel);
 }
 

@@ -10,7 +10,7 @@
 #include "session/Session.h"
 #include "CommandManager.h"
 #include "Globals.h"
-#include "MediaManager.h"
+#include "session/MediaManager.h"
 #include "Settings.h"
 #include "URIs.h"
 

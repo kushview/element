@@ -275,6 +275,7 @@ namespace Element {
         if (! canGoToPrevious())
             return nullptr;
 
+		Array<int> i;
         nextDocs.insert (0, previousDocs.removeAndReturn (previousDocs.size() - 1));
         return previousDocs.getLast();
     }

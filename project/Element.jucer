@@ -436,7 +436,7 @@
                        isDebug="1" optimisation="1" targetName="Element" binaryPath=""
                        headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\KushviewSDK\include&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
@@ -459,6 +459,36 @@
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </VS2013>
+    <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0&#10;SCL_SECURE_NO_WARNINGS=1"
+            smallIcon="eG1U6B" bigIcon="eG1U6B">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
+                       characterSet="MultiByte"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+      </MODULEPATHS>
+    </VS2015>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
@@ -486,7 +516,7 @@
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
                JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
-               JUCE_WASAPI_EXCLUSIVE="disabled"/>
+               JUCE_WASAPI_EXCLUSIVE="disabled" JUCE_PLUGINHOST_VST3="disabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>
