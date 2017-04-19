@@ -50,6 +50,10 @@ namespace Element {
         int getNumRows()    override { return matrix.getNumRows(); }
         int getNumColumns() override { return matrix.getNumColumns(); }
         
+        void updateMatrix (const MatrixState& state) {
+            matrix = state;
+        }
+        
     private:
         MatrixState matrix;
     };
