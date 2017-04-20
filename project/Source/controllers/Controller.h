@@ -52,6 +52,19 @@ namespace Element {
                 added->parent = this;
         }
 
+        
+        virtual void activate() {
+            for (auto* child : children) {
+                child->activate();
+            }
+        }
+        
+        virtual void deactivate() {
+            for (auto* child : children) {
+                child->deactivate();
+            }
+        }
+        
     private:
         OwnedArray<Controller> children;
         Controller* parent;

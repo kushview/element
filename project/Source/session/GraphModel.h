@@ -1,24 +1,28 @@
 /*
     GraphModel.h - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2017  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_GRAPH_MODEL_H
-#define ELEMENT_GRAPH_MODEL_H
+#ifndef EL_GRAPH_MODEL_H
+#define EL_GRAPH_MODEL_H
 
-#include "session/BlockModel.h"
+#include "ElementApp.h"
+#include "session/NodeModel.h"
 
 namespace Element {
     
-class GraphModel :  public BlockModel
+class Graph :  public Node
 {
 public:
-    GraphModel();
-    ~GraphModel();
+    explicit Graph (const Identifier& type = Tags::graph);
+    virtual ~Graph();
+    
     void addPlugin();
-    void addSubGraph (const GraphModel& graph);
+    void addSubGraph (const Graph& graph);
 };
+
+typedef Graph GraphModel;
 
 }
 
-#endif // ELEMENT_GRAPH_MODEL_H
+#endif // EL_GRAPH_MODEL_H

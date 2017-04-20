@@ -43,7 +43,9 @@ void EngineController::activate()
 {
     if (root != nullptr)
         return;
-
+    
+    Controller::activate();
+    
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& g (app->getWorld());
     AudioEnginePtr engine (g.engine());
@@ -54,11 +56,8 @@ void EngineController::activate()
 void EngineController::changeListenerCallback (ChangeBroadcaster*)
 {
     if (auto* app = dynamic_cast<AppController*> (getRoot())) {
-        DBG("GRAPH CHANGED");
-        GraphLog::print (*root);
-        app->postMessage (new Message());
+        DBG("[EC] root graph changed");
     }
-    
 }
     
 }

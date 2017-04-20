@@ -716,9 +716,8 @@ GraphProcessor::GraphProcessor()
       currentAudioOutputBuffer (1, 1),
       currentMidiInputBuffer (nullptr)
 {
-    graphState.graph = ValueTree ("graph");
-    graphState.arcs  = ValueTree ("arcs");
-    graphState.graph.addChild (graphState.arcs, -1, 0);
+    nodesModel = ValueTree ("nodes");
+    arcsModel  = ValueTree ("arcs");
 
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = ELEMENT_INVALID_PORT;
@@ -789,7 +788,10 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
     {
         n->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (n);
+        nodesModel.addChild (n->metadata, -1, nullptr);
+        jassert(getNumNodes() == nodesModel.getNumChildren());
         triggerAsyncUpdate();
+        
         return n;
     }
     
@@ -802,10 +804,13 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
 
     for (int i = nodes.size(); --i >= 0;)
     {
+        GraphNodePtr n = nodes.getUnchecked(i);
         if (nodes.getUnchecked(i)->nodeId == nodeId)
         {
-            nodes.getUnchecked(i)->setParentGraph (nullptr);
+            n->setParentGraph (nullptr);
             nodes.remove (i);
+            nodesModel.removeChild (n->metadata, nullptr);
+            jassert(getNumNodes() == nodesModel.getNumChildren());
             triggerAsyncUpdate();
             return true;
         }
@@ -1057,7 +1062,6 @@ void GraphProcessor::buildRenderingSequence()
 
     {
         // swap over to the new rendering sequence..
-        // XXX: use non-locking techniques for the swap
         const ScopedLock sl (getCallbackLock());
 
         renderingBuffers.setSize (numRenderingBuffersNeeded, 1024);

@@ -4,6 +4,7 @@
 */
 
 #include "controllers/AppController.h"
+#include "engine/GraphProcessor.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
@@ -106,11 +107,18 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (GuiApp& gui)
+    ContentContainer (AppController& app, GuiApp& gui)
     {
+        AudioEnginePtr e (app.getGlobals().engine());
+        GraphProcessor& graph (e->graph());
+        
         addAndMakeVisible (dummy1 = new ConnectionGrid());
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
         addAndMakeVisible (dummy2 = new Component());
+        
+        const Node root (graph.getNodesModel());
+        dummy1->setGraphNode (node);
+        
         updateLayout();
         resized();
     }
@@ -131,7 +139,8 @@ public:
 private:
     StretchableLayoutManager layout;
     ScopedPointer<StretchableLayoutResizerBar> bar;
-    ScopedPointer<Component> dummy1, dummy2;
+    ScopedPointer<ConnectionGrid> dummy1;
+    ScopedPointer<Component> dummy2;
     
     void updateLayout()
     {
@@ -141,14 +150,15 @@ private:
     }
 };
 
-ContentComponent::ContentComponent (GuiApp& app_)
-    : gui (app_)
+ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
+    : controller (ctl_),
+      gui (app_)
 {
     setOpaque (true);
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (app_));
+    addAndMakeVisible (container = new ContentContainer (controller, gui));
     
     updateLayout();
     resized();
@@ -159,7 +169,7 @@ ContentComponent::~ContentComponent()
     toolTips = nullptr;
 }
 
-Globals& ContentComponent::getGlobals() { return gui.globals(); }
+Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }
     
 void ContentComponent::childBoundsChanged (Component* child)
 {
@@ -193,7 +203,7 @@ void ContentComponent::setRackViewNode (GraphNodePtr node)
 
 void ContentComponent::post (Message* message)
 {
-    gui.getAppController().postMessage(message);
+    controller.postMessage (message);
 }
     
 GuiApp& ContentComponent::app() { return gui; }

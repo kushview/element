@@ -14,9 +14,10 @@
 #endif
 
 namespace Element {
-    namespace Tags {
-        const Identifier node = "node";
-    }
+namespace Tags {
+    const Identifier graph = "graph";
+    const Identifier node = "node";
+}
 }
 
 #endif  // ELEMENT_APP_H

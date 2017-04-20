@@ -11,6 +11,7 @@
 
 namespace Element {
 
+class AppController;
 class ContentContainer;
 class Globals;
 class GuiApp;
@@ -22,7 +23,7 @@ class ContentComponent :  public Component,
                           public DragAndDropContainer
 {
 public:
-    ContentComponent (GuiApp& app);
+    ContentComponent (AppController& app, GuiApp& gui);
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;
@@ -41,6 +42,7 @@ public:
     JUCE_DEPRECATED(GuiApp& app());
 
 private:
+    AppController& controller;
     GuiApp& gui;
     ScopedPointer<Component> nav;
     ScopedPointer<ContentContainer> container;

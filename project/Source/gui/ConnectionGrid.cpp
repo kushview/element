@@ -10,6 +10,7 @@
 #include "gui/GuiApp.h"
 #include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
+#include "session/NodeModel.h"
 #include "Messages.h"
 
 #include "gui/ConnectionGrid.h"
@@ -24,6 +25,16 @@ namespace Element {
         PatchMatrix() : matrix()
         {
             setSize (300, 200);
+
+            nodes = ValueTree ("nodes");
+            Node node;
+            nodess.add(node);
+            nodess.size();
+            nodes.addChild (node.node(), -1, nullptr);
+            nodes.addChild (node.node().createCopy()
+                .setProperty(Slugs::name, "Node 1", nullptr), -1, nullptr);
+            nodes.addChild (node.node().createCopy()
+                .setProperty(Slugs::name, "Node 2", nullptr), -1, nullptr);
         }
         
         ~PatchMatrix() { }
@@ -39,17 +50,17 @@ namespace Element {
             int newNumRows = 0;
             int newNumCols = 0;
             
-            if (auto *cc = findParentComponentOfClass<ContentComponent>())
-            {
-                auto e = cc->getGlobals().engine();
-                auto& g (e->graph());
-                for (int i = 0; i < g.getNumNodes(); ++i)
-                {
-                    GraphNodePtr node = g.getNode (i);
-                    newNumRows += node->getNumAudioInputs();
-                    newNumCols += node->getNumAudioOutputs();
-                }
-            }
+            // if (auto *cc = findParentComponentOfClass<ContentComponent>())
+            // {
+            //     auto e = cc->getGlobals().engine();
+            //     auto& g (e->graph());
+            //     for (int i = 0; i < g.getNumNodes(); ++i)
+            //     {
+            //         GraphNodePtr node = g.getNode (i);
+            //         newNumRows += node->getNumAudioInputs();
+            //         newNumCols += node->getNumAudioOutputs();
+            //     }
+            // }
             
             matrix.resize (newNumRows, newNumCols);
             repaint();
@@ -81,7 +92,9 @@ namespace Element {
         
     private:
         MatrixState matrix;
-        
+        ValueTree nodes;
+        NodeArray nodess;
+
         void paintEmptyMessage (Graphics& g, const int width, const int height) {
             return;
             g.fillAll (LookAndFeel_E1::widgetBackgroundColor.darker());

@@ -311,7 +311,9 @@ public:
 
     virtual void fillInPluginDescription (PluginDescription& d) const;
 
-    inline ValueTree getGraphState() const { return graphState.graph; }
+    inline ValueTree getGraphState() const { return nodesModel; }
+    inline ValueTree getNodesModel() const { return nodesModel; }
+    inline ValueTree getArcsModel() const { return arcsModel; }
 
 protected:
     virtual GraphNode* createNode (uint32 nodeId, Processor* proc) { return new GraphNode (nodeId, proc); }
@@ -324,11 +326,10 @@ private:
     OwnedArray<Connection> connections;
     uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
 
-    struct GraphState {
-        ValueTree graph;
-        ValueTree arcs;
-    } graphState;
-
+    ValueTree graphModel;
+    ValueTree nodesModel;
+    ValueTree arcsModel;
+    
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
     OwnedArray <MidiBuffer> midiBuffers;

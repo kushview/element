@@ -23,14 +23,14 @@ AppController::~AppController() { }
 
 void AppController::run()
 {
-    findChild<EngineController>()->activate();
+    activate();
     gui->run();
 }
 
 void AppController::handleMessage (const Message& msg)
 {
     bool handled = true;
-
+    
     if (const auto* m = dynamic_cast<const LoadPluginMessage*> (&msg)) {
         if (auto* ec = findChild<EngineController>())
             ec->addPlugin (m->description);
@@ -38,10 +38,9 @@ void AppController::handleMessage (const Message& msg)
         handled = false;
     }
     
-    
     if (! handled)
     {
-        DBG("[EL] AppController: unhandled message received");
+        DBG("[EL] AppController: unhandled Message received");
     }
 }
     

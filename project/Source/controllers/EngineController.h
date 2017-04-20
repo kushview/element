@@ -11,7 +11,7 @@ public:
     EngineController();
     ~EngineController();
     
-    void activate();
+    void activate() override;
     void addPlugin (const PluginDescription&);
     
 private:

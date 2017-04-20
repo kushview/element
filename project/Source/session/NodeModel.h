@@ -27,6 +27,11 @@ namespace Element {
 class Node : public ObjectModel
 {
 public:
+    Node() : ObjectModel (Tags::node)
+    {
+        setMissingProperties();
+    }
+    
     Node (const ValueTree& data, const bool setMissing = true)
         : ObjectModel (data)
     {
@@ -38,17 +43,25 @@ public:
     Node (const Identifier& nodeType)
         : ObjectModel (Tags::node)
     {
+        objectData.setProperty (Slugs::type, nodeType.toString(), nullptr);
         setMissingProperties();
     }
+    
+    const Identifier getNodeType() const { return Identifier (getProperty(Slugs::type).toString()); }
+    const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
+    const String getName() const { return getProperty (Slugs::name); }
     
 private:
     inline void setMissingProperties()
     {
         stabilizePropertyString (Slugs::type, "default");
+        stabilizePropertyString (Slugs::name, "Default Node");
     }
 };
 
 typedef Node NodeModel;
+
+class NodeArray : public Array<Node> { };
 
 }
 

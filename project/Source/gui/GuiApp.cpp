@@ -170,7 +170,7 @@ void GuiApp::runDispatch() { }
 
 void GuiApp::run()
 {
-    content = new ContentComponent (*this);
+    content = new ContentComponent (controller, *this);
     content->setSize (800, 600);
     mainWindow = new MainWindow (commander());
     mainWindow->setContentNonOwned (content.get(), true);

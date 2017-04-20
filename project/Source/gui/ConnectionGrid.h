@@ -10,13 +10,17 @@
 
 namespace Element {
     
+class Node;
+
 class ConnectionGrid : public Component,
                        public DragAndDropTarget
 {
 public:
     ConnectionGrid();
     ~ConnectionGrid();
-
+    
+    void setGraphNode (const Node& node);
+    
     void paint (Graphics&) override;
     void resized() override;
     

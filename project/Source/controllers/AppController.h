@@ -17,8 +17,9 @@ public:
     AppController (Globals&);
     ~AppController();
 
-    CommandManager& getCommandManager() { return commands; }
-    Globals& getWorld() { return world; }
+    inline CommandManager& getCommandManager() { return commands; }
+    inline Globals& getWorld() { return getGlobals(); }
+    inline Globals& getGlobals() { return world; }
 
 protected:
     friend class ApplicationCommandTarget;
