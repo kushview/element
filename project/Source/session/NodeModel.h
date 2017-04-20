@@ -24,16 +24,30 @@
 
 namespace Element {
 
-class NodeModel : public ObjectModel
+class Node : public ObjectModel
 {
 public:
-    NodeModel (const ValueTree& data)
-        : ObjectModel (data) { }
-
-    NodeModel (const Identifier& nodeType)
-        : ObjectModel (nodeType) { }
-
+    Node (const ValueTree& data)
+        : ObjectModel (data)
+    {
+        jassert (data.hasType (Tags::node));
+        setDefaultProperties();
+    }
+    
+    Node (const Identifier& nodeType)
+        : ObjectModel (Tags::node)
+    {
+        setDefaultProperties();
+    }
+    
+private:
+    inline void setDefaultProperties()
+    {
+        stabilizePropertyString (Slugs::type, "default");
+    }
 };
+
+typedef Node NodeModel;
 
 }
 

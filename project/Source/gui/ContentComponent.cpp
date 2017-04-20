@@ -52,8 +52,9 @@ public:
         names.add ("Audio");
         Component* c = new AudioIOPanelView();
         addPanel (-1, c, true);
-        setMaximumPanelSize (c, 160);
         setPanelHeaderSize (c, headerHeight);
+        setMaximumPanelSize (c, 160);
+        setPanelSize (c, 60, false);
         
         names.add ("Plugins");
         c = new PluginsPanelView (globals.plugins());
@@ -158,6 +159,8 @@ ContentComponent::~ContentComponent()
     toolTips = nullptr;
 }
 
+Globals& ContentComponent::getGlobals() { return gui.globals(); }
+    
 void ContentComponent::childBoundsChanged (Component* child)
 {
 }

@@ -3,6 +3,7 @@
     Copyright (C) 2016  Kushview, LLC.  All rights reserved.
 */
 
+#include "engine/GraphProcessor.h"
 #include "gui/HorizontalListBox.h"
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
@@ -13,8 +14,6 @@
 
 #include "gui/ConnectionGrid.h"
 
-#define NUM_DUMMY_NODES 16
-
 namespace Element {
     // Spacing between each patch point
     static const int gridPadding = 1;
@@ -22,11 +21,8 @@ namespace Element {
     class ConnectionGrid::PatchMatrix :  public PatchMatrixComponent
     {
     public:
-        PatchMatrix() : matrix (NUM_DUMMY_NODES, NUM_DUMMY_NODES)
+        PatchMatrix() : matrix()
         {
-            for (int i = 0 ; i < NUM_DUMMY_NODES; ++i)
-                matrix.connect (i, i);
-            
             setSize (300, 200);
         }
         
@@ -35,6 +31,27 @@ namespace Element {
         void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
         {
             matrix.toggleCell (row, col);
+            repaint();
+        }
+        
+        void updateContent()
+        {
+            int newNumRows = 0;
+            int newNumCols = 0;
+            
+            if (auto *cc = findParentComponentOfClass<ContentComponent>())
+            {
+                auto e = cc->getGlobals().engine();
+                auto& g (e->graph());
+                for (int i = 0; i < g.getNumNodes(); ++i)
+                {
+                    GraphNodePtr node = g.getNode (i);
+                    newNumRows += node->getNumAudioInputs();
+                    newNumCols += node->getNumAudioOutputs();
+                }
+            }
+            
+            matrix.resize (newNumRows, newNumCols);
             repaint();
         }
         
@@ -49,13 +66,28 @@ namespace Element {
 
         int getNumRows()    override { return matrix.getNumRows(); }
         int getNumColumns() override { return matrix.getNumColumns(); }
-        
+
         void updateMatrix (const MatrixState& state) {
             matrix = state;
         }
         
+        void paint (Graphics& g) override
+        {
+            if (matrix.getNumRows() > 1 && matrix.getNumColumns() > 1)
+                return PatchMatrixComponent::paint(g);
+            
+            paintEmptyMessage (g, getWidth(), getHeight());
+        }
+        
     private:
         MatrixState matrix;
+        
+        void paintEmptyMessage (Graphics& g, const int width, const int height) {
+            return;
+            g.fillAll (LookAndFeel_E1::widgetBackgroundColor.darker());
+            g.setColour(LookAndFeel_E1::textColor);
+            g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
+        }
     };
     
     class ConnectionGrid::Sources : public ListBox,
@@ -65,17 +97,17 @@ namespace Element {
         Sources (PatchMatrix* m)
             : matrix(m)
         {
-            assert (m != nullptr);
+            jassert (m != nullptr);
             setRowHeight (matrix->getRowThickness());
             setModel (this);
         }
         
         ~Sources() { }
         
-        int getNumRows() override { return NUM_DUMMY_NODES; };
+        int getNumRows() override { return matrix->getNumRows(); };
         
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
-                                       bool rowIsSelected) override
+                               bool rowIsSelected) override
         {
             g.setColour (LookAndFeel_E1::widgetBackgroundColor);
             g.fillRect (0, 0, width - 1, height - 1);
@@ -110,6 +142,7 @@ namespace Element {
         
     private:
         PatchMatrix* matrix;
+        friend class PatchMatrix;
     };
     
     class ConnectionGrid::Controls : public Component { };
@@ -121,12 +154,12 @@ namespace Element {
         Destinations (PatchMatrix* m)
             : matrix (m)
         {
-            assert(m != nullptr);
+            jassert(m != nullptr);
             setRowHeight (matrix->getColumnThickness());
             setModel (this);
         }
         
-        int getNumRows() override { return NUM_DUMMY_NODES; }
+        int getNumRows() override { return matrix->getNumColumns(); }
         
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
@@ -150,6 +183,7 @@ namespace Element {
 
     private:
         PatchMatrix* matrix;
+        friend class PatchMatrix;
     };
     
     class ConnectionGrid::Quads : public QuadrantLayout
@@ -163,7 +197,7 @@ namespace Element {
         }
     };
     
-    ConnectionGrid::ConnectionGrid()
+    ConnectionGrid::ConnectionGrid ()
     {
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());

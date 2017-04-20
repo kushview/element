@@ -7,10 +7,12 @@
 #define EL_CONTENT_COMPONENT_H
 
 #include "engine/GraphNode.h"
+#include "session/Session.h"
 
 namespace Element {
 
 class ContentContainer;
+class Globals;
 class GuiApp;
 class GraphEditorView;
 class RackView;
@@ -33,6 +35,8 @@ public:
     void stabilize();
     
     void post (Message*);
+    Globals& getGlobals();
+    SessionRef getSession() const { return SessionRef(); }
     
     JUCE_DEPRECATED(GuiApp& app());
 

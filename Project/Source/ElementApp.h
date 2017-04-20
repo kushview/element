@@ -13,4 +13,10 @@
  #include "JuceHeader.h"
 #endif
 
+namespace Element {
+    namespace Tags {
+        const Identifier node = "node";
+    }
+}
+
 #endif  // ELEMENT_APP_H
