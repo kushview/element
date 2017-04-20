@@ -27,21 +27,22 @@ namespace Element {
 class Node : public ObjectModel
 {
 public:
-    Node (const ValueTree& data)
+    Node (const ValueTree& data, const bool setMissing = true)
         : ObjectModel (data)
     {
         jassert (data.hasType (Tags::node));
-        setDefaultProperties();
+        if (setMissing)
+            setMissingProperties();
     }
     
     Node (const Identifier& nodeType)
         : ObjectModel (Tags::node)
     {
-        setDefaultProperties();
+        setMissingProperties();
     }
     
 private:
-    inline void setDefaultProperties()
+    inline void setMissingProperties()
     {
         stabilizePropertyString (Slugs::type, "default");
     }
