@@ -272,10 +272,10 @@ namespace Element {
         // }
         
         matrix.resize (newNumRows, newNumCols);
-        if (auto* p = findParentComponentOfClass<ConnectionGrid>())
+        if (auto* grid = findParentComponentOfClass<ConnectionGrid>())
         {
-            p->sources->updateContent();
-            p->destinations->updateContent();
+            grid->sources->updateContent();
+            grid->destinations->updateContent();
         }
         repaint();
     }
