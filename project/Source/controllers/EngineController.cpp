@@ -56,6 +56,7 @@ void EngineController::activate()
 void EngineController::changeListenerCallback (ChangeBroadcaster*)
 {
     if (auto* app = dynamic_cast<AppController*> (getRoot())) {
+        ignoreUnused(app);
         DBG("[EC] root graph changed");
     }
 }

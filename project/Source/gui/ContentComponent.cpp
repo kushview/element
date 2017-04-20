@@ -10,9 +10,11 @@
 #include "gui/ConnectionGrid.h"
 #include "gui/GuiApp.h"
 #include "gui/LookAndFeel.h"
+#include "session/NodeModel.h"
+#include "Globals.h"
 
 #include "gui/ContentComponent.h"
-#include "Globals.h"
+
 
 namespace Element {
 
@@ -107,7 +109,8 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (AppController& app, GuiApp& gui)
+    ContentContainer (ContentComponent& cc, AppController& app, GuiApp& gui)
+        : owner(cc)
     {
         AudioEnginePtr e (app.getGlobals().engine());
         GraphProcessor& graph (e->graph());
@@ -116,8 +119,8 @@ public:
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
         addAndMakeVisible (dummy2 = new Component());
         
-        const Node root (graph.getNodesModel());
-        dummy1->setGraphNode (node);
+        const Node root (graph.getGraphModel());
+        dummy1->setNode (root);
         
         updateLayout();
         resized();
@@ -137,6 +140,7 @@ public:
     }
     
 private:
+    ContentComponent& owner;
     StretchableLayoutManager layout;
     ScopedPointer<StretchableLayoutResizerBar> bar;
     ScopedPointer<ConnectionGrid> dummy1;
@@ -158,7 +162,7 @@ ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
     addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (controller, gui));
+    addAndMakeVisible (container = new ContentContainer (*this, controller, gui));
     
     updateLayout();
     resized();

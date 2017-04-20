@@ -709,6 +709,13 @@ GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 s
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_)
 { }
 
+static ValueTree createGraphModel() {
+    ValueTree graphModel ("node");
+    graphModel.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
+    graphModel.setProperty (Slugs::name, "Processing Graph", nullptr);
+    return graphModel;
+}
+    
 GraphProcessor::GraphProcessor()
     : lastNodeId (0),
       renderingBuffers (1, 1),
@@ -716,8 +723,9 @@ GraphProcessor::GraphProcessor()
       currentAudioOutputBuffer (1, 1),
       currentMidiInputBuffer (nullptr)
 {
-    nodesModel = ValueTree ("nodes");
-    arcsModel  = ValueTree ("arcs");
+    graphModel = createGraphModel();
+    nodesModel = graphModel.getOrCreateChildWithName("nodes", nullptr);
+    arcsModel  = graphModel.getOrCreateChildWithName("arcs", nullptr);
 
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = ELEMENT_INVALID_PORT;

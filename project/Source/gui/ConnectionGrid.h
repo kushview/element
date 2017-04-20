@@ -19,7 +19,7 @@ public:
     ConnectionGrid();
     ~ConnectionGrid();
     
-    void setGraphNode (const Node& node);
+    void setNode (const Node& node);
     
     void paint (Graphics&) override;
     void resized() override;

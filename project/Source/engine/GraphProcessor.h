@@ -311,9 +311,10 @@ public:
 
     virtual void fillInPluginDescription (PluginDescription& d) const;
 
-    inline ValueTree getGraphState() const { return nodesModel; }
+    inline ValueTree getGraphState() const { return getGraphModel(); }
+    inline ValueTree getGraphModel() const { return graphModel; }
     inline ValueTree getNodesModel() const { return nodesModel; }
-    inline ValueTree getArcsModel() const { return arcsModel; }
+    inline ValueTree getArcsModel()  const { return arcsModel; }
 
 protected:
     virtual GraphNode* createNode (uint32 nodeId, Processor* proc) { return new GraphNode (nodeId, proc); }

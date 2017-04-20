@@ -1,3 +1,4 @@
+#include "ElementApp.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/PluginWrapper.h"
@@ -8,12 +9,16 @@ GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcep
     : nodeId (nodeId_),
       proc (processor_),
       isPrepared (false),
-      metadata ("metadata")
+      metadata (Tags::node)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set(1.0f);
     inputGain.set(1.0f); lastInputGain.set(1.0f);
     jassert (proc != nullptr);
+    
+    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr);
+    metadata.setProperty (Slugs::name, proc->getName(), nullptr);
+    metadata.setProperty (Slugs::type, "plugin", nullptr);
 }
 
 void GraphNode::setInputGain (const float f) {

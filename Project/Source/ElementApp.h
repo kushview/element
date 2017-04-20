@@ -17,6 +17,7 @@ namespace Element {
 namespace Tags {
     const Identifier graph = "graph";
     const Identifier node = "node";
+    const Identifier nodes = "nodes";
 }
 }
 
