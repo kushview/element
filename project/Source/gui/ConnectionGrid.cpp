@@ -25,7 +25,8 @@ namespace Element {
     {
     public:
         PatchMatrix()
-            : matrix()
+            : useHighlighting(false),
+              matrix()
         {
             setSize (300, 200);
 
@@ -42,7 +43,8 @@ namespace Element {
         
         const Node getNode (const int index, const bool isSource) const
         {
-            return nodes [isSource ? audioOutIndexes [index] : audioInIndexes [index]];
+            return nodes [isSource ? audioOutIndexes [index]
+                                   : audioInIndexes [index]];
         }
         
         const int getAudioChannelForIndex (const int index, const bool isSource) const
@@ -52,6 +54,14 @@ namespace Element {
         }
         
         void updateContent();
+        
+        void setUseHighlighting (const bool shouldUseHighlighting)
+        {
+            if (shouldUseHighlighting == useHighlighting)
+                return;
+            useHighlighting = shouldUseHighlighting;
+            repaint();
+        }
         
         void mouseMove (const MouseEvent& ev) override {
             PatchMatrixComponent::mouseMove (ev);
@@ -64,7 +74,8 @@ namespace Element {
             const Node src (getNode (row, true));
             const Node dst (getNode (column, false));
             
-            if (mouseIsOverCell (row, column) && ! matrix.connected (row, column))
+            if (useHighlighting &&
+                    (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
             {
                 g.setColour (Element::LookAndFeel_E1::elementBlue.withAlpha (0.3f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
@@ -88,9 +99,7 @@ namespace Element {
             const int dstChan (getAudioChannelForIndex (col, false));
             
             if (ev.mods.isPopupMenu()) {
-                PopupMenu menu;
-                menu.addItem (1, "hello");
-                menu.show();
+                // noop
                 return;
             }
             
@@ -141,6 +150,7 @@ namespace Element {
         friend class ConnectionGrid;
         friend class Sources;
         friend class Destinations;
+        bool useHighlighting;
         MatrixState matrix;
         ValueTree nodeModels;
         NodeArray nodes;
@@ -176,6 +186,50 @@ namespace Element {
                 g.drawFittedText (text, 0, 0, height - 1, width - 1,
                                   Justification::centredRight, 1);
                 g.restoreState();
+            }
+        }
+        
+        static ValueTree findArc (const ValueTree& arcs, uint32 sourceNode, int sourceChannel, uint32 destNode, int destChannel)
+        {
+            for (int i = arcs.getNumChildren(); --i >= 0;)
+            {
+                const ValueTree arc (arcs.getChild (i));
+                if (sourceNode == (uint32)(int64)arc.getProperty ("srcNode") &&
+                    sourceChannel == (int) arc.getProperty ("srcChannel") &&
+                    destNode == (uint32)(int64)arc.getProperty ("dstNode") &&
+                    destChannel == (int) arc.getProperty ("dstChannel"))
+                {
+                    return arc;
+                }
+            }
+            
+            return ValueTree::invalid;
+        }
+        
+        static ValueTree findArc (const ValueTree& arcs, const Node& sourceNode, int sourceChannel,
+                                  const Node& destNode, int destChannel)
+        {
+            return findArc (arcs, sourceNode.getNodeId(), sourceChannel,
+                                  destNode.getNodeId(), destChannel);
+        }
+        
+        void resetMatrix()
+        {
+            const ValueTree arcs (nodeModels.getParent().getChildWithName(Tags::arcs));
+            jassert (arcs.hasType (Tags::arcs));
+            for (int row = 0; row < matrix.getNumRows(); ++row)
+            {
+                for (int col = 0; col < matrix.getNumColumns(); ++col)
+                {
+                    const Node src = getNode (row, true);
+                    const Node dst = getNode (col, false);
+                    const ValueTree arc (findArc (arcs, src, getAudioChannelForIndex (row, true),
+                                                        dst, getAudioChannelForIndex (col, false)));
+                    if (arc.isValid())
+                        matrix.connect(row, col);
+                    else
+                        matrix.disconnect(row, col);
+                }
             }
         }
         
@@ -363,17 +417,21 @@ namespace Element {
         matrix.resize (newNumRows, newNumCols);
         jassert(newNumRows == audioOutChannels.size() &&
                 newNumCols == audioInChannels.size());
-        repaint();
+        
+        resetMatrix();
+        
         if (auto* grid = findParentComponentOfClass<ConnectionGrid>())
         {
             grid->sources->updateContent();
             grid->destinations->updateContent();
         }
+        
+        repaint();
     }
 
     // MARK: Connection Grid IMPL
     
-    ConnectionGrid::ConnectionGrid ()
+    ConnectionGrid::ConnectionGrid()
     {
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());
@@ -396,8 +454,7 @@ namespace Element {
     {
         jassert (newNode.hasNodeType (Tags::graph)); // need a graph at the moment
         jassert (this->matrix != nullptr);
-        DBG(newNode.node().toXmlString());
-        matrix->nodeModels = newNode.node().getChildWithName(Tags::nodes);
+        matrix->nodeModels = newNode.getNodesValueTree();
     }
     
     void ConnectionGrid::paint (Graphics& g)

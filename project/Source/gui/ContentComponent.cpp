@@ -15,6 +15,7 @@
 
 #include "gui/ContentComponent.h"
 
+#define EL_USE_AUDIO_PANEL 0
 
 namespace Element {
 
@@ -52,13 +53,15 @@ public:
     {
         clearPanels();
         
+        Component* c = nullptr;
+       #if EL_USE_AUDIO_PANEL
         names.add ("Audio");
-        Component* c = new AudioIOPanelView();
+        c = new AudioIOPanelView();
         addPanel (-1, c, true);
         setPanelHeaderSize (c, headerHeight);
         setMaximumPanelSize (c, 160);
         setPanelSize (c, 60, false);
-        
+       #endif
         names.add ("Plugins");
         c = new PluginsPanelView (globals.plugins());
         addPanel (-1, c, true);

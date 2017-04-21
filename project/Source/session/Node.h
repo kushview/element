@@ -43,6 +43,7 @@ namespace Element {
         const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
         
         const bool canConnectTo (const Node& o) const;
+        ValueTree getNodesValueTree() const { return objectData.getChildWithName(Tags::nodes); }
         ValueTree getParentArcsNode() const;
         
     private:
