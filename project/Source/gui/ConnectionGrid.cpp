@@ -39,56 +39,148 @@ namespace Element {
             nodeModels.removeListener (this);
         }
         
-        void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
+        
+        const Node getNode (const int index, const bool isSource) const
         {
-            matrix.toggleCell (row, col);
-            repaint();
+            return nodes [isSource ? audioOutIndexes [index] : audioInIndexes [index]];
         }
         
-        const Node getNode (const int index) const { return nodes [index]; }
+        const int getAudioChannelForIndex (const int index, const bool isSource) const
+        {
+            return isSource ? audioOutChannels.getUnchecked(index)
+                            : audioInChannels.getUnchecked(index);
+        }
         
         void updateContent();
+        
+        void mouseMove (const MouseEvent& ev) override {
+            PatchMatrixComponent::mouseMove (ev);
+            repaint();
+        }
         
         void paintMatrixCell (Graphics& g, const int width, const int height,
                               const int row, const int column) override
         {
-            g.setColour (matrix.isCellToggled (row, column) ?
-                         Colour (Element::LookAndFeel_E1::defaultMatrixCellOnColor) :
-                         Colour (Element::LookAndFeel_E1::defaultMatrixCellOffColor));
-            g.fillRect (0, 0, width - gridPadding, height - gridPadding);
-        }
+            const Node src (getNode (row, true));
+            const Node dst (getNode (column, false));
+            
+            if (mouseIsOverCell (row, column) && ! matrix.connected (row, column))
+            {
+                g.setColour (Element::LookAndFeel_E1::elementBlue.withAlpha (0.3f));
+                g.fillRect (0, 0, width - gridPadding, height - gridPadding);
+            }
+            else
+            {
+                g.setColour (matrix.connected (row, column) ?
+                             Colour (Element::LookAndFeel_E1::elementBlue.brighter()) :
+                             Colour (Element::LookAndFeel_E1::defaultMatrixCellOffColor));
+        
+                g.fillRect (0, 0, width - gridPadding, height - gridPadding);
 
-        int getNumRows()    override { return nodes.size(); }
-        int getNumColumns() override { return nodes.size(); }
-
-        void updateMatrix (const MatrixState& state) {
-            matrix = state;
+            }
         }
+        
+        void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
+        {
+            const Node srcNode (getNode (row, true));
+            const int srcChan (getAudioChannelForIndex (row, true));
+            const Node dstNode (getNode (col, false));
+            const int dstChan (getAudioChannelForIndex (col, false));
+            
+            if (ev.mods.isPopupMenu()) {
+                PopupMenu menu;
+                menu.addItem (1, "hello");
+                menu.show();
+                return;
+            }
+            
+            if (! srcNode.canConnectTo (dstNode)) {
+                matrix.disconnect (row, col);
+                return;
+            }
+            
+            ValueTree arcs (srcNode.getParentArcsNode());
+            for (int i = arcs.getNumChildren(); --i >= 0;)
+            {
+                const ValueTree arc (arcs.getChild (i));
+                if (srcNode.getNodeId() == (uint32)(int64)arc.getProperty ("srcNode") &&
+                    srcChan == (int) arc.getProperty ("srcChannel") &&
+                    dstNode.getNodeId() == (uint32)(int64)arc.getProperty ("dstNode") &&
+                    dstChan == (int) arc.getProperty ("dstChannel"))
+                {
+                    matrix.disconnect (row, col);
+                    arcs.removeChild (arc, nullptr);
+                    repaint();
+                    return;
+                }
+            }
+            
+            ValueTree arc (Tags::arc);
+            arc.setProperty ("srcNode", (int64) srcNode.getNodeId(), nullptr)
+               .setProperty ("srcChannel", srcChan, nullptr)
+               .setProperty ("dstNode", (int64) dstNode.getNodeId(), nullptr)
+               .setProperty ("dstChannel", dstChan, nullptr);
+            jassert (arcs.hasType (Tags::arcs));
+            arcs.addChild (arc, -1, nullptr);
+            matrix.connect (row, col);
+            repaint();
+        }
+        
+        int getNumRows()    override { return matrix.getNumRows(); }
+        int getNumColumns() override { return matrix.getNumColumns(); }
         
         void paint (Graphics& g) override
         {
             if (matrix.isNotEmpty())
-                return PatchMatrixComponent::paint(g);
+                return PatchMatrixComponent::paint (g);
             
             paintEmptyMessage (g, getWidth(), getHeight());
         }
         
     private:
         friend class ConnectionGrid;
+        friend class Sources;
+        friend class Destinations;
         MatrixState matrix;
         ValueTree nodeModels;
         NodeArray nodes;
+        Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels;
 
         void paintEmptyMessage (Graphics& g, const int width, const int height) {
 //            return;
 //            g.fillAll (LookAndFeel_E1::widgetBackgroundColor.darker());
-//            g.setColour(LookAndFeel_E1::textColor);
+            g.setColour(LookAndFeel_E1::textColor);
             g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
+        }
+        
+        void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
+                               bool rowIsSelected, bool isSource)
+        {
+            const Node node (getNode (rowNumber, isSource));
+            const int channel = 1 + getAudioChannelForIndex (rowNumber, isSource);
+            String text = node.getName();
+            text << " " << channel;
+            g.setColour (LookAndFeel_E1::widgetBackgroundColor);
+            g.fillRect (0, 0, width - 1, height - 1);
+            g.setColour (Colours::white);
+            
+            if (isSource)
+            {
+                g.drawText (text, 0, 0, width - 1, height - 1, Justification::centredLeft);
+            }
+            else
+            {
+                g.saveState();
+                g.addTransform (AffineTransform::identity.rotated (
+                    1.57079633f, (float)width, 0.0f));
+                g.drawFittedText (text, 0, 0, height - 1, width - 1,
+                                  Justification::centredRight, 1);
+                g.restoreState();
+            }
         }
         
         void buildNodeArray()
         {
-            // DBG(nodeModels.toXmlString());
             nodes.clearQuick();
             for (int i = 0; i < nodeModels.getNumChildren(); ++i)
             {
@@ -106,14 +198,16 @@ namespace Element {
         virtual void valueTreeChildAdded (ValueTree& parentTree,
                                           ValueTree& childWhichHasBeenAdded) override
         {
-            buildNodeArray();
+            if (nodeModels == parentTree && childWhichHasBeenAdded.hasType(Tags::node))
+                buildNodeArray();
         }
         
         virtual void valueTreeChildRemoved (ValueTree& parentTree,
                                             ValueTree& childWhichHasBeenRemoved,
                                             int indexFromWhichChildWasRemoved) override
         {
-            buildNodeArray();
+            if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node))
+                buildNodeArray();
         }
         
         virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
@@ -128,13 +222,15 @@ namespace Element {
             buildNodeArray();
         }
     };
+
+    // MARK: Sources
     
     class ConnectionGrid::Sources : public ListBox,
                                     public ListBoxModel
     {
     public:
         Sources (PatchMatrix* m)
-            : matrix(m)
+            : matrix (m)
         {
             jassert (m != nullptr);
             setRowHeight (matrix->getRowThickness());
@@ -148,12 +244,7 @@ namespace Element {
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            const Node node (matrix->getNode (rowNumber));
-            g.setColour (LookAndFeel_E1::widgetBackgroundColor);
-            g.fillRect (0, 0, width - 1, height - 1);
-            
-            g.setColour (Colours::white);
-            g.drawText (node.getName(), 0, 0, width - 1, height - 1, Justification::centredLeft);
+            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected, true);
         }
         
         void listWasScrolled() override
@@ -185,7 +276,11 @@ namespace Element {
         friend class PatchMatrix;
     };
     
+    // MARK: Controls
+    
     class ConnectionGrid::Controls : public Component { };
+    
+    // MARK: Destinations
     
     class ConnectionGrid::Destinations : public HorizontalListBox,
                                          public ListBoxModel
@@ -204,29 +299,7 @@ namespace Element {
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            const Node node (matrix->getNode (rowNumber));
-            g.setColour (LookAndFeel_E1::widgetBackgroundColor);
-            g.fillRect (0, 0, width - 1, height - 1);
-            
-            // ViewHelpers::drawVerticalTextRow (node.getName(), g, width, height, rowIsSelected);
-            g.saveState();
-            g.addTransform (AffineTransform::identity.rotated (1.57079633f, (float)width, 0.0f));
-            
-//            if (selected)
-//            {
-//                g.setColour(LF::textColor.darker (0.6000006));
-//                g.setOpacity (0.60);
-//                g.fillRect (0, 0, h, w);
-//            }
-            
-#if JUCE_MAC
-            // g.setFont (Resources::normalFontSize);
-#endif
-            
-            g.setColour (Colours::white);
-            g.drawFittedText (node.getName(), 0, 0, height - 1, width - 1, Justification::centredRight, 1);
-            
-            g.restoreState();
+            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected, false);
         }
         
         void listWasScrolled() override
@@ -243,6 +316,8 @@ namespace Element {
         friend class PatchMatrix;
     };
     
+    // MARK: Quads
+    
     class ConnectionGrid::Quads : public QuadrantLayout
     {
     public:
@@ -254,33 +329,49 @@ namespace Element {
         }
     };
     
+    // MARK: PatchMatrix IMPL
+    
     void ConnectionGrid::PatchMatrix::updateContent()
     {
-        int newNumRows = nodes.size();
-        int newNumCols = nodes.size();
-        
-        // if (auto *cc = findParentComponentOfClass<ContentComponent>())
-        // {
-        //     auto e = cc->getGlobals().engine();
-        //     auto& g (e->graph());
-        //     for (int i = 0; i < g.getNumNodes(); ++i)
-        //     {
-        //         GraphNodePtr node = g.getNode (i);
-        //         newNumRows += node->getNumAudioInputs();
-        //         newNumCols += node->getNumAudioOutputs();
-        //     }
-        // }
+        audioInIndexes.clearQuick(); audioOutIndexes.clearQuick();
+        audioInChannels.clearQuick(); audioOutChannels.clearQuick();
+        int newNumRows = 0, newNumCols = 0, nodeIndex = 0;
+        for (const Node& node : nodes)
+        {
+            const int numAudioIns   = node.getNumAudioIns();
+            const int numAudioOuts  = node.getNumAudioOuts();
+            for (int i = 0; i < jmax (numAudioIns, numAudioOuts); ++i)
+            {
+                if (i < numAudioIns)
+                {
+                    audioInIndexes.add (nodeIndex);
+                    audioInChannels.add (i);
+                }
+                
+                if (i < numAudioOuts)
+                {
+                    audioOutIndexes.add (nodeIndex);
+                    audioOutChannels.add (i);
+                }
+            }
+            
+            newNumRows += numAudioOuts;
+            newNumCols += numAudioIns;
+            ++nodeIndex;
+        }
         
         matrix.resize (newNumRows, newNumCols);
+        jassert(newNumRows == audioOutChannels.size() &&
+                newNumCols == audioInChannels.size());
+        repaint();
         if (auto* grid = findParentComponentOfClass<ConnectionGrid>())
         {
             grid->sources->updateContent();
             grid->destinations->updateContent();
         }
-        repaint();
     }
 
-    
+    // MARK: Connection Grid IMPL
     
     ConnectionGrid::ConnectionGrid ()
     {

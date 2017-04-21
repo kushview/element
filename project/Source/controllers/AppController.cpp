@@ -24,6 +24,7 @@ AppController::~AppController() { }
 void AppController::run()
 {
     activate();
+    getGlobals().engine()->activate();
     gui->run();
 }
 

@@ -253,6 +253,8 @@
         <FILE id="Z8fHex" name="MidiClip.cpp" compile="1" resource="0" file="Source/session/MidiClip.cpp"/>
         <FILE id="dIrbHz" name="MidiClip.h" compile="0" resource="0" file="Source/session/MidiClip.h"/>
         <FILE id="nB7y30" name="Module.h" compile="0" resource="0" file="Source/session/Module.h"/>
+        <FILE id="WCIEqE" name="Node.cpp" compile="1" resource="0" file="Source/session/Node.cpp"/>
+        <FILE id="kwalR3" name="Node.h" compile="0" resource="0" file="Source/session/Node.h"/>
         <FILE id="QI9jCi" name="NodeModel.h" compile="0" resource="0" file="Source/session/NodeModel.h"/>
         <FILE id="o4zGK5" name="Note.cpp" compile="1" resource="0" file="Source/session/Note.cpp"/>
         <FILE id="gswGU9" name="Note.h" compile="0" resource="0" file="Source/session/Note.h"/>

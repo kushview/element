@@ -15,9 +15,11 @@
 
 namespace Element {
 namespace Tags {
-    const Identifier graph = "graph";
-    const Identifier node = "node";
-    const Identifier nodes = "nodes";
+    const Identifier arc    = "arc";
+    const Identifier arcs   = "arcs";
+    const Identifier graph  = "graph";
+    const Identifier node   = "node";
+    const Identifier nodes  = "nodes";
 }
 }
 

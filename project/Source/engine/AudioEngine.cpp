@@ -256,7 +256,7 @@ public:
             {
                 nextGraph->setPlayHead (engine->transport());
                 nextGraph->setPlayConfigDetails (numInputChans, numOutputChans,
-                                                       sampleRate, blockSize);
+                                                 sampleRate, blockSize);
                 nextGraph->prepareToPlay (sampleRate, blockSize);
             }
 
@@ -394,6 +394,7 @@ public:
             if (isPrepared)
                 processor->releaseResources();
 
+            processor->setPlayConfigDetails(numChansIn, numChansOut, sampleRate, blockSize);
             GraphProcessor* const oldProcessor = processor;
             setRootGraph (nullptr);
             setRootGraph (oldProcessor);
@@ -480,15 +481,17 @@ AudioEngine::~AudioEngine()
 void AudioEngine::activate()
 {
     auto& devices (globals().getDeviceManager());
-    
+    graph().setPlayConfigDetails (2, 2, 44100.0, 1024);
     cb->setRootGraph (&graph());
     devices.addMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
     Shared<EngineControl> c (controller());
 
     InternalFormat* fmt = globals().plugins().format<InternalFormat>();
-    c->addFilter (fmt->description (InternalFormat::audioInputDevice));
-    c->addFilter (fmt->description (InternalFormat::audioOutputDevice));
-    c->addFilter (fmt->description (InternalFormat::midiInputDevice));
+    String errormsg;
+    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
+    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
+    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
+    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
 }
 
 AudioIODeviceCallback&  AudioEngine::callback()              { assert (cb != nullptr); return *cb; }

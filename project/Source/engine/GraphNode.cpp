@@ -16,9 +16,11 @@ GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcep
     inputGain.set(1.0f); lastInputGain.set(1.0f);
     jassert (proc != nullptr);
     
-    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr);
-    metadata.setProperty (Slugs::name, proc->getName(), nullptr);
-    metadata.setProperty (Slugs::type, "plugin", nullptr);
+    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (Slugs::name, proc->getName(), nullptr)
+            .setProperty (Slugs::type, "plugin", nullptr)
+            .setProperty ("numAudioIns", getNumAudioInputs(), nullptr)
+            .setProperty ("numAudioOuts", getNumAudioOutputs(), nullptr);
 }
 
 void GraphNode::setInputGain (const float f) {
@@ -43,7 +45,6 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     GraphProcessor& graph (*getParentGraph());
     AudioPluginInstance* const src = getAudioPluginInstance();
     AudioPluginInstance* const dst = other->getAudioPluginInstance();
-    DBG("Try connecting: " << src->getName() << " to " << dst->getName());
 
     const int totalChans = jmin (getNumAudioOutputs(), other->getNumAudioInputs());
     bool failed = false;
@@ -139,8 +140,9 @@ bool GraphNode::isSubgraph() const noexcept
 }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,
-                                    GraphProcessor* const graph)
+                         GraphProcessor* const graph)
 {
+    parent = graph;
     if (! isPrepared)
     {
         AudioPluginInstance* instance = getAudioPluginInstance();
@@ -149,7 +151,10 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
                                         sampleRate, blockSize);
         setParentGraph (graph);
         instance->prepareToPlay (sampleRate, blockSize);
-
+        
+        metadata.setProperty ("numAudioIns", instance->getTotalNumInputChannels(), nullptr)
+                .setProperty ("numAudioOuts", instance->getTotalNumOutputChannels(), nullptr);
+        
         inRMS.clearQuick(true);
         for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
         {

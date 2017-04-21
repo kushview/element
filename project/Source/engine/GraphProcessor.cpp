@@ -726,13 +726,15 @@ GraphProcessor::GraphProcessor()
     graphModel = createGraphModel();
     nodesModel = graphModel.getOrCreateChildWithName("nodes", nullptr);
     arcsModel  = graphModel.getOrCreateChildWithName("arcs", nullptr);
-
+    
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = ELEMENT_INVALID_PORT;
+    graphModel.addListener(this);
 }
 
 GraphProcessor::~GraphProcessor()
 {
+    graphModel.removeListener (this);
     clearRenderingSequence();
     clear();
 }
@@ -1229,6 +1231,71 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
     return String::empty;
 }
 
+    void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
+                                                   const Identifier& property)
+    {
+    
+    }
+    
+    void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    {
+        if (parent == arcsModel && child.hasType (Tags::arc)) {
+            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty ("srcNode", 0));
+            const int srcChan = child.getProperty ("srcChannel", -1);
+            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty ("dstNode", 0));
+            const int dstChan = child.getProperty("dstChannel", -1);
+            
+            if (addConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
+                               dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
+            {
+                // noop
+            }
+            else
+            {
+                // noop
+            }
+        }
+    }
+    
+    void GraphProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child,
+                                                int indexFromWhichChildWasRemoved)
+    {
+        graphModel.removeListener (this);
+        
+        if (parent == arcsModel && child.hasType (Tags::arc))
+        {
+            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty ("srcNode", 0));
+            const int srcChan = child.getProperty ("srcChannel", -1);
+            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty ("dstNode", 0));
+            const int dstChan = child.getProperty("dstChannel", -1);
+            
+            if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
+                                  dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
+            {
+                // noop
+            }
+            else
+            {
+                // noop
+            }
+        }
+        
+        graphModel.addListener (this);
+    }
+    
+    void GraphProcessor::valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                     int oldIndex, int newIndex) { }
+    
+    void GraphProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) { }
+    
+    void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
+    {
+
+    }
+    
+    
+    // MARK: AudioGraphIOProcessor
+    
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
@@ -1393,6 +1460,7 @@ void GraphProcessor::AudioGraphIOProcessor::setParentGraph (GraphProcessor* cons
         setPlayConfigDetails (type == audioOutputNode ? graph->getTotalNumOutputChannels() : 0,
                               type == audioInputNode ? graph->getTotalNumInputChannels() : 0,
                               graph->getSampleRate(), graph->getBlockSize());
+        DBG(getName() << " ins: " << getTotalNumInputChannels() << " outs: " << getTotalNumOutputChannels());
         updateHostDisplay();
     }
 }
