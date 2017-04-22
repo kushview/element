@@ -1469,7 +1469,6 @@ void GraphProcessor::AudioGraphIOProcessor::setParentGraph (GraphProcessor* cons
         setPlayConfigDetails (type == audioOutputNode ? graph->getTotalNumOutputChannels() : 0,
                               type == audioInputNode ? graph->getTotalNumInputChannels() : 0,
                               graph->getSampleRate(), graph->getBlockSize());
-        DBG(getName() << " ins: " << getTotalNumInputChannels() << " outs: " << getTotalNumOutputChannels());
         updateHostDisplay();
     }
 }
