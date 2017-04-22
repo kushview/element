@@ -14,12 +14,20 @@
 #endif
 
 namespace Element {
-namespace Tags {
-    const Identifier arc    = "arc";
-    const Identifier arcs   = "arcs";
-    const Identifier graph  = "graph";
-    const Identifier node   = "node";
-    const Identifier nodes  = "nodes";
+namespace Tags
+{
+    const Identifier arc                = "arc";
+    const Identifier arcs               = "arcs";
+    const Identifier graph              = "graph";
+    const Identifier node               = "node";
+    const Identifier nodes              = "nodes";
+    
+    const Identifier sourceNode         = "sourceNode";
+    const Identifier sourcePort         = "sourcePort";
+    const Identifier sourceChannel      = "sourceChannel";
+    const Identifier destNode           = "destNode";
+    const Identifier destPort           = "destPort";
+    const Identifier destChannel        = "destChannel";
 }
 }
 

@@ -211,26 +211,26 @@ namespace Element {
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected, bool isSource)
         {
+            const int padding = 18;
             const Node node (getNode (rowNumber, isSource));
             const int channel = 1 + getAudioChannelForIndex (rowNumber, isSource);
             String text = node.getName();
             text << " " << channel;
             g.setColour (LookAndFeel_E1::widgetBackgroundColor);
-            g.fillRect (0, 0, width - 1, height - 1);
+            if (isSource)
+                g.fillRect (0, 0, width - 1, height - 1);
+            else
+                g.fillRect (0, 1, width - 1, height - 1);
             g.setColour (Colours::white);
             
             if (isSource)
             {
-                g.drawText (text, 0, 0, width - 1, height - 1, Justification::centredLeft);
+                g.drawText (text, padding, 0, width - 1 - padding, height - 1, Justification::centredLeft);
             }
             else
             {
-                g.saveState();
-                g.addTransform (AffineTransform::identity.rotated (
-                    1.57079633f, (float)width, 0.0f));
-                g.drawFittedText (text, 0, 0, height - 1, width - 1,
-                                  Justification::centredRight, 1);
-                g.restoreState();
+                g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
+                g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
             }
         }
         
@@ -286,7 +286,6 @@ namespace Element {
                 const Node node (nodeModels.getChild(i));
                 nodes.add (node);
             }
-            
             updateContent();
         }
         

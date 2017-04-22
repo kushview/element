@@ -1,5 +1,5 @@
 /*
-    Signals.h - This file is part of Element
+    CommandManager.h - This file is part of Element
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
