@@ -102,7 +102,7 @@ GuiApp* GuiApp::create (Globals& g, AppController& a)
 }
 
 CommandManager& GuiApp::commander() {
-    return world.getCommands();
+    return world.getCommandManager();
 }
 
 Globals& GuiApp::globals()
@@ -212,11 +212,11 @@ bool GuiApp::shutdownApp()
         }
     }
 
-    if (result) {
+    if (result)
+    {
         windowManager->closeAll();
         session()->close();
         session()->clear();
-        session()->controller()->clear();
     }
 
     return result;

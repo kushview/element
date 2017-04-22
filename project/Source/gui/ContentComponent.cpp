@@ -239,15 +239,14 @@ class ContentContainer : public Component
 {
 public:
     ContentContainer (ContentComponent& cc, AppController& app, GuiApp& gui)
-        : owner(cc)
+        : owner (cc)
     {
-        AudioEnginePtr e (app.getGlobals().engine());
-        GraphProcessor& graph (e->graph());
-        
         addAndMakeVisible (dummy1 = new ConnectionGrid());
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
         addAndMakeVisible (dummy2 = new Component());
         
+        AudioEnginePtr e (app.getGlobals().getAudioEngine());
+        GraphProcessor& graph (e->graph());
         const Node root (graph.getGraphModel());
         dummy1->setNode (root);
         

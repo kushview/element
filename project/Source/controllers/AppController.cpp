@@ -15,8 +15,8 @@ AppController::AppController (Globals& g)
     gui = GuiApp::create (g, *this);
     addChild (new GuiController());
     addChild (new EngineController());
-    g.getCommands().registerAllCommandsForTarget (this);
-    g.getCommands().setFirstCommandTarget (this);
+    g.getCommandManager().registerAllCommandsForTarget (this);
+    g.getCommandManager().setFirstCommandTarget (this);
 }
 
 AppController::~AppController() { }
@@ -24,7 +24,7 @@ AppController::~AppController() { }
 void AppController::run()
 {
     activate();
-    getGlobals().engine()->activate();
+    getGlobals().getAudioEngine()->activate();
     gui->run();
 }
 

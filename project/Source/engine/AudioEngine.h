@@ -31,7 +31,7 @@ public:
     ValueTree createGraphTree();
     void restoreFromGraphTree (const ValueTree&);
     
-    Shared<EngineControl> controller();
+    JUCE_DEPRECATED(Shared<EngineControl> controller());
 
     // Member access
     ClipFactory& clips();
@@ -40,16 +40,14 @@ public:
     Transport* transport();
 
     // Engine methods
-    AudioIODeviceCallback& callback() override;
+    AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     
 private:
     class Callback;
     Callback* cb;
-
     class Private;
     ScopedPointer<Private> priv;
-
     Globals& world;
 };
 

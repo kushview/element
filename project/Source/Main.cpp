@@ -139,7 +139,7 @@ public:
     {
         controller->deactivate();
 
-        AudioEnginePtr engine (world->engine());
+        AudioEnginePtr engine (world->getAudioEngine());
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
         auto* props = settings.getUserSettings();
@@ -215,7 +215,6 @@ private:
         putenv (putEnv.toRawUTF8());
        #else
         setenv ("ELEMENT_MODULE_PATH", modDir.getFullPathName().toRawUTF8(), 1);
-        Logger::writeToLog (String("[element] module path: ") + String(getenv ("ELEMENT_MODULE_PATH")));
        #endif
     }
 };

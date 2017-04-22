@@ -36,8 +36,8 @@ public:
 
     const CommandLine cli;
 
-    AudioEnginePtr getAudioEngine();
-    CommandManager& getCommands();
+    AudioEnginePtr getAudioEngine() const;
+    CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
     PluginManager& getPluginManager();
     Settings& getSettings();
@@ -48,13 +48,12 @@ public:
     SymbolMap& symbols();
     MediaManager& media();
     Session& session();
-    AudioEnginePtr engine() const;
 
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
 
     JUCE_DEPRECATED(DeviceManager& devices());
-
+    JUCE_DEPRECATED(AudioEnginePtr engine() const);
 private:
     String appName;
     friend class Application;

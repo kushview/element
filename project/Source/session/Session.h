@@ -79,7 +79,7 @@ namespace Element {
         Shared<Monitor> getPlaybackMonitor();
 
         AssetTree& assets();
-        Shared<EngineControl> controller();
+        
         Globals& globals();
         MediaManager& media();
 
@@ -101,7 +101,7 @@ namespace Element {
         inline UndoManager* undoManager() { return nullptr; }
 
         XmlElement* createXml();
-
+        
     protected:
 
         /** Create a new session object. Session is created once and owned by Globals

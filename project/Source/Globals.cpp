@@ -88,8 +88,13 @@ Globals::~Globals()
     impl->freeAll();
 }
 
-CommandManager& Globals::getCommands() { assert(impl->commands); return *impl->commands; }
+CommandManager& Globals::getCommandManager()
+{
+    jassert (impl && impl->commands);
+    return *impl->commands;
+}
 
+    
 DeviceManager& Globals::getDeviceManager()
 {
     assert (impl->devices != nullptr);
@@ -104,9 +109,10 @@ MediaManager& Globals::media()
     return *impl->media;
 }
 
-AudioEnginePtr Globals::engine() const { return impl->engine; }
+AudioEnginePtr Globals::engine() const { return getAudioEngine(); }
+AudioEnginePtr Globals::getAudioEngine() const { return impl->engine; }
 
-PluginManager& Globals::plugins()
+    PluginManager& Globals::plugins()
 {
     assert (impl->plugins != nullptr);
     return *impl->plugins;

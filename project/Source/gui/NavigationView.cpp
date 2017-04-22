@@ -197,7 +197,7 @@ private:
             if (! cc)
                 return;
                 
-            AudioEnginePtr e = cc->app().globals().engine();
+            AudioEnginePtr e = cc->app().globals().getAudioEngine();
             GraphProcessor& graph (e->graph());
             ReferenceCountedArray<Element::GraphNode> nodes;
             graph.getOrderedNodes (nodes);

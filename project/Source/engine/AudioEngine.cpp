@@ -158,12 +158,12 @@ public:
     {
         clear();
 
-        ValueTree arcs  = data.getChildWithName ("arcs");
-        ValueTree nodes = data.getChildWithName ("nodes");
+        ValueTree arcs  = data.getChildWithName (Tags::arcs);
+        ValueTree nodes = data.getChildWithName (Tags::nodes);
         for (int i = 0; i < nodes.getNumChildren(); ++i)
         {
             ValueTree c (nodes.getChild(i));
-            if (! c.hasType ("node"))
+            if (! c.hasType (Tags::node))
                 continue;
             
             EngineHelpers::createNodeFromValueTreeNode (*this, c, plugins);
@@ -174,12 +174,12 @@ public:
             for (int i = 0; i < arcs.getNumChildren(); ++i)
             {
                 ValueTree c = arcs.getChild(i);
-                if (c.isValid() && c.hasType("arc"))
+                if (c.isValid() && c.hasType (Tags::arc))
                 {
-                    addConnection ((uint32)(int) c.getProperty ("sourceNode"),
-                                   (uint32)(int) c.getProperty ("sourcePort"),
-                                   (uint32)(int) c.getProperty ("destNode"),
-                                   (uint32)(int) c.getProperty ("destPort"));
+                    addConnection ((uint32)(int) c.getProperty (Tags::sourceNode),
+                                   (uint32)(int) c.getProperty (Tags::sourcePort),
+                                   (uint32)(int) c.getProperty (Tags::destNode),
+                                   (uint32)(int) c.getProperty (Tags::destPort));
                 }
             }
 
@@ -482,20 +482,21 @@ void AudioEngine::activate()
 {
     auto& devices (globals().getDeviceManager());
     graph().setPlayConfigDetails (2, 2, 44100.0, 1024);
-    cb->setRootGraph (&graph());
-    devices.addMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
-    Shared<EngineControl> c (controller());
+    
+    devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
 
-    InternalFormat* fmt = globals().plugins().format<InternalFormat>();
     String errormsg;
+    InternalFormat* fmt = globals().plugins().format<InternalFormat>();
     graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
     graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
     graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
     graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
+    
+    cb->setRootGraph (&graph());
 }
 
-AudioIODeviceCallback&  AudioEngine::callback()              { assert (cb != nullptr); return *cb; }
-MidiInputCallback&      AudioEngine::getMidiInputCallback()  { assert (cb != nullptr); return *cb; }
+AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (cb != nullptr); return *cb; }
+MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (cb != nullptr); return *cb; }
 
 ClipFactory& AudioEngine::clips()
 {
@@ -513,7 +514,7 @@ Shared<EngineControl> AudioEngine::controller()
 void AudioEngine::deactivate()
 {
     cb->setRootGraph (nullptr);
-    globals().getDeviceManager().removeMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
+    globals().getDeviceManager().removeMidiInputCallback (String::empty, &getMidiInputCallback());
     
     priv->controller.reset();
     priv->graph.clear();

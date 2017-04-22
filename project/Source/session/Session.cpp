@@ -1,20 +1,6 @@
 /*
     Session.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include <boost/bind.hpp>
@@ -37,12 +23,9 @@ namespace Element {
         Private (Session& s, Globals& g)
             : session (s)
         {
-            engine = g.engine();
-            assert (engine != nullptr);
+            engine = g.getAudioEngine();
+            jassert (engine != nullptr);
             playMonitor = engine->transport()->monitor();
-            graph = engine->controller();
-            assert (graph != nullptr);
-
             assets = new SessionAssets (session);
         }
 
@@ -78,9 +61,8 @@ namespace Element {
         friend class Session;
         Session&                     session;
         ScopedPointer<SessionAssets> assets;
-        AudioEnginePtr          engine;
-        Shared<EngineControl>   graph;
-        Shared<Monitor> playMonitor;
+        AudioEnginePtr               engine;
+        Shared<Monitor>              playMonitor;
     };
 
     Session::Session (Globals& g)
@@ -122,7 +104,6 @@ namespace Element {
     
     void Session::clear()
     {
-        controller()->clear();
         clearTracks();
         close();
         priv->clearSessionMedia();
@@ -136,12 +117,6 @@ namespace Element {
 
     void Session::close()
     {
-        controller()->close();
-    }
-
-    Shared<EngineControl> Session::controller()
-    {
-        return priv->graph;
     }
 
     MediaManager& Session::media()
@@ -163,7 +138,7 @@ namespace Element {
         
         ValueTree nd = node().getOrCreateChildWithName ("assets", nullptr);
         
-        if (auto engine = globals().engine()) {
+        if (auto engine = globals().getAudioEngine()) {
             const ValueTree gd = node().getOrCreateChildWithName ("graph", nullptr);
             engine->restoreFromGraphTree (gd);
         }
@@ -185,7 +160,7 @@ namespace Element {
         if (d.isValid())
             saveData.removeChild (d, nullptr);
         
-        if (auto engine = globals().engine()) {
+        if (auto engine = globals().getAudioEngine()) {
             ValueTree graph = engine->createGraphTree();
             saveData.addChild (graph, -1, nullptr);
         }
@@ -201,31 +176,22 @@ namespace Element {
     {
         close();
 
-        Shared<EngineControl> c (controller());
-        c->setTempo (node().getProperty (Slugs::tempo, 120.0f));
-
-        if (! c->open (*this)) {
-            Logger::writeToLog ("SESSION: could not open the graph engine");
-        }
     }
 
     void Session::testSetTempo (double tempo)
     {
         setProperty ("tempo", tempo);
-        Shared<EngineControl> c (controller());
-        c->setTempo (node().getProperty ("tempo", 120.0f));
+
     }
 
     void Session::testSetPlaying (bool isPlaying)
     {
-        Shared<EngineControl> c (controller());
-        c->setPlaying (isPlaying);
+
     }
 
     void Session::testSetRecording (bool isRecording)
     {
-        Shared<EngineControl> c (controller());
-        c->setRecording (isRecording);
+
     }
 
     void Session::testPrintXml()
@@ -274,7 +240,6 @@ namespace Element {
 
         if (property == Slugs::tempo)
         {
-            controller()->setTempo ((double) node().getProperty (property, 120.0f));
             notifyChanged();
         }
     }

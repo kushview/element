@@ -48,7 +48,7 @@ void EngineController::activate()
     
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& g (app->getWorld());
-    AudioEnginePtr engine (g.engine());
+    AudioEnginePtr engine (g.getAudioEngine());
     root = new GraphController (engine->graph(), g.plugins());
     root->addChangeListener (this);
 }
