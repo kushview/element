@@ -1208,43 +1208,20 @@ void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.numOutputChannels = getTotalNumOutputChannels();
 }
 
-GraphProcessor::AudioGraphIOProcessor::AudioGraphIOProcessor (const IODeviceType type_)
-    : type (type_),
-      graph (nullptr)
-{
-}
-
-GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
-{
-}
-
-const String GraphProcessor::AudioGraphIOProcessor::getName() const
-{
-    switch (type)
-    {
-        case audioOutputNode:   return "Audio Output";
-        case audioInputNode:    return "Audio Input";
-        case midiOutputNode:    return "Midi Output";
-        case midiInputNode:     return "Midi Input";
-        default:                break;
-    }
-
-    return String::empty;
-}
-
     void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
                                                    const Identifier& property)
     {
-    
+        
     }
     
     void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     {
-        if (parent == arcsModel && child.hasType (Tags::arc)) {
-            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty ("srcNode", 0));
-            const int srcChan = child.getProperty ("srcChannel", -1);
-            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty ("dstNode", 0));
-            const int dstChan = child.getProperty("dstChannel", -1);
+        if (parent == arcsModel && child.hasType (Tags::arc))
+        {
+            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+            const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+            const int dstChan = child.getProperty(Tags::destChannel, -1);
             
             if (addConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
                                dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
@@ -1265,10 +1242,10 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
         
         if (parent == arcsModel && child.hasType (Tags::arc))
         {
-            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty ("srcNode", 0));
-            const int srcChan = child.getProperty ("srcChannel", -1);
-            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty ("dstNode", 0));
-            const int dstChan = child.getProperty("dstChannel", -1);
+            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+            const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+            const int dstChan = child.getProperty(Tags::destChannel, -1);
             
             if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
                                   dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
@@ -1299,11 +1276,36 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
     
     void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
     {
-
+        
     }
     
+// MARK: AudioGraphIOProcessor
     
-    // MARK: AudioGraphIOProcessor
+GraphProcessor::AudioGraphIOProcessor::AudioGraphIOProcessor (const IODeviceType type_)
+    : type (type_), graph (nullptr)
+{
+}
+
+GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
+{
+}
+
+const String GraphProcessor::AudioGraphIOProcessor::getName() const
+{
+    switch (type)
+    {
+        case audioOutputNode:   return "Audio Output";
+        case audioInputNode:    return "Audio Input";
+        case midiOutputNode:    return "Midi Output";
+        case midiInputNode:     return "Midi Input";
+        default:                break;
+    }
+
+    return String::empty;
+}
+
+    
+
     
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
 {
@@ -1349,7 +1351,6 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
     {
         case audioOutputNode:
         {
-
             for (int i = jmin (graph->currentAudioOutputBuffer.getNumChannels(),
                                buffer.getNumChannels()); --i >= 0;)
             {
@@ -1361,7 +1362,6 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
 
         case audioInputNode:
         {
-
             for (int i = jmin (graph->currentAudioInputBuffer->getNumChannels(),
                                buffer.getNumChannels()); --i >= 0;)
             {

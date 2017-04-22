@@ -499,7 +499,7 @@ MidiInputCallback&      AudioEngine::getMidiInputCallback()  { assert (cb != nul
 
 ClipFactory& AudioEngine::clips()
 {
-    assert (priv->clips != nullptr);
+    jassert (priv->clips != nullptr);
     return *priv->clips;
 }
 

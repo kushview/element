@@ -145,10 +145,10 @@ namespace Element {
             for (int i = arcs.getNumChildren(); --i >= 0;)
             {
                 const ValueTree arc (arcs.getChild (i));
-                if (srcNode.getNodeId() == (uint32)(int64)arc.getProperty ("srcNode") &&
-                    srcChan == (int) arc.getProperty ("srcChannel") &&
-                    dstNode.getNodeId() == (uint32)(int64)arc.getProperty ("dstNode") &&
-                    dstChan == (int) arc.getProperty ("dstChannel"))
+                if (srcNode.getNodeId() == (uint32)(int64)arc.getProperty (Tags::sourceNode) &&
+                    srcChan == (int) arc.getProperty (Tags::sourceChannel) &&
+                    dstNode.getNodeId() == (uint32)(int64)arc.getProperty (Tags::destNode) &&
+                    dstChan == (int) arc.getProperty (Tags::destChannel))
                 {
                     matrix.disconnect (row, col);
                     arcs.removeChild (arc, nullptr);
@@ -158,10 +158,10 @@ namespace Element {
             }
             
             ValueTree arc (Tags::arc);
-            arc.setProperty ("srcNode", (int64) srcNode.getNodeId(), nullptr)
-               .setProperty ("srcChannel", srcChan, nullptr)
-               .setProperty ("dstNode", (int64) dstNode.getNodeId(), nullptr)
-               .setProperty ("dstChannel", dstChan, nullptr);
+            arc.setProperty (Tags::sourceNode, (int64) srcNode.getNodeId(), nullptr)
+               .setProperty (Tags::sourceChannel, srcChan, nullptr)
+               .setProperty (Tags::destNode, (int64) dstNode.getNodeId(), nullptr)
+               .setProperty (Tags::destChannel, dstChan, nullptr);
             jassert (arcs.hasType (Tags::arcs));
             arcs.addChild (arc, -1, nullptr);
             matrix.connect (row, col);
@@ -239,10 +239,10 @@ namespace Element {
             for (int i = arcs.getNumChildren(); --i >= 0;)
             {
                 const ValueTree arc (arcs.getChild (i));
-                if (sourceNode == (uint32)(int64)arc.getProperty ("srcNode") &&
-                    sourceChannel == (int) arc.getProperty ("srcChannel") &&
-                    destNode == (uint32)(int64)arc.getProperty ("dstNode") &&
-                    destChannel == (int) arc.getProperty ("dstChannel"))
+                if (sourceNode == (uint32)(int64)arc.getProperty (Tags::sourceNode) &&
+                    sourceChannel == (int) arc.getProperty (Tags::sourceChannel) &&
+                    destNode == (uint32)(int64)arc.getProperty (Tags::destNode) &&
+                    destChannel == (int) arc.getProperty (Tags::destChannel))
                 {
                     return arc;
                 }
@@ -318,6 +318,7 @@ namespace Element {
             if (nodeModels != treeWhichHasBeenChanged)
                 return;
             buildNodeArray();
+            resetMatrix();
         }
     };
 
