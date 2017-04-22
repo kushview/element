@@ -19,94 +19,220 @@
 
 namespace Element {
 
-class NavigationConcertinaPanel : public ConcertinaPanel {
-public:
-    NavigationConcertinaPanel (Globals& g)
-        : globals(g),
-          headerHeight (30),
-          defaultPanelHeight (80)
+    class ContentComponent::Resizer : public StretchableLayoutResizerBar
     {
-        setLookAndFeel (&lookAndFeel);
-        updateContent();
-    }
-    
-    ~NavigationConcertinaPanel()
-    {
-        setLookAndFeel (nullptr);
-    }
-    
-    void clearPanels()
-    {
-        Array<Component*> comps;
-        for (int i = 0; i < getNumPanels(); ++i)
-            comps.add (getPanel (i));
-        for (int i = 0; i < comps.size(); ++i)
+    public:
+        Resizer(ContentComponent& contentComponent,
+                StretchableLayoutManager* layoutToUse,
+                int itemIndexInLayout,
+                bool isBarVertical)
+            : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+              owner (contentComponent)
         {
-            removePanel (comps[i]);
-            this->removePanel(0);
+            
         }
-        names.clear();
-        comps.clear();
-    }
-    
-    void updateContent()
-    {
-        clearPanels();
         
-        Component* c = nullptr;
-       #if EL_USE_AUDIO_PANEL
-        names.add ("Audio");
-        c = new AudioIOPanelView();
-        addPanel (-1, c, true);
-        setPanelHeaderSize (c, headerHeight);
-        setMaximumPanelSize (c, 160);
-        setPanelSize (c, 60, false);
-       #endif
-        names.add ("Plugins");
-        c = new PluginsPanelView (globals.plugins());
-        addPanel (-1, c, true);
-        setPanelHeaderSize (c, headerHeight);
+        void mouseDown (const MouseEvent& ev) override
+        {
+            StretchableLayoutResizerBar::mouseDown (ev);
+            owner.resizerMouseDown();
+        }
+        
+        void mouseUp (const MouseEvent& ev) override
+        {
+            StretchableLayoutResizerBar::mouseUp(ev);
+            owner.resizerMouseUp();
+        }
+        
+    private:
+        ContentComponent& owner;
+    };
+    
+    
+class ContentComponent::Toolbar : public Component {
+    
+};
+
+class ContentComponent::StatusBar : public Component,
+                                    public Value::Listener
+{
+public:
+    StatusBar()
+    {
+        sampleRate.addListener (this);
+        streamingStatus.addListener (this);
+        status.addListener (this);
+        
+        addAndMakeVisible (sampleRateLabel);
+        addAndMakeVisible (streamingStatusLabel);
+        addAndMakeVisible (statusLabel);
+        
+        const Colour labelColor (0xff999999);
+        const Font font (12.0f);
+        
+        for (int i = 0; i < getNumChildComponents(); ++i)
+        {
+            if (Label* label = dynamic_cast<Label*> (getChildComponent (i)))
+            {
+                label->setFont (font);
+                label->setColour (Label::textColourId, labelColor);
+                label->setJustificationType (Justification::centredLeft);
+            }
+        }
     }
     
-    const StringArray& getNames() const { return names; }
-    const int getHeaderHeight() const { return headerHeight; }
-    void setHeaderHeight (const int newHeight)
+    ~StatusBar()
     {
-        jassert (newHeight > 0);
-        headerHeight = newHeight;
-        updateContent();
+        sampleRate.removeListener (this);
+        streamingStatus.removeListener (this);
+        status.removeListener (this);
+    }
+    
+    void paint (Graphics& g) override
+    {
+        g.setColour(Colour(0xff333333).brighter(0.2));
+        g.drawLine(streamingStatusLabel.getX(), 0, streamingStatusLabel.getX(), getHeight());
+        g.drawLine(sampleRateLabel.getX(), 0, sampleRateLabel.getX(), getHeight());
+        g.setColour (Colour(0xff333333));
+        g.drawLine (0, 0, getWidth(), 0);
+        g.setColour (Colour(0xff222222));
+        g.drawLine (0, 1, getWidth(), 1);
+    }
+    
+    void resized() override
+    {
+        Rectangle<int> r (getLocalBounds());
+        statusLabel.setBounds (r.removeFromLeft (getWidth() / 5));
+        streamingStatusLabel.setBounds (r.removeFromLeft (r.getWidth() / 2));
+        sampleRateLabel.setBounds(r);
+    }
+    
+#if 0
+    void setDevice (const Driver& driver)
+    {
+        node = driver.node();
+        
+        sampleRate.referTo (node.getPropertyAsValue (Tags::sampleRate, nullptr));
+        streamingStatus.referTo (node.getPropertyAsValue (Tags::streamingStateName, nullptr));
+        status = "Ready";
+        updateLabels();
+    }
+#endif
+    void valueChanged (Value&) override
+    {
+        updateLabels();
+    }
+    
+    void updateLabels()
+    {
+        String text = "Current sample rate: ";
+        text << String ((double)sampleRate.getValue() * 0.001, 3) << " KHz";
+        sampleRateLabel.setText (text, dontSendNotification);
+        
+        text.clear();
+        String strText = streamingStatus.getValue().toString();
+        if (strText.isEmpty())
+            strText = "Pending";
+        text << "Engine state: " << strText;
+        streamingStatusLabel.setText (text, dontSendNotification);
+        
+        statusLabel.setText (status.getValue().toString(), dontSendNotification);
     }
     
 private:
-    typedef Element::LookAndFeel ELF;
-    Globals& globals;
-    StringArray names;
-    int headerHeight;
-    int defaultPanelHeight;
-    
-    class LookAndFeel : public Element::LookAndFeel
+    Label sampleRateLabel, streamingStatusLabel, statusLabel;
+    ValueTree node;
+    Value sampleRate, streamingStatus, status;
+};
+
+class NavigationConcertinaPanel : public ConcertinaPanel {
+public:
+    NavigationConcertinaPanel (Globals& g)
+    : globals(g),
+      headerHeight (30),
+      defaultPanelHeight (80)
+{
+    setLookAndFeel (&lookAndFeel);
+    updateContent();
+}
+
+~NavigationConcertinaPanel()
+{
+    setLookAndFeel (nullptr);
+}
+
+void clearPanels()
+{
+    Array<Component*> comps;
+    for (int i = 0; i < getNumPanels(); ++i)
+        comps.add (getPanel (i));
+    for (int i = 0; i < comps.size(); ++i)
     {
-    public:
-        LookAndFeel() { }
-        ~LookAndFeel() { }
-        
-        void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
-                                        bool isMouseOver, bool isMouseDown,
-                                        ConcertinaPanel& panel, Component& comp)
-        {
-            auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
-            int i = p->getNumPanels();
-            while (--i >= 0) {
-                if (p->getPanel(i) == &comp)
-                    break;
-            }
-            ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
-            g.setColour (Colours::white);
-            Rectangle<int> r (area.withTrimmedLeft (20));
-            g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
-                        Justification::centredLeft);
+        removePanel (comps[i]);
+        this->removePanel(0);
+    }
+    names.clear();
+    comps.clear();
+}
+
+void updateContent()
+{
+    clearPanels();
+    
+    Component* c = nullptr;
+   #if EL_USE_AUDIO_PANEL
+    names.add ("Audio");
+    c = new AudioIOPanelView();
+    addPanel (-1, c, true);
+    setPanelHeaderSize (c, headerHeight);
+    setMaximumPanelSize (c, 160);
+    setPanelSize (c, 60, false);
+   #endif
+    names.add ("Plugins");
+    c = new PluginsPanelView (globals.plugins());
+    addPanel (-1, c, true);
+    setPanelHeaderSize (c, headerHeight);
+}
+
+const StringArray& getNames() const { return names; }
+const int getHeaderHeight() const { return headerHeight; }
+void setHeaderHeight (const int newHeight)
+{
+    jassert (newHeight > 0);
+    headerHeight = newHeight;
+    updateContent();
+}
+
+private:
+typedef Element::LookAndFeel ELF;
+Globals& globals;
+StringArray names;
+int headerHeight;
+int defaultPanelHeight;
+
+class LookAndFeel : public Element::LookAndFeel
+{
+public:
+    LookAndFeel() { }
+    ~LookAndFeel() { }
+    
+    void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
+                                    bool isMouseOver, bool isMouseDown,
+                                    ConcertinaPanel& panel, Component& comp)
+    {
+        auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
+        int i = p->getNumPanels();
+        while (--i >= 0) {
+            if (p->getPanel(i) == &comp)
+                break;
         }
-    } lookAndFeel;
+        ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
+        g.setColour (Colours::white);
+        Rectangle<int> r (area.withTrimmedLeft (20));
+        g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
+                    Justification::centredLeft);
+    }
+} lookAndFeel;
 };
     
 class ContentContainer : public Component
@@ -164,8 +290,15 @@ ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
     setOpaque (true);
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
-    addAndMakeVisible (bar1 = new StretchableLayoutResizerBar (&layout, 1, true));
+    addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, controller, gui));
+    addAndMakeVisible (statusBar = new StatusBar());
+    addAndMakeVisible (toolBar = new Toolbar());
+    
+    toolBarVisible = false;
+    toolBarSize = 48;
+    statusBarVisible = false;
+    statusBarSize = 22;
     
     updateLayout();
     resized();
@@ -194,8 +327,16 @@ void ContentComponent::paint (Graphics &g)
 
 void ContentComponent::resized()
 {
+    Rectangle<int> r (getLocalBounds());
+    
+    if (toolBarVisible)
+        toolBar->setBounds (r.removeFromTop (toolBarSize));
+    if (statusBarVisible)
+        statusBar->setBounds (r.removeFromBottom (statusBarSize));
+    
     Component* comps[3] = { nav.get(), bar1.get(), container.get() };
-    layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), false, true);
+    layout.layOutComponents (comps, 3, r.getX(), r.getY(),
+                             r.getWidth(), r.getHeight(), false, true);
 }
 
 void ContentComponent::setRackViewComponent (Component* comp)
@@ -224,6 +365,21 @@ void ContentComponent::updateLayout()
     layout.setItemLayout (2, 300, -1, 400);
 }
 
+void ContentComponent::resizerMouseDown()
+{
+    layout.setItemLayout (0, 220, 220, 220);
+    layout.setItemLayout (1, 4, 4, 4);
+    layout.setItemLayout (2, 300, -1, 400);
+    resized();
+}
+
+void ContentComponent::resizerMouseUp()
+{
+    layout.setItemLayout (0, 220, 220, 220);
+    layout.setItemLayout (1, 4, 4, 4);
+    layout.setItemLayout (2, 300, -1, 400);
+    resized();
+}
 }
 
 

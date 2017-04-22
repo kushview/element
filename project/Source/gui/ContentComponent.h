@@ -48,8 +48,23 @@ private:
     ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;
     StretchableLayoutManager layout;
-    ScopedPointer<StretchableLayoutResizerBar> bar1;
     
+    class Resizer; friend class Resizer;
+    ScopedPointer<Resizer> bar1;
+    
+    class Toolbar; friend class Toolbar;
+    ScopedPointer<Toolbar> toolBar;
+    
+    class StatusBar; friend class StatusBar;
+    ScopedPointer<StatusBar> statusBar;
+    
+    bool statusBarVisible;
+    int statusBarSize;
+    bool toolBarVisible;
+    int toolBarSize;
+    
+    void resizerMouseDown();
+    void resizerMouseUp();
     void updateLayout();
 };
 

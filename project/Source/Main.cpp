@@ -10,7 +10,6 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "gui/Commands.h"
-
 #include "Globals.h"
 #include "Settings.h"
 
@@ -87,8 +86,14 @@ private:
         PluginManager& plugins (world.plugins());
         
         if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
+        {
             devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
-            
+        }
+        else
+        {
+            devices.initialiseWithDefaultDevices (16, 16);
+        }
+        
         AudioEnginePtr engine = new AudioEngine (world);
         world.setEngine (engine); // this will also instantiate the session
         
@@ -97,10 +102,6 @@ private:
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
         plugins.restoreUserPlugins (settings);
-        
-        for (int i = plugins.availablePlugins().getNumTypes(); --i >= 0;) {
-            DBG("PLUGIN: " << plugins.availablePlugins().getType(i)->name);
-        }
         
         world.loadModule ("test");
         controller = new AppController (world);

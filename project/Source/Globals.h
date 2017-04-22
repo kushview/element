@@ -36,9 +36,13 @@ public:
 
     const CommandLine cli;
 
+    AudioEnginePtr getAudioEngine();
     CommandManager& getCommands();
     DeviceManager& getDeviceManager();
-
+    PluginManager& getPluginManager();
+    Settings& getSettings();
+    MediaManager& getMediaManager();
+    
     PluginManager& plugins();
     Settings& settings();
     SymbolMap& symbols();
