@@ -397,7 +397,7 @@
       </MODULEPATHS>
     </VS2013>
     <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0&#10;SCL_SECURE_NO_WARNINGS=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B">
+            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
