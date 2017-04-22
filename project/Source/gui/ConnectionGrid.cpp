@@ -20,6 +20,39 @@ namespace Element {
     // Spacing between each patch point
     static const int gridPadding = 1;
     
+    class NodePopupMenu : public PopupMenu {
+    public:
+        enum ItemIds
+        {
+            Duplicate = 1,
+            RemoveNode,
+            LastItem
+        };
+        
+        NodePopupMenu (const Node& n)
+            : node (n)
+        {
+            for (int item = RemoveNode; item < LastItem; ++item) {
+                addItem (item, getNameForItem ((ItemIds) item));
+            }
+        }
+        
+        
+        const Node node;
+    private:
+        
+        String getNameForItem (ItemIds item)
+        {
+            switch (item)
+            {
+                case Duplicate:  return "Duplicate"; break;
+                case RemoveNode: return "Remove"; break;
+                default: jassertfalse; break;
+            }
+            return "Unknown Item";
+        }
+    };
+    
     class ConnectionGrid::PatchMatrix :  public PatchMatrixComponent,
                                          private ValueTree::Listener
     {
@@ -146,6 +179,19 @@ namespace Element {
             paintEmptyMessage (g, getWidth(), getHeight());
         }
         
+        void showMenuForNode (const Node& node)
+        {
+            NodePopupMenu menu (node);
+            
+            switch (menu.show())
+            {
+                case NodePopupMenu::RemoveNode: {
+                    ValueTree parent (node.node().getParent());
+                    parent.removeChild (node.node(), nullptr);
+                } break;
+            }
+        }
+        
     private:
         friend class ConnectionGrid;
         friend class Sources;
@@ -156,9 +202,8 @@ namespace Element {
         NodeArray nodes;
         Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels;
 
-        void paintEmptyMessage (Graphics& g, const int width, const int height) {
-//            return;
-//            g.fillAll (LookAndFeel_E1::widgetBackgroundColor.darker());
+        void paintEmptyMessage (Graphics& g, const int width, const int height)
+        {
             g.setColour(LookAndFeel_E1::textColor);
             g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
         }
@@ -310,6 +355,18 @@ namespace Element {
             }
         }
         
+        void listBoxItemClicked (int row, const MouseEvent& ev) override
+        {
+            if (! ev.mods.isPopupMenu())
+                return;
+            const Node node (matrix->getNode (row, true));
+            matrix->showMenuForNode (node);
+        }
+
+        void listBoxItemDoubleClicked (int row, const MouseEvent&) override
+        {
+
+        }
 #if 0
         virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                    Component* existingComponentToUpdate);
@@ -365,6 +422,19 @@ namespace Element {
             }
         }
 
+        void listBoxItemClicked (int row, const MouseEvent& ev) override
+        {
+            if (! ev.mods.isPopupMenu())
+                return;
+            const Node node (matrix->getNode (row, true));
+            matrix->showMenuForNode (node);
+        }
+        
+        void listBoxItemDoubleClicked (int row, const MouseEvent&) override
+        {
+            
+        }
+        
     private:
         PatchMatrix* matrix;
         friend class PatchMatrix;

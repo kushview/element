@@ -84,6 +84,7 @@ private:
         Settings& settings (world.settings());
         DeviceManager& devices (world.getDeviceManager());
         PluginManager& plugins (world.plugins());
+        auto* props = settings.getUserSettings();
         
         if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
         {
@@ -96,12 +97,16 @@ private:
         
         AudioEnginePtr engine = new AudioEngine (world);
         world.setEngine (engine); // this will also instantiate the session
-        
-        // global data is ready, so now we can start using it;
-        
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
         plugins.restoreUserPlugins (settings);
+        
+        if (ScopedXml el = props->getXmlValue ("lastGraph"))
+        {
+            const ValueTree graphTree (ValueTree::fromXml(*el));
+            engine->restoreFromGraphTree (graphTree);
+        }
+        // global data is ready, so now we can start using it;
         
         world.loadModule ("test");
         controller = new AppController (world);
@@ -132,21 +137,25 @@ public:
 
     void shutdown() override
     {
-#if 0
-        if (gui != nullptr) {
-            PluginWindow::closeAllCurrentlyOpenWindows();
-            gui = nullptr;
-        }
+        controller->deactivate();
 
+        AudioEnginePtr engine (world->engine());
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
-
-        if (ScopedXml el = world->devices().createStateXml())
-            settings.getUserSettings()->setValue ("devices", el);
-
-        world->setEngine (nullptr);
+        auto* props = settings.getUserSettings();
+        jassert(props);
+        
+        plugins.saveUserPlugins (settings);
+        if (ScopedXml el = world->getDeviceManager().createStateXml())
+            props->setValue ("devices", el);
+        
+        const ValueTree lastGraph (engine->createGraphTree());
+        if (lastGraph.isValid()) {
+            if (ScopedXml el = lastGraph.createXml())
+                props->setValue ("lastGraph", el);
+        }
+        
         engine = nullptr;
-#endif
         controller = nullptr;
         world->setEngine (nullptr);
         world->unloadModules();

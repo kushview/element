@@ -16,6 +16,7 @@
 */
 
 #include "engine/GraphProcessor.h"
+#include "session/Node.h"
 
 namespace Element {
 
@@ -1277,6 +1278,14 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
             else
             {
                 // noop
+            }
+        }
+        else if (parent == nodesModel && child.hasType (Tags::node))
+        {
+            const Node model (child, false);
+            const bool wasRemoved = removeNode (model.getNodeId());
+            if (wasRemoved) {
+                
             }
         }
         
