@@ -43,8 +43,6 @@ public:
     Settings& getSettings();
     MediaManager& getMediaManager();
     
-    PluginManager& plugins();
-    Settings& settings();
     SymbolMap& symbols();
     MediaManager& media();
     Session& session();
@@ -54,6 +52,8 @@ public:
 
     JUCE_DEPRECATED(DeviceManager& devices());
     JUCE_DEPRECATED(AudioEnginePtr engine() const);
+    JUCE_DEPRECATED(PluginManager& plugins());
+    JUCE_DEPRECATED(Settings& settings());
 private:
     String appName;
     friend class Application;

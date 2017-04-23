@@ -12,6 +12,7 @@ public:
     ~EngineController();
     
     void activate() override;
+    void deactivate() override;
     void addPlugin (const PluginDescription&);
     
 private:

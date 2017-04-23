@@ -57,7 +57,7 @@ public:
     const NodePtr getNode (const int index) const noexcept;
     const NodePtr getNodeForId (const uint32 uid) const noexcept;
 
-    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f);
+    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
 
     void removeFilter (const uint32 filterUID);
     void disconnectFilter (const uint32 filterUID);

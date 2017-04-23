@@ -103,7 +103,7 @@ private:
         
         if (ScopedXml el = props->getXmlValue ("lastGraph"))
         {
-            const ValueTree graphTree (ValueTree::fromXml(*el));
+            const ValueTree graphTree (ValueTree::fromXml (*el));
             engine->restoreFromGraphTree (graphTree);
         }
         // global data is ready, so now we can start using it;
@@ -143,7 +143,7 @@ public:
         PluginManager& plugins (world->plugins());
         Settings& settings (world->settings());
         auto* props = settings.getUserSettings();
-        jassert(props);
+        jassert (props);
         
         plugins.saveUserPlugins (settings);
         if (ScopedXml el = world->getDeviceManager().createStateXml())

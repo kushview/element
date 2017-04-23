@@ -16,6 +16,7 @@
 #include "EngineControl.h"
 #include "Globals.h"
 #include "session/MediaManager.h"
+#include "session/Node.h"
 
 namespace Element {
 
@@ -536,14 +537,11 @@ Transport* AudioEngine::transport()
 
 ValueTree AudioEngine::createGraphTree()
 {
-    return (priv) ? priv->graph.createValueTree() : ValueTree::invalid;
+    if (! priv)
+        return ValueTree();
+    return priv->graph.getGraphModel().createCopy();
 }
 
-void AudioEngine::restoreFromGraphTree (const ValueTree& tree)
-{
-    if (priv) {
-        priv->graph.restoreFromValueTree (tree, world.plugins());
-    }
-}
+void AudioEngine::restoreFromGraphTree (const ValueTree&) { }
 
 }

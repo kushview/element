@@ -28,6 +28,8 @@ namespace Tags
     const Identifier destNode           = "destNode";
     const Identifier destPort           = "destPort";
     const Identifier destChannel        = "destChannel";
+    
+    const Identifier format             = "format";
 }
 }
 

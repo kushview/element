@@ -12,6 +12,32 @@ namespace Element {
         friend class NodeArray;
     };
     
+    static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescription& pd)
+    {
+        pd.pluginFormatName = p.getProperty (Tags::format);
+        pd.fileOrIdentifier = p.getProperty (Slugs::file);
+    }
+    
+    static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
+    {
+        p.setProperty (Slugs::name, pd.name, nullptr);
+        if (pd.descriptiveName != pd.name)
+            p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
+        
+        p.setProperty (Tags::format,   pd.pluginFormatName, nullptr);
+        p.setProperty ("category",     pd.category, nullptr);
+        p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
+        p.setProperty ("version",      pd.version, nullptr);
+        p.setProperty (Slugs::file,    pd.fileOrIdentifier, nullptr);
+        p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
+        p.setProperty ("isInstrument", pd.isInstrument, nullptr);
+        p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
+        p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
+        p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
+        p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
+        // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
+    }
+    
     const bool Node::canConnectTo (const Node& o) const
     {
         if (objectData.getParent() != o.objectData.getParent() ||
@@ -34,6 +60,11 @@ namespace Element {
         
         jassert (arcs.hasType (Tags::node));
         return arcs.getOrCreateChildWithName (Tags::arcs, nullptr);
+    }
+    
+    void Node::getPluginDescription (PluginDescription& p) const
+    {
+        readPluginDescriptionForLoading (objectData, p);
     }
     
     void Node::setMissingProperties()

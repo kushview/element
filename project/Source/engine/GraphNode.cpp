@@ -2,8 +2,35 @@
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/PluginWrapper.h"
+#include "session/Node.h"
 
 namespace Element {
+
+static void readPluginDescription (const ValueTree& p, PluginDescription& pd)
+{
+    pd.pluginFormatName = p.getProperty ("format");
+    pd.fileOrIdentifier = p.getProperty ("file");
+}
+    
+static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
+{
+    p.setProperty (Slugs::name, pd.name, nullptr);
+    if (pd.descriptiveName != pd.name)
+        p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
+    
+    p.setProperty ("format",       pd.pluginFormatName, nullptr);
+    p.setProperty ("category",     pd.category, nullptr);
+    p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
+    p.setProperty ("version",      pd.version, nullptr);
+    p.setProperty ("file",         pd.fileOrIdentifier, nullptr);
+    p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
+    p.setProperty ("isInstrument", pd.isInstrument, nullptr);
+    p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
+    p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
+    p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
+    p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
+    // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
+}
 
 GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcept
     : nodeId (nodeId_),
@@ -15,7 +42,9 @@ GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcep
     gain.set(1.0f); lastGain.set(1.0f);
     inputGain.set(1.0f); lastInputGain.set(1.0f);
     jassert (proc != nullptr);
-    
+    PluginDescription desc;
+    getPluginDescription (desc);
+    setNodePropertiesFrom (desc, metadata);
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Slugs::name, proc->getName(), nullptr)
             .setProperty (Slugs::type, "plugin", nullptr)

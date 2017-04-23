@@ -105,20 +105,22 @@ DeviceManager& Globals::devices() { return getDeviceManager(); }
     
 MediaManager& Globals::media()
 {
-    assert (impl->media != nullptr);
+    jassert (impl->media != nullptr);
     return *impl->media;
 }
 
 AudioEnginePtr Globals::engine() const { return getAudioEngine(); }
 AudioEnginePtr Globals::getAudioEngine() const { return impl->engine; }
 
-    PluginManager& Globals::plugins()
+PluginManager& Globals::plugins() { return getPluginManager(); }
+PluginManager& Globals::getPluginManager()
 {
-    assert (impl->plugins != nullptr);
+    jassert (impl->plugins != nullptr);
     return *impl->plugins;
 }
 
-Settings& Globals::settings()
+Settings& Globals::settings() { return getSettings(); }
+Settings& Globals::getSettings()
 {
     jassert (impl->settings != nullptr);
     return *impl->settings;
