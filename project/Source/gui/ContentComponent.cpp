@@ -189,7 +189,7 @@ void updateContent()
     setPanelSize (c, 60, false);
    #endif
     names.add ("Plugins");
-    c = new PluginsPanelView (globals.plugins());
+    c = new PluginsPanelView (globals.getPluginManager());
     addPanel (-1, c, true);
     setPanelHeaderSize (c, headerHeight);
 }

@@ -49,14 +49,16 @@ void EngineController::activate()
     Controller::activate();
     
     auto* app = dynamic_cast<AppController*> (getRoot());
-    auto& g (app->getWorld());
-    auto& s (g.getSettings());
-    auto* props = s.getUserSettings();
-    AudioEnginePtr engine (g.getAudioEngine());
-    root = new GraphController (engine->graph(), g.getPluginManager());
+    auto& globals (app->getWorld());
+    auto& settings (globals.getSettings());
+    auto* props = settings.getUserSettings();
+    AudioEnginePtr engine (globals.getAudioEngine());
+    root = new GraphController (engine->graph(), globals.getPluginManager());
     
     if (ScopedXml xml = props->getXmlValue ("lastGraph"))
     {
+        root->clear();
+        
         const Node lastGraph (ValueTree::fromXml (*xml), false);
         const ValueTree nodes (lastGraph.getNodesValueTree());
         const ValueTree arcs (lastGraph.getArcsValueTree());

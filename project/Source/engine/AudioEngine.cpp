@@ -451,12 +451,10 @@ public:
 
     ~Private()
     {
-        controller.reset();
         clips = nullptr;
     }
 
     AudioEngine& engine;
-    Shared<EngineControl> controller;
     RootGraph graph;
     Transport transport;
 
@@ -482,18 +480,27 @@ AudioEngine::~AudioEngine()
 void AudioEngine::activate()
 {
     auto& devices (globals().getDeviceManager());
-    graph().setPlayConfigDetails (2, 2, 44100.0, 1024);
+    auto& plugins (globals().getPluginManager());
     
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
 
     String errormsg;
-    InternalFormat* fmt = globals().plugins().format<InternalFormat>();
-    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
-    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
-    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
-    graph().addNode (globals().plugins().createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
+    InternalFormat* fmt = plugins.format<InternalFormat>();
+    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
+    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
+    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
+    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
     
     cb->setRootGraph (&graph());
+}
+
+void AudioEngine::deactivate()
+{
+    cb->setRootGraph (nullptr);
+    globals().getDeviceManager().removeMidiInputCallback (String::empty, &getMidiInputCallback());
+    
+    priv->graph.clear();
+    priv->graph.reset();
 }
 
 AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (cb != nullptr); return *cb; }
@@ -503,23 +510,6 @@ ClipFactory& AudioEngine::clips()
 {
     jassert (priv->clips != nullptr);
     return *priv->clips;
-}
-
-Shared<EngineControl> AudioEngine::controller()
-{
-    if (priv->controller == nullptr)
-        priv->controller = Shared<EngineControl> (new EngineControl (*this));
-    return priv->controller;
-}
-
-void AudioEngine::deactivate()
-{
-    cb->setRootGraph (nullptr);
-    globals().getDeviceManager().removeMidiInputCallback (String::empty, &getMidiInputCallback());
-    
-    priv->controller.reset();
-    priv->graph.clear();
-    priv->graph.reset();
 }
 
 Globals& AudioEngine::globals() { return world; }
@@ -533,7 +523,6 @@ Transport* AudioEngine::transport()
 {
     return &priv->transport;
 }
-
 
 ValueTree AudioEngine::createGraphTree()
 {

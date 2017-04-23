@@ -149,7 +149,6 @@ PreferencesWidget::PreferencesWidget (GuiApp& gui_)
     // pageList->addItem ("Application",  "element://gui/application");
     pageList->addItem ("Audio Engine", "element://gui/audioEngine");
     // pageList->addItem ("MIDI Devices", "element://gui/midiDevices");
-    pageList->selectRow (1);
     setPage ("element://gui/audioEngine");
     //[/Constructor]
 }
@@ -221,6 +220,7 @@ void PreferencesWidget::setPage (const String& uri)
         pageComponent->setName ("nil");
     }
 
+    pageList->selectRow (pageList->pageURIs.indexOf (uri));
     pageComponent->setBounds (b);
     addAndMakeVisible (pageComponent);
 }

@@ -10,6 +10,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "gui/Commands.h"
+#include "DataPath.h"
 #include "Globals.h"
 #include "Settings.h"
 
@@ -81,12 +82,12 @@ private:
 
     void run() override
     {
-        Settings& settings (world.settings());
+        Settings& settings (world.getSettings());
         DeviceManager& devices (world.getDeviceManager());
-        PluginManager& plugins (world.plugins());
+        PluginManager& plugins (world.getPluginManager());
         auto* props = settings.getUserSettings();
         
-        if (ScopedXml dxml = settings.getUserSettings()->getXmlValue ("devices"))
+        if (ScopedXml dxml = props->getXmlValue ("devices"))
         {
             devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
         }
@@ -101,11 +102,6 @@ private:
         plugins.addFormat (new InternalFormat (*engine));
         plugins.restoreUserPlugins (settings);
         
-        if (ScopedXml el = props->getXmlValue ("lastGraph"))
-        {
-            const ValueTree graphTree (ValueTree::fromXml (*el));
-            engine->restoreFromGraphTree (graphTree);
-        }
         // global data is ready, so now we can start using it;
         
         world.loadModule ("test");
@@ -140,8 +136,8 @@ public:
         controller->deactivate();
 
         AudioEnginePtr engine (world->getAudioEngine());
-        PluginManager& plugins (world->plugins());
-        Settings& settings (world->settings());
+        PluginManager& plugins (world->getPluginManager());
+        Settings& settings (world->getSettings());
         auto* props = settings.getUserSettings();
         jassert (props);
         
@@ -153,6 +149,7 @@ public:
         if (lastGraph.isValid()) {
             if (ScopedXml el = lastGraph.createXml())
                 props->setValue ("lastGraph", el);
+            DBG(lastGraph.toXmlString());
         }
         
         engine = nullptr;

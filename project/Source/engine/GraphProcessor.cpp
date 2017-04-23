@@ -747,10 +747,16 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
+    graphModel.removeListener (this);
+    graphModel.removeChild (arcsModel, nullptr);
+    graphModel.removeChild (nodesModel, nullptr);
+    arcsModel = graphModel.getOrCreateChildWithName(Tags::arcs, nullptr);
+    nodesModel = graphModel.getOrCreateChildWithName(Tags::nodes, nullptr);
     nodes.clear();
     connections.clear();
     //triggerAsyncUpdate();
     handleAsyncUpdate();
+    graphModel.addListener(this);
 }
 
 GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const
@@ -1208,76 +1214,89 @@ void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.numOutputChannels = getTotalNumOutputChannels();
 }
 
-    void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                                   const Identifier& property)
-    {
-        
-    }
+void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
+                                               const Identifier& property)
+{
     
-    void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+}
+
+void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+{
+    graphModel.removeListener(this);
+    
+    if (parent == arcsModel && child.hasType (Tags::arc))
     {
-        if (parent == arcsModel && child.hasType (Tags::arc))
+        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+        const int dstChan = child.getProperty(Tags::destChannel, -1);
+        
+        if (src == nullptr || dst == nullptr) {
+            parent.removeChild (child, nullptr);
+            return;
+        }
+        
+        if (addConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
+                           dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
         {
-            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
-            const int srcChan = child.getProperty (Tags::sourceChannel, -1);
-            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
-            const int dstChan = child.getProperty(Tags::destChannel, -1);
+            // noop
+        }
+        else
+        {
+            // noop
+        }
+    }
+    graphModel.addListener(this);
+}
+
+void GraphProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child,
+                                            int indexFromWhichChildWasRemoved)
+{
+    graphModel.removeListener (this);
+    
+    if (parent == arcsModel && child.hasType (Tags::arc))
+    {
+        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+        const int dstChan = child.getProperty(Tags::destChannel, -1);
+        
+        if (src == nullptr || dst == nullptr)
+            return;
+        
+        if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
+                              dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
+        {
+            // noop
+        }
+        else
+        {
+            // noop
+        }
+    }
+    else if (parent == nodesModel && child.hasType (Tags::node))
+    {
+        const Node model (child, false);
+        const bool wasRemoved = removeNode (model.getNodeId());
+        if (wasRemoved) {
             
-            if (addConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
-                               dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
-            {
-                // noop
-            }
-            else
-            {
-                // noop
-            }
         }
     }
     
-    void GraphProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child,
-                                                int indexFromWhichChildWasRemoved)
-    {
-        graphModel.removeListener (this);
-        
-        if (parent == arcsModel && child.hasType (Tags::arc))
-        {
-            GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
-            const int srcChan = child.getProperty (Tags::sourceChannel, -1);
-            GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
-            const int dstChan = child.getProperty(Tags::destChannel, -1);
-            
-            if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
-                                  dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
-            {
-                // noop
-            }
-            else
-            {
-                // noop
-            }
-        }
-        else if (parent == nodesModel && child.hasType (Tags::node))
-        {
-            const Node model (child, false);
-            const bool wasRemoved = removeNode (model.getNodeId());
-            if (wasRemoved) {
-                
-            }
-        }
-        
-        graphModel.addListener (this);
-    }
+    graphModel.addListener (this);
+}
+
+void GraphProcessor::valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                 int oldIndex, int newIndex) { }
+
+void GraphProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) { }
+
+void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
+{
     
-    void GraphProcessor::valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                     int oldIndex, int newIndex) { }
-    
-    void GraphProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) { }
-    
-    void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
-    {
-        
-    }
+}
+
+
     
 // MARK: AudioGraphIOProcessor
     

@@ -31,8 +31,6 @@ public:
     ValueTree createGraphTree();
     void restoreFromGraphTree (const ValueTree&);
     
-    JUCE_DEPRECATED(Shared<EngineControl> controller());
-
     // Member access
     ClipFactory& clips();
     Globals& globals();

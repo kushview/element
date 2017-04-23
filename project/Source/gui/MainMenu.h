@@ -17,8 +17,13 @@ class MainMenu : public MenuBarModel,
                  public ApplicationCommandTarget
 {
 public:
-    enum RootNames {
+    enum RootNames
+    {
+       #if JUCE_DEBUG
+        File, Window, Debug, Help, NumMenus
+       #else
         File, Window, Help, NumMenus
+       #endif
     };
 
     MainMenu (MainWindow& parent, CommandManager& c)
@@ -49,16 +54,23 @@ public:
 
     StringArray getMenuBarNames() override
     {
+#if JUCE_DEBUG
+        const char* const names[] = { "File", "Window", "Debug", "Help", nullptr };
+#else
         const char* const names[] = { "File", "Window", "Help", nullptr };
+#endif
         return StringArray (names);
     }
 
     PopupMenu getMenuForIndex (int id, const String&) override
     {
         PopupMenu menu;
-        if (id == File)        buildFileMenu (menu);
-        else if (id == Window) buildWindowMenu (menu);
-        else if (id == Help)   buildHelpMenu (menu);
+        if (id == File)         buildFileMenu (menu);
+        else if (id == Window)  buildWindowMenu (menu);
+        else if (id == Help)    buildHelpMenu (menu);
+       #if JUCE_DEBUG
+        else if (id == Debug)   buildDebugMenu (menu);
+       #endif
         else  { };
         return menu;
     }
@@ -80,6 +92,11 @@ public:
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
+    
+    void buildDebugMenu (PopupMenu& menu)
+    {
+        menu.addItem (10000, "Reset settings file");
+    }
     
     void buildFileMenu (PopupMenu& menu)
     {

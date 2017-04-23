@@ -24,7 +24,6 @@ AppController::~AppController() { }
 void AppController::run()
 {
     activate();
-    getGlobals().getAudioEngine()->activate();
     gui->run();
 }
 
