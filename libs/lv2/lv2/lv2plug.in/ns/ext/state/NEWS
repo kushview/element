@@ -1,0 +1,26 @@
+state (2.2) stable;
+
+  * Add LV2_STATE_ERR_NO_SPACE status flag.
+  * Add state:threadSafeRestore feature for dropout-free state restoration.
+
+ -- David Robillard <d@drobilla.net>  Sun, 31 Jul 2016 00:00:00 +0000
+
+state (2.0) stable;
+
+  * Add state:loadDefaultState feature so plugins can have their default state
+    loaded without hard-coding default state as a special case.
+
+ -- David Robillard <d@drobilla.net>  Wed, 16 Jan 2013 00:00:00 +0000
+
+state (1.2) stable;
+
+  * Use consistent label style.
+
+ -- David Robillard <d@drobilla.net>  Sun, 14 Oct 2012 00:00:00 +0000
+
+state (1.0) stable;
+
+  * Initial release.
+
+ -- David Robillard <d@drobilla.net>  Tue, 17 Apr 2012 00:00:00 +0000
+
