@@ -29,11 +29,23 @@ EngineController::~EngineController()
 {
     if (root)
     {
-        root->removeChangeListener(this);
+        root->removeChangeListener (this);
         root = nullptr;
     }
 }
 
+    void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
+    {
+        jassert (root);
+        root->addConnection (s, sp, d, dp);
+    }
+    
+    void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
+    {
+        jassert (root);
+        root->getGraph().connectChannels(PortType::Audio, s, sc, d, dc);
+    }
+    
 void EngineController::addPlugin (const PluginDescription& d)
 {
     if (! root)
@@ -103,5 +115,4 @@ void EngineController::changeListenerCallback (ChangeBroadcaster*)
         ignoreUnused(app);
     }
 }
-    
 }

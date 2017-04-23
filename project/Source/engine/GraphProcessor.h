@@ -62,8 +62,9 @@ public:
     public:
         Connection (uint32 sourceNode, uint32 sourcePort,
                     uint32 destNode, uint32 destPort) noexcept;
-
+        Connection (const ValueTree props);
     private:
+        ValueTree arc;
         JUCE_LEAK_DETECTOR (Connection)
     };
 
@@ -363,6 +364,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphProcessor)
 };
 
+typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
+typedef IOProcessor::IODeviceType IODeviceType;
 }
 
 #endif   // ELEMENT_GRAPH_PROCESSOR_H

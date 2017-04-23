@@ -12,7 +12,7 @@
 namespace Element {
 
     EngineControl::EngineControl (AudioEngine& e)
-        : GraphController (e.graph(), e.globals().plugins()),
+        : GraphController (e.graph(), e.globals().getPluginManager()),
           world (e.globals()), engine (e)
     {
         ioNodes.ensureStorageAllocated (IOProcessor::numDeviceTypes);

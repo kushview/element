@@ -30,11 +30,37 @@ void AppController::run()
 void AppController::handleMessage (const Message& msg)
 {
     bool handled = true;
-    
-    if (const auto* m = dynamic_cast<const LoadPluginMessage*> (&msg)) {
+
+    if (const auto* m = dynamic_cast<const LoadPluginMessage*> (&msg))
+    {
         if (auto* ec = findChild<EngineController>())
             ec->addPlugin (m->description);
-    } else {
+    }
+    else if (const auto* m = dynamic_cast<const AddConnectionMessage*> (&msg))
+    {
+        if (auto* ec = findChild<EngineController>()) {
+            if (m->useChannels())
+                ec->connectChannels (m->sourceNode, m->sourceChannel, m->destNode, m->destChannel);
+            else
+                ec->addConnection (m->sourceNode, m->sourcePort, m->destNode, m->destPort);
+        }
+    }
+    else if (const auto* m = dynamic_cast<const RemoveConnectionMessage*> (&msg))
+    {
+        DBG("REMOVE CONNECTION");
+        if (auto* ec = findChild<EngineController>())
+        {
+            if (m->useChannels()) {
+                
+            }
+            else
+            {
+
+            }
+        }
+    }
+    else
+    {
         handled = false;
     }
     

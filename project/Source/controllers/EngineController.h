@@ -14,11 +14,13 @@ public:
     void activate() override;
     void deactivate() override;
     void addPlugin (const PluginDescription&);
+    void addConnection (const uint32, const uint32, const uint32, const uint32);
+    void connectChannels (const uint32, const int, const uint32, const int);
     
 private:
     ScopedPointer<GraphController> root;
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
 };
-
+    
 }

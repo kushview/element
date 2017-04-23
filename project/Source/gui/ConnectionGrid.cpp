@@ -151,12 +151,18 @@ namespace Element {
                     dstChan == (int) arc.getProperty (Tags::destChannel))
                 {
                     matrix.disconnect (row, col);
-                    arcs.removeChild (arc, nullptr);
+                    // arcs.removeChild (arc, nullptr);
+                    ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                         srcNode.getNodeId(), srcChan, dstNode.getNodeId(), dstChan));
                     repaint();
-                    return;
+                    return; 
                 }
             }
+
+            ViewHelpers::postMessageFor (this, new AddConnectionMessage (
+                srcNode.getNodeId(), srcChan, dstNode.getNodeId(), dstChan));
             
+#if 0
             ValueTree arc (Tags::arc);
             arc.setProperty (Tags::sourceNode, (int64) srcNode.getNodeId(), nullptr)
                .setProperty (Tags::sourceChannel, srcChan, nullptr)
@@ -164,6 +170,7 @@ namespace Element {
                .setProperty (Tags::destChannel, dstChan, nullptr);
             jassert (arcs.hasType (Tags::arcs));
             arcs.addChild (arc, -1, nullptr);
+#endif
             matrix.connect (row, col);
             repaint();
         }

@@ -708,9 +708,12 @@ private:
 GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_,
                                         const uint32 destNode_, const uint32 destPort_) noexcept
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_)
-{ }
+{
+    arc = ValueTree (Tags::arc);
+}
 
-static ValueTree createGraphModel() {
+static ValueTree createGraphModel()
+{
     ValueTree graphModel (Tags::node);
     graphModel.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
     graphModel.setProperty (Slugs::name, "Processing Graph", nullptr);
@@ -969,7 +972,22 @@ bool GraphProcessor::disconnectNode (const uint32 nodeId)
             doneAnything = true;
         }
     }
-
+    
+    graphModel.removeListener (this);
+    for (int i = arcsModel.getNumChildren(); --i >= 0;)
+    {
+        const ValueTree arc (arcsModel.getChild (i));
+        const uint32 srcNode = (uint32)(int) arc.getProperty ("sourceNode");
+        const uint32 dstNode = (uint32)(int) arc.getProperty ("destNode");
+        if (srcNode== nodeId || dstNode == nodeId)
+        {
+            arcsModel.removeChild (arc, nullptr);
+        }
+    }
+    graphModel.addListener(nullptr);
+    
+    jassert (arcsModel.getNumChildren() == connections.size());
+    
     return doneAnything;
 }
 
@@ -1222,28 +1240,27 @@ void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasCh
 
 void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
-    graphModel.removeListener(this);
+    graphModel.removeListener (this);
     
     if (parent == arcsModel && child.hasType (Tags::arc))
     {
         GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
         const int srcChan = child.getProperty (Tags::sourceChannel, -1);
         GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
-        const int dstChan = child.getProperty(Tags::destChannel, -1);
+        const int dstChan = child.getProperty (Tags::destChannel, -1);
         
         if (src == nullptr || dst == nullptr) {
             parent.removeChild (child, nullptr);
             return;
         }
         
-        if (addConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
-                           dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
+        if (connectChannels (PortType::Audio, src->nodeId, srcChan, dst->nodeId, dstChan))
         {
             // noop
         }
         else
         {
-            // noop
+            parent.removeChild (child, nullptr);
         }
     }
     graphModel.addListener(this);
