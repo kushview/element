@@ -146,7 +146,7 @@ void GuiApp::runDialog (const String& uri)
     if (uri == ELEMENT_PREFERENCES)
     {
         DialogOptions opts;
-        opts.content.set (new PreferencesWidget (*this), true);
+        opts.content.set (new PreferencesComponent (*this), true);
         opts.dialogTitle = "Preferences";
         opts.componentToCentreAround = (Component*) mainWindow.get();
 

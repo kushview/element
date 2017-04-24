@@ -20,21 +20,22 @@
 //[Headers] You can add your own extra header files here...
 #include "gui/GuiApp.h"
 #include "session/DeviceManager.h"
+#include "Globals.h"
 //[/Headers]
 
-#include "PreferencesWidget.h"
+#include "PreferencesComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
 
 
-    class PreferencesWidget::PageList :  public ListBox,
-                                         public ListBoxModel
+    class PreferencesComponent::PageList :  public ListBox,
+                                            public ListBoxModel
     {
     public:
 
-        PageList (PreferencesWidget& prefs)
+        PageList (PreferencesComponent& prefs)
             : owner (prefs)
         {
             font.setHeight (16);
@@ -87,7 +88,7 @@ namespace Element {
 
 
     private:
-        friend class PreferencesWidget;
+        friend class PreferencesComponent;
 
         void addItem (const String& n, const String& uri)
         {
@@ -97,7 +98,7 @@ namespace Element {
         }
 
         Font font;
-        PreferencesWidget& owner;
+        PreferencesComponent& owner;
 
         StringArray pageNames;
         StringArray pageURIs;
@@ -120,7 +121,7 @@ namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesWidget::PreferencesWidget (GuiApp& gui_)
+PreferencesComponent::PreferencesComponent (GuiApp& gui_)
     : gui (gui_)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -153,7 +154,7 @@ PreferencesWidget::PreferencesWidget (GuiApp& gui_)
     //[/Constructor]
 }
 
-PreferencesWidget::~PreferencesWidget()
+PreferencesComponent::~PreferencesComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
@@ -168,7 +169,7 @@ PreferencesWidget::~PreferencesWidget()
 }
 
 //==============================================================================
-void PreferencesWidget::paint (Graphics& g)
+void PreferencesComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
@@ -179,7 +180,7 @@ void PreferencesWidget::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void PreferencesWidget::resized()
+void PreferencesComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
@@ -195,7 +196,7 @@ void PreferencesWidget::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void PreferencesWidget::setPage (const String& uri)
+void PreferencesComponent::setPage (const String& uri)
 {
     if (nullptr != pageComponent && uri == pageComponent->getName())
         return;
@@ -238,7 +239,7 @@ void PreferencesWidget::setPage (const String& uri)
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="PreferencesWidget" componentName=""
+<JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
                  parentClasses="public Component" constructorParams="GuiApp&amp; gui_"
                  variableInitialisers="gui (gui_)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"

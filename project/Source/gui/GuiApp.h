@@ -9,7 +9,7 @@
 #include "ElementApp.h"
 #include "session/Session.h"
 #include "gui/LookAndFeel.h"
-#include "gui/Preferences.h"
+#include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
 #include "CommandManager.h"
 #include "URIs.h"

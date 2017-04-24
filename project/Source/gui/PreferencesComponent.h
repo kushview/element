@@ -17,8 +17,8 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_66D14F855D7E86CC__
-#define __JUCE_HEADER_66D14F855D7E86CC__
+#ifndef __JUCE_HEADER_248C56742F074362__
+#define __JUCE_HEADER_248C56742F074362__
 
 //[Headers]     -- You can add your own extra header files here --
 #include <element/Juce.h>
@@ -38,12 +38,12 @@ class GuiApp;
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class PreferencesWidget  : public Component
+class PreferencesComponent  : public Component
 {
 public:
     //==============================================================================
-    PreferencesWidget (GuiApp& gui_);
-    ~PreferencesWidget();
+    PreferencesComponent (GuiApp& gui_);
+    ~PreferencesComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -69,11 +69,11 @@ private:
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesWidget)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PreferencesComponent)
 };
 
 //[EndFile] You can add extra defines here...
 }
 //[/EndFile]
 
-#endif   // __JUCE_HEADER_66D14F855D7E86CC__
+#endif   // __JUCE_HEADER_248C56742F074362__

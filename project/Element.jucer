@@ -194,12 +194,10 @@
         <FILE id="dQixGq" name="PluginWindow.cpp" compile="1" resource="0"
               file="Source/gui/PluginWindow.cpp"/>
         <FILE id="apg1Kn" name="PluginWindow.h" compile="0" resource="0" file="Source/gui/PluginWindow.h"/>
-        <FILE id="Kql61f" name="Preferences.cpp" compile="1" resource="0" file="Source/gui/Preferences.cpp"/>
-        <FILE id="Fk6kww" name="Preferences.h" compile="0" resource="0" file="Source/gui/Preferences.h"/>
-        <FILE id="OyaYz3" name="PreferencesWidget.cpp" compile="1" resource="0"
-              file="Source/gui/PreferencesWidget.cpp"/>
-        <FILE id="ZVdKzn" name="PreferencesWidget.h" compile="0" resource="0"
-              file="Source/gui/PreferencesWidget.h"/>
+        <FILE id="OyaYz3" name="PreferencesComponent.cpp" compile="1" resource="0"
+              file="Source/gui/PreferencesComponent.cpp"/>
+        <FILE id="ZVdKzn" name="PreferencesComponent.h" compile="0" resource="0"
+              file="Source/gui/PreferencesComponent.h"/>
         <FILE id="WpP2mo" name="RackView.cpp" compile="1" resource="0" file="Source/gui/RackView.cpp"/>
         <FILE id="Wenhme" name="RackView.h" compile="0" resource="0" file="Source/gui/RackView.h"/>
         <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="0" resource="0"
