@@ -21,6 +21,8 @@ namespace Tags
     const Identifier graph              = "graph";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
+    const Identifier port               = "port";
+    const Identifier ports              = "ports";
     
     const Identifier sourceNode         = "sourceNode";
     const Identifier sourcePort         = "sourcePort";
@@ -30,6 +32,9 @@ namespace Tags
     const Identifier destChannel        = "destChannel";
     
     const Identifier format             = "format";
+    const Identifier flow               = "flow";
+    const Identifier input              = "input";
+    const Identifier output             = "output";
 }
 }
 

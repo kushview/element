@@ -23,7 +23,6 @@ namespace Element {
     {
     public:
         typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-        typedef GraphNodePtr NodePtr;
 
         ~EngineControl();
 
@@ -44,8 +43,8 @@ namespace Element {
 
     private:
         /** Adds a plugin to the root graph */
-        NodePtr addRootPlugin (IOProcessor::IODeviceType ioType);
-        NodePtr addRootPlugin (InternalFormat::ID internal);
+        GraphNodePtr addRootPlugin (IOProcessor::IODeviceType ioType);
+        GraphNodePtr addRootPlugin (InternalFormat::ID internal);
         InternalFormat* internals() const;
         Sequencer* sequencer() const;
 
@@ -55,8 +54,8 @@ namespace Element {
 
         Array<NodePtr> ioNodes;
 
-        NodePtr metro, audioOut, audioIn, midiOut, midiIn;
-        NodePtr seqNode;
+        GraphNodePtr metro, audioOut, audioIn, midiOut, midiIn;
+        GraphNodePtr seqNode;
 
         bool validateRequiredNodes();
 

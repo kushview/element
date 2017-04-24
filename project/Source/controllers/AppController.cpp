@@ -36,9 +36,15 @@ void AppController::handleMessage (const Message& msg)
         if (auto* ec = findChild<EngineController>())
             ec->addPlugin (m->description);
     }
+    else if (const auto* m = dynamic_cast<const RemoveNodeMessage*> (&msg))
+    {
+        if (auto* ec = findChild<EngineController>())
+            ec->removeNode (m->nodeId);
+    }
     else if (const auto* m = dynamic_cast<const AddConnectionMessage*> (&msg))
     {
-        if (auto* ec = findChild<EngineController>()) {
+        if (auto* ec = findChild<EngineController>())
+        {
             if (m->useChannels())
                 ec->connectChannels (m->sourceNode, m->sourceChannel, m->destNode, m->destChannel);
             else
@@ -47,15 +53,14 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* m = dynamic_cast<const RemoveConnectionMessage*> (&msg))
     {
-        DBG("REMOVE CONNECTION");
         if (auto* ec = findChild<EngineController>())
         {
             if (m->useChannels()) {
-                
+                jassertfalse; // channels not yet supported
             }
             else
             {
-
+                ec->removeConnection (m->sourceNode, m->sourcePort, m->destNode, m->destPort);
             }
         }
     }

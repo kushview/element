@@ -10,6 +10,49 @@
 #include "engine/GraphNode.h"
 namespace Element {
     
+    class NodeArray;
+    class PortArray;
+    
+    class Port : public ObjectModel
+    {
+    public:
+        Port() : ObjectModel (Tags::port) { }
+        Port (const ValueTree& p) : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
+        ~Port() { }
+        
+        int getChannel() const { return 0; }
+        
+        const bool isInput() const
+        {
+            jassert (objectData.hasProperty ("flow"));
+            return getProperty("flow", "").toString() == "input";
+        }
+        
+        const bool isOutput() const
+        {
+            jassert (objectData.hasProperty ("flow"));
+            return getProperty("flow", "").toString() == "output";
+        }
+        
+        const String getName() const { return getProperty (Slugs::name, "Port"); }
+        
+        const PortType getType() const {
+            return PortType (getProperty (Slugs::type, "unknown"));
+        }
+        
+        bool isA (const PortType type, const bool isInputFlow) const {
+            return getType() == type && isInputFlow == isInput();
+        }
+        
+        uint32 getIndex() const
+        {
+            const int index = getProperty (Slugs::index, -1);
+            return index >= 0 ? static_cast<uint32> (index) : ELEMENT_INVALID_PORT;
+        }
+    
+        operator uint32() const { return getIndex(); }
+    };
+
     class Node : public ObjectModel
     {
     public:
@@ -46,6 +89,14 @@ namespace Element {
         ValueTree getArcsValueTree()  const { return objectData.getChildWithName(Tags::arcs); }
         ValueTree getNodesValueTree() const { return objectData.getChildWithName(Tags::nodes); }
         ValueTree getParentArcsNode() const;
+        ValueTree getPortsValueTree() const { return objectData.getChildWithName(Tags::ports); }
+        
+        void getPorts (PortArray& ports, PortType type, bool isInput) const;
+        void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
+        
+        void getAudioInputs (PortArray& ports) const;
+        void getAudioOutputs (PortArray& ports) const;
+        
         void getPluginDescription (PluginDescription&) const;
         
     private:
@@ -54,10 +105,10 @@ namespace Element {
     
     typedef Node NodeModel;
     
+    class PortArray : public Array<Port> { };
     class NodeArray : public Array<Node> {
     public:
         void sortByName();
-        
     };
     
 }

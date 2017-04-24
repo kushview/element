@@ -20,6 +20,24 @@ namespace Element {
     // Spacing between each patch point
     static const int gridPadding = 1;
     
+    bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
+                                                  const uint32 destNode, const uint32 destPort)
+    {
+        for (int i = arcs.getNumChildren(); --i >= 0;)
+        {
+            const ValueTree arc (arcs.getChild (i));
+            if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) &&
+                static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) &&
+                static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) &&
+                static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
     class NodePopupMenu : public PopupMenu {
     public:
         enum ItemIds
@@ -80,6 +98,13 @@ namespace Element {
                                    : audioInIndexes [index]];
         }
         
+        const Port getPort (const int index, const bool isSource) const
+        {
+            const PortArray& ports = isSource ? outs : ins;
+            jassert (isPositiveAndBelow (index, ports.size()));
+            return ports.getUnchecked (index);
+        }
+        
         const int getAudioChannelForIndex (const int index, const bool isSource) const
         {
             return isSource ? audioOutChannels.getUnchecked(index)
@@ -127,9 +152,9 @@ namespace Element {
         void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
         {
             const Node srcNode (getNode (row, true));
-            const int srcChan (getAudioChannelForIndex (row, true));
+            const Port srcPort (getPort (row, true));
             const Node dstNode (getNode (col, false));
-            const int dstChan (getAudioChannelForIndex (col, false));
+            const Port dstPort (getPort (col, false));
             
             if (ev.mods.isPopupMenu()) {
                 // noop
@@ -138,40 +163,26 @@ namespace Element {
             
             if (! srcNode.canConnectTo (dstNode)) {
                 matrix.disconnect (row, col);
+                repaint();
                 return;
             }
             
-            ValueTree arcs (srcNode.getParentArcsNode());
-            for (int i = arcs.getNumChildren(); --i >= 0;)
+            const ValueTree arcs (srcNode.getParentArcsNode());
+            if (connectionExists (arcs, srcNode.getNodeId(), srcPort.getIndex(),
+                                        dstNode.getNodeId(), dstPort.getIndex()))
             {
-                const ValueTree arc (arcs.getChild (i));
-                if (srcNode.getNodeId() == (uint32)(int64)arc.getProperty (Tags::sourceNode) &&
-                    srcChan == (int) arc.getProperty (Tags::sourceChannel) &&
-                    dstNode.getNodeId() == (uint32)(int64)arc.getProperty (Tags::destNode) &&
-                    dstChan == (int) arc.getProperty (Tags::destChannel))
-                {
-                    matrix.disconnect (row, col);
-                    // arcs.removeChild (arc, nullptr);
-                    ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                         srcNode.getNodeId(), srcChan, dstNode.getNodeId(), dstChan));
-                    repaint();
-                    return; 
-                }
+                matrix.disconnect (row, col);
+                ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                    srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()));
+                
             }
-
-            ViewHelpers::postMessageFor (this, new AddConnectionMessage (
-                srcNode.getNodeId(), srcChan, dstNode.getNodeId(), dstChan));
+            else
+            {
+                matrix.connect (row, col);
+                ViewHelpers::postMessageFor (this, new AddConnectionMessage (
+                    srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()));
+            }
             
-#if 0
-            ValueTree arc (Tags::arc);
-            arc.setProperty (Tags::sourceNode, (int64) srcNode.getNodeId(), nullptr)
-               .setProperty (Tags::sourceChannel, srcChan, nullptr)
-               .setProperty (Tags::destNode, (int64) dstNode.getNodeId(), nullptr)
-               .setProperty (Tags::destChannel, dstChan, nullptr);
-            jassert (arcs.hasType (Tags::arcs));
-            arcs.addChild (arc, -1, nullptr);
-#endif
-            matrix.connect (row, col);
             repaint();
         }
         
@@ -193,8 +204,7 @@ namespace Element {
             switch (menu.show())
             {
                 case NodePopupMenu::RemoveNode: {
-                    ValueTree parent (node.node().getParent());
-                    parent.removeChild (node.node(), nullptr);
+                    ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
                 } break;
             }
         }
@@ -207,6 +217,7 @@ namespace Element {
         MatrixState matrix;
         ValueTree nodeModels;
         NodeArray nodes;
+        PortArray ins, outs;
         Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels;
 
         void paintEmptyMessage (Graphics& g, const int width, const int height)
@@ -220,9 +231,10 @@ namespace Element {
         {
             const int padding = 18;
             const Node node (getNode (rowNumber, isSource));
-            const int channel = 1 + getAudioChannelForIndex (rowNumber, isSource);
-            String text = node.getName();
-            text << " " << channel;
+            const Port port (getPort (rowNumber, isSource));
+            
+            String text = port.getName();
+            
             g.setColour (LookAndFeel_E1::widgetBackgroundColor);
             if (isSource)
                 g.fillRect (0, 0, width - 1, height - 1);
@@ -258,6 +270,24 @@ namespace Element {
             return ValueTree::invalid;
         }
         
+        static ValueTree findArc (const ValueTree& arcs, uint32 sourceNode, uint32 sourcePort,
+                                                         uint32 destNode, uint32 destPort)
+        {
+            for (int i = arcs.getNumChildren(); --i >= 0;)
+            {
+                const ValueTree arc (arcs.getChild (i));
+                if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) &&
+                    static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) &&
+                    static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) &&
+                    static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
+                {
+                    return arc;
+                }
+            }
+            
+            return ValueTree::invalid;
+        }
+        
         static ValueTree findArc (const ValueTree& arcs, const Node& sourceNode, int sourceChannel,
                                   const Node& destNode, int destChannel)
         {
@@ -274,13 +304,16 @@ namespace Element {
                 for (int col = 0; col < matrix.getNumColumns(); ++col)
                 {
                     const Node src = getNode (row, true);
+                    const Port srcPort = getPort (row, true);
                     const Node dst = getNode (col, false);
-                    const ValueTree arc (findArc (arcs, src, getAudioChannelForIndex (row, true),
-                                                        dst, getAudioChannelForIndex (col, false)));
+                    const Port dstPort = getPort (col, false);
+                    
+                    const ValueTree arc (findArc (arcs, src.getNodeId(), srcPort.getIndex(),
+                                                        dst.getNodeId(), dstPort.getIndex()));
                     if (arc.isValid())
-                        matrix.connect(row, col);
+                        matrix.connect (row, col);
                     else
-                        matrix.disconnect(row, col);
+                        matrix.disconnect (row, col);
                 }
             }
         }
@@ -466,34 +499,40 @@ namespace Element {
     {
         audioInIndexes.clearQuick(); audioOutIndexes.clearQuick();
         audioInChannels.clearQuick(); audioOutChannels.clearQuick();
+        ins.clearQuick(); outs.clearQuick();
         int newNumRows = 0, newNumCols = 0, nodeIndex = 0;
+
         for (const Node& node : nodes)
         {
-            const int numAudioIns   = node.getNumAudioIns();
-            const int numAudioOuts  = node.getNumAudioOuts();
-            for (int i = 0; i < jmax (numAudioIns, numAudioOuts); ++i)
+            const ValueTree ports (node.getPortsValueTree());
+            for (int i = 0; i < ports.getNumChildren(); ++i)
             {
-                if (i < numAudioIns)
+                const Port port (ports.getChild (i));
+                if (port.getType() != PortType::Audio)
+                    continue;
+            
+                if (port.isInput())
                 {
                     audioInIndexes.add (nodeIndex);
                     audioInChannels.add (i);
+                    ins.add(port);
+                    ++newNumCols;
                 }
-                
-                if (i < numAudioOuts)
+                else
                 {
                     audioOutIndexes.add (nodeIndex);
                     audioOutChannels.add (i);
+                    outs.add(port);
+                    ++newNumRows;
                 }
             }
             
-            newNumRows += numAudioOuts;
-            newNumCols += numAudioIns;
             ++nodeIndex;
         }
         
         matrix.resize (newNumRows, newNumCols);
-        jassert(newNumRows == audioOutChannels.size() &&
-                newNumCols == audioInChannels.size());
+        jassert(newNumRows == outs.size() &&
+                newNumCols == ins.size());
         
         resetMatrix();
         

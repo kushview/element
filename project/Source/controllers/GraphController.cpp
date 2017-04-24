@@ -179,7 +179,7 @@ void GraphController::removeConnection (const int index)
 }
 
 void GraphController::removeConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                    uint32 destFilterUID, int destFilterChannel)
+                                        uint32 destFilterUID, int destFilterChannel)
 {
     if (processor.removeConnection (sourceFilterUID, sourceFilterChannel,
                                     destFilterUID, destFilterChannel))

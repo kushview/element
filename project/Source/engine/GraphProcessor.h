@@ -41,8 +41,10 @@ namespace Element {
     AudioProcessorPlayer object.
 */
 class JUCE_API GraphProcessor : public Processor,
-                                public AsyncUpdater,
+                                public AsyncUpdater
+#if 0
                                 public ValueTree::Listener
+#endif
 {
 public:
     /** Creates an empty graph. */
@@ -64,6 +66,7 @@ public:
                     uint32 destNode, uint32 destPort) noexcept;
         Connection (const ValueTree props);
     private:
+        friend class GraphProcessor;
         ValueTree arc;
         JUCE_LEAK_DETECTOR (Connection)
     };
@@ -348,6 +351,7 @@ private:
     void buildRenderingSequence();
     bool isAnInputTo (uint32 possibleInputId, uint32 possibleDestinationId, int recursionCheck) const;
 
+#if 0
     friend class ValueTree;
     virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
                                            const Identifier& property) override;
@@ -360,7 +364,7 @@ private:
                                              int oldIndex, int newIndex) override;
     virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
     virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
-    
+#endif
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphProcessor)
 };
 

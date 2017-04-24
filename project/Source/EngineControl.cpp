@@ -40,8 +40,7 @@ namespace Element {
         return nullptr;
     }
 
-    EngineControl::NodePtr
-    EngineControl::addRootPlugin (IOProcessor::IODeviceType ioType)
+    GraphNodePtr EngineControl::addRootPlugin (IOProcessor::IODeviceType ioType)
     {
         switch (ioType)
         {
@@ -52,10 +51,10 @@ namespace Element {
             default: break;
         }
 
-        return NodePtr ();
+        return GraphNodePtr();
     }
 
-    EngineControl::NodePtr
+    GraphNodePtr
     EngineControl::addRootPlugin (InternalFormat::ID internal)
     {
         const uint32 id = addFilter (internals()->description (internal));
@@ -78,7 +77,7 @@ namespace Element {
 
     InternalFormat* EngineControl::internals() const
     {
-        return engine.globals().plugins().format<InternalFormat>();
+        return engine.globals().getPluginManager().format<InternalFormat>();
     }
 
     bool EngineControl::open (Session &s)

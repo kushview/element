@@ -80,6 +80,38 @@ namespace Element {
         return dynamic_cast<GraphNode*> (val.getObject());
     }
     
+    void Node::getPorts (PortArray& ports, PortType type, bool isInput) const
+    {
+        const ValueTree portList (getPortsValueTree());
+        for (int i = 0; i < portList.getNumChildren(); ++i)
+        {
+            const Port port (portList.getChild (i));
+            if (port.isA (type, isInput))
+                ports.add (port);
+        }
+    }
+    
+    void Node::getPorts (PortArray& ins, PortArray& outs, PortType type) const
+    {
+        const ValueTree portList (getPortsValueTree());
+        for (int i = 0; i < portList.getNumChildren(); ++i)
+        {
+            const Port port (portList.getChild (i));
+            if (port.isA (type, true))
+                ins.add (port);
+            else if (port.isA (type, false))
+                outs.add (port);
+        }
+    }
+    
+    void Node::getAudioInputs (PortArray& ports) const {
+        getPorts (ports, PortType::Audio, true);
+    }
+    
+    void Node::getAudioOutputs (PortArray& ports) const {
+        getPorts (ports, PortType::Audio, false);
+    }
+    
     void NodeArray::sortByName()
     {
         NameSorter sorter;

@@ -50,6 +50,29 @@ GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcep
             .setProperty (Slugs::type, "plugin", nullptr)
             .setProperty ("numAudioIns", getNumAudioInputs(), nullptr)
             .setProperty ("numAudioOuts", getNumAudioOutputs(), nullptr);
+    
+    ValueTree ports (metadata.getOrCreateChildWithName ("ports", nullptr));
+    auto* inst = getAudioPluginInstance();
+    for (uint32 p = 0; p < (uint32) Processor::getNumPorts(inst); ++p)
+    {
+        ValueTree port (Tags::port);
+        const PortType type (proc->getPortType (p));
+        const bool isInput (proc->isPortInput(p));
+        
+        if (type != PortType::Audio)
+            continue;
+        
+        port.setProperty (Slugs::index, (int)p, nullptr)
+            .setProperty (Slugs::type, type.getSlug(), nullptr)
+            .setProperty (Tags::flow, isInput ? Tags::input.toString() : Tags::output.toString(), nullptr);
+        
+        const int channel = proc->getChannelPort (p);
+        port.setProperty (Slugs::name, isInput ? inst->getInputChannelName (channel)
+                                               : inst->getOutputChannelName (channel),
+                          nullptr);
+        
+        ports.addChild (port, -1, nullptr);
+    }
 }
 
 void GraphNode::setInputGain (const float f) {

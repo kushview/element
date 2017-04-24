@@ -34,23 +34,38 @@ EngineController::~EngineController()
     }
 }
 
-    void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
-    {
-        jassert (root);
-        root->addConnection (s, sp, d, dp);
-    }
-    
-    void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
-    {
-        jassert (root);
-        root->getGraph().connectChannels(PortType::Audio, s, sc, d, dc);
-    }
+void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
+{
+    jassert (root);
+    root->addConnection (s, sp, d, dp);
+}
+
+void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
+{
+    jassert (root);
+    root->getGraph().connectChannels(PortType::Audio, s, sc, d, dc);
+}
+
+void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
+{
+    jassert(root);
+    root->getGraph().removeConnection (s, sp, d, dp);
+    root->sendChangeMessage();
+}
     
 void EngineController::addPlugin (const PluginDescription& d)
 {
     if (! root)
         return;
     root->addFilter (&d);
+}
+
+void EngineController::removeNode (const uint32 nodeId)
+{
+    jassert(root);
+    if (! root)
+        return;
+    root->removeFilter (nodeId);
 }
     
 void EngineController::activate()
@@ -94,10 +109,14 @@ void EngineController::activate()
         }
         
         jassert (nodes.getNumChildren() == root->getNumFilters());
+        
         for (int i = 0; i < arcs.getNumChildren(); ++i)
         {
-            const ValueTree arc (arcs.getChild(i));
-            currentArcs.addChild (arc.createCopy(), -1, nullptr);
+            const ValueTree arc (arcs.getChild (i));
+            addConnection ((uint32)(int) arc.getProperty("sourceNode"),
+                           (uint32)(int) arc.getProperty("sourcePort"),
+                           (uint32)(int) arc.getProperty("destNode"),
+                           (uint32)(int) arc.getProperty("destPort"));
         }
     }
     

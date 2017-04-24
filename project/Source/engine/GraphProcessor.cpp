@@ -710,6 +710,10 @@ GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 s
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_)
 {
     arc = ValueTree (Tags::arc);
+    arc.setProperty (Tags::sourceNode, (int) sourceNode, nullptr)
+       .setProperty (Tags::sourcePort, (int) sourcePort, nullptr)
+       .setProperty (Tags::destNode, (int) destNode, nullptr)
+       .setProperty (Tags::destPort, (int) destPort, nullptr);
 }
 
 static ValueTree createGraphModel()
@@ -733,12 +737,12 @@ GraphProcessor::GraphProcessor()
     
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = ELEMENT_INVALID_PORT;
-    graphModel.addListener(this);
+    //graphModel.addListener(this);
 }
 
 GraphProcessor::~GraphProcessor()
 {
-    graphModel.removeListener (this);
+    //graphModel.removeListener (this);
     clearRenderingSequence();
     clear();
 }
@@ -750,7 +754,7 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
-    graphModel.removeListener (this);
+    //graphModel.removeListener (this);
     graphModel.removeChild (arcsModel, nullptr);
     graphModel.removeChild (nodesModel, nullptr);
     arcsModel = graphModel.getOrCreateChildWithName(Tags::arcs, nullptr);
@@ -759,7 +763,7 @@ void GraphProcessor::clear()
     connections.clear();
     //triggerAsyncUpdate();
     handleAsyncUpdate();
-    graphModel.addListener(this);
+    //graphModel.addListener (this);
 }
 
 GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const
@@ -809,7 +813,10 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
         n->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (n);
         nodesModel.addChild (n->metadata, -1, nullptr);
+        
+        DBG("numNodes: " << nodes.size() << " numNodesModel: " << nodesModel.getNumChildren());
         jassert(getNumNodes() == nodesModel.getNumChildren());
+        
         triggerAsyncUpdate();
         
         return n;
@@ -830,6 +837,7 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
             n->setParentGraph (nullptr);
             nodes.remove (i);
             nodesModel.removeChild (n->metadata, nullptr);
+            DBG("numNodes: " << nodes.size() << " numNodesModel: " << nodesModel.getNumChildren());
             jassert(getNumNodes() == nodesModel.getNumChildren());
             triggerAsyncUpdate();
             return true;
@@ -910,13 +918,14 @@ bool GraphProcessor::addConnection (const uint32 sourceNode, const uint32 source
     ArcSorter sorter;
     Connection* c = new Connection (sourceNode, sourcePort, destNode, destPort);
     connections.addSorted (sorter, c);
-
+    arcsModel.addChild (c->arc, -1, nullptr);
+    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
     return true;
 }
 
 bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
-                                 uint32 destNode, int32 destChannel)
+                                      uint32 destNode, int32 destChannel)
 {
     GraphNode* src = getNodeForId (sourceNode);
     GraphNode* dst = getNodeForId (destNode);
@@ -932,7 +941,10 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
 
 void GraphProcessor::removeConnection (const int index)
 {
+    const auto* const connection = connections [index];
     connections.remove (index);
+    if (connection) arcsModel.removeChild (connection->arc, nullptr);
+    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
 }
 
@@ -973,18 +985,18 @@ bool GraphProcessor::disconnectNode (const uint32 nodeId)
         }
     }
     
-    graphModel.removeListener (this);
-    for (int i = arcsModel.getNumChildren(); --i >= 0;)
-    {
-        const ValueTree arc (arcsModel.getChild (i));
-        const uint32 srcNode = (uint32)(int) arc.getProperty ("sourceNode");
-        const uint32 dstNode = (uint32)(int) arc.getProperty ("destNode");
-        if (srcNode== nodeId || dstNode == nodeId)
-        {
-            arcsModel.removeChild (arc, nullptr);
-        }
-    }
-    graphModel.addListener(nullptr);
+//    //graphModel.removeListener (this);
+//    for (int i = arcsModel.getNumChildren(); --i >= 0;)
+//    {
+//        const ValueTree arc (arcsModel.getChild (i));
+//        const uint32 srcNode = (uint32)(int) arc.getProperty ("sourceNode");
+//        const uint32 dstNode = (uint32)(int) arc.getProperty ("destNode");
+//        if (srcNode== nodeId || dstNode == nodeId)
+//        {
+//            arcsModel.removeChild (arc, nullptr);
+//        }
+//    }
+//    graphModel.addListener(nullptr);
     
     jassert (arcsModel.getNumChildren() == connections.size());
     
@@ -1232,6 +1244,7 @@ void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.numOutputChannels = getTotalNumOutputChannels();
 }
 
+#if 0
 void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
                                                const Identifier& property)
 {
@@ -1313,7 +1326,7 @@ void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
     
 }
 
-
+#endif
     
 // MARK: AudioGraphIOProcessor
     

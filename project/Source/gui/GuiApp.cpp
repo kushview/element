@@ -82,7 +82,7 @@ GuiApp::GuiApp (Globals& w, AppController& a)
 
 GuiApp::~GuiApp()
 {
-    PropertiesFile* pf = globals().settings().getUserSettings();
+    PropertiesFile* pf = globals().getSettings().getUserSettings();
     pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
 
     render.detach();
@@ -176,7 +176,7 @@ void GuiApp::run()
     mainWindow->setContentNonOwned (content.get(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
 
-    PropertiesFile* pf = globals().settings().getUserSettings();
+    PropertiesFile* pf = globals().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (commander().getKeyMappings());
     mainWindow->addToDesktop();

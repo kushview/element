@@ -99,7 +99,8 @@ private:
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
 
-    ValueTree metadata;
+    ChannelConfig channels;
+    ValueTree metadata, node;
     GraphProcessor* parent;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
