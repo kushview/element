@@ -44,6 +44,8 @@ namespace Element {
         {
             Duplicate = 1,
             RemoveNode,
+            AddAudioInputNode,
+            AddAudioOutputNode,
             LastItem
         };
         
@@ -51,6 +53,8 @@ namespace Element {
             : node (n)
         {
             for (int item = RemoveNode; item < LastItem; ++item) {
+                if (item == AddAudioInputNode)
+                    addSeparator();
                 addItem (item, getNameForItem ((ItemIds) item));
             }
         }
@@ -65,6 +69,8 @@ namespace Element {
             {
                 case Duplicate:  return "Duplicate"; break;
                 case RemoveNode: return "Remove"; break;
+                case AddAudioInputNode: return "Add audio inputs"; break;
+                case AddAudioOutputNode: return "Add audio outputs"; break;
                 default: jassertfalse; break;
             }
             return "Unknown Item";
@@ -205,6 +211,20 @@ namespace Element {
             {
                 case NodePopupMenu::RemoveNode: {
                     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
+                } break;
+                    
+                case NodePopupMenu::AddAudioInputNode: {
+                    PluginDescription desc;
+                    desc.fileOrIdentifier = "audio.input";
+                    desc.pluginFormatName = "Internal";
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                } break;
+                    
+                case NodePopupMenu::AddAudioOutputNode: {
+                    PluginDescription desc;
+                    desc.fileOrIdentifier = "audio.output";
+                    desc.pluginFormatName = "Internal";
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
                 } break;
             }
         }

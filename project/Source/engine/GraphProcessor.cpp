@@ -807,7 +807,13 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
     }
 
     newProcessor->setPlayHead (getPlayHead());
-
+    
+    if (auto *iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor)) {
+        // TODO: handle metadata initialization in a cleaner way. This allows the IO procs
+        // to get channel information prior to GraphNode::prepare is called.
+        iop->setParentGraph (this);
+    }
+    
     if (GraphNode* const n = createNode (nodeId, newProcessor))
     {
         n->prepare (getSampleRate(), getBlockSize(), this);
