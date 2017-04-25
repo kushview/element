@@ -95,10 +95,11 @@ private:
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*);
     void unprepare();
-
+    void resetPorts();
+    
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
-
+    
     ChannelConfig channels;
     ValueTree metadata, node;
     GraphProcessor* parent;

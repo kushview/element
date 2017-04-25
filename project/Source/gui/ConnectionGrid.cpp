@@ -253,7 +253,8 @@ namespace Element {
             const Node node (getNode (rowNumber, isSource));
             const Port port (getPort (rowNumber, isSource));
             
-            String text = port.getName();
+            String text = node.getName();
+            text << " - " << port.getName();
             
             g.setColour (LookAndFeel_E1::widgetBackgroundColor);
             if (isSource)
@@ -505,12 +506,21 @@ namespace Element {
     class ConnectionGrid::Quads : public QuadrantLayout
     {
     public:
-        Quads() { }
+        Quads() : thicknessOnOtherQuads (190) { }
         ~Quads() { }
         
-        void updateCenter() override {
-            QuadrantLayout::updateCenter();
+        void updateCenter() override
+        {
+            // keeps q2, q3, and q4 static
+            const int w = getWidth();
+            const int h = getHeight();
+            const int x = (thicknessOnOtherQuads <= w) ? thicknessOnOtherQuads : 0;
+            const int y = (h - thicknessOnOtherQuads >= 0) ? h - thicknessOnOtherQuads : 0;
+            setCenter (x, y);
         }
+        
+    private:
+        int thicknessOnOtherQuads;
     };
     
     // MARK: PatchMatrix IMPL

@@ -2,6 +2,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GraphController.h"
+#include "session/DeviceManager.h"
 #include "session/Node.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -78,24 +79,33 @@ void EngineController::activate()
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
     auto& settings (globals.getSettings());
-    auto* props = settings.getUserSettings();
+    auto& devices (globals.getDeviceManager());
+    
     AudioEnginePtr engine (globals.getAudioEngine());
+    GraphProcessor& graph (engine->graph());
+    
+    if (auto* device = devices.getCurrentAudioDevice())
+    {
+        ignoreUnused (device);
+        
+        const int numIns = device->getActiveOutputChannels().countNumberOfSetBits();
+        const int numOuts = device->getActiveInputChannels().countNumberOfSetBits();
+        const int bufferSize = device->getCurrentBufferSizeSamples();
+        const double sampleRate = device->getCurrentSampleRate();
+        
+        graph.setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
+    }
+    
     root = new GraphController (engine->graph(), globals.getPluginManager());
     
-    if (ScopedXml xml = props->getXmlValue ("lastGraph"))
+    if (ScopedXml xml = settings.getLastGraph())
     {
         root->clear();
         
         const Node lastGraph (ValueTree::fromXml (*xml), false);
         const ValueTree nodes (lastGraph.getNodesValueTree());
         const ValueTree arcs (lastGraph.getArcsValueTree());
-
-        ValueTree currentGraph = root->getGraph().getGraphModel();
-        ValueTree currentNodes = root->getGraph().getNodesModel();
-        ValueTree currentArcs = root->getGraph().getArcsModel();
-        currentNodes.removeAllChildren (nullptr);
-        currentArcs.removeAllChildren (nullptr);
-
+        
         for (int i = 0; i < nodes.getNumChildren(); ++i)
         {
             const Node node (nodes.getChild(i), false);
@@ -118,8 +128,11 @@ void EngineController::activate()
                            (uint32)(int) arc.getProperty("destNode"),
                            (uint32)(int) arc.getProperty("destPort"));
         }
+        
+        jassert (arcs.getNumChildren() == root->getNumConnections());
     }
     
+    engine->activate();
     root->addChangeListener (this);
 }
 

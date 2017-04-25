@@ -24,4 +24,25 @@ Settings::Settings()
 }
 
 Settings::~Settings() { }
+
+PropertiesFile* Settings::getProps() const {
+    return (const_cast<Settings*> (this))->getUserSettings();
+}
+
+XmlElement* Settings::getLastGraph() const
+{
+    if (auto* p = getProps())
+        return p->getXmlValue ("lastGraph");
+    return nullptr;
+}
+
+void Settings::setLastGraph (const ValueTree& data)
+{
+    jassert (data.hasType (Tags::node));
+    if (! data.hasType(Tags::node))
+        return;
+    if (auto* p = getProps())
+        if (ScopedXml xml = data.createXml())
+            p->setValue ("lastGraph", xml);
+}
 }

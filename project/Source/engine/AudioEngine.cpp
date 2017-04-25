@@ -342,6 +342,17 @@ public:
                 for (int i = 0; i < numOutputChannels; ++i)
                     zeromem (outputChannelData[i], sizeof (float) * (size_t) numSamples);
             }
+            else
+            {
+                messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+                AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
+                processor->processBlock (buffer, incomingMidi);
+                if (engine->transport()->isPlaying()) {
+                    engine->transport()->advance (numSamples);
+                }
+            }
+            
+#if 0
             else if (engine->transport()->getRemainingFrames() >= numSamples)
             {
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
@@ -368,8 +379,9 @@ public:
                     engine->transport()->advance (numSamples - remainingFrames);
                 }
             }
+#endif
         }
-
+        
         engine->transport()->postProcess (numSamples);
     }
 
@@ -484,12 +496,14 @@ void AudioEngine::activate()
     
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
 
+#if 0
     String errormsg;
     InternalFormat* fmt = plugins.format<InternalFormat>();
     graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
     graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
     graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
     graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
+#endif
     
     cb->setRootGraph (&graph());
 }

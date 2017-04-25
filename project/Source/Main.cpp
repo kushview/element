@@ -145,12 +145,7 @@ public:
         if (ScopedXml el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el);
         
-        const ValueTree lastGraph (engine->createGraphTree());
-        if (lastGraph.isValid()) {
-            if (ScopedXml el = lastGraph.createXml())
-                props->setValue ("lastGraph", el);
-            DBG(lastGraph.toXmlString());
-        }
+        settings.setLastGraph (engine->createGraphTree());
         
         engine = nullptr;
         controller = nullptr;

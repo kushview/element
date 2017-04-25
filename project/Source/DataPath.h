@@ -1,11 +1,12 @@
 
-#ifndef DATAPATH_H_INCLUDED
-#define DATAPATH_H_INCLUDED
+#ifndef EL_DATAPATH_H
+#define EL_DATAPATH_H
 
 #include "ElementApp.h"
 
 namespace Element {
-    class DataPath {
+    class DataPath
+    {
     public:
         DataPath();
         ~DataPath();
@@ -15,4 +16,4 @@ namespace Element {
 }
 
 
-#endif  // DATAPATH_H_INCLUDED
+#endif  // EL_DATAPATH_H

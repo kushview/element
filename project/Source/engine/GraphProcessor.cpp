@@ -819,8 +819,6 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
         n->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (n);
         nodesModel.addChild (n->metadata, -1, nullptr);
-        
-        DBG("numNodes: " << nodes.size() << " numNodesModel: " << nodesModel.getNumChildren());
         jassert(getNumNodes() == nodesModel.getNumChildren());
         
         triggerAsyncUpdate();
@@ -843,7 +841,6 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
             n->setParentGraph (nullptr);
             nodes.remove (i);
             nodesModel.removeChild (n->metadata, nullptr);
-            DBG("numNodes: " << nodes.size() << " numNodesModel: " << nodesModel.getNumChildren());
             jassert(getNumNodes() == nodesModel.getNumChildren());
             triggerAsyncUpdate();
             return true;
@@ -990,19 +987,6 @@ bool GraphProcessor::disconnectNode (const uint32 nodeId)
             doneAnything = true;
         }
     }
-    
-//    //graphModel.removeListener (this);
-//    for (int i = arcsModel.getNumChildren(); --i >= 0;)
-//    {
-//        const ValueTree arc (arcsModel.getChild (i));
-//        const uint32 srcNode = (uint32)(int) arc.getProperty ("sourceNode");
-//        const uint32 dstNode = (uint32)(int) arc.getProperty ("destNode");
-//        if (srcNode== nodeId || dstNode == nodeId)
-//        {
-//            arcsModel.removeChild (arc, nullptr);
-//        }
-//    }
-//    graphModel.addListener(nullptr);
     
     jassert (arcsModel.getNumChildren() == connections.size());
     
