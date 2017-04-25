@@ -370,44 +370,21 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="Element" binaryPath=""
-                       headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </VS2013>
     <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0&#10;SCL_SECURE_NO_WARNINGS=1"
             smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       characterSet="MultiByte"/>
+                       characterSet="MultiByte" binaryPath="../build/x86/Debug" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/x86/Release" useRuntimeLibDLL="0"/>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       characterSet="MultiByte" binaryPath="../build/x86/Debug" useRuntimeLibDLL="0"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/x86/Release" useRuntimeLibDLL="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
@@ -430,71 +407,6 @@
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </VS2015>
-    <XCODE_IPHONE targetFolder="Builds/iOS" externalLibraries="lilv-0&#10;suil-0&#10;sratom-0&#10;sord-0&#10;serd-0"
-                  postbuildCommand="libdir=&quot;/opt/element/ios/lib&quot;&#10;deplibs=&quot;liblilv-0.dylib libsuil-0.dylib libserd-0.dylib libsord-0.dylib libsratom-0.dylib&quot;&#10;&#10;exit 0&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;binary=&quot;$original/$EXECUTABLE_NAME&quot;&#10;frameworks=&quot;$original/Frameworks&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*.dylib&quot;&#10;&#10;echo &quot;Copying Libraries from $libdir&quot;&#10;&#10;for deplib in $deplibs; do&#10;  echo &quot;  $deplib&quot;&#10;  cp -f &quot;$libdir/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;&#10;  install_name_tool -id &quot;@loader_path/Frameworks/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;  install_name_tool -change &quot;$libdir/$deplib&quot; &quot;@loader_path/Frameworks/$deplib&quot; &quot;$binary&quot;&#10;&#10;  for dep in $deplibs; do&#10;    install_name_tool -change &quot;$libdir/$dep&quot; &quot;@loader_path/$dep&quot; &quot;$frameworks/$deplib&quot;&#10;  done&#10;&#10;done&#10;"
-                  iosScreenOrientation="portraitlandscape">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="1"
-                       targetName="Element" cppLibType="libc++" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
-                       libraryPath="/opt/element/arm/lib"/>
-        <CONFIGURATION name="Release" iosCompatibility="default" isDebug="0" optimisation="3"
-                       targetName="Element" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
-                       libraryPath="/opt/element/arm/lib" cppLibType="libc++"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </XCODE_IPHONE>
-    <ANDROID targetFolder="Builds/Android" androidActivityClass="com.yourcompany.Element"
-             androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
-             androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
-             androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
-             androidKeyAliasPass="android" androidVersionCode="1" androidCpp11="1"
-             androidBluetoothNeeded="1" androidScreenOrientation="unspecified">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
-                       optimisation="1" targetName="Element"/>
-        <CONFIGURATION name="Release" androidArchitectures="armeabi armeabi-v7a" isDebug="0"
-                       optimisation="2" targetName="Element"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_opengl" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </ANDROID>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
