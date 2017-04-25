@@ -10,6 +10,8 @@
 #include "gui/ConnectionGrid.h"
 #include "gui/GuiApp.h"
 #include "gui/LookAndFeel.h"
+#include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 #include "session/NodeModel.h"
 #include "Globals.h"
 
@@ -50,14 +52,20 @@ namespace Element {
     
     
 class ContentComponent::Toolbar : public Component {
-    
+public:
+    void paint (Graphics& g) override {
+        g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+    }
 };
 
 class ContentComponent::StatusBar : public Component,
-                                    public Value::Listener
+                                    public Value::Listener,
+                                    private Timer
 {
 public:
-    StatusBar()
+    StatusBar (Globals& g)
+        : devices (g.getDeviceManager()),
+          plugins (g.getPluginManager())
     {
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
@@ -67,7 +75,7 @@ public:
         addAndMakeVisible (streamingStatusLabel);
         addAndMakeVisible (statusLabel);
         
-        const Colour labelColor (0xff999999);
+        const Colour labelColor (0xffaaaaaa);
         const Font font (12.0f);
         
         for (int i = 0; i < getNumChildComponents(); ++i)
@@ -79,6 +87,9 @@ public:
                 label->setJustificationType (Justification::centredLeft);
             }
         }
+        
+        startTimer (5000);
+        updateLabels();
     }
     
     ~StatusBar()
@@ -90,12 +101,17 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour(Colour(0xff333333).brighter(0.2));
+        g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
+        g.fillRect (getLocalBounds());
+        
+        const Colour lineColor (0xff545454);
+        g.setColour (lineColor);
+        
         g.drawLine(streamingStatusLabel.getX(), 0, streamingStatusLabel.getX(), getHeight());
         g.drawLine(sampleRateLabel.getX(), 0, sampleRateLabel.getX(), getHeight());
-        g.setColour (Colour(0xff333333));
+        g.setColour (lineColor.darker());
         g.drawLine (0, 0, getWidth(), 0);
-        g.setColour (Colour(0xff222222));
+        g.setColour (lineColor);
         g.drawLine (0, 1, getWidth(), 1);
     }
     
@@ -118,6 +134,7 @@ public:
         updateLabels();
     }
 #endif
+    
     void valueChanged (Value&) override
     {
         updateLabels();
@@ -125,115 +142,135 @@ public:
     
     void updateLabels()
     {
-        String text = "Current sample rate: ";
-        text << String ((double)sampleRate.getValue() * 0.001, 3) << " KHz";
-        sampleRateLabel.setText (text, dontSendNotification);
-        
-        text.clear();
-        String strText = streamingStatus.getValue().toString();
-        if (strText.isEmpty())
-            strText = "Pending";
-        text << "Engine state: " << strText;
-        streamingStatusLabel.setText (text, dontSendNotification);
-        
-        statusLabel.setText (status.getValue().toString(), dontSendNotification);
+        if (auto* dev = devices.getCurrentAudioDevice())
+        {
+            devices.getCpuUsage();
+            
+            String text = "Sample Rate: ";
+            text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
+            text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
+            sampleRateLabel.setText (text, dontSendNotification);
+            
+            text.clear();
+            String strText = streamingStatus.getValue().toString();
+            if (strText.isEmpty())
+                strText = "Running";
+            text << "Engine: " << strText << ":  CPU: " << String(devices.getCpuUsage() * 100.f, 1) << "%";
+            streamingStatusLabel.setText (text, dontSendNotification);
+            
+            statusLabel.setText (String("Device: ") + dev->getName(), dontSendNotification);
+        }
+        else
+        {
+            sampleRateLabel.setText ("", dontSendNotification);
+            streamingStatusLabel.setText ("", dontSendNotification);
+            statusLabel.setText ("No Device", dontSendNotification);
+        }
     }
     
 private:
+    DeviceManager& devices;
+    PluginManager& plugins;
+    
     Label sampleRateLabel, streamingStatusLabel, statusLabel;
     ValueTree node;
     Value sampleRate, streamingStatus, status;
+    
+    friend class Timer;
+    void timerCallback() override {
+        updateLabels();
+    }
 };
 
-class NavigationConcertinaPanel : public ConcertinaPanel {
-public:
-    NavigationConcertinaPanel (Globals& g)
-    : globals(g),
-      headerHeight (30),
-      defaultPanelHeight (80)
-{
-    setLookAndFeel (&lookAndFeel);
-    updateContent();
-}
-
-~NavigationConcertinaPanel()
-{
-    setLookAndFeel (nullptr);
-}
-
-void clearPanels()
-{
-    Array<Component*> comps;
-    for (int i = 0; i < getNumPanels(); ++i)
-        comps.add (getPanel (i));
-    for (int i = 0; i < comps.size(); ++i)
-    {
-        removePanel (comps[i]);
-        this->removePanel(0);
-    }
-    names.clear();
-    comps.clear();
-}
-
-void updateContent()
-{
-    clearPanels();
-    
-    Component* c = nullptr;
-   #if EL_USE_AUDIO_PANEL
-    names.add ("Audio");
-    c = new AudioIOPanelView();
-    addPanel (-1, c, true);
-    setPanelHeaderSize (c, headerHeight);
-    setMaximumPanelSize (c, 160);
-    setPanelSize (c, 60, false);
-   #endif
-    names.add ("Plugins");
-    c = new PluginsPanelView (globals.getPluginManager());
-    addPanel (-1, c, true);
-    setPanelHeaderSize (c, headerHeight);
-}
-
-const StringArray& getNames() const { return names; }
-const int getHeaderHeight() const { return headerHeight; }
-void setHeaderHeight (const int newHeight)
-{
-    jassert (newHeight > 0);
-    headerHeight = newHeight;
-    updateContent();
-}
-
-private:
-typedef Element::LookAndFeel ELF;
-Globals& globals;
-StringArray names;
-int headerHeight;
-int defaultPanelHeight;
-
-class LookAndFeel : public Element::LookAndFeel
-{
-public:
-    LookAndFeel() { }
-    ~LookAndFeel() { }
-    
-    void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
-                                    bool isMouseOver, bool isMouseDown,
-                                    ConcertinaPanel& panel, Component& comp)
-    {
-        auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
-        int i = p->getNumPanels();
-        while (--i >= 0) {
-            if (p->getPanel(i) == &comp)
-                break;
+    class NavigationConcertinaPanel : public ConcertinaPanel {
+    public:
+        NavigationConcertinaPanel (Globals& g)
+        : globals(g),
+        headerHeight (30),
+        defaultPanelHeight (80)
+        {
+            setLookAndFeel (&lookAndFeel);
+            updateContent();
         }
-        ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
-        g.setColour (Colours::white);
-        Rectangle<int> r (area.withTrimmedLeft (20));
-        g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
-                    Justification::centredLeft);
-    }
-} lookAndFeel;
-};
+        
+        ~NavigationConcertinaPanel()
+        {
+            setLookAndFeel (nullptr);
+        }
+        
+        void clearPanels()
+        {
+            Array<Component*> comps;
+            for (int i = 0; i < getNumPanels(); ++i)
+                comps.add (getPanel (i));
+            for (int i = 0; i < comps.size(); ++i)
+            {
+                removePanel (comps[i]);
+                this->removePanel(0);
+            }
+            names.clear();
+            comps.clear();
+        }
+        
+        void updateContent()
+        {
+            clearPanels();
+            
+            Component* c = nullptr;
+#if EL_USE_AUDIO_PANEL
+            names.add ("Audio");
+            c = new AudioIOPanelView();
+            addPanel (-1, c, true);
+            setPanelHeaderSize (c, headerHeight);
+            setMaximumPanelSize (c, 160);
+            setPanelSize (c, 60, false);
+#endif
+            names.add ("Plugins");
+            c = new PluginsPanelView (globals.getPluginManager());
+            addPanel (-1, c, true);
+            setPanelHeaderSize (c, headerHeight);
+        }
+        
+        const StringArray& getNames() const { return names; }
+        const int getHeaderHeight() const { return headerHeight; }
+        void setHeaderHeight (const int newHeight)
+        {
+            jassert (newHeight > 0);
+            headerHeight = newHeight;
+            updateContent();
+        }
+        
+    private:
+        typedef Element::LookAndFeel ELF;
+        Globals& globals;
+        StringArray names;
+        int headerHeight;
+        int defaultPanelHeight;
+        
+        class LookAndFeel : public Element::LookAndFeel
+        {
+        public:
+            LookAndFeel() { }
+            ~LookAndFeel() { }
+            
+            void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
+                                            bool isMouseOver, bool isMouseDown,
+                                            ConcertinaPanel& panel, Component& comp)
+            {
+                auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
+                int i = p->getNumPanels();
+                while (--i >= 0) {
+                    if (p->getPanel(i) == &comp)
+                        break;
+                }
+                ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
+                g.setColour (Colours::white);
+                Rectangle<int> r (area.withTrimmedLeft (20));
+                g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
+                            Justification::centredLeft);
+            }
+        } lookAndFeel;
+    };
     
 class ContentContainer : public Component
 {
@@ -291,12 +328,12 @@ ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
     addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, controller, gui));
-    addAndMakeVisible (statusBar = new StatusBar());
+    addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar());
     
     toolBarVisible = false;
     toolBarSize = 48;
-    statusBarVisible = false;
+    statusBarVisible = true;
     statusBarSize = 22;
     
     updateLayout();

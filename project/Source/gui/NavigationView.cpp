@@ -107,7 +107,7 @@ public:
     virtual String getDisplayName()  const override { return desc.name; }
     virtual void setName (const String&)  override {  }
     virtual bool isMissing() override { return false; }
-    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    virtual Icon getIcon() const override { return Icon(); }
     
     void itemDoubleClicked (const MouseEvent& ev) override { }
     
@@ -135,9 +135,9 @@ public:
     bool mightContainSubItems() override { return true; }
     String getRenamingName() const override { return "Plugins"; }
     String getDisplayName() const override { return "Plugins"; }
-    void setName (const String&) override {  }
+    void setName (const String&) override { }
     bool isMissing() override { return false; }
-    Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_E1::elementBlue); }
     void addSubItems() override
     {
         KnownPluginList& known (plugins.availablePlugins());
