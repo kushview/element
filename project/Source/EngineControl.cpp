@@ -170,12 +170,12 @@ namespace Element {
         return true;
     }
 
-    void EngineControl::valueTreePropertyChanged (ValueTree& /*tree*/, const Identifier& /*prop*/)
+    void EngineControl::valueTreePropertyChanged (ValueTree&, const Identifier&)
     {
 
     }
 
-    void EngineControl::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void EngineControl::valueTreeChildAdded (ValueTree&, ValueTree&)
     {
 
     }
@@ -185,17 +185,17 @@ namespace Element {
 
     }
 
-    void EngineControl::valueTreeChildOrderChanged (ValueTree& parent, int, int)
+    void EngineControl::valueTreeChildOrderChanged (ValueTree&, int, int)
     {
 
     }
 
-    void EngineControl::valueTreeParentChanged (ValueTree& tree)
+    void EngineControl::valueTreeParentChanged (ValueTree&)
     {
 
     }
 
-    void EngineControl::valueTreeRedirected (ValueTree& tree)
+    void EngineControl::valueTreeRedirected (ValueTree&)
     {
 
     }

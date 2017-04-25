@@ -338,7 +338,7 @@
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
-    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
@@ -371,7 +371,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B">
+            smallIcon="eG1U6B" bigIcon="eG1U6B" vst3Folder="" rtasFolder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath=""
@@ -401,13 +401,14 @@
       </MODULEPATHS>
     </VS2013>
     <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0&#10;SCL_SECURE_NO_WARNINGS=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp">
+            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp" vst3Folder=""
+            rtasFolder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\VST_SDK\VST2_SDK&#10;C:\SDKs\VST_SDK\VST3_SDK&#10;../../Source&#10;../../../libs/lv2&#10;"
                        characterSet="MultiByte"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\VST_SDK\VST2_SDK&#10;C:\SDKs\VST_SDK\VST3_SDK&#10;../../Source&#10;../../../libs/lv2&#10;"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
@@ -518,11 +519,11 @@
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
-               JUCE_ASIO="enabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
+               JUCE_ASIO="enabled" JUCE_WASAPI="enabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
                JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
-               JUCE_WASAPI_EXCLUSIVE="disabled" JUCE_PLUGINHOST_VST3="disabled"/>
+               JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="disabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>
