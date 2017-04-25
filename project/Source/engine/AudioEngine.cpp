@@ -491,20 +491,8 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::activate()
 {
-    auto& devices (globals().getDeviceManager());
-    auto& plugins (globals().getPluginManager());
-    
+    auto& devices (globals().getDeviceManager());    
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
-
-#if 0
-    String errormsg;
-    InternalFormat* fmt = plugins.format<InternalFormat>();
-    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioInputDevice), errormsg));
-    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::audioOutputDevice), errormsg));
-    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiInputDevice), errormsg));
-    graph().addNode (plugins.createPlugin (*fmt->description(InternalFormat::midiOutputDevice), errormsg));
-#endif
-    
     cb->setRootGraph (&graph());
 }
 
