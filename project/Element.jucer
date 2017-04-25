@@ -309,7 +309,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <LINUX_MAKE targetFolder="Builds/Linux" userNotes="This exporter is here for reference.  Please use waf to build the project.&#10;&#10;$ ./waf configure&#10;$ ./waf build&#10;$ sudo ./waf install&#10;"
-                externalLibraries="">
+                externalLibraries="" smallIcon="eG1U6B" bigIcon="eG1U6B">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
                        targetName="Element"/>
