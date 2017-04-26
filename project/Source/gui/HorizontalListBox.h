@@ -13,7 +13,7 @@
  @see ComboBox, TableListBox
  */
 class HorizontalListBox  : public Component,
-public SettableTooltipClient
+                           public SettableTooltipClient
 {
 public:
     

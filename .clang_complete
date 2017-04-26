@@ -6,3 +6,5 @@
 -I/usr/local/include/suil-0
 -I./project/Source
 -I./plugins
+-I/opt/kushview/include
+-I/opt/kushview/JUCE/modules
