@@ -85,8 +85,6 @@ GuiApp::~GuiApp()
     PropertiesFile* pf = globals().getSettings().getUserSettings();
     pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
 
-    render.detach();
-
     mainWindow->setVisible (false);
     mainWindow->removeFromDesktop();
 

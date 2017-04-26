@@ -308,16 +308,16 @@
     <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0"
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=0&#10;JUCE_PLUGINHOST_VST3=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
-               vst3Folder="">
+               vst3Folder="" extraFrameworks="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
-                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../Source&#10;"
+                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -337,7 +337,6 @@
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
@@ -359,7 +358,6 @@
                        binaryPath="../build/x64/Release" useRuntimeLibDLL="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_opengl" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
@@ -398,7 +396,6 @@
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
@@ -406,7 +403,9 @@
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
                JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
-               JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"/>
+               JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"
+               JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled" JUCE_USE_MP3AUDIOFORMAT="disabled"
+               JUCE_USE_LAME_AUDIO_FORMAT="disabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>

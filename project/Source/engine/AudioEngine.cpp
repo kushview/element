@@ -335,6 +335,7 @@ public:
         if (processor != nullptr)
         {
             const int remainingFrames = engine->transport()->getRemainingFrames();
+            ignoreUnused (remainingFrames);
             const ScopedLock sl2 (processor->getCallbackLock());
 
             if (processor->isSuspended())

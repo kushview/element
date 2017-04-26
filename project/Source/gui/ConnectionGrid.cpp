@@ -242,8 +242,8 @@ namespace Element {
 
         void paintEmptyMessage (Graphics& g, const int width, const int height)
         {
-            g.setColour(LookAndFeel_E1::textColor);
-            g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
+//            g.setColour (LookAndFeel_E1::textColor);
+//            g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
         }
         
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
