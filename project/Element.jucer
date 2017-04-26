@@ -308,36 +308,6 @@
     <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <LINUX_MAKE targetFolder="Builds/Linux" userNotes="This exporter is here for reference.  Please use waf to build the project.&#10;&#10;$ ./waf configure&#10;$ ./waf build&#10;$ sudo ./waf install&#10;"
-                externalLibraries="" smallIcon="" bigIcon="">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
-                       targetName="Element"/>
-        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="2"
-                       targetName="Element"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../libs/juce/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </LINUX_MAKE>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
                vst3Folder="">
