@@ -349,13 +349,13 @@
                        characterSet="MultiByte" binaryPath="../build/x86/Debug" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       binaryPath="../build/x86/Release" useRuntimeLibDLL="0"/>
+                       binaryPath="../build/x86/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
                        characterSet="MultiByte" binaryPath="../build/x64/Debug" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       binaryPath="../build/x64/Release" useRuntimeLibDLL="0"/>
+                       binaryPath="../build/x64/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
