@@ -21,7 +21,7 @@
 #define __JUCE_HEADER_AD8B3DC21171FFC3__
 
 //[Headers]     -- You can add your own extra header files here --
-#include <element/Juce.h>
+#include "ElementApp.h"
 
 namespace Element {
 namespace Gui {

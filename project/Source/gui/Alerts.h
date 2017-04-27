@@ -20,7 +20,7 @@
 #ifndef ELEMENT_GUI_ALERTS_H
 #define ELEMENT_GUI_ALERTS_H
 
-#include <element/Juce.h>
+#include "ElementApp.h"
 
 namespace Element {
 
