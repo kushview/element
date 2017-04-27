@@ -279,6 +279,9 @@
               file="Source/session/SessionTrack.cpp"/>
         <FILE id="o0jdbc" name="TempoMap.h" compile="0" resource="0" file="Source/session/TempoMap.h"/>
         <FILE id="vWLdgY" name="TrackModel.h" compile="0" resource="0" file="Source/session/TrackModel.h"/>
+        <FILE id="saq9O0" name="UnlockStatus.cpp" compile="1" resource="0"
+              file="Source/session/UnlockStatus.cpp"/>
+        <FILE id="UnTwR7" name="UnlockStatus.h" compile="0" resource="0" file="Source/session/UnlockStatus.h"/>
       </GROUP>
       <FILE id="IVf5gW" name="CommandManager.h" compile="0" resource="0"
             file="Source/CommandManager.h"/>
@@ -339,6 +342,7 @@
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="../../../../../../opt/kushview/JUCE5/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
@@ -376,6 +380,7 @@
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="../../../../../../opt/kushview/JUCE5/modules"/>
       </MODULEPATHS>
     </VS2015>
   </EXPORTFORMATS>
@@ -397,6 +402,7 @@
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_product_unlocking" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"

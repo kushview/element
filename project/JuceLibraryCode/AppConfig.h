@@ -45,23 +45,24 @@
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
 
 //==============================================================================
-#define JUCE_MODULE_AVAILABLE_element_base               1
-#define JUCE_MODULE_AVAILABLE_element_engines            1
-#define JUCE_MODULE_AVAILABLE_element_gui                1
-#define JUCE_MODULE_AVAILABLE_element_lv2                1
-#define JUCE_MODULE_AVAILABLE_element_models             1
-#define JUCE_MODULE_AVAILABLE_juce_audio_basics          1
-#define JUCE_MODULE_AVAILABLE_juce_audio_devices         1
-#define JUCE_MODULE_AVAILABLE_juce_audio_formats         1
-#define JUCE_MODULE_AVAILABLE_juce_audio_processors      1
-#define JUCE_MODULE_AVAILABLE_juce_audio_utils           1
-#define JUCE_MODULE_AVAILABLE_juce_core                  1
-#define JUCE_MODULE_AVAILABLE_juce_cryptography          1
-#define JUCE_MODULE_AVAILABLE_juce_data_structures       1
-#define JUCE_MODULE_AVAILABLE_juce_events                1
-#define JUCE_MODULE_AVAILABLE_juce_graphics              1
-#define JUCE_MODULE_AVAILABLE_juce_gui_basics            1
-#define JUCE_MODULE_AVAILABLE_juce_gui_extra             1
+#define JUCE_MODULE_AVAILABLE_element_base                1
+#define JUCE_MODULE_AVAILABLE_element_engines             1
+#define JUCE_MODULE_AVAILABLE_element_gui                 1
+#define JUCE_MODULE_AVAILABLE_element_lv2                 1
+#define JUCE_MODULE_AVAILABLE_element_models              1
+#define JUCE_MODULE_AVAILABLE_juce_audio_basics           1
+#define JUCE_MODULE_AVAILABLE_juce_audio_devices          1
+#define JUCE_MODULE_AVAILABLE_juce_audio_formats          1
+#define JUCE_MODULE_AVAILABLE_juce_audio_processors       1
+#define JUCE_MODULE_AVAILABLE_juce_audio_utils            1
+#define JUCE_MODULE_AVAILABLE_juce_core                   1
+#define JUCE_MODULE_AVAILABLE_juce_cryptography           1
+#define JUCE_MODULE_AVAILABLE_juce_data_structures        1
+#define JUCE_MODULE_AVAILABLE_juce_events                 1
+#define JUCE_MODULE_AVAILABLE_juce_graphics               1
+#define JUCE_MODULE_AVAILABLE_juce_gui_basics             1
+#define JUCE_MODULE_AVAILABLE_juce_gui_extra              1
+#define JUCE_MODULE_AVAILABLE_juce_product_unlocking      1
 
 //==============================================================================
 #ifndef    JUCE_STANDALONE_APPLICATION

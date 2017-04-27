@@ -31,6 +31,7 @@
 #include <juce_graphics/juce_graphics.h>
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
+#include <juce_product_unlocking/juce_product_unlocking.h>
 
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE
