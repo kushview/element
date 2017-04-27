@@ -275,17 +275,6 @@ String PlainTextFileTreeViewItem::getDisplayName() const
     return item.getName();
 }
 
-static File findCorrespondingHeaderOrCpp (const File& f)
-{
-#if 0
-    if (f.hasFileExtension (sourceFileExtensions))
-        return f.withFileExtension (".h");
-    else if (f.hasFileExtension (headerFileExtensions))
-        return f.withFileExtension (".cpp");
-#endif
-    return File::nonexistent;
-}
-
 void PlainTextFileTreeViewItem::setName (const String& newName)
 {
 #if 0

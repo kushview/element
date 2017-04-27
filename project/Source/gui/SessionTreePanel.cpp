@@ -91,8 +91,7 @@ public:
         : GroupTreeViewItem (i), session (sess)
     { }
 
-    AssetTreeViewItem*
-    createAssetSubItem (const AssetItem &child)
+    AssetTreeViewItem* createAssetSubItem (const AssetItem &child)
     {
         if (child.isFile()) {
             return new PatternTreeItem (child);

@@ -83,7 +83,6 @@ namespace Element {
     private:
         AppController& controller;
         Globals& world;
-        OpenGLContext render;
         SessionRef sessionRef;
         ScopedPointer<SessionDocument> sessionDoc;
 

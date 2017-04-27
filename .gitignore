@@ -13,3 +13,5 @@ build/
 *.pyc
 .DS_Store
 *.autosave
+
+/.vscode
