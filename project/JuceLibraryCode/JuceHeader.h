@@ -10,8 +10,7 @@
 
 */
 
-#ifndef __APPHEADERFILE_UNTEAW__
-#define __APPHEADERFILE_UNTEAW__
+#pragma once
 
 #include "AppConfig.h"
 
@@ -48,5 +47,3 @@ namespace ProjectInfo
     const int          versionNumber  = 0x201;
 }
 #endif
-
-#endif   // __APPHEADERFILE_UNTEAW__

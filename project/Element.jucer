@@ -2,8 +2,9 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.2.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="4.3.1" companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="info@kushview.net">
+              jucerVersion="5.0.0" companyName="Kushview" companyWebsite="https://kushview.net"
+              companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
+              splashScreenColour="Dark">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
@@ -321,18 +322,18 @@
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE5/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
@@ -358,18 +359,18 @@
                        binaryPath="../build/x64/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE5\modules"/>
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
