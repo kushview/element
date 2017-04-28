@@ -74,7 +74,7 @@ void AppController::handleMessage (const Message& msg)
         DBG("[EL] AppController: unhandled Message received");
     }
 }
-    
+
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
     return gui.get();

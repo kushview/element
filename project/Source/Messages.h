@@ -3,7 +3,7 @@
 #define EL_MESSAGES_H
 
 #include "ElementApp.h"
-#include "Session/Node.h"
+#include "session/Node.h"
 
 namespace Element {
     

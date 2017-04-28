@@ -9,6 +9,7 @@
 #include "engine/InternalFormat.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
+#include "session/UnlockStatus.h"
 #include "gui/Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
@@ -133,6 +134,9 @@ public:
 
     void shutdown() override
     {
+        if (! world)
+            return;
+        
         controller->deactivate();
 
         AudioEnginePtr engine (world->getAudioEngine());

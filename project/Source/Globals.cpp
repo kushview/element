@@ -6,13 +6,14 @@
 #include "ElementApp.h"
 #include "engine/InternalFormat.h"
 #include "session/DeviceManager.h"
+#include "session/MediaManager.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"
-#include "CommandManager.h"
-#include "Globals.h"
-#include "session/MediaManager.h"
+#include "session/UnlockStatus.h"
 #include "Settings.h"
 #include "URIs.h"
+#include "CommandManager.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -47,6 +48,7 @@ public:
         media    = new MediaManager();
         settings = new Settings();
         commands = new CommandManager();
+        unlock   = new UnlockStatus (g);
     }
 
     void freeAll()
@@ -58,6 +60,7 @@ public:
         plugins  = nullptr;
         settings = nullptr;
         engine   = nullptr;
+        unlock   = nullptr;
     }
 
     ~Impl() { }
@@ -70,6 +73,7 @@ public:
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
     ScopedPointer<Session>        session;
+    ScopedPointer<UnlockStatus>   unlock;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
    #endif
@@ -81,6 +85,8 @@ Globals::Globals (const String& _cli)
 {
     appName = "Element";
     impl = new Impl (*this);
+    impl->unlock->load();
+    DBG("[EL] application unlocked: " << (impl->unlock->isUnlocked() ? "Yes" : "No"));
 }
 
 Globals::~Globals()
@@ -94,16 +100,15 @@ CommandManager& Globals::getCommandManager()
     return *impl->commands;
 }
 
-    
+DeviceManager& Globals::devices() { return getDeviceManager(); }
 DeviceManager& Globals::getDeviceManager()
 {
     assert (impl->devices != nullptr);
     return *impl->devices;
 }
-    
-DeviceManager& Globals::devices() { return getDeviceManager(); }
-    
-MediaManager& Globals::media()
+
+MediaManager& Globals::media() { return getMediaManager(); }
+MediaManager& Globals::getMediaManager()
 {
     jassert (impl->media != nullptr);
     return *impl->media;
@@ -126,21 +131,29 @@ Settings& Globals::getSettings()
     return *impl->settings;
 }
 
-SymbolMap& Globals::symbols()
+SymbolMap& Globals::symbols() { return getSymbolMap(); }
+SymbolMap& Globals::getSymbolMap()
 {
    #if ELEMENT_LV2_PLUGIN_HOST
     auto* fmt = impl->plugins->format<LV2PluginFormat>();
     jassert(fmt);
     return fmt->getSymbolMap();
    #else
-    assert(impl->symbols);
+    jassert(impl->symbols);
     return *impl->symbols;
    #endif
 }
 
-Session& Globals::session()
+UnlockStatus& Globals::getUnlockStatus()
 {
-    assert (impl->session != nullptr);
+    jassert (impl && impl->unlock);
+    return *impl->unlock;
+}
+    
+Session& Globals::session() { return getSession(); }
+Session& Globals::getSession()
+{
+    jassert (impl->session != nullptr);
     return *impl->session;
 }
 

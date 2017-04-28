@@ -4,9 +4,12 @@
 #include "ElementApp.h"
 
 namespace Element {
+    class Globals;
     class UnlockStatus :  public OnlineUnlockStatus
     {
     public:
+        UnlockStatus (Globals&);
+        ~UnlockStatus() { }
         String getProductID() override;
         bool doesProductIDMatch (const String& returnedIDFromServer) override;
         RSAKey getPublicKey() override;
@@ -16,5 +19,7 @@ namespace Element {
         URL getServerAuthenticationURL() override;
         String readReplyFromWebserver (const String& email, const String& password) override;
         StringArray getLocalMachineIDs() override;
+    private:
+        Globals& globals;
     };
 }

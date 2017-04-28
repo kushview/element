@@ -28,7 +28,7 @@ namespace Element {
 
     SessionAssets::SessionAssets (Session& s)
         : AssetTree (s.node(), "Session Assets", "assets", nullptr),
-          session (s), related (s, *this, s.globals().media())
+          session (s), related (s, *this, s.globals().getMediaManager())
     { }
 
     SessionAssets::~SessionAssets() { }
@@ -39,7 +39,7 @@ namespace Element {
         if (item.isGroup())
             return;
 
-        MediaManager& media (session.globals().media());
+        MediaManager& media (session.globals().getMediaManager());
 
         if (! media.canOpenFile (item.getFile()))
         {

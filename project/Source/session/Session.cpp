@@ -121,9 +121,8 @@ namespace Element {
 
     MediaManager& Session::media()
     {
-        return globals().media();
+        return globals().getMediaManager();
     }
-
 
     Globals& Session::globals()
     {

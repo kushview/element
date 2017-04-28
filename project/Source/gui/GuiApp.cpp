@@ -223,7 +223,7 @@ bool GuiApp::shutdownApp()
 SessionRef GuiApp::session()
 {
     if (sessionRef.get() == nullptr)
-        sessionRef = globals().session().makeRef();
+        sessionRef = globals().getSession().makeRef();
 
     return sessionRef;
 }
@@ -249,8 +249,8 @@ void GuiApp::newSession()
         sessionDoc->save (true, true);
 
     sessionDoc->setFile (File::nonexistent);
-    globals().session().clear();
-    globals().session().open();
+    globals().getSession().clear();
+    globals().getSession().open();
     sessionDoc->setChangedFlag (false);
     
     content->stabilize();

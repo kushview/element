@@ -54,7 +54,8 @@ namespace Element {
 class ContentComponent::Toolbar : public Component {
 public:
     void paint (Graphics& g) override {
-        g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+        g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
+        g.fillRect (getLocalBounds());
     }
 };
 
@@ -185,9 +186,9 @@ private:
     class NavigationConcertinaPanel : public ConcertinaPanel {
     public:
         NavigationConcertinaPanel (Globals& g)
-        : globals(g),
-        headerHeight (30),
-        defaultPanelHeight (80)
+            : globals(g),
+              headerHeight (30),
+              defaultPanelHeight (80)
         {
             setLookAndFeel (&lookAndFeel);
             updateContent();
@@ -331,8 +332,8 @@ ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar());
     
-    toolBarVisible = false;
-    toolBarSize = 48;
+    toolBarVisible = true;
+    toolBarSize = 32;
     statusBarVisible = true;
     statusBarSize = 22;
     
@@ -372,7 +373,8 @@ void ContentComponent::resized()
     
     Component* comps[3] = { nav.get(), bar1.get(), container.get() };
     layout.layOutComponents (comps, 3, r.getX(), r.getY(),
-                             r.getWidth(), r.getHeight(), false, true);
+                             r.getWidth(), r.getHeight(),
+                             false, true);
 }
 
 void ContentComponent::setRackViewComponent (Component* comp)

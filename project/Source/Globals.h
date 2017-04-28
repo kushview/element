@@ -19,6 +19,7 @@ class MediaManager;
 class PluginManager;
 class Session;
 class Settings;
+class UnlockStatus;
 class Writer;
 
 struct CommandLine
@@ -42,14 +43,16 @@ public:
     PluginManager& getPluginManager();
     Settings& getSettings();
     MediaManager& getMediaManager();
-    
-    SymbolMap& symbols();
-    MediaManager& media();
-    Session& session();
+    UnlockStatus& getUnlockStatus();
+    SymbolMap& getSymbolMap();
+    Session& getSession();
 
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
 
+    JUCE_DEPRECATED(Session& session());
+    JUCE_DEPRECATED(SymbolMap& symbols());
+    JUCE_DEPRECATED(MediaManager& media());
     JUCE_DEPRECATED(DeviceManager& devices());
     JUCE_DEPRECATED(AudioEnginePtr engine() const);
     JUCE_DEPRECATED(PluginManager& plugins());

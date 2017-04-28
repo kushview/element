@@ -28,7 +28,7 @@ namespace Element {
 
     GraphController* EngineControl::createSequenceController()
     {
-#if 0
+       #if 0
         // not supported. saved for reference.
         if (seqNode == nullptr) {
             seqNode = addRootPlugin (InternalFormat::sequenceProcessor);
@@ -36,7 +36,7 @@ namespace Element {
 
         if (sequencer() != nullptr)
             return new GraphController (*sequencer(), engine.globals().plugins());
-#endif
+       #endif
         return nullptr;
     }
 

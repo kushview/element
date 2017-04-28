@@ -161,7 +161,7 @@ namespace Element {
 
     MediaManager& Sequence::media()
     {
-        return globals().media();
+        return globals().getMediaManager();
     }
 
 
