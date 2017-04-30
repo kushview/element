@@ -198,10 +198,10 @@ private:
             if (! cc)
                 return;
                 
-            AudioEnginePtr e = cc->app().globals().getAudioEngine();
-            GraphProcessor& graph (e->graph());
+//            AudioEnginePtr e = cc->app().globals().getAudioEngine();
+//            GraphProcessor& graph (e->graph());
             ReferenceCountedArray<Element::GraphNode> nodes;
-            graph.getOrderedNodes (nodes);
+//            graph.getOrderedNodes (nodes);
             
             for (int i = 0; i < nodes.size(); ++i)
                 addSubItem (new PluginInstanceItem (nodes.getUnchecked (i)));

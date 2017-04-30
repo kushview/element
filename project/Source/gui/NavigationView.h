@@ -2,7 +2,7 @@
 #define EL_NAVIGATION_VIEW_H
 
 #include "ElementApp.h"
-#include "gui/TreeViewBase.h"
+#include "gui/TreeviewBase.h"
 
 namespace Element {
 

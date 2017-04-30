@@ -48,6 +48,7 @@ namespace Element {
 
     void MainWindow::refreshMenu()
     {
-        if (mainMenu) mainMenu->menuItemsChanged();
+        if (mainMenu)
+            mainMenu->menuItemsChanged();
     }
 }

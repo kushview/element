@@ -1,6 +1,7 @@
 
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
+#include "gui/MainWindow.h"
 
 namespace Element {
 namespace ViewHelpers {
@@ -47,15 +48,20 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 }
     
 
-static ContentComponent* findContentComponent (Component* c) {
-    return c->findParentComponentOfClass<ContentComponent>();
+ContentComponent* findContentComponent (Component* c)
+{
+    if (auto* cc = c->findParentComponentOfClass<ContentComponent>())
+        return cc;
+    return nullptr;
 }
-    
+
 void postMessageFor (Component* c, Message* m)
 {
     ScopedPointer<Message> deleter (m);
     if (auto* const cc = findContentComponent (c))
-        cc->post (deleter.release());
+        return cc->post (deleter.release());
+    jassertfalse; // message not delivered
+    deleter = nullptr;
 }
 
 }

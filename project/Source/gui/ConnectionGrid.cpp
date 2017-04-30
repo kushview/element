@@ -59,7 +59,6 @@ namespace Element {
             }
         }
         
-        
         const Node node;
     private:
         
@@ -86,7 +85,7 @@ namespace Element {
               matrix()
         {
             setSize (300, 200);
-
+            setMatrixCellSize (36);
             nodeModels = ValueTree (Tags::nodes);
             nodes.clear();
             nodeModels.addListener (this);
@@ -129,7 +128,8 @@ namespace Element {
         
         void mouseMove (const MouseEvent& ev) override {
             PatchMatrixComponent::mouseMove (ev);
-            repaint();
+            if (useHighlighting)
+                repaint();
         }
         
         void paintMatrixCell (Graphics& g, const int width, const int height,
@@ -151,7 +151,6 @@ namespace Element {
                              Colour (Element::LookAndFeel_E1::defaultMatrixCellOffColor));
         
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
-
             }
         }
         
@@ -180,7 +179,6 @@ namespace Element {
                 matrix.disconnect (row, col);
                 ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
                     srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()));
-                
             }
             else
             {
@@ -256,7 +254,8 @@ namespace Element {
             String text = node.getName();
             text << " - " << port.getName();
             
-            g.setColour (LookAndFeel_E1::widgetBackgroundColor);
+            g.setColour (rowIsSelected ? LookAndFeel_E1::widgetBackgroundColor.brighter()
+                                       : LookAndFeel_E1::widgetBackgroundColor);
             if (isSource)
                 g.fillRect (0, 0, width - 1, height - 1);
             else
@@ -418,15 +417,25 @@ namespace Element {
         
         void listBoxItemClicked (int row, const MouseEvent& ev) override
         {
-            if (! ev.mods.isPopupMenu())
-                return;
-            const Node node (matrix->getNode (row, true));
-            matrix->showMenuForNode (node);
+            if (ev.mods.isPopupMenu())
+            {
+                const Node node (matrix->getNode (row, true));
+                return matrix->showMenuForNode (node);
+            }
+            
+            jassert (row == getSelectedRow());
         }
 
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
         {
-
+            const Node node (matrix->getNode (row, true));
+//            ViewHelpers::presentPluginWindowFor (node);
+        }
+        
+        void deleteKeyPressed (int lastRowSelected) override
+        {
+            const Node node (matrix->getNode (lastRowSelected, true));
+            ViewHelpers::postMessageFor(this, new RemoveNodeMessage (node));
         }
 #if 0
         virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,

@@ -10,8 +10,8 @@ namespace Element {
 /** Send this to remove a node from the graph */
 class RemoveNodeMessage : public Message {
 public:
-    RemoveNodeMessage (const Node& node)
-        : nodeId (node.getNodeId()) { }
+    RemoveNodeMessage (const Node& node) : nodeId (node.getNodeId()) { }
+    RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) { }
     const uint32 nodeId;
 };
 

@@ -13,6 +13,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/NodeModel.h"
+#include "session/UnlockStatus.h"
 #include "Globals.h"
 
 #include "gui/ContentComponent.h"
@@ -51,12 +52,53 @@ namespace Element {
     };
     
     
-class ContentComponent::Toolbar : public Component {
+class ContentComponent::Toolbar : public Component,
+                                  public ButtonListener
+{
 public:
+    Toolbar() : grid ("Grid"), graph("Graph")
+    {
+        addAndMakeVisible (grid);
+//        grid.setColour (TextButton::buttonColourId, Colors::toggleOrange.darker());
+        grid.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
+        grid.setToggleState (true, dontSendNotification);
+        grid.addListener (this);
+        
+        addAndMakeVisible (graph);
+//        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
+        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+        graph.addListener (this);
+    }
+    
+    ~Toolbar() { }
+    
+    void resized() override {
+        Rectangle<int> r (getLocalBounds());
+        graph.setBounds (r.removeFromRight(60).reduced(1 ,3));
+        grid.setBounds (r.removeFromRight(60).reduced(1, 3));
+    }
+    
     void paint (Graphics& g) override {
         g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
         g.fillRect (getLocalBounds());
     }
+    
+    void buttonClicked (Button* btn) override {
+        if (btn->getToggleState())
+            return;
+        const bool nextState = !btn->getToggleState();
+        grid.setToggleState (false, dontSendNotification);
+        graph.setToggleState (false, dontSendNotification);
+        if (btn == &graph) {
+            
+        } else if (btn == &grid) {
+            
+        }
+        btn->setToggleState (nextState, dontSendNotification);
+        DBG("TOGLED: " << String(btn->getToggleState()));
+    }
+private:
+    TextButton grid, graph;
 };
 
 class ContentComponent::StatusBar : public Component,
@@ -183,95 +225,95 @@ private:
     }
 };
 
-    class NavigationConcertinaPanel : public ConcertinaPanel {
-    public:
-        NavigationConcertinaPanel (Globals& g)
-            : globals(g),
-              headerHeight (30),
-              defaultPanelHeight (80)
+class NavigationConcertinaPanel : public ConcertinaPanel {
+public:
+    NavigationConcertinaPanel (Globals& g)
+        : globals(g),
+          headerHeight (30),
+          defaultPanelHeight (80)
+    {
+        setLookAndFeel (&lookAndFeel);
+        updateContent();
+    }
+    
+    ~NavigationConcertinaPanel()
+    {
+        setLookAndFeel (nullptr);
+    }
+    
+    void clearPanels()
+    {
+        Array<Component*> comps;
+        for (int i = 0; i < getNumPanels(); ++i)
+            comps.add (getPanel (i));
+        for (int i = 0; i < comps.size(); ++i)
         {
-            setLookAndFeel (&lookAndFeel);
-            updateContent();
+            removePanel (comps[i]);
+            this->removePanel(0);
         }
+        names.clear();
+        comps.clear();
+    }
+    
+    void updateContent()
+    {
+        clearPanels();
         
-        ~NavigationConcertinaPanel()
-        {
-            setLookAndFeel (nullptr);
-        }
-        
-        void clearPanels()
-        {
-            Array<Component*> comps;
-            for (int i = 0; i < getNumPanels(); ++i)
-                comps.add (getPanel (i));
-            for (int i = 0; i < comps.size(); ++i)
-            {
-                removePanel (comps[i]);
-                this->removePanel(0);
-            }
-            names.clear();
-            comps.clear();
-        }
-        
-        void updateContent()
-        {
-            clearPanels();
-            
-            Component* c = nullptr;
+        Component* c = nullptr;
 #if EL_USE_AUDIO_PANEL
-            names.add ("Audio");
-            c = new AudioIOPanelView();
-            addPanel (-1, c, true);
-            setPanelHeaderSize (c, headerHeight);
-            setMaximumPanelSize (c, 160);
-            setPanelSize (c, 60, false);
+        names.add ("Audio");
+        c = new AudioIOPanelView();
+        addPanel (-1, c, true);
+        setPanelHeaderSize (c, headerHeight);
+        setMaximumPanelSize (c, 160);
+        setPanelSize (c, 60, false);
 #endif
-            names.add ("Plugins");
-            c = new PluginsPanelView (globals.getPluginManager());
-            addPanel (-1, c, true);
-            setPanelHeaderSize (c, headerHeight);
-        }
+        names.add ("Plugins");
+        c = new PluginsPanelView (globals.getPluginManager());
+        addPanel (-1, c, true);
+        setPanelHeaderSize (c, headerHeight);
+    }
+    
+    const StringArray& getNames() const { return names; }
+    const int getHeaderHeight() const { return headerHeight; }
+    void setHeaderHeight (const int newHeight)
+    {
+        jassert (newHeight > 0);
+        headerHeight = newHeight;
+        updateContent();
+    }
+    
+private:
+    typedef Element::LookAndFeel ELF;
+    Globals& globals;
+    StringArray names;
+    int headerHeight;
+    int defaultPanelHeight;
+    
+    class LookAndFeel : public Element::LookAndFeel
+    {
+    public:
+        LookAndFeel() { }
+        ~LookAndFeel() { }
         
-        const StringArray& getNames() const { return names; }
-        const int getHeaderHeight() const { return headerHeight; }
-        void setHeaderHeight (const int newHeight)
+        void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
+                                        bool isMouseOver, bool isMouseDown,
+                                        ConcertinaPanel& panel, Component& comp)
         {
-            jassert (newHeight > 0);
-            headerHeight = newHeight;
-            updateContent();
-        }
-        
-    private:
-        typedef Element::LookAndFeel ELF;
-        Globals& globals;
-        StringArray names;
-        int headerHeight;
-        int defaultPanelHeight;
-        
-        class LookAndFeel : public Element::LookAndFeel
-        {
-        public:
-            LookAndFeel() { }
-            ~LookAndFeel() { }
-            
-            void drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
-                                            bool isMouseOver, bool isMouseDown,
-                                            ConcertinaPanel& panel, Component& comp)
-            {
-                auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
-                int i = p->getNumPanels();
-                while (--i >= 0) {
-                    if (p->getPanel(i) == &comp)
-                        break;
-                }
-                ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
-                g.setColour (Colours::white);
-                Rectangle<int> r (area.withTrimmedLeft (20));
-                g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
-                            Justification::centredLeft);
+            auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
+            int i = p->getNumPanels();
+            while (--i >= 0) {
+                if (p->getPanel(i) == &comp)
+                    break;
             }
-        } lookAndFeel;
-    };
+            ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
+            g.setColour (Colours::white);
+            Rectangle<int> r (area.withTrimmedLeft (20));
+            g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
+                        Justification::centredLeft);
+        }
+    } lookAndFeel;
+};
     
 class ContentContainer : public Component
 {
@@ -377,6 +419,40 @@ void ContentComponent::resized()
                              false, true);
 }
 
+bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
+{
+    for (const auto& path : files)
+    {
+        const File file (path);
+        if (file.hasFileExtension ("elc;elg;wav"))
+            return true;
+    }
+    return false;
+}
+
+void ContentComponent::filesDropped (const StringArray &files, int x, int y)
+{
+    for (const auto& path : files)
+    {
+        const File file (path);
+        if (file.hasFileExtension ("elc"))
+        {
+            auto& unlock (controller.getGlobals().getUnlockStatus());
+            FileInputStream src (file);
+            if (unlock.applyKeyFile (src.readString()))
+            {
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+                    "Apply License File", "Your software has successfully been unlocked.");
+            }
+            else
+            {
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+                    "Apply License File", "Your software could not be unlocked.");
+            }
+        }
+    }
+}
+    
 void ContentComponent::setRackViewComponent (Component* comp)
 {
     

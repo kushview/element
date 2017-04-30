@@ -311,15 +311,18 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=0&#10;JUCE_PLUGINHOST_VST3=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
-               vst3Folder="" extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;">
+               vst3Folder="" extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+               documentExtensions=".elc,elg">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"/>
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
+                       defines="EL_USE_LOCAL_AUTH=1"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
-                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"/>
+                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
+                       defines="EL_USE_LOCAL_AUTH=0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE5/modules"/>
@@ -380,6 +383,34 @@
         <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE5\modules"/>
       </MODULEPATHS>
     </VS2015>
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="Element"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="Element"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE5\modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+      </MODULEPATHS>
+    </VS2017>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>

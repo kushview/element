@@ -50,13 +50,6 @@ public:
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
 
-    JUCE_DEPRECATED(Session& session());
-    JUCE_DEPRECATED(SymbolMap& symbols());
-    JUCE_DEPRECATED(MediaManager& media());
-    JUCE_DEPRECATED(DeviceManager& devices());
-    JUCE_DEPRECATED(AudioEnginePtr engine() const);
-    JUCE_DEPRECATED(PluginManager& plugins());
-    JUCE_DEPRECATED(Settings& settings());
 private:
     String appName;
     friend class Application;

@@ -20,7 +20,8 @@ class RackView;
 class TransportBar;
 
 class ContentComponent :  public Component,
-                          public DragAndDropContainer
+                          public DragAndDropContainer,
+                          public FileDragAndDropTarget
 {
 public:
     ContentComponent (AppController& app, GuiApp& gui);
@@ -39,6 +40,8 @@ public:
     Globals& getGlobals();
     SessionRef getSession() const { return SessionRef(); }
     
+    bool isInterestedInFileDrag (const StringArray &files) override;
+    void filesDropped (const StringArray &files, int x, int y) override;
     JUCE_DEPRECATED(GuiApp& app());
 
 private:

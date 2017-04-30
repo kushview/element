@@ -7,6 +7,7 @@
 #define ELEMENT_MAIN_MENU_H
 
 #include "gui/MainWindow.h"
+#include "gui/ViewHelpers.h"
 #include "Commands.h"
 #include "CommandManager.h"
 #include "URIs.h"
@@ -20,7 +21,7 @@ public:
     enum RootNames
     {
        #if JUCE_DEBUG
-        File, Window, Debug, Help, NumMenus
+        File, Window, DebugItem, Help, NumMenus
        #else
         File, Window, Help, NumMenus
        #endif
@@ -54,33 +55,44 @@ public:
 
     StringArray getMenuBarNames() override
     {
-#if JUCE_DEBUG
+       #if JUCE_DEBUG
         const char* const names[] = { "File", "Window", "Debug", "Help", nullptr };
-#else
+       #else
         const char* const names[] = { "File", "Window", "Help", nullptr };
-#endif
-        return StringArray (names);
+       #endif
+        return StringArray (names, MainMenu::NumMenus);
     }
 
-    PopupMenu getMenuForIndex (int id, const String&) override
+    PopupMenu getMenuForIndex (int index, const String& name) override
     {
-        PopupMenu menu;
-        if (id == File)         buildFileMenu (menu);
-        else if (id == Window)  buildWindowMenu (menu);
-        else if (id == Help)    buildHelpMenu (menu);
-       #if JUCE_DEBUG
-        else if (id == Debug)   buildDebugMenu (menu);
+       #if JUCE_MAC
+        --index;
        #endif
-        else  { };
+        PopupMenu menu;
+        if (index == MainMenu::File)
+            buildFileMenu (menu);
+        else if (index == MainMenu::Window)
+            buildWindowMenu (menu);
+        else if (index == MainMenu::Help)
+            buildHelpMenu (menu);
+       #if JUCE_DEBUG
+        else if (index == MainMenu::DebugItem)
+            buildDebugMenu (menu);
+       #endif
+
         return menu;
     }
 
     void menuItemSelected (int index, int menu) override
     {
-#if 0
+        #if 0
         if (index == 999)
             owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
-#endif
+        #endif
+        
+        if (index == 1001) {
+            ViewHelpers::postMessageFor (&owner, new Message());
+        }
     }
     
     // Command Target
@@ -92,12 +104,7 @@ public:
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
-    
-    void buildDebugMenu (PopupMenu& menu)
-    {
-        menu.addItem (10000, "Reset settings file");
-    }
-    
+
     void buildFileMenu (PopupMenu& menu)
     {
        #if ! JUCE_MAC
@@ -137,6 +144,12 @@ private:
     void buildWindowMenu (PopupMenu& menu)
     {
         menu.addCommandItem (&cmd, Commands::showPluginManager);
+    }
+    
+    void buildDebugMenu (PopupMenu& menu)
+    {
+        menu.addItem (1000, "Reset settings file");
+        menu.addItem (1001, "Authenticate Trial");
     }
     
     void buildHelpMenu (PopupMenu& menu)

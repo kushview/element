@@ -3,8 +3,8 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#include "engine/AudioEngine.h"
 #include "controllers/AppController.h"
+#include "engine/AudioEngine.h"
 #include "gui/NewSessionView.h"
 #include "gui/AboutComponent.h"
 #include "gui/Alerts.h"
@@ -14,11 +14,10 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"
-
 #include "gui/ConnectionGrid.h"
-
-#include "EngineControl.h"
 #include "session/MediaManager.h"
+#include "session/UnlockStatus.h"
+
 #include "Globals.h"
 #include "Settings.h"
 
@@ -110,7 +109,8 @@ Globals& GuiApp::globals()
 
 void GuiApp::openWindow (const String& uri)
 {
-    if (uri == ELEMENT_PLUGIN_MANAGER) {
+    if (uri == ELEMENT_PLUGIN_MANAGER)
+    {
         for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;) {
             if (PluginListWindow* w = dynamic_cast<PluginListWindow*> (DocumentWindow::getTopLevelWindow (i))) {
                 w->closeButtonPressed();

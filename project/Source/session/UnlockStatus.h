@@ -5,6 +5,8 @@
 
 namespace Element {
     class Globals;
+    class Settings;
+    
     class UnlockStatus :  public OnlineUnlockStatus
     {
     public:
@@ -19,7 +21,8 @@ namespace Element {
         URL getServerAuthenticationURL() override;
         String readReplyFromWebserver (const String& email, const String& password) override;
         StringArray getLocalMachineIDs() override;
+
     private:
-        Globals& globals;
+        Settings& settings;
     };
 }

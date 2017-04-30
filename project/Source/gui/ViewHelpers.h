@@ -5,6 +5,9 @@
 #include "ElementApp.h"
 
 namespace Element {
+
+class ContentComponent;
+
 namespace ViewHelpers {
 
 /** Draws a common text row in a normal list box */
@@ -12,6 +15,9 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 
 /** Draws a common text row in a horizontal list box */
 void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool selected);
+
+/** Finds the content component by traversing parent component(s) */
+ContentComponent* findContentComponent (Component* c);
 
 /** Post a message to AppController
  

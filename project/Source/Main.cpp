@@ -67,12 +67,14 @@ private:
             text.setColour (Label::textColourId, Colours::white);
         }
 
-        void resized() override {
+        void resized() override
+        {
             SplashScreen::resized();
             text.setBounds (getLocalBounds());
         }
 
-        void paint (Graphics& g) override {
+        void paint (Graphics& g) override
+        {
             SplashScreen::paint (g);
             g.fillAll (Colours::aliceblue);
         }
