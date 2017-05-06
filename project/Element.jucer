@@ -388,7 +388,7 @@
             smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v141_xp" cppLanguageStandard="stdcpp14">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/x86/Debug"
+                       isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/Win32/Debug"
                        headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
                        useRuntimeLibDLL="1"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
