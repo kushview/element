@@ -106,7 +106,7 @@ CommandManager& Globals::getCommandManager()
 
 DeviceManager& Globals::getDeviceManager()
 {
-    assert (impl->devices != nullptr);
+    jassert (impl->devices != nullptr);
     return *impl->devices;
 }
 

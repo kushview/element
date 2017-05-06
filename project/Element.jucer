@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.2.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.0.0" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.0.1" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark">
   <MAINGROUP id="z1aYPy" name="Element">
@@ -325,24 +325,24 @@
                        defines="EL_USE_LOCAL_AUTH=0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE5/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE5/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
@@ -351,10 +351,10 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       characterSet="MultiByte" binaryPath="../build/x86/Debug" useRuntimeLibDLL="0"/>
+                       characterSet="MultiByte" binaryPath="../build/Win32/Debug" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       binaryPath="../build/x86/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
+                       binaryPath="../build/Win32/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
                        characterSet="MultiByte" binaryPath="../build/x64/Debug" useRuntimeLibDLL="0"/>
