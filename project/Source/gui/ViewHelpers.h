@@ -3,10 +3,12 @@
 #define EL_VIEW_HELPERS_H
 
 #include "ElementApp.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 
 class ContentComponent;
+class Node;
 
 namespace ViewHelpers {
 
@@ -27,6 +29,8 @@ ContentComponent* findContentComponent (Component* c);
  */
 void postMessageFor (Component*, Message*);
 
+GraphNodePtr findGraphNodeFor (Component*, const Node&);
+void presentPluginWindow (GraphNodePtr);
 }
 }
 

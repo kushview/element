@@ -2,6 +2,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GraphController.h"
+#include "gui/PluginWindow.h"
 #include "session/DeviceManager.h"
 #include "session/Node.h"
 #include "Globals.h"
@@ -63,12 +64,12 @@ void EngineController::addPlugin (const PluginDescription& d)
 
 void EngineController::removeNode (const uint32 nodeId)
 {
-    jassert(root);
-    if (! root)
-        return;
+    jassert (root);
+    if (! root) return;
+    PluginWindow::closeCurrentlyOpenWindowsFor (nodeId);
     root->removeFilter (nodeId);
 }
-    
+
 void EngineController::activate()
 {
     if (root != nullptr)

@@ -9,7 +9,6 @@
 #include "ElementApp.h"
 
 namespace Element {
-
 namespace Commands {
 
 }

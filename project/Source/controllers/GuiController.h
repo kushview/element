@@ -11,6 +11,9 @@ namespace Element {
     public:
         GuiController() { }
         ~GuiController() { }
+        
+        void activate() override;
+        void deactivate() override;
     };
 }
 

@@ -1,7 +1,12 @@
 
+#include "engine/AudioEngine.h"
+#include "engine/GraphProcessor.h"
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
 #include "gui/MainWindow.h"
+#include "gui/PluginWindow.h"
+#include "session/Node.h"
+#include "Globals.h"
 
 namespace Element {
 namespace ViewHelpers {
@@ -55,6 +60,14 @@ ContentComponent* findContentComponent (Component* c)
     return nullptr;
 }
 
+GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
+{
+    auto* cc = findContentComponent (c);
+    if (! cc) return nullptr;
+    auto& graph (cc->getGlobals().getAudioEngine()->graph());
+    return graph.getNodeForId (node.getNodeId());
+}
+
 void postMessageFor (Component* c, Message* m)
 {
     ScopedPointer<Message> deleter (m);
@@ -62,6 +75,23 @@ void postMessageFor (Component* c, Message* m)
         return cc->post (deleter.release());
     jassertfalse; // message not delivered
     deleter = nullptr;
+}
+
+void presentPluginWindow (GraphNodePtr ptr)
+{
+    auto* window = PluginWindow::getWindowFor (ptr);
+    if (window)
+    {
+        window->setVisible (true);
+        window->toFront (false);
+        return;
+    }
+    
+    window = PluginWindow::createWindowFor (ptr);
+    if (window)
+    {
+        window->setVisible (true);
+    }
 }
 
 }

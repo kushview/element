@@ -28,7 +28,6 @@ class PluginWindowToolbar : public Toolbar
 public:
     PluginWindowToolbar() { }
     ~PluginWindowToolbar() { }
-    
 };
 
 class PluginWindowContent : public Component
@@ -70,6 +69,7 @@ PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
       owner (node)
 {
+    setUsingNativeTitleBar(true);
     setSize (400, 300);
     setContentOwned (ui, true);
     setTopLeftPosition (owner->properties.getWithDefault ("windowLastX", Random::getSystemRandom().nextInt (500)),
@@ -81,8 +81,8 @@ PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
 
 PluginWindow::~PluginWindow()
 {
-    clearContentComponent();
     activePluginWindows.removeFirstMatchingValue (this);
+    clearContentComponent();
 }
 
 void PluginWindow::closeCurrentlyOpenWindowsFor (GraphNode* const node)
@@ -104,9 +104,6 @@ void PluginWindow::closeAllCurrentlyOpenWindows()
     {
         for (int i = activePluginWindows.size(); --i >= 0;)
             delete activePluginWindows.getUnchecked(i);
-
-        Component dummyModalComp;
-        dummyModalComp.enterModalState();
         MessageManager::getInstance()->runDispatchLoopUntil (50);
     }
 }

@@ -6,7 +6,7 @@
 #include "session/Node.h"
 
 namespace Element {
-    
+
 /** Send this to remove a node from the graph */
 class RemoveNodeMessage : public Message {
 public:
@@ -65,8 +65,7 @@ public:
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }
 };
-    
-    
+
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:

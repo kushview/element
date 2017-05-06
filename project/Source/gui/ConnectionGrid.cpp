@@ -429,13 +429,14 @@ namespace Element {
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
         {
             const Node node (matrix->getNode (row, true));
-//            ViewHelpers::presentPluginWindowFor (node);
+            if (auto ptr = ViewHelpers::findGraphNodeFor (this, node))
+                ViewHelpers::presentPluginWindow (ptr);
         }
         
         void deleteKeyPressed (int lastRowSelected) override
         {
             const Node node (matrix->getNode (lastRowSelected, true));
-            ViewHelpers::postMessageFor(this, new RemoveNodeMessage (node));
+            ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
         }
 #if 0
         virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
