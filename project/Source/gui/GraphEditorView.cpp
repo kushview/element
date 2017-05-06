@@ -1,5 +1,5 @@
 /*
-    GraphEditorPanel.cpp - This file is part of Element
+    GraphEditorView.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -28,18 +28,18 @@ namespace Element {
 
     typedef InternalFormat Internals;
     
-    GraphEditorPanel::GraphEditorPanel (GuiApp& gui, GraphController& ctl)
+    GraphEditorView::GraphEditorView (GuiApp& gui, GraphController& ctl)
             : GraphEditorBase (ctl)
     { }
 
-    GraphEditorPanel::~GraphEditorPanel()
+    GraphEditorView::~GraphEditorView()
     { }
 
-    void GraphEditorPanel::mouseDown(const MouseEvent &e)
+    void GraphEditorView::mouseDown(const MouseEvent &e)
     {
         if (! e.mods.isPopupMenu())
         {
-            GraphEditorBase::mouseDown (e);
+            GraphEditorComponent::mouseDown (e);
             return;
         }
 

@@ -1,20 +1,6 @@
 /*
     EngineControl.h - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef ELEMENT_ENGINECONTROL_H
@@ -37,7 +23,6 @@ namespace Element {
     {
     public:
         typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-        typedef GraphNodePtr NodePtr;
 
         ~EngineControl();
 
@@ -58,8 +43,8 @@ namespace Element {
 
     private:
         /** Adds a plugin to the root graph */
-        NodePtr addRootPlugin (IOProcessor::IODeviceType ioType);
-        NodePtr addRootPlugin (InternalFormat::ID internal);
+        GraphNodePtr addRootPlugin (IOProcessor::IODeviceType ioType);
+        GraphNodePtr addRootPlugin (InternalFormat::ID internal);
         InternalFormat* internals() const;
         Sequencer* sequencer() const;
 
@@ -69,8 +54,8 @@ namespace Element {
 
         Array<NodePtr> ioNodes;
 
-        NodePtr metro, audioOut, audioIn, midiOut, midiIn;
-        NodePtr seqNode;
+        GraphNodePtr metro, audioOut, audioIn, midiOut, midiIn;
+        GraphNodePtr seqNode;
 
         bool validateRequiredNodes();
 

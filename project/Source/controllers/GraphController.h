@@ -25,7 +25,7 @@
 #ifndef ELEMENT_GRAPH_CONTROLLER_H
 #define ELEMENT_GRAPH_CONTROLLER_H
 
-#include "element/Juce.h"
+#include "controllers/Controller.h"
 #include "engine/GraphProcessor.h"
 
 namespace Element {
@@ -37,11 +37,11 @@ class PluginManager;
 /**
     A collection of filters and some connections between them.
  */
-class GraphController :  public ChangeBroadcaster
+class GraphController :  public ChangeBroadcaster,
+                         public Controller
 {
 public:
     static const uint32 invalidNodeId = (uint32)-1;
-
     typedef GraphNodePtr NodePtr;
 
     GraphController (GraphProcessor&, PluginManager&);
@@ -57,7 +57,7 @@ public:
     const NodePtr getNode (const int index) const noexcept;
     const NodePtr getNodeForId (const uint32 uid) const noexcept;
 
-    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f);
+    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
 
     void removeFilter (const uint32 filterUID);
     void disconnectFilter (const uint32 filterUID);

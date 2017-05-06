@@ -23,7 +23,6 @@
 */
 
 #include "controllers/GraphController.h"
-#include "engine/GraphProcessor.h"
 #include "session/PluginManager.h"
 
 namespace Element {
@@ -61,10 +60,8 @@ GraphController::getNodeForId (const uint32 uid) const noexcept
     return processor.getNodeForId (uid);
 }
 
-uint32 GraphController::addFilter (const PluginDescription* desc, double x, double y)
+uint32 GraphController::addFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
-    uint32 nodeId = GraphController::invalidNodeId;
-
     if (desc != nullptr)
     {
 #if 1
@@ -74,7 +71,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
         GraphNode* node = nullptr;
 
         if (instance != nullptr)
-            node = processor.addNode (instance);
+            node = processor.addNode (instance, nodeId);
 
         if (node != nullptr)
         {
@@ -85,6 +82,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
         }
         else
         {
+            nodeId = GraphController::invalidNodeId;
             AlertWindow::showMessageBox (AlertWindow::WarningIcon,
                                          TRANS ("Couldn't create filter"),
                                          errorMessage);
@@ -181,7 +179,7 @@ void GraphController::removeConnection (const int index)
 }
 
 void GraphController::removeConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                    uint32 destFilterUID, int destFilterChannel)
+                                        uint32 destFilterUID, int destFilterChannel)
 {
     if (processor.removeConnection (sourceFilterUID, sourceFilterChannel,
                                     destFilterUID, destFilterChannel))

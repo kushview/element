@@ -91,8 +91,7 @@ public:
         : GroupTreeViewItem (i), session (sess)
     { }
 
-    AssetTreeViewItem*
-    createAssetSubItem (const AssetItem &child)
+    AssetTreeViewItem* createAssetSubItem (const AssetItem &child)
     {
         if (child.isFile()) {
             return new PatternTreeItem (child);
@@ -112,10 +111,10 @@ class SessionRootTreeItem :  public SessionGroupItem
 public:
 
     SessionRootTreeItem (GuiApp& g, SessionTreePanel& p)
-        : SessionGroupItem (g.globals().session(),
-                            g.globals().session().assets().root()),
+        : SessionGroupItem (g.globals().getSession(),
+                            g.globals().getSession().assets().root()),
           gui(g),
-          session (g.globals().session()),
+          session (g.globals().getSession()),
           panel (p)
     { }
 
@@ -202,7 +201,7 @@ void SessionTreePanel::mouseDown (const MouseEvent &ev)
 
 Session& SessionTreePanel::session()
 {
-    return gui.globals().session();
+    return gui.globals().getSession();
 }
 
 }

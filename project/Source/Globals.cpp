@@ -1,32 +1,19 @@
 /*
     Globals.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/InternalFormat.h"
 #include "session/DeviceManager.h"
+#include "session/MediaManager.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"
-#include "CommandManager.h"
-#include "Globals.h"
-#include "MediaManager.h"
+#include "session/UnlockStatus.h"
 #include "Settings.h"
 #include "URIs.h"
+#include "CommandManager.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -51,30 +38,8 @@ class Globals::Impl
 {
 public:
     Impl (Globals& g)
-        : owner (g)
-    {
-       #if !ELEMENT_LV2_PLUGIN_HOST
-        symbols  = new SymbolMap();
-       #endif
-        plugins  = new PluginManager();
-        //plugins->addFormat (new InternalFormat());
-        devices  = new DeviceManager();
-        media    = new MediaManager();
-        settings = new Settings();
-        commands = new CommandManager();
-    }
-
-    void freeAll()
-    {
-        commands = nullptr;
-        session  = nullptr;
-        devices  = nullptr;
-        media    = nullptr;
-        plugins  = nullptr;
-        settings = nullptr;
-        engine   = nullptr;
-    }
-
+        : owner (g) { }
+    
     ~Impl() { }
 
     Globals& owner;
@@ -85,9 +50,37 @@ public:
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
     ScopedPointer<Session>        session;
+    ScopedPointer<UnlockStatus>   unlock;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
    #endif
+   
+private:
+    friend class Globals;
+    void init()
+    {
+#if !ELEMENT_LV2_PLUGIN_HOST
+        symbols  = new SymbolMap();
+#endif
+        plugins  = new PluginManager();
+        devices  = new DeviceManager();
+        media    = new MediaManager();
+        settings = new Settings();
+        commands = new CommandManager();
+        unlock   = new UnlockStatus (owner);
+    }
+    
+    void freeAll()
+    {
+        commands = nullptr;
+        session  = nullptr;
+        devices  = nullptr;
+        media    = nullptr;
+        plugins  = nullptr;
+        settings = nullptr;
+        engine   = nullptr;
+        unlock   = nullptr;
+    }
 };
 
 Globals::Globals (const String& _cli)
@@ -96,6 +89,8 @@ Globals::Globals (const String& _cli)
 {
     appName = "Element";
     impl = new Impl (*this);
+    impl->init();
+    impl->unlock->load();
 }
 
 Globals::~Globals()
@@ -103,60 +98,72 @@ Globals::~Globals()
     impl->freeAll();
 }
 
-CommandManager& Globals::getCommands() { assert(impl->commands); return *impl->commands; }
-
-DeviceManager& Globals::devices()
+CommandManager& Globals::getCommandManager()
 {
-    assert (impl->devices != nullptr);
+    jassert (impl && impl->commands);
+    return *impl->commands;
+}
+
+DeviceManager& Globals::getDeviceManager()
+{
+    jassert (impl->devices != nullptr);
     return *impl->devices;
 }
 
-MediaManager& Globals::media()
+MediaManager& Globals::getMediaManager()
 {
-    assert (impl->media != nullptr);
+    jassert (impl->media != nullptr);
     return *impl->media;
 }
 
-AudioEnginePtr Globals::engine() const { return impl->engine; }
+AudioEnginePtr Globals::getAudioEngine() const { return impl->engine; }
 
-PluginManager& Globals::plugins()
+PluginManager& Globals::getPluginManager()
 {
-    assert (impl->plugins != nullptr);
+    jassert (impl->plugins != nullptr);
     return *impl->plugins;
 }
 
-Settings& Globals::settings()
+Settings& Globals::getSettings()
 {
-    assert (impl->settings != nullptr);
+    jassert (impl->settings != nullptr);
     return *impl->settings;
 }
 
-SymbolMap& Globals::symbols()
+SymbolMap& Globals::getSymbolMap()
 {
    #if ELEMENT_LV2_PLUGIN_HOST
     auto* fmt = impl->plugins->format<LV2PluginFormat>();
     jassert(fmt);
     return fmt->getSymbolMap();
    #else
-    assert(impl->symbols);
+    jassert(impl->symbols);
     return *impl->symbols;
    #endif
 }
 
-Session& Globals::session()
+UnlockStatus& Globals::getUnlockStatus()
 {
-    assert (impl->session != nullptr);
+    jassert (impl && impl->unlock);
+    return *impl->unlock;
+}
+    
+Session& Globals::getSession()
+{
+    jassert (impl->session != nullptr);
     return *impl->session;
 }
 
 void Globals::setEngine (EnginePtr engine)
 {
+    if (impl->engine)
+        impl->engine->deactivate();
     impl->engine = engine;
     if (impl->session == nullptr) {
         impl->session = new Session (*this);
     }
 
-    devices().attach (engine);
+    getDeviceManager().attach (engine);
 }
 
 }

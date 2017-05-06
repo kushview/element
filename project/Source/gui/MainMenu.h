@@ -1,27 +1,16 @@
 /*
     MainMenu.h - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef ELEMENT_MAIN_MENU_H
 #define ELEMENT_MAIN_MENU_H
 
-#include "URIs.h"
 #include "gui/MainWindow.h"
+#include "gui/ViewHelpers.h"
+#include "Commands.h"
+#include "CommandManager.h"
+#include "URIs.h"
 
 namespace Element {
 
@@ -29,20 +18,25 @@ class MainMenu : public MenuBarModel,
                  public ApplicationCommandTarget
 {
 public:
-    enum RootNames {
+    enum RootNames
+    {
+       #if JUCE_DEBUG
+        File, Window, DebugItem, Help, NumMenus
+       #else
         File, Window, Help, NumMenus
+       #endif
     };
 
-    MainMenu (MainWindow& parent)
-        : owner (parent) { }
+    MainMenu (MainWindow& parent, CommandManager& c)
+        : owner (parent), cmd(c) { }
 
     void setupMenu()
     {
       #if JUCE_MAC
         macMenu = new PopupMenu();
-        macMenu->addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
+        macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
         macMenu->addSeparator();
-        macMenu->addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences...");
+        macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
        #else
         owner.setMenuBar (this);
@@ -61,29 +55,48 @@ public:
 
     StringArray getMenuBarNames() override
     {
+       #if JUCE_DEBUG
+        const char* const names[] = { "File", "Window", "Debug", "Help", nullptr };
+       #else
         const char* const names[] = { "File", "Window", "Help", nullptr };
-        return StringArray (names);
+       #endif
+        return StringArray (names, MainMenu::NumMenus);
     }
 
-    PopupMenu getMenuForIndex (int id, const String&) override
+    PopupMenu getMenuForIndex (int index, const String& name) override
     {
+       #if JUCE_MAC
+        --index;
+       #endif
         PopupMenu menu;
-        if (id == File)        buildFileMenu (menu);
-        else if (id == Window) buildWindowMenu (menu);
-        else if (id == Help)   buildHelpMenu (menu);
-        else  { };
+        if (index == MainMenu::File)
+            buildFileMenu (menu);
+        else if (index == MainMenu::Window)
+            buildWindowMenu (menu);
+        else if (index == MainMenu::Help)
+            buildHelpMenu (menu);
+       #if JUCE_DEBUG
+        else if (index == MainMenu::DebugItem)
+            buildDebugMenu (menu);
+       #endif
+
         return menu;
     }
 
     void menuItemSelected (int index, int menu) override
     {
+        #if 0
         if (index == 999)
             owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
+        #endif
+        
+        if (index == 1001) {
+            ViewHelpers::postMessageFor (&owner, new Message());
+        }
     }
     
-    
     // Command Target
-    ApplicationCommandTarget* getNextCommandTarget() override { return &owner.app(); }
+    ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; /* &owner.app(); */ }
     void getAllCommands (Array <CommandID>&) override { }
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
     bool perform (const InvocationInfo& info) override { return false; }
@@ -91,9 +104,15 @@ public:
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
-    
+
     void buildFileMenu (PopupMenu& menu)
     {
+       #if ! JUCE_MAC
+        menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
+       #endif
+#if 0
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
         menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
@@ -101,17 +120,12 @@ private:
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-        
-       #if ! JUCE_MAC
-        menu.addCommandItem (&owner.app().commander(), Commands::showPreferences, "Preferences..");
-        menu.addSeparator();
-        menu.addCommandItem (&owner.app().commander(), StandardApplicationCommandIDs::quit);
-       #endif
+#endif
     }
     
     void buildEditMenu (PopupMenu& menu)
     {
-        ApplicationCommandManager* acm = &owner.app().commander();
+        ApplicationCommandManager* acm = &cmd;
         menu.addCommandItem (acm, StandardApplicationCommandIDs::undo, "Undo");
         menu.addCommandItem (acm, StandardApplicationCommandIDs::redo, "Redo");
         menu.addSeparator();
@@ -124,22 +138,29 @@ private:
     
     void buildViewMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&owner.app().commander(), Commands::showLegacyView, "Legacy View");
+
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        const bool isOpen = owner.app().isWindowOpen (ELEMENT_PLUGIN_MANAGER);
-        menu.addItem (999, "Plugin Manager", true, isOpen);
+        menu.addCommandItem (&cmd, Commands::showPluginManager);
+    }
+    
+    void buildDebugMenu (PopupMenu& menu)
+    {
+        menu.addItem (1000, "Reset settings file");
+        menu.addItem (1001, "Authenticate Trial");
     }
     
     void buildHelpMenu (PopupMenu& menu)
     {
-#if ! JUCE_MAC
-        menu.addCommandItem (&owner.app().commander(), Commands::showAbout, "About Element");
-#endif
-        // menu.addItem (111, "Do it", true, true);
+       #if ! JUCE_MAC
+        menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
+       #endif
     }
+    
+private:
+    CommandManager& cmd;
 };
 
 }

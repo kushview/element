@@ -4,73 +4,73 @@
     project - if you alter its contents, your changes may be overwritten!
 
     There's a section below where you can add your own custom code safely, and the
-    Introjucer will preserve the contents of that block, but the best way to change
-    any of these definitions is by using the Introjucer's project settings.
+    Projucer will preserve the contents of that block, but the best way to change
+    any of these definitions is by using the Projucer's project settings.
 
     Any commented-out settings will assume their default values.
 
 */
 
-#ifndef __JUCE_APPCONFIG_UNTEAW__
-#define __JUCE_APPCONFIG_UNTEAW__
+#pragma once
 
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
+// (You can add your own code in this section, and the Projucer will not overwrite it)
 
-#ifndef ELEMENT_VERSION_STRING
- // This is for systems that don't use Waf to build the project
- #define ELEMENT_VERSION_STRING ProjectInfo::versionString
-#endif
-
-#if _MSC_VER
-// unused method parameters
-#pragma warning( disable : 4100 )
-
-// previous method not overridden
-#pragma warning( disable : 4373 )
-
-// possible loss of data from casting
-#pragma warning( disable : 4244 )
-
-// const conditional
-#pragma warning( disable : 4127 )
-
-// signed/unsigned mismatch
-#pragma warning( disable : 4389 )
-#pragma warning( disable : 4018 )
-#pragma warning( disable : 4245 )
-
-// local var not used
-#pragma warning( disable : 4189 )
-
-#endif
 // [END_USER_CODE_SECTION]
 
+/*
+  ==============================================================================
+
+   In accordance with the terms of the JUCE 5 End-Use License Agreement, the
+   JUCE Code in SECTION A cannot be removed, changed or otherwise rendered
+   ineffective unless you have a JUCE Indie or Pro license, or are using JUCE
+   under the GPL v3 license.
+
+   End User License Agreement: www.juce.com/juce-5-licence
+  ==============================================================================
+*/
+
+// BEGIN SECTION A
+
+#define JUCE_DISPLAY_SPLASH_SCREEN 0
+#define JUCE_REPORT_APP_USAGE 0
+
+// END SECTION A
+
+#define JUCE_USE_DARK_SPLASH_SCREEN 1
+
 //==============================================================================
-#define JUCE_MODULE_AVAILABLE_element_base               1
-#define JUCE_MODULE_AVAILABLE_element_engines            1
-#define JUCE_MODULE_AVAILABLE_element_gui                1
-#define JUCE_MODULE_AVAILABLE_element_lv2                1
-#define JUCE_MODULE_AVAILABLE_element_models             1
-#define JUCE_MODULE_AVAILABLE_juce_audio_basics          1
-#define JUCE_MODULE_AVAILABLE_juce_audio_devices         1
-#define JUCE_MODULE_AVAILABLE_juce_audio_formats         1
-#define JUCE_MODULE_AVAILABLE_juce_audio_processors      1
-#define JUCE_MODULE_AVAILABLE_juce_audio_utils           1
-#define JUCE_MODULE_AVAILABLE_juce_core                  1
-#define JUCE_MODULE_AVAILABLE_juce_cryptography          1
-#define JUCE_MODULE_AVAILABLE_juce_data_structures       1
-#define JUCE_MODULE_AVAILABLE_juce_events                1
-#define JUCE_MODULE_AVAILABLE_juce_graphics              1
-#define JUCE_MODULE_AVAILABLE_juce_gui_basics            1
-#define JUCE_MODULE_AVAILABLE_juce_gui_extra             1
-#define JUCE_MODULE_AVAILABLE_juce_opengl                1
+#define JUCE_MODULE_AVAILABLE_element_base                1
+#define JUCE_MODULE_AVAILABLE_element_engines             1
+#define JUCE_MODULE_AVAILABLE_element_gui                 1
+#define JUCE_MODULE_AVAILABLE_element_lv2                 1
+#define JUCE_MODULE_AVAILABLE_element_models              1
+#define JUCE_MODULE_AVAILABLE_juce_audio_basics           1
+#define JUCE_MODULE_AVAILABLE_juce_audio_devices          1
+#define JUCE_MODULE_AVAILABLE_juce_audio_formats          1
+#define JUCE_MODULE_AVAILABLE_juce_audio_processors       1
+#define JUCE_MODULE_AVAILABLE_juce_audio_utils            1
+#define JUCE_MODULE_AVAILABLE_juce_core                   1
+#define JUCE_MODULE_AVAILABLE_juce_cryptography           1
+#define JUCE_MODULE_AVAILABLE_juce_data_structures        1
+#define JUCE_MODULE_AVAILABLE_juce_events                 1
+#define JUCE_MODULE_AVAILABLE_juce_graphics               1
+#define JUCE_MODULE_AVAILABLE_juce_gui_basics             1
+#define JUCE_MODULE_AVAILABLE_juce_gui_extra              1
+#define JUCE_MODULE_AVAILABLE_juce_product_unlocking      1
 
 //==============================================================================
 #ifndef    JUCE_STANDALONE_APPLICATION
- #define   JUCE_STANDALONE_APPLICATION 1
+ #if defined(JucePlugin_Name) && defined(JucePlugin_Build_Standalone)
+  #define  JUCE_STANDALONE_APPLICATION JucePlugin_Build_Standalone
+ #else
+  #define  JUCE_STANDALONE_APPLICATION 1
+ #endif
 #endif
+
+#define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
 
 //==============================================================================
 // element_engines flags:
@@ -97,15 +97,15 @@
 // juce_audio_devices flags:
 
 #ifndef    JUCE_ASIO
- #define   JUCE_ASIO 0
+ #define   JUCE_ASIO 1
 #endif
 
 #ifndef    JUCE_WASAPI
- #define   JUCE_WASAPI 0
+ #define   JUCE_WASAPI 1
 #endif
 
 #ifndef    JUCE_WASAPI_EXCLUSIVE
- //#define JUCE_WASAPI_EXCLUSIVE
+ #define   JUCE_WASAPI_EXCLUSIVE 1
 #endif
 
 #ifndef    JUCE_DIRECTSOUND
@@ -124,12 +124,8 @@
  #define   JUCE_USE_ANDROID_OPENSLES 0
 #endif
 
-#ifndef    JUCE_USE_CDREADER
- #define   JUCE_USE_CDREADER 0
-#endif
-
-#ifndef    JUCE_USE_CDBURNER
- #define   JUCE_USE_CDBURNER 0
+#ifndef    JUCE_USE_WINRT_MIDI
+ //#define JUCE_USE_WINRT_MIDI
 #endif
 
 //==============================================================================
@@ -144,11 +140,11 @@
 #endif
 
 #ifndef    JUCE_USE_MP3AUDIOFORMAT
- //#define JUCE_USE_MP3AUDIOFORMAT
+ #define   JUCE_USE_MP3AUDIOFORMAT 0
 #endif
 
 #ifndef    JUCE_USE_LAME_AUDIO_FORMAT
- //#define JUCE_USE_LAME_AUDIO_FORMAT
+ #define   JUCE_USE_LAME_AUDIO_FORMAT 0
 #endif
 
 #ifndef    JUCE_USE_WINDOWS_MEDIA_FORMAT
@@ -163,11 +159,22 @@
 #endif
 
 #ifndef    JUCE_PLUGINHOST_VST3
- //#define JUCE_PLUGINHOST_VST3
+ #define   JUCE_PLUGINHOST_VST3 1
 #endif
 
 #ifndef    JUCE_PLUGINHOST_AU
  #define   JUCE_PLUGINHOST_AU 1
+#endif
+
+//==============================================================================
+// juce_audio_utils flags:
+
+#ifndef    JUCE_USE_CDREADER
+ #define   JUCE_USE_CDREADER 0
+#endif
+
+#ifndef    JUCE_USE_CDBURNER
+ #define   JUCE_USE_CDBURNER 0
 #endif
 
 //==============================================================================
@@ -195,6 +202,21 @@
 
 #ifndef    JUCE_USE_CURL
  //#define JUCE_USE_CURL
+#endif
+
+#ifndef    JUCE_CATCH_UNHANDLED_EXCEPTIONS
+ //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS
+#endif
+
+#ifndef    JUCE_ALLOW_STATIC_NULL_VARIABLES
+ //#define JUCE_ALLOW_STATIC_NULL_VARIABLES
+#endif
+
+//==============================================================================
+// juce_events flags:
+
+#ifndef    JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
+ //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
 #endif
 
 //==============================================================================
@@ -231,12 +253,9 @@
 // juce_gui_extra flags:
 
 #ifndef    JUCE_WEB_BROWSER
- //#define JUCE_WEB_BROWSER
+ #define   JUCE_WEB_BROWSER 0
 #endif
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
- //#define JUCE_ENABLE_LIVE_CONSTANT_EDITOR
+ #define   JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
 #endif
-
-
-#endif  // __JUCE_APPCONFIG_UNTEAW__

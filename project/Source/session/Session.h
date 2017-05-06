@@ -1,26 +1,12 @@
 /*
     Session.h - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #ifndef ELEMENT_SESSION_H
 #define ELEMENT_SESSION_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include <boost/intrusive_ptr.hpp>
 
 namespace Element {
@@ -79,7 +65,7 @@ namespace Element {
         Shared<Monitor> getPlaybackMonitor();
 
         AssetTree& assets();
-        Shared<EngineControl> controller();
+        
         Globals& globals();
         MediaManager& media();
 
@@ -101,9 +87,8 @@ namespace Element {
         inline UndoManager* undoManager() { return nullptr; }
 
         XmlElement* createXml();
-
+        
     protected:
-
         /** Create a new session object. Session is created once and owned by Globals
             @see Globals::setEngine */
         Session (Globals&);
@@ -144,7 +129,7 @@ namespace Element {
         friend void intrusive_ptr_add_ref (Session*);
         friend void intrusive_ptr_release (Session*);
         
-        void notifyChanged() { DBG("Session::notifyChanged()"); }
+        void notifyChanged() { }
     };
 }
 

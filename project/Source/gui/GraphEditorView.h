@@ -1,5 +1,5 @@
 /*
-    GraphEditorPanel.h - This file is part of Element
+    GraphEditorView.h - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -17,23 +17,25 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_GRAPHEDITORCOMPONENT_H
-#define ELEMENT_GRAPHEDITORCOMPONENT_H
+#ifndef EL_GRAPH_EDITOR_VIEW_H
+#define EL_GRAPH_EDITOR_VIEW_H
 
 #include "gui/GraphEditorComponent.h"
 
 namespace Element {
 
-    class GuiApp;
-    class GraphEditorPanel : public GraphEditorComponent
-    {
-    public:
-        GraphEditorPanel (GuiApp& gui, GraphController& ctl);
-        ~GraphEditorPanel();
+class GuiApp;
 
-        void mouseDown (const MouseEvent &e);
-    };
+class GraphEditorView : public GraphEditorComponent
+{
+public:
+    GraphEditorView (GuiApp& gui, GraphController& ctl);
+    ~GraphEditorView();
+
+    void mouseDown (const MouseEvent &e);
+};
+
 }
 
 
-#endif // ELEMENT_GRAPHEDITORCOMPONENT_H
+#endif // EL_GRAPH_EDITOR_VIEW_H

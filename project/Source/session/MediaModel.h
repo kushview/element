@@ -20,7 +20,7 @@
 #ifndef ELEMENT_MEDIA_MODEL_H
 #define ELEMENT_MEDIA_MODEL_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

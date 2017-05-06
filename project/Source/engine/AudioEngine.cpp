@@ -1,20 +1,6 @@
 /*
     AudioEngine.cpp - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
 #include "engine/AudioEngine.h"
@@ -29,138 +15,139 @@
 
 #include "EngineControl.h"
 #include "Globals.h"
-#include "MediaManager.h"
+#include "session/MediaManager.h"
+#include "session/Node.h"
 
 namespace Element {
 
-    namespace EngineHelpers {
+namespace EngineHelpers {
+    
+    GraphNodePtr createNodeFromValueTreeNode (GraphProcessor& graph, const ValueTree& node,
+                                              PluginManager& plugins)
+    {
+        /* const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch); */
+        const bool restorePluginGain     = true; // ! filters.contains (Snapshot::filterPluginGain);
+        const bool restorePluginSettings = true; // ! filters.contains (Snapshot::filterPluginSettings);
+        const bool restoreBypassState    = true; // ! filters.contains (Snapshot::filterBypassState);
+        const bool restoreWindowLayout   = true; // ! filters.contains (Snapshot::filterWindowLayout);
+
+        ValueTree plugin = node.getChildWithName ("plugin");
+        PluginDescription desc;
+        desc.pluginFormatName = plugin.getProperty ("format");
+        desc.name = plugin.getProperty("name");
+        desc.category = plugin.getProperty ("category");
+        desc.manufacturerName = plugin.getProperty ("manufacturer");
+        desc.version = plugin.getProperty ("version");
+        desc.fileOrIdentifier = plugin.getProperty ("file");
+        desc.uid = CharacterFunctions::getIntValue<int> (plugin.getProperty ("uid").toString().toUTF8());
+        desc.isInstrument = (bool)plugin.getProperty ("isInstrument");
+        // TODO: desc.fileTime = plugin.getProperty ("fileTime");
+        desc.numInputChannels = (int) plugin.getProperty ("numInputs");
+        desc.numOutputChannels = (int) plugin.getProperty ("numOutputs");
+        desc.hasSharedContainer = (bool) plugin.getProperty ("isShell");
+
+        String errorMessage;
+        Processor* instance = plugins.createPlugin (desc, errorMessage);
+
+        if (instance == nullptr) {
+            DBG (errorMessage);
+            return nullptr;
+        }
+
+        GraphNodePtr nodePtr (graph.addNode (instance, (uint32)(int) node.getProperty ("id")));
+        /* TODO: Prevent memory leaks. Unlikely, but the Processor instance here could leak
+         memory if the node wasn't created - MRF */
+
         
-        GraphNodePtr createNodeFromValueTreeNode (GraphProcessor& graph, const ValueTree& node,
-                                                  PluginManager& plugins)
+        if (nodePtr)
         {
-            /* const bool restoreAudioPatch     = true; // ! filters.contains (Snapshot::filterAudioPatch); */
-            const bool restorePluginGain     = true; // ! filters.contains (Snapshot::filterPluginGain);
-            const bool restorePluginSettings = true; // ! filters.contains (Snapshot::filterPluginSettings);
-            const bool restoreBypassState    = true; // ! filters.contains (Snapshot::filterBypassState);
-            const bool restoreWindowLayout   = true; // ! filters.contains (Snapshot::filterWindowLayout);
+            ValueTree meta = node.getChildWithName ("metadata");
+            if (meta.isValid())
+                nodePtr->setMetadata (meta, true);
 
-            ValueTree plugin = node.getChildWithName ("plugin");
-            PluginDescription desc;
-            desc.pluginFormatName = plugin.getProperty ("format");
-            desc.name = plugin.getProperty("name");
-            desc.category = plugin.getProperty ("category");
-            desc.manufacturerName = plugin.getProperty ("manufacturer");
-            desc.version = plugin.getProperty ("version");
-            desc.fileOrIdentifier = plugin.getProperty ("file");
-            desc.uid = CharacterFunctions::getIntValue<int> (plugin.getProperty ("uid").toString().toUTF8());
-            desc.isInstrument = (bool)plugin.getProperty ("isInstrument");
-            // TODO: desc.fileTime = plugin.getProperty ("fileTime");
-            desc.numInputChannels = (int) plugin.getProperty ("numInputs");
-            desc.numOutputChannels = (int) plugin.getProperty ("numOutputs");
-            desc.hasSharedContainer = (bool) plugin.getProperty ("isShell");
-
-            String errorMessage;
-            Processor* instance = plugins.createPlugin (desc, errorMessage);
-
-            if (instance == nullptr) {
-                DBG (errorMessage);
-                return nullptr;
+            if (node.hasProperty("gain") && restorePluginGain) {
+                nodePtr->setGain ((float) node.getProperty("gain"));
             }
 
-            GraphNodePtr nodePtr (graph.addNode (instance, (uint32)(int) node.getProperty ("id")));
-            /* TODO: Prevent memory leaks. Unlikely, but the Processor instance here could leak
-             memory if the node wasn't created - MRF */
-
-            
-            if (nodePtr)
+            if (plugin.hasProperty ("state") && restorePluginSettings)
             {
-                ValueTree meta = node.getChildWithName ("metadata");
-                if (meta.isValid())
-                    nodePtr->setMetadata (meta, true);
-
-                if (node.hasProperty("gain") && restorePluginGain) {
-                    nodePtr->setGain ((float) node.getProperty("gain"));
-                }
-
-                if (plugin.hasProperty ("state") && restorePluginSettings)
-                {
-                    MemoryBlock m;
-                    m.fromBase64Encoding (plugin.getProperty("state").toString());
-                    nodePtr->getAudioPluginInstance()->setStateInformation (m.getData(), (int) m.getSize());
-                }
-
-                if (plugin.hasProperty("isSuspended") && restoreBypassState)
-                    nodePtr->getAudioPluginInstance()->suspendProcessing ((bool) plugin.getProperty ("isSuspended", false));
-
-                // set misc properties from the node property store
-                Array<Identifier> ignore;
-                if (! restoreWindowLayout) {
-                    ignore.add (Identifier("uiLastX"));
-                    ignore.add (Identifier("uiLastY"));
-                }
-
-                for (int i = 0; i < node.getNumProperties(); ++i)
-                    if (! ignore.contains (node.getPropertyName (i)))
-                        nodePtr->properties.set (node.getPropertyName(i), node.getProperty (node.getPropertyName(i)));
-            }
-            else
-            {
-                DBG ("Could not create plugin");
-            }
-
-            return nodePtr;
-        }
-
-        ValueTree createValueTreeForNode (GraphNodePtr node, Identifier valueTreeType = "node")
-        {
-            ValueTree result (valueTreeType);
-
-            result.setProperty ("id", static_cast<int> (node->nodeId), nullptr);
-            for (int i = 0; i < node->properties.size(); ++i)
-            {
-                result.setProperty (node->properties.getName(i),
-                                    node->properties.getValueAt(i),
-                                    nullptr);
-            }
-
-            result.setProperty ("gain", node->getGain(), nullptr);
-
-            if (AudioPluginInstance* plugin = dynamic_cast<AudioPluginInstance*> (node->getAudioPluginInstance()))
-            {
-                PluginDescription pd;
-                plugin->fillInPluginDescription (pd);
-
-                ValueTree p ("plugin");
-                p.setProperty (Slugs::name, pd.name, nullptr);
-                if (pd.descriptiveName != pd.name)
-                    p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
-
-                p.setProperty ("format",       pd.pluginFormatName, nullptr);
-                p.setProperty ("category",     pd.category, nullptr);
-                p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
-                p.setProperty ("version",      pd.version, nullptr);
-                p.setProperty ("file",         pd.fileOrIdentifier, nullptr);
-                p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
-                p.setProperty ("isInstrument", pd.isInstrument, nullptr);
-                p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
-                p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
-                p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
-                p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
-                p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
-
                 MemoryBlock m;
-                node->getProcessor()->getStateInformation (m);
-                p.setProperty ("state", m.toBase64Encoding(), nullptr);
-
-                result.addChild (p, -1, nullptr);
-
-                ValueTree meta (node->getMetadata().createCopy());
-                result.addChild (meta, -1, nullptr);
+                m.fromBase64Encoding (plugin.getProperty("state").toString());
+                nodePtr->getAudioPluginInstance()->setStateInformation (m.getData(), (int) m.getSize());
             }
 
-            return result;
+            if (plugin.hasProperty("isSuspended") && restoreBypassState)
+                nodePtr->getAudioPluginInstance()->suspendProcessing ((bool) plugin.getProperty ("isSuspended", false));
+
+            // set misc properties from the node property store
+            Array<Identifier> ignore;
+            if (! restoreWindowLayout) {
+                ignore.add (Identifier("uiLastX"));
+                ignore.add (Identifier("uiLastY"));
+            }
+
+            for (int i = 0; i < node.getNumProperties(); ++i)
+                if (! ignore.contains (node.getPropertyName (i)))
+                    nodePtr->properties.set (node.getPropertyName(i), node.getProperty (node.getPropertyName(i)));
         }
+        else
+        {
+            DBG ("Could not create plugin");
+        }
+
+        return nodePtr;
     }
+
+    ValueTree createValueTreeForNode (GraphNodePtr node, Identifier valueTreeType = "node")
+    {
+        ValueTree result (valueTreeType);
+
+        result.setProperty ("id", static_cast<int> (node->nodeId), nullptr);
+        for (int i = 0; i < node->properties.size(); ++i)
+        {
+            result.setProperty (node->properties.getName(i),
+                                node->properties.getValueAt(i),
+                                nullptr);
+        }
+
+        result.setProperty ("gain", node->getGain(), nullptr);
+
+        if (AudioPluginInstance* plugin = dynamic_cast<AudioPluginInstance*> (node->getAudioPluginInstance()))
+        {
+            PluginDescription pd;
+            plugin->fillInPluginDescription (pd);
+
+            ValueTree p ("plugin");
+            p.setProperty (Slugs::name, pd.name, nullptr);
+            if (pd.descriptiveName != pd.name)
+                p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
+
+            p.setProperty ("format",       pd.pluginFormatName, nullptr);
+            p.setProperty ("category",     pd.category, nullptr);
+            p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
+            p.setProperty ("version",      pd.version, nullptr);
+            p.setProperty ("file",         pd.fileOrIdentifier, nullptr);
+            p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
+            p.setProperty ("isInstrument", pd.isInstrument, nullptr);
+            p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
+            p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
+            p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
+            p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
+            p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
+
+            MemoryBlock m;
+            node->getProcessor()->getStateInformation (m);
+            p.setProperty ("state", m.toBase64Encoding(), nullptr);
+
+            result.addChild (p, -1, nullptr);
+
+            ValueTree meta (node->getMetadata().createCopy());
+            result.addChild (meta, -1, nullptr);
+        }
+
+        return result;
+    }
+}
 
 class RootGraph : public GraphProcessor
 {
@@ -172,12 +159,12 @@ public:
     {
         clear();
 
-        ValueTree arcs  = data.getChildWithName ("arcs");
-        ValueTree nodes = data.getChildWithName ("nodes");
+        ValueTree arcs  = data.getChildWithName (Tags::arcs);
+        ValueTree nodes = data.getChildWithName (Tags::nodes);
         for (int i = 0; i < nodes.getNumChildren(); ++i)
         {
             ValueTree c (nodes.getChild(i));
-            if (! c.hasType ("node"))
+            if (! c.hasType (Tags::node))
                 continue;
             
             EngineHelpers::createNodeFromValueTreeNode (*this, c, plugins);
@@ -188,12 +175,12 @@ public:
             for (int i = 0; i < arcs.getNumChildren(); ++i)
             {
                 ValueTree c = arcs.getChild(i);
-                if (c.isValid() && c.hasType("arc"))
+                if (c.isValid() && c.hasType (Tags::arc))
                 {
-                    addConnection ((uint32)(int) c.getProperty ("sourceNode"),
-                                   (uint32)(int) c.getProperty ("sourcePort"),
-                                   (uint32)(int) c.getProperty ("destNode"),
-                                   (uint32)(int) c.getProperty ("destPort"));
+                    addConnection ((uint32)(int) c.getProperty (Tags::sourceNode),
+                                   (uint32)(int) c.getProperty (Tags::sourcePort),
+                                   (uint32)(int) c.getProperty (Tags::destNode),
+                                   (uint32)(int) c.getProperty (Tags::destPort));
                 }
             }
 
@@ -270,7 +257,7 @@ public:
             {
                 nextGraph->setPlayHead (engine->transport());
                 nextGraph->setPlayConfigDetails (numInputChans, numOutputChans,
-                                                       sampleRate, blockSize);
+                                                 sampleRate, blockSize);
                 nextGraph->prepareToPlay (sampleRate, blockSize);
             }
 
@@ -348,6 +335,7 @@ public:
         if (processor != nullptr)
         {
             const int remainingFrames = engine->transport()->getRemainingFrames();
+            ignoreUnused (remainingFrames);
             const ScopedLock sl2 (processor->getCallbackLock());
 
             if (processor->isSuspended())
@@ -355,6 +343,17 @@ public:
                 for (int i = 0; i < numOutputChannels; ++i)
                     zeromem (outputChannelData[i], sizeof (float) * (size_t) numSamples);
             }
+            else
+            {
+                messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+                AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
+                processor->processBlock (buffer, incomingMidi);
+                if (engine->transport()->isPlaying()) {
+                    engine->transport()->advance (numSamples);
+                }
+            }
+            
+#if 0
             else if (engine->transport()->getRemainingFrames() >= numSamples)
             {
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
@@ -381,8 +380,9 @@ public:
                     engine->transport()->advance (numSamples - remainingFrames);
                 }
             }
+#endif
         }
-
+        
         engine->transport()->postProcess (numSamples);
     }
 
@@ -408,13 +408,14 @@ public:
             if (isPrepared)
                 processor->releaseResources();
 
+            processor->setPlayConfigDetails(numChansIn, numChansOut, sampleRate, blockSize);
             GraphProcessor* const oldProcessor = processor;
             setRootGraph (nullptr);
             setRootGraph (oldProcessor);
         }
     }
 
-    void audioDeviceStopped()
+    void audioDeviceStopped() override
     {
         const ScopedLock sl (lock);
 
@@ -427,7 +428,7 @@ public:
         tempBuffer.setSize (1, 1);
     }
 
-    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
+    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         messageCollector.addMessageToQueue (message);
     }
@@ -453,7 +454,6 @@ private:
 class AudioEngine::Private
 {
 public:
-
     Private (AudioEngine& e)
         : engine (e)
     {
@@ -464,12 +464,10 @@ public:
 
     ~Private()
     {
-        controller.reset();
         clips = nullptr;
     }
 
     AudioEngine& engine;
-    Shared<EngineControl> controller;
     RootGraph graph;
     Transport transport;
 
@@ -494,39 +492,27 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::activate()
 {
+    auto& devices (globals().getDeviceManager());    
+    devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
     cb->setRootGraph (&graph());
-    globals().devices().addMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
-    Shared<EngineControl> c (controller());
-
-    InternalFormat* fmt = globals().plugins().format<InternalFormat>();
-    c->addFilter (fmt->description (InternalFormat::audioInputDevice));
-    c->addFilter (fmt->description (InternalFormat::audioOutputDevice));
-    c->addFilter (fmt->description (InternalFormat::midiInputDevice));
-}
-
-AudioIODeviceCallback&  AudioEngine::callback()              { assert (cb != nullptr); return *cb; }
-MidiInputCallback&      AudioEngine::getMidiInputCallback()  { assert (cb != nullptr); return *cb; }
-
-ClipFactory& AudioEngine::clips()
-{
-    assert (priv->clips != nullptr);
-    return *priv->clips;
-}
-
-Shared<EngineControl> AudioEngine::controller()
-{
-    if (priv->controller == nullptr)
-        priv->controller = Shared<EngineControl> (new EngineControl (*this));
-    return priv->controller;
 }
 
 void AudioEngine::deactivate()
 {
     cb->setRootGraph (nullptr);
-    globals().devices().removeMidiInputCallback (String::empty, dynamic_cast<MidiInputCallback*> (&this->callback()));
-    priv->controller.reset();
+    globals().getDeviceManager().removeMidiInputCallback (String::empty, &getMidiInputCallback());
+    
     priv->graph.clear();
     priv->graph.reset();
+}
+
+AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (cb != nullptr); return *cb; }
+MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (cb != nullptr); return *cb; }
+
+ClipFactory& AudioEngine::clips()
+{
+    jassert (priv->clips != nullptr);
+    return *priv->clips;
 }
 
 Globals& AudioEngine::globals() { return world; }
@@ -541,17 +527,13 @@ Transport* AudioEngine::transport()
     return &priv->transport;
 }
 
-
 ValueTree AudioEngine::createGraphTree()
 {
-    return (priv) ? priv->graph.createValueTree() : ValueTree::invalid;
+    if (! priv)
+        return ValueTree();
+    return priv->graph.getGraphModel().createCopy();
 }
 
-void AudioEngine::restoreFromGraphTree (const ValueTree& tree)
-{
-    if (priv) {
-        priv->graph.restoreFromValueTree (tree, world.plugins());
-    }
-}
+void AudioEngine::restoreFromGraphTree (const ValueTree&) { }
 
 }

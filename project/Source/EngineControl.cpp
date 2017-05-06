@@ -1,33 +1,18 @@
 /*
     EngineControl.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "engine/AudioEngine.h"
 #include "engine/Transport.h"
 #include "session/PluginManager.h"
-
 #include "EngineControl.h"
 #include "Globals.h"
 
 namespace Element {
 
     EngineControl::EngineControl (AudioEngine& e)
-        : GraphController (e.graph(), e.globals().plugins()),
+        : GraphController (e.graph(), e.globals().getPluginManager()),
           world (e.globals()), engine (e)
     {
         ioNodes.ensureStorageAllocated (IOProcessor::numDeviceTypes);
@@ -41,10 +26,9 @@ namespace Element {
         seqNode = nullptr;
     }
 
-    GraphController*
-    EngineControl::createSequenceController()
+    GraphController* EngineControl::createSequenceController()
     {
-#if 0
+       #if 0
         // not supported. saved for reference.
         if (seqNode == nullptr) {
             seqNode = addRootPlugin (InternalFormat::sequenceProcessor);
@@ -52,12 +36,11 @@ namespace Element {
 
         if (sequencer() != nullptr)
             return new GraphController (*sequencer(), engine.globals().plugins());
-#endif
+       #endif
         return nullptr;
     }
 
-    EngineControl::NodePtr
-    EngineControl::addRootPlugin (IOProcessor::IODeviceType ioType)
+    GraphNodePtr EngineControl::addRootPlugin (IOProcessor::IODeviceType ioType)
     {
         switch (ioType)
         {
@@ -68,10 +51,10 @@ namespace Element {
             default: break;
         }
 
-        return NodePtr ();
+        return GraphNodePtr();
     }
 
-    EngineControl::NodePtr
+    GraphNodePtr
     EngineControl::addRootPlugin (InternalFormat::ID internal)
     {
         const uint32 id = addFilter (internals()->description (internal));
@@ -94,7 +77,7 @@ namespace Element {
 
     InternalFormat* EngineControl::internals() const
     {
-        return engine.globals().plugins().format<InternalFormat>();
+        return engine.globals().getPluginManager().format<InternalFormat>();
     }
 
     bool EngineControl::open (Session &s)
@@ -187,12 +170,12 @@ namespace Element {
         return true;
     }
 
-    void EngineControl::valueTreePropertyChanged (ValueTree& /*tree*/, const Identifier& /*prop*/)
+    void EngineControl::valueTreePropertyChanged (ValueTree&, const Identifier&)
     {
 
     }
 
-    void EngineControl::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+    void EngineControl::valueTreeChildAdded (ValueTree&, ValueTree&)
     {
 
     }
@@ -202,17 +185,17 @@ namespace Element {
 
     }
 
-    void EngineControl::valueTreeChildOrderChanged (ValueTree& parent, int, int)
+    void EngineControl::valueTreeChildOrderChanged (ValueTree&, int, int)
     {
 
     }
 
-    void EngineControl::valueTreeParentChanged (ValueTree& tree)
+    void EngineControl::valueTreeParentChanged (ValueTree&)
     {
 
     }
 
-    void EngineControl::valueTreeRedirected (ValueTree& tree)
+    void EngineControl::valueTreeRedirected (ValueTree&)
     {
 
     }

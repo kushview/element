@@ -1,22 +1,25 @@
 
-#ifndef ELEMENT_APP_CONTROLLER_H
-#define ELEMENT_APP_CONTROLLER_H
+#ifndef EL_APP_CONTROLLER_H
+#define EL_APP_CONTROLLER_H
 
 #include "controllers/Controller.h"
 #include "CommandManager.h"
 
 namespace Element {
 class Globals;
+class GuiApp;
 
 class AppController :  public Controller,
-                       protected ApplicationCommandTarget
+                       protected ApplicationCommandTarget,
+                       public MessageListener
 {
 public:
     AppController (Globals&);
     ~AppController();
 
-    CommandManager& getCommandManager() { return commands; }
-    Globals& getWorld() { return world; }
+    inline CommandManager& getCommandManager() { return commands; }
+    inline Globals& getWorld() { return getGlobals(); }
+    inline Globals& getGlobals() { return world; }
 
 protected:
     friend class ApplicationCommandTarget;
@@ -24,11 +27,17 @@ protected:
     void getAllCommands (Array<CommandID>& commands) override;
     void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
     bool perform (const InvocationInfo& info) override;
-
+    
+    void handleMessage (const Message&) override;
+    
 private:
+    friend class Application;
     Globals& world;
     CommandManager commands;
+    ScopedPointer<GuiApp> gui;
+    void run();
 };
+
 }
 
 #endif

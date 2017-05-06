@@ -20,7 +20,7 @@
 #ifndef EL_PLUGIN_WRAPPER_H
 #define EL_PLUGIN_WRAPPER_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

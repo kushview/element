@@ -16,6 +16,7 @@
 */
 
 #include "engine/GraphProcessor.h"
+#include "session/Node.h"
 
 namespace Element {
 
@@ -387,16 +388,16 @@ private:
                     channelsToUse [portType.id()].add (bufIndex);
                     const uint32 outPort = proc->getNthPort (portType, outputChan, false, false);
 
-                    assert (bufIndex != 0);
-                    assert (outPort == port);
-                    assert (outPort < proc->getNumPorts());
+                    jassert (bufIndex != 0);
+                    jassert (outPort == port);
+                    jassert (outPort < proc->getNumPorts());
 
                     markBufferAsContaining (bufIndex, portType, node->nodeId, outPort);
                 }
                 continue;
             }
 
-            assert (proc->isPortInput(port));
+            jassert (proc->isPortInput(port));
 
             const int inputChan = proc->getChannelPort (port);
 
@@ -422,7 +423,7 @@ private:
                 if (inputChan >= (int)numOuts)
                 {
                     bufIndex = getReadOnlyEmptyBuffer();
-                    assert (bufIndex >= 0);
+                    jassert (bufIndex >= 0);
                 }
                 else
                 {
@@ -616,7 +617,7 @@ private:
 
     int32 getFreeBuffer (PortType type)
     {
-        assert (type.id() < PortType::Unknown);
+        jassert (type.id() < PortType::Unknown);
 
         Array<uint32>& nodes = allNodes [type.id()];
         for (int i = 1; i < nodes.size(); ++i)
@@ -707,8 +708,22 @@ private:
 GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 sourcePort_,
                                         const uint32 destNode_, const uint32 destPort_) noexcept
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_)
-{ }
+{
+    arc = ValueTree (Tags::arc);
+    arc.setProperty (Tags::sourceNode, (int) sourceNode, nullptr)
+       .setProperty (Tags::sourcePort, (int) sourcePort, nullptr)
+       .setProperty (Tags::destNode, (int) destNode, nullptr)
+       .setProperty (Tags::destPort, (int) destPort, nullptr);
+}
 
+static ValueTree createGraphModel()
+{
+    ValueTree graphModel (Tags::node);
+    graphModel.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
+    graphModel.setProperty (Slugs::name, "Processing Graph", nullptr);
+    return graphModel;
+}
+    
 GraphProcessor::GraphProcessor()
     : lastNodeId (0),
       renderingBuffers (1, 1),
@@ -716,16 +731,18 @@ GraphProcessor::GraphProcessor()
       currentAudioOutputBuffer (1, 1),
       currentMidiInputBuffer (nullptr)
 {
-    graphState.graph = ValueTree ("graph");
-    graphState.arcs  = ValueTree ("arcs");
-    graphState.graph.addChild (graphState.arcs, -1, 0);
-
+    graphModel = createGraphModel();
+    nodesModel = graphModel.getOrCreateChildWithName (Tags::nodes, nullptr);
+    arcsModel  = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
+    
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = ELEMENT_INVALID_PORT;
+    //graphModel.addListener(this);
 }
 
 GraphProcessor::~GraphProcessor()
 {
+    //graphModel.removeListener (this);
     clearRenderingSequence();
     clear();
 }
@@ -737,10 +754,16 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
+    //graphModel.removeListener (this);
+    graphModel.removeChild (arcsModel, nullptr);
+    graphModel.removeChild (nodesModel, nullptr);
+    arcsModel = graphModel.getOrCreateChildWithName(Tags::arcs, nullptr);
+    nodesModel = graphModel.getOrCreateChildWithName(Tags::nodes, nullptr);
     nodes.clear();
     connections.clear();
     //triggerAsyncUpdate();
     handleAsyncUpdate();
+    //graphModel.addListener (this);
 }
 
 GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const
@@ -784,12 +807,22 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
     }
 
     newProcessor->setPlayHead (getPlayHead());
-
+    
+    if (auto *iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor)) {
+        // TODO: handle metadata initialization in a cleaner way. This allows the IO procs
+        // to get channel information prior to GraphNode::prepare is called.
+        iop->setParentGraph (this);
+    }
+    
     if (GraphNode* const n = createNode (nodeId, newProcessor))
     {
         n->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (n);
+        nodesModel.addChild (n->metadata, -1, nullptr);
+        jassert(getNumNodes() == nodesModel.getNumChildren());
+        
         triggerAsyncUpdate();
+        
         return n;
     }
     
@@ -802,10 +835,13 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
 
     for (int i = nodes.size(); --i >= 0;)
     {
+        GraphNodePtr n = nodes.getUnchecked(i);
         if (nodes.getUnchecked(i)->nodeId == nodeId)
         {
-            nodes.getUnchecked(i)->setParentGraph (nullptr);
+            n->setParentGraph (nullptr);
             nodes.remove (i);
+            nodesModel.removeChild (n->metadata, nullptr);
+            jassert(getNumNodes() == nodesModel.getNumChildren());
             triggerAsyncUpdate();
             return true;
         }
@@ -885,13 +921,14 @@ bool GraphProcessor::addConnection (const uint32 sourceNode, const uint32 source
     ArcSorter sorter;
     Connection* c = new Connection (sourceNode, sourcePort, destNode, destPort);
     connections.addSorted (sorter, c);
-
+    arcsModel.addChild (c->arc, -1, nullptr);
+    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
     return true;
 }
 
 bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
-                                 uint32 destNode, int32 destChannel)
+                                      uint32 destNode, int32 destChannel)
 {
     GraphNode* src = getNodeForId (sourceNode);
     GraphNode* dst = getNodeForId (destNode);
@@ -907,7 +944,10 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
 
 void GraphProcessor::removeConnection (const int index)
 {
+    const auto* const connection = connections [index];
     connections.remove (index);
+    if (connection) arcsModel.removeChild (connection->arc, nullptr);
+    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
 }
 
@@ -947,7 +987,9 @@ bool GraphProcessor::disconnectNode (const uint32 nodeId)
             doneAnything = true;
         }
     }
-
+    
+    jassert (arcsModel.getNumChildren() == connections.size());
+    
     return doneAnything;
 }
 
@@ -1057,7 +1099,6 @@ void GraphProcessor::buildRenderingSequence()
 
     {
         // swap over to the new rendering sequence..
-        // XXX: use non-locking techniques for the swap
         const ScopedLock sl (getCallbackLock());
 
         renderingBuffers.setSize (numRenderingBuffersNeeded, 1024);
@@ -1193,9 +1234,94 @@ void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.numOutputChannels = getTotalNumOutputChannels();
 }
 
+#if 0
+void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
+                                               const Identifier& property)
+{
+    
+}
+
+void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+{
+    graphModel.removeListener (this);
+    
+    if (parent == arcsModel && child.hasType (Tags::arc))
+    {
+        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+        const int dstChan = child.getProperty (Tags::destChannel, -1);
+        
+        if (src == nullptr || dst == nullptr) {
+            parent.removeChild (child, nullptr);
+            return;
+        }
+        
+        if (connectChannels (PortType::Audio, src->nodeId, srcChan, dst->nodeId, dstChan))
+        {
+            // noop
+        }
+        else
+        {
+            parent.removeChild (child, nullptr);
+        }
+    }
+    graphModel.addListener(this);
+}
+
+void GraphProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child,
+                                            int indexFromWhichChildWasRemoved)
+{
+    graphModel.removeListener (this);
+    
+    if (parent == arcsModel && child.hasType (Tags::arc))
+    {
+        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
+        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
+        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
+        const int dstChan = child.getProperty(Tags::destChannel, -1);
+        
+        if (src == nullptr || dst == nullptr)
+            return;
+        
+        if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
+                              dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
+        {
+            // noop
+        }
+        else
+        {
+            // noop
+        }
+    }
+    else if (parent == nodesModel && child.hasType (Tags::node))
+    {
+        const Node model (child, false);
+        const bool wasRemoved = removeNode (model.getNodeId());
+        if (wasRemoved) {
+            
+        }
+    }
+    
+    graphModel.addListener (this);
+}
+
+void GraphProcessor::valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                                 int oldIndex, int newIndex) { }
+
+void GraphProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) { }
+
+void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
+{
+    
+}
+
+#endif
+    
+// MARK: AudioGraphIOProcessor
+    
 GraphProcessor::AudioGraphIOProcessor::AudioGraphIOProcessor (const IODeviceType type_)
-    : type (type_),
-      graph (nullptr)
+    : type (type_), graph (nullptr)
 {
 }
 
@@ -1217,6 +1343,9 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
     return String::empty;
 }
 
+    
+
+    
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
@@ -1261,7 +1390,6 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
     {
         case audioOutputNode:
         {
-
             for (int i = jmin (graph->currentAudioOutputBuffer.getNumChannels(),
                                buffer.getNumChannels()); --i >= 0;)
             {
@@ -1273,7 +1401,6 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
 
         case audioInputNode:
         {
-
             for (int i = jmin (graph->currentAudioInputBuffer->getNumChannels(),
                                buffer.getNumChannels()); --i >= 0;)
             {

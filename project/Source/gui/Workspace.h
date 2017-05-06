@@ -22,7 +22,7 @@
 #ifndef ELEMENT_WORKSPACE_H
 #define ELEMENT_WORKSPACE_H
 xxx
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

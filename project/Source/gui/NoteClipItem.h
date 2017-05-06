@@ -33,9 +33,9 @@ public:
         : TimelineClip (owner),
           model (m)
     {
-        assert (model.isValid());
-        assert (isPositiveAndBelow (model.keyId(), 128));
-        assert (model.channel() >= 1 && model.channel() <= 16);
+        jassert (model.isValid());
+        jassert (isPositiveAndBelow (model.keyId(), 128));
+        jassert (model.channel() >= 1 && model.channel() <= 16);
         colour.addColour (0.0, Colours::lightsalmon);
         colour.addColour (1.0, Colours::red);
         trackRequested (127 - model.keyId());

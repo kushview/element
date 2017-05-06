@@ -20,7 +20,7 @@
 #ifndef ELEMENT_SESSION_TREE_PANEL_H
 #define ELEMENT_SESSION_TREE_PANEL_H
 
-#include "gui/TreeViewBase.h"
+#include "gui/TreeviewBase.h"
 #include "session/Session.h"
 
 namespace Element {

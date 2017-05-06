@@ -20,7 +20,7 @@
 #ifndef ELEMENT_TRANSPORT_H
 #define ELEMENT_TRANSPORT_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element
 {

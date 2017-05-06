@@ -1,7 +1,7 @@
 #ifndef MIDICLIPSOURCE_H_INCLUDED
 #define MIDICLIPSOURCE_H_INCLUDED
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
     class ClipType;

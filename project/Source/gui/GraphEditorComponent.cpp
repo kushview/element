@@ -17,8 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "controllers/GraphController.h"
+#include "gui/ContentComponent.h"
 #include "gui/GraphEditorComponent.h"
 #include "gui/PluginWindow.h"
 #include "session/PluginManager.h"
@@ -113,9 +114,9 @@ public:
 private:
     GraphController& graph;
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
@@ -148,32 +149,37 @@ public:
     void mouseDown (const MouseEvent& e)
     {
         originalPos = localPointToGlobal (Point<int>());
-
         toFront (true);
 
         if (e.mods.isPopupMenu())
         {
-
             GraphNodePtr node = graph.getNodeForId (filterID);
+            auto* instance = node->getAudioPluginInstance();
+            const PluginDescription desc (instance->getPluginDescription());
 
             PopupMenu menu;
-
-            /* if (! node->isSubgraph()) {
-                menu.addItem (100, "Not a subgraph");
-            } */
-
             menu.addItem (1, "Remove this block...");
             menu.addItem (2, "Disconnect all ports");
             menu.addSeparator();
-            // menu.addItem (5, "Embed plugin UI");
-            menu.addItem (3, "Show plugin UI");
-            menu.addItem (4, "Show generic UI");
-
+            
+            if (desc.pluginFormatName != "Internal")
+            {
+                menu.addItem (3, "Show plugin UI");
+                menu.addItem (4, "Show generic UI");
+            }
+            
             const int r = menu.show();
 
             if (r == 1)
             {
                 PluginWindow::closeCurrentlyOpenWindowsFor (filterID);
+                
+                // FIXME: Hack gui management: Fix in EL-54
+                auto* cc = findParentComponentOfClass<ContentComponent>();
+                if (GraphNodePtr gnp = graph.getNodeForId (filterID))
+                    if (auto* i = gnp->getAudioPluginInstance())
+                        if (auto* c = i->getActiveEditor())
+                            cc->setRackViewComponent (c);
                 embedded = nullptr;
                 graph.removeFilter (filterID);
                 return;
@@ -190,65 +196,61 @@ public:
                         win->toFront (true);
                 }
             }
-            else if (r == 5)
-            {
-                if (GraphNodePtr f = graph.getNodeForId (filterID))
-                {
-                    AudioProcessorEditor* ui = nullptr;
-                    bool useGenericView      = false;
-
-                    if (! useGenericView)
-                    {
-                        ui = f->getProcessor()->createEditorIfNeeded();
-                        if (ui == nullptr)
-                            useGenericView = true;
-                    }
-
-                    if (useGenericView)
-                        ui = new GenericAudioProcessorEditor (f->getProcessor());
-
-                    if (ui) delete ui;
-                    if (ui != nullptr)
-                    {
-//                        PluginWindow::closeCurrentlyOpenWindowsFor (filterID);
-//                        embedded = ui;
-//
-//                        if (AudioPluginInstance* const plugin = dynamic_cast <AudioPluginInstance*> (f->getProcessor()))
-//                            ui->setName (plugin->getName());
-//
-//                        setSize (ui->getWidth(), ui->getHeight());
-//                        addAndMakeVisible (ui);
-                    }
-                }
-            }
         }
     }
 
+    void updatePosition()
+    {
+        double x = 0.0f, y = 0.0f;
+        graph.getNodePosition (filterID, x, y);
+        setCentreRelative ((float) x, (float) y);
+        getGraphPanel()->updateConnectorComponents();
+    }
+    
     void mouseDrag (const MouseEvent& e)
     {
-        if (! e.mods.isPopupMenu())
-        {
-            Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
-
-            if (getParentComponent() != nullptr)
-                pos = getParentComponent()->getLocalPoint (nullptr, pos);
-#if 1
-            graph.setNodePosition (filterID,
-                                   (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-                                   (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-#endif
-            getGraphPanel()->updateComponents();
-            update();
-        }
+        if (e.mods.isPopupMenu())
+            return;
+        
+        Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
+        
+        if (getParentComponent() != nullptr)
+            pos = getParentComponent()->getLocalPoint (nullptr, pos);
+        
+        graph.setNodePosition (filterID,
+                               (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+        
+        updatePosition();
     }
 
+    void makeEditorActive()
+    {
+        const GraphNodePtr f = graph.getNodeForId (filterID);
+        if (! f) return;
+        
+        auto* instance = f->getAudioPluginInstance();
+        if (! instance) return;
+        
+        const PluginDescription desc (instance->getPluginDescription());
+        
+        if (desc.pluginFormatName != "Internal")
+        {
+            if (PluginWindow* const w = getGraphPanel()->getOrCreateWindowForNode (f, false))
+                w->toFront (true);
+        }
+        else if (ScopedPointer<Component> ed = instance->createEditorIfNeeded())
+        {
+            if (ContentComponent* content = findParentComponentOfClass<ContentComponent>())
+                content->setRackViewComponent (ed.release());
+        }
+    }
+    
     void mouseUp (const MouseEvent& e)
     {
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
-            if (const GraphNodePtr f = graph.getNodeForId (filterID))
-                if (PluginWindow* const w = getGraphPanel()->getOrCreateWindowForNode (f, false))
-                    w->toFront (true);
+            makeEditorActive();
         }
         else if (! e.mouseWasClicked())
         {
@@ -286,16 +288,12 @@ public:
 
     void resized()
     {
-        if (embedded)
-            setSize (embedded->getWidth(), embedded->getHeight());
-
         int indexIn = 0, indexOut = 0;
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
             if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
             {
                 const int total = pc->isInput ? numIns : numOuts;
-                //const int index = pc->port == GraphController::midiChannelNumber ? (total - 1) : pc->port;
                 const int index = pc->isInput ? indexIn++ : indexOut++;
                 pc->setBounds (proportionOfWidth ((1 + index) / (total + 1.0f)) - pinSize / 2,
                                pc->isInput ? 0 : (getHeight() - pinSize),
@@ -370,9 +368,7 @@ public:
 
             deleteAllChildren();
 
-            uint32 i;
-#if 1
-            for (i = 0; i < f->getProcessor()->getNumPorts(); ++i)
+            for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
             {
                 const PortType t (f->getProcessor()->getPortType (i));
                 if (t ==PortType::Control)
@@ -381,19 +377,7 @@ public:
                 const bool isInput (f->getProcessor()->isPortInput (i));
                 addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
             }
-#else
-            for (i = 0; i < f->getProcessor()->getNumInputChannels(); ++i)
-                addAndMakeVisible (new PinComponent (graph, filterID, i, true));
 
-            if (f->getProcessor()->acceptsMidi())
-                addAndMakeVisible (new PinComponent (graph, filterID, GraphController::midiChannelNumber, true));
-
-            for (i = 0; i < f->getProcessor()->getNumOutputChannels(); ++i)
-                addAndMakeVisible (new PinComponent (graph, filterID, i, false));
-
-            if (f->getProcessor()->producesMidi())
-                addAndMakeVisible (new PinComponent (graph, filterID, GraphController::midiChannelNumber, false));
-#endif
             resized();
         }
     }
@@ -411,9 +395,9 @@ private:
     ScopedPointer<Component> embedded;
 
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     FilterComponent (const FilterComponent&);
@@ -450,9 +434,6 @@ public:
             sourceFilterChannel = sourceFilterChannel_;
             update();
         }
-        else {
-            DBG("Not valid source");
-        }
     }
 
     void setOutput (const uint32 destFilterID_, const int destFilterChannel_)
@@ -462,10 +443,6 @@ public:
             destFilterID = destFilterID_;
             destFilterChannel = destFilterChannel_;
             update();
-        }
-        else
-        {
-            DBG("not valid destination");
         }
     }
 
@@ -507,11 +484,7 @@ public:
                                         (int) fabsf (x1 - x2) + 8,
                                         (int) fabsf (y1 - y2) + 8);
 
-        if (newBounds != getBounds())
-            setBounds (newBounds);
-        else
-            resized();
-
+        setBounds (newBounds);
         repaint();
     }
 
@@ -522,7 +495,7 @@ public:
         x2 = lastOutputX;
         y2 = lastOutputY;
 
-        if (GraphEditorBase* const hostPanel = getGraphPanel())
+        if (GraphEditorComponent* const hostPanel = getGraphPanel())
         {
             if (FilterComponent* srcFilterComp = hostPanel->getComponentForFilter (sourceFilterID))
                 srcFilterComp->getPinPos (sourceFilterChannel, false, x1, y1);
@@ -534,16 +507,7 @@ public:
 
     void paint (Graphics& g)
     {
-        if (sourceFilterChannel == GraphProcessor::midiChannelIndex
-             || destFilterChannel == GraphProcessor::midiChannelIndex)
-        {
-            g.setColour (Colours::red);
-        }
-        else
-        {
-            g.setColour (Colours::green);
-        }
-
+        g.setColour (Colours::black.brighter());
         g.fillPath (linePath);
     }
 
@@ -650,9 +614,9 @@ private:
     Path linePath, hitPath;
     bool dragging;
 
-    GraphEditorBase* getGraphPanel() const noexcept
+    GraphEditorComponent* getGraphPanel() const noexcept
     {
-        return findParentComponentOfClass<GraphEditorBase>();
+        return findParentComponentOfClass<GraphEditorComponent>();
     }
 
     void getDistancesFromEnds (int x, int y, double& distanceFromStart, double& distanceFromEnd) const
@@ -667,26 +631,26 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConnectorComponent)
 };
 
-GraphEditorBase::GraphEditorBase (GraphController& graph_)
+GraphEditorComponent::GraphEditorComponent (GraphController& graph_)
     :  graph (graph_)
 {
     graph.addChangeListener (this);
     setOpaque (true);
 }
 
-GraphEditorBase::~GraphEditorBase()
+GraphEditorComponent::~GraphEditorComponent()
 {
     graph.removeChangeListener (this);
     draggingConnector = nullptr;
     deleteAllChildren();
 }
 
-void GraphEditorBase::paint (Graphics& g)
+void GraphEditorComponent::paint (Graphics& g)
 {
     g.fillAll (Colour (0xff303030));
 }
 
-void GraphEditorBase::mouseDown (const MouseEvent& e)
+void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
@@ -702,12 +666,12 @@ void GraphEditorBase::mouseDown (const MouseEvent& e)
     }
 }
 
-void GraphEditorBase::createNewPlugin (const PluginDescription* desc, int x, int y)
+void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
 {
     graph.addFilter (desc, x / (double) getWidth(), y / (double) getHeight());
 }
 
-FilterComponent* GraphEditorBase::getComponentForFilter (const uint32 filterID) const
+FilterComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -719,7 +683,7 @@ FilterComponent* GraphEditorBase::getComponentForFilter (const uint32 filterID) 
     return nullptr;
 }
 
-ConnectorComponent* GraphEditorBase::getComponentForConnection (const Arc& arc) const
+ConnectorComponent* GraphEditorComponent::getComponentForConnection (const Arc& arc) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -734,7 +698,7 @@ ConnectorComponent* GraphEditorBase::getComponentForConnection (const Arc& arc) 
     return nullptr;
 }
 
-PinComponent* GraphEditorBase::findPinAt (const int x, const int y) const
+PinComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
@@ -749,22 +713,43 @@ PinComponent* GraphEditorBase::findPinAt (const int x, const int y) const
     return nullptr;
 }
 
-void GraphEditorBase::resized()
+void GraphEditorComponent::resized()
 {
     updateComponents();
 }
 
-void GraphEditorBase::changeListenerCallback (ChangeBroadcaster*)
+void GraphEditorComponent::changeListenerCallback (ChangeBroadcaster*)
 {
     updateComponents();
 }
 
-void GraphEditorBase::onGraphChanged()
+void GraphEditorComponent::onGraphChanged()
 {
     updateComponents();
 }
 
-void GraphEditorBase::updateComponents()
+void GraphEditorComponent::updateConnectorComponents()
+{
+    for (int i = getNumChildComponents(); --i >= 0;)
+    {
+        ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
+        
+        if (cc != nullptr && cc != draggingConnector)
+        {
+            if (graph.getConnectionBetween (cc->sourceFilterID, cc->sourceFilterChannel,
+                                            cc->destFilterID, cc->destFilterChannel) == nullptr)
+            {
+                delete cc;
+            }
+            else
+            {
+                cc->update();
+            }
+        }
+    }
+}
+    
+void GraphEditorComponent::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
     {
@@ -820,7 +805,7 @@ void GraphEditorBase::updateComponents()
     }
 }
 
-void GraphEditorBase::beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
+void GraphEditorComponent::beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
                                           const uint32 destFilterID, const int destFilterChannel,
                                           const MouseEvent& e)
 {
@@ -837,7 +822,7 @@ void GraphEditorBase::beginConnectorDrag (const uint32 sourceFilterID, const int
     dragConnector (e);
 }
 
-void GraphEditorBase::dragConnector (const MouseEvent& e)
+void GraphEditorComponent::dragConnector (const MouseEvent& e)
 {
     const MouseEvent e2 (e.getEventRelativeTo (this));
 
@@ -882,7 +867,7 @@ void GraphEditorBase::dragConnector (const MouseEvent& e)
     }
 }
 
-Component* GraphEditorBase::createContainerForNode (GraphNodePtr node, bool useGenericEditor)
+Component* GraphEditorComponent::createContainerForNode (GraphNodePtr node, bool useGenericEditor)
 {
     if (AudioProcessorEditor* ed = createEditorForNode (node, useGenericEditor))
         if (Component* comp = wrapAudioProcessorEditor (ed, node))
@@ -890,9 +875,9 @@ Component* GraphEditorBase::createContainerForNode (GraphNodePtr node, bool useG
     return nullptr;
 }
 
-Component* GraphEditorBase::wrapAudioProcessorEditor(AudioProcessorEditor* ed, GraphNodePtr) { return ed; }
+Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* ed, GraphNodePtr) { return ed; }
 
-AudioProcessorEditor* GraphEditorBase::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
+AudioProcessorEditor* GraphEditorComponent::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
 {
     ScopedPointer<AudioProcessorEditor> ui = nullptr;
     
@@ -910,7 +895,7 @@ AudioProcessorEditor* GraphEditorBase::createEditorForNode (GraphNodePtr node, b
     return (nullptr != ui) ? ui.release() : nullptr;
 }
 
-void GraphEditorBase::endDraggingConnector (const MouseEvent& e)
+void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
 {
     if (draggingConnector == nullptr)
         return;
@@ -949,7 +934,7 @@ void GraphEditorBase::endDraggingConnector (const MouseEvent& e)
     }
 }
 
-PluginWindow* GraphEditorBase::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
+PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
 {
     if (PluginWindow* window = PluginWindow::getWindowFor (f))
         return window;
@@ -969,6 +954,38 @@ PluginWindow* GraphEditorBase::getOrCreateWindowForNode (GraphNodePtr f, bool us
 
     return w;
 }
+
+
+bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& details)
+{
+    if (! details.description.isArray())
+        return false;
+    
+    if (auto* a = details.description.getArray())
+    {
+        const var type (a->getFirst());
+        return type == var ("element://dnd/plugin");
+    }
+    
+    return false;
+}
+
+void GraphEditorComponent::itemDropped (const SourceDetails& details)
+{
+    if (const auto* a = details.description.getArray())
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = a->getUnchecked (1);
+        desc.fileOrIdentifier = a->getUnchecked (2);
+        createNewPlugin (&desc, details.localPosition.x, details.localPosition.y);
+    }
+}
+
+bool shouldDrawDragImageWhenOver()
+{
+    return true;
+}
+
 
 class TooltipBar   : public Component,
                      private Timer

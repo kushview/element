@@ -21,7 +21,7 @@
 #define __JUCE_HEADER_C8F4A1A75D11B38A__
 
 //[Headers]     -- You can add your own extra header files here --
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Session.h"
 //[/Headers]
 
@@ -47,8 +47,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     //[/UserMethods]
 
-    void paint (Graphics& g);
-    void resized();
+    void paint (Graphics& g) override;
+    void resized() override;
 
 
 

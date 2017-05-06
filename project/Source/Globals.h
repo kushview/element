@@ -1,26 +1,12 @@
 /*
     Globals.h - This file is part of Element
-    -2016  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_GLOBALS_H
-#define ELEMENT_GLOBALS_H
+#ifndef EL_GLOBALS_H
+#define EL_GLOBALS_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/AudioEngine.h"
 #include "URIs.h"
 #include "WorldBase.h"
@@ -33,15 +19,17 @@ class MediaManager;
 class PluginManager;
 class Session;
 class Settings;
+class UnlockStatus;
 class Writer;
 
-struct CommandLine {
+struct CommandLine
+{
     explicit CommandLine (const String& cli = String::empty);
     bool fullScreen;
-    bool port;
+    int port;
 };
 
-class Globals :  public WorldBase
+class Globals : public WorldBase
 {
 public:
     explicit Globals (const String& commandLine = String::empty);
@@ -49,14 +37,15 @@ public:
 
     const CommandLine cli;
 
-    CommandManager& getCommands();
-    DeviceManager& devices();
-    PluginManager& plugins();
-    Settings& settings();
-    SymbolMap& symbols();
-    MediaManager& media();
-    Session& session();
-    AudioEnginePtr engine() const;
+    AudioEnginePtr getAudioEngine() const;
+    CommandManager& getCommandManager();
+    DeviceManager& getDeviceManager();
+    PluginManager& getPluginManager();
+    Settings& getSettings();
+    MediaManager& getMediaManager();
+    UnlockStatus& getUnlockStatus();
+    SymbolMap& getSymbolMap();
+    Session& getSession();
 
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
@@ -70,4 +59,4 @@ private:
 
 }
 
-#endif // ELEMENT_GLOBALS_H
+#endif // EL_GLOBALS_H

@@ -22,55 +22,54 @@
 
 #include "Globals.h"
 #include "gui/Window.h"
+#include "gui/PluginManagerComponent.h"
 #include "session/PluginManager.h"
 
 namespace Element {
 
-    class PluginListWindow  : public Window
+class PluginListWindow : public Window
+{
+public:
+    PluginListWindow (Globals& world, const File& deadmansFile = File::nonexistent)
+        : Window ("Plugin Manager", gui),
+          pluginList (world.getPluginManager().availablePlugins()),
+          pluginManager (world.getPluginManager())
     {
-    public:
+       #if 0
+        const File deadMansPedalFile (getAppProperties().getUserSettings()
+                                      ->getFile().getSiblingFile ("RecentlyCrashedPluginsList"));
 
-        PluginListWindow (Globals& world, const File& deadmansFile = File::nonexistent)
-            : Window ("Plugin Manager", gui),
-              pluginList (world.plugins().availablePlugins()),
-              pluginManager (world.plugins())
-        {
-#if 0
-            const File deadMansPedalFile (getAppProperties().getUserSettings()
-                                          ->getFile().getSiblingFile ("RecentlyCrashedPluginsList"));
+        setContentOwned (listComponent = new PluginListComponent (pluginManager.formats(), pluginList,
+                                deadmansFile, world.settings().getUserSettings()),
+                         true);
+       #else
+        setContentOwned (listComponent = new Element::PluginListComponent (
+                         pluginManager.formats(), pluginList, File::nonexistent, nullptr), true);
+       #endif
+        setResizable (true, false);
+        setResizeLimits (300, 400, 800, 1500);
+        setTopLeftPosition (60, 60);
+        setVisible (true);
+    }
 
-            setContentOwned (listComponent = new PluginListComponent (pluginManager.formats(), pluginList,
-                                    deadmansFile, world.settings().getUserSettings()),
-                             true);
-#else
-            setContentOwned (listComponent = new PluginListComponent (pluginManager.formats(), pluginList,
-                                                                      File::nonexistent, nullptr), true);
-#endif
-            setResizable (true, false);
-            setResizeLimits (300, 400, 800, 1500);
-            setTopLeftPosition (60, 60);
-
-            setVisible (true);
-        }
-
-        ~PluginListWindow()
-        {
-            clearContentComponent();
-        }
+    ~PluginListWindow()
+    {
+        clearContentComponent();
+    }
 
 
-        void closeButtonPressed()
-        {
-            closedSignal();
-        }
+    void closeButtonPressed()
+    {
+        closedSignal();
+    }
 
-    private:
-        KnownPluginList& pluginList;
-        PluginManager&   pluginManager;
-        PluginListComponent* listComponent;
+private:
+    KnownPluginList& pluginList;
+    PluginManager&   pluginManager;
+    PluginListComponent* listComponent;
 
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListWindow)
-    };
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListWindow)
+};
 
 }
 

@@ -1,7 +1,7 @@
 #ifndef EL_MIDI_SEQUENCE_PROCESSOR_H
 #define EL_MIDI_SEQUENCE_PROCESSOR_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/MidiClip.h"
 
 namespace Element {

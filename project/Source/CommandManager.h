@@ -1,9 +1,17 @@
-#ifndef ELEMENT_COMMAND_MANAGER_H
-#define ELEMENT_COMMAND_MANAGER_H
+/*
+    CommandManager.h - This file is part of Element
+    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+*/
 
-#include "element/Juce.h"
+#ifndef EL_COMMAND_MANAGER_H
+#define EL_COMMAND_MANAGER_H
+
+#include "ElementApp.h"
 
 namespace Element {
+namespace Commands {
+
+}
 
 class CommandManager :  public ApplicationCommandManager
 {
@@ -14,5 +22,4 @@ public:
 
 }
 
-#endif // ELEMENT_COMMAND_MANAGER_H
-
+#endif  /* EL_COMMAND_MANAGER_H */

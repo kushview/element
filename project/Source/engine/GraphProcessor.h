@@ -22,7 +22,7 @@
 #ifndef ELEMENT_GRAPH_PROCESSOR_H
 #define ELEMENT_GRAPH_PROCESSOR_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/GraphNode.h"
 
 namespace Element {
@@ -40,11 +40,13 @@ namespace Element {
     To play back a graph through an audio device, you might want to use an
     AudioProcessorPlayer object.
 */
-class JUCE_API  GraphProcessor :  public Processor,
-                                  public AsyncUpdater
+class JUCE_API GraphProcessor : public Processor,
+                                public AsyncUpdater
+#if 0
+                                public ValueTree::Listener
+#endif
 {
 public:
-    
     /** Creates an empty graph. */
     GraphProcessor();
 
@@ -62,8 +64,10 @@ public:
     public:
         Connection (uint32 sourceNode, uint32 sourcePort,
                     uint32 destNode, uint32 destPort) noexcept;
-
+        Connection (const ValueTree props);
     private:
+        friend class GraphProcessor;
+        ValueTree arc;
         JUCE_LEAK_DETECTOR (Connection)
     };
 
@@ -272,46 +276,47 @@ public:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioGraphIOProcessor)
     };
 
+    // MARK: AudioProcessor methods
 
+    virtual const String getName() const override;
+    virtual void prepareToPlay (double sampleRate, int estimatedBlockSize) override;
+    virtual void releaseResources() override;
+    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+    void reset() override;
+    virtual const String getInputChannelName (int channelIndex) const override;
+    virtual const String getOutputChannelName (int channelIndex) const override;
+    virtual bool isInputChannelStereoPair (int index) const override;
+    virtual bool isOutputChannelStereoPair (int index) const override;
+    virtual bool silenceInProducesSilenceOut() const override;
+    virtual double getTailLengthSeconds() const override;
 
-    // AudioProcessor methods:
+    virtual bool acceptsMidi() const override;
+    virtual bool producesMidi() const override;
 
-    virtual const String getName() const;
-    virtual void prepareToPlay (double sampleRate, int estimatedBlockSize);
-    virtual void releaseResources();
-    void processBlock (AudioSampleBuffer&, MidiBuffer&);
-    void reset();
-    virtual const String getInputChannelName (int channelIndex) const;
-    virtual const String getOutputChannelName (int channelIndex) const;
-    virtual bool isInputChannelStereoPair (int index) const;
-    virtual bool isOutputChannelStereoPair (int index) const;
-    virtual bool silenceInProducesSilenceOut() const;
-    virtual double getTailLengthSeconds() const;
+    virtual bool hasEditor() const override                          { return false; }
+    virtual AudioProcessorEditor* createEditor() override            { return nullptr; }
 
-    virtual bool acceptsMidi() const;
-    virtual bool producesMidi() const;
+    virtual int getNumParameters() override                          { return 0; }
+    virtual const String getParameterName (int) override             { return String::empty; }
+    virtual float getParameter (int) override                        { return 0; }
+    virtual const String getParameterText (int) override             { return String::empty; }
+    virtual void setParameter (int, float) override                  { }
 
-    virtual bool hasEditor() const                          { return false; }
-    virtual AudioProcessorEditor* createEditor()            { return nullptr; }
+    virtual int getNumPrograms() override                            { return 0; }
+    virtual int getCurrentProgram() override                         { return 0; }
+    virtual void setCurrentProgram (int) override                    { }
+    virtual const String getProgramName (int) override               { return String::empty; }
+    virtual void changeProgramName (int, const String&) override     { }
 
-    virtual int getNumParameters()                          { return 0; }
-    virtual const String getParameterName (int)             { return String::empty; }
-    virtual float getParameter (int)                        { return 0; }
-    virtual const String getParameterText (int)             { return String::empty; }
-    virtual void setParameter (int, float)                  { }
+    virtual void getStateInformation (MemoryBlock&) override;
+    virtual void setStateInformation (const void* data, int sizeInBytes) override;
 
-    virtual int getNumPrograms()                            { return 0; }
-    virtual int getCurrentProgram()                         { return 0; }
-    virtual void setCurrentProgram (int)                    { }
-    virtual const String getProgramName (int)               { return String::empty; }
-    virtual void changeProgramName (int, const String&)     { }
+    virtual void fillInPluginDescription (PluginDescription& d) const override;
 
-    virtual void getStateInformation (MemoryBlock&);
-    virtual void setStateInformation (const void* data, int sizeInBytes);
-
-    virtual void fillInPluginDescription (PluginDescription& d) const;
-
-    inline ValueTree getGraphState() const { return graphState.graph; }
+    inline ValueTree getGraphState() const { return getGraphModel(); }
+    inline ValueTree getGraphModel() const { return graphModel; }
+    inline ValueTree getNodesModel() const { return nodesModel; }
+    inline ValueTree getArcsModel()  const { return arcsModel; }
 
 protected:
     virtual GraphNode* createNode (uint32 nodeId, Processor* proc) { return new GraphNode (nodeId, proc); }
@@ -324,11 +329,10 @@ private:
     OwnedArray<Connection> connections;
     uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
 
-    struct GraphState {
-        ValueTree graph;
-        ValueTree arcs;
-    } graphState;
-
+    ValueTree graphModel;
+    ValueTree nodesModel;
+    ValueTree arcsModel;
+    
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
     OwnedArray <MidiBuffer> midiBuffers;
@@ -342,14 +346,30 @@ private:
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
 
-    void handleAsyncUpdate();
+    void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();
     bool isAnInputTo (uint32 possibleInputId, uint32 possibleDestinationId, int recursionCheck) const;
 
+#if 0
+    friend class ValueTree;
+    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
+                                           const Identifier& property) override;
+    virtual void valueTreeChildAdded (ValueTree& parentTree,
+                                      ValueTree& childWhichHasBeenAdded) override;
+    virtual void valueTreeChildRemoved (ValueTree& parentTree,
+                                        ValueTree& childWhichHasBeenRemoved,
+                                        int indexFromWhichChildWasRemoved) override;
+    virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
+                                             int oldIndex, int newIndex) override;
+    virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
+    virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
+#endif
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphProcessor)
 };
 
+typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
+typedef IOProcessor::IODeviceType IODeviceType;
 }
 
 #endif   // ELEMENT_GRAPH_PROCESSOR_H

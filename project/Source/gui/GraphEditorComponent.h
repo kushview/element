@@ -1,5 +1,5 @@
 /*
-    GraphEditorBase.cpp - This file is part of Element
+    GraphEditorComponent.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 #ifndef EL_GRAPH_EDITOR_COMPONENT_H
 #define EL_GRAPH_EDITOR_COMPONENT_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "engine/GraphProcessor.h"
 
 namespace Element {
@@ -32,13 +32,13 @@ class PinComponent;
 class PluginWindow;
 
 /** A panel that displays and edits a GraphProcessor. */
-class GraphEditorBase   : public Component,
-                          public ChangeListener,
-                          public DragAndDropTarget
+class GraphEditorComponent   : public Component,
+                               public ChangeListener,
+                               public DragAndDropTarget
 {
 public:
-    GraphEditorBase (GraphController&);
-    virtual ~GraphEditorBase();
+    GraphEditorComponent (GraphController&);
+    virtual ~GraphEditorComponent();
 
     void paint (Graphics& g);
 
@@ -61,14 +61,11 @@ public:
     void dragConnector (const MouseEvent& e);
     void endDraggingConnector (const MouseEvent& e);
 
-    virtual bool isInterestedInDragSource (const SourceDetails& /*details*/) { return true; }
+    virtual bool isInterestedInDragSource (const SourceDetails& /*details*/);
     //virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
     //virtual void itemDragMove (const SourceDetails& dragSourceDetails);
     //virtual void itemDragExit (const SourceDetails& dragSourceDetails);
-    void itemDropped (const SourceDetails& details)
-    {
-        Logger::writeToLog (details.description);
-    }
+    void itemDropped (const SourceDetails& details);
 
     virtual bool shouldDrawDragImageWhenOver() { return true; }
 
@@ -76,17 +73,19 @@ protected:
     GraphController& graph;
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
     
+    
 private:
     friend class FilterComponent;
     ScopedPointer<ConnectorComponent> draggingConnector;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorBase)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphEditorComponent)
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
-    
+    void updateConnectorComponents();
 };
     
-typedef GraphEditorBase GraphEditorComponent;
+typedef GraphEditorComponent GraphEditorBase;
+
 }
 
 #endif // EL_GRAPH_EDITOR_COMPONENT_H

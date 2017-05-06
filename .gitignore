@@ -1,6 +1,8 @@
 *.pch
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
+project/JuceLibraryCode/include_*.*
+project/JuceLIbraryCode/include_*.*
 data/*.ai
 
 dst
@@ -11,3 +13,5 @@ build/
 *.pyc
 .DS_Store
 *.autosave
+
+/.vscode

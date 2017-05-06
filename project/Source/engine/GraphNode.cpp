@@ -1,26 +1,85 @@
+#include "ElementApp.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/PluginWrapper.h"
+#include "session/Node.h"
 
 namespace Element {
+
+static void readPluginDescription (const ValueTree& p, PluginDescription& pd)
+{
+    pd.pluginFormatName = p.getProperty ("format");
+    pd.fileOrIdentifier = p.getProperty ("file");
+}
+    
+static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
+{
+    p.setProperty (Slugs::name, pd.name, nullptr);
+    if (pd.descriptiveName != pd.name)
+        p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
+    
+    p.setProperty ("format",       pd.pluginFormatName, nullptr);
+    p.setProperty ("category",     pd.category, nullptr);
+    p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
+    p.setProperty ("version",      pd.version, nullptr);
+    p.setProperty ("file",         pd.fileOrIdentifier, nullptr);
+    p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
+    p.setProperty ("isInstrument", pd.isInstrument, nullptr);
+    p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
+    p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
+    p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
+    p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
+    // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
+}
 
 GraphNode::GraphNode (const uint32 nodeId_, Processor* const processor_) noexcept
     : nodeId (nodeId_),
       proc (processor_),
       isPrepared (false),
-      metadata ("metadata")
+      metadata (Tags::node)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set(1.0f);
     inputGain.set(1.0f); lastInputGain.set(1.0f);
     jassert (proc != nullptr);
+    PluginDescription desc;
+    getPluginDescription (desc);
+    setNodePropertiesFrom (desc, metadata);
+    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (Slugs::name, proc->getName(), nullptr)
+            .setProperty (Slugs::type, "plugin", nullptr)
+            .setProperty ("numAudioIns", getNumAudioInputs(), nullptr)
+            .setProperty ("numAudioOuts", getNumAudioOutputs(), nullptr);
+    
+    ValueTree ports (metadata.getOrCreateChildWithName ("ports", nullptr));
+    auto* inst = getAudioPluginInstance();
+    for (uint32 p = 0; p < (uint32) Processor::getNumPorts(inst); ++p)
+    {
+        ValueTree port (Tags::port);
+        const PortType type (proc->getPortType (p));
+        const bool isInput (proc->isPortInput(p));
+        
+        if (type != PortType::Audio)
+            continue;
+        
+        port.setProperty (Slugs::index, (int)p, nullptr)
+            .setProperty (Slugs::type, type.getSlug(), nullptr)
+            .setProperty (Tags::flow, isInput ? Tags::input.toString() : Tags::output.toString(), nullptr);
+        
+        const int channel = proc->getChannelPort (p);
+        port.setProperty (Slugs::name, isInput ? inst->getInputChannelName (channel)
+                                               : inst->getOutputChannelName (channel),
+                          nullptr);
+        
+        ports.addChild (port, -1, nullptr);
+    }
 }
 
-void GraphNode::setInputGain(const float f) {
+void GraphNode::setInputGain (const float f) {
     inputGain.set(f);
 }
 
-void GraphNode::setGain(const float f) {
+void GraphNode::setGain (const float f) {
     gain.set(f);
 }
 
@@ -38,7 +97,6 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     GraphProcessor& graph (*getParentGraph());
     AudioPluginInstance* const src = getAudioPluginInstance();
     AudioPluginInstance* const dst = other->getAudioPluginInstance();
-    DBG("Try connecting: " << src->getName() << " to " << dst->getName());
 
     const int totalChans = jmin (getNumAudioOutputs(), other->getNumAudioInputs());
     bool failed = false;
@@ -134,8 +192,9 @@ bool GraphNode::isSubgraph() const noexcept
 }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,
-                                    GraphProcessor* const graph)
+                         GraphProcessor* const graph)
 {
+    parent = graph;
     if (! isPrepared)
     {
         AudioPluginInstance* instance = getAudioPluginInstance();
@@ -144,7 +203,11 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
                                         sampleRate, blockSize);
         setParentGraph (graph);
         instance->prepareToPlay (sampleRate, blockSize);
-
+        
+        if (nullptr != dynamic_cast<IOProcessor*> (instance)) {
+            resetPorts();
+        }
+        
         inRMS.clearQuick(true);
         for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
         {
@@ -177,6 +240,42 @@ void GraphNode::unprepare()
     }
 }
 
+    void GraphNode::resetPorts()
+    {
+        ValueTree ports (metadata.getOrCreateChildWithName ("ports", nullptr));
+        metadata.removeChild (ports, nullptr);
+        ports = ValueTree (Tags::ports);
+        
+        auto* inst = getAudioPluginInstance();
+//        const uint32 numPorts = (uint32) Processor::getNumPorts (inst);
+//        const int numIns = parent->getTotalNumInputChannels(); // inst->getTotalNumInputChannels();
+//        const int numOuts = parent->getTotalNumOutputChannels(); // inst->getTotalNumOutputChannels();
+        
+        for (uint32 p = 0; p < (uint32) Processor::getNumPorts (inst); ++p)
+        {
+            ValueTree port (Tags::port);
+            const PortType type (proc->getPortType (p));
+            const bool isInput (proc->isPortInput(p));
+            
+            if (type != PortType::Audio)
+                continue;
+            
+            port.setProperty (Slugs::index, (int)p, nullptr)
+                .setProperty (Slugs::type, type.getSlug(), nullptr)
+                .setProperty (Tags::flow, isInput ? Tags::input.toString() : Tags::output.toString(), nullptr);
+            
+            const int channel = proc->getChannelPort (p);
+            port.setProperty (Slugs::name, isInput ? inst->getInputChannelName (channel)
+                                                   : inst->getOutputChannelName (channel),
+                              nullptr);
+            
+            ports.addChild (port, -1, nullptr);
+        }
+        
+        metadata.addChild (ports, 0, nullptr);
+        DBG(metadata.getChildWithName (Tags::ports).toXmlString());
+    }
+    
 AudioPluginInstance* GraphNode::getAudioPluginInstance() const
 {
     if (PluginWrapper* wrapper = dynamic_cast<PluginWrapper*> (proc.get()))

@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.1.1"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.3.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="4.1.0" companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="info@kushview.net">
+              jucerVersion="5.0.1" companyName="Kushview" companyWebsite="https://kushview.net"
+              companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
+              splashScreenColour="Dark">
   <MAINGROUP id="z1aYPy" name="Element">
-    <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="Resources">
+    <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
     </GROUP>
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="Source">
@@ -13,6 +14,7 @@
         <FILE id="iXbind" name="AppController.cpp" compile="1" resource="0"
               file="Source/controllers/AppController.cpp"/>
         <FILE id="dUnv0f" name="AppController.h" compile="0" resource="0" file="Source/controllers/AppController.h"/>
+        <FILE id="zrLMkT" name="Controller.cpp" compile="1" resource="0" file="Source/controllers/Controller.cpp"/>
         <FILE id="fTUDgM" name="Controller.h" compile="0" resource="0" file="Source/controllers/Controller.h"/>
         <FILE id="RWYfG0" name="EngineController.cpp" compile="1" resource="0"
               file="Source/controllers/EngineController.cpp"/>
@@ -22,9 +24,9 @@
               file="Source/controllers/GraphController.cpp"/>
         <FILE id="oF4cif" name="GraphController.h" compile="0" resource="0"
               file="Source/controllers/GraphController.h"/>
-      </GROUP>
-      <GROUP id="{8C407BCF-7BF0-F9A3-29AB-83E56A6CB994}" name="element">
-        <FILE id="o1FZqB" name="Juce.h" compile="0" resource="0" file="Source/element/Juce.h"/>
+        <FILE id="cSUiJ4" name="GuiController.cpp" compile="1" resource="0"
+              file="Source/controllers/GuiController.cpp"/>
+        <FILE id="Tyum0W" name="GuiController.h" compile="0" resource="0" file="Source/controllers/GuiController.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
         <FILE id="BnMPIm" name="AtomBuffer.cpp" compile="0" resource="0" file="Source/engine/AtomBuffer.cpp"/>
@@ -45,6 +47,10 @@
         <FILE id="kvWn2k" name="EngineBase.cpp" compile="1" resource="0" file="Source/engine/EngineBase.cpp"/>
         <FILE id="EldMb9" name="EngineProcessor.h" compile="0" resource="0"
               file="Source/engine/EngineProcessor.h"/>
+        <FILE id="fUeClE" name="GraphIOProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/GraphIOProcessor.cpp"/>
+        <FILE id="YCwID5" name="GraphIOProcessor.h" compile="0" resource="0"
+              file="Source/engine/GraphIOProcessor.h"/>
         <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>
         <FILE id="UpjKzL" name="GraphNode.h" compile="0" resource="0" file="Source/engine/GraphNode.h"/>
         <FILE id="W7RYnx" name="GraphPlayer.cpp" compile="0" resource="0" file="Source/engine/GraphPlayer.cpp"/>
@@ -117,7 +123,15 @@
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
               file="Source/gui/AssetTreeView.cpp"/>
         <FILE id="KsEoBI" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>
+        <FILE id="Z9ueHT" name="AudioIOPanelView.cpp" compile="1" resource="0"
+              file="Source/gui/AudioIOPanelView.cpp"/>
+        <FILE id="CqOHs6" name="AudioIOPanelView.h" compile="0" resource="0"
+              file="Source/gui/AudioIOPanelView.h"/>
         <FILE id="Eyh8a2" name="Commands.h" compile="0" resource="0" file="Source/gui/Commands.h"/>
+        <FILE id="sg07lP" name="ConnectionGrid.cpp" compile="1" resource="0"
+              file="Source/gui/ConnectionGrid.cpp"/>
+        <FILE id="EZVC8d" name="ConnectionGrid.h" compile="0" resource="0"
+              file="Source/gui/ConnectionGrid.h"/>
         <FILE id="acDBYH" name="ContentComponent.cpp" compile="1" resource="0"
               file="Source/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
@@ -133,9 +147,15 @@
         <FILE id="VY02a4" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
         <FILE id="oKKgS7" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="cPWpB0" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
+        <FILE id="VrN10k" name="HorizontalListBox.cpp" compile="1" resource="0"
+              file="Source/gui/HorizontalListBox.cpp"/>
+        <FILE id="b3pdvd" name="HorizontalListBox.h" compile="0" resource="0"
+              file="Source/gui/HorizontalListBox.h"/>
         <FILE id="UYQNVW" name="IconButton.h" compile="0" resource="0" file="Source/gui/IconButton.h"/>
         <FILE id="qOKTw2" name="Icons.cpp" compile="1" resource="0" file="Source/gui/Icons.cpp"/>
         <FILE id="ksQT0O" name="Icons.h" compile="0" resource="0" file="Source/gui/Icons.h"/>
+        <FILE id="Twc6WL" name="LookAndFeel.cpp" compile="1" resource="0" file="Source/gui/LookAndFeel.cpp"/>
+        <FILE id="ysuQQn" name="LookAndFeel.h" compile="0" resource="0" file="Source/gui/LookAndFeel.h"/>
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="Source/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="Source/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="Source/gui/MainWindow.h"/>
@@ -147,6 +167,10 @@
               file="Source/gui/MidiEditorComponent.cpp"/>
         <FILE id="YSTMmW" name="MidiEditorComponent.h" compile="0" resource="0"
               file="Source/gui/MidiEditorComponent.h"/>
+        <FILE id="sD0Gu6" name="NavigationView.cpp" compile="1" resource="0"
+              file="Source/gui/NavigationView.cpp"/>
+        <FILE id="nbrl8E" name="NavigationView.h" compile="0" resource="0"
+              file="Source/gui/NavigationView.h"/>
         <FILE id="ZVkvZh" name="NewFileWizard.cpp" compile="1" resource="0"
               file="Source/gui/NewFileWizard.cpp"/>
         <FILE id="AP7kUF" name="NewFileWizard.h" compile="0" resource="0" file="Source/gui/NewFileWizard.h"/>
@@ -157,15 +181,23 @@
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
         <FILE id="BKStDb" name="PluginListWindow.h" compile="0" resource="0"
               file="Source/gui/PluginListWindow.h"/>
+        <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
+              file="Source/gui/PluginManagerComponent.cpp"/>
+        <FILE id="DqoFQ0" name="PluginManagerComponent.h" compile="0" resource="0"
+              file="Source/gui/PluginManagerComponent.h"/>
+        <FILE id="BusONx" name="PluginsPanelView.cpp" compile="1" resource="0"
+              file="Source/gui/PluginsPanelView.cpp"/>
+        <FILE id="CDZq99" name="PluginsPanelView.h" compile="0" resource="0"
+              file="Source/gui/PluginsPanelView.h"/>
         <FILE id="dQixGq" name="PluginWindow.cpp" compile="1" resource="0"
               file="Source/gui/PluginWindow.cpp"/>
         <FILE id="apg1Kn" name="PluginWindow.h" compile="0" resource="0" file="Source/gui/PluginWindow.h"/>
-        <FILE id="Kql61f" name="Preferences.cpp" compile="1" resource="0" file="Source/gui/Preferences.cpp"/>
-        <FILE id="Fk6kww" name="Preferences.h" compile="0" resource="0" file="Source/gui/Preferences.h"/>
-        <FILE id="OyaYz3" name="PreferencesWidget.cpp" compile="1" resource="0"
-              file="Source/gui/PreferencesWidget.cpp"/>
-        <FILE id="ZVdKzn" name="PreferencesWidget.h" compile="0" resource="0"
-              file="Source/gui/PreferencesWidget.h"/>
+        <FILE id="OyaYz3" name="PreferencesComponent.cpp" compile="1" resource="0"
+              file="Source/gui/PreferencesComponent.cpp"/>
+        <FILE id="ZVdKzn" name="PreferencesComponent.h" compile="0" resource="0"
+              file="Source/gui/PreferencesComponent.h"/>
+        <FILE id="WpP2mo" name="RackView.cpp" compile="1" resource="0" file="Source/gui/RackView.cpp"/>
+        <FILE id="Wenhme" name="RackView.h" compile="0" resource="0" file="Source/gui/RackView.h"/>
         <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="0" resource="0"
               file="Source/gui/SequencerClipItem.cpp"/>
         <FILE id="Daatdg" name="SequencerClipItem.h" compile="0" resource="0"
@@ -189,6 +221,8 @@
         <FILE id="LKLsgk" name="TreeviewBase.cpp" compile="1" resource="0"
               file="Source/gui/TreeviewBase.cpp"/>
         <FILE id="TWN09g" name="TreeviewBase.h" compile="0" resource="0" file="Source/gui/TreeviewBase.h"/>
+        <FILE id="hfURVC" name="ViewHelpers.cpp" compile="1" resource="0" file="Source/gui/ViewHelpers.cpp"/>
+        <FILE id="bkdWVL" name="ViewHelpers.h" compile="0" resource="0" file="Source/gui/ViewHelpers.h"/>
         <FILE id="TJ8hvg" name="Window.cpp" compile="1" resource="0" file="Source/gui/Window.cpp"/>
         <FILE id="WfFCIC" name="Window.h" compile="0" resource="0" file="Source/gui/Window.h"/>
         <FILE id="qis1vl" name="WindowManager.cpp" compile="1" resource="0"
@@ -196,192 +230,6 @@
         <FILE id="NBe9Yb" name="WindowManager.h" compile="0" resource="0" file="Source/gui/WindowManager.h"/>
         <FILE id="vY0OlN" name="Workspace.cpp" compile="1" resource="0" file="Source/gui/Workspace.cpp"/>
         <FILE id="zZaXn1" name="Workspace.h" compile="0" resource="0" file="Source/gui/Workspace.h"/>
-      </GROUP>
-      <GROUP id="{836DDB2F-1E02-5D2B-5EC9-A763BCB3E0F6}" name="ksp1">
-        <GROUP id="{DEA916E9-1A5F-3B53-A24C-B91ED5878C99}" name="editor">
-          <FILE id="mUTMKr" name="AmpControls.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/AmpControls.cpp"/>
-          <FILE id="kLhpc5" name="AmpControls.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AmpControls.h"/>
-          <FILE id="JAsIbE" name="ArticulationControls.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/ArticulationControls.cpp"/>
-          <FILE id="cABiJM" name="ArticulationControls.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/ArticulationControls.h"/>
-          <FILE id="kfHetX" name="AssetsListBox.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/AssetsListBox.cpp"/>
-          <FILE id="cu2Skg" name="AssetsListBox.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AssetsListBox.h"/>
-          <FILE id="CFEfNL" name="AudioPeaks.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/AudioPeaks.cpp"/>
-          <FILE id="S6GbUY" name="AudioPeaks.h" compile="0" resource="0" file="../libs/ksp1/src/editor/AudioPeaks.h"/>
-          <FILE id="BGn5dm" name="Banks.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Banks.h"/>
-          <FILE id="IKoaH9" name="BrowseScreen.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/BrowseScreen.cpp"/>
-          <FILE id="wHdUpL" name="BrowseScreen.h" compile="0" resource="0" file="../libs/ksp1/src/editor/BrowseScreen.h"/>
-          <FILE id="yA2q5L" name="ComponentMixin.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/ComponentMixin.h"/>
-          <FILE id="TtLjH2" name="DisplayView.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/DisplayView.cpp"/>
-          <FILE id="EgEryX" name="DisplayView.h" compile="0" resource="0" file="../libs/ksp1/src/editor/DisplayView.h"/>
-          <FILE id="AYk5Zz" name="EditScreen.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/EditScreen.cpp"/>
-          <FILE id="ME4hSd" name="EditScreen.h" compile="0" resource="0" file="../libs/ksp1/src/editor/EditScreen.h"/>
-          <FILE id="ccpEkT" name="FilterControls.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/FilterControls.cpp"/>
-          <FILE id="QppDwz" name="FilterControls.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/FilterControls.h"/>
-          <FILE id="cK2vDi" name="Keyboard.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Keyboard.cpp"/>
-          <FILE id="H2KXZH" name="Keyboard.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Keyboard.h"/>
-          <FILE id="aHdGZi" name="LayerCell.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LayerCell.cpp"/>
-          <FILE id="bsPom2" name="LayerCell.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LayerCell.h"/>
-          <FILE id="c9ZW9c" name="LayersListBox.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/LayersListBox.cpp"/>
-          <FILE id="Soktwl" name="LayersListBox.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LayersListBox.h"/>
-          <FILE id="DNc81f" name="LevelMeter.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LevelMeter.cpp"/>
-          <FILE id="uDzetl" name="LevelMeter.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LevelMeter.h"/>
-          <FILE id="BGWYUK" name="LV2Editor.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/LV2Editor.cpp"/>
-          <FILE id="D6XE3D" name="LV2Editor.h" compile="0" resource="0" file="../libs/ksp1/src/editor/LV2Editor.h"/>
-          <FILE id="gT1ifc" name="MenuButton.h" compile="0" resource="0" file="../libs/ksp1/src/editor/MenuButton.h"/>
-          <FILE id="l2M2OI" name="MidiFilterScreen.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/MidiFilterScreen.cpp"/>
-          <FILE id="cnFbIf" name="MidiFilterScreen.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/MidiFilterScreen.h"/>
-          <FILE id="kSgn7p" name="MidiKeyboardComponent.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/MidiKeyboardComponent.cpp"/>
-          <FILE id="zIApwM" name="MidiKeyboardComponent.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/MidiKeyboardComponent.h"/>
-          <FILE id="p4ppm3" name="MidiNoteSliderPropertyComponent.h" compile="0"
-                resource="0" file="../libs/ksp1/src/editor/MidiNoteSliderPropertyComponent.h"/>
-          <FILE id="I9DesV" name="PanelButton.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PanelButton.h"/>
-          <FILE id="JVpSHI" name="Panels.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Panels.h"/>
-          <FILE id="Do8mIU" name="PianoRoll.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/PianoRoll.cpp"/>
-          <FILE id="RJ3UFy" name="PianoRoll.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PianoRoll.h"/>
-          <FILE id="vuMUUY" name="ProgramEditor.cpp" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/ProgramEditor.cpp"/>
-          <FILE id="uHO9TQ" name="ProgramEditor.h" compile="0" resource="0" file="../libs/ksp1/src/editor/ProgramEditor.h"/>
-          <FILE id="NOZqZB" name="ProgramsListBox.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/ProgramsListBox.cpp"/>
-          <FILE id="MOvDAs" name="ProgramsListBox.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/ProgramsListBox.h"/>
-          <FILE id="X8DRGp" name="PropertiesScreen.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/PropertiesScreen.cpp"/>
-          <FILE id="wp4nkY" name="PropertiesScreen.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/PropertiesScreen.h"/>
-          <FILE id="yX9wOo" name="PropertyPage.h" compile="0" resource="0" file="../libs/ksp1/src/editor/PropertyPage.h"/>
-          <FILE id="vPed3P" name="QuickBrowser.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/QuickBrowser.cpp"/>
-          <FILE id="ZAPG7c" name="QuickBrowser.h" compile="0" resource="0" file="../libs/ksp1/src/editor/QuickBrowser.h"/>
-          <FILE id="OBMkZW" name="SamplerDisplay.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/SamplerDisplay.cpp"/>
-          <FILE id="Ee5x2N" name="SamplerDisplay.h" compile="0" resource="0"
-                file="../libs/ksp1/src/editor/SamplerDisplay.h"/>
-          <FILE id="fxbDGd" name="SamplerView.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/SamplerView.cpp"/>
-          <FILE id="etOcFa" name="SamplerView.h" compile="0" resource="0" file="../libs/ksp1/src/editor/SamplerView.h"/>
-          <FILE id="n05yfM" name="ScreenManager.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/ScreenManager.cpp"/>
-          <FILE id="sQqwRl" name="ScreenManager.h" compile="0" resource="0" file="../libs/ksp1/src/editor/ScreenManager.h"/>
-          <FILE id="B8jPXs" name="Screens.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Screens.cpp"/>
-          <FILE id="GbEUFq" name="Screens.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Screens.h"/>
-          <FILE id="SHbCSL" name="SendsControls.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/editor/SendsControls.cpp"/>
-          <FILE id="gbhmxu" name="SendsControls.h" compile="0" resource="0" file="../libs/ksp1/src/editor/SendsControls.h"/>
-          <FILE id="QMb7IU" name="Views.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Views.h"/>
-          <FILE id="bhPR4g" name="Waveform.cpp" compile="1" resource="0" file="../libs/ksp1/src/editor/Waveform.cpp"/>
-          <FILE id="Kg1INq" name="Waveform.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Waveform.h"/>
-          <FILE id="gEpQOc" name="Workspace.h" compile="0" resource="0" file="../libs/ksp1/src/editor/Workspace.h"/>
-        </GROUP>
-        <GROUP id="{AB19AE57-030C-CFF5-2A5A-59FF696F5CB3}" name="engine">
-          <FILE id="gkUWY3" name="ADSR.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/ADSR.cpp"/>
-          <FILE id="rBzTUQ" name="ADSR.h" compile="0" resource="0" file="../libs/ksp1/src/engine/ADSR.h"/>
-          <FILE id="rXMbJm" name="Articulator.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/Articulator.cpp"/>
-          <FILE id="B2PXBx" name="Articulator.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Articulator.h"/>
-          <FILE id="Jc502a" name="Disposable.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Disposable.h"/>
-          <FILE id="dWZU0h" name="Jobs.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/Jobs.cpp"/>
-          <FILE id="NvAm6G" name="Jobs.h" compile="0" resource="0" file="../libs/ksp1/src/engine/Jobs.h"/>
-          <FILE id="sJz1kj" name="LayerData.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/LayerData.cpp"/>
-          <FILE id="zUv5B7" name="LayerData.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LayerData.h"/>
-          <FILE id="aDZxVp" name="LayeringMode.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LayeringMode.h"/>
-          <FILE id="szTUui" name="LowPassFilter.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/engine/LowPassFilter.cpp"/>
-          <FILE id="JJmu1P" name="LowPassFilter.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LowPassFilter.h"/>
-          <FILE id="UuNHWF" name="LV2Plugin.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/LV2Plugin.cpp"/>
-          <FILE id="k3xBiG" name="LV2Plugin.h" compile="0" resource="0" file="../libs/ksp1/src/engine/LV2Plugin.h"/>
-          <FILE id="z3TDV3" name="MidiFilter.h" compile="0" resource="0" file="../libs/ksp1/src/engine/MidiFilter.h"/>
-          <FILE id="voWBnz" name="SampleCache.cpp" compile="1" resource="0" file="../libs/ksp1/src/engine/SampleCache.cpp"/>
-          <FILE id="LeKv4Q" name="SampleCache.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SampleCache.h"/>
-          <FILE id="oatSOv" name="SamplerKeys.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerKeys.h"/>
-          <FILE id="szTGEt" name="SamplerSounds.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/engine/SamplerSounds.cpp"/>
-          <FILE id="AQb7sh" name="SamplerSounds.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerSounds.h"/>
-          <FILE id="slT585" name="SamplerSynth.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/engine/SamplerSynth.cpp"/>
-          <FILE id="eD4xMH" name="SamplerSynth.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerSynth.h"/>
-          <FILE id="JzbqLo" name="SamplerVoice.cpp" compile="1" resource="0"
-                file="../libs/ksp1/src/engine/SamplerVoice.cpp"/>
-          <FILE id="XMmWtZ" name="SamplerVoice.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SamplerVoice.h"/>
-          <FILE id="U9BPM2" name="SqlQuery.h" compile="0" resource="0" file="../libs/ksp1/src/engine/SqlQuery.h"/>
-        </GROUP>
-        <FILE id="aANtq7" name="Articulation.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/Articulation.cpp"/>
-        <FILE id="yFXieu" name="Articulation.h" compile="0" resource="0" file="../libs/ksp1/src/Articulation.h"/>
-        <FILE id="vmRkRB" name="BeatThangKitLoader.h" compile="0" resource="0"
-              file="../libs/ksp1/src/BeatThangKitLoader.h"/>
-        <FILE id="NipJ0P" name="BeatThangPatternLoader.h" compile="0" resource="0"
-              file="../libs/ksp1/src/BeatThangPatternLoader.h"/>
-        <FILE id="EpJNYX" name="ContentScanner.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/ContentScanner.cpp"/>
-        <FILE id="Of8pLx" name="ContentScanner.h" compile="0" resource="0"
-              file="../libs/ksp1/src/ContentScanner.h"/>
-        <FILE id="bJneyv" name="Controller.cpp" compile="1" resource="0" file="../libs/ksp1/src/Controller.cpp"/>
-        <FILE id="sEv7AC" name="Controller.h" compile="0" resource="0" file="../libs/ksp1/src/Controller.h"/>
-        <FILE id="uawFqg" name="Database.cpp" compile="1" resource="0" file="../libs/ksp1/src/Database.cpp"/>
-        <FILE id="OvNICg" name="Database.h" compile="0" resource="0" file="../libs/ksp1/src/Database.h"/>
-        <FILE id="Y67XNp" name="DataPath.cpp" compile="1" resource="0" file="../libs/ksp1/src/DataPath.cpp"/>
-        <FILE id="KM2zSK" name="DataPath.h" compile="0" resource="0" file="../libs/ksp1/src/DataPath.h"/>
-        <FILE id="mikJkQ" name="Filesystem.cpp" compile="1" resource="0" file="../libs/ksp1/src/Filesystem.cpp"/>
-        <FILE id="qMn1r5" name="Filesystem.h" compile="0" resource="0" file="../libs/ksp1/src/Filesystem.h"/>
-        <FILE id="kfLTj2" name="Forge.h" compile="0" resource="0" file="../libs/ksp1/src/Forge.h"/>
-        <FILE id="x8eGbj" name="H2DrumkitLoader.h" compile="0" resource="0"
-              file="../libs/ksp1/src/H2DrumkitLoader.h"/>
-        <FILE id="haVmSK" name="Instrument.cpp" compile="1" resource="0" file="../libs/ksp1/src/Instrument.cpp"/>
-        <FILE id="FgR4C3" name="Instrument.h" compile="0" resource="0" file="../libs/ksp1/src/Instrument.h"/>
-        <FILE id="dzxHhF" name="InstrumentLoader.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/InstrumentLoader.cpp"/>
-        <FILE id="uMJzGw" name="InstrumentLoader.h" compile="0" resource="0"
-              file="../libs/ksp1/src/InstrumentLoader.h"/>
-        <FILE id="GhIssJ" name="KeyItem.cpp" compile="1" resource="0" file="../libs/ksp1/src/KeyItem.cpp"/>
-        <FILE id="byF2gC" name="KSP1.cpp" compile="1" resource="0" file="../libs/ksp1/jucer/Source/KSP1.cpp"/>
-        <FILE id="NGp16F" name="KSP1.h" compile="0" resource="0" file="../libs/ksp1/src/KSP1.h"/>
-        <FILE id="Va8MFX" name="LayerItem.cpp" compile="1" resource="0" file="../libs/ksp1/src/LayerItem.cpp"/>
-        <FILE id="xcLxLX" name="Locations.cpp" compile="1" resource="0" file="../libs/ksp1/src/Locations.cpp"/>
-        <FILE id="vhAdZL" name="Locations.h" compile="0" resource="0" file="../libs/ksp1/src/Locations.h"/>
-        <FILE id="MWY40q" name="MediaLibrary.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/MediaLibrary.cpp"/>
-        <FILE id="SRXjQa" name="MediaLibrary.h" compile="0" resource="0" file="../libs/ksp1/src/MediaLibrary.h"/>
-        <FILE id="P1jvhh" name="MediaObject.h" compile="0" resource="0" file="../libs/ksp1/src/MediaObject.h"/>
-        <FILE id="MMlRZK" name="Monitor.h" compile="0" resource="0" file="../libs/ksp1/src/Monitor.h"/>
-        <FILE id="CgJRjx" name="PatternClip.h" compile="0" resource="0" file="../libs/ksp1/src/PatternClip.h"/>
-        <FILE id="Z9z6iI" name="PatternLoader.h" compile="0" resource="0" file="../libs/ksp1/src/PatternLoader.h"/>
-        <FILE id="Z5C7CA" name="PluginConfig.h" compile="0" resource="0" file="../libs/ksp1/jucer/Source/PluginConfig.h"/>
-        <FILE id="OHHCDe" name="PluginEditor.cpp" compile="1" resource="0"
-              file="../libs/ksp1/jucer/Source/PluginEditor.cpp"/>
-        <FILE id="FL4xpf" name="PluginEditor.h" compile="0" resource="0" file="../libs/ksp1/jucer/Source/PluginEditor.h"/>
-        <FILE id="tCGOXi" name="PluginProcessor.cpp" compile="1" resource="0"
-              file="../libs/ksp1/jucer/Source/PluginProcessor.cpp"/>
-        <FILE id="U6U5SE" name="PluginProcessor.h" compile="0" resource="0"
-              file="../libs/ksp1/jucer/Source/PluginProcessor.h"/>
-        <FILE id="So4LBq" name="Ports.h" compile="0" resource="0" file="../libs/ksp1/src/Ports.h"/>
-        <FILE id="z16Dts" name="PortWriter.cpp" compile="1" resource="0" file="../libs/ksp1/src/PortWriter.cpp"/>
-        <FILE id="xttAvG" name="PortWriter.h" compile="0" resource="0" file="../libs/ksp1/src/PortWriter.h"/>
-        <FILE id="TnSNV8" name="PortWriterInterface.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/PortWriterInterface.cpp"/>
-        <FILE id="Z7wtnz" name="PortWriterInterface.h" compile="0" resource="0"
-              file="../libs/ksp1/src/PortWriterInterface.h"/>
-        <FILE id="w3Jrnd" name="Programming.cpp" compile="1" resource="0" file="../libs/ksp1/src/Programming.cpp"/>
-        <FILE id="TXDWX9" name="Programming.h" compile="0" resource="0" file="../libs/ksp1/src/Programming.h"/>
-        <FILE id="GZReJy" name="SamplerInterface.cpp" compile="1" resource="0"
-              file="../libs/ksp1/src/SamplerInterface.cpp"/>
-        <FILE id="D0blHT" name="SamplerInterface.h" compile="0" resource="0"
-              file="../libs/ksp1/src/SamplerInterface.h"/>
-        <FILE id="LymnjA" name="StandardLoader.h" compile="0" resource="0"
-              file="../libs/ksp1/src/StandardLoader.h"/>
-        <FILE id="DqGK1m" name="Types.h" compile="0" resource="0" file="../libs/ksp1/src/Types.h"/>
-        <FILE id="IHzK5B" name="URIs.cpp" compile="1" resource="0" file="../libs/ksp1/src/URIs.cpp"/>
-        <FILE id="gtdarN" name="URIs.h" compile="0" resource="0" file="../libs/ksp1/src/URIs.h"/>
       </GROUP>
       <GROUP id="{B9118D49-09C0-7ADA-2A2D-6D0A76656BF1}" name="session">
         <FILE id="qXGab1" name="Asset.cpp" compile="1" resource="0" file="Source/session/Asset.cpp"/>
@@ -397,11 +245,16 @@
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
         <FILE id="L3dN2b" name="GraphModel.cpp" compile="1" resource="0" file="Source/session/GraphModel.cpp"/>
         <FILE id="vWMbjH" name="GraphModel.h" compile="0" resource="0" file="Source/session/GraphModel.h"/>
+        <FILE id="EePoMm" name="MediaManager.cpp" compile="1" resource="0"
+              file="Source/session/MediaManager.cpp"/>
+        <FILE id="iPEraJ" name="MediaManager.h" compile="0" resource="0" file="Source/session/MediaManager.h"/>
         <FILE id="M2406w" name="MediaModel.h" compile="0" resource="0" file="Source/session/MediaModel.h"/>
         <FILE id="M0yKZu" name="MediaStorage.h" compile="0" resource="0" file="Source/session/MediaStorage.h"/>
         <FILE id="Z8fHex" name="MidiClip.cpp" compile="1" resource="0" file="Source/session/MidiClip.cpp"/>
         <FILE id="dIrbHz" name="MidiClip.h" compile="0" resource="0" file="Source/session/MidiClip.h"/>
         <FILE id="nB7y30" name="Module.h" compile="0" resource="0" file="Source/session/Module.h"/>
+        <FILE id="WCIEqE" name="Node.cpp" compile="1" resource="0" file="Source/session/Node.cpp"/>
+        <FILE id="kwalR3" name="Node.h" compile="0" resource="0" file="Source/session/Node.h"/>
         <FILE id="QI9jCi" name="NodeModel.h" compile="0" resource="0" file="Source/session/NodeModel.h"/>
         <FILE id="o4zGK5" name="Note.cpp" compile="1" resource="0" file="Source/session/Note.cpp"/>
         <FILE id="gswGU9" name="Note.h" compile="0" resource="0" file="Source/session/Note.h"/>
@@ -423,31 +276,27 @@
               file="Source/session/SessionTrack.cpp"/>
         <FILE id="o0jdbc" name="TempoMap.h" compile="0" resource="0" file="Source/session/TempoMap.h"/>
         <FILE id="vWLdgY" name="TrackModel.h" compile="0" resource="0" file="Source/session/TrackModel.h"/>
+        <FILE id="saq9O0" name="UnlockStatus.cpp" compile="1" resource="0"
+              file="Source/session/UnlockStatus.cpp"/>
+        <FILE id="UnTwR7" name="UnlockStatus.h" compile="0" resource="0" file="Source/session/UnlockStatus.h"/>
       </GROUP>
-      <GROUP id="{161B7D7D-21F6-7798-618E-0A21C7F2C3B5}" name="sqlite3">
-        <FILE id="rU5alL" name="readme.txt" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/readme.txt"/>
-        <FILE id="qOiAd4" name="shell.c" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/shell.c"/>
-        <FILE id="jD9cnD" name="sqlite3.c" compile="1" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3.c"/>
-        <FILE id="G5LoB4" name="sqlite3.h" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3.h"/>
-        <FILE id="BJ7oJ6" name="sqlite3ext.h" compile="0" resource="0" file="../libs/ksp1/libs/sqlite3/sqlite3ext.h"/>
-      </GROUP>
-      <FILE id="qVj5DJ" name="AppTypes.h" compile="0" resource="0" file="Source/AppTypes.h"/>
       <FILE id="IVf5gW" name="CommandManager.h" compile="0" resource="0"
             file="Source/CommandManager.h"/>
+      <FILE id="K6661n" name="DataPath.cpp" compile="1" resource="0" file="Source/DataPath.cpp"/>
+      <FILE id="AAnMXa" name="DataPath.h" compile="0" resource="0" file="Source/DataPath.h"/>
+      <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="Source/ElementApp.h"/>
       <FILE id="Zs6mUU" name="EngineControl.cpp" compile="1" resource="0"
             file="Source/EngineControl.cpp"/>
       <FILE id="FLLIFn" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
       <FILE id="dEn8dF" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
-      <FILE id="k33Zf2" name="MediaManager.cpp" compile="1" resource="0"
-            file="Source/MediaManager.cpp"/>
-      <FILE id="dEMrlS" name="MediaManager.h" compile="0" resource="0" file="Source/MediaManager.h"/>
+      <FILE id="QrURzP" name="Messages.h" compile="0" resource="0" file="Source/Messages.h"/>
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="Source/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="Source/Settings.cpp"/>
       <FILE id="WhwWGx" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>
+      <FILE id="Eg6hYr" name="Signals.h" compile="0" resource="0" file="Source/Signals.h"/>
       <FILE id="dCZvEA" name="URIs.h" compile="0" resource="0" file="Source/URIs.h"/>
-      <FILE id="DsnYel" name="World.h" compile="0" resource="0" file="Source/World.h"/>
       <FILE id="zSi9fC" name="WorldBase.cpp" compile="1" resource="0" file="Source/WorldBase.cpp"/>
       <FILE id="yZQybR" name="WorldBase.h" compile="0" resource="0" file="Source/WorldBase.h"/>
     </GROUP>
@@ -460,162 +309,119 @@
     <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <LINUX_MAKE targetFolder="Builds/Linux" userNotes="This exporter is here for reference.  Please use waf to build the project.&#10;&#10;$ ./waf configure&#10;$ ./waf build&#10;$ sudo ./waf install&#10;"
-                externalLibraries="">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" libraryPath="/usr/X11R6/lib/" isDebug="1" optimisation="1"
-                       targetName="Element"/>
-        <CONFIGURATION name="Release" libraryPath="/usr/X11R6/lib/" isDebug="0" optimisation="2"
-                       targetName="Element"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../libs/juce/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </LINUX_MAKE>
-    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="lilv-0" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
-               extraLinkerFlags="-lsqlite3" bigIcon="eG1U6B" smallIcon="eG1U6B">
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=0&#10;JUCE_PLUGINHOST_VST3=0"
+               extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
+               vst3Folder="" extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+               documentExtensions=".elc,elg">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
-                       cppLibType="libc++" libraryPath="/opt/kushview/lib" binaryPath="../build"/>
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
+                       defines="EL_USE_LOCAL_AUTH=1"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
-                       binaryPath="../build" headerPath="/opt/kushview/include&#10;/opt/kushview/include/lilv-0&#10;/opt/kushview/include/suil-0&#10;../../Source&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"
-                       libraryPath="/opt/kushview/lib" cppLibType="libc++" cppLanguageStandard="c++11"/>
+                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
+                       defines="EL_USE_LOCAL_AUTH=0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <XCODE_IPHONE targetFolder="Builds/iOS" externalLibraries="lilv-0&#10;suil-0&#10;sratom-0&#10;sord-0&#10;serd-0"
-                  postbuildCommand="libdir=&quot;/opt/element/ios/lib&quot;&#10;deplibs=&quot;liblilv-0.dylib libsuil-0.dylib libserd-0.dylib libsord-0.dylib libsratom-0.dylib&quot;&#10;&#10;exit 0&#10;&#10;original=$CONFIGURATION_BUILD_DIR/$FULL_PRODUCT_NAME&#10;binary=&quot;$original/$EXECUTABLE_NAME&quot;&#10;frameworks=&quot;$original/Frameworks&quot;&#10;mkdir -p &quot;$frameworks&quot;&#10;rm -f &quot;$frameworks/*.dylib&quot;&#10;&#10;echo &quot;Copying Libraries from $libdir&quot;&#10;&#10;for deplib in $deplibs; do&#10;  echo &quot;  $deplib&quot;&#10;  cp -f &quot;$libdir/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;&#10;  install_name_tool -id &quot;@loader_path/Frameworks/$deplib&quot; &quot;$frameworks/$deplib&quot;&#10;  install_name_tool -change &quot;$libdir/$deplib&quot; &quot;@loader_path/Frameworks/$deplib&quot; &quot;$binary&quot;&#10;&#10;  for dep in $deplibs; do&#10;    install_name_tool -change &quot;$libdir/$dep&quot; &quot;@loader_path/$dep&quot; &quot;$frameworks/$deplib&quot;&#10;  done&#10;&#10;done&#10;">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" iosCompatibility="default" isDebug="1" optimisation="1"
-                       targetName="Element" cppLibType="libc++" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
-                       libraryPath="/opt/element/arm/lib"/>
-        <CONFIGURATION name="Release" iosCompatibility="default" isDebug="0" optimisation="3"
-                       targetName="Element" headerPath="/opt/element/arm/include&#10;/opt/element/arm/include/lilv-0&#10;/opt/element/arm/include/suil-0&#10;../../Source"
-                       libraryPath="/opt/element/arm/lib" cppLibType="libc++"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </XCODE_IPHONE>
-    <ANDROID targetFolder="Builds/Android" androidActivityClass="com.yourcompany.Element"
-             androidSDKPath="${user.home}/SDKs/android-sdk" androidNDKPath="${user.home}/SDKs/android-ndk"
-             androidMinimumSDK="8" androidInternetNeeded="1" androidKeyStore="${user.home}/.android/debug.keystore"
-             androidKeyStorePass="android" androidKeyAlias="androiddebugkey"
-             androidKeyAliasPass="android" androidVersionCode="1" androidCpp11="1"
-             androidBluetoothNeeded="1">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" androidArchitectures="armeabi armeabi-v7a" isDebug="1"
-                       optimisation="1" targetName="Element"/>
-        <CONFIGURATION name="Release" androidArchitectures="armeabi armeabi-v7a" isDebug="0"
-                       optimisation="2" targetName="Element"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-      </MODULEPATHS>
-    </ANDROID>
-    <VS2013 targetFolder="Builds/VisualStudio2013" toolset="v120_xp" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B">
+    <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
+            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
+            rtasFolder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="Element" binaryPath=""
-                       headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       characterSet="MultiByte" binaryPath="../build/Win32/Debug" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="c://KushviewSDK/include&#10;../../Source&#10;../../../libs/lv2&#10;../../../libs/ksp1/src&#10;../../../libs/ksp1/libs/lvtk"/>
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/Win32/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       characterSet="MultiByte" binaryPath="../build/x64/Debug" useRuntimeLibDLL="0"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/x64/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_opengl" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_graphics" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_events" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_core" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../libs/libjuce/src/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../libs/libjuce/src/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
+        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE\modules"/>
+      </MODULEPATHS>
+    </VS2015>
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
+            extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
+            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v141_xp" cppLanguageStandard="stdcpp14">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/Win32/Debug"
+                       headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       useRuntimeLibDLL="1"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/Win32/Release"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/x64/Debug" characterSet="MultiByte" useRuntimeLibDLL="1"/>
+        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/x64/Release"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
         <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
       </MODULEPATHS>
-    </VS2013>
+    </VS2017>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
@@ -635,11 +441,18 @@
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="juce_opengl" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_product_unlocking" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
-               JUCE_ASIO="disabled" JUCE_WASAPI="disabled" JUCE_DIRECTSOUND="disabled"
+               JUCE_ASIO="enabled" JUCE_WASAPI="enabled" JUCE_DIRECTSOUND="disabled"
                JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
-               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"/>
+               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
+               JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
+               JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"
+               JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled" JUCE_USE_MP3AUDIOFORMAT="disabled"
+               JUCE_USE_LAME_AUDIO_FORMAT="disabled"/>
+  <LIVE_SETTINGS>
+    <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

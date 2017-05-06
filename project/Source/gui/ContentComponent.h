@@ -1,62 +1,74 @@
 /*
     ContentComponent.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (c) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_CONTENT_COMPONENT_H
-#define ELEMENT_CONTENT_COMPONENT_H
+#ifndef EL_CONTENT_COMPONENT_H
+#define EL_CONTENT_COMPONENT_H
 
-#include "element/Juce.h"
+#include "engine/GraphNode.h"
+#include "session/Session.h"
 
 namespace Element {
 
-class GraphEditorPanel;
-class TransportBar;
+class AppController;
+class ContentContainer;
+class Globals;
 class GuiApp;
-class SequencerComponent;
-class Workspace;
+class GraphEditorView;
+class RackView;
+class TransportBar;
 
 class ContentComponent :  public Component,
                           public DragAndDropContainer,
-                          private Timer
+                          public FileDragAndDropTarget
 {
 public:
-    ContentComponent (GuiApp& app);
+    ContentComponent (AppController& app, GuiApp& gui);
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;
+    void mouseDown (const MouseEvent&) override;
     void paint (Graphics &g) override;
     void resized() override;
 
+    void setRackViewComponent (Component* comp);
+    void setRackViewNode (GraphNodePtr node);
     void stabilize();
     
-    GuiApp& app();
+    void post (Message*);
+    Globals& getGlobals();
+    SessionRef getSession() const { return SessionRef(); }
+    
+    bool isInterestedInFileDrag (const StringArray &files) override;
+    void filesDropped (const StringArray &files, int x, int y) override;
+    JUCE_DEPRECATED(GuiApp& app());
 
 private:
+    AppController& controller;
     GuiApp& gui;
-    ScopedPointer<ScreenDisplay> display;
-    ScopedPointer<SequencerComponent> seq;
-    ScopedPointer<TransportBar>  transport;
+    ScopedPointer<Component> nav;
+    ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;
-    ScopedPointer<GraphEditorPanel> graph;
-    Shared<Monitor> playbackMonitor;
+    StretchableLayoutManager layout;
     
-    friend class Timer;
-    void timerCallback() override;
+    class Resizer; friend class Resizer;
+    ScopedPointer<Resizer> bar1;
+    
+    class Toolbar; friend class Toolbar;
+    ScopedPointer<Toolbar> toolBar;
+    
+    class StatusBar; friend class StatusBar;
+    ScopedPointer<StatusBar> statusBar;
+    
+    bool statusBarVisible;
+    int statusBarSize;
+    bool toolBarVisible;
+    int toolBarSize;
+    
+    void resizerMouseDown();
+    void resizerMouseUp();
+    void updateLayout();
 };
 
 }

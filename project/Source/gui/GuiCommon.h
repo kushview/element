@@ -20,7 +20,7 @@
 #ifndef ELEMENT_GUI_COMMON_H
 #define ELEMENT_GUI_COMMON_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Session.h"
 #include "Globals.h"
 #include "gui/GuiApp.h"

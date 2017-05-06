@@ -23,7 +23,6 @@ public:
 
     void cancelDelayedSelectionTimer();
 
-    //==============================================================================
     virtual Font getFont() const;
     virtual String getRenamingName() const = 0;
     virtual String getDisplayName() const = 0;
@@ -47,10 +46,6 @@ public:
     virtual void showPopupMenu();
     virtual void handlePopupMenuResult (int resultCode);
 
-    //==============================================================================
-    // To handle situations where an item gets deleted before openness is
-    // restored for it, this OpennessRestorer keeps only a pointer to the
-    // topmost tree item.
     struct WholeTreeOpennessRestorer   : public OpennessRestorer
     {
         WholeTreeOpennessRestorer (TreeViewItem& item)  : OpennessRestorer (getTopLevelItem (item))
@@ -95,25 +90,12 @@ private:
     void invokeShowDocument();
 };
 
-//==============================================================================
 class TreePanelBase   : public Component
 {
 public:
-    TreePanelBase (const String& treeviewID)
-        : opennessStateKey (treeviewID)
-    {
-        addAndMakeVisible (&tree);
-        tree.setRootItemVisible (true);
-        tree.setDefaultOpenness (true);
-        tree.setColour (TreeView::backgroundColourId, Colour (0xff202020));
-        tree.setIndentSize (14);
-        tree.getViewport()->setScrollBarThickness (14);
-    }
+    explicit TreePanelBase (const String& treeviewID = "treePanelBase");
 
-    ~TreePanelBase()
-    {
-        tree.setRootItem (nullptr);
-    }
+    ~TreePanelBase();
 
     void setRoot (TreeItemBase* root);
     virtual void saveOpenness();
@@ -126,9 +108,9 @@ public:
 
     void setEmptyTreeMessage (const String& newMessage)
     {
-        if (emptyTreeMessage != newMessage)
+        if (emptyTreeMessage.getValue().toString() != newMessage)
         {
-            emptyTreeMessage = newMessage;
+            emptyTreeMessage.setValue (newMessage);
             repaint();
         }
     }
@@ -139,13 +121,16 @@ public:
         const Rectangle<int> area (comp.getLocalBounds());
         g.setColour (Colours::black.contrasting (0.7f));
         g.setFont ((float) fontHeight);
-        g.drawFittedText (message, area.reduced (4, 2), Justification::centred, area.getHeight() / fontHeight);
+        g.drawFittedText (message, area.reduced (4, 2),
+                          Justification::centred,
+                          area.getHeight() / fontHeight);
     }
 
     void paint (Graphics& g) override
     {
-        if (emptyTreeMessage.isNotEmpty() && (rootItem == nullptr || rootItem->getNumSubItems() == 0))
-            drawEmptyPanelMessage (*this, g, emptyTreeMessage);
+        g.fillAll (LookAndFeel_E1::backgroundColor);
+        if (emptyTreeMessage.getValue() != var::null && (rootItem == nullptr || rootItem->getNumSubItems() == 0))
+            drawEmptyPanelMessage (*this, g, emptyTreeMessage.getValue());
     }
 
     void resized() override
@@ -157,15 +142,15 @@ public:
     {
         return Rectangle<int> (0, 2, getWidth() - 2, getHeight() - 2);
     }
-
+    
     TreeView tree;
     ScopedPointer<TreeItemBase> rootItem;
 
 private:
-    String opennessStateKey, emptyTreeMessage;
+    String opennessStateKey;
+    Value emptyTreeMessage;
 };
 
-//==============================================================================
 class TreeItemComponent   : public Component
 {
 public:

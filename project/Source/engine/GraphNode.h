@@ -1,7 +1,7 @@
 #ifndef EL_GRAPH_NODE_H
 #define EL_GRAPH_NODE_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
     
@@ -95,11 +95,13 @@ private:
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*);
     void unprepare();
-
+    void resetPorts();
+    
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
-
-    ValueTree metadata;
+    
+    ChannelConfig channels;
+    ValueTree metadata, node;
     GraphProcessor* parent;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };

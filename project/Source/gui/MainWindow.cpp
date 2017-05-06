@@ -17,24 +17,22 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "ContentComponent.h"
-#include "MainMenu.h"
-#include "MainWindow.h"
+#include "gui/ContentComponent.h"
+#include "gui/MainMenu.h"
+#include "gui/MainWindow.h"
+#include "CommandManager.h"
 
 namespace Element {
-
-    MainWindow::MainWindow (GuiApp& gui_)
-        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
-          gui (gui_)
+    MainWindow::MainWindow (CommandManager& cmd)
+        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false)
     {
         setUsingNativeTitleBar (true);
         setResizable (true, false);
-
-        mainMenu = new MainMenu (*this);
-        gui.commander().registerAllCommandsForTarget (mainMenu);
-        gui.commander().setFirstCommandTarget (mainMenu);
-        addKeyListener (gui.commander().getKeyMappings());
+        
+        mainMenu = new MainMenu (*this, cmd);
         mainMenu->setupMenu();
+        
+        addKeyListener (cmd.getKeyMappings());
     }
 
     MainWindow::~MainWindow()
@@ -42,8 +40,7 @@ namespace Element {
         mainMenu = nullptr;
     }
 
-    void
-    MainWindow::closeButtonPressed()
+    void MainWindow::closeButtonPressed()
     {
         JUCEApplication* app (JUCEApplication::getInstance());
         app->systemRequestedQuit();
@@ -51,6 +48,7 @@ namespace Element {
 
     void MainWindow::refreshMenu()
     {
-        if (mainMenu) mainMenu->menuItemsChanged();
+        if (mainMenu)
+            mainMenu->menuItemsChanged();
     }
 }

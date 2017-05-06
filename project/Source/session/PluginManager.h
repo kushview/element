@@ -20,7 +20,7 @@
 #ifndef ELEMENT_PLUGIN_MANAGER_H
 #define ELEMENT_PLUGIN_MANAGER_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 
 namespace Element {
 

@@ -1,24 +1,10 @@
 /*
     GuiApp.cpp - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "controllers/AppController.h"
 #include "engine/AudioEngine.h"
-
 #include "gui/NewSessionView.h"
 #include "gui/AboutComponent.h"
 #include "gui/Alerts.h"
@@ -28,9 +14,10 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"
+#include "gui/ConnectionGrid.h"
+#include "session/MediaManager.h"
+#include "session/UnlockStatus.h"
 
-#include "EngineControl.h"
-#include "MediaManager.h"
 #include "Globals.h"
 #include "Settings.h"
 
@@ -81,27 +68,21 @@ private:
     int milliseconds;
 };
 
-GuiApp::GuiApp (Globals& w)
-    : world(w),
+GuiApp::GuiApp (Globals& w, AppController& a)
+    : controller(a), world(w),
       windowManager (nullptr),
       mainWindow (nullptr)
 {
     dispatch = new Dispatch (*this);
     LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     windowManager = new WindowManager (*this);
+    commander().registerAllCommandsForTarget (this);
 }
 
 GuiApp::~GuiApp()
 {
-    PropertiesFile* pf = globals().settings().getUserSettings();
+    PropertiesFile* pf = globals().getSettings().getUserSettings();
     pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
-
-    File f (sessionDoc->getFile());
-    if (f.existsAsFile()) {
-        pf->setValue ("lastSession", f.getFullPathName());
-    }
-
-    render.detach();
 
     mainWindow->setVisible (false);
     mainWindow->removeFromDesktop();
@@ -111,14 +92,14 @@ GuiApp::~GuiApp()
     LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
-GuiApp* GuiApp::create (Globals& g)
+GuiApp* GuiApp::create (Globals& g, AppController& a)
 {
-    GuiApp* theGui (new GuiApp (g));
+    GuiApp* theGui (new GuiApp (g, a));
     return theGui;
 }
 
 CommandManager& GuiApp::commander() {
-    return world.getCommands();
+    return world.getCommandManager();
 }
 
 Globals& GuiApp::globals()
@@ -128,9 +109,10 @@ Globals& GuiApp::globals()
 
 void GuiApp::openWindow (const String& uri)
 {
-    if (uri == ELEMENT_PLUGIN_MANAGER) {
+    if (uri == ELEMENT_PLUGIN_MANAGER)
+    {
         for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;) {
-            if (PluginListWindow* w = dynamic_cast<PluginListWindow*>(DocumentWindow::getTopLevelWindow (i))) {
+            if (PluginListWindow* w = dynamic_cast<PluginListWindow*> (DocumentWindow::getTopLevelWindow (i))) {
                 w->closeButtonPressed();
                 mainWindow->refreshMenu();
                 return;
@@ -162,7 +144,7 @@ void GuiApp::runDialog (const String& uri)
     if (uri == ELEMENT_PREFERENCES)
     {
         DialogOptions opts;
-        opts.content.set (new PreferencesWidget (*this), true);
+        opts.content.set (new PreferencesComponent (*this), true);
         opts.dialogTitle = "Preferences";
         opts.componentToCentreAround = (Component*) mainWindow.get();
 
@@ -186,36 +168,17 @@ void GuiApp::runDispatch() { }
 
 void GuiApp::run()
 {
-   // commander().registerAllCommandsForTarget (JUCEApplication::getInstance());
-    commander().registerAllCommandsForTarget (this);
-
-    globals().session().open();
-    sessionDoc = new SessionDocument (globals().session());
-
-    content = new ContentComponent (*this);
+    content = new ContentComponent (controller, *this);
     content->setSize (800, 600);
-    mainWindow = new MainWindow (*this);
+    mainWindow = new MainWindow (commander());
     mainWindow->setContentNonOwned (content.get(), true);
+    mainWindow->centreWithSize (content->getWidth(), content->getHeight());
 
-    PropertiesFile* pf = globals().settings().getUserSettings();
+    PropertiesFile* pf = globals().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (commander().getKeyMappings());
-
-   #if JUCE_IOS || JUCE_ANDROID
-    Desktop& d = Desktop::getInstance();
-    d.setKioskModeComponent (mainWindow);
-   #endif
-
     mainWindow->addToDesktop();
     mainWindow->setVisible (true);
-    dispatch->startTimer (250);
-
-    File sess (pf->getValue ("lastSession"));
-    if (sess.existsAsFile()) {
-        sessionDoc->loadFrom (sess, true);
-        mainWindow->setName (sessionDoc->getDocumentTitle());
-        content->stabilize();
-    }
 }
 
 bool GuiApp::shutdownApp()
@@ -247,21 +210,20 @@ bool GuiApp::shutdownApp()
         }
     }
 
-    if (result) {
+    if (result)
+    {
         windowManager->closeAll();
         session()->close();
         session()->clear();
-        session()->controller()->clear();
     }
 
     return result;
 }
 
-SessionRef
-GuiApp::session()
+SessionRef GuiApp::session()
 {
     if (sessionRef.get() == nullptr)
-        sessionRef = globals().session().makeRef();
+        sessionRef = globals().getSession().makeRef();
 
     return sessionRef;
 }
@@ -283,30 +245,16 @@ void GuiApp::openSession()
 
 void GuiApp::newSession()
 {
-    if (sessionDoc->hasChangedSinceSaved()) {
+    if (sessionDoc->hasChangedSinceSaved())
         sessionDoc->save (true, true);
-        // content->stabilize();
-    }
 
-    DialogWindow::LaunchOptions opts;
-    opts.dialogBackgroundColour = Colours::darkgrey;
-    opts.content.set (new NewSessionView (globals().session()), true);
-    opts.dialogTitle = "New Session";
-    opts.resizable = false;
-    opts.useBottomRightCornerResizer = false;
-    opts.useNativeTitleBar = true;
-    opts.componentToCentreAround = (Component*) mainWindow.get();
-    if (DialogWindow* dw = opts.create())
-    {
-        windowManager->push (dw);
-
-        sessionDoc->setFile (File::nonexistent);
-        globals().session().clear();
-        globals().session().open();
-
-        // content->stabilize();
-        sessionDoc->setChangedFlag (false);
-    }
+    sessionDoc->setFile (File::nonexistent);
+    globals().getSession().clear();
+    globals().getSession().open();
+    sessionDoc->setChangedFlag (false);
+    
+    content->stabilize();
+    mainWindow->setName (session()->getProperty (Slugs::name));
 }
 
 void GuiApp::saveSession (bool saveAs)
@@ -364,7 +312,6 @@ void GuiApp::getAllCommands (Array <CommandID>& commands)
 
 void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
-
     if (Commands::devicePadPress <= commandID && (Commands::devicePadPress + 13) > commandID)
     {
         result.setInfo (("Pad Press"), "Triggers sounds.", "Beat Thang Hardware", ApplicationCommandInfo::dontTriggerVisualFeedback);

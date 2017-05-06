@@ -1,34 +1,22 @@
 /*
     GuiApp.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+    Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
 #ifndef ELEMENT_GUIAPP_H
 #define ELEMENT_GUIAPP_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "session/Session.h"
-#include "gui/Preferences.h"
+#include "gui/LookAndFeel.h"
+#include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
 #include "CommandManager.h"
 #include "URIs.h"
 
 namespace Element {
     class AboutComponent;
+    class AppController;
     class EngineControl;
     class Globals;
     class ContentComponent;
@@ -40,11 +28,13 @@ namespace Element {
     public:
         virtual ~GuiApp();
 
-        static GuiApp* create (Globals& globals);
+        static GuiApp* create (Globals&, AppController&);
         void run();
 
         CommandManager& commander();
 
+        AppController& getAppController() const { return controller; }
+        
         Globals& globals();
 
         /** Open an application window by uri
@@ -88,11 +78,11 @@ namespace Element {
         virtual bool perform (const InvocationInfo& info);
 
     protected:
-        GuiApp (Globals&);
+        GuiApp (Globals&, AppController&);
 
     private:
+        AppController& controller;
         Globals& world;
-        OpenGLContext render;
         SessionRef sessionRef;
         ScopedPointer<SessionDocument> sessionDoc;
 
@@ -101,7 +91,7 @@ namespace Element {
         Scoped<ContentComponent>  content;
         Scoped<AboutComponent>    about;
 
-        LookAndFeel_E1            lookAndFeel;
+        Element::LookAndFeel      lookAndFeel;
 
         class Dispatch;
         ScopedPointer<Dispatch>   dispatch;

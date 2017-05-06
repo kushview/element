@@ -20,7 +20,7 @@
 #ifndef ELEMENT_WINDOW_MANAGER_H
 #define ELEMENT_WINDOW_MANAGER_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
 #include "Commands.h"
 #include "gui/Window.h"
 

@@ -20,7 +20,8 @@
 #ifndef ELEMENT_WINDOW_H
 #define ELEMENT_WINDOW_H
 
-#include "element/Juce.h"
+#include "ElementApp.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -49,15 +50,12 @@ namespace Element {
     class WindowHook
     {
     public:
-
         WindowHook() { }
         virtual ~WindowHook() { Logger::writeToLog("~WindowHook()"); }
         inline Signal& signalClosed() { return closedSignal; }
 
     protected:
-
         Signal  closedSignal;
-
     };
 
     /** A juce DialogWindow that emits a closed signal */
@@ -77,7 +75,7 @@ namespace Element {
 
     /** A juce DocumentWindow that emits a closed signal */
     class Window : public DocumentWindow,
-            public WindowHook
+                   public WindowHook
     {
     public:
         Window (const String& name, GuiApp&);

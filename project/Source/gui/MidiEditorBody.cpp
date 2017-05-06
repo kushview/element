@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <boost/bind.hpp>
 #include "session/NoteSequence.h"
 #include "gui/MidiEditorBody.h"
 
@@ -76,7 +77,7 @@ MidiEditorBody::~MidiEditorBody()
 void
 MidiEditorBody::addNote (int note, float start, float length, int channel)
 {
-    assert (sequence.get() != nullptr);
+    jassert (sequence.get() != nullptr);
     sequence->addNote (note, start, length, channel);
 }
 

@@ -20,7 +20,7 @@
 #ifndef ELEMENT_ENGINE_PROCESSOR_H
 #define ELEMENT_ENGINE_PROCESSOR_H
 
-#include <element/Juce.h>
+#include "ElementApp.h"
 #include <element/engine/Processor.h>
 
 #include "Transport.h"
