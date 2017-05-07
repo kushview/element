@@ -35,6 +35,7 @@ public:
       #if JUCE_MAC
         macMenu = new PopupMenu();
         macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
+        macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
         macMenu->addSeparator();
         macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
@@ -107,7 +108,10 @@ private:
 
     void buildFileMenu (PopupMenu& menu)
     {
+        menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
        #if ! JUCE_MAC
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showPreferences, "Check For Updates..");
         menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);

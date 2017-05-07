@@ -297,6 +297,8 @@
       <FILE id="WhwWGx" name="Settings.h" compile="0" resource="0" file="Source/Settings.h"/>
       <FILE id="Eg6hYr" name="Signals.h" compile="0" resource="0" file="Source/Signals.h"/>
       <FILE id="dCZvEA" name="URIs.h" compile="0" resource="0" file="Source/URIs.h"/>
+      <FILE id="ob9I3e" name="Version.cpp" compile="1" resource="0" file="Source/Version.cpp"/>
+      <FILE id="JimWDd" name="Version.h" compile="0" resource="0" file="Source/Version.h"/>
       <FILE id="zSi9fC" name="WorldBase.cpp" compile="1" resource="0" file="Source/WorldBase.cpp"/>
       <FILE id="yZQybR" name="WorldBase.h" compile="0" resource="0" file="Source/WorldBase.h"/>
     </GROUP>

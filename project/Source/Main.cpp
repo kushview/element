@@ -13,6 +13,7 @@
 #include "gui/Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
+#include "Version.h"
 #include "Settings.h"
 
 namespace Element {
@@ -178,6 +179,7 @@ public:
         controller = startup->controller.release();
         startup = nullptr;
         controller->run();
+        CurrentVersion::checkAfterDelay (5000);
     }
     
 private:

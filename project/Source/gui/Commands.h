@@ -88,7 +88,9 @@ namespace Commands {
 
         exportAudio            = 0x9030,
         exportMidi             = 0x9031,
-
+        
+        checkNewerVersion      = 0x9032,
+        
         transportRewind        = deviceSeekBack,
         transportForward       = deviceSeekForward,
         transportPlay          = devicePlay,

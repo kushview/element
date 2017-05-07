@@ -20,6 +20,7 @@
 
 #include "Globals.h"
 #include "Settings.h"
+#include "Version.h"
 
 namespace Element {
 
@@ -259,6 +260,9 @@ void GuiApp::newSession()
 
 void GuiApp::saveSession (bool saveAs)
 {
+    if (! sessionDoc)
+        return;
+
     if (! saveAs) {
         sessionDoc->save (true, true);
     } else {
@@ -292,6 +296,7 @@ void GuiApp::getAllCommands (Array <CommandID>& commands)
         Commands::showPreferences,
         Commands::showPluginManager,
         Commands::mediaSave,
+        Commands::checkNewerVersion,
         Commands::transportRewind,
         Commands::transportForward,
         Commands::transportPlay,
@@ -350,7 +355,7 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             result.setInfo ("Open Session", "Open an existing session", "Session", 0);
             break;
         case Commands::sessionSave:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Session", "Save the current session", "Session", 0);
             break;
         case Commands::sessionSaveAs:
@@ -370,6 +375,9 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             break;
         case Commands::showPluginManager:
             result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
+            break;
+        case Commands::checkNewerVersion:
+            result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
             break;
         
         case Commands::quit:
@@ -447,11 +455,16 @@ bool GuiApp::perform (const InvocationInfo& info)
     bool result = true;
     switch (info.commandID)
     {
+        case Commands::checkNewerVersion: {
+            CurrentVersion::checkAfterDelay (14, true);
+        } break;
+        
         case Commands::mediaSave: {
             //if (MediaManager::Document* doc = sr->media().openFile (sr.get(), pattern->getFile()))
              //   doc->save();
             return true;
-        }
+        } break;
+        
         case Commands::sessionClose:
             return true;
             break;
