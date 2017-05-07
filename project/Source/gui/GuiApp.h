@@ -11,7 +11,7 @@
 #include "gui/LookAndFeel.h"
 #include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
-#include "CommandManager.h"
+#include "session/CommandManager.h"
 #include "URIs.h"
 
 namespace Element {

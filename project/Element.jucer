@@ -127,7 +127,6 @@
               file="Source/gui/AudioIOPanelView.cpp"/>
         <FILE id="CqOHs6" name="AudioIOPanelView.h" compile="0" resource="0"
               file="Source/gui/AudioIOPanelView.h"/>
-        <FILE id="Eyh8a2" name="Commands.h" compile="0" resource="0" file="Source/gui/Commands.h"/>
         <FILE id="sg07lP" name="ConnectionGrid.cpp" compile="1" resource="0"
               file="Source/gui/ConnectionGrid.cpp"/>
         <FILE id="EZVC8d" name="ConnectionGrid.h" compile="0" resource="0"
@@ -240,6 +239,8 @@
         <FILE id="ty2bp0" name="BlockModel.cpp" compile="1" resource="0" file="Source/session/BlockModel.cpp"/>
         <FILE id="zkZsrO" name="BlockModel.h" compile="0" resource="0" file="Source/session/BlockModel.h"/>
         <FILE id="IsKejY" name="ClipModel.h" compile="0" resource="0" file="Source/session/ClipModel.h"/>
+        <FILE id="lcKFiX" name="CommandManager.h" compile="0" resource="0"
+              file="Source/session/CommandManager.h"/>
         <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
               file="Source/session/DeviceManager.cpp"/>
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
@@ -280,8 +281,8 @@
               file="Source/session/UnlockStatus.cpp"/>
         <FILE id="UnTwR7" name="UnlockStatus.h" compile="0" resource="0" file="Source/session/UnlockStatus.h"/>
       </GROUP>
-      <FILE id="IVf5gW" name="CommandManager.h" compile="0" resource="0"
-            file="Source/CommandManager.h"/>
+      <FILE id="lFdHY3" name="Commands.cpp" compile="1" resource="0" file="Source/Commands.cpp"/>
+      <FILE id="aH8YyX" name="Commands.h" compile="0" resource="0" file="Source/Commands.h"/>
       <FILE id="K6661n" name="DataPath.cpp" compile="1" resource="0" file="Source/DataPath.cpp"/>
       <FILE id="AAnMXa" name="DataPath.h" compile="0" resource="0" file="Source/DataPath.h"/>
       <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="Source/ElementApp.h"/>

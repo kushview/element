@@ -9,7 +9,7 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "Commands.h"
-#include "CommandManager.h"
+#include "session/CommandManager.h"
 #include "URIs.h"
 
 namespace Element {
@@ -64,20 +64,17 @@ public:
         return StringArray (names, MainMenu::NumMenus);
     }
 
-    PopupMenu getMenuForIndex (int index, const String& name) override
+    PopupMenu getMenuForIndex (int, const String& name) override
     {
-       #if JUCE_MAC
-        --index;
-       #endif
         PopupMenu menu;
-        if (index == MainMenu::File)
+        if (name == "File")
             buildFileMenu (menu);
-        else if (index == MainMenu::Window)
+        else if (name == "Window")
             buildWindowMenu (menu);
-        else if (index == MainMenu::Help)
+        else if (name == "Help")
             buildHelpMenu (menu);
        #if JUCE_DEBUG
-        else if (index == MainMenu::DebugItem)
+        else if (name == "Debug")
             buildDebugMenu (menu);
        #endif
 
@@ -105,10 +102,24 @@ public:
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
-
+    
+    PopupMenu makeFileNewMenu()
+    {
+        PopupMenu menu;
+        menu.addItem (2000, "Graph");
+        return menu;
+    }
+    
     void buildFileMenu (PopupMenu& menu)
     {
+        menu.addSubMenu ("New", makeFileNewMenu());
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open");
+        menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::signIn, "Sign In");
+        
        #if ! JUCE_MAC
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPreferences, "Check For Updates..");
@@ -116,7 +127,8 @@ private:
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
        #endif
-#if 0
+       
+       #if 0
         ApplicationCommandManager* acm = &owner.app().commander();
         menu.addCommandItem (acm, Commands::sessionNew, "New Session");
         menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
@@ -124,7 +136,7 @@ private:
         menu.addSeparator();
         menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
         menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-#endif
+       #endif
     }
     
     void buildEditMenu (PopupMenu& menu)

@@ -281,38 +281,7 @@ void GuiApp::getAllCommands (Array <CommandID>& commands)
 {
     Commands::getDevicePadCommands (commands);
     Commands::getDeviceTrackCommands (commands);
-
-    const CommandID cmds[] = {
-        Commands::exportAudio,
-        Commands::exportMidi,
-        Commands::mediaClose,
-        Commands::sessionClose,
-        Commands::sessionNew,
-        Commands::sessionOpen,
-        Commands::sessionSave,
-        Commands::sessionSaveAs,
-        Commands::showAbout,
-        Commands::showLegacyView,
-        Commands::showPreferences,
-        Commands::showPluginManager,
-        Commands::mediaSave,
-        Commands::checkNewerVersion,
-        Commands::transportRewind,
-        Commands::transportForward,
-        Commands::transportPlay,
-        Commands::transportRecord,
-        Commands::transportSeekZero,
-        Commands::transportStop,
-        Commands::quit,
-        Commands::undo,
-        Commands::redo,
-        Commands::cut,
-        Commands::copy,
-        Commands::paste,
-        Commands::selectAll,
-    };
-
-    commands.addArray (cmds, numElementsInArray (cmds));
+    Commands::getApplicationCommands (commands);
 }
 
 void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -339,29 +308,28 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
         case Commands::exportMidi:
             result.setInfo ("Exort MIDI", "Export to a MIDI file", "Exporting", 0);
             break;
-        case Commands::mediaClose:
-            result.setInfo ("Close Media", "Close the current media", "Application", 0);
-            break;
+
         case Commands::sessionClose:
-            result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
+//            result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
             result.setInfo ("Close Session", "Close the current session", "Session", 0);
             break;
         case Commands::sessionNew:
-            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+//            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
             result.setInfo ("New Session", "Create a new session", "Session", 0);
             break;
         case Commands::sessionOpen:
-            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
+//            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
             result.setInfo ("Open Session", "Open an existing session", "Session", 0);
             break;
         case Commands::sessionSave:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+//            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Session", "Save the current session", "Session", 0);
             break;
         case Commands::sessionSaveAs:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+//            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Session As", "Save the current session with a new name", "Session", 0);
             break;
+
         case Commands::showPreferences:
             result.setInfo ("Show Preferences", "BTV Preferences", "Application", 0);
             result.addDefaultKeypress (',', ModifierKeys::commandModifier);
@@ -380,33 +348,49 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
             break;
         
+        case Commands::mediaClose:
+            result.setInfo ("Close Media", "Close the current media", "Application", 0);
+            break;
+        case Commands::mediaSave:
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
+            result.setInfo ("Close Media", "Saves the currently viewed object", "Session Media", 0);
+            break;
+        case Commands::mediaSaveAs:
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Close Media", "Saves the current object with another name", "Session Media", 0);
+            break;
+        
+        case Commands::signIn:
+            result.setInfo ("Sign In", "Saves the current object with another name", "Application", 0);
+            break;
+        case Commands::signOut:
+            result.setInfo ("Sign Out", "Saves the current object with another name", "Application",   0);
+            break;
+
         case Commands::quit:
             result.setActive (false);
             result.setInfo("Quit", "Quit the app", "Application", 0);
             result.addDefaultKeypress ('q', ModifierKeys::commandModifier);
             break;
-        case StandardApplicationCommandIDs::undo:
-            result.setInfo ("Undo", "Element Plugin Management", "Application", 0);
+        case Commands::undo:
+            result.setInfo ("Undo", "Undo the last operation", "Application", 0);
             break;
-         case StandardApplicationCommandIDs::redo:
-            result.setInfo ("Redo", "Element Plugin Management", "Application", 0);
+        case Commands::redo:
+            result.setInfo ("Redo", "Redo the last operation", "Application", 0);
             break;
-        case StandardApplicationCommandIDs::cut:
-            result.setInfo ("Cut", "Element Plugin Management", "Application", 0);
+        case Commands::cut:
+            result.setInfo ("Cut", "Cut", "Application", 0);
             break;
-         case StandardApplicationCommandIDs::copy:
-            result.setInfo ("Copy", "Element Plugin Management", "Application", 0);
+        case Commands::copy:
+            result.setInfo ("Copy", "Copy", "Application", 0);
             break;
-         case StandardApplicationCommandIDs::paste:
-            result.setInfo ("Paste", "Element Plugin Management", "Application", 0);
+        case Commands::paste:
+            result.setInfo ("Paste", "Paste", "Application", 0);
             break;
-         case StandardApplicationCommandIDs::selectAll:
-            result.setInfo ("Select All", "Element Plugin Management", "Application", 0);
+        case Commands::selectAll:
+            result.setInfo ("Select All", "Select all", "Application", 0);
             break;
-        case Commands::mediaSave:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-            result.setInfo ("Close Media", "Closes the currently edited object", "Session Media", 0);
-            break;
+        
         case Commands::transportRewind:
             result.setInfo ("Rewind", "Transport Rewind", "Playback", 0);
             result.addDefaultKeypress ('j', 0);

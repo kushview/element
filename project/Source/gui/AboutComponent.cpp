@@ -19,7 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "gui/GuiApp.h"
-#include "CommandManager.h"
+#include "session/CommandManager.h"
 //[/Headers]
 
 #include "AboutComponent.h"

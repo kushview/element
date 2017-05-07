@@ -3,7 +3,7 @@
 #define EL_APP_CONTROLLER_H
 
 #include "controllers/Controller.h"
-#include "CommandManager.h"
+#include "session/CommandManager.h"
 
 namespace Element {
 class Globals;

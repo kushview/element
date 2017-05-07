@@ -3,8 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_COMMANDS_H
-#define EL_COMMANDS_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -88,8 +87,11 @@ namespace Commands {
 
         exportAudio            = 0x9030,
         exportMidi             = 0x9031,
-        
+
         checkNewerVersion      = 0x9032,
+
+        signIn,
+        signOut,
         
         transportRewind        = deviceSeekBack,
         transportForward       = deviceSeekForward,
@@ -101,13 +103,60 @@ namespace Commands {
 
    namespace Categories
    {
+       static const char* const application   = "Application";
        static const char* const general       = "General";
        static const char* const editing       = "Editing";
        static const char* const view          = "View";
        static const char* const windows       = "Windows";
    }
-
-   inline bool isDeviceTrackCommand (CommandID cmd) {
+    
+    inline void getApplicationCommands (Array<CommandID>& commands)
+    {
+        const CommandID cmds[] = {
+            Commands::exportAudio,
+            Commands::exportMidi,
+            
+            Commands::sessionClose,
+            Commands::sessionNew,
+            Commands::sessionOpen,
+            Commands::sessionSave,
+            Commands::sessionSaveAs,
+            
+            Commands::showAbout,
+            Commands::showLegacyView,
+            Commands::showPreferences,
+            Commands::showPluginManager,
+            
+            Commands::mediaClose,
+            Commands::mediaSave,
+            Commands::mediaSaveAs,
+            
+            Commands::checkNewerVersion,
+            
+            Commands::signIn,
+            Commands::signOut,
+            
+            Commands::transportRewind,
+            Commands::transportForward,
+            Commands::transportPlay,
+            Commands::transportRecord,
+            Commands::transportSeekZero,
+            Commands::transportStop,
+            
+            Commands::quit,
+            Commands::undo,
+            Commands::redo,
+            Commands::cut,
+            Commands::copy,
+            Commands::paste,
+            Commands::selectAll
+        };
+        
+        commands.addArray (cmds, numElementsInArray (cmds));
+    }
+    
+   inline bool isDeviceTrackCommand (CommandID cmd)
+   {
        return (cmd >= Commands::deviceTrack && cmd < Commands::deviceTrack + 16);
    }
 
@@ -156,5 +205,3 @@ namespace Commands {
        return true;
    }
 }}
-
-#endif /* EL_COMMANDS_H */

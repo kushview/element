@@ -12,7 +12,7 @@
 #include "session/UnlockStatus.h"
 #include "Settings.h"
 #include "URIs.h"
-#include "CommandManager.h"
+#include "session/CommandManager.h"
 #include "Globals.h"
 
 namespace Element {
