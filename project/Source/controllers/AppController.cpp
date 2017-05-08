@@ -3,6 +3,7 @@
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
 #include "gui/GuiApp.h"
+#include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Messages.h"
@@ -98,7 +99,7 @@ bool AppController::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::signIn: {
-            auto* form = new OnlineUnlockForm (world.getUnlockStatus(), "Sign In", true);
+            auto* form = new UnlockForm (world.getUnlockStatus(), "Sign in to authorize your software.", true);
             DialogWindow::LaunchOptions opts;
             opts.content.setOwned (form);
             opts.resizable = false;
