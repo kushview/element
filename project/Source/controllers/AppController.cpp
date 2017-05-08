@@ -84,6 +84,7 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 
 void AppController::getAllCommands (Array<CommandID>& commands)
 {
+    commands.add (Commands::mediaSave);
     commands.add (Commands::signIn);
 }
 
@@ -95,11 +96,25 @@ void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& r
 
 bool AppController::perform (const InvocationInfo& info)
 {
+    auto& status (world.getUnlockStatus());
     bool res = true;
     switch (info.commandID)
     {
+        case Commands::mediaSave: {
+            if (! status.isUnlocked())
+            {
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+                    "Unauthorized",
+                    "Saving is only available with a paid version of this software. Visit https://kushview.net/products/element to purchase a copy");
+            }
+            else
+            {
+                
+            }
+        } break;
+        
         case Commands::signIn: {
-            auto* form = new UnlockForm (world.getUnlockStatus(), "Sign in to authorize your software.", true);
+            auto* form = new UnlockForm (status, "Please provide your kushview.net email and password to authorize this software.", true);
             DialogWindow::LaunchOptions opts;
             opts.content.setOwned (form);
             opts.resizable = false;

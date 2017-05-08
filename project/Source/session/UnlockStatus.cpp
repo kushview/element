@@ -34,7 +34,7 @@ namespace Element {
     String UnlockStatus::getState()
     {
         if (auto* const props = settings.getUserSettings())
-            return props->getValue ("license");
+            return props->getValue (EL_LICENSE_SETTINGS_KEY);
         return String();
     }
     

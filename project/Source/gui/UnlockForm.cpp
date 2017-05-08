@@ -249,7 +249,6 @@ void UnlockForm::attemptRegistration()
         }
         
         status.setUserEmail (emailBox.getText());
-        
         addAndMakeVisible (unlockingOverlay = new OverlayComp (*this));
         resized();
         unlockingOverlay->enterModalState();
@@ -258,6 +257,7 @@ void UnlockForm::attemptRegistration()
 
 void UnlockForm::dismiss()
 {
+    status.save();
     if (auto *dw = findParentComponentOfClass<DialogWindow>())
         delete dw;
     else

@@ -8,9 +8,10 @@
 
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
-#include "Commands.h"
 #include "session/CommandManager.h"
-#include "URIs.h"
+#include "session/UnlockStatus.h"
+#include "Commands.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -112,13 +113,14 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
-        menu.addSubMenu ("New", makeFileNewMenu());
-        menu.addSeparator();
+//        menu.addSubMenu ("New", makeFileNewMenu());
+//        menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaOpen, "Open");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
+        
         menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::signIn, "Sign In");
+        menu.addCommandItem (&cmd, Commands::signIn, "Authorize...");
         
        #if ! JUCE_MAC
         menu.addSeparator();
