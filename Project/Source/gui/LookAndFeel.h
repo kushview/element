@@ -1,6 +1,5 @@
 
-#ifndef EL_APP_LOOK_AND_FEEL_H
-#define EL_APP_LOOK_AND_FEEL_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -26,7 +25,3 @@ public:
 };
 
 }
-
-
-
-#endif  // EL_APP_LOOK_AND_FEEL_H
