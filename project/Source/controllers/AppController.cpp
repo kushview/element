@@ -2,8 +2,8 @@
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
-
 #include "gui/GuiApp.h"
+#include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Messages.h"
 
@@ -75,16 +75,40 @@ void AppController::handleMessage (const Message& msg)
     }
 }
 
+
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
     return gui.get();
 }
 
-void AppController::getAllCommands (Array<CommandID>&) { }
-void AppController::getCommandInfo (CommandID, ApplicationCommandInfo&) { }
-bool AppController::perform (const InvocationInfo&)
+void AppController::getAllCommands (Array<CommandID>& commands)
 {
-    return false;
+    commands.add (Commands::signIn);
+}
+
+void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
+{
+    if (gui)
+        gui->getCommandInfo (command, result);
+}
+
+bool AppController::perform (const InvocationInfo& info)
+{
+    bool res = true;
+    switch (info.commandID)
+    {
+        case Commands::signIn: {
+            auto* form = new OnlineUnlockForm (world.getUnlockStatus(), "Sign In", true);
+            DialogWindow::LaunchOptions opts;
+            opts.content.setOwned (form);
+            opts.resizable = false;
+            opts.dialogTitle = "Authorization";
+            opts.launchAsync();
+        } break;
+        
+        default: res = false; break;
+    }
+    return res;
 }
 
 }
