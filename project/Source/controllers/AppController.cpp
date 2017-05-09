@@ -2,6 +2,7 @@
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
+#include "engine/GraphProcessor.h"
 #include "gui/GuiApp.h"
 #include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
@@ -109,7 +110,26 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
+                GraphProcessor& graph (world.getAudioEngine()->graph());
                 
+                if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elgraph"))
+                {
+                    const ValueTree model (graph.getGraphState());
+                    FileOutputStream stream (lastSavedFile);
+                    model.writeToStream (stream);
+                }
+                
+                else
+                {
+                    FileChooser chooser ("Save current graph", File(), "elgraph");
+                    if (chooser.browseForFileToSave (true))
+                    {
+                        lastSavedFile = chooser.getResult();
+                        const ValueTree model (graph.getGraphState());
+                        FileOutputStream stream (lastSavedFile);
+                        model.writeToStream (stream);
+                    }
+                }
             }
         } break;
         

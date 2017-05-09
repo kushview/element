@@ -32,6 +32,7 @@ protected:
     
 private:
     friend class Application;
+    File lastSavedFile;
     Globals& world;
     CommandManager commands;
     ScopedPointer<GuiApp> gui;
