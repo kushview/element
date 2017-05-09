@@ -85,8 +85,11 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 
 void AppController::getAllCommands (Array<CommandID>& commands)
 {
-    commands.add (Commands::mediaSave);
-    commands.add (Commands::signIn);
+    commands.addArray ({
+        Commands::mediaOpen,
+        Commands::mediaSave,
+        Commands::signIn
+    });
 }
 
 void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
@@ -101,7 +104,23 @@ bool AppController::perform (const InvocationInfo& info)
     bool res = true;
     switch (info.commandID)
     {
-        case Commands::mediaSave: {
+        case Commands::mediaOpen:
+        {
+            FileChooser chooser ("Open a graph", File(), "*.elgraph;*.elg");
+            if (chooser.browseForFileToOpen())
+            {
+                lastSavedFile = chooser.getResult();
+                FileInputStream stream (lastSavedFile);
+                const ValueTree g (ValueTree::readFromStream (stream));
+                if (g.isValid())
+                {
+                    const Node node (g, false);
+                }
+            }
+        } break;
+            
+        case Commands::mediaSave:
+        {
             if (! status.isUnlocked())
             {
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
@@ -121,7 +140,7 @@ bool AppController::perform (const InvocationInfo& info)
                 
                 else
                 {
-                    FileChooser chooser ("Save current graph", File(), "elgraph");
+                    FileChooser chooser ("Save current graph", File(), "*.elgraph");
                     if (chooser.browseForFileToSave (true))
                     {
                         lastSavedFile = chooser.getResult();
@@ -133,7 +152,8 @@ bool AppController::perform (const InvocationInfo& info)
             }
         } break;
         
-        case Commands::signIn: {
+        case Commands::signIn:
+        {
             auto* form = new UnlockForm (status, "Please provide your kushview.net email and password to authorize this software.", true);
             DialogWindow::LaunchOptions opts;
             opts.content.setOwned (form);

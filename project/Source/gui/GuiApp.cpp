@@ -351,6 +351,10 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
         case Commands::mediaClose:
             result.setInfo ("Close Media", "Close the current media", "Application", 0);
             break;
+        case Commands::mediaOpen:
+            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
+            result.setInfo ("Open Media", "Opens a type of supported media", "Session Media", 0);
+            break;
         case Commands::mediaSave:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
             result.setInfo ("Close Media", "Saves the currently viewed object", "Session Media", 0);

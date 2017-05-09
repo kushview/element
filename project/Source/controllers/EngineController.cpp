@@ -124,10 +124,10 @@ void EngineController::activate()
         for (int i = 0; i < arcs.getNumChildren(); ++i)
         {
             const ValueTree arc (arcs.getChild (i));
-            addConnection ((uint32)(int) arc.getProperty("sourceNode"),
-                           (uint32)(int) arc.getProperty("sourcePort"),
-                           (uint32)(int) arc.getProperty("destNode"),
-                           (uint32)(int) arc.getProperty("destPort"));
+            addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
+                           (uint32)(int) arc.getProperty (Tags::sourcePort),
+                           (uint32)(int) arc.getProperty (Tags::destNode),
+                           (uint32)(int) arc.getProperty (Tags::destPort));
         }
         
         jassert (arcs.getNumChildren() == root->getNumConnections());
