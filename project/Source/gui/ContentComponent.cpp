@@ -56,8 +56,12 @@ class ContentComponent::Toolbar : public Component,
                                   public ButtonListener
 {
 public:
-    Toolbar() : grid ("Grid"), graph("Graph")
+    Toolbar()
+        : grid ("Grid"),
+          graph("Graph"),
+          title ("No selection")
     {
+        // addAndMakeVisible (title);
         addAndMakeVisible (grid);
 //        grid.setColour (TextButton::buttonColourId, Colors::toggleOrange.darker());
         grid.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
@@ -77,6 +81,8 @@ public:
         Rectangle<int> r (getLocalBounds());
         // graph.setBounds (r.removeFromRight(60).reduced(1 ,3));
         grid.setBounds (r.removeFromRight(60).reduced(1, 3));
+        r.removeFromLeft (10);
+        title.setBounds (r);
     }
     
     void paint (Graphics& g) override
@@ -100,8 +106,11 @@ public:
         btn->setToggleState (nextState, dontSendNotification);
         DBG("TOGLED: " << String(btn->getToggleState()));
     }
+    
+    Value& getTitleValue() { return title.getTextValue(); }
 private:
     TextButton grid, graph;
+    Label title;
 };
 
 class ContentComponent::StatusBar : public Component,

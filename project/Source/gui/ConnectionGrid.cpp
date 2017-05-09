@@ -80,8 +80,8 @@ namespace Element {
                                          private ValueTree::Listener
     {
     public:
-        PatchMatrix()
-            : useHighlighting(false),
+        PatchMatrix ()
+            : useHighlighting (true),
               matrix()
         {
             setSize (300, 200);
@@ -231,6 +231,7 @@ namespace Element {
         friend class ConnectionGrid;
         friend class Sources;
         friend class Destinations;
+
         bool useHighlighting;
         MatrixState matrix;
         ValueTree nodeModels;
@@ -270,6 +271,15 @@ namespace Element {
             {
                 g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
                 g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
+            }
+        }
+        
+        void listBoxItemClicked (int row, const MouseEvent& ev, bool isSource)
+        {
+            if (ev.mods.isPopupMenu())
+            {
+                const Node node (getNode (row, isSource));
+                showMenuForNode (node);
             }
         }
         
@@ -417,12 +427,7 @@ namespace Element {
         
         void listBoxItemClicked (int row, const MouseEvent& ev) override
         {
-            if (ev.mods.isPopupMenu())
-            {
-                const Node node (matrix->getNode (row, true));
-                return matrix->showMenuForNode (node);
-            }
-            
+            matrix->listBoxItemClicked (row, ev, true);
             jassert (row == getSelectedRow());
         }
 
@@ -495,10 +500,8 @@ namespace Element {
 
         void listBoxItemClicked (int row, const MouseEvent& ev) override
         {
-            if (! ev.mods.isPopupMenu())
-                return;
-            const Node node (matrix->getNode (row, true));
-            matrix->showMenuForNode (node);
+            matrix->listBoxItemClicked (row, ev, false);
+            jassert (row == getSelectedRow());
         }
         
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
@@ -590,7 +593,7 @@ namespace Element {
     ConnectionGrid::ConnectionGrid()
     {
         addAndMakeVisible (quads = new Quads());
-        quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix());
+        quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix ());
         quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
         quads->setQuadrantComponent (Quads::Q3, controls = new Controls());
         quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
