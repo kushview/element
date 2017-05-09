@@ -64,26 +64,29 @@ public:
         grid.setToggleState (true, dontSendNotification);
         grid.addListener (this);
         
-        addAndMakeVisible (graph);
-//        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
-        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-        graph.addListener (this);
+//        addAndMakeVisible (graph);
+////        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
+//        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+//        graph.addListener (this);
     }
     
     ~Toolbar() { }
     
-    void resized() override {
+    void resized() override
+    {
         Rectangle<int> r (getLocalBounds());
-        graph.setBounds (r.removeFromRight(60).reduced(1 ,3));
+        // graph.setBounds (r.removeFromRight(60).reduced(1 ,3));
         grid.setBounds (r.removeFromRight(60).reduced(1, 3));
     }
     
-    void paint (Graphics& g) override {
+    void paint (Graphics& g) override
+    {
         g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
         g.fillRect (getLocalBounds());
     }
     
-    void buttonClicked (Button* btn) override {
+    void buttonClicked (Button* btn) override
+    {
         if (btn->getToggleState())
             return;
         const bool nextState = !btn->getToggleState();
@@ -165,18 +168,6 @@ public:
         streamingStatusLabel.setBounds (r.removeFromLeft (r.getWidth() / 2));
         sampleRateLabel.setBounds(r);
     }
-    
-#if 0
-    void setDevice (const Driver& driver)
-    {
-        node = driver.node();
-        
-        sampleRate.referTo (node.getPropertyAsValue (Tags::sampleRate, nullptr));
-        streamingStatus.referTo (node.getPropertyAsValue (Tags::streamingStateName, nullptr));
-        status = "Ready";
-        updateLabels();
-    }
-#endif
     
     void valueChanged (Value&) override
     {
