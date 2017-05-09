@@ -273,7 +273,6 @@ void GraphNode::unprepare()
         }
         
         metadata.addChild (ports, 0, nullptr);
-        DBG(metadata.getChildWithName (Tags::ports).toXmlString());
     }
     
 AudioPluginInstance* GraphNode::getAudioPluginInstance() const
