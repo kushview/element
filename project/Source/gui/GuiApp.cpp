@@ -348,6 +348,10 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
             break;
         
+        case Commands::mediaNew:
+            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+            result.setInfo ("New Media", "Close the current media", "Application", 0);
+            break;
         case Commands::mediaClose:
             result.setInfo ("Close Media", "Close the current media", "Application", 0);
             break;

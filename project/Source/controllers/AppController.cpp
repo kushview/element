@@ -86,8 +86,8 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 void AppController::getAllCommands (Array<CommandID>& commands)
 {
     commands.addArray ({
-        Commands::mediaOpen,
-        Commands::mediaSave,
+        Commands::mediaNew,  Commands::mediaOpen,
+        Commands::mediaSave, Commands::mediaSaveAs,
         Commands::signIn
     });
 }
@@ -104,6 +104,10 @@ bool AppController::perform (const InvocationInfo& info)
     bool res = true;
     switch (info.commandID)
     {
+        case Commands::mediaNew: {
+            DBG("NEW GRAPH");
+        } break;
+            
         case Commands::mediaOpen:
         {
             FileChooser chooser ("Open a graph", File(), "*.elgraph;*.elg");
@@ -150,6 +154,10 @@ bool AppController::perform (const InvocationInfo& info)
                     }
                 }
             }
+        } break;
+        
+        case Commands::mediaSaveAs: {
+            DBG("SAVE AS...");
         } break;
         
         case Commands::signIn:

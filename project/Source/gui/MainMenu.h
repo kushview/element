@@ -115,9 +115,11 @@ private:
     {
 //        menu.addSubMenu ("New", makeFileNewMenu());
 //        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::mediaNew, "New Graph");
         menu.addCommandItem (&cmd, Commands::mediaOpen, "Open");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
+        menu.addCommandItem (&cmd, Commands::mediaSaveAs, "Save As...");
         
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::signIn, "Authorize...");

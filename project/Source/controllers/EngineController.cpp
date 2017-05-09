@@ -145,7 +145,7 @@ void EngineController::deactivate()
 void EngineController::changeListenerCallback (ChangeBroadcaster*)
 {
     if (auto* app = dynamic_cast<AppController*> (getRoot())) {
-        ignoreUnused(app);
+        ignoreUnused (app);
     }
 }
 }
