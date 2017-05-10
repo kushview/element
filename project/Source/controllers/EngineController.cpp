@@ -118,7 +118,7 @@ void EngineController::activate()
             jassert(nodeId == node.getNodeId());
             if (GraphNodePtr obj = root->getNodeForId (nodeId))
             {
-                DBG("Added plugin: " << node.getName());
+                DBG("[EL] Added plugin: " << node.getName());
             }
         }
         
