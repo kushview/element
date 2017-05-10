@@ -132,8 +132,7 @@ bool AppController::perform (const InvocationInfo& info)
             if (! status.isUnlocked())
             {
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Unauthorized",
-                    "Saving is only available with a paid version of this software. Visit https://kushview.net/products/element to purchase a copy");
+                    "Unauthorized", "Saving is only available with a paid version of this software. Visit https://kushview.net/products/element to purchase a copy");
             }
             else
             {
@@ -161,7 +160,23 @@ bool AppController::perform (const InvocationInfo& info)
         } break;
         
         case Commands::mediaSaveAs: {
-            DBG("SAVE AS...");
+            if (! status.isUnlocked())
+            {
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+                    "Unauthorized", "Saving is only available with a paid version of this software. Visit https://kushview.net/products/element to purchase a copy");
+            }
+            else
+            {
+                GraphProcessor& graph (world.getAudioEngine()->graph());
+                FileChooser chooser ("Save current graph", File(), "*.elgraph");
+                if (chooser.browseForFileToSave (true))
+                {
+                    lastSavedFile = chooser.getResult();
+                    const ValueTree model (graph.getGraphState());
+                    FileOutputStream stream (lastSavedFile);
+                    model.writeToStream (stream);
+                }
+            }
         } break;
         
         case Commands::signIn:
