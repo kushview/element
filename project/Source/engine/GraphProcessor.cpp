@@ -754,16 +754,14 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
-    //graphModel.removeListener (this);
-    graphModel.removeChild (arcsModel, nullptr);
-    graphModel.removeChild (nodesModel, nullptr);
-    arcsModel = graphModel.getOrCreateChildWithName(Tags::arcs, nullptr);
-    nodesModel = graphModel.getOrCreateChildWithName(Tags::nodes, nullptr);
+    arcsModel.removeAllChildren (nullptr);
+    nodesModel.removeAllChildren (nullptr);
+    arcsModel = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
+    nodesModel = graphModel.getOrCreateChildWithName (Tags::nodes, nullptr);
     nodes.clear();
     connections.clear();
     //triggerAsyncUpdate();
     handleAsyncUpdate();
-    //graphModel.addListener (this);
 }
 
 GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const

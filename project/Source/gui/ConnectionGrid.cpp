@@ -366,22 +366,36 @@ namespace Element {
         virtual void valueTreeChildAdded (ValueTree& parentTree,
                                           ValueTree& childWhichHasBeenAdded) override
         {
-            if (nodeModels == parentTree && childWhichHasBeenAdded.hasType(Tags::node))
+            if (parentTree == nodeModels.getParent() && childWhichHasBeenAdded.hasType(Tags::nodes)) {
                 buildNodeArray();
+                resetMatrix();
+            } else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType(Tags::node)) {
+                buildNodeArray();
+            }
         }
         
         virtual void valueTreeChildRemoved (ValueTree& parentTree,
                                             ValueTree& childWhichHasBeenRemoved,
                                             int indexFromWhichChildWasRemoved) override
         {
-            if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node))
+            if (parentTree == nodeModels.getParent() && childWhichHasBeenRemoved.hasType(Tags::nodes)) {
                 buildNodeArray();
+                resetMatrix();
+            } else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node)) {
+                buildNodeArray();
+            }
         }
         
         virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
                                                  int oldIndex, int newIndex) override { }
         
-        virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override { }
+        virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override
+        {
+            if (treeWhoseParentHasChanged.hasType (Tags::nodes))
+            {
+                nodeModels = treeWhoseParentHasChanged;
+            }
+        }
         
         virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override
         {

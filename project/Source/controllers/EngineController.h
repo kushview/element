@@ -3,6 +3,7 @@
 namespace Element {
     
 class GraphController;
+class Node;
     
 class EngineController : public Controller,
                          private ChangeListener
@@ -20,6 +21,8 @@ public:
     void addConnection (const uint32, const uint32, const uint32, const uint32);
     void connectChannels (const uint32, const int, const uint32, const int);
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
+    
+    void setRootNode (const Node&);
     
 private:
     ScopedPointer<GraphController> root;

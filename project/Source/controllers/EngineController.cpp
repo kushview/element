@@ -101,6 +101,9 @@ void EngineController::activate()
     
     if (ScopedXml xml = settings.getLastGraph())
     {
+        const Node lastGraph (ValueTree::fromXml (*xml), false);
+        setRootNode (lastGraph);
+#if 0
         root->clear();
         
         const Node lastGraph (ValueTree::fromXml (*xml), false);
@@ -131,6 +134,7 @@ void EngineController::activate()
         }
         
         jassert (arcs.getNumChildren() == root->getNumConnections());
+#endif
     }
     
     engine->activate();
@@ -140,6 +144,44 @@ void EngineController::activate()
 void EngineController::deactivate()
 {
     Controller::deactivate();
+}
+
+void EngineController::setRootNode (const Node& node)
+{
+    if (! node.hasNodeType (Tags::graph)) {
+        jassertfalse; // needs to be a graph
+        return;
+    }
+    
+    root->clear();
+    
+    const ValueTree nodes (node.getNodesValueTree());
+    const ValueTree arcs (node.getArcsValueTree());
+    
+    for (int i = 0; i < nodes.getNumChildren(); ++i)
+    {
+        const Node node (nodes.getChild(i), false);
+        PluginDescription desc; node.getPluginDescription (desc);
+        const uint32 nodeId = root->addFilter (&desc, 0.0, 0.0, node.getNodeId());
+        jassert(nodeId == node.getNodeId());
+        if (GraphNodePtr obj = root->getNodeForId (nodeId))
+        {
+            DBG("Added plugin: " << node.getName());
+        }
+    }
+    
+    jassert (nodes.getNumChildren() == root->getNumFilters());
+    
+    for (int i = 0; i < arcs.getNumChildren(); ++i)
+    {
+        const ValueTree arc (arcs.getChild (i));
+        addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
+                       (uint32)(int) arc.getProperty (Tags::sourcePort),
+                       (uint32)(int) arc.getProperty (Tags::destNode),
+                       (uint32)(int) arc.getProperty (Tags::destPort));
+    }
+    
+    jassert (arcs.getNumChildren() == root->getNumConnections());
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster*)

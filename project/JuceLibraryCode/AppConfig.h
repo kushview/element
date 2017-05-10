@@ -16,7 +16,13 @@
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
 
-// (You can add your own code in this section, and the Projucer will not overwrite it)
+#if _MSC_VER
+ #pragma warning(disable: 4100) // unreferenced formal param
+ #pragma warning(disable: 4244) // convert possible data loss
+ #pragma warning(disable: 4245) // signed/unsigned mismatch
+ #pragma warning(disable: 4373) // virtual override params minor differences
+ #pragma warning(disable: 4702) // unreachable code
+#endif
 
 // [END_USER_CODE_SECTION]
 

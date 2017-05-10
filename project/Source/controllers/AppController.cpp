@@ -100,6 +100,9 @@ void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& r
 
 bool AppController::perform (const InvocationInfo& info)
 {
+    EngineController* ec = findChild<EngineController>();
+    jassert(ec);
+    
     auto& status (world.getUnlockStatus());
     bool res = true;
     switch (info.commandID)
@@ -119,6 +122,7 @@ bool AppController::perform (const InvocationInfo& info)
                 if (g.isValid())
                 {
                     const Node node (g, false);
+                    ec->setRootNode (node);
                 }
             }
         } break;
