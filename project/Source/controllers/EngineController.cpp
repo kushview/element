@@ -146,6 +146,12 @@ void EngineController::deactivate()
     Controller::deactivate();
 }
 
+void EngineController::clear()
+{
+    if (root)
+        root->clear();
+}
+
 void EngineController::setRootNode (const Node& node)
 {
     if (! node.hasNodeType (Tags::graph)) {

@@ -108,7 +108,11 @@ bool AppController::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::mediaNew: {
-            DBG("NEW GRAPH");
+            if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", "This will clear the current graph, are you sure?"))
+            {
+                lastSavedFile = File();
+                ec->clear();
+            }
         } break;
             
         case Commands::mediaOpen:

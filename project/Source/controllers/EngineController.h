@@ -22,6 +22,7 @@ public:
     void connectChannels (const uint32, const int, const uint32, const int);
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
     
+    void clear();
     void setRootNode (const Node&);
     
 private:
