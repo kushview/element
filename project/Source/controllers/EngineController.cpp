@@ -103,38 +103,6 @@ void EngineController::activate()
     {
         const Node lastGraph (ValueTree::fromXml (*xml), false);
         setRootNode (lastGraph);
-#if 0
-        root->clear();
-        
-        const Node lastGraph (ValueTree::fromXml (*xml), false);
-        const ValueTree nodes (lastGraph.getNodesValueTree());
-        const ValueTree arcs (lastGraph.getArcsValueTree());
-        
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
-            const Node node (nodes.getChild(i), false);
-            PluginDescription desc; node.getPluginDescription (desc);
-            const uint32 nodeId = root->addFilter (&desc, 0.0, 0.0, node.getNodeId());
-            jassert(nodeId == node.getNodeId());
-            if (GraphNodePtr obj = root->getNodeForId (nodeId))
-            {
-                DBG("[EL] Added plugin: " << node.getName());
-            }
-        }
-        
-        jassert (nodes.getNumChildren() == root->getNumFilters());
-        
-        for (int i = 0; i < arcs.getNumChildren(); ++i)
-        {
-            const ValueTree arc (arcs.getChild (i));
-            addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
-                           (uint32)(int) arc.getProperty (Tags::sourcePort),
-                           (uint32)(int) arc.getProperty (Tags::destNode),
-                           (uint32)(int) arc.getProperty (Tags::destPort));
-        }
-        
-        jassert (arcs.getNumChildren() == root->getNumConnections());
-#endif
     }
     
     engine->activate();
