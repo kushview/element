@@ -322,7 +322,7 @@
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=1"/>
+                       defines="EL_USE_LOCAL_AUTH=0"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
