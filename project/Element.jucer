@@ -350,44 +350,6 @@
         <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2015 targetFolder="Builds/VisualStudio2015" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
-            smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
-            rtasFolder="">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       characterSet="MultiByte" binaryPath="../build/Win32/Debug" useRuntimeLibDLL="0"/>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       binaryPath="../build/Win32/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
-        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       characterSet="MultiByte" binaryPath="../build/x64/Debug" useRuntimeLibDLL="0"/>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       binaryPath="../build/x64/Release" useRuntimeLibDLL="0" characterSet="MultiByte"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE\modules"/>
-      </MODULEPATHS>
-    </VS2015>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
             extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1"
             smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v141_xp" cppLanguageStandard="stdcpp14">
@@ -395,7 +357,7 @@
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/Win32/Debug"
                        headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
-                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=1"/>
+                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/Win32/Release"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
@@ -403,7 +365,7 @@
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
                        binaryPath="../build/x64/Debug" characterSet="MultiByte" useRuntimeLibDLL="1"
-                       defines="EL_USE_LOCAL_AUTH=1"/>
+                       defines="EL_USE_LOCAL_AUTH=0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/x64/Release"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_58_0&#10;C:\SDKs\ASIOSDK2.3\common&#10;C:\SDKs\vstsdk2.4&#10;../../Source&#10;../../../libs/lv2&#10;"
