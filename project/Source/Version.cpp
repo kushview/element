@@ -8,6 +8,29 @@
 Version::Version() { }
 Version::~Version() { }
 
+StringArray Version::segments (const String& versionString)
+{
+    StringArray segments;
+    segments.addTokens (versionString, ",.", "");
+    segments.trim();
+    segments.removeEmptyStrings();
+    return segments;
+}
+
+int Version::asHexInteger (const String& versionString)
+{
+    const StringArray segs (segments (versionString));
+    
+    int value = (segs[0].getIntValue() << 16)
+              + (segs[1].getIntValue() << 8)
+              + segs[2].getIntValue();
+    
+    if (segs.size() >= 4)
+        value = (value << 8) + segs[3].getIntValue();
+    
+    return value;
+}
+
 CurrentVersion::CurrentVersion()
     : version (ProjectInfo::versionString),
       hasChecked (false) { }

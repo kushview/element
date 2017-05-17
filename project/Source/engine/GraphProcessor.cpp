@@ -304,7 +304,7 @@ private:
     Array <uint32> allNodes [PortType::Unknown];
     Array <uint32> allPorts [PortType::Unknown];
 
-    enum { freeNodeID = 0xffffffff, zeroNodeID = 0xfffffffe };
+    enum { freeNodeID = 0xffffffff, zeroNodeID = 0xfffffffe, anonymousNodeID = 0xfffffffd };
 
     static bool isNodeBusy (uint32 nodeID) noexcept { return nodeID != freeNodeID && nodeID != zeroNodeID; }
 
@@ -397,7 +397,7 @@ private:
                 continue;
             }
 
-            jassert (proc->isPortInput(port));
+            jassert (proc->isPortInput (port));
 
             const int inputChan = proc->getChannelPort (port);
 
@@ -521,7 +521,9 @@ private:
                     // can't re-use any of our input chans, so get a new one and copy everything into it..
                     bufIndex = getFreeBuffer (portType);
                     jassert (bufIndex != 0);
-
+                    
+                    markBufferAsContaining (bufIndex, portType, anonymousNodeID, 0);
+                    
                     const int srcIndex = getBufferContaining (portType, sourceNodes.getUnchecked (0),
                                                                         sourcePorts.getUnchecked (0));
                     if (srcIndex < 0)

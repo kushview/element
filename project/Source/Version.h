@@ -9,29 +9,10 @@ struct Version
     ~Version();
     
     /** Split a version string into an array of segments */
-    inline static StringArray segments (const String& versionString)
-    {
-        StringArray segments;
-        segments.addTokens (versionString, ",.", "");
-        segments.trim();
-        segments.removeEmptyStrings();
-        return segments;
-    }
+    static StringArray segments (const String& versionString);
     
     /** Converts version segments into an integer, good for version comparison */
-    inline static int asHexInteger (const String& versionString)
-    {
-        const StringArray segs (segments (versionString));
-
-        int value = (segs[0].getIntValue() << 16)
-                  + (segs[1].getIntValue() << 8)
-                  + segs[2].getIntValue();
-        
-        if (segs.size() >= 4)
-            value = (value << 8) + segs[3].getIntValue();
-        
-        return value;
-    }
+    static int asHexInteger (const String& versionString);
 };
 
 class CurrentVersion : private Timer

@@ -89,7 +89,7 @@
 // element_gui flags:
 
 #ifndef    ELEMENT_DOCKING_WINDOWS
- //#define ELEMENT_DOCKING_WINDOWS
+ #define   ELEMENT_DOCKING_WINDOWS 0
 #endif
 
 //==============================================================================

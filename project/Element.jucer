@@ -421,7 +421,7 @@
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
                JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"
                JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled" JUCE_USE_MP3AUDIOFORMAT="disabled"
-               JUCE_USE_LAME_AUDIO_FORMAT="disabled"/>
+               JUCE_USE_LAME_AUDIO_FORMAT="disabled" ELEMENT_DOCKING_WINDOWS="disabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>
