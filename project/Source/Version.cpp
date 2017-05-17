@@ -55,7 +55,8 @@ void CurrentVersion::timerCallback()
     }
     else if (shouldShowUpToDateMessage)
     {
-        String msg = "Element v"; msg << version << " is currently the newest version available.";
+        String msg = "Element v";
+        msg << ProjectInfo::versionString << " is currently the newest version available.";
         AlertWindow::showMessageBox(AlertWindow::InfoIcon, "You're up-to-date.", msg);
     }
     
