@@ -21,10 +21,33 @@ namespace Element {
         URL getServerAuthenticationURL() override;
         StringArray getLocalMachineIDs() override;
     
+        inline bool isFullVersion() const
+        {
+            if (! (bool) isUnlocked())
+                return false;
+            
+            StringArray ids; Array<int> pids;
+            ids.addTokens (edd["ownedPriceIDs"].toString(), ",", String());
+            for (const auto& i : ids)
+            {
+                const int ii = atoi(i.trim().toRawUTF8());
+                if (ii > 1) pids.add(ii);
+            }
+            
+            return pids.contains (2);
+        }
+        
         inline void dump()
         {
+           #if JUCE_DEBUG
+            DBG("UNLOCKED: " << ((bool) isUnlocked() ? "yes" : "no"));
+            DBG("DL ID:    " << edd["downloadID"].toString());
+            DBG("PIDS:     " << edd["ownedPriceIDs"].toString());
+            DBG("FULL:     " << (isFullVersion() ? "yes" : "no"));
             
+            DBG("EDD XML:");
             DBG (edd.toXmlString());
+           #endif
         }
         
     protected:

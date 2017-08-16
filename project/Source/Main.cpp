@@ -134,7 +134,6 @@ public:
         world = new Globals (commandLine);
         UnlockStatus& status (world->getUnlockStatus());
         
-        DBG("UNLOCKED: " << ((bool)status.isUnlocked() ? "yes" : "no"));
         status.dump();
         
         launchApplication();

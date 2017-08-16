@@ -35,15 +35,13 @@ namespace Element {
             {
                 MemoryOutputStream mo;
                 GZIPCompressorOutputStream gzip (&mo, 9);
-                edd.writeToStream (gzip);
-                gzip.flush();
+                edd.writeToStream (gzip); gzip.flush();
                 state.setProperty ("edd", mo.getMemoryBlock().toBase64Encoding(), nullptr);
             }
             
             MemoryOutputStream mo2;
             GZIPCompressorOutputStream gzip2 (&mo2, 9);
-            state.writeToStream (gzip2);
-            gzip2.flush();
+            state.writeToStream (gzip2); gzip2.flush();
             props->setValue (EL_LICENSE_SETTINGS_KEY, mo2.getMemoryBlock().toBase64Encoding());
         }
     }
