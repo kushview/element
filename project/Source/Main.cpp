@@ -132,6 +132,11 @@ public:
     {
         initializeModulePath();
         world = new Globals (commandLine);
+        UnlockStatus& status (world->getUnlockStatus());
+        
+        DBG("UNLOCKED: " << ((bool)status.isUnlocked() ? "yes" : "no"));
+        status.dump();
+        
         launchApplication();
     }
 
@@ -139,6 +144,9 @@ public:
     {
         if (! world)
             return;
+        
+        UnlockStatus& status (world->getUnlockStatus());
+        status.save();
         
         controller->deactivate();
 

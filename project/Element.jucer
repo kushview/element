@@ -349,6 +349,7 @@
         <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
         <MODULEPATH id="kv_models" path="../libs/element/modules"/>
         <MODULEPATH id="kv_video" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_edd" path="../../edd-juce-examples/Modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
@@ -392,6 +393,7 @@
         <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
         <MODULEPATH id="kv_models" path="../libs/element/modules"/>
         <MODULEPATH id="kv_video" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_edd" path="../../edd-juce-examples/Modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -410,6 +412,7 @@
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_product_unlocking" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="kv_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_edd" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_engines" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_lv2" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

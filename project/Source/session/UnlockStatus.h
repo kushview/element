@@ -7,7 +7,7 @@ namespace Element {
     class Globals;
     class Settings;
     
-    class UnlockStatus :  public OnlineUnlockStatus
+    class UnlockStatus :  public kv::EDDOnlineUnlockStatus
     {
     public:
         UnlockStatus (Globals&);
@@ -19,9 +19,24 @@ namespace Element {
         String getState() override;
         String getWebsiteName() override;
         URL getServerAuthenticationURL() override;
-        String readReplyFromWebserver (const String& email, const String& password) override;
         StringArray getLocalMachineIDs() override;
-
+    
+        inline void dump()
+        {
+            
+            DBG (edd.toXmlString());
+        }
+        
+    protected:
+        inline bool useLicenseKey() const override { return false; }
+        
+        inline StringPairArray getQueryParams() override
+        {
+            StringPairArray params;
+            params.set ("mach", getLocalMachineIDs()[0]);
+            return params;
+        }
+        
     private:
         Settings& settings;
     };

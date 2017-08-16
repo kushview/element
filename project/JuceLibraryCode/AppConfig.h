@@ -70,6 +70,7 @@ using namespace kv;
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra              1
 #define JUCE_MODULE_AVAILABLE_juce_product_unlocking      1
 #define JUCE_MODULE_AVAILABLE_kv_core                     1
+#define JUCE_MODULE_AVAILABLE_kv_edd                      1
 #define JUCE_MODULE_AVAILABLE_kv_engines                  1
 #define JUCE_MODULE_AVAILABLE_kv_gui                      1
 #define JUCE_MODULE_AVAILABLE_kv_lv2                      1

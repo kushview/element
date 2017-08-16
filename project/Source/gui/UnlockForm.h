@@ -8,7 +8,7 @@ class UnlockForm  : public Component,
 {
 public:
     /** Creates an unlock form that will work with the given status object.
-     The userInstructions will be displayed above the email and password boxes.
+        The userInstructions will be displayed above the email and password boxes.
      */
     UnlockForm (OnlineUnlockStatus&, const String& userInstructions,
                 bool hasCancelButton = true);

@@ -185,7 +185,7 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            auto* form = new UnlockForm (status, "Please provide your kushview.net email and password to authorize this software.", true);
+            auto* form = new UnlockForm (status, "Enter you email/username and license key.", true);
             DialogWindow::LaunchOptions opts;
             opts.content.setOwned (form);
             opts.resizable = false;

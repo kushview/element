@@ -205,9 +205,8 @@ void UnlockForm::resized()
 void UnlockForm::lookAndFeelChanged()
 {
     Colour labelCol (findColour (TextEditor::backgroundColourId).contrasting (0.5f));
-    
-    emailBox.setTextToShowWhenEmpty (TRANS("Email Address"), labelCol);
-    passwordBox.setTextToShowWhenEmpty (TRANS("Password"), labelCol);
+    emailBox.setTextToShowWhenEmpty (TRANS("Email/Username"), labelCol);
+    passwordBox.setTextToShowWhenEmpty (TRANS("License Key"), labelCol);
 }
 
 void UnlockForm::showBubbleMessage (const String& text, Component& target)
@@ -244,7 +243,7 @@ void UnlockForm::attemptRegistration()
         
         if (passwordBox.getText().trim().length() < 3)
         {
-            showBubbleMessage (TRANS ("Please enter a valid password!"), passwordBox);
+            showBubbleMessage (TRANS ("Please enter a valid license key!"), passwordBox);
             return;
         }
         

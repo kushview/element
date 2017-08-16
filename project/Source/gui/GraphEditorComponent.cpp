@@ -51,10 +51,7 @@ public:
             
             if (tip.isEmpty())
             {
-                if (false) //XXX index_ == GraphController::midiChannelNumber)
-                    tip = isInput ? "Midi Input" : "Midi Output";
-                else
-                    tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
+                tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
             }
 
             setTooltip (tip);
