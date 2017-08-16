@@ -14,11 +14,6 @@
 
 #include "AppConfig.h"
 
-#include <element_base/element_base.h>
-#include <element_engines/element_engines.h>
-#include <element_gui/element_gui.h>
-#include <element_lv2/element_lv2.h>
-#include <element_models/element_models.h>
 #include <juce_audio_basics/juce_audio_basics.h>
 #include <juce_audio_devices/juce_audio_devices.h>
 #include <juce_audio_formats/juce_audio_formats.h>
@@ -32,6 +27,12 @@
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_gui_extra/juce_gui_extra.h>
 #include <juce_product_unlocking/juce_product_unlocking.h>
+#include <kv_core/kv_core.h>
+#include <kv_engines/kv_engines.h>
+#include <kv_gui/kv_gui.h>
+#include <kv_lv2/kv_lv2.h>
+#include <kv_models/kv_models.h>
+#include <kv_video/kv_video.h>
 
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE

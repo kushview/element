@@ -2,9 +2,9 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.4.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.0.1" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.1.1" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark">
+              splashScreenColour="Dark" cppLanguageStandard="14">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
@@ -322,7 +322,7 @@
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0"/>
+                       defines="EL_USE_LOCAL_AUTH=1"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="3rd Party Mac Developer Application: Kushview, LLC (K7JD899TJ4)"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
@@ -342,12 +342,13 @@
         <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
         <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="kv_core" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_video" path="../libs/element/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
@@ -385,20 +386,16 @@
         <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="element_models" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_lv2" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_gui" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_engines" path="../libs/element/element/modules"/>
-        <MODULEPATH id="element_base" path="../libs/element/element/modules"/>
+        <MODULEPATH id="kv_core" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_video" path="../libs/element/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULES id="element_base" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="element_engines" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="element_gui" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="element_lv2" showAllCode="1" useLocalCopy="0"/>
-    <MODULES id="element_models" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
@@ -412,6 +409,12 @@
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="juce_product_unlocking" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="kv_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_engines" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_lv2" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_models" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="kv_video" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
@@ -421,7 +424,8 @@
                JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
                JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"
                JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled" JUCE_USE_MP3AUDIOFORMAT="disabled"
-               JUCE_USE_LAME_AUDIO_FORMAT="disabled" ELEMENT_DOCKING_WINDOWS="disabled"/>
+               JUCE_USE_LAME_AUDIO_FORMAT="disabled" ELEMENT_DOCKING_WINDOWS="disabled"
+               KV_LV2_PLUGIN_HOST="disabled"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>

@@ -35,7 +35,7 @@ struct UnlockForm::OverlayComp  : public Component,
     {
         g.fillAll (Colours::transparentBlack.withAlpha (0.50f));
         
-        g.setColour (Element::LookAndFeel_E1::textColor);
+        g.setColour (LookAndFeel_E1::textColor);
         g.setFont (15.0f);
         
         g.drawFittedText (TRANS("Contacting XYZ...").replace ("XYZ", form.status.getWebsiteName()),
@@ -149,7 +149,7 @@ UnlockForm::~UnlockForm()
 
 void UnlockForm::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel_E1::widgetBackgroundColor);
+    g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
 }
 
 void UnlockForm::resized()

@@ -23,9 +23,9 @@ RackView::~RackView()
 
 void RackView::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel_E1::backgroundColor);
+    g.fillAll (LookAndFeel_E1::backgroundColor);
     
-    g.setColour (Element::LookAndFeel_E1::elementBlue);
+    g.setColour (LookAndFeel_E1::elementBlue);
     g.setFont (14.0f);
     g.drawText ("No Selection...", getLocalBounds(),
                 Justification::centred, true);

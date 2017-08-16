@@ -24,7 +24,6 @@
 
 namespace Element {
     
-class RelativePath;
 
 class AssetTree :  private ValueTree::Listener
 {

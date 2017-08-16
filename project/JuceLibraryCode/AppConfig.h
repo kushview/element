@@ -24,6 +24,8 @@
  #pragma warning(disable: 4702) // unreachable code
 #endif
 
+namespace kv { }
+using namespace kv;
 // [END_USER_CODE_SECTION]
 
 /*
@@ -40,19 +42,20 @@
 
 // BEGIN SECTION A
 
-#define JUCE_DISPLAY_SPLASH_SCREEN 0
-#define JUCE_REPORT_APP_USAGE 0
+#ifndef JUCE_DISPLAY_SPLASH_SCREEN
+ #define JUCE_DISPLAY_SPLASH_SCREEN 0
+#endif
+
+#ifndef JUCE_REPORT_APP_USAGE
+ #define JUCE_REPORT_APP_USAGE 0
+#endif
+
 
 // END SECTION A
 
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
 
 //==============================================================================
-#define JUCE_MODULE_AVAILABLE_element_base                1
-#define JUCE_MODULE_AVAILABLE_element_engines             1
-#define JUCE_MODULE_AVAILABLE_element_gui                 1
-#define JUCE_MODULE_AVAILABLE_element_lv2                 1
-#define JUCE_MODULE_AVAILABLE_element_models              1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics           1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices          1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats          1
@@ -66,38 +69,14 @@
 #define JUCE_MODULE_AVAILABLE_juce_gui_basics             1
 #define JUCE_MODULE_AVAILABLE_juce_gui_extra              1
 #define JUCE_MODULE_AVAILABLE_juce_product_unlocking      1
-
-//==============================================================================
-#ifndef    JUCE_STANDALONE_APPLICATION
- #if defined(JucePlugin_Name) && defined(JucePlugin_Build_Standalone)
-  #define  JUCE_STANDALONE_APPLICATION JucePlugin_Build_Standalone
- #else
-  #define  JUCE_STANDALONE_APPLICATION 1
- #endif
-#endif
+#define JUCE_MODULE_AVAILABLE_kv_core                     1
+#define JUCE_MODULE_AVAILABLE_kv_engines                  1
+#define JUCE_MODULE_AVAILABLE_kv_gui                      1
+#define JUCE_MODULE_AVAILABLE_kv_lv2                      1
+#define JUCE_MODULE_AVAILABLE_kv_models                   1
+#define JUCE_MODULE_AVAILABLE_kv_video                    1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
-
-//==============================================================================
-// element_engines flags:
-
-#ifndef    ELEMENT_USE_JACK
- //#define ELEMENT_USE_JACK
-#endif
-
-//==============================================================================
-// element_gui flags:
-
-#ifndef    ELEMENT_DOCKING_WINDOWS
- #define   ELEMENT_DOCKING_WINDOWS 0
-#endif
-
-//==============================================================================
-// element_lv2 flags:
-
-#ifndef    ELEMENT_LV2_PLUGIN_HOST
- #define   ELEMENT_LV2_PLUGIN_HOST 0
-#endif
 
 //==============================================================================
 // juce_audio_devices flags:
@@ -131,18 +110,18 @@
 #endif
 
 #ifndef    JUCE_USE_WINRT_MIDI
- //#define JUCE_USE_WINRT_MIDI
+ //#define JUCE_USE_WINRT_MIDI 1
 #endif
 
 //==============================================================================
 // juce_audio_formats flags:
 
 #ifndef    JUCE_USE_FLAC
- //#define JUCE_USE_FLAC
+ //#define JUCE_USE_FLAC 1
 #endif
 
 #ifndef    JUCE_USE_OGGVORBIS
- //#define JUCE_USE_OGGVORBIS
+ //#define JUCE_USE_OGGVORBIS 1
 #endif
 
 #ifndef    JUCE_USE_MP3AUDIOFORMAT
@@ -154,14 +133,14 @@
 #endif
 
 #ifndef    JUCE_USE_WINDOWS_MEDIA_FORMAT
- //#define JUCE_USE_WINDOWS_MEDIA_FORMAT
+ //#define JUCE_USE_WINDOWS_MEDIA_FORMAT 1
 #endif
 
 //==============================================================================
 // juce_audio_processors flags:
 
 #ifndef    JUCE_PLUGINHOST_VST
- //#define JUCE_PLUGINHOST_VST
+ //#define JUCE_PLUGINHOST_VST 1
 #endif
 
 #ifndef    JUCE_PLUGINHOST_VST3
@@ -187,72 +166,72 @@
 // juce_core flags:
 
 #ifndef    JUCE_FORCE_DEBUG
- //#define JUCE_FORCE_DEBUG
+ //#define JUCE_FORCE_DEBUG 1
 #endif
 
 #ifndef    JUCE_LOG_ASSERTIONS
- //#define JUCE_LOG_ASSERTIONS
+ //#define JUCE_LOG_ASSERTIONS 1
 #endif
 
 #ifndef    JUCE_CHECK_MEMORY_LEAKS
- //#define JUCE_CHECK_MEMORY_LEAKS
+ //#define JUCE_CHECK_MEMORY_LEAKS 1
 #endif
 
 #ifndef    JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
- //#define JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES
+ //#define JUCE_DONT_AUTOLINK_TO_WIN32_LIBRARIES 1
 #endif
 
 #ifndef    JUCE_INCLUDE_ZLIB_CODE
- //#define JUCE_INCLUDE_ZLIB_CODE
+ //#define JUCE_INCLUDE_ZLIB_CODE 1
 #endif
 
 #ifndef    JUCE_USE_CURL
- //#define JUCE_USE_CURL
+ //#define JUCE_USE_CURL 1
 #endif
 
 #ifndef    JUCE_CATCH_UNHANDLED_EXCEPTIONS
- //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS
+ //#define JUCE_CATCH_UNHANDLED_EXCEPTIONS 1
 #endif
 
 #ifndef    JUCE_ALLOW_STATIC_NULL_VARIABLES
- //#define JUCE_ALLOW_STATIC_NULL_VARIABLES
+ //#define JUCE_ALLOW_STATIC_NULL_VARIABLES 1
 #endif
 
 //==============================================================================
 // juce_events flags:
 
 #ifndef    JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
- //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK
+ //#define JUCE_EXECUTE_APP_SUSPEND_ON_IOS_BACKGROUND_TASK 1
 #endif
 
 //==============================================================================
 // juce_graphics flags:
 
 #ifndef    JUCE_USE_COREIMAGE_LOADER
- //#define JUCE_USE_COREIMAGE_LOADER
+ //#define JUCE_USE_COREIMAGE_LOADER 1
 #endif
 
 #ifndef    JUCE_USE_DIRECTWRITE
- //#define JUCE_USE_DIRECTWRITE
+ //#define JUCE_USE_DIRECTWRITE 1
 #endif
 
 //==============================================================================
 // juce_gui_basics flags:
 
 #ifndef    JUCE_ENABLE_REPAINT_DEBUGGING
- //#define JUCE_ENABLE_REPAINT_DEBUGGING
+ //#define JUCE_ENABLE_REPAINT_DEBUGGING 1
 #endif
 
 #ifndef    JUCE_USE_XSHM
- //#define JUCE_USE_XSHM
+ //#define JUCE_USE_XSHM 1
 #endif
 
 #ifndef    JUCE_USE_XRENDER
- //#define JUCE_USE_XRENDER
+ //#define JUCE_USE_XRENDER 1
 #endif
 
 #ifndef    JUCE_USE_XCURSOR
- //#define JUCE_USE_XCURSOR
+ //#define JUCE_USE_XCURSOR 1
 #endif
 
 //==============================================================================
@@ -264,4 +243,33 @@
 
 #ifndef    JUCE_ENABLE_LIVE_CONSTANT_EDITOR
  #define   JUCE_ENABLE_LIVE_CONSTANT_EDITOR 0
+#endif
+
+//==============================================================================
+// kv_engines flags:
+
+#ifndef    KV_JACK_AUDIO
+ //#define KV_JACK_AUDIO 1
+#endif
+
+//==============================================================================
+// kv_gui flags:
+
+#ifndef    KV_DOCKING_WINDOWS
+ //#define KV_DOCKING_WINDOWS 1
+#endif
+
+//==============================================================================
+// kv_lv2 flags:
+
+#ifndef    KV_LV2_PLUGIN_HOST
+ #define   KV_LV2_PLUGIN_HOST 0
+#endif
+//==============================================================================
+#ifndef    JUCE_STANDALONE_APPLICATION
+ #if defined(JucePlugin_Name) && defined(JucePlugin_Build_Standalone)
+  #define  JUCE_STANDALONE_APPLICATION JucePlugin_Build_Standalone
+ #else
+  #define  JUCE_STANDALONE_APPLICATION 1
+ #endif
 #endif

@@ -47,7 +47,7 @@ namespace Element {
         uint32 getIndex() const
         {
             const int index = getProperty (Slugs::index, -1);
-            return index >= 0 ? static_cast<uint32> (index) : ELEMENT_INVALID_PORT;
+            return index >= 0 ? static_cast<uint32> (index) : KV_INVALID_PORT;
         }
     
         operator uint32() const { return getIndex(); }

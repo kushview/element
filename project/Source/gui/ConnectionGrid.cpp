@@ -141,14 +141,14 @@ namespace Element {
             if (useHighlighting &&
                     (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
             {
-                g.setColour (Element::LookAndFeel_E1::elementBlue.withAlpha (0.3f));
+                g.setColour (kv::LookAndFeel_E1::elementBlue.withAlpha (0.3f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
             else
             {
                 g.setColour (matrix.connected (row, column) ?
-                             Colour (Element::LookAndFeel_E1::elementBlue.brighter()) :
-                             Colour (Element::LookAndFeel_E1::defaultMatrixCellOffColor));
+                             Colour (kv::LookAndFeel_E1::elementBlue.brighter()) :
+                             Colour (kv::LookAndFeel_E1::defaultMatrixCellOffColor));
         
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }

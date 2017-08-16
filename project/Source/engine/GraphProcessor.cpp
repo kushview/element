@@ -282,7 +282,7 @@ public:
         for (int i = 0; i < PortType::Unknown; ++i)
         {
             allNodes[i].add ((uint32) zeroNodeID);  // first buffer is read-only zeros
-            allPorts[i].add (ELEMENT_INVALID_PORT);
+            allPorts[i].add (KV_INVALID_PORT);
         }
 
         for (int i = 0; i < orderedNodes.size(); ++i)
@@ -658,7 +658,7 @@ private:
             for (int i = 0; i < nodes.size(); ++i)
             {
                 if (isNodeBusy (nodes.getUnchecked (i))
-                     && ! isBufferNeededLater (stepIndex, ELEMENT_INVALID_PORT,
+                     && ! isBufferNeededLater (stepIndex, KV_INVALID_PORT,
                                                           nodes.getUnchecked(i),
                                                           ports.getUnchecked(i)))
                 {
@@ -685,7 +685,7 @@ private:
                         return true;
             }
 
-            inputChannelOfIndexToIgnore = ELEMENT_INVALID_PORT;
+            inputChannelOfIndexToIgnore = KV_INVALID_PORT;
             ++stepIndexToSearchFrom;
         }
 
@@ -738,7 +738,7 @@ GraphProcessor::GraphProcessor()
     arcsModel  = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
     
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
-        ioNodes[i] = ELEMENT_INVALID_PORT;
+        ioNodes[i] = KV_INVALID_PORT;
     //graphModel.addListener(this);
 }
 

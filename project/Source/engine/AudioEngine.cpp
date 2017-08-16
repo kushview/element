@@ -190,7 +190,7 @@ public:
 
     ValueTree createValueTree() const
     {
-        ValueTree graph (Element::Slugs::graph);
+        ValueTree graph (Slugs::graph);
 
         ValueTree nodes ("nodes");
         for (int i = 0; i < getNumNodes(); ++i)

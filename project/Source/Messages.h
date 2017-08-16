@@ -22,7 +22,7 @@ public:
     {
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
-        sourcePort = destPort = ELEMENT_INVALID_PORT;
+        sourcePort = destPort = KV_INVALID_PORT;
         jassert(useChannels());
     }
     
@@ -47,7 +47,7 @@ public:
     RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc) {
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
-        sourcePort = destPort = ELEMENT_INVALID_PORT;
+        sourcePort = destPort = KV_INVALID_PORT;
         jassert(useChannels());
     }
     
