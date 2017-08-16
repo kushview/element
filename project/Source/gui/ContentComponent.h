@@ -19,6 +19,10 @@ class GraphEditorView;
 class RackView;
 class TransportBar;
 
+class ContentView : public Component {
+    
+};
+
 class ContentComponent :  public Component,
                           public DragAndDropContainer,
                           public FileDragAndDropTarget

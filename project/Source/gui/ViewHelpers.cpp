@@ -51,7 +51,6 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
     
     g.restoreState();
 }
-    
 
 ContentComponent* findContentComponent (Component* c)
 {
