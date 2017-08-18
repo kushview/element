@@ -16,9 +16,6 @@ namespace Element {
 
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
                                                                     //[/Comments]
 */
 class AudioIOPanelView  : public Component,

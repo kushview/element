@@ -8,6 +8,7 @@
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Messages.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -88,7 +89,7 @@ void AppController::getAllCommands (Array<CommandID>& commands)
     commands.addArray ({
         Commands::mediaNew,  Commands::mediaOpen,
         Commands::mediaSave, Commands::mediaSaveAs,
-        Commands::signIn
+        Commands::signIn,    Commands::signOut
     });
 }
 
@@ -185,12 +186,30 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            auto* form = new UnlockForm (status, "Enter you email/username and license key.", true);
-            DialogWindow::LaunchOptions opts;
-            opts.content.setOwned (form);
-            opts.resizable = false;
-            opts.dialogTitle = "Authorization";
-            opts.launchAsync();
+            auto& status (getGlobals().getUnlockStatus());
+            auto& settings (getGlobals().getSettings());
+            {
+                auto* form = new UnlockForm (status, "Enter your license key.",
+                                             false, false, true, true);
+                DialogWindow::LaunchOptions opts;
+                opts.content.setOwned (form);
+                opts.resizable = false;
+                opts.dialogTitle = "Authorization";
+                opts.runModal();
+            }
+        } break;
+        
+        case Commands::signOut:
+        {
+            auto& status (getGlobals().getUnlockStatus());
+            auto& settings (getGlobals().getSettings());
+            if (status.isUnlocked())
+            {
+                auto* props = settings.getUserSettings();
+                props->removeValue("L");
+                props->save();
+                status.load();
+            }
         } break;
         
         default: res = false; break;

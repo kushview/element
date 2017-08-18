@@ -1,5 +1,6 @@
 
 #include "gui/UnlockForm.h"
+#include "session/UnlockStatus.h"
 
 struct Spinner  : public Component, private Timer
 {
@@ -16,13 +17,14 @@ struct UnlockForm::OverlayComp  : public Component,
                                   private Thread,
                                   private Timer
 {
-    OverlayComp (UnlockForm& f)  : Thread (String()), form (f)
+    OverlayComp (UnlockForm& f, bool d = false)
+        : Thread (String()), deactivating(d), form (f)
     {
         result.succeeded = false;
         email = form.emailBox.getText();
         password = form.passwordBox.getText();
+        license = form.status.getLicenseKey();
         addAndMakeVisible (spinner);
-        
         startThread (4);
     }
     
@@ -51,8 +53,17 @@ struct UnlockForm::OverlayComp  : public Component,
     
     void run() override
     {
-        result = form.status.attemptWebserverUnlock (email, password);
-        startTimer (100);
+        if (deactivating)
+        {
+            result.succeeded = true;
+            form.status.deactivateLicense (license);
+        }
+        else
+        {
+            result = form.status.attemptWebserverUnlock (email, password);
+        }
+        
+        startTimer (200);
     }
     
     void timerCallback() override
@@ -63,13 +74,13 @@ struct UnlockForm::OverlayComp  : public Component,
         if (result.errorMessage.isNotEmpty())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                              TRANS("Registration Failed"),
+                                              TRANS("Activation Failed"),
                                               result.errorMessage);
         }
         else if (result.informativeMessage.isNotEmpty())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                              TRANS("Registration Complete!"),
+                                              TRANS("Activation Complete!"),
                                               result.informativeMessage);
         }
         else if (result.urlToLaunch.isNotEmpty())
@@ -88,13 +99,77 @@ struct UnlockForm::OverlayComp  : public Component,
             f.dismiss();
     }
     
+    const bool deactivating;
+    
     UnlockForm& form;
     Spinner spinner;
     OnlineUnlockStatus::UnlockResult result;
-    String email, password;
+    String email, password, license;
     
+    friend class LicenseInfo;
     JUCE_LEAK_DETECTOR (UnlockForm::OverlayComp)
 };
+
+
+namespace Element {
+struct LicenseInfo : public Component,
+                     public ButtonListener
+{
+    LicenseInfo (UnlockForm& f) : form(f)
+    {
+        setOpaque(true);
+        addAndMakeVisible(deactivateButton);
+        deactivateButton.setButtonText("Deactivate");
+        deactivateButton.addListener(this);
+        
+        addAndMakeVisible(licenseKey);
+        licenseKey.setText (String("License: ") + f.status.getLicenseKey(), dontSendNotification);
+        licenseKey.setJustificationType (Justification::centred);
+        licenseKey.setColour (Label::textColourId, kv::LookAndFeel_E1::textColor);
+    }
+    
+    void paint (Graphics&g) override {
+       g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+    }
+    
+    void resized() override
+    {
+        Rectangle<int> r (getLocalBounds());
+        r.removeFromBottom (80);
+        licenseKey.setBounds (r);
+        deactivateButton.setSize (90, 30);
+        deactivateButton.setBoundsToFit (0, getHeight() - 80, getWidth(), 80, Justification::centred, true);
+        
+        if (overlay)
+            overlay->setBounds (getLocalBounds());
+    }
+    
+    void buttonClicked (Button* b) override
+    {
+        if (b == &deactivateButton)
+            deacviateLicense();
+    }
+    
+private:
+    TextButton deactivateButton;
+    Label email;
+    Label licenseKey;
+    UnlockForm& form;
+    Component::SafePointer<Component> overlay;
+    
+    void deacviateLicense()
+    {
+        if (! overlay)
+        {
+            addAndMakeVisible (overlay = new UnlockForm::OverlayComp (form, true));
+            resized();
+        }
+    }
+    
+    JUCE_LEAK_DETECTOR (LicenseInfo);
+};
+
+}
 
 static juce_wchar getDefaultPasswordChar() noexcept
 {
@@ -105,38 +180,67 @@ static juce_wchar getDefaultPasswordChar() noexcept
 #endif
 }
 
-UnlockForm::UnlockForm (OnlineUnlockStatus& s,
+UnlockForm::UnlockForm (Element::UnlockStatus& s,
                         const String& userInstructions,
+                        bool hasEmailBox,
+                        bool hasPasswordBox,
+                        bool hasLicenseBox,
                         bool hasCancelButton)
     : message (String(), userInstructions),
       passwordBox (String(), getDefaultPasswordChar()),
-      registerButton (TRANS("Register")),
+      activateButton (TRANS ("Activate")),
       cancelButton (TRANS ("Cancel")),
-      status (s)
+      status (s),
+      useLicense (hasLicenseBox),
+      useEmail (hasEmailBox),
+      usePassword (hasPasswordBox)
 {
+    if (usePassword && !useEmail)
+    {
+        // password requires email too!
+        jassertfalse;
+        useEmail = hasEmailBox = true;
+    }
+    
     // Please supply a message to tell your users what to do!
     jassert (userInstructions.isNotEmpty());
     
     setOpaque (true);
     
-    emailBox.setText (status.getUserEmail());
     message.setJustificationType (Justification::centred);
     
     addAndMakeVisible (message);
-    addAndMakeVisible (emailBox);
-    addAndMakeVisible (passwordBox);
-    addAndMakeVisible (registerButton);
+    
+    if (useEmail)
+    {
+        addAndMakeVisible (emailBox);
+        emailBox.setText (status.getUserEmail());
+    }
+    
+    if (usePassword)
+        addAndMakeVisible (passwordBox);
+    
+    if (useLicense)
+    {
+        addAndMakeVisible (licenseBox);
+        licenseBox.setText (status.getLicenseKey());
+    }
     
     if (hasCancelButton)
         addAndMakeVisible (cancelButton);
     
     emailBox.setEscapeAndReturnKeysConsumed (false);
     passwordBox.setEscapeAndReturnKeysConsumed (false);
+    licenseBox.setEscapeAndReturnKeysConsumed (false);
     
-    registerButton.addShortcut (KeyPress (KeyPress::returnKey));
-    
-    registerButton.addListener (this);
+    addAndMakeVisible (activateButton);
+    activateButton.addShortcut (KeyPress (KeyPress::returnKey));
+    activateButton.addListener (this);
     cancelButton.addListener (this);
+    
+    if (status.isUnlocked()) {
+        addAndMakeVisible (info = new Element::LicenseInfo (*this));
+    }
     
     lookAndFeelChanged();
     setSize (500, 250);
@@ -144,6 +248,7 @@ UnlockForm::UnlockForm (OnlineUnlockStatus& s,
 
 UnlockForm::~UnlockForm()
 {
+    info.deleteAndZero();
     unlockingOverlay.deleteAndZero();
 }
 
@@ -166,14 +271,14 @@ void UnlockForm::resized()
     Rectangle<int> r (getLocalBounds().reduced (10, 20));
     
     Rectangle<int> buttonArea (r.removeFromBottom (buttonHeight));
-    registerButton.changeWidthToFitText (buttonHeight);
+    activateButton.changeWidthToFitText (buttonHeight);
     cancelButton.changeWidthToFitText (buttonHeight);
     
     const int gap = 20;
-    buttonArea = buttonArea.withSizeKeepingCentre (registerButton.getWidth()
+    buttonArea = buttonArea.withSizeKeepingCentre (activateButton.getWidth()
                                                    + (cancelButton.isVisible() ? gap + cancelButton.getWidth() : 0),
                                                    buttonHeight);
-    registerButton.setBounds (buttonArea.removeFromLeft (registerButton.getWidth()));
+    activateButton.setBounds (buttonArea.removeFromLeft (activateButton.getWidth()));
     buttonArea.removeFromLeft (gap);
     cancelButton.setBounds (buttonArea);
     
@@ -185,18 +290,35 @@ void UnlockForm::resized()
                                                       5.0f)));
     
     const int boxHeight = 24;
-    passwordBox.setBounds (r.removeFromBottom (boxHeight));
-    passwordBox.setInputRestrictions (64);
-    passwordBox.setFont (font);
     
-    r.removeFromBottom (20);
-    emailBox.setBounds (r.removeFromBottom (boxHeight));
-    emailBox.setInputRestrictions (512);
-    emailBox.setFont (font);
+    if (useLicense)
+    {
+        licenseBox.setBounds (r.removeFromBottom (boxHeight));
+        licenseBox.setInputRestrictions (512);
+        licenseBox.setFont (font);
+        r.removeFromBottom (20);
+    }
     
-    r.removeFromBottom (20);
+    if (usePassword) {
+        passwordBox.setBounds (r.removeFromBottom (boxHeight));
+        passwordBox.setInputRestrictions (64);
+        passwordBox.setFont (font);
+        r.removeFromBottom (20);
+    }
+    
+    if (useEmail)
+    {
+        emailBox.setBounds (r.removeFromBottom (boxHeight));
+        emailBox.setInputRestrictions (512);
+        emailBox.setFont (font);
+    
+        r.removeFromBottom (20);
+    }
     
     message.setBounds (r);
+    
+    if (info != nullptr)
+        info->setBounds (getLocalBounds());
     
     if (unlockingOverlay != nullptr)
         unlockingOverlay->setBounds (getLocalBounds());
@@ -205,8 +327,9 @@ void UnlockForm::resized()
 void UnlockForm::lookAndFeelChanged()
 {
     Colour labelCol (findColour (TextEditor::backgroundColourId).contrasting (0.5f));
-    emailBox.setTextToShowWhenEmpty (TRANS("Email/Username"), labelCol);
-    passwordBox.setTextToShowWhenEmpty (TRANS("License Key"), labelCol);
+    emailBox.setTextToShowWhenEmpty (TRANS ("Email or Username"), labelCol);
+    passwordBox.setTextToShowWhenEmpty (TRANS ("Password"), labelCol);
+    licenseBox.setTextToShowWhenEmpty (TRANS ("Serial Number"), labelCol);
 }
 
 void UnlockForm::showBubbleMessage (const String& text, Component& target)
@@ -225,7 +348,7 @@ void UnlockForm::showBubbleMessage (const String& text, Component& target)
 
 void UnlockForm::buttonClicked (Button* b)
 {
-    if (b == &registerButton)
+    if (b == &activateButton)
         attemptRegistration();
     else if (b == &cancelButton)
         dismiss();
@@ -235,19 +358,29 @@ void UnlockForm::attemptRegistration()
 {
     if (unlockingOverlay == nullptr)
     {
-        if (emailBox.getText().trim().length() < 3)
+        if (useEmail && emailBox.getText().trim().length() < 3)
         {
             showBubbleMessage (TRANS ("Please enter a valid email address!"), emailBox);
             return;
         }
         
-        if (passwordBox.getText().trim().length() < 3)
+        if (usePassword && passwordBox.getText().trim().length() < 3)
         {
-            showBubbleMessage (TRANS ("Please enter a valid license key!"), passwordBox);
+            showBubbleMessage (TRANS ("Please enter a valid password key!"), passwordBox);
             return;
         }
         
-        status.setUserEmail (emailBox.getText());
+        if (useLicense && licenseBox.getText().trim().length() < 16)
+        {
+            showBubbleMessage (TRANS ("Please enter a valid license key!"), licenseBox);
+            return;
+        }
+        
+        if (useEmail)
+            status.setUserEmail (emailBox.getText().trim());
+        if (useLicense)
+            status.setLicenseKey (licenseBox.getText().trim());
+
         addAndMakeVisible (unlockingOverlay = new OverlayComp (*this));
         resized();
         unlockingOverlay->enterModalState();
