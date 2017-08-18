@@ -19,6 +19,7 @@ namespace Element {
         String getState() override;
         String getWebsiteName() override;
         URL getServerAuthenticationURL() override;
+        URL getApiEndPoint() override;
         StringArray getLocalMachineIDs() override;
     
         inline bool isFullVersion() const

@@ -53,6 +53,10 @@ namespace Element {
         return authurl;
     }
     
+    URL UnlockStatus::getApiEndPoint() {
+        return URL (EL_BASE_URL);
+    }
+    
     StringArray UnlockStatus::getLocalMachineIDs()
     {
         auto ids (OnlineUnlockStatus::getLocalMachineIDs());
