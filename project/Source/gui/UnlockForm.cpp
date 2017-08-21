@@ -17,13 +17,17 @@ struct UnlockForm::OverlayComp  : public Component,
                                   private Thread,
                                   private Timer
 {
-    OverlayComp (UnlockForm& f, bool d = false)
-        : Thread (String()), deactivating(d), form (f)
+    enum Action {
+        Activate, Deactivate, Check
+    };
+    
+    OverlayComp (UnlockForm& f, Action a)
+        : Thread (String()), action(a), form (f)
     {
         result.succeeded = false;
-        email = form.emailBox.getText();
-        password = form.passwordBox.getText();
-        license = form.status.getLicenseKey();
+        email       = form.emailBox.getText();
+        password    = form.passwordBox.getText();
+        license     = form.status.getLicenseKey();
         addAndMakeVisible (spinner);
         startThread (4);
     }
@@ -53,19 +57,35 @@ struct UnlockForm::OverlayComp  : public Component,
     
     void run() override
     {
-        if (deactivating)
+        switch (action)
         {
-            result.succeeded = true;
-            form.status.deactivateLicense (license);
-        }
-        else
-        {
-            result = form.status.attemptWebserverUnlock (email, password);
+            case Deactivate:
+                result =form.status.deactivateLicense (license);
+                break;
+            case Activate:
+                result = form.status.activateLicense (license);
+                break;
+            case Check:
+                result = form.status.checkLicense (license);
+                break;
         }
         
         startTimer (200);
     }
     
+    String getActionTitle (bool failed) const
+    {
+        String title;
+        switch (action)
+        {
+            case Activate:      title = "Activation"; break;
+            case Deactivate:    title = "Deactivation"; break;
+            case Check:         title = "License Check"; break;
+        }
+        
+        title << (failed ? " Failed" : " Complete");
+        return TRANS (title);
+    }
     void timerCallback() override
     {
         spinner.setVisible (false);
@@ -74,13 +94,13 @@ struct UnlockForm::OverlayComp  : public Component,
         if (result.errorMessage.isNotEmpty())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                              TRANS("Activation Failed"),
+                                              getActionTitle (true),
                                               result.errorMessage);
         }
         else if (result.informativeMessage.isNotEmpty())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                              TRANS("Activation Complete!"),
+                                              getActionTitle (false),
                                               result.informativeMessage);
         }
         else if (result.urlToLaunch.isNotEmpty())
@@ -95,12 +115,11 @@ struct UnlockForm::OverlayComp  : public Component,
         
         delete this;
         
-        if (worked)
+        if (worked && action != Check)
             f.dismiss();
     }
     
-    const bool deactivating;
-    
+    const Action action;
     UnlockForm& form;
     Spinner spinner;
     OnlineUnlockStatus::UnlockResult result;
@@ -118,14 +137,19 @@ struct LicenseInfo : public Component,
     LicenseInfo (UnlockForm& f) : form(f)
     {
         setOpaque(true);
-        addAndMakeVisible(deactivateButton);
-        deactivateButton.setButtonText("Deactivate");
-        deactivateButton.addListener(this);
         
-        addAndMakeVisible(licenseKey);
+        addAndMakeVisible (licenseKey);
         licenseKey.setText (String("License: ") + f.status.getLicenseKey(), dontSendNotification);
         licenseKey.setJustificationType (Justification::centred);
         licenseKey.setColour (Label::textColourId, kv::LookAndFeel_E1::textColor);
+        
+        addAndMakeVisible (refreshButton);
+        refreshButton.setButtonText ("Refresh");
+        refreshButton.addListener (this);
+        
+        addAndMakeVisible (deactivateButton);
+        deactivateButton.setButtonText ("Deactivate");
+        deactivateButton.addListener (this);
     }
     
     void paint (Graphics&g) override {
@@ -137,8 +161,9 @@ struct LicenseInfo : public Component,
         Rectangle<int> r (getLocalBounds());
         r.removeFromBottom (80);
         licenseKey.setBounds (r);
-        deactivateButton.setSize (90, 30);
-        deactivateButton.setBoundsToFit (0, getHeight() - 80, getWidth(), 80, Justification::centred, true);
+        
+        refreshButton.setBounds ((getWidth() / 2) - 92, getHeight() - 40, 90, 30);
+        deactivateButton.setBounds ((getWidth() / 2) + 2, getHeight() - 40, 90, 30);
         
         if (overlay)
             overlay->setBounds (getLocalBounds());
@@ -148,10 +173,13 @@ struct LicenseInfo : public Component,
     {
         if (b == &deactivateButton)
             deacviateLicense();
+        else if (b == &refreshButton)
+            refreshLicense();
     }
     
 private:
-    TextButton deactivateButton;
+    typedef UnlockForm::OverlayComp Overlay;
+    TextButton deactivateButton, refreshButton;
     Label email;
     Label licenseKey;
     UnlockForm& form;
@@ -159,11 +187,18 @@ private:
     
     void deacviateLicense()
     {
-        if (! overlay)
-        {
-            addAndMakeVisible (overlay = new UnlockForm::OverlayComp (form, true));
-            resized();
-        }
+        if (overlay)
+            return;
+        addAndMakeVisible (overlay = new Overlay (form, Overlay::Deactivate));
+        resized();
+    }
+    
+    void refreshLicense()
+    {
+        if (overlay)
+            return;
+        addAndMakeVisible (overlay = new Overlay (form, Overlay::Check));
+        resized();
     }
     
     JUCE_LEAK_DETECTOR (LicenseInfo);
@@ -381,7 +416,7 @@ void UnlockForm::attemptRegistration()
         if (useLicense)
             status.setLicenseKey (licenseBox.getText().trim());
 
-        addAndMakeVisible (unlockingOverlay = new OverlayComp (*this));
+        addAndMakeVisible (unlockingOverlay = new OverlayComp (*this, OverlayComp::Activate));
         resized();
         unlockingOverlay->enterModalState();
     }
@@ -390,6 +425,7 @@ void UnlockForm::attemptRegistration()
 void UnlockForm::dismiss()
 {
     status.save();
+    
     if (auto *dw = findParentComponentOfClass<DialogWindow>())
         delete dw;
     else

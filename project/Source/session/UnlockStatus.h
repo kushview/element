@@ -12,6 +12,7 @@ namespace Element {
     public:
         UnlockStatus (Globals&);
         ~UnlockStatus() { }
+        
         String getProductID() override;
         bool doesProductIDMatch (const String& returnedIDFromServer) override;
         RSAKey getPublicKey() override;
@@ -19,7 +20,6 @@ namespace Element {
         String getState() override;
         String getWebsiteName() override;
         URL getServerAuthenticationURL() override;
-        URL getApiEndPoint() override;
         StringArray getLocalMachineIDs() override;
     
         inline bool isFullVersion() const
@@ -33,14 +33,6 @@ namespace Element {
             DBG("UNLOCKED: " << ((bool) isUnlocked() ? "yes" : "no"));
             DBG("LICENSE:  " << getLicenseKey());
            #endif
-        }
-        
-    protected:
-        inline StringPairArray getQueryParams() override
-        {
-            StringPairArray params;
-            params.set ("mach", getLocalMachineIDs()[0]);
-            return params;
         }
         
     private:

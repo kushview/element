@@ -40,7 +40,7 @@ public:
     
     Label message;
     TextEditor emailBox, passwordBox, licenseBox;
-    TextButton activateButton, cancelButton, deactivateButton;
+    TextButton activateButton, cancelButton, deactivateButton, refreshButton;
    
 private:
     Element::UnlockStatus& status;
