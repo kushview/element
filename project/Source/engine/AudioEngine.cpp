@@ -408,7 +408,7 @@ public:
             if (isPrepared)
                 processor->releaseResources();
 
-            processor->setPlayConfigDetails(numChansIn, numChansOut, sampleRate, blockSize);
+            processor->setPlayConfigDetails (numChansIn, numChansOut, sampleRate, blockSize);
             GraphProcessor* const oldProcessor = processor;
             setRootGraph (nullptr);
             setRootGraph (oldProcessor);

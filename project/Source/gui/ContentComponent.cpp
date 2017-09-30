@@ -104,7 +104,6 @@ public:
             
         }
         btn->setToggleState (nextState, dontSendNotification);
-        DBG("TOGLED: " << String(btn->getToggleState()));
     }
     
     Value& getTitleValue() { return title.getTextValue(); }

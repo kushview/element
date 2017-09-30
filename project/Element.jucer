@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.4.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.1.1" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.1.2" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="14">
   <MAINGROUP id="z1aYPy" name="Element">
