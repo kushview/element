@@ -160,10 +160,10 @@ public:
         clear();
 
         ValueTree arcs  = data.getChildWithName (Tags::arcs);
-        ValueTree nodes = data.getChildWithName (Tags::nodes);
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        ValueTree nodeList = data.getChildWithName (Tags::nodes);
+        for (int i = 0; i < nodeList.getNumChildren(); ++i)
         {
-            ValueTree c (nodes.getChild(i));
+            ValueTree c (nodeList.getChild (i));
             if (! c.hasType (Tags::node))
                 continue;
             
@@ -192,7 +192,7 @@ public:
     {
         ValueTree graph (Slugs::graph);
 
-        ValueTree nodes ("nodes");
+        ValueTree nodeList (Tags::nodes);
         for (int i = 0; i < getNumNodes(); ++i)
         {
             GraphNodePtr node = getNode (i);
@@ -205,16 +205,16 @@ public:
             }
 
             ValueTree n (EngineHelpers::createValueTreeForNode (node));
-            if (n.isValid()) nodes.addChild (n, -1, nullptr);
+            if (n.isValid())
+				nodeList.addChild (n, -1, nullptr);
         }
-        graph.addChild (nodes, -1, nullptr);
+        graph.addChild (nodeList, -1, nullptr);
 
-        ValueTree arcs ("arcs");
+        ValueTree arcs (Tags::arcs);
         for (int i = 0; i < getNumConnections(); ++i)
         {
             const GraphProcessor::Connection* const fc = getConnection(i);
-            ValueTree arc ("arc");
-
+            ValueTree arc (Tags::arc);
             arc.setProperty ("sourceNode", (int) fc->sourceNode, nullptr);
             arc.setProperty ("sourcePort", (int) fc->sourcePort, nullptr);
             arc.setProperty ("destNode",   (int) fc->destNode,   nullptr);

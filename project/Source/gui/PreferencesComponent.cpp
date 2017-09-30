@@ -90,10 +90,10 @@ namespace Element {
     private:
         friend class PreferencesComponent;
 
-        void addItem (const String& n, const String& uri)
+        void addItem (const String& name, const String& identifier)
         {
-            pageNames.addIfNotAlreadyThere (n);
-            pageURIs.addIfNotAlreadyThere (uri);
+            pageNames.addIfNotAlreadyThere (name);
+            pageURIs.addIfNotAlreadyThere (identifier);
             updateContent();
         }
 

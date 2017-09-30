@@ -4,8 +4,8 @@
 #include "ElementApp.h"
 
 namespace Element {
-class UnlockStatus;
-class LicenseInfo;
+	class UnlockStatus;
+	struct LicenseInfo;
 }
 
 class UnlockForm  : public Component,

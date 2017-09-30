@@ -120,17 +120,17 @@ void EngineController::clear()
         root->clear();
 }
 
-void EngineController::setRootNode (const Node& node)
+void EngineController::setRootNode (const Node& newRootNode)
 {
-    if (! node.hasNodeType (Tags::graph)) {
+    if (!newRootNode.hasNodeType (Tags::graph)) {
         jassertfalse; // needs to be a graph
         return;
     }
     
     root->clear();
     
-    const ValueTree nodes (node.getNodesValueTree());
-    const ValueTree arcs (node.getArcsValueTree());
+    const ValueTree nodes (newRootNode.getNodesValueTree());
+    const ValueTree arcs (newRootNode.getArcsValueTree());
     
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
@@ -155,7 +155,7 @@ void EngineController::setRootNode (const Node& node)
                        (uint32)(int) arc.getProperty (Tags::destPort));
     }
     
-    jassert (arcs.getNumChildren() == root->getNumConnections());
+    jassert (arcs.getNumChildren() == root->getNumConnections ());
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster*)

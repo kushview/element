@@ -5,12 +5,6 @@
 #include "session/Node.h"
 
 namespace Element {
-
-static void readPluginDescription (const ValueTree& p, PluginDescription& pd)
-{
-    pd.pluginFormatName = p.getProperty ("format");
-    pd.fileOrIdentifier = p.getProperty ("file");
-}
     
 static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 {

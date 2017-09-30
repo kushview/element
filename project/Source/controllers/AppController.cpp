@@ -32,39 +32,35 @@ void AppController::run()
 
 void AppController::handleMessage (const Message& msg)
 {
+	auto* ec = findChild<EngineController>();
+	jassert(ec);
+
     bool handled = true;
 
-    if (const auto* m = dynamic_cast<const LoadPluginMessage*> (&msg))
+    if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
-        if (auto* ec = findChild<EngineController>())
-            ec->addPlugin (m->description);
+        ec->addPlugin (lpm->description);
     }
-    else if (const auto* m = dynamic_cast<const RemoveNodeMessage*> (&msg))
+    else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
     {
-        if (auto* ec = findChild<EngineController>())
-            ec->removeNode (m->nodeId);
+        ec->removeNode (rnm->nodeId);
     }
-    else if (const auto* m = dynamic_cast<const AddConnectionMessage*> (&msg))
+    else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
     {
-        if (auto* ec = findChild<EngineController>())
-        {
-            if (m->useChannels())
-                ec->connectChannels (m->sourceNode, m->sourceChannel, m->destNode, m->destChannel);
-            else
-                ec->addConnection (m->sourceNode, m->sourcePort, m->destNode, m->destPort);
+        if (acm->useChannels())
+            ec->connectChannels (acm->sourceNode, acm->sourceChannel, acm->destNode, acm->destChannel);
+        else
+            ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort);
+    }
+    else if (const auto* rcm = dynamic_cast<const RemoveConnectionMessage*> (&msg))
+    {
+        if (rcm->useChannels())
+		{
+            jassertfalse; // channels not yet supported
         }
-    }
-    else if (const auto* m = dynamic_cast<const RemoveConnectionMessage*> (&msg))
-    {
-        if (auto* ec = findChild<EngineController>())
+        else
         {
-            if (m->useChannels()) {
-                jassertfalse; // channels not yet supported
-            }
-            else
-            {
-                ec->removeConnection (m->sourceNode, m->sourcePort, m->destNode, m->destPort);
-            }
+            ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
         }
     }
     else
@@ -84,9 +80,9 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
     return gui.get();
 }
 
-void AppController::getAllCommands (Array<CommandID>& commands)
+void AppController::getAllCommands (Array<CommandID>& cids)
 {
-    commands.addArray ({
+    cids.addArray ({
         Commands::mediaNew,  Commands::mediaOpen,
         Commands::mediaSave, Commands::mediaSaveAs,
         Commands::signIn,    Commands::signOut
@@ -102,14 +98,17 @@ void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& r
 bool AppController::perform (const InvocationInfo& info)
 {
     EngineController* ec = findChild<EngineController>();
-    jassert(ec);
+    jassert (ec);
     
     auto& status (world.getUnlockStatus());
+	auto& settings(getGlobals().getSettings());
     bool res = true;
     switch (info.commandID)
     {
-        case Commands::mediaNew: {
-            if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", "This will clear the current graph, are you sure?"))
+        case Commands::mediaNew:
+		{
+            if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", 
+											  "This will clear the current graph, are you sure?"))
             {
                 lastSavedFile = File();
                 ec->clear();
@@ -186,8 +185,6 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            auto& status (getGlobals().getUnlockStatus());
-            auto& settings (getGlobals().getSettings());
             {
                 auto* form = new UnlockForm (status, "Enter your license key.",
                                              false, false, true, true);
@@ -201,8 +198,7 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signOut:
         {
-            auto& status (getGlobals().getUnlockStatus());
-            auto& settings (getGlobals().getSettings());
+           
             if (status.isUnlocked())
             {
                 auto* props = settings.getUserSettings();
