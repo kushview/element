@@ -33,7 +33,6 @@
 #include <kv_gui/kv_gui.h>
 #include <kv_lv2/kv_lv2.h>
 #include <kv_models/kv_models.h>
-#include <kv_video/kv_video.h>
 
 
 #if ! DONT_SET_USING_JUCE_NAMESPACE

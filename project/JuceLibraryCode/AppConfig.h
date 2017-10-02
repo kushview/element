@@ -79,7 +79,6 @@ using namespace kv;
 #define JUCE_MODULE_AVAILABLE_kv_gui                      1
 #define JUCE_MODULE_AVAILABLE_kv_lv2                      1
 #define JUCE_MODULE_AVAILABLE_kv_models                   1
-#define JUCE_MODULE_AVAILABLE_kv_video                    1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
 

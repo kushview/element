@@ -54,7 +54,6 @@ namespace Element {
         return authurl;
     }
     
-    
     StringArray UnlockStatus::getLocalMachineIDs()
     {
         auto ids (OnlineUnlockStatus::getLocalMachineIDs());

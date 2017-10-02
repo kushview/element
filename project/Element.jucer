@@ -29,8 +29,6 @@
         <FILE id="Tyum0W" name="GuiController.h" compile="0" resource="0" file="Source/controllers/GuiController.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
-        <FILE id="BnMPIm" name="AtomBuffer.cpp" compile="0" resource="0" file="Source/engine/AtomBuffer.cpp"/>
-        <FILE id="XSEiim" name="AtomBuffer.h" compile="0" resource="0" file="Source/engine/AtomBuffer.h"/>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="Source/engine/AudioEngine.h"/>
         <FILE id="V0jXER" name="Buffer.cpp" compile="0" resource="0" file="Source/engine/Buffer.cpp"/>
@@ -45,12 +43,6 @@
         <FILE id="kBJmQL" name="DataType.h" compile="0" resource="0" file="Source/engine/DataType.h"/>
         <FILE id="q8nmE2" name="Engine.h" compile="0" resource="0" file="Source/engine/Engine.h"/>
         <FILE id="kvWn2k" name="EngineBase.cpp" compile="1" resource="0" file="Source/engine/EngineBase.cpp"/>
-        <FILE id="EldMb9" name="EngineProcessor.h" compile="0" resource="0"
-              file="Source/engine/EngineProcessor.h"/>
-        <FILE id="fUeClE" name="GraphIOProcessor.cpp" compile="1" resource="0"
-              file="Source/engine/GraphIOProcessor.cpp"/>
-        <FILE id="YCwID5" name="GraphIOProcessor.h" compile="0" resource="0"
-              file="Source/engine/GraphIOProcessor.h"/>
         <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>
         <FILE id="UpjKzL" name="GraphNode.h" compile="0" resource="0" file="Source/engine/GraphNode.h"/>
         <FILE id="W7RYnx" name="GraphPlayer.cpp" compile="0" resource="0" file="Source/engine/GraphPlayer.cpp"/>
@@ -66,7 +58,6 @@
               file="Source/engine/InternalFormat.cpp"/>
         <FILE id="NbNubd" name="InternalFormat.h" compile="0" resource="0"
               file="Source/engine/InternalFormat.h"/>
-        <FILE id="RbzE8D" name="lv2_evbuf.h" compile="0" resource="0" file="Source/engine/lv2_evbuf.h"/>
         <FILE id="LAe9tF" name="MidiClipSource.cpp" compile="1" resource="0"
               file="Source/engine/MidiClipSource.cpp"/>
         <FILE id="MVLD5m" name="MidiClipSource.h" compile="0" resource="0"
@@ -343,13 +334,12 @@
         <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="kv_core" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_engines" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_gui" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_models" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_video" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_edd" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
@@ -387,13 +377,12 @@
         <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="kv_core" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_engines" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_gui" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_lv2" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_models" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_video" path="../libs/element/modules"/>
-        <MODULEPATH id="kv_edd" path="../libs/element/modules"/>
+        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -417,7 +406,6 @@
     <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_lv2" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_models" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
-    <MODULE id="kv_video" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
