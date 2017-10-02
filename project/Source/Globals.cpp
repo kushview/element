@@ -73,13 +73,13 @@ private:
     void freeAll()
     {
         commands = nullptr;
-        session  = nullptr;
-        devices  = nullptr;
-        media    = nullptr;
         plugins  = nullptr;
         settings = nullptr;
         engine   = nullptr;
         unlock   = nullptr;
+        session  = nullptr;
+        media    = nullptr;
+        devices  = nullptr;
     }
 };
 

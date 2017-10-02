@@ -20,6 +20,9 @@ public:
     inline CommandManager& getCommandManager() { return commands; }
     inline Globals& getWorld() { return getGlobals(); }
     inline Globals& getGlobals() { return world; }
+    
+    void activate() override { Controller::activate(); }
+    void deactivate() override;
 
 protected:
     friend class ApplicationCommandTarget;

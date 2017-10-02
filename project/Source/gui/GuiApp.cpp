@@ -85,6 +85,7 @@ GuiApp::~GuiApp()
     PropertiesFile* pf = globals().getSettings().getUserSettings();
     pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
 
+    closeAllWindows();
     mainWindow->setVisible (false);
     mainWindow->removeFromDesktop();
 
@@ -93,6 +94,13 @@ GuiApp::~GuiApp()
     LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
+    void GuiApp::closeAllWindows()
+    {
+        if (! windowManager)
+            return;
+        windowManager->closeAll();
+    }
+    
 GuiApp* GuiApp::create (Globals& g, AppController& a)
 {
     GuiApp* theGui (new GuiApp (g, a));
@@ -331,7 +339,7 @@ void GuiApp::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result
             break;
 
         case Commands::showPreferences:
-            result.setInfo ("Show Preferences", "BTV Preferences", "Application", 0);
+            result.setInfo ("Show Preferences", "Element Preferences", "Application", 0);
             result.addDefaultKeypress (',', ModifierKeys::commandModifier);
             break;
         

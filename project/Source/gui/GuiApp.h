@@ -36,7 +36,9 @@ namespace Element {
         AppController& getAppController() const { return controller; }
         
         Globals& globals();
-
+        
+        void closeAllWindows();
+        
         /** Open an application window by uri
             Not fully operable, the widget factory needs implemented first */
         void openWindow (const String& uri);

@@ -132,10 +132,6 @@ public:
     {
         initializeModulePath();
         world = new Globals (commandLine);
-        UnlockStatus& status (world->getUnlockStatus());
-        
-        status.dump();
-        
         launchApplication();
     }
 

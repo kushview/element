@@ -22,8 +22,18 @@ AppController::AppController (Globals& g)
     g.getCommandManager().setFirstCommandTarget (this);
 }
 
-AppController::~AppController() { }
+AppController::~AppController()
+{
+    gui->closeAllWindows();
+    gui = nullptr;
+}
 
+void AppController::deactivate()
+{
+    gui->closeAllWindows();
+    Controller::deactivate();
+}
+    
 void AppController::run()
 {
     activate();
