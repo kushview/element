@@ -38,7 +38,8 @@ namespace Element {
         return false;
     }
     
-    class NodePopupMenu : public PopupMenu {
+    class NodePopupMenu : public PopupMenu
+    {
     public:
         enum ItemIds
         {
@@ -48,6 +49,12 @@ namespace Element {
             AddAudioOutputNode,
             LastItem
         };
+        
+        NodePopupMenu()
+        {
+            for (int item = AddAudioInputNode; item < LastItem; ++item)
+                addItem (item, getNameForItem ((ItemIds) item));
+        }
         
         NodePopupMenu (const Node& n)
             : node (n)
@@ -190,6 +197,11 @@ namespace Element {
             repaint();
         }
         
+        void matrixBackgroundClicked (const MouseEvent& ev) override
+        {
+            emptyAreaClicked (ev);
+        }
+        
         int getNumRows()    override { return matrix.getNumRows(); }
         int getNumColumns() override { return matrix.getNumColumns(); }
         
@@ -201,11 +213,9 @@ namespace Element {
             paintEmptyMessage (g, getWidth(), getHeight());
         }
         
-        void showMenuForNode (const Node& node)
+        void handleNodeMenuResult (const int result, const Node& node)
         {
-            NodePopupMenu menu (node);
-            
-            switch (menu.show())
+            switch (result)
             {
                 case NodePopupMenu::RemoveNode: {
                     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
@@ -225,6 +235,12 @@ namespace Element {
                     ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
                 } break;
             }
+        }
+        
+        void showMenuForNode (const Node& node)
+        {
+            NodePopupMenu menu (node);
+            handleNodeMenuResult (menu.show(), node);
         }
         
     private:
@@ -272,6 +288,15 @@ namespace Element {
                 g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
                 g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
             }
+        }
+        
+        void emptyAreaClicked (const MouseEvent& ev)
+        {
+            if (! ev.mods.isPopupMenu())
+                return;
+            
+            NodePopupMenu menu;
+            handleNodeMenuResult (menu.show(), Node());
         }
         
         void listBoxItemClicked (int row, const MouseEvent& ev, bool isSource)
@@ -452,6 +477,11 @@ namespace Element {
                 ViewHelpers::presentPluginWindow (ptr);
         }
         
+        void backgroundClicked (const MouseEvent& ev) override
+        {
+            matrix->emptyAreaClicked (ev);
+        }
+        
         void deleteKeyPressed (int lastRowSelected) override
         {
             const Node node (matrix->getNode (lastRowSelected, true));
@@ -479,7 +509,18 @@ namespace Element {
     
     // MARK: Controls
     
-    class ConnectionGrid::Controls : public Component { };
+    class ConnectionGrid::Controls : public Component
+    {
+    public:
+        Controls (PatchMatrix* m) : matrix(m) { }
+        void mouseDown (const MouseEvent& ev) override {
+            if (ev.mods.isPopupMenu())
+                matrix->emptyAreaClicked (ev);
+        }
+        
+    private:
+        PatchMatrix* matrix;
+    };
     
     // MARK: Destinations
     
@@ -609,7 +650,7 @@ namespace Element {
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix ());
         quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
-        quads->setQuadrantComponent (Quads::Q3, controls = new Controls());
+        quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
         quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
         resized();
     }
@@ -638,6 +679,11 @@ namespace Element {
     void ConnectionGrid::resized()
     {
         quads->setBounds (getLocalBounds());
+    }
+    
+    void ConnectionGrid::mouseDown (const MouseEvent& ev)
+    {
+        DBG("DOWN");
     }
     
     bool ConnectionGrid::isInterestedInDragSource (const SourceDetails& sd)
