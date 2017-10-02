@@ -49,8 +49,7 @@ namespace Element {
 
         void connectPattern (const AssetTree::Item& item) { }
 
-        void setMissingProperties() {
-        }
+        void setMissingProperties() { }
 
     private:
         friend class Session;

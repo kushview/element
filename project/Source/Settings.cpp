@@ -15,7 +15,7 @@ Settings::Settings()
     opts.storageFormat       = PropertiesFile::storeAsXML;
 
    #if JUCE_LINUX
-    opts.folderName          = ".config/element";
+    opts.folderName          = ".config/Element";
    #else
     opts.folderName          = opts.applicationName;
    #endif
@@ -39,7 +39,7 @@ XmlElement* Settings::getLastGraph() const
 void Settings::setLastGraph (const ValueTree& data)
 {
     jassert (data.hasType (Tags::node));
-    if (! data.hasType(Tags::node))
+    if (! data.hasType (Tags::node))
         return;
     if (auto* p = getProps())
         if (ScopedXml xml = data.createXml())
