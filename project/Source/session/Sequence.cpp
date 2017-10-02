@@ -10,7 +10,6 @@
 #include "session/SessionAssets.h"
 #include "session/Session.h"
 #include "session/Sequence.h"
-#include "EngineControl.h"
 #include "MediaManager.h"
 #include "Globals.h"
 
@@ -146,12 +145,11 @@ namespace Element {
     void Sequence::close()
     {
         Track t (getTrack (0));
-        while (t.isValid()) {
+        while (t.isValid())
+        {
             t.state().removeProperty ("node", nullptr);
             t = t.next();
         }
-
-        controller()->close();
     }
 
     Shared<EngineControl> Sequence::controller()
@@ -215,20 +213,16 @@ namespace Element {
     void Sequence::testSetTempo (double tempo)
     {
         setProperty ("tempo", tempo);
-        Shared<EngineControl> c (controller());
-        c->setTempo (node().getProperty ("tempo", 120.0f));
     }
 
     void Sequence::testSetPlaying (bool isPlaying)
     {
         Shared<EngineControl> c (controller());
-        c->setPlaying (isPlaying);
     }
 
     void Sequence::testSetRecording (bool isRecording)
     {
         Shared<EngineControl> c (controller());
-        c->setRecording (isRecording);
     }
 
     void Sequence::testPrintXml()
@@ -277,7 +271,6 @@ namespace Element {
 
         if (property == Slugs::tempo)
         {
-            controller()->setTempo ((double) node().getProperty (property, 120.0f));
             notifyChanged();
         }
     }

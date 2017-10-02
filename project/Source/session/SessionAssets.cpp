@@ -19,7 +19,6 @@
 
 #include "session/Session.h"
 #include "session/MediaManager.h"
-#include "EngineControl.h"
 #include "Globals.h"
 
 #include "session/SessionAssets.h"
@@ -33,8 +32,7 @@ namespace Element {
 
     SessionAssets::~SessionAssets() { }
 
-    void
-    SessionAssets::assetAdded (const AssetTree::Item& item)
+    void SessionAssets::assetAdded (const AssetTree::Item& item)
     {
         if (item.isGroup())
             return;
@@ -62,8 +60,7 @@ namespace Element {
         }
     }
 
-    void
-    SessionAssets::assetRemoved (const AssetTree::Item& item)
+    void SessionAssets::assetRemoved (const AssetTree::Item& item)
     {
     }
 

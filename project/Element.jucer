@@ -275,9 +275,6 @@
       <FILE id="K6661n" name="DataPath.cpp" compile="1" resource="0" file="Source/DataPath.cpp"/>
       <FILE id="AAnMXa" name="DataPath.h" compile="0" resource="0" file="Source/DataPath.h"/>
       <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="Source/ElementApp.h"/>
-      <FILE id="Zs6mUU" name="EngineControl.cpp" compile="1" resource="0"
-            file="Source/EngineControl.cpp"/>
-      <FILE id="FLLIFn" name="EngineControl.h" compile="0" resource="0" file="Source/EngineControl.h"/>
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="Source/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="Source/Globals.h"/>
       <FILE id="dEn8dF" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>

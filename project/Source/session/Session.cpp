@@ -3,18 +3,13 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#include <boost/bind.hpp>
-#include <boost/function.hpp>
-
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
 #include "engine/Transport.h"
 #include "session/SessionAssets.h"
 #include "session/Session.h"
-#include "EngineControl.h"
 #include "MediaManager.h"
 #include "Globals.h"
-
 
 namespace Element {
     class Session::Private
@@ -143,8 +138,8 @@ namespace Element {
         }
         
         assets().setAssetsNode (nd);
-        boost::function<void(const AssetItem&)> assetAdded =
-                boost::bind (&SessionAssets::assetAdded, priv->assets.get(), ::_1);
+        std::function<void(const AssetItem&)> assetAdded =
+            std::bind (&SessionAssets::assetAdded, priv->assets.get(), std::placeholders::_1);
         priv->assets->root().foreachChild (assetAdded);
         priv->removeBogusTracks();
 
