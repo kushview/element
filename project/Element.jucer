@@ -69,10 +69,6 @@
               file="Source/engine/MidiSequenceProcessor.cpp"/>
         <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
               file="Source/engine/MidiSequenceProcessor.h"/>
-        <FILE id="bSmXUq" name="PluginWrapper.h" compile="0" resource="0" file="Source/engine/PluginWrapper.h"/>
-        <FILE id="SXdT3p" name="PreProcessor.cpp" compile="0" resource="0"
-              file="Source/engine/PreProcessor.cpp"/>
-        <FILE id="VLZcbL" name="PreProcessor.h" compile="0" resource="0" file="Source/engine/PreProcessor.h"/>
         <FILE id="erSmKq" name="SequenceCursor.cpp" compile="0" resource="0"
               file="Source/engine/SequenceCursor.cpp"/>
         <FILE id="zhtJ2H" name="SequenceCursor.h" compile="0" resource="0"
@@ -385,6 +381,34 @@
         <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
       </MODULEPATHS>
     </VS2017>
+    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
+                  vst3Folder="" smallIcon="eG1U6B" bigIcon="eG1U6B">
+      <CONFIGURATIONS>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Element"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Element"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
+      </MODULEPATHS>
+    </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>

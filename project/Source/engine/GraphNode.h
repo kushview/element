@@ -26,16 +26,29 @@ public:
     */
     NamedValueSet properties;
 
+    /** Returns the processor as an AudioProcessor */
+    AudioProcessor* getAudioProcessor() const noexcept { return proc; }
+    
     /** Returns the actual processor object that this node represents. */
-    Processor* getProcessor() const noexcept { return proc; }
+    Processor* getProcessor() const noexcept { return dynamic_cast<Processor*> (proc.get()); }
 
+    /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const;
 
     int getNumAudioInputs() const;
     int getNumAudioOutputs() const;
+    
+    PortType getPortType (const uint32 port) const;
+    uint32 getNumPorts() const;
+    int getNumPorts (const PortType type, const bool isInput) const;
+    int getChannelPort (const uint32 port) const;
+    int getNthPort (const PortType portType, const int inputChan, bool, bool) const;
+    bool isPortInput (const uint32 port) const;
+    bool isPortOutput (const uint32 port) const;
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
     
+    /** If an audio plugin instance, fill the details */
     void getPluginDescription (PluginDescription& desc);
     
     /** The actual processor object dynamic_cast'd to ProcType */
@@ -47,11 +60,15 @@ public:
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
+    
+    /** Suspend processing */
     void suspendProcessing (const bool);
 
-    void setInputGain(const float f);
+    /** Set the Input Gain of this Node */
+    void setInputGain (const float f);
 
-    void setGain(const float f);
+    /** Set the Gain of this Node */
+    void setGain (const float f);
 
     inline float getInputGain() const { return inputGain.get(); }
     inline float getGain() const { return gain.get(); }
@@ -88,9 +105,9 @@ public:
 private:
     friend class GraphProcessor;
 
-    const ScopedPointer<Processor> proc;
+    const ScopedPointer<AudioProcessor> proc;
     bool isPrepared;
-    GraphNode (uint32 nodeId, Processor*) noexcept;
+    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*);

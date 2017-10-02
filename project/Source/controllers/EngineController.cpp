@@ -65,7 +65,8 @@ void EngineController::addPlugin (const PluginDescription& d)
 void EngineController::removeNode (const uint32 nodeId)
 {
     jassert (root);
-    if (! root) return;
+    if (! root)
+        return;
     PluginWindow::closeCurrentlyOpenWindowsFor (nodeId);
     root->removeFilter (nodeId);
 }
@@ -87,8 +88,6 @@ void EngineController::activate()
     
     if (auto* device = devices.getCurrentAudioDevice())
     {
-        ignoreUnused (device);
-        
         const int numIns = device->getActiveOutputChannels().countNumberOfSetBits();
         const int numOuts = device->getActiveInputChannels().countNumberOfSetBits();
         const int bufferSize = device->getCurrentBufferSizeSamples();
@@ -122,7 +121,7 @@ void EngineController::clear()
 
 void EngineController::setRootNode (const Node& newRootNode)
 {
-    if (!newRootNode.hasNodeType (Tags::graph)) {
+    if (! newRootNode.hasNodeType (Tags::graph)) {
         jassertfalse; // needs to be a graph
         return;
     }

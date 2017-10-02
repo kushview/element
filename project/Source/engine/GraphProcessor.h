@@ -102,7 +102,7 @@ public:
 
         If this succeeds, it returns a pointer to the newly-created node.
     */
-    GraphNode* addNode (Processor* newProcessor, uint32 nodeId = 0);
+    GraphNode* addNode (AudioProcessor* newProcessor, uint32 nodeId = 0);
 
     /** Deletes a node within the graph which has the specified ID.
 
@@ -319,7 +319,7 @@ public:
     inline ValueTree getArcsModel()  const { return arcsModel; }
 
 protected:
-    virtual GraphNode* createNode (uint32 nodeId, Processor* proc) { return new GraphNode (nodeId, proc); }
+    virtual GraphNode* createNode (uint32 nodeId, AudioProcessor* proc) { return new GraphNode (nodeId, proc); }
     virtual void preRenderNodes() { }
     virtual void postRenderNodes() { }
 

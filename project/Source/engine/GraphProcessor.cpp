@@ -1,18 +1,6 @@
 /*
    This file is part of Element
-   Copyright (c) 2014-2016 Kushview, LLC.  All rights reserved.
-
-   Adapted from JUCE's AudioProcessorGraph
-
-   Permission is granted to use this software under the terms of either:
-   a) the GPL v2 (or any later version)
-   b) the Affero GPL v3
-
-   Details of these licenses can be found at: www.gnu.org/licenses
-
-   Element is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+   Copyright (c) 2014-2017 Kushview, LLC.  All rights reserved.
 */
 
 #include "engine/GraphProcessor.h"
@@ -348,16 +336,16 @@ private:
                                     Array<void*>& renderingOps,
                                     const int ourRenderingIndex)
     {
-        Processor* proc (node->getProcessor());
+        AudioProcessor* const proc (node->getAudioProcessor());
 
         // don't add IONodes that cannot process
         typedef GraphProcessor::AudioGraphIOProcessor IOProc;
         if (IOProc* ioproc = dynamic_cast<IOProc*> (proc))
         {
-            const uint32 numOuts = proc->getNumPorts (PortType::Audio, false);
+            const uint32 numOuts = node->getNumPorts (PortType::Audio, false);
             if (IOProc::audioInputNode == ioproc->getType() && numOuts <= 0)
                 return;
-            const uint32 numIns = proc->getNumPorts (PortType::Audio, true);
+            const uint32 numIns = node->getNumPorts (PortType::Audio, true);
             if (IOProc::audioOutputNode == ioproc->getType() && numIns <= 0)
                 return;
         }
@@ -365,41 +353,41 @@ private:
         Array <int> channelsToUse [PortType::Unknown];
         int maxLatency = getInputLatency (node->nodeId);
 
-        const uint32 numPorts (proc->getNumPorts());
+        const uint32 numPorts (node->getNumPorts());
         for (uint32 port = 0; port < numPorts; ++port)
         {
-            const PortType portType (proc->getPortType (port));
+            const PortType portType (node->getPortType (port));
 
             if (portType != PortType::Audio && portType != PortType::Atom) {
                 continue;
             }
 
-            const uint32 numIns    = proc->getNumPorts (portType, true);
-            const uint32 numOuts   = proc->getNumPorts (portType, false);
+            const uint32 numIns    = node->getNumPorts (portType, true);
+            const uint32 numOuts   = node->getNumPorts (portType, false);
 
             // Outputs only need a buffer if the channel index is greater
             // than or equal to the total inputs of the same port type
-            if (proc->isPortOutput (port))
+            if (node->isPortOutput (port))
             {
-                const int outputChan = proc->getChannelPort (port);
+                const int outputChan = node->getChannelPort (port);
                 if (outputChan >= (int)numIns && outputChan < (int)numOuts)
                 {
                     const int bufIndex = getFreeBuffer (portType);
                     channelsToUse [portType.id()].add (bufIndex);
-                    const uint32 outPort = proc->getNthPort (portType, outputChan, false, false);
+                    const uint32 outPort = node->getNthPort (portType, outputChan, false, false);
 
                     jassert (bufIndex != 0);
                     jassert (outPort == port);
-                    jassert (outPort < proc->getNumPorts());
+                    jassert (outPort < node->getNumPorts());
 
                     markBufferAsContaining (bufIndex, portType, node->nodeId, outPort);
                 }
                 continue;
             }
 
-            jassert (proc->isPortInput (port));
+            jassert (node->isPortInput (port));
 
-            const int inputChan = proc->getChannelPort (port);
+            const int inputChan = node->getChannelPort (port);
 
             // get a list of all the inputs to this node
             Array <uint32> sourceNodes;
@@ -443,9 +431,9 @@ private:
             }
             else if (sourceNodes.size() == 1)
             {
-                // channel with a straightforward single input..
-                const uint32 srcNode = sourceNodes.getUnchecked(0);
-                const uint32 srcPort = sourcePorts.getUnchecked(0);
+                // port with a straight forward single input..
+                const uint32 srcNode = sourceNodes.getUnchecked (0);
+                const uint32 srcPort = sourcePorts.getUnchecked (0);
 
                 bufIndex = getBufferContaining (portType, srcNode, srcPort);
 
@@ -597,20 +585,20 @@ private:
 
             if (inputChan < (int)numOuts)
             {
-                const int outputPort = proc->getNthPort (portType, inputChan, false, false);
+                const int outputPort = node->getNthPort (portType, inputChan, false, false);
                 markBufferAsContaining (bufIndex, portType, node->nodeId, outputPort);
             }
 
         } /* foreach port */
 
-        setNodeDelay (node->nodeId, maxLatency + node->getProcessor()->getLatencySamples());
+        setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
 
         if (proc->getTotalNumOutputChannels() == 0)
             totalLatency = maxLatency;
 
 #if 1
-        int totalChans = jmax (proc->getNumPorts (PortType::Audio, true),
-                               proc->getNumPorts (PortType::Audio, false));
+        int totalChans = jmax (node->getNumPorts (PortType::Audio, true),
+                               node->getNumPorts (PortType::Audio, false));
 
         renderingOps.add (new ProcessBufferOp (node, channelsToUse [PortType::Audio],
                                                totalChans, 0, channelsToUse));
@@ -678,7 +666,7 @@ private:
             const GraphNode* const node = (const GraphNode*) orderedNodes.getUnchecked (stepIndexToSearchFrom);
 
             {
-                for (uint32 i = 0; i < node->getProcessor()->getNumPorts(); ++i)
+                for (uint32 i = 0; i < node->getNumPorts(); ++i)
                     if (i != inputChannelOfIndexToIgnore
                          && graph.getConnectionBetween (sourceNode, outputPortIndex,
                                                         node->nodeId, i) != nullptr)
@@ -775,7 +763,7 @@ GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const
     return nullptr;
 }
 
-GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId)
+GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 nodeId)
 {
     if (newProcessor == nullptr || (void*)newProcessor == (void*)this)
     {
@@ -785,7 +773,7 @@ GraphNode* GraphProcessor::addNode (Processor* const newProcessor, uint32 nodeId
 
     for (int i = nodes.size(); --i >= 0;)
     {
-        if (nodes.getUnchecked(i)->getProcessor() == newProcessor)
+        if (nodes.getUnchecked(i)->getAudioProcessor() == newProcessor)
         {
             jassertfalse; // Cannot add the same object to the graph twice!
             return nullptr;
@@ -878,18 +866,16 @@ bool GraphProcessor::isConnected (const uint32 sourceNode,
     return false;
 }
 
-bool GraphProcessor::canConnect (const uint32 sourceNode,
-                                 const uint32 sourcePort,
-                                 const uint32 destNode,
-                                 const uint32 destPort) const
+bool GraphProcessor::canConnect (const uint32 sourceNode, const uint32 sourcePort,
+                                 const uint32 destNode, const uint32 destPort) const
 {
     if (sourceNode == destNode)
         return false;
 
     const GraphNode* const source = getNodeForId (sourceNode);
     if (source == nullptr
-         || (sourcePort >= source->proc->getNumPorts())
-         || (! source->proc->isPortOutput (sourcePort)))
+         || (sourcePort >= source->getNumPorts())
+         || (! source->isPortOutput (sourcePort)))
     {
         return false;
     }
@@ -897,14 +883,14 @@ bool GraphProcessor::canConnect (const uint32 sourceNode,
     const GraphNode* const dest = getNodeForId (destNode);
 
     if (dest == nullptr
-         || (destPort >= dest->proc->getNumPorts())
-         || (! dest->proc->isPortInput (destPort)))
+         || (destPort >= dest->getNumPorts())
+         || (! dest->isPortInput (destPort)))
     {
         return false;
     }
 
-    const PortType sourceType (source->proc->getPortType (sourcePort));
-    const PortType destType (dest->proc->getPortType (destPort));
+    const PortType sourceType (source->getPortType (sourcePort));
+    const PortType destType (dest->getPortType (destPort));
 
     if (! sourceType.canConnect (destType))
         return false;
@@ -1000,12 +986,10 @@ bool GraphProcessor::isConnectionLegal (const Connection* const c) const
     const GraphNode* const source = getNodeForId (c->sourceNode);
     const GraphNode* const dest   = getNodeForId (c->destNode);
 
-    return source != nullptr
-            && dest != nullptr
-            && source->proc->getPortType (c->sourcePort).canConnect (
-                 dest->proc->getPortType (c->destPort))
-            && c->sourcePort < source->proc->getNumPorts()
-            && c->destPort < dest->proc->getNumPorts();
+    return source != nullptr && dest != nullptr
+            && source->getPortType (c->sourcePort).canConnect (dest->getPortType (c->destPort))
+            && c->sourcePort < source->getNumPorts()
+            && c->destPort < dest->getNumPorts();
 }
 
 bool GraphProcessor::removeIllegalConnections()

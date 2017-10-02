@@ -66,7 +66,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
     {
 #if 1
         String errorMessage;
-        Processor* instance = pluginManager.createPlugin (*desc, errorMessage);
+        auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
 
         GraphNode* node = nullptr;
 

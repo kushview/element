@@ -50,6 +50,7 @@ public:
     void restoreUserPlugins (ApplicationProperties&);
     void restoreUserPlugins (const XmlElement& xml);
 
+    AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
     Processor *createPlugin (const PluginDescription& desc, String& errorMsg);
 
     void setPlayConfig (double sampleRate, int blockSize);
