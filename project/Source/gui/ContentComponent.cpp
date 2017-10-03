@@ -62,14 +62,14 @@ public:
           title ("No selection")
     {
         // addAndMakeVisible (title);
-        addAndMakeVisible (grid);
+//        addAndMakeVisible (grid);
 //        grid.setColour (TextButton::buttonColourId, Colors::toggleOrange.darker());
-        grid.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
-        grid.setToggleState (true, dontSendNotification);
-        grid.addListener (this);
+//        grid.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
+//        grid.setToggleState (true, dontSendNotification);
+//        grid.addListener (this);
         
 //        addAndMakeVisible (graph);
-////        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
+//        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
 //        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
 //        graph.addListener (this);
     }
