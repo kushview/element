@@ -45,8 +45,6 @@
         <FILE id="kvWn2k" name="EngineBase.cpp" compile="1" resource="0" file="Source/engine/EngineBase.cpp"/>
         <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>
         <FILE id="UpjKzL" name="GraphNode.h" compile="0" resource="0" file="Source/engine/GraphNode.h"/>
-        <FILE id="W7RYnx" name="GraphPlayer.cpp" compile="0" resource="0" file="Source/engine/GraphPlayer.cpp"/>
-        <FILE id="JXs4yK" name="GraphPlayer.h" compile="0" resource="0" file="Source/engine/GraphPlayer.h"/>
         <FILE id="kWMX9N" name="GraphPort.cpp" compile="0" resource="0" file="Source/engine/GraphPort.cpp"/>
         <FILE id="In9kWA" name="GraphPort.h" compile="0" resource="0" file="Source/engine/GraphPort.h"/>
         <FILE id="KPs4qR" name="GraphProcessor.cpp" compile="1" resource="0"
@@ -306,12 +304,17 @@
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0"/>
+                       defines="EL_USE_CI_AUTH=1"/>
         <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0" fastMath="0"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;" fastMath="0"/>
+        <CONFIGURATION name="DebugLocal" osxSDK="default" osxCompatibility="10.8 SDK"
+                       osxArchitecture="64BitIntel" isDebug="0" optimisation="1" targetName="Element"
+                       headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
+                       defines="EL_USE_LOCAL_AUTH=1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
