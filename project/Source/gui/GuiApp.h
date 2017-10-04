@@ -97,11 +97,6 @@ namespace Element {
 
         Element::LookAndFeel      lookAndFeel;
 
-        class Dispatch;
-        ScopedPointer<Dispatch>   dispatch;
-        void runDispatch();
-        friend class Dispatch;
-
         void showSplash();
     };
 

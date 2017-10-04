@@ -24,57 +24,11 @@
 
 namespace Element {
 
-class GuiApp::Dispatch : public Timer
-{
-public:
-    Dispatch (GuiApp& d)
-        : app (d)
-    {
-        setFrequencyMillis (64);
-    }
-
-    ~Dispatch()
-    {
-        stopTimer();
-    }
-
-    void setFrequencyMillis (int millis)
-    {
-        const bool wasRunning = isTimerRunning();
-
-        if (wasRunning)
-            stopTimer();
-
-        milliseconds = millis;
-
-        if (wasRunning && milliseconds > 0)
-            startTimer (milliseconds);
-    }
-
-    void timerCallback () {
-        app.runDispatch();
-    }
-
-    /** refresh rate in hertz */
-    double refreshRate() const
-    {
-        if (milliseconds <= 0)
-            return 0.0f;
-
-        return  1000.f / (double) milliseconds;
-    }
-
-private:
-    GuiApp& app;
-    int milliseconds;
-};
-
 GuiApp::GuiApp (Globals& w, AppController& a)
     : controller(a), world(w),
       windowManager (nullptr),
       mainWindow (nullptr)
 {
-    dispatch = new Dispatch (*this);
     LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     windowManager = new WindowManager (*this);
     commander().registerAllCommandsForTarget (this);
@@ -173,7 +127,6 @@ void GuiApp::runDialog (Component* c, const String& title)
 }
 
 void GuiApp::showSplash() { }
-void GuiApp::runDispatch() { }
 
 void GuiApp::run()
 {
@@ -486,7 +439,8 @@ bool GuiApp::perform (const InvocationInfo& info)
             saveSession (true);
             return true;
             break;
-        case Commands::showAbout: {
+        case Commands::showAbout:
+		{
             if (! about) {
                 about = new AboutComponent (*this);
                 about->centreWithSize(about->getWidth(), about->getHeight());
@@ -512,8 +466,7 @@ bool GuiApp::perform (const InvocationInfo& info)
             break;
         case Commands::showPreferences:
             runDialog (ELEMENT_PREFERENCES);
-            return true;
-        break;
+			break;
         case Commands::transportRewind:
             break;
         case Commands::transportForward:
@@ -526,11 +479,9 @@ bool GuiApp::perform (const InvocationInfo& info)
         case Commands::transportSeekZero:
             break;
         case Commands::quit:
-        {
-
-            return false;
-        }
-        case Commands::transportStop:
+ 			JUCEApplication::getInstance()->systemRequestedQuit();
+			break;
+		case Commands::transportStop:
             sr->testSetRecording (false);
             sr->testSetPlaying (false);
             break;
