@@ -4,7 +4,6 @@
 */
 
 #include "engine/AudioEngine.h"
-#include "engine/ClipFactory.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
@@ -21,68 +20,32 @@ public:
     ~RootGraph() { }
 };
 
-class  AudioEngine::Callback : public AudioIODeviceCallback,
-                               public MidiInputCallback
+class AudioEngine::Private : public AudioIODeviceCallback,
+                             public MidiInputCallback
 {
 public:
-    Callback (AudioEngine* e)
-        : engine (e),
-          processor (nullptr),
-          sampleRate (0),
-          blockSize (0),
-          isPrepared (false),
-          numInputChans (0),
-          numOutputChans (0),
-          tempBuffer (1, 1)
-    { }
-
-    ~Callback()
+    Private (AudioEngine& e)
+    : engine (e),sampleRate (0), blockSize (0), isPrepared (false),
+      numInputChans (0), numOutputChans (0),
+      tempBuffer (1, 1)
     {
-        setRootGraph (nullptr);
+        graph.setPlayHead (&transport);
     }
 
-    void setRootGraph (GraphProcessor* const nextGraph)
+    ~Private()
     {
-        if (processor != nextGraph)
-        {
-            if (nextGraph != nullptr && sampleRate > 0 && blockSize > 0)
-            {
-                nextGraph->setPlayHead (engine->transport());
-                nextGraph->setPlayConfigDetails (numInputChans, numOutputChans,
-                                                 sampleRate, blockSize);
-                nextGraph->prepareToPlay (sampleRate, blockSize);
-            }
-
-            GraphProcessor* oldOne;
-
-            {
-                const ScopedLock sl (lock);
-                oldOne = isPrepared ? processor : nullptr;
-                processor = nextGraph;
-
-                if (processor != nullptr)
-                    processor->setPlayHead (engine->transport());
-
-                isPrepared = true;
-            }
-
-            if (oldOne != nullptr) {
-                oldOne->setPlayHead (nullptr);
-                oldOne->releaseResources();
-            }
-        }
     }
 
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
     {
-        engine->transport()->preProcess (numSamples);
+        transport.preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
         incomingMidi.clear();
-
+        
         int totalNumChans = 0;
-
+        
         if (numInputChannels > numOutputChannels)
         {
             // if there aren't enough output channels for the number of
@@ -90,14 +53,14 @@ public:
             // use the input data in case it gets written to)
             tempBuffer.setSize (numInputChannels - numOutputChannels, numSamples,
                                 false, false, true);
-
+            
             for (int i = 0; i < numOutputChannels; ++i)
             {
                 channels[totalNumChans] = outputChannelData[i];
                 memcpy (channels[totalNumChans], inputChannelData[i], sizeof (float) * (size_t) numSamples);
                 ++totalNumChans;
             }
-
+            
             for (int i = numOutputChannels; i < numInputChannels; ++i)
             {
                 channels[totalNumChans] = tempBuffer.getWritePointer (i - numOutputChannels, 0);
@@ -113,7 +76,7 @@ public:
                 memcpy (channels[totalNumChans], inputChannelData[i], sizeof (float) * (size_t) numSamples);
                 ++totalNumChans;
             }
-
+            
             for (int i = numInputChannels; i < numOutputChannels; ++i)
             {
                 channels[totalNumChans] = outputChannelData[i];
@@ -121,16 +84,17 @@ public:
                 ++totalNumChans;
             }
         }
-
+        
         const ScopedLock sl (lock);
-
-        if (processor != nullptr)
+        
+        const bool shouldProcess = true;
+        if (shouldProcess)
         {
-            const int remainingFrames = engine->transport()->getRemainingFrames();
+            const int remainingFrames = transport.getRemainingFrames();
             ignoreUnused (remainingFrames);
-            const ScopedLock sl2 (processor->getCallbackLock());
-
-            if (processor->isSuspended())
+            const ScopedLock sl2 (graph.getCallbackLock());
+            
+            if (graph.isSuspended())
             {
                 for (int i = 0; i < numOutputChannels; ++i)
                     zeromem (outputChannelData[i], sizeof (float) * (size_t) numSamples);
@@ -139,107 +103,82 @@ public:
             {
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
                 AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-                processor->processBlock (buffer, incomingMidi);
-                if (engine->transport()->isPlaying()) {
-                    engine->transport()->advance (numSamples);
+                graph.processBlock (buffer, incomingMidi);
+                if (transport.isPlaying()) {
+                    transport.advance (numSamples);
                 }
             }
         }
         
-        engine->transport()->postProcess (numSamples);
+        transport.postProcess (numSamples);
     }
-
+    
     void audioDeviceAboutToStart (AudioIODevice* const device) override
     {
         const double newSampleRate = device->getCurrentSampleRate();
         const int newBlockSize     = device->getCurrentBufferSizeSamples();
         const int numChansIn       = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
-
+        
         const ScopedLock sl (lock);
-
-        sampleRate = newSampleRate;
-        blockSize  = newBlockSize;
-        numInputChans  = numChansIn;
-        numOutputChans = numChansOut;
-
+        
+        sampleRate      = newSampleRate;
+        blockSize       = newBlockSize;
+        numInputChans   = numChansIn;
+        numOutputChans  = numChansOut;
+        
         messageCollector.reset (sampleRate);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
-
-        if (processor != nullptr)
-        {
-            if (isPrepared)
-                processor->releaseResources();
-
-            processor->setPlayConfigDetails (numChansIn, numChansOut, sampleRate, blockSize);
-            GraphProcessor* const oldProcessor = processor;
-            setRootGraph (nullptr);
-            setRootGraph (oldProcessor);
-        }
+        
+        if (isPrepared)
+            graph.releaseResources();
+        
+        graph.setPlayConfigDetails (numChansIn, numChansOut, sampleRate, blockSize);
+        graph.setPlayHead (&transport);
+        graph.prepareToPlay (sampleRate, blockSize);
+        isPrepared = true;
     }
-
+    
     void audioDeviceStopped() override
     {
         const ScopedLock sl (lock);
-
-        if (processor != nullptr && isPrepared)
-            processor->releaseResources();
-
-        sampleRate = 0.0;
-        blockSize = 0;
-        isPrepared = false;
+        if (isPrepared)
+            graph.releaseResources();
+        isPrepared  = false;
+        sampleRate  = 0.0;
+        blockSize   = 0;
         tempBuffer.setSize (1, 1);
     }
-
+    
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         messageCollector.addMessageToQueue (message);
     }
 
 private:
-    AudioEngine* engine;
-    GraphProcessor* processor;
-    CriticalSection lock;
-    double sampleRate;
-    int blockSize;
-    bool isPrepared;
-
-    int numInputChans, numOutputChans;
-    HeapBlock<float*> channels;
-    AudioSampleBuffer tempBuffer;
-
-    MidiBuffer incomingMidi;
-    MidiMessageCollector messageCollector;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Callback)
-};
-
-class AudioEngine::Private
-{
-public:
-    Private (AudioEngine& e)
-        : engine (e)
-    {
-        graph.setPlayHead (&transport);
-        clips = new ClipFactory (e);
-        clips->registerType (createMidiClipType());
-    }
-
-    ~Private()
-    {
-        clips = nullptr;
-    }
-
+    friend class AudioEngine;
     AudioEngine& engine;
     RootGraph graph;
     Transport transport;
-    ScopedPointer<ClipFactory> clips;
+    
+    CriticalSection lock;
+    double sampleRate   = 0.0;
+    int blockSize       = 0;
+    bool isPrepared     = false;
+    
+    int numInputChans, numOutputChans;
+    HeapBlock<float*> channels;
+    AudioSampleBuffer tempBuffer;
+    
+    MidiBuffer incomingMidi;
+    MidiMessageCollector messageCollector;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
 };
 
 AudioEngine::AudioEngine (Globals& g)
     : world (g)
 {
-    cb   = new Callback (this);
     priv = new Private (*this);
 }
 
@@ -247,46 +186,29 @@ AudioEngine::~AudioEngine()
 {
     deactivate();
     priv = nullptr;
-    delete cb;
-    cb = nullptr;
 }
 
 void AudioEngine::activate()
 {
-    auto& devices (globals().getDeviceManager());    
+    auto& devices (globals().getDeviceManager());
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
-    cb->setRootGraph (&graph());
 }
 
 void AudioEngine::deactivate()
 {
-    cb->setRootGraph (nullptr);
-    globals().getDeviceManager().removeMidiInputCallback (String::empty, &getMidiInputCallback());
-    
+    auto& devices (globals().getDeviceManager());
+    devices.removeMidiInputCallback (String::empty, &getMidiInputCallback());
     priv->graph.clear();
     priv->graph.reset();
 }
 
-AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (cb != nullptr); return *cb; }
-MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (cb != nullptr); return *cb; }
-
-ClipFactory& AudioEngine::clips()
-{
-    jassert (priv->clips != nullptr);
-    return *priv->clips;
-}
+AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }
+MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (priv != nullptr); return *priv; }
 
 Globals& AudioEngine::globals() { return world; }
 
-GraphProcessor& AudioEngine::graph()
-{
-    return priv->graph;
-}
-
-Transport* AudioEngine::transport()
-{
-    return &priv->transport;
-}
+GraphProcessor& AudioEngine::getRootGraph()         { return priv->graph; }
+Transport* AudioEngine::transport()                 { return &priv->transport; }
 
 ValueTree AudioEngine::createGraphTree()
 {

@@ -63,7 +63,7 @@ GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
 {
     auto* cc = findContentComponent (c);
     if (! cc) return nullptr;
-    auto& graph (cc->getGlobals().getAudioEngine()->graph());
+    auto& graph (cc->getGlobals().getAudioEngine()->getRootGraph());
     return graph.getNodeForId (node.getNodeId());
 }
 

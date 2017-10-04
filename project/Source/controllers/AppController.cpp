@@ -150,7 +150,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
-                GraphProcessor& graph (world.getAudioEngine()->graph());
+                auto& graph (world.getAudioEngine()->getRootGraph());
                 
                 if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elgraph"))
                 {
@@ -181,7 +181,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
-                GraphProcessor& graph (world.getAudioEngine()->graph());
+                GraphProcessor& graph (world.getAudioEngine()->getRootGraph());
                 FileChooser chooser ("Save current graph", File(), "*.elgraph");
                 if (chooser.browseForFileToSave (true))
                 {

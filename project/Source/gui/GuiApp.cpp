@@ -540,4 +540,11 @@ bool GuiApp::perform (const InvocationInfo& info)
     return result;
 }
 
+void GuiApp::stabilizeContent()
+{
+    if (this->content) {
+        content->stabilize();
+    }
+}
+
 }

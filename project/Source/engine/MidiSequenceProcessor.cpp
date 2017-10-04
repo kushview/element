@@ -44,6 +44,7 @@ namespace Element {
     void MidiSequenceProcessor::prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
         setPlayConfigDetails (0, 0, sampleRate, estimatedBlockSize);
+#if 0
         if (ClipSource* s = engine.clips().createSource (clip))
         {
             source = s;
@@ -54,7 +55,7 @@ namespace Element {
             source = nullptr;
             DBG("could not create midi clip source");
         }
-        
+#endif
         player.prepareToPlay (sampleRate, estimatedBlockSize);
     }
     
@@ -97,6 +98,7 @@ namespace Element {
         const ValueTree newData (ValueTree::readFromStream (input));
         if (newData.isValid())
         {
+#if 0
             clip.setData (newData);
             if (auto* s = engine.clips().createSource (clip)) {
                 source = s;
@@ -105,6 +107,7 @@ namespace Element {
             {
                 source = nullptr;
             }
+            #endif
         }
     }
     

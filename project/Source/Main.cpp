@@ -7,6 +7,7 @@
 
 #include "controllers/AppController.h"
 #include "engine/InternalFormat.h"
+#include "engine/GraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
@@ -143,19 +144,24 @@ public:
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
         
-        controller->deactivate();
-
         AudioEnginePtr engine (world->getAudioEngine());
+        DBG(engine->getRootGraph().getGraphState().toXmlString());
+        
         PluginManager& plugins (world->getPluginManager());
         Settings& settings (world->getSettings());
         auto* props = settings.getUserSettings();
         jassert (props);
         
+        controller->deactivate();
+        
         plugins.saveUserPlugins (settings);
         if (ScopedXml el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el);
         
-        settings.setLastGraph (engine->createGraphTree());
+        if (status.isUnlocked())
+        {
+            settings.setLastGraph (engine->createGraphTree());
+        }
         
         engine = nullptr;
         controller = nullptr;

@@ -32,9 +32,8 @@ public:
     void restoreFromGraphTree (const ValueTree&);
     
     // Member access
-    ClipFactory& clips();
     Globals& globals();
-    GraphProcessor& graph();
+    GraphProcessor& getRootGraph();
     Transport* transport();
 
     // Engine methods
@@ -42,8 +41,6 @@ public:
     MidiInputCallback& getMidiInputCallback() override;
     
 private:
-    class Callback;
-    Callback* cb;
     class Private;
     ScopedPointer<Private> priv;
     Globals& world;

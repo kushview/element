@@ -84,7 +84,7 @@ void EngineController::activate()
     auto& devices (globals.getDeviceManager());
     
     AudioEnginePtr engine (globals.getAudioEngine());
-    GraphProcessor& graph (engine->graph());
+    GraphProcessor& graph (engine->getRootGraph());
     
     if (auto* device = devices.getCurrentAudioDevice())
     {
@@ -96,7 +96,7 @@ void EngineController::activate()
         graph.setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
     }
     
-    root = new GraphController (engine->graph(), globals.getPluginManager());
+    root = new GraphController (engine->getRootGraph(), globals.getPluginManager());
     
     if (ScopedXml xml = settings.getLastGraph())
     {
@@ -106,11 +106,21 @@ void EngineController::activate()
     
     engine->activate();
     root->addChangeListener (this);
+    devices.addChangeListener (this);
 }
 
 void EngineController::deactivate()
 {
     Controller::deactivate();
+    auto* app = dynamic_cast<AppController*> (getRoot());
+    auto& globals (app->getWorld());
+    auto& devices (globals.getDeviceManager());
+    devices.removeChangeListener (this);
+    if (root)
+    {
+        root->removeChangeListener (this);
+        root = nullptr;
+    }
 }
 
 void EngineController::clear()
@@ -157,10 +167,29 @@ void EngineController::setRootNode (const Node& newRootNode)
     jassert (arcs.getNumChildren() == root->getNumConnections ());
 }
 
-void EngineController::changeListenerCallback (ChangeBroadcaster*)
+void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
-    if (auto* app = dynamic_cast<AppController*> (getRoot())) {
-        ignoreUnused (app);
+    auto* app = dynamic_cast<AppController*> (getRoot());
+    auto& devices (app->getWorld().getDeviceManager());
+    
+    if (cb == (ChangeBroadcaster*) &devices)
+    {
+        DeviceManager::AudioSettings setup;
+        devices.getAudioDeviceSetup (setup);
+        
+        auto& processor (root->getGraph());
+        
+        for (int i = processor.getNumNodes(); --i >= 0;)
+        {
+            auto node = processor.getNode (i);
+            if (node->isAudioIONode())
+                processor.removeNode (node->nodeId);
+        }
+        
+        typedef GraphProcessor::AudioGraphIOProcessor IOP;
+        processor.addNode (new IOP (IOP::audioInputNode));
+        processor.addNode (new IOP (IOP::audioOutputNode));
     }
 }
+
 }

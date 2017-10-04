@@ -809,6 +809,8 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
         nodesModel.addChild (n->metadata, -1, nullptr);
         jassert(getNumNodes() == nodesModel.getNumChildren());
         
+        DBG(getGraphState().toXmlString());
+        
         triggerAsyncUpdate();
         
         return n;
@@ -823,14 +825,17 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
 
     for (int i = nodes.size(); --i >= 0;)
     {
-        GraphNodePtr n = nodes.getUnchecked(i);
+        GraphNodePtr n = nodes.getUnchecked (i);
         if (nodes.getUnchecked(i)->nodeId == nodeId)
         {
-            n->setParentGraph (nullptr);
-            nodes.remove (i);
+            nodes.remove(i);
             nodesModel.removeChild (n->metadata, nullptr);
             jassert(getNumNodes() == nodesModel.getNumChildren());
-            triggerAsyncUpdate();
+
+            // triggerAsyncUpdate();
+            // do this syncronoously so it wont try processing with a null graph
+            handleAsyncUpdate();
+            n->setParentGraph (nullptr);
             return true;
         }
     }

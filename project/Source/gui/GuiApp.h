@@ -73,6 +73,8 @@ namespace Element {
         /** Get a reference to Sesison data */
         SessionRef session();
 
+        void stabilizeContent();
+        
         /* Command manager... */
         virtual ApplicationCommandTarget* getNextCommandTarget();
         virtual void getAllCommands (Array <CommandID>& commands);

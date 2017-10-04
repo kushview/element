@@ -88,7 +88,6 @@ void GraphNode::connectAudioTo (const GraphNode* other)
 bool GraphNode::isAudioIONode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
-
     if (IOP* iop = dynamic_cast<IOP*> (proc.get()))
     {
         return iop->getType() == IOP::audioInputNode ||

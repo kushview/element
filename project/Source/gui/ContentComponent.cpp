@@ -25,10 +25,10 @@ namespace Element {
     class ContentComponent::Resizer : public StretchableLayoutResizerBar
     {
     public:
-        Resizer(ContentComponent& contentComponent,
-                StretchableLayoutManager* layoutToUse,
-                int itemIndexInLayout,
-                bool isBarVertical)
+        Resizer (ContentComponent& contentComponent,
+                 StretchableLayoutManager* layoutToUse,
+                 int itemIndexInLayout,
+                 bool isBarVertical)
             : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
               owner (contentComponent)
         {
@@ -325,7 +325,7 @@ public:
         addAndMakeVisible (dummy2 = new Component());
         
         AudioEnginePtr e (app.getGlobals().getAudioEngine());
-        GraphProcessor& graph (e->graph());
+        GraphProcessor& graph (e->getRootGraph());
         const Node root (graph.getGraphModel());
         dummy1->setNode (root);
         
@@ -339,11 +339,6 @@ public:
     {
         Component* comps[] = { dummy1.get(), bar.get(), dummy2.get() };
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
-    }
-    
-    void stabilize()
-    {
-
     }
     
 private:
