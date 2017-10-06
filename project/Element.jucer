@@ -304,17 +304,21 @@
         <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;"/>
+        <CONFIGURATION name="DebugCI" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_CI_AUTH=1"/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
-                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
-                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;" fastMath="0"/>
         <CONFIGURATION name="DebugLocal" osxSDK="default" osxCompatibility="10.8 SDK"
                        osxArchitecture="64BitIntel" isDebug="0" optimisation="1" targetName="Element"
                        headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=1"/>
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
+                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;" fastMath="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>

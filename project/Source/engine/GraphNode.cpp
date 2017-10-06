@@ -154,6 +154,24 @@ bool GraphNode::isPortOutput (const uint32 port) const
     return ! Processor::isPortInput (proc.get(), port);
 }
 
+uint32 GraphNode::getPortForChanel (const PortType type, const int channel, const bool isInput) const
+{
+    uint32 port = KV_INVALID_PORT;
+    
+    switch (type)
+    {
+        case PortType::Audio:
+        {
+            return Processor::getPortForAudioChannel (proc.get(), channel, isInput);
+        }
+        break;
+        
+        default: break;
+    }
+    
+    return port;
+}
+    
 int GraphNode::getChannelPort (const uint32 port) const
 {
     jassert (port < getNumPorts());

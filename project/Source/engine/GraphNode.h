@@ -41,10 +41,18 @@ public:
     PortType getPortType (const uint32 port) const;
     uint32 getNumPorts() const;
     int getNumPorts (const PortType type, const bool isInput) const;
+    uint32 getPortForChanel (const PortType type, const int channel, const bool isInput) const;
+    
     int getChannelPort (const uint32 port) const;
+    
     int getNthPort (const PortType portType, const int inputChan, bool, bool) const;
+    
+    /** Returns true if an input port */
     bool isPortInput (const uint32 port) const;
+
+    /** Returns true if an output port */
     bool isPortOutput (const uint32 port) const;
+    
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
     
@@ -104,6 +112,7 @@ public:
 
 private:
     friend class GraphProcessor;
+    friend class EngineController;
 
     const ScopedPointer<AudioProcessor> proc;
     bool isPrepared;

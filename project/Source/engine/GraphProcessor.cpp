@@ -925,12 +925,8 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
     GraphNode* dst = getNodeForId (destNode);
     if (! src && ! dst)
         return false;
-
-    uint32 from = src->getProcessor()->getNthPort (type, sourceChannel, false, false);
-    uint32 to   = dst->getProcessor()->getNthPort (type, destChannel, true, false);
-
-    const bool res = addConnection (sourceNode, from, destNode, to);
-    return res;
+    return addConnection (sourceNode, src->getPortForChanel (type, sourceChannel, false),
+                          destNode,   dst->getPortForChanel (type, destChannel, true));
 }
 
 void GraphProcessor::removeConnection (const int index)
