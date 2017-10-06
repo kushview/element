@@ -201,8 +201,8 @@ public:
         while (audioChannelsToUse.size() < totalChans)
             audioChannelsToUse.add (0);
 
-        if (chans[PortType::Atom].size() > 0)
-            midiBufferToUse = chans[PortType::Atom].getFirst();
+        if (chans[PortType::Midi].size() > 0)
+            midiBufferToUse = chans[PortType::Midi].getFirst();
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
@@ -358,7 +358,7 @@ private:
         {
             const PortType portType (node->getPortType (port));
 
-            if (portType != PortType::Audio && portType != PortType::Atom) {
+            if (portType != PortType::Audio && portType != PortType::Midi) {
                 continue;
             }
 
@@ -421,7 +421,7 @@ private:
                         case PortType::Audio:
                             renderingOps.add (new ClearChannelOp (bufIndex));
                             break;
-                        case PortType::Atom:
+                        case PortType::Midi:
                             renderingOps.add (new ClearMidiBufferOp (bufIndex));
                             break;
                         default:
@@ -457,7 +457,7 @@ private:
                         case PortType::Audio:
                             renderingOps.add (new CopyChannelOp (bufIndex, newFreeBuffer));
                             break;
-                        case PortType::Atom:
+                        case PortType::Midi:
                             renderingOps.add (new CopyMidiBufferOp (bufIndex, newFreeBuffer));
                             break;
                         default:
@@ -519,14 +519,14 @@ private:
                         // if not found, this is probably a feedback loop
                         if (portType == PortType::Audio)
                             renderingOps.add (new ClearChannelOp (bufIndex));
-                        else if (portType == PortType::Atom)
+                        else if (portType == PortType::Midi)
                             renderingOps.add (new ClearMidiBufferOp (bufIndex));
                     }
                     else
                     {
                         if (portType == PortType::Audio)
                             renderingOps.add (new CopyChannelOp (srcIndex, bufIndex));
-                        else if (portType == PortType::Atom)
+                        else if (portType == PortType::Midi)
                             renderingOps.add (new CopyMidiBufferOp (srcIndex, bufIndex));
                     }
 
@@ -571,7 +571,7 @@ private:
 
                                 renderingOps.add (new AddChannelOp (srcIndex, bufIndex));
                             }
-                            else if (portType == PortType::Atom)
+                            else if (portType == PortType::Midi)
                             {
                                 renderingOps.add (new AddMidiBufferOp (srcIndex, bufIndex));
                             }
@@ -1076,7 +1076,7 @@ void GraphProcessor::buildRenderingSequence()
         GraphRender::ProcessorGraphBuilder calculator (*this, orderedNodes, newRenderingOps);
 
         numRenderingBuffersNeeded = calculator.buffersNeeded (PortType::Audio);
-        numMidiBuffersNeeded      = calculator.buffersNeeded (PortType::Atom);
+        numMidiBuffersNeeded      = calculator.buffersNeeded (PortType::Midi);
     }
 
     {
