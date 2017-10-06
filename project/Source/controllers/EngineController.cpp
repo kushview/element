@@ -169,6 +169,7 @@ void EngineController::setRootNode (const Node& newRootNode)
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
+    typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& devices (app->getWorld().getDeviceManager());
     
@@ -181,14 +182,45 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
         
         for (int i = processor.getNumNodes(); --i >= 0;)
         {
-            auto node = processor.getNode (i);
+            GraphNodePtr node = processor.getNode (i);
             if (node->isAudioIONode())
-                processor.removeNode (node->nodeId);
+            {
+                const IOP::IODeviceType type = (dynamic_cast<IOP*>(node->getAudioProcessor()))->getType();
+                const uint32 nodeId = node->nodeId;
+                OwnedArray<kv::Arc> savedArcs;
+                
+                for (int c = 0; c < processor.getNumConnections(); ++c)
+                {
+                    const auto* conn = processor.getConnection (c);
+                
+                    if (type == IOP::audioInputNode && nodeId == conn->sourceNode)
+                    {
+                        auto dest = processor.getNodeForId (conn->destNode);
+                        savedArcs.add (new Arc (conn->sourceNode, (uint32) node->getChannelPort (conn->sourcePort),
+                                                conn->destNode,   (uint32) dest->getChannelPort (conn->destPort)));
+                    }
+                    else if (type == IOP::audioOutputNode && nodeId == conn->destNode)
+                    {
+                        auto src = processor.getNodeForId (conn->sourceNode);
+                        savedArcs.add (new Arc (conn->sourceNode, (uint32) src->getChannelPort (conn->sourcePort),
+                                                conn->destNode,   (uint32) node->getChannelPort (conn->destPort)));
+                    }
+                }
+                
+                processor.removeNode (nodeId);
+                
+                for (const auto* arc : savedArcs)
+                {
+                    auto s = processor.getNodeForId (arc->sourceNode);
+                    auto d = processor.getNodeForId (arc->destNode);
+                    if (!s || !d)
+                        continue;
+                    processor.connectChannels (PortType::Audio,
+                                               arc->sourceNode, (int) arc->sourcePort,
+                                               arc->destNode,   (int) arc->destPort);
+                }
+            }
         }
-        
-        typedef GraphProcessor::AudioGraphIOProcessor IOP;
-        processor.addNode (new IOP (IOP::audioInputNode));
-        processor.addNode (new IOP (IOP::audioOutputNode));
     }
 }
 
