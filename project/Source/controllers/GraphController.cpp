@@ -54,8 +54,7 @@ const GraphNodePtr GraphController::getNode (const int index) const noexcept
     return processor.getNode (index);
 }
 
-const GraphNodePtr
-GraphController::getNodeForId (const uint32 uid) const noexcept
+const GraphNodePtr GraphController::getNodeForId (const uint32 uid) const noexcept
 {
     return processor.getNodeForId (uid);
 }

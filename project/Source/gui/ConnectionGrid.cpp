@@ -396,17 +396,20 @@ namespace Element {
                 resetMatrix();
             } else if (nodeModels == parentTree && childWhichHasBeenAdded.hasType(Tags::node)) {
                 buildNodeArray();
+            } else if (childWhichHasBeenAdded.hasType (Tags::ports) || childWhichHasBeenAdded.hasType (Tags::port)) {
+                buildNodeArray();
             }
         }
         
-        virtual void valueTreeChildRemoved (ValueTree& parentTree,
-                                            ValueTree& childWhichHasBeenRemoved,
+        virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved,
                                             int indexFromWhichChildWasRemoved) override
         {
             if (parentTree == nodeModels.getParent() && childWhichHasBeenRemoved.hasType(Tags::nodes)) {
                 buildNodeArray();
                 resetMatrix();
             } else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node)) {
+                buildNodeArray();
+            } else if (childWhichHasBeenRemoved.hasType (Tags::ports) || childWhichHasBeenRemoved.hasType(Tags::port)) {
                 buildNodeArray();
             }
         }

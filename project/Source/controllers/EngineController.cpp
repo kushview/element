@@ -169,6 +169,7 @@ void EngineController::setRootNode (const Node& newRootNode)
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
+    typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& devices (app->getWorld().getDeviceManager());
     
@@ -176,19 +177,25 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     {
         DeviceManager::AudioSettings setup;
         devices.getAudioDeviceSetup (setup);
-        
         auto& processor (root->getGraph());
-        
+        processor.suspendProcessing (true);
+        processor.setPlayConfigDetails (setup.inputChannels.countNumberOfSetBits(),
+                                        setup.outputChannels.countNumberOfSetBits(),
+                                        setup.sampleRate, setup.bufferSize);
         for (int i = processor.getNumNodes(); --i >= 0;)
         {
-            auto node = processor.getNode (i);
+            GraphNodePtr node = processor.getNode (i);
             if (node->isAudioIONode())
-                processor.removeNode (node->nodeId);
+            {
+                (dynamic_cast<IOP*>(node->getProcessor()))->releaseResources();
+                (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
+                (dynamic_cast<IOP*>(node->getProcessor()))->prepareToPlay (setup.sampleRate, setup.bufferSize);
+                processor.removeIllegalConnections();
+                node->resetPorts();
+            }
         }
         
-        typedef GraphProcessor::AudioGraphIOProcessor IOP;
-        processor.addNode (new IOP (IOP::audioInputNode));
-        processor.addNode (new IOP (IOP::audioOutputNode));
+        processor.suspendProcessing (false);
     }
 }
 
