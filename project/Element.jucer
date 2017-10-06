@@ -42,7 +42,6 @@
         <FILE id="K1qC5U" name="ClipSource.h" compile="0" resource="0" file="Source/engine/ClipSource.h"/>
         <FILE id="kBJmQL" name="DataType.h" compile="0" resource="0" file="Source/engine/DataType.h"/>
         <FILE id="q8nmE2" name="Engine.h" compile="0" resource="0" file="Source/engine/Engine.h"/>
-        <FILE id="kvWn2k" name="EngineBase.cpp" compile="1" resource="0" file="Source/engine/EngineBase.cpp"/>
         <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>
         <FILE id="UpjKzL" name="GraphNode.h" compile="0" resource="0" file="Source/engine/GraphNode.h"/>
         <FILE id="kWMX9N" name="GraphPort.cpp" compile="0" resource="0" file="Source/engine/GraphPort.cpp"/>

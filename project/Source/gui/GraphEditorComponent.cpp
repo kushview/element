@@ -199,7 +199,7 @@ public:
     void updatePosition()
     {
         double x = 0.0f, y = 0.0f;
-        graph.getNodePosition (filterID, x, y);
+//        graph.getNodePosition (filterID, x, y);
         setCentreRelative ((float) x, (float) y);
         getGraphPanel()->updateConnectorComponents();
     }
@@ -214,10 +214,10 @@ public:
         if (getParentComponent() != nullptr)
             pos = getParentComponent()->getLocalPoint (nullptr, pos);
         
-        graph.setNodePosition (filterID,
-                               (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-        
+//        graph.setNodePosition (filterID,
+//                               (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+//                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+//
         updatePosition();
     }
 
@@ -354,7 +354,7 @@ public:
         {
             double x, y;
             x = y = 0.0f;
-            graph.getNodePosition (filterID, x, y);
+//            graph.getNodePosition (filterID, x, y);
             setCentreRelative ((float) x, (float) y);
         }
 

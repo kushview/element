@@ -154,7 +154,7 @@ public:
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
-
+ DBG(engine->getRootGraph().getGraphModel().toXmlString());
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);
@@ -166,6 +166,7 @@ public:
             settings.setLastGraph (engine->createGraphTree());
         }
         
+       
         engine = nullptr;
         controller = nullptr;
         world->setEngine (nullptr);

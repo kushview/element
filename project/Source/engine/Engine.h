@@ -3,8 +3,7 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_ENGINE_BASE_H
-#define ELEMENT_ENGINE_BASE_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -21,5 +20,3 @@ public:
 typedef ReferenceCountedObjectPtr<Engine> EnginePtr;
 
 }
-
-#endif // ELEMENT_ENGINE_BASE_H

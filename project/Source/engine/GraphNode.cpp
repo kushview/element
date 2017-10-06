@@ -314,6 +314,28 @@ void GraphNode::resetPorts()
         ++index;
     }
     
+    if (proc->acceptsMidi())
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Slugs::name,  "MIDI Input", nullptr);
+        ports.addChild (port, index, nullptr);
+        index++;
+    }
+    
+    if (proc->producesMidi())
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Slugs::name,  "MIDI Output", nullptr);
+        ports.addChild (port, index, nullptr);
+        index++;
+    }
+    
     metadata.addChild (ports, 0, nullptr);
 }
 

@@ -2,7 +2,7 @@
 
 namespace Element {
     
-class GraphController;
+class RootGraphController;
 class Node;
     
 class EngineController : public Controller,
@@ -26,7 +26,7 @@ public:
     void setRootNode (const Node&);
     
 private:
-    ScopedPointer<GraphController> root;
+    ScopedPointer<RootGraphController> root;
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
 };

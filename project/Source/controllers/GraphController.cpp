@@ -1,26 +1,3 @@
-/*
-  ==============================================================================
-
-   This file is part of the JUCE library.
-   Copyright (c) 2013 - Raw Material Software Ltd.
-
-   Permission is granted to use this software under the terms of either:
-   a) the GPL v2 (or any later version)
-   b) the Affero GPL v3
-
-   Details of these licenses can be found at: www.gnu.org/licenses
-
-   JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-   ------------------------------------------------------------------------------
-
-   To release a closed-source product which uses JUCE, commercial licenses are
-   available: visit www.juce.com for more information.
-
-  ==============================================================================
-*/
 
 #include "controllers/GraphController.h"
 #include "session/PluginManager.h"
@@ -33,17 +10,13 @@ GraphController::GraphController (GraphProcessor& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
 { }
 
-GraphController::~GraphController()
-{
-    //processor.clear();
-}
+GraphController::~GraphController() { }
 
 uint32 GraphController::getNextUID() noexcept
 {
     return ++lastUID;
 }
 
-//==============================================================================
 int GraphController::getNumFilters() const noexcept
 {
     return processor.getNumNodes();
@@ -63,7 +36,6 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
 {
     if (desc != nullptr)
     {
-#if 1
         String errorMessage;
         auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
 
@@ -86,7 +58,6 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
                                          TRANS ("Couldn't create filter"),
                                          errorMessage);
         }
-#endif
     }
 
     return nodeId;
@@ -110,31 +81,6 @@ void GraphController::removeIllegalConnections()
         changed();
 }
 
-void GraphController::setNodePosition (const int nodeId, double x, double y)
-{
-    const GraphNodePtr n (processor.getNodeForId (nodeId));
-
-    if (n != nullptr)
-    {
-        n->properties.set ("x", jlimit (0.0, 1.0, x));
-        n->properties.set ("y", jlimit (0.0, 1.0, y));
-    }
-}
-
-void GraphController::getNodePosition (const int nodeId, double& x, double& y) const
-{
-    x = y = 0;
-
-    const GraphNodePtr n (processor.getNodeForId (nodeId));
-
-    if (n != nullptr)
-    {
-        x = (double) n->properties ["x"];
-        y = (double) n->properties ["y"];
-    }
-}
-
-//==============================================================================
 int GraphController::getNumConnections() const noexcept
 {
     return processor.getNumConnections();
@@ -177,11 +123,10 @@ void GraphController::removeConnection (const int index)
     changed();
 }
 
-void GraphController::removeConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                        uint32 destFilterUID, int destFilterChannel)
+void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
+                                        uint32 destNode, uint32 destPort)
 {
-    if (processor.removeConnection (sourceFilterUID, sourceFilterChannel,
-                                    destFilterUID, destFilterChannel))
+    if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
         changed();
 }
 
@@ -190,4 +135,5 @@ void GraphController::clear()
     processor.clear();
     changed();
 }
+
 }

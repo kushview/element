@@ -1,29 +1,5 @@
-/*
-  ==============================================================================
 
-   This file is part of the JUCE library.
-   Copyright (c) 2013 - Raw Material Software Ltd.
-
-   Permission is granted to use this software under the terms of either:
-   a) the GPL v2 (or any later version)
-   b) the Affero GPL v3
-
-   Details of these licenses can be found at: www.gnu.org/licenses
-
-   JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
-   WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
-   A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-
-   ------------------------------------------------------------------------------
-
-   To release a closed-source product which uses JUCE, commercial licenses are
-   available: visit www.juce.com for more information.
-
-  ==============================================================================
-*/
-
-#ifndef ELEMENT_GRAPH_CONTROLLER_H
-#define ELEMENT_GRAPH_CONTROLLER_H
+#pragma once
 
 #include "controllers/Controller.h"
 #include "engine/GraphProcessor.h"
@@ -34,21 +10,18 @@ class FilterInGraph;
 class GraphController;
 class PluginManager;
 
-/**
-    A collection of filters and some connections between them.
- */
-class GraphController :  public ChangeBroadcaster,
-                         public Controller
+class GraphController : public ChangeBroadcaster,
+                        public Controller
 {
 public:
-    static const uint32 invalidNodeId = (uint32)-1;
+    static const uint32 invalidNodeId   = KV_INVALID_PORT;
+    static const int invalidChannel     = -1;
     typedef GraphNodePtr NodePtr;
 
     GraphController (GraphProcessor&, PluginManager&);
     ~GraphController();
 
     GraphProcessor& getGraph() noexcept { return processor; }
-    GraphProcessor& graph() { return getGraph(); }
 
     PluginManager& plugins() { return pluginManager; }
 
@@ -57,21 +30,19 @@ public:
     const NodePtr getNode (const int index) const noexcept;
     const NodePtr getNodeForId (const uint32 uid) const noexcept;
 
-    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
+    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
+                      uint32 nodeId = 0);
 
     void removeFilter (const uint32 filterUID);
     void disconnectFilter (const uint32 filterUID);
 
-    void removeIllegalConnections();
-
-    void setNodePosition (const int nodeId, double x, double y);
-    void getNodePosition (const int nodeId, double& x, double& y) const;
 
     int getNumConnections() const noexcept;
     const GraphProcessor::Connection* getConnection (const int index) const noexcept;
 
-    const GraphProcessor::Connection* getConnectionBetween (uint32 sourceFilterUID, int sourceFilterChannel,
-                                                            uint32 destFilterUID, int destFilterChannel) const noexcept;
+    const GraphProcessor::Connection*
+    getConnectionBetween (uint32 sourceNode, int sourcePort,
+                          uint32 destNode, int destPort) const noexcept;
 
     bool canConnect (uint32 sourceFilterUID, int sourceFilterChannel,
                      uint32 destFilterUID, int destFilterChannel) const noexcept;
@@ -81,8 +52,10 @@ public:
 
     void removeConnection (const int index);
 
-    void removeConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                           uint32 destFilterUID, int destFilterChannel);
+    void removeConnection (uint32 sourceNode, uint32 sourcePort,
+                           uint32 destNode, uint32 destPort);
+
+    void removeIllegalConnections();
 
     void clear();
 
@@ -99,5 +72,12 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphController)
 };
+    
+class RootGraphController : public GraphController {
+public:
+    RootGraphController (GraphProcessor& graph, PluginManager& plugins)
+        : GraphController (graph, plugins){ }
+    ~RootGraphController() { }
+};
+
 }
-#endif   // ELEMENT_GRAPH_CONTROLLER_H

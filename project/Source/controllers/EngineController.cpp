@@ -96,7 +96,7 @@ void EngineController::activate()
         graph.setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
     }
     
-    root = new GraphController (engine->getRootGraph(), globals.getPluginManager());
+    root = new RootGraphController (engine->getRootGraph(), globals.getPluginManager());
     
     if (ScopedXml xml = settings.getLastGraph())
     {
@@ -105,7 +105,6 @@ void EngineController::activate()
     }
     
     engine->activate();
-    root->addChangeListener (this);
     devices.addChangeListener (this);
 }
 

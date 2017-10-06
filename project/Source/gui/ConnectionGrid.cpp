@@ -47,6 +47,8 @@ namespace Element {
             RemoveNode,
             AddAudioInputNode,
             AddAudioOutputNode,
+            AddMidiInputNode,
+            AddMidiOutputNode,
             LastItem
         };
         
@@ -77,6 +79,8 @@ namespace Element {
                 case RemoveNode: return "Remove"; break;
                 case AddAudioInputNode: return "Add audio inputs"; break;
                 case AddAudioOutputNode: return "Add audio outputs"; break;
+                case AddMidiInputNode: return "Add MIDI Input"; break;
+                case AddMidiOutputNode: return "Add MIDI Output"; break;
                 default: jassertfalse; break;
             }
             return "Unknown Item";
@@ -231,6 +235,20 @@ namespace Element {
                 case NodePopupMenu::AddAudioOutputNode: {
                     PluginDescription desc;
                     desc.fileOrIdentifier = "audio.output";
+                    desc.pluginFormatName = "Internal";
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                } break;
+                    
+                case NodePopupMenu::AddMidiInputNode: {
+                    PluginDescription desc;
+                    desc.fileOrIdentifier = "midi.input";
+                    desc.pluginFormatName = "Internal";
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                } break;
+                    
+                case NodePopupMenu::AddMidiOutputNode: {
+                    PluginDescription desc;
+                    desc.fileOrIdentifier = "midi.output";
                     desc.pluginFormatName = "Internal";
                     ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
                 } break;
