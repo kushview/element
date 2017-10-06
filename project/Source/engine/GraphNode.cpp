@@ -330,7 +330,7 @@ void GraphNode::resetPorts()
         ValueTree port (Tags::port);
         port.setProperty (Slugs::index, index, nullptr)
             .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
             .setProperty (Slugs::name,  "MIDI Output", nullptr);
         ports.addChild (port, index, nullptr);
         index++;

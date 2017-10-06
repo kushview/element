@@ -40,9 +40,7 @@ namespace Element {
     
     const bool Node::canConnectTo (const Node& o) const
     {
-        if (objectData.getParent() != o.objectData.getParent() ||
-            objectData == o.objectData ||
-            getNumAudioOuts() <= 0 || o.getNumAudioIns() <= 0)
+        if (objectData.getParent() != o.objectData.getParent() || objectData == o.objectData)
         {
             return false;
         }

@@ -271,7 +271,8 @@ namespace Element {
         ValueTree nodeModels;
         NodeArray nodes;
         PortArray ins, outs;
-        Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels;
+        Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels,
+                   midiInIndexes, midiOutIndexes, midiInChannels, midiOutChannels;
 
         void paintEmptyMessage (Graphics& g, const int width, const int height)
         {
@@ -399,6 +400,7 @@ namespace Element {
                 const Node node (nodeModels.getChild(i));
                 nodes.add (node);
             }
+            
             updateContent();
         }
         
@@ -626,6 +628,8 @@ namespace Element {
     {
         audioInIndexes.clearQuick(); audioOutIndexes.clearQuick();
         audioInChannels.clearQuick(); audioOutChannels.clearQuick();
+        midiInIndexes.clearQuick(); midiInChannels.clearQuick();
+        midiOutIndexes.clearQuick(); midiOutChannels.clearQuick();
         ins.clearQuick(); outs.clearQuick();
         int newNumRows = 0, newNumCols = 0, nodeIndex = 0;
 
@@ -635,21 +639,26 @@ namespace Element {
             for (int i = 0; i < ports.getNumChildren(); ++i)
             {
                 const Port port (ports.getChild (i));
-                if (port.getType() != PortType::Audio)
+                if (port.getType() != PortType::Audio && port.getType() != PortType::Midi)
                     continue;
-            
+                
+                Array<int>& inIndexes   = port.getType() == PortType::Audio ? audioInIndexes : audioInIndexes;
+                Array<int>& inChannels  = port.getType() == PortType::Audio ? audioInChannels : audioInChannels;
+                Array<int>& outIndexes  = port.getType() == PortType::Audio ? audioOutIndexes : audioOutIndexes;
+                Array<int>& outChannels = port.getType() == PortType::Audio ? audioOutChannels : audioOutChannels;
+                
                 if (port.isInput())
                 {
-                    audioInIndexes.add (nodeIndex);
-                    audioInChannels.add (i);
-                    ins.add(port);
+                    inIndexes.add (nodeIndex);
+                    inChannels.add (i);
+                    ins.add (port);
                     ++newNumCols;
                 }
                 else
                 {
-                    audioOutIndexes.add (nodeIndex);
-                    audioOutChannels.add (i);
-                    outs.add(port);
+                    outIndexes.add (nodeIndex);
+                    outChannels.add (i);
+                    outs.add (port);
                     ++newNumRows;
                 }
             }

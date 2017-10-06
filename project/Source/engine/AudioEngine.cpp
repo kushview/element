@@ -102,6 +102,15 @@ public:
             else
             {
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+                MidiMessage msg; int pos = 0;
+                MidiBuffer::Iterator iter (incomingMidi);
+                while (iter.getNextEvent (msg, pos))
+                {
+                    if (msg.isNoteOn()) {
+                        DBG("NOTE ON: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
+                    }
+                }
+                
                 AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
                 graph.processBlock (buffer, incomingMidi);
                 if (transport.isPlaying()) {

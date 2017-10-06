@@ -1162,7 +1162,6 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     currentAudioInputBuffer = &buffer;
     currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
-
     currentMidiInputBuffer = &midiMessages;
     currentMidiOutputBuffer.clear();
 
@@ -1215,90 +1214,6 @@ void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.numInputChannels = getTotalNumInputChannels();
     d.numOutputChannels = getTotalNumOutputChannels();
 }
-
-#if 0
-void GraphProcessor::valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                               const Identifier& property)
-{
-    
-}
-
-void GraphProcessor::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
-{
-    graphModel.removeListener (this);
-    
-    if (parent == arcsModel && child.hasType (Tags::arc))
-    {
-        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
-        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
-        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
-        const int dstChan = child.getProperty (Tags::destChannel, -1);
-        
-        if (src == nullptr || dst == nullptr) {
-            parent.removeChild (child, nullptr);
-            return;
-        }
-        
-        if (connectChannels (PortType::Audio, src->nodeId, srcChan, dst->nodeId, dstChan))
-        {
-            // noop
-        }
-        else
-        {
-            parent.removeChild (child, nullptr);
-        }
-    }
-    graphModel.addListener(this);
-}
-
-void GraphProcessor::valueTreeChildRemoved (ValueTree& parent, ValueTree& child,
-                                            int indexFromWhichChildWasRemoved)
-{
-    graphModel.removeListener (this);
-    
-    if (parent == arcsModel && child.hasType (Tags::arc))
-    {
-        GraphNodePtr src = getNodeForId ((uint32)(int64) child.getProperty (Tags::sourceNode, 0));
-        GraphNodePtr dst = getNodeForId ((uint32)(int64) child.getProperty (Tags::destNode, 0));
-        const int srcChan = child.getProperty (Tags::sourceChannel, -1);
-        const int dstChan = child.getProperty(Tags::destChannel, -1);
-        
-        if (src == nullptr || dst == nullptr)
-            return;
-        
-        if (removeConnection (src->nodeId, Processor::getPortForAudioChannel (src->getAudioPluginInstance(), srcChan, false),
-                              dst->nodeId, Processor::getPortForAudioChannel (dst->getAudioPluginInstance(), dstChan, true)))
-        {
-            // noop
-        }
-        else
-        {
-            // noop
-        }
-    }
-    else if (parent == nodesModel && child.hasType (Tags::node))
-    {
-        const Node model (child, false);
-        const bool wasRemoved = removeNode (model.getNodeId());
-        if (wasRemoved) {
-            
-        }
-    }
-    
-    graphModel.addListener (this);
-}
-
-void GraphProcessor::valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                                 int oldIndex, int newIndex) { }
-
-void GraphProcessor::valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) { }
-
-void GraphProcessor::valueTreeRedirected (ValueTree& treeWhichHasBeenChanged)
-{
-    
-}
-
-#endif
     
 // MARK: AudioGraphIOProcessor
     
@@ -1325,9 +1240,6 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
     return String::empty;
 }
 
-    
-
-    
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
@@ -1398,6 +1310,14 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
 
         case midiInputNode: {
             midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
+            MidiMessage msg; int pos = 0;
+            MidiBuffer::Iterator iter (midiMessages);
+            while (iter.getNextEvent (msg, pos))
+            {
+                if (msg.isNoteOn()) {
+                    DBG("NOTE ON: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
+                }
+            }
         } break;
 
         default:
