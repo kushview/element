@@ -131,6 +131,12 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
+        if (sendCommandLineToPreexistingInstance())
+        {
+            quit();
+            return;
+        }
+        
         initializeModulePath();
         world = new Globals (commandLine);
         launchApplication();
@@ -144,14 +150,11 @@ public:
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
         
-        AudioEnginePtr engine (world->getAudioEngine());
-        DBG(engine->getRootGraph().getGraphState().toXmlString());
-        
-        PluginManager& plugins (world->getPluginManager());
-        Settings& settings (world->getSettings());
+        auto engine (world->getAudioEngine());
+        auto& plugins (world->getPluginManager());
+        auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
-        jassert (props);
-        
+
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);
@@ -177,7 +180,8 @@ public:
 
     void anotherInstanceStarted (const String& /*commandLine*/) override
     {
-    
+        if (! controller)
+            return;
     }
 
     void finishLaunching()

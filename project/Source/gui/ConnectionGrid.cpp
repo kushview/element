@@ -493,13 +493,8 @@ namespace Element {
 #if 0
         virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                    Component* existingComponentToUpdate);
-        virtual void listBoxItemClicked (int row, const MouseEvent&);
-        virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
-        virtual void backgroundClicked (const MouseEvent&);
         virtual void selectedRowsChanged (int lastRowSelected);
-        virtual void deleteKeyPressed (int lastRowSelected);
         virtual void returnKeyPressed (int lastRowSelected);
-        
         virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
         virtual String getTooltipForRow (int row);
         virtual MouseCursor getMouseCursorForRow (int row);
@@ -564,7 +559,20 @@ namespace Element {
         
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
         {
-            
+            const Node node (matrix->getNode (row, false));
+            if (auto ptr = ViewHelpers::findGraphNodeFor (this, node))
+                ViewHelpers::presentPluginWindow (ptr);
+        }
+        
+        void backgroundClicked (const MouseEvent& ev) override
+        {
+            matrix->emptyAreaClicked (ev);
+        }
+        
+        void deleteKeyPressed (int lastRowSelected) override
+        {
+            const Node node (matrix->getNode (lastRowSelected, false));
+            ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
         }
         
     private:

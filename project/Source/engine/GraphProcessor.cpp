@@ -808,9 +808,6 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
         nodes.add (n);
         nodesModel.addChild (n->metadata, -1, nullptr);
         jassert(getNumNodes() == nodesModel.getNumChildren());
-        
-        DBG(getGraphState().toXmlString());
-        
         triggerAsyncUpdate();
         
         return n;

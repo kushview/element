@@ -175,6 +175,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     
     if (cb == (ChangeBroadcaster*) &devices)
     {
+        // Hack to refresh IO Nodes channel counts
         DeviceManager::AudioSettings setup;
         devices.getAudioDeviceSetup (setup);
         auto& processor (root->getGraph());
