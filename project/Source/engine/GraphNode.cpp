@@ -281,6 +281,57 @@ void GraphNode::unprepare()
     }
 }
 
+static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcessor* proc, ValueTree& ports)
+{
+    int index = 0;
+    for (int channel = 0; channel < node->getNumAudioInputs(); ++channel)
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+        .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
+        .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+        .setProperty (Slugs::name,  proc->getInputChannelName (channel), nullptr);
+        
+        ports.addChild (port, index, nullptr);
+        ++index;
+    }
+    
+    for (int channel = 0; channel < node->getNumAudioOutputs(); ++channel)
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
+            .setProperty (Slugs::name,  proc->getOutputChannelName (channel), nullptr);
+        
+        ports.addChild (port, index, nullptr);
+        ++index;
+    }
+    
+    if (proc->acceptsMidi())
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Slugs::name,  "MIDI", nullptr);
+        ports.addChild (port, index, nullptr);
+        index++;
+    }
+    
+    if (proc->producesMidi())
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
+            .setProperty (Slugs::name,  "MIDI", nullptr);
+        ports.addChild (port, index, nullptr);
+        index++;
+    }
+    
+}
+
 void GraphNode::resetPorts()
 {
     jassert(proc);
@@ -288,6 +339,13 @@ void GraphNode::resetPorts()
     ValueTree ports (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
     metadata.removeChild (ports, nullptr);
     ports.removeAllChildren (nullptr);
+    
+    if (isAudioIONode() || isMidiIONode())
+    {
+        addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*> (proc.get()), ports);
+        metadata.addChild (ports, 0, nullptr);
+        return;
+    }
     
     int index = 0;
     for (int channel = 0; channel < getNumAudioInputs(); ++channel)

@@ -1083,7 +1083,7 @@ void GraphProcessor::buildRenderingSequence()
         // swap over to the new rendering sequence..
         const ScopedLock sl (getCallbackLock());
 
-        renderingBuffers.setSize (numRenderingBuffersNeeded, 1024);
+        renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
         renderingBuffers.clear();
 
         for (int i = midiBuffers.size(); --i >= 0;)
