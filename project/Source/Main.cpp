@@ -154,7 +154,7 @@ public:
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
- DBG(engine->getRootGraph().getGraphModel().toXmlString());
+// DBG(engine->getRootGraph().getGraphModel().toXmlString());
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);
@@ -220,7 +220,7 @@ private:
        #if JUCE_DEBUG
         if (! modDir.exists()) {
             modDir = path.getParentDirectory().getParentDirectory()
-            .getChildFile ("modules");
+                         .getChildFile ("modules");
         }
        #endif
         
