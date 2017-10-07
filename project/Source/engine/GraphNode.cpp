@@ -329,7 +329,6 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
         ports.addChild (port, index, nullptr);
         index++;
     }
-    
 }
 
 void GraphNode::resetPorts()

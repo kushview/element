@@ -182,6 +182,9 @@ namespace Element {
                 repaint();
                 return;
             }
+
+            if (! PortType::canConnect (srcPort.getType(), dstPort.getType()))
+                return;
             
             const ValueTree arcs (srcNode.getParentArcsNode());
             if (connectionExists (arcs, srcNode.getNodeId(), srcPort.getIndex(),
