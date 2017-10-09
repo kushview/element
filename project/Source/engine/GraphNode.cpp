@@ -154,7 +154,7 @@ bool GraphNode::isPortOutput (const uint32 port) const
     return ! Processor::isPortInput (proc.get(), port);
 }
 
-uint32 GraphNode::getPortForChanel (const PortType type, const int channel, const bool isInput) const
+uint32 GraphNode::getPortForChannel (const PortType type, const int channel, const bool isInput) const
 {
     uint32 port = KV_INVALID_PORT;
     
@@ -162,11 +162,21 @@ uint32 GraphNode::getPortForChanel (const PortType type, const int channel, cons
     {
         case PortType::Audio:
         {
-            return Processor::getPortForAudioChannel (proc.get(), channel, isInput);
+            port = Processor::getPortForAudioChannel (proc.get(), channel, isInput);
         }
         break;
         
-        default: break;
+        case PortType::Midi:
+        {
+            port = (uint32)channel + static_cast<uint32> (getNumAudioInputs() + getNumAudioOutputs() + proc->getNumParameters());
+            if (! isInput)
+                port += getNumPorts (PortType::Midi, true);
+        }
+        break;
+            
+        default:
+            jassertfalse;
+            break;
     }
     
     return port;
@@ -180,7 +190,7 @@ int GraphNode::getChannelPort (const uint32 port) const
     const bool isInput  = isPortInput (port);
     const PortType type = getPortType (port);
     
-    for (uint32 p = 0; p < (uint32)getNumPorts(); ++p)
+    for (uint32 p = 0; p < (uint32) getNumPorts(); ++p)
     {
         const PortType thisPortType = getPortType (p);
         const bool thisPortIsInput = isPortInput (p);
@@ -219,12 +229,12 @@ int GraphNode::getNthPort (const PortType type, const int index, bool isInput, b
 
 uint32 GraphNode::getMidiInputPort() const
 {
-    return KV_INVALID_PORT;
+    return getPortForChannel (PortType::Midi, 0, true);
 }
 
 uint32 GraphNode::getMidiOutputPort() const
 {
-    return KV_INVALID_PORT;
+    return getPortForChannel (PortType::Midi, 0, false);;
 }
 
 bool GraphNode::isSubgraph() const noexcept
@@ -288,9 +298,9 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
     {
         ValueTree port (Tags::port);
         port.setProperty (Slugs::index, index, nullptr)
-        .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
-        .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-        .setProperty (Slugs::name,  proc->getInputChannelName (channel), nullptr);
+            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Slugs::name,  proc->getInputChannelName (channel), nullptr);
         
         ports.addChild (port, index, nullptr);
         ++index;
@@ -371,6 +381,17 @@ void GraphNode::resetPorts()
         ++index;
     }
     
+    for (int i = 0; i < proc->getNumParameters(); ++i)
+    {
+        ValueTree port (Tags::port);
+        port.setProperty (Slugs::index, index, nullptr)
+            .setProperty (Slugs::type,  PortType(PortType::Control).getSlug(), nullptr)
+            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
+            .setProperty (Slugs::name,  "Param", nullptr);
+        ports.addChild (port, index, nullptr);
+        index++;
+    }
+    
     if (proc->acceptsMidi())
     {
         ValueTree port (Tags::port);
@@ -408,10 +429,12 @@ GraphProcessor* GraphNode::getParentGraph() const
 
 void GraphNode::setParentGraph (GraphProcessor* const graph)
 {
+    typedef GraphProcessor::AudioGraphIOProcessor IOP;
     parent = graph;
-    if (GraphProcessor::AudioGraphIOProcessor* const ioProc
-            = dynamic_cast<GraphProcessor::AudioGraphIOProcessor*> (proc.get()))
-        ioProc->setParentGraph (graph);
+    if (IOP* const iop = dynamic_cast<IOP*> (proc.get()))
+    {
+        iop->setParentGraph (parent);
+        resetPorts();
+    }
 }
-
 }

@@ -50,7 +50,6 @@
               file="Source/engine/GraphProcessor.cpp"/>
         <FILE id="gcdKJK" name="GraphProcessor.h" compile="0" resource="0"
               file="Source/engine/GraphProcessor.h"/>
-        <FILE id="pzAoJk" name="Interface.h" compile="0" resource="0" file="Source/engine/Interface.h"/>
         <FILE id="Cx0ehM" name="InternalFormat.cpp" compile="1" resource="0"
               file="Source/engine/InternalFormat.cpp"/>
         <FILE id="NbNubd" name="InternalFormat.h" compile="0" resource="0"
@@ -291,6 +290,14 @@
             file="Templates/ElementTemplate.cpp"/>
       <FILE id="Ag660q" name="ElementTemplate.h" compile="0" resource="0"
             file="Templates/ElementTemplate.h"/>
+    </GROUP>
+    <GROUP id="{80BC6615-7843-20A4-315F-7437392D43B5}" name="tests">
+      <FILE id="iESLri" name="DummyTest.cpp" compile="0" resource="0" file="../tests/DummyTest.cpp"/>
+      <FILE id="afeqYj" name="GraphNodeTest.cpp" compile="0" resource="0"
+            file="../tests/GraphNodeTest.cpp"/>
+      <FILE id="EAQBqx" name="Runner.cpp" compile="0" resource="0" file="../tests/Runner.cpp"/>
+      <FILE id="ItTH1t" name="Tests.h" compile="0" resource="0" file="../tests/Tests.h"/>
+      <FILE id="ujRJ4A" name="wscript_build" compile="0" resource="0" file="../tests/wscript_build"/>
     </GROUP>
     <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
   </MAINGROUP>

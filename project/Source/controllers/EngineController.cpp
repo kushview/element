@@ -88,8 +88,8 @@ void EngineController::activate()
     
     if (auto* device = devices.getCurrentAudioDevice())
     {
-        const int numIns = device->getActiveOutputChannels().countNumberOfSetBits();
-        const int numOuts = device->getActiveInputChannels().countNumberOfSetBits();
+        const int numIns = device->getActiveInputChannels().countNumberOfSetBits();
+        const int numOuts = device->getActiveOutputChannels().countNumberOfSetBits();
         const int bufferSize = device->getCurrentBufferSizeSamples();
         const double sampleRate = device->getCurrentSampleRate();
         
@@ -142,7 +142,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
-        const Node node (nodes.getChild(i), false);
+        const Node node (nodes.getChild (i), false);
         PluginDescription desc; node.getPluginDescription (desc);
         const uint32 nodeId = root->addFilter (&desc, 0.0, 0.0, node.getNodeId());
         jassert(nodeId == node.getNodeId());
@@ -164,6 +164,11 @@ void EngineController::setRootNode (const Node& newRootNode)
     }
     
     jassert (arcs.getNumChildren() == root->getNumConnections ());
+    
+    auto graphModel = root->getGraph().getGraphModel();
+    const auto graphArcs = root->getGraph().getArcsModel();
+    graphModel.removeChild (graphArcs, nullptr);
+    graphModel.addChild (graphArcs, -1, nullptr);
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)

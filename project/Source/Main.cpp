@@ -144,7 +144,7 @@ public:
 
     void shutdown() override
     {
-        if (! world)
+        if (! world || ! controller)
             return;
         
         UnlockStatus& status (world->getUnlockStatus());
@@ -154,7 +154,7 @@ public:
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
-// DBG(engine->getRootGraph().getGraphModel().toXmlString());
+        
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);

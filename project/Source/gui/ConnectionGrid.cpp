@@ -100,11 +100,13 @@ namespace Element {
             nodeModels = ValueTree (Tags::nodes);
             nodes.clear();
             nodeModels.addListener (this);
+            graphModel.addListener(this);
         }
         
         ~PatchMatrix()
         {
             nodeModels.removeListener (this);
+            graphModel.removeListener(this);
         }
         
         
@@ -272,6 +274,7 @@ namespace Element {
         bool useHighlighting;
         MatrixState matrix;
         ValueTree nodeModels;
+        ValueTree graphModel;
         NodeArray nodes;
         PortArray ins, outs;
         Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels,
@@ -374,8 +377,8 @@ namespace Element {
         
         void resetMatrix()
         {
-            const ValueTree arcs (nodeModels.getParent().getChildWithName(Tags::arcs));
-            jassert (arcs.hasType (Tags::arcs));
+            const ValueTree arcs (nodeModels.getParent().getChildWithName (Tags::arcs));
+            //FIXME: jassert (arcs.hasType (Tags::arcs));
             for (int row = 0; row < matrix.getNumRows(); ++row)
             {
                 for (int col = 0; col < matrix.getNumColumns(); ++col)
@@ -421,6 +424,8 @@ namespace Element {
                 buildNodeArray();
             } else if (childWhichHasBeenAdded.hasType (Tags::ports) || childWhichHasBeenAdded.hasType (Tags::port)) {
                 buildNodeArray();
+            } else if (childWhichHasBeenAdded.hasType (Tags::arcs) || childWhichHasBeenAdded.hasType (Tags::arc)) {
+                buildNodeArray();
             }
         }
         
@@ -433,6 +438,8 @@ namespace Element {
             } else if (nodeModels == parentTree && childWhichHasBeenRemoved.hasType (Tags::node)) {
                 buildNodeArray();
             } else if (childWhichHasBeenRemoved.hasType (Tags::ports) || childWhichHasBeenRemoved.hasType(Tags::port)) {
+                buildNodeArray();
+            } else if (childWhichHasBeenRemoved.hasType (Tags::arcs) || childWhichHasBeenRemoved.hasType (Tags::arc)) {
                 buildNodeArray();
             }
         }
@@ -452,6 +459,7 @@ namespace Element {
         {
             if (nodeModels != treeWhichHasBeenChanged)
                 return;
+            graphModel = nodeModels.getParent();
             buildNodeArray();
             resetMatrix();
         }

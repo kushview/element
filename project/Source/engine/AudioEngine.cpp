@@ -90,7 +90,7 @@ public:
         const bool shouldProcess = true;
         if (shouldProcess)
         {
-            const int remainingFrames = transport.getRemainingFrames();
+            const int64 remainingFrames = transport.getRemainingFrames();
             ignoreUnused (remainingFrames);
             const ScopedLock sl2 (graph.getCallbackLock());
             
@@ -102,15 +102,6 @@ public:
             else
             {
                 messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
-                MidiMessage msg; int pos = 0;
-                MidiBuffer::Iterator iter (incomingMidi);
-                while (iter.getNextEvent (msg, pos))
-                {
-                    if (msg.isNoteOn()) {
-                        DBG("NOTE ON: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
-                    }
-                }
-                
                 AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
                 graph.processBlock (buffer, incomingMidi);
                 if (transport.isPlaying()) {
@@ -140,11 +131,15 @@ public:
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
         
         if (isPrepared)
+        {
+            isPrepared = false;
             graph.releaseResources();
+        }
         
-        graph.setPlayConfigDetails (numChansIn, numChansOut, sampleRate, blockSize);
+        graph.setPlayConfigDetails (numInputChans, numOutputChans, sampleRate, blockSize);
         graph.setPlayHead (&transport);
         graph.prepareToPlay (sampleRate, blockSize);
+    
         isPrepared = true;
     }
     

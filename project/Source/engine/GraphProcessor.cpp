@@ -349,7 +349,7 @@ private:
             if (IOProc::audioOutputNode == ioproc->getType() && numIns <= 0)
                 return;
         }
-
+        
         Array <int> channelsToUse [PortType::Unknown];
         int maxLatency = getInputLatency (node->nodeId);
 
@@ -404,11 +404,10 @@ private:
             }
 
             int bufIndex = -1;
-
             if (sourceNodes.size() == 0)
             {
                 // unconnected input channel
-                if (inputChan >= (int)numOuts)
+                if (portType == PortType::Audio && inputChan >= (int)numOuts)
                 {
                     bufIndex = getReadOnlyEmptyBuffer();
                     jassert (bufIndex >= 0);
@@ -605,7 +604,7 @@ private:
 #endif
     }
 
-    int32 getFreeBuffer (PortType type)
+    int getFreeBuffer (PortType type)
     {
         jassert (type.id() < PortType::Unknown);
 
@@ -727,12 +726,10 @@ GraphProcessor::GraphProcessor()
     
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = KV_INVALID_PORT;
-    //graphModel.addListener(this);
 }
 
 GraphProcessor::~GraphProcessor()
 {
-    //graphModel.removeListener (this);
     clearRenderingSequence();
     clear();
 }
@@ -744,10 +741,11 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
-    arcsModel.removeAllChildren (nullptr);
-    nodesModel.removeAllChildren (nullptr);
     arcsModel = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
     nodesModel = graphModel.getOrCreateChildWithName (Tags::nodes, nullptr);
+    arcsModel.removeAllChildren (nullptr);
+    nodesModel.removeAllChildren (nullptr);
+    
     nodes.clear();
     connections.clear();
     //triggerAsyncUpdate();
@@ -796,21 +794,16 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
 
     newProcessor->setPlayHead (getPlayHead());
     
-    if (auto *iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor)) {
-        // TODO: handle metadata initialization in a cleaner way. This allows the IO procs
-        // to get channel information prior to GraphNode::prepare is called.
-        iop->setParentGraph (this);
-    }
-    
-    if (GraphNode* const n = createNode (nodeId, newProcessor))
+    if (GraphNodePtr node = createNode (nodeId, newProcessor))
     {
-        n->prepare (getSampleRate(), getBlockSize(), this);
-        nodes.add (n);
-        nodesModel.addChild (n->metadata, -1, nullptr);
+        node->setParentGraph (this);
+        node->prepare (getSampleRate(), getBlockSize(), this);
+        nodes.add (node);
+        nodesModel.addChild (node->getMetadata(), -1, nullptr);
         jassert(getNumNodes() == nodesModel.getNumChildren());
         triggerAsyncUpdate();
         
-        return n;
+        return node;
     }
     
     return nullptr;
@@ -922,8 +915,8 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
     GraphNode* dst = getNodeForId (destNode);
     if (! src && ! dst)
         return false;
-    return addConnection (sourceNode, src->getPortForChanel (type, sourceChannel, false),
-                          destNode,   dst->getPortForChanel (type, destChannel, true));
+    return addConnection (sourceNode, src->getPortForChannel (type, sourceChannel, false),
+                          destNode,   dst->getPortForChannel (type, destChannel, true));
 }
 
 void GraphProcessor::removeConnection (const int index)
@@ -1129,7 +1122,7 @@ void GraphProcessor::prepareToPlay (double sampleRate, int estimatedSamplesPerBl
     clearRenderingSequence();
 
     for (int i = 0; i < nodes.size(); ++i)
-        nodes.getUnchecked(i)->prepare(sampleRate, estimatedSamplesPerBlock, this);
+        nodes.getUnchecked(i)->prepare (sampleRate, estimatedSamplesPerBlock, this);
 
     buildRenderingSequence();
 }
@@ -1155,6 +1148,7 @@ void GraphProcessor::reset()
         nodes.getUnchecked(i)->getProcessor()->reset();
 }
 
+// MARK: Process Graph
 void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     const int32 numSamples = buffer.getNumSamples();
@@ -1180,6 +1174,15 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
 
     midiMessages.clear();
     midiMessages.addEvents (currentMidiOutputBuffer, 0, buffer.getNumSamples(), 0);
+    
+    MidiBuffer::Iterator iter (midiMessages);
+    MidiMessage msg; int pos = 0;
+    while (iter.getNextEvent (msg, pos))
+    {
+        if (msg.isNoteOn()) {
+            DBG("ProcessorGraph Output: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
+        }
+    }
 }
 
 const String GraphProcessor::getInputChannelName (int channelIndex) const
@@ -1187,8 +1190,7 @@ const String GraphProcessor::getInputChannelName (int channelIndex) const
     return "Input " + String (channelIndex + 1);
 }
 
-const
-String GraphProcessor::getOutputChannelName (int channelIndex) const
+const String GraphProcessor::getOutputChannelName (int channelIndex) const
 {
     return "Output " + String (channelIndex + 1);
 }
@@ -1308,17 +1310,9 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
             graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, buffer.getNumSamples(), 0);
             break;
 
-        case midiInputNode: {
+        case midiInputNode:
             midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
-            MidiMessage msg; int pos = 0;
-            MidiBuffer::Iterator iter (midiMessages);
-            while (iter.getNextEvent (msg, pos))
-            {
-                if (msg.isNoteOn()) {
-                    DBG("NOTE ON: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
-                }
-            }
-        } break;
+            break;
 
         default:
             break;

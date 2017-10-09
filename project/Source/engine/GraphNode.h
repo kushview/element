@@ -41,7 +41,7 @@ public:
     PortType getPortType (const uint32 port) const;
     uint32 getNumPorts() const;
     int getNumPorts (const PortType type, const bool isInput) const;
-    uint32 getPortForChanel (const PortType type, const int channel, const bool isInput) const;
+    uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
     
     int getChannelPort (const uint32 port) const;
     
