@@ -2,6 +2,7 @@
 #pragma once
 
 #include "controllers/Controller.h"
+#include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 
 namespace Element {
@@ -75,9 +76,15 @@ private:
     
 class RootGraphController : public GraphController {
 public:
-    RootGraphController (GraphProcessor& graph, PluginManager& plugins)
-        : GraphController (graph, plugins){ }
+    RootGraphController (RootGraph& graph, PluginManager& plugins)
+        : GraphController (graph, plugins),
+          root (graph)
+    { }
     ~RootGraphController() { }
+    
+    RootGraph& getRootGraph() const { return root; }
+private:
+    RootGraph& root;
 };
 
 }

@@ -84,17 +84,10 @@ void EngineController::activate()
     auto& devices (globals.getDeviceManager());
     
     AudioEnginePtr engine (globals.getAudioEngine());
-    GraphProcessor& graph (engine->getRootGraph());
+    RootGraph& graph (engine->getRootGraph());
     
     if (auto* device = devices.getCurrentAudioDevice())
-    {
-        const int numIns = device->getActiveInputChannels().countNumberOfSetBits();
-        const int numOuts = device->getActiveOutputChannels().countNumberOfSetBits();
-        const int bufferSize = device->getCurrentBufferSizeSamples();
-        const double sampleRate = device->getCurrentSampleRate();
-        
-        graph.setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
-    }
+        graph.setPlayConfigFor (device);
     
     root = new RootGraphController (engine->getRootGraph(), globals.getPluginManager());
     
@@ -179,14 +172,11 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     
     if (cb == (ChangeBroadcaster*) &devices)
     {
-        // Hack to refresh IO Nodes channel counts
-        DeviceManager::AudioSettings setup;
-        devices.getAudioDeviceSetup (setup);
-        auto& processor (root->getGraph());
+        // Refresh IO Nodes
+        DeviceManager::AudioSettings setup; devices.getAudioDeviceSetup (setup);
+        auto& processor (root->getRootGraph());
         processor.suspendProcessing (true);
-        processor.setPlayConfigDetails (setup.inputChannels.countNumberOfSetBits(),
-                                        setup.outputChannels.countNumberOfSetBits(),
-                                        setup.sampleRate, setup.bufferSize);
+        processor.setPlayConfigFor (setup);
         for (int i = processor.getNumNodes(); --i >= 0;)
         {
             GraphNodePtr node = processor.getNode (i);

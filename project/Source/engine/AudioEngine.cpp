@@ -8,17 +8,27 @@
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
-#include "session/DeviceManager.h"
 #include "Globals.h"
 
 namespace Element {
-
-class RootGraph : public GraphProcessor
+    
+void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
-public:
-    RootGraph() { }
-    ~RootGraph() { }
-};
+    jassert (device);
+    const int numIns        = device->getActiveInputChannels().countNumberOfSetBits();
+    const int numOuts       = device->getActiveOutputChannels().countNumberOfSetBits();
+    const int bufferSize    = device->getCurrentBufferSizeSamples();
+    const double sampleRate = device->getCurrentSampleRate();
+    
+    setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
+}
+
+void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
+{
+    setPlayConfigDetails (setup.inputChannels.countNumberOfSetBits(),
+                          setup.outputChannels.countNumberOfSetBits(),
+                          setup.sampleRate, setup.bufferSize);
+}
 
 class AudioEngine::Private : public AudioIODeviceCallback,
                              public MidiInputCallback
@@ -211,8 +221,8 @@ MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (priv 
 
 Globals& AudioEngine::globals() { return world; }
 
-GraphProcessor& AudioEngine::getRootGraph()         { return priv->graph; }
-Transport* AudioEngine::transport()                 { return &priv->transport; }
+RootGraph& AudioEngine::getRootGraph()         { return priv->graph; }
+Transport* AudioEngine::transport()            { return &priv->transport; }
 
 ValueTree AudioEngine::createGraphTree()
 {

@@ -3,12 +3,12 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_AUDIO_ENGINE_H
-#define ELEMENT_AUDIO_ENGINE_H
+#pragma once
 
 #include "ElementApp.h"
 #include "engine/Engine.h"
-
+#include "engine/GraphProcessor.h"
+#include "session/DeviceManager.h"
 namespace Element {
 
 class Globals;
@@ -18,6 +18,16 @@ class GraphProcessor;
 class PatternInterface;
 class Pattern;
 class Transport;
+    
+class RootGraph : public GraphProcessor
+{
+public:
+    RootGraph() { }
+    ~RootGraph() { }
+    
+    void setPlayConfigFor (AudioIODevice* device);
+    void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
+};
 
 class AudioEngine : public Engine
 {
@@ -33,7 +43,7 @@ public:
     
     // Member access
     Globals& globals();
-    GraphProcessor& getRootGraph();
+    RootGraph& getRootGraph();
     Transport* transport();
 
     // Engine methods
@@ -49,5 +59,3 @@ private:
 typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;
 
 }
-
-#endif // ELEMENT_AUDIO_ENGINE_H

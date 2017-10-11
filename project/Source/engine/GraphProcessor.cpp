@@ -1174,15 +1174,6 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
 
     midiMessages.clear();
     midiMessages.addEvents (currentMidiOutputBuffer, 0, buffer.getNumSamples(), 0);
-    
-    MidiBuffer::Iterator iter (midiMessages);
-    MidiMessage msg; int pos = 0;
-    while (iter.getNextEvent (msg, pos))
-    {
-        if (msg.isNoteOn()) {
-            DBG("ProcessorGraph Output: " << msg.getMidiNoteName(msg.getNoteNumber(), true, false, 0));
-        }
-    }
 }
 
 const String GraphProcessor::getInputChannelName (int channelIndex) const
