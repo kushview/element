@@ -294,13 +294,15 @@ void GraphNode::unprepare()
 static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcessor* proc, ValueTree& ports)
 {
     int index = 0;
+    auto* graph = proc->getParentGraph();
+    jassert(graph && proc);
     for (int channel = 0; channel < node->getNumAudioInputs(); ++channel)
     {
         ValueTree port (Tags::port);
         port.setProperty (Slugs::index, index, nullptr)
             .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
             .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  proc->getInputChannelName (channel), nullptr);
+            .setProperty (Slugs::name,  graph->getOutputChannelName (channel), nullptr);
         
         ports.addChild (port, index, nullptr);
         ++index;
@@ -312,7 +314,7 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
         port.setProperty (Slugs::index, index, nullptr)
             .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
             .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
-            .setProperty (Slugs::name,  proc->getOutputChannelName (channel), nullptr);
+            .setProperty (Slugs::name,  graph->getInputChannelName (channel), nullptr);
         
         ports.addChild (port, index, nullptr);
         ++index;
@@ -351,7 +353,7 @@ void GraphNode::resetPorts()
     
     if (isAudioIONode() || isMidiIONode())
     {
-        addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*> (proc.get()), ports);
+        addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*>(proc.get()), ports);
         metadata.addChild (ports, 0, nullptr);
         return;
     }
@@ -434,7 +436,11 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
     if (IOP* const iop = dynamic_cast<IOP*> (proc.get()))
     {
         iop->setParentGraph (parent);
-        resetPorts();
+        if (parent != nullptr)
+        {
+            metadata.setProperty (Slugs::name, parent->getName(), nullptr);
+            resetPorts();
+        }
     }
 }
 }

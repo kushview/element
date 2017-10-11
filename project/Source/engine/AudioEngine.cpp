@@ -11,6 +11,11 @@
 #include "Globals.h"
 
 namespace Element {
+
+RootGraph::RootGraph()
+{
+    
+}
     
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
@@ -21,6 +26,8 @@ void RootGraph::setPlayConfigFor (AudioIODevice *device)
     const double sampleRate = device->getCurrentSampleRate();
     
     setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
+    updateChannelNames (device);
+    graphName = "Device";
 }
 
 void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
@@ -28,6 +35,27 @@ void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
     setPlayConfigDetails (setup.inputChannels.countNumberOfSetBits(),
                           setup.outputChannels.countNumberOfSetBits(),
                           setup.sampleRate, setup.bufferSize);
+}
+
+const String RootGraph::getName() const { return graphName; }
+    
+const String RootGraph::getInputChannelName (int c) const { return audioInputNames [c]; }
+    
+const String RootGraph::getOutputChannelName (int c) const { return audioOutputNames[c]; }
+
+void RootGraph::updateChannelNames (AudioIODevice* device)
+{
+    auto activeIn  = device->getActiveInputChannels();
+    auto namesIn   = device->getInputChannelNames();
+    auto activeOut = device->getActiveOutputChannels();
+    auto namesOut  = device->getOutputChannelNames();
+    audioOutputNames.clear(); audioInputNames.clear();
+    for (int i = 0; i < namesIn.size(); ++i)
+        if (activeIn[i] == true)
+            audioInputNames.add(namesIn[i]);
+    for (int i = 0; i < namesOut.size(); ++i)
+        if (activeOut[i] == true)
+            audioOutputNames.add(namesOut[i]);
 }
 
 class AudioEngine::Private : public AudioIODeviceCallback,

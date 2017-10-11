@@ -793,7 +793,8 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     }
 
     newProcessor->setPlayHead (getPlayHead());
-    
+    if (auto* iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor))
+        iop->setParentGraph (this);
     if (GraphNodePtr node = createNode (nodeId, newProcessor))
     {
         node->setParentGraph (this);

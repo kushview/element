@@ -42,9 +42,6 @@ namespace Element {
 */
 class JUCE_API GraphProcessor : public Processor,
                                 public AsyncUpdater
-#if 0
-                                public ValueTree::Listener
-#endif
 {
 public:
     /** Creates an empty graph. */
@@ -194,7 +191,7 @@ public:
 
         @see AudioProcessorGraph
     */
-    class JUCE_API  AudioGraphIOProcessor     : public Processor
+    class AudioGraphIOProcessor : public Processor
     {
     public:
         /** Specifies the mode in which this processor will operate.
@@ -236,13 +233,13 @@ public:
         void fillInPluginDescription (PluginDescription& d) const;
 
         const String getName() const;
-
+        const String getInputChannelName (int channelIndex) const;
+        const String getOutputChannelName (int channelIndex) const;
+        
         void prepareToPlay (double sampleRate, int estimatedSamplesPerBlock);
         void releaseResources();
         void processBlock (AudioSampleBuffer&, MidiBuffer&);
 
-        const String getInputChannelName (int channelIndex) const;
-        const String getOutputChannelName (int channelIndex) const;
         bool isInputChannelStereoPair (int index) const;
         bool isOutputChannelStereoPair (int index) const;
         bool silenceInProducesSilenceOut() const;
@@ -279,10 +276,13 @@ public:
     // MARK: AudioProcessor methods
 
     virtual const String getName() const override;
+    
     virtual void prepareToPlay (double sampleRate, int estimatedBlockSize) override;
     virtual void releaseResources() override;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
+    
     void reset() override;
+    
     virtual const String getInputChannelName (int channelIndex) const override;
     virtual const String getOutputChannelName (int channelIndex) const override;
     virtual bool isInputChannelStereoPair (int index) const override;

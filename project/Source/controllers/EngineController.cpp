@@ -169,28 +169,30 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& devices (app->getWorld().getDeviceManager());
+    auto& processor (root->getRootGraph());
     
     if (cb == (ChangeBroadcaster*) &devices)
     {
-        // Refresh IO Nodes
-        DeviceManager::AudioSettings setup; devices.getAudioDeviceSetup (setup);
-        auto& processor (root->getRootGraph());
-        processor.suspendProcessing (true);
-        processor.setPlayConfigFor (setup);
-        for (int i = processor.getNumNodes(); --i >= 0;)
+        if (auto* device = devices.getCurrentAudioDevice())
         {
-            GraphNodePtr node = processor.getNode (i);
-            if (node->isAudioIONode())
+            processor.suspendProcessing (true);
+            processor.setPlayConfigFor (device);
+            for (int i = processor.getNumNodes(); --i >= 0;)
             {
-                (dynamic_cast<IOP*>(node->getProcessor()))->releaseResources();
-                (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
-                (dynamic_cast<IOP*>(node->getProcessor()))->prepareToPlay (setup.sampleRate, setup.bufferSize);
-                processor.removeIllegalConnections();
-                node->resetPorts();
+                GraphNodePtr node = processor.getNode (i);
+                if (node->isAudioIONode())
+                {
+                    (dynamic_cast<IOP*>(node->getProcessor()))->releaseResources();
+                    (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
+                    (dynamic_cast<IOP*>(node->getProcessor()))->prepareToPlay (device->getCurrentSampleRate(),
+                                                                               device->getCurrentBufferSizeSamples());
+                    processor.removeIllegalConnections();
+                    node->resetPorts();
+                }
             }
+            
+            processor.suspendProcessing (false);
         }
-        
-        processor.suspendProcessing (false);
     }
 }
 

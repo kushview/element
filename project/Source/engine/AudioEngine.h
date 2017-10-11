@@ -22,11 +22,22 @@ class Transport;
 class RootGraph : public GraphProcessor
 {
 public:
-    RootGraph() { }
+    RootGraph();
     ~RootGraph() { }
     
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
+    
+    const String getName() const override;
+    const String getInputChannelName (int channelIndex) const override;
+    const String getOutputChannelName (int channelIndex) const override;
+
+private:
+    String graphName = "Device";
+    StringArray audioInputNames;
+    StringArray audioOutputNames;
+    
+    void updateChannelNames (AudioIODevice* device);
 };
 
 class AudioEngine : public Engine
