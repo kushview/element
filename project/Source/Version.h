@@ -3,6 +3,7 @@
 
 #include "ElementApp.h"
 
+/** Representation of a version number */
 struct Version
 {
     Version();

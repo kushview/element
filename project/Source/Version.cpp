@@ -40,6 +40,7 @@ CurrentVersion::~CurrentVersion() { }
 void CurrentVersion::checkAfterDelay (const int milliseconds, const bool showUpToDate)
 {
     auto* cv = new CurrentVersion();
+    cv->hasChecked = false;
     cv->shouldShowUpToDateMessage = showUpToDate;
     cv->startTimer (milliseconds);
 }
@@ -59,15 +60,17 @@ bool CurrentVersion::isNewerVersionAvailable()
     
     DBG("Running: " << ProjectInfo::projectName << " v" << ProjectInfo::versionString);
     DBG("Latest: " << data["name"].toString() << " v" << data["stable_version"].toString());
-    permalink = data["homepage"].toString();
-    version = data["stable_version"].toString();
+    permalink   = data["homepage"].toString();
+    version     = data["stable_version"].toString();
     
     return Version::asHexInteger(version) > ProjectInfo::versionNumber;
 }
 
 void CurrentVersion::timerCallback()
 {
-    if (hasChecked) return;
+    stopTimer();
+    if (hasChecked)
+        return;
     hasChecked = true;
     if (isNewerVersionAvailable())
     {
