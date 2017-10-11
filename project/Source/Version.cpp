@@ -47,9 +47,9 @@ void CurrentVersion::checkAfterDelay (const int milliseconds, const bool showUpT
 bool CurrentVersion::isNewerVersionAvailable()
 {
    #if TEST_CURRENT_VERSION
-    const URL url ("http://kushview.dev/v1/products/element/version.json");
+    const URL url ("http://kushview.dev/?edd_action=get_version&item_id=15");
    #else
-    const URL url ("https://kushview.net/v1/products/element/version.json");
+    const URL url ("https://kushview.net/?edd_action=get_version&item_id=20");
    #endif
     
     var data;
@@ -58,11 +58,11 @@ bool CurrentVersion::isNewerVersionAvailable()
         return false;
     
     DBG("Running: " << ProjectInfo::projectName << " v" << ProjectInfo::versionString);
-    DBG("Latest: " << data["name"].toString() << " v" << data["version"].toString());
-    permalink = data["permalink"].toString();
-    version = data["version"];
+    DBG("Latest: " << data["name"].toString() << " v" << data["stable_version"].toString());
+    permalink = data["homepage"].toString();
+    version = data["stable_version"].toString();
     
-    return Version::asHexInteger(data["version"].toString().trim()) > ProjectInfo::versionNumber;
+    return Version::asHexInteger(version) > ProjectInfo::versionNumber;
 }
 
 void CurrentVersion::timerCallback()
@@ -71,7 +71,7 @@ void CurrentVersion::timerCallback()
     hasChecked = true;
     if (isNewerVersionAvailable())
     {
-        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Version", "A new version is available"))
+        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Version", "A new version is available", "Download"))
         {
             URL(permalink).launchInDefaultBrowser();
         }

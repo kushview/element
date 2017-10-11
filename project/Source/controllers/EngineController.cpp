@@ -25,7 +25,7 @@ namespace GraphLog {
         }
     }
 }
-    
+
 EngineController::EngineController() { }
 EngineController::~EngineController()
 {
