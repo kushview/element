@@ -44,12 +44,13 @@ public:
 
     Globals& owner;
     AudioEnginePtr                engine;
+    SessionPtr                    session;
+    
     ScopedPointer<CommandManager> commands;
     ScopedPointer<DeviceManager>  devices;
     ScopedPointer<MediaManager>   media;
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
-    ScopedPointer<Session>        session;
     ScopedPointer<UnlockStatus>   unlock;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
@@ -68,6 +69,7 @@ private:
         settings = new Settings();
         commands = new CommandManager();
         unlock   = new UnlockStatus (owner);
+        session  = new Session();
     }
     
     void freeAll()
@@ -90,7 +92,6 @@ Globals::Globals (const String& _cli)
     appName = "Element";
     impl = new Impl (*this);
     impl->init();
-    impl->unlock->load();
 }
 
 Globals::~Globals()
@@ -148,10 +149,9 @@ UnlockStatus& Globals::getUnlockStatus()
     return *impl->unlock;
 }
     
-Session& Globals::getSession()
+SessionPtr Globals::getSession()
 {
-    jassert (impl->session != nullptr);
-    return *impl->session;
+    return (impl) ? impl->session : nullptr;
 }
 
 void Globals::setEngine (EnginePtr engine)
@@ -159,10 +159,7 @@ void Globals::setEngine (EnginePtr engine)
     if (impl->engine)
         impl->engine->deactivate();
     impl->engine = engine;
-    if (impl->session == nullptr) {
-        impl->session = new Session (*this);
-    }
-
+    
     getDeviceManager().attach (engine);
 }
 

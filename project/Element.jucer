@@ -245,14 +245,10 @@
         <FILE id="r3Ufcg" name="PluginManager.cpp" compile="1" resource="0"
               file="Source/session/PluginManager.cpp"/>
         <FILE id="KgUf2F" name="PluginManager.h" compile="0" resource="0" file="Source/session/PluginManager.h"/>
-        <FILE id="Cw8Aee" name="PortModel.h" compile="0" resource="0" file="Source/session/PortModel.h"/>
         <FILE id="Xwhlg4" name="Sequence.cpp" compile="1" resource="0" file="Source/session/Sequence.cpp"/>
         <FILE id="GZJ2EU" name="Sequence.h" compile="0" resource="0" file="Source/session/Sequence.h"/>
         <FILE id="ywwtsx" name="Session.cpp" compile="1" resource="0" file="Source/session/Session.cpp"/>
         <FILE id="Y5cDGZ" name="Session.h" compile="0" resource="0" file="Source/session/Session.h"/>
-        <FILE id="gX52BA" name="SessionAssets.cpp" compile="1" resource="0"
-              file="Source/session/SessionAssets.cpp"/>
-        <FILE id="wN8TOl" name="SessionAssets.h" compile="0" resource="0" file="Source/session/SessionAssets.h"/>
         <FILE id="H3r9zD" name="SessionTrack.cpp" compile="1" resource="0"
               file="Source/session/SessionTrack.cpp"/>
         <FILE id="o0jdbc" name="TempoMap.h" compile="0" resource="0" file="Source/session/TempoMap.h"/>

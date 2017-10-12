@@ -35,6 +35,8 @@ namespace Tags
     const Identifier flow               = "flow";
     const Identifier input              = "input";
     const Identifier output             = "output";
+    
+    const Identifier session            = "session";
 }
 }
 

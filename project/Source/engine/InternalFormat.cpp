@@ -45,9 +45,6 @@ namespace Element {
 
     AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
     {
-        Globals& g (engine.globals());
-        SessionRef s (g.getSession().makeRef());
-
         if (desc.fileOrIdentifier == audioOutDesc.fileOrIdentifier)
         {
             return new IOP (IOP::audioOutputNode);

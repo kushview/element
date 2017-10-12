@@ -161,14 +161,16 @@ bool GuiController::shutdownApp()
                                                    "The current session has changes. Would you like to save them?",
                                                    "Save Session", "Just Quit", "Cancel");
         
-        if (res == 2) {
+        if (res == 2)
+        {
             // Just Quit
         }
-        else if (res == 1) {
-            // Save Session
-            session()->media().closeAllDocumentsUsingSession (*session(), true);
+        else if (res == 1)
+        {
             sessionDoc->save (true, true);
-        } else if (res == 0) {
+        }
+        else if (res == 0)
+        {
             result = false; // cancel shutdown
         }
     }
@@ -176,8 +178,6 @@ bool GuiController::shutdownApp()
     if (result)
     {
         windowManager->closeAll();
-        session()->close();
-        session()->clear();
     }
     
     return result;
@@ -185,9 +185,8 @@ bool GuiController::shutdownApp()
 
 SessionRef GuiController::session()
 {
-    if (sessionRef.get() == nullptr)
-        sessionRef = globals().getSession().makeRef();
-    
+    if (! sessionRef)
+        sessionRef = world.getSession();
     return sessionRef;
 }
 
@@ -210,12 +209,8 @@ void GuiController::newSession()
 {
     if (sessionDoc->hasChangedSinceSaved())
         sessionDoc->save (true, true);
-    
     sessionDoc->setFile (File::nonexistent);
-    globals().getSession().clear();
-    globals().getSession().open();
     sessionDoc->setChangedFlag (false);
-    
     content->stabilize();
     mainWindow->setName (session()->getProperty (Slugs::name));
 }
@@ -448,11 +443,15 @@ bool GuiController::perform (const InvocationInfo& info)
                 about->setVisible(true);
                 about->addToDesktop(0);
             }
+            else if (about->isVisible())
+            {
+                about->setVisible (false);
+                about->removeFromDesktop();
+            }
             else
             {
-                about->setVisible(false);
-                about->removeFromDesktop();
-                about = nullptr;
+                about->setVisible(true);
+                about->addToDesktop(0);
             }
             return true;
             break;
@@ -473,7 +472,6 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::transportForward:
             break;
         case Commands::transportPlay:
-            sr->testSetPlaying (true);
             break;
         case Commands::transportRecord:
             break;
@@ -483,8 +481,6 @@ bool GuiController::perform (const InvocationInfo& info)
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
         case Commands::transportStop:
-            sr->testSetRecording (false);
-            sr->testSetPlaying (false);
             break;
         default:
             result = false;

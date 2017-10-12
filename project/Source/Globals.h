@@ -3,11 +3,11 @@
     Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_GLOBALS_H
-#define EL_GLOBALS_H
+#pragma once
 
 #include "ElementApp.h"
 #include "engine/AudioEngine.h"
+#include "session/Session.h"
 #include "URIs.h"
 #include "WorldBase.h"
 
@@ -17,7 +17,6 @@ class CommandManager;
 class DeviceManager;
 class MediaManager;
 class PluginManager;
-class Session;
 class Settings;
 class UnlockStatus;
 class Writer;
@@ -45,7 +44,7 @@ public:
     MediaManager& getMediaManager();
     UnlockStatus& getUnlockStatus();
     SymbolMap& getSymbolMap();
-    Session& getSession();
+    SessionPtr getSession();
 
     const String& getAppName() const { return appName; }
     void setEngine (EnginePtr engine);
@@ -58,5 +57,3 @@ private:
 };
 
 }
-
-#endif // EL_GLOBALS_H

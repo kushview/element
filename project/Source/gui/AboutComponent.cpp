@@ -117,9 +117,8 @@ void AboutComponent::resized()
 void AboutComponent::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
-    // FIXME:
-//    if (isOnDesktop() || isVisible())
-//        gui.commander().invokeDirectly (Commands::showAbout, true);
+    setVisible(false);
+    removeFromDesktop();
     //[/UserCode_mouseDown]
 }
 

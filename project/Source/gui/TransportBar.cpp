@@ -148,13 +148,11 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_play] -- add your button handler code here..
         play->setToggleState (! play->getToggleState(), dontSendNotification);
-        session->testSetPlaying (play->getToggleState());
         //[/UserButtonCode_play]
     }
     else if (buttonThatWasClicked == stop)
     {
         //[UserButtonCode_stop] -- add your button handler code here..
-        session->testSetPlaying (false);
         play->setToggleState (false, dontSendNotification);
         //[/UserButtonCode_stop]
     }
@@ -162,7 +160,6 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_record] -- add your button handler code here..
         record->setToggleState (! record->getToggleState(), dontSendNotification);
-        session->testSetRecording (record->getToggleState());
         //[/UserButtonCode_record]
     }
 

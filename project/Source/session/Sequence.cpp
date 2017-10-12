@@ -7,7 +7,6 @@
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
 #include "engine/Transport.h"
-#include "session/SessionAssets.h"
 #include "session/Session.h"
 #include "session/Sequence.h"
 #include "MediaManager.h"

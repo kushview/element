@@ -7,12 +7,10 @@
 #include "session/Session.h"
 
 namespace Element {
-
     MediaManager::MediaManager() { }
     MediaManager::~MediaManager() { }
 
-    bool
-    MediaManager::anyFilesNeedSaving() const
+    bool MediaManager::anyFilesNeedSaving() const
     {
         for (int i = documents.size(); --i >= 0;)
         {
@@ -25,10 +23,9 @@ namespace Element {
         return false;
     }
 
-    MediaPtr
-    MediaManager::createObject (Session* session, const File &file)
+    MediaPtr MediaManager::createObject (Session* session, const File &file)
     {
-        SessionRef ref = session->makeRef();
+        SessionRef ref = session;
 
         MediaPtr obj;
         if (Document* d = openFile (session, file))
@@ -39,7 +36,6 @@ namespace Element {
 
         }
 
-        ref.reset();
         return obj;
     }
 
