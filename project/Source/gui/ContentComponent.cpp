@@ -8,7 +8,7 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
-#include "gui/GuiApp.h"
+ 
 #include "gui/LookAndFeel.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"

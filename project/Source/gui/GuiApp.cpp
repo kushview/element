@@ -11,7 +11,7 @@
 #include "gui/Alerts.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
-#include "gui/GuiApp.h"
+ 
 #include "gui/MainWindow.h"
 #include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"

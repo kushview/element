@@ -23,6 +23,6 @@
 #include "ElementApp.h"
 #include "session/Session.h"
 #include "Globals.h"
-#include "gui/GuiApp.h"
+ 
 
 #endif // ELEMENT_GUI_COMMON_H
