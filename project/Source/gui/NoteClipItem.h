@@ -83,7 +83,7 @@ public:
         g.drawRect (getLocalBounds(), 1);
 
         if (model.isValid())
-            g.drawFittedText (Midi::noteToText (model.keyId()),
+            g.drawFittedText (String (model.keyId()),
                               getLocalBounds(), Justification::centred, 1);
     }
 

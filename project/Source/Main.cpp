@@ -139,7 +139,7 @@ public:
         
         initializeModulePath();
         world = new Globals (commandLine);
-        world->getUnlockStatus().load();
+        world->getUnlockStatus().loadAll();
         launchApplication();
     }
 

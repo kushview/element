@@ -308,13 +308,13 @@ void MidiEditorBody::paintTrackHeader (Graphics &g, int track, const Rectangle<i
     {
         g.setFont (Font (10.0f));
         g.setColour (Colours::black.withAlpha (0.78f));
-        g.drawText (Midi::noteToText (track), area, Justification::left, true);
+        g.drawText (String (track), area, Justification::left, true);
 
         g.setColour (Colours::black.withAlpha (0.5f));
         g.drawHorizontalLine (area.getBottom(), area.getX(), area.getRight());
     }
 
-    if (Midi::noteIsWhiteKey (track))
+    if (true) // Midi::noteIsWhiteKey (track))
         g.setColour (Colours::white);
     else
         g.setColour (Colours::black);
@@ -330,7 +330,7 @@ void MidiEditorBody::paintTrackLane (Graphics &g, int track, const Rectangle<int
 
     g.resetToDefaultState();
 
-    if (Midi::noteIsWhiteKey (track))
+    if (true) //Midi::noteIsWhiteKey (track))
         g.setColour (Colour (0xff999999));
     else
         g.setColour (Colour (0xff888888));

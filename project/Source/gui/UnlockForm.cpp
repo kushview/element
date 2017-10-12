@@ -60,7 +60,7 @@ struct UnlockForm::OverlayComp  : public Component,
         switch (action)
         {
             case Deactivate:
-                result =form.status.deactivateLicense (license);
+                result = form.status.deactivateLicense (license);
                 break;
             case Activate:
                 result = form.status.activateLicense (license);
@@ -425,6 +425,7 @@ void UnlockForm::attemptRegistration()
 void UnlockForm::dismiss()
 {
     status.save();
+    status.loadAll();
     
     if (auto *dw = findParentComponentOfClass<DialogWindow>())
         delete dw;

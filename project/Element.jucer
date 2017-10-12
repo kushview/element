@@ -307,7 +307,7 @@
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_CI_AUTH=1"/>
         <CONFIGURATION name="DebugLocal" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="0" optimisation="1" targetName="Element"
+                       osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="Element"
                        headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=1"/>
