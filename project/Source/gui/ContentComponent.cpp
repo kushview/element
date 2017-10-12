@@ -18,7 +18,7 @@
 
 #include "gui/ContentComponent.h"
 
-#define EL_USE_AUDIO_PANEL 1
+#define EL_USE_AUDIO_PANEL 0
 
 namespace Element {
 
