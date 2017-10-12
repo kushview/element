@@ -19,8 +19,7 @@ namespace GraphLog {
         for (int i = 0; i < g.getNumFilters(); ++i)
         {
             PluginDescription d;
-            g.getNode(i)->getPluginDescription(d);
-            
+            g.getNode(i)->getPluginDescription (d);
             DBG("[EL] GC Node Name: " << d.name);
         }
     }
@@ -104,13 +103,27 @@ void EngineController::activate()
 void EngineController::deactivate()
 {
     Controller::deactivate();
-    auto* app = dynamic_cast<AppController*> (getRoot());
+    auto* app =   dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
     auto& devices (globals.getDeviceManager());
+    auto engine   (globals.getAudioEngine());
     devices.removeChangeListener (this);
     if (root)
     {
         root->removeChangeListener (this);
+        const auto nodes = root->getGraph().getNodesModel();
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        {
+            const Node node (nodes.getChild (i), false);
+            ValueTree tree = node.node();
+            MemoryBlock state;
+            if (GraphNodePtr obj = root->getNodeForId (node.getNodeId()))
+                if (auto* proc = obj->getAudioProcessor())
+                    proc->getStateInformation (state);
+            if (state.getSize() > 0)
+                tree.setProperty ("state", state.toBase64Encoding(), nullptr);
+        }
+        
         root = nullptr;
     }
 }
@@ -141,7 +154,9 @@ void EngineController::setRootNode (const Node& newRootNode)
         jassert(nodeId == node.getNodeId());
         if (GraphNodePtr obj = root->getNodeForId (nodeId))
         {
-            DBG("Added plugin: " << node.getName());
+            MemoryBlock state;
+            if (state.fromBase64Encoding (node.node().getProperty("state").toString()))
+                obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
         }
     }
     

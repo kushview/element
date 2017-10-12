@@ -124,7 +124,7 @@ bool AppController::perform (const InvocationInfo& info)
                 ec->clear();
             }
         } break;
-            
+
         case Commands::mediaOpen:
         {
             FileChooser chooser ("Open a graph", File(), "*.elgraph;*.elg");
