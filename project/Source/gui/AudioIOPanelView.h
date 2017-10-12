@@ -1,25 +1,42 @@
 /*
-    AudioIOPanelView.h - This file is part of Element
-    Copyright (C) 2017 Kushview, LLC.  All rights reserved.
+  ==============================================================================
+
+  This is an automatically generated GUI class created by the Projucer!
+
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
+
+  Created with Projucer version: 5.1.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  Copyright (c) 2015 - ROLI Ltd.
+
+  ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_2EFBBB6231C674B2__
-#define __JUCE_HEADER_2EFBBB6231C674B2__
+#pragma once
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../../JuceLibraryCode/JuceHeader.h"
+
+namespace Element {
+    class Node;
+}
 //[/Headers]
 
 
 
-namespace Element {
-
+//==============================================================================
 /**
                                                                     //[Comments]
                                                                     //[/Comments]
 */
 class AudioIOPanelView  : public Component,
-                          public SliderListener
+                          public Slider::Listener,
+                          public Label::Listener
 {
 public:
     //==============================================================================
@@ -28,16 +45,19 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void setNode (const Element::Node& node);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void labelTextChanged (Label* labelThatHasChanged) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    Value inputGain, outputGain;
     //[/UserVariables]
 
     //==============================================================================
@@ -47,6 +67,7 @@ private:
     ScopedPointer<Label> outputGainLabel;
     ScopedPointer<Label> inputGainDbLabel;
     ScopedPointer<Label> outputGainDbLabel;
+    ScopedPointer<Label> nodeNameLabel;
 
 
     //==============================================================================
@@ -55,7 +76,3 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-
-} /* namespace Element */
-
-#endif   // __JUCE_HEADER_2EFBBB6231C674B2__

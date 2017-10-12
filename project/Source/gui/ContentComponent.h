@@ -16,6 +16,8 @@ class ContentContainer;
 class Globals;
 class GuiApp;
 class GraphEditorView;
+class NavigationConcertinaPanel;
+class Node;
 class RackView;
 class TransportBar;
 
@@ -36,6 +38,7 @@ public:
     void paint (Graphics &g) override;
     void resized() override;
 
+    void setCurrentNode (const Node& node);
     void setRackViewComponent (Component* comp);
     void setRackViewNode (GraphNodePtr node);
     void stabilize();
@@ -51,7 +54,7 @@ public:
 private:
     AppController& controller;
     GuiApp& gui;
-    ScopedPointer<Component> nav;
+    ScopedPointer<NavigationConcertinaPanel> nav;
     ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;
     StretchableLayoutManager layout;

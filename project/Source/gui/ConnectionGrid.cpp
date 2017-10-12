@@ -326,11 +326,11 @@ namespace Element {
         
         void listBoxItemClicked (int row, const MouseEvent& ev, bool isSource)
         {
+            const Node node (getNode (row, isSource));
             if (ev.mods.isPopupMenu())
-            {
-                const Node node (getNode (row, isSource));
                 showMenuForNode (node);
-            }
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+                cc->setCurrentNode (node);
         }
         
         static ValueTree findArc (const ValueTree& arcs, uint32 sourceNode, int sourceChannel, uint32 destNode, int destChannel)

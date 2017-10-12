@@ -18,40 +18,40 @@
 
 #include "gui/ContentComponent.h"
 
-#define EL_USE_AUDIO_PANEL 0
+#define EL_USE_AUDIO_PANEL 1
 
 namespace Element {
 
-    class ContentComponent::Resizer : public StretchableLayoutResizerBar
+class ContentComponent::Resizer : public StretchableLayoutResizerBar
+{
+public:
+    Resizer (ContentComponent& contentComponent,
+             StretchableLayoutManager* layoutToUse,
+             int itemIndexInLayout,
+             bool isBarVertical)
+        : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+          owner (contentComponent)
     {
-    public:
-        Resizer (ContentComponent& contentComponent,
-                 StretchableLayoutManager* layoutToUse,
-                 int itemIndexInLayout,
-                 bool isBarVertical)
-            : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-              owner (contentComponent)
-        {
-            
-        }
         
-        void mouseDown (const MouseEvent& ev) override
-        {
-            StretchableLayoutResizerBar::mouseDown (ev);
-            owner.resizerMouseDown();
-        }
-        
-        void mouseUp (const MouseEvent& ev) override
-        {
-            StretchableLayoutResizerBar::mouseUp(ev);
-            owner.resizerMouseUp();
-        }
-        
-    private:
-        ContentComponent& owner;
-    };
+    }
     
+    void mouseDown (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseDown (ev);
+        owner.resizerMouseDown();
+    }
     
+    void mouseUp (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseUp(ev);
+        owner.resizerMouseUp();
+    }
+    
+private:
+    ContentComponent& owner;
+};
+
+
 class ContentComponent::Toolbar : public Component,
                                   public ButtonListener
 {
@@ -240,6 +240,24 @@ public:
         setLookAndFeel (nullptr);
     }
     
+    int getIndexOfPanel (Component* panel)
+    {
+        if (nullptr == panel)
+            return -1;
+        for (int i = 0; i < getNumPanels(); ++i)
+            if (auto* p = getPanel (i))
+                if (p == panel)
+                    return i;
+        return -1;
+    }
+    
+    template<class T> T* findPanel() {
+        for (int i = getNumPanels(); --i >= 0;)
+            if (auto* panel = dynamic_cast<T*> (getPanel (i)))
+                return panel;
+        return nullptr;
+    }
+    
     void clearPanels()
     {
         Array<Component*> comps;
@@ -272,6 +290,9 @@ public:
         addPanel (-1, c, true);
         setPanelHeaderSize (c, headerHeight);
     }
+    
+    AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
+    PluginsPanelView* getPluginsPanel() { return findPanel<PluginsPanelView>(); }
     
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
@@ -465,6 +486,12 @@ void ContentComponent::post (Message* message)
 GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize() { }
+
+void ContentComponent::setCurrentNode (const Node& node)
+{
+    if (auto* audioPanel = nav->getAudioIOPanel())
+        audioPanel->setNode (node);
+}
 
 void ContentComponent::updateLayout()
 {
