@@ -3,6 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
+#if 0
 #include "controllers/AppController.h"
 #include "engine/AudioEngine.h"
 #include "gui/NewSessionView.h"
@@ -499,3 +500,5 @@ void GuiApp::stabilizeContent()
 }
 
 }
+#endif
+

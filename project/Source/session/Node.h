@@ -1,10 +1,9 @@
 /*
- NodeModel.h - This file is part of Element
- Copyright (C) 2014-2017  Kushview, LLC.  All rights reserved.
+    NodeModel.h - This file is part of Element
+    Copyright (C) 2014-2017  Kushview, LLC.  All rights reserved.
  */
 
-#ifndef EL_NODE_H
-#define EL_NODE_H
+#pragma once
 
 #include "ElementApp.h"
 #include "engine/GraphNode.h"
@@ -112,5 +111,3 @@ namespace Element {
     };
     
 }
-
-#endif // EL_NODE_H

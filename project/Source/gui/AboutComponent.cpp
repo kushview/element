@@ -18,7 +18,6 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "gui/GuiApp.h"
 #include "session/CommandManager.h"
 //[/Headers]
 
@@ -111,9 +110,9 @@ void AboutComponent::resized()
 void AboutComponent::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
-    DBG("DOWNL");
-    if (isOnDesktop() || isVisible())
-        gui.commander().invokeDirectly (Commands::showAbout, true);
+    // FIXME:
+//    if (isOnDesktop() || isVisible())
+//        gui.commander().invokeDirectly (Commands::showAbout, true);
     //[/UserCode_mouseDown]
 }
 

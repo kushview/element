@@ -3,9 +3,9 @@
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
 #include "engine/GraphProcessor.h"
-#include "gui/GuiApp.h"
 #include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
+#include "Commands.h"
 #include "Globals.h"
 #include "Messages.h"
 #include "Settings.h"
@@ -15,7 +15,6 @@ namespace Element {
 AppController::AppController (Globals& g)
     : world (g)
 {
-    gui = GuiApp::create (g, *this);
     addChild (new GuiController());
     addChild (new EngineController());
     g.getCommandManager().registerAllCommandsForTarget (this);
@@ -24,20 +23,17 @@ AppController::AppController (Globals& g)
 
 AppController::~AppController()
 {
-    gui->closeAllWindows();
-    gui = nullptr;
+
 }
 
 void AppController::deactivate()
 {
-    gui->closeAllWindows();
     Controller::deactivate();
 }
-    
+
 void AppController::run()
 {
     activate();
-    gui->run();
 }
 
 void AppController::handleMessage (const Message& msg)
@@ -87,7 +83,8 @@ void AppController::handleMessage (const Message& msg)
 
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
-    return gui.get();
+    // FIXME
+    return nullptr;
 }
 
 void AppController::getAllCommands (Array<CommandID>& cids)
@@ -101,8 +98,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
 
 void AppController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
 {
-    if (gui)
-        gui->getCommandInfo (command, result);
+    // FIXME: 
 }
 
 bool AppController::perform (const InvocationInfo& info)

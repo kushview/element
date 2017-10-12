@@ -7,7 +7,6 @@
 
 namespace Element {
 class Globals;
-class GuiApp;
 
 class AppController :  public Controller,
                        protected ApplicationCommandTarget,
@@ -38,7 +37,6 @@ private:
     File lastSavedFile;
     Globals& world;
     CommandManager commands;
-    ScopedPointer<GuiApp> gui;
     void run();
 };
 

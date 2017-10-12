@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 4.3.1
+  Created with Projucer version: 5.1.2
 
   ------------------------------------------------------------------------------
 
@@ -17,14 +17,12 @@
   ==============================================================================
 */
 
-#ifndef __JUCE_HEADER_248C56742F074362__
-#define __JUCE_HEADER_248C56742F074362__
+#pragma once
 
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 
 namespace Element {
-class GuiApp;
 
 //[/Headers]
 
@@ -42,7 +40,7 @@ class PreferencesComponent  : public Component
 {
 public:
     //==============================================================================
-    PreferencesComponent (GuiApp& gui_);
+    PreferencesComponent ();
     ~PreferencesComponent();
 
     //==============================================================================
@@ -58,7 +56,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    GuiApp& gui;
     class PageList;
     //[/UserVariables]
 
@@ -75,5 +72,3 @@ private:
 //[EndFile] You can add extra defines here...
 }
 //[/EndFile]
-
-#endif   // __JUCE_HEADER_248C56742F074362__

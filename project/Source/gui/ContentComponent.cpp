@@ -338,7 +338,7 @@ private:
 class ContentContainer : public Component
 {
 public:
-    ContentContainer (ContentComponent& cc, AppController& app, GuiApp& gui)
+    ContentContainer (ContentComponent& cc, AppController& app)
         : owner (cc)
     {
         addAndMakeVisible (dummy1 = new ConnectionGrid());
@@ -377,15 +377,14 @@ private:
     }
 };
 
-ContentComponent::ContentComponent (AppController& ctl_, GuiApp& app_)
-    : controller (ctl_),
-      gui (app_)
+ContentComponent::ContentComponent (AppController& ctl_)
+    : controller (ctl_)
 {
     setOpaque (true);
     
-    addAndMakeVisible (nav = new NavigationConcertinaPanel (gui.globals()));
+    addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (*this, controller, gui));
+    addAndMakeVisible (container = new ContentContainer (*this, controller));
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar());
     
@@ -482,8 +481,6 @@ void ContentComponent::post (Message* message)
 {
     controller.postMessage (message);
 }
-    
-GuiApp& ContentComponent::app() { return gui; }
 
 void ContentComponent::stabilize() { }
 
