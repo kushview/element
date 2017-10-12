@@ -12,7 +12,7 @@
 #include "gui/LookAndFeel.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
-#include "session/NodeModel.h"
+#include "session/Node.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 

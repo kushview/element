@@ -1,5 +1,5 @@
 /*
-    NodeModel.h - This file is part of Element
+    Node.h - This file is part of Element
     Copyright (C) 2014-2017  Kushview, LLC.  All rights reserved.
  */
 

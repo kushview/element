@@ -11,7 +11,7 @@
  
 #include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
-#include "session/NodeModel.h"
+#include "session/Node.h"
 #include "Messages.h"
 
 #include "gui/ConnectionGrid.h"

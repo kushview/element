@@ -126,8 +126,6 @@
               file="Source/gui/GraphEditorView.cpp"/>
         <FILE id="dqN1CW" name="GraphEditorView.h" compile="0" resource="0"
               file="Source/gui/GraphEditorView.h"/>
-        <FILE id="VY02a4" name="GuiApp.cpp" compile="0" resource="0" file="Source/gui/GuiApp.cpp"/>
-        <FILE id="oKKgS7" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="cPWpB0" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
         <FILE id="VrN10k" name="HorizontalListBox.cpp" compile="1" resource="0"
               file="Source/gui/HorizontalListBox.cpp"/>
@@ -221,16 +219,14 @@
         <FILE id="CFkl6z" name="AssetTree.cpp" compile="1" resource="0" file="Source/session/AssetTree.cpp"/>
         <FILE id="nXWsbL" name="AssetTree.h" compile="0" resource="0" file="Source/session/AssetTree.h"/>
         <FILE id="La8Q6S" name="AssetType.h" compile="0" resource="0" file="Source/session/AssetType.h"/>
-        <FILE id="ty2bp0" name="BlockModel.cpp" compile="1" resource="0" file="Source/session/BlockModel.cpp"/>
-        <FILE id="zkZsrO" name="BlockModel.h" compile="0" resource="0" file="Source/session/BlockModel.h"/>
         <FILE id="IsKejY" name="ClipModel.h" compile="0" resource="0" file="Source/session/ClipModel.h"/>
         <FILE id="lcKFiX" name="CommandManager.h" compile="0" resource="0"
               file="Source/session/CommandManager.h"/>
         <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
               file="Source/session/DeviceManager.cpp"/>
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
-        <FILE id="L3dN2b" name="GraphModel.cpp" compile="1" resource="0" file="Source/session/GraphModel.cpp"/>
-        <FILE id="vWMbjH" name="GraphModel.h" compile="0" resource="0" file="Source/session/GraphModel.h"/>
+        <FILE id="L3dN2b" name="Graph.cpp" compile="1" resource="0" file="Source/session/Graph.cpp"/>
+        <FILE id="vWMbjH" name="Graph.h" compile="0" resource="0" file="Source/session/Graph.h"/>
         <FILE id="EePoMm" name="MediaManager.cpp" compile="1" resource="0"
               file="Source/session/MediaManager.cpp"/>
         <FILE id="iPEraJ" name="MediaManager.h" compile="0" resource="0" file="Source/session/MediaManager.h"/>
@@ -241,7 +237,6 @@
         <FILE id="nB7y30" name="Module.h" compile="0" resource="0" file="Source/session/Module.h"/>
         <FILE id="WCIEqE" name="Node.cpp" compile="1" resource="0" file="Source/session/Node.cpp"/>
         <FILE id="kwalR3" name="Node.h" compile="0" resource="0" file="Source/session/Node.h"/>
-        <FILE id="QI9jCi" name="NodeModel.h" compile="0" resource="0" file="Source/session/NodeModel.h"/>
         <FILE id="o4zGK5" name="Note.cpp" compile="1" resource="0" file="Source/session/Note.cpp"/>
         <FILE id="gswGU9" name="Note.h" compile="0" resource="0" file="Source/session/Note.h"/>
         <FILE id="hi8aY2" name="NoteSequence.cpp" compile="1" resource="0"

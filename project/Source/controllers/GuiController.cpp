@@ -56,8 +56,6 @@ void GuiController::deactivate()
     Controller::deactivate();
 }
 
-
-
 void GuiController::closeAllWindows()
 {
     if (! windowManager)
