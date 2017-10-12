@@ -60,31 +60,22 @@ namespace Element {
 
     /** A juce DialogWindow that emits a closed signal */
     class Dialog : public DialogWindow,
-            public WindowHook
+                   public WindowHook
     {
     public:
-        Dialog (const String& name, GuiApp&);
+        Dialog (const String& name);
         virtual ~Dialog();
-        GuiApp& app() { return gui; }
         virtual void closeButtonPressed();
-
-    private:
-        GuiApp& gui;
     };
-
 
     /** A juce DocumentWindow that emits a closed signal */
     class Window : public DocumentWindow,
                    public WindowHook
     {
     public:
-        Window (const String& name, GuiApp&);
+        Window (const String& name);
         virtual ~Window();
-        GuiApp& app() { return gui; }
         void closeButtonPressed();
-
-    protected:
-        GuiApp& gui;
     };
 }
 #endif

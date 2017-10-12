@@ -1,7 +1,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "gui/ContentComponent.h"
-#include "gui/GuiApp.h"
+ 
 #include "gui/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"

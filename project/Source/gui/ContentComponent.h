@@ -14,7 +14,6 @@ namespace Element {
 class AppController;
 class ContentContainer;
 class Globals;
-class GuiApp;
 class GraphEditorView;
 class NavigationConcertinaPanel;
 class Node;
@@ -30,7 +29,7 @@ class ContentComponent :  public Component,
                           public FileDragAndDropTarget
 {
 public:
-    ContentComponent (AppController& app, GuiApp& gui);
+    ContentComponent (AppController& app);
     ~ContentComponent();
 
     void childBoundsChanged (Component* child) override;
@@ -49,11 +48,9 @@ public:
     
     bool isInterestedInFileDrag (const StringArray &files) override;
     void filesDropped (const StringArray &files, int x, int y) override;
-    JUCE_DEPRECATED(GuiApp& app());
 
 private:
     AppController& controller;
-    GuiApp& gui;
     ScopedPointer<NavigationConcertinaPanel> nav;
     ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;

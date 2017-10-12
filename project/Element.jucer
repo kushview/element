@@ -126,7 +126,7 @@
               file="Source/gui/GraphEditorView.cpp"/>
         <FILE id="dqN1CW" name="GraphEditorView.h" compile="0" resource="0"
               file="Source/gui/GraphEditorView.h"/>
-        <FILE id="VY02a4" name="GuiApp.cpp" compile="1" resource="0" file="Source/gui/GuiApp.cpp"/>
+        <FILE id="VY02a4" name="GuiApp.cpp" compile="0" resource="0" file="Source/gui/GuiApp.cpp"/>
         <FILE id="oKKgS7" name="GuiApp.h" compile="0" resource="0" file="Source/gui/GuiApp.h"/>
         <FILE id="cPWpB0" name="GuiCommon.h" compile="0" resource="0" file="Source/gui/GuiCommon.h"/>
         <FILE id="VrN10k" name="HorizontalListBox.cpp" compile="1" resource="0"
@@ -188,12 +188,12 @@
               file="Source/gui/SequencerComponent.cpp"/>
         <FILE id="qvSqR4" name="SequencerComponent.h" compile="0" resource="0"
               file="Source/gui/SequencerComponent.h"/>
-        <FILE id="BAapOh" name="SessionDocument.cpp" compile="1" resource="0"
+        <FILE id="BAapOh" name="SessionDocument.cpp" compile="0" resource="0"
               file="Source/gui/SessionDocument.cpp"/>
         <FILE id="otOrmC" name="SessionDocument.h" compile="0" resource="0"
               file="Source/gui/SessionDocument.h"/>
-        <FILE id="qKvsna" name="SessionTreePanel.cpp" compile="1" resource="0"
-              file="Source/gui/SessionTreePanel.cpp"/>
+        <FILE id="qKvsna" name="SessionTreePanel.cpp" compile="0" resource="0"
+              file="Source/gui/SessionTreePanel.cpp" xcodeResource="0"/>
         <FILE id="QhIgwr" name="SessionTreePanel.h" compile="0" resource="0"
               file="Source/gui/SessionTreePanel.h"/>
         <FILE id="u0qA7E" name="Timeline.h" compile="0" resource="0" file="Source/gui/Timeline.h"/>

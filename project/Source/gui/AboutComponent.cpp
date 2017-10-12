@@ -1,39 +1,39 @@
 /*
-    AboutComponent.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.1.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  Copyright (c) 2015 - ROLI Ltd.
+
+  ==============================================================================
 */
 
 //[Headers] You can add your own extra header files here...
-#include "gui/GuiApp.h"
 #include "session/CommandManager.h"
 //[/Headers]
 
 #include "AboutComponent.h"
 
 
-namespace Element {
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
-AboutComponent::AboutComponent (GuiApp& g)
-    : gui(g)
+AboutComponent::AboutComponent ()
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
     setName ("AboutComponent");
     addAndMakeVisible (label = new Label ("new label",
                                           TRANS("Element")));
@@ -46,7 +46,7 @@ AboutComponent::AboutComponent (GuiApp& g)
 
     addAndMakeVisible (label2 = new Label ("new label",
                                            TRANS("Element v0.1.1 (build 1)")));
-    label2->setFont (Font (14.00f, Font::plain));
+    label2->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     label2->setJustificationType (Justification::centredLeft);
     label2->setEditable (false, false, false);
     label2->setColour (Label::textColourId, Colour (0xffe6e6e6));
@@ -90,8 +90,14 @@ void AboutComponent::paint (Graphics& g)
 
     g.fillAll (Colours::black);
 
-    g.setColour (Colour (0xff4765a0));
-    g.fillRect (0, 0, 524, 200);
+    {
+        int x = 0, y = 0, width = 524, height = 200;
+        Colour fillColour = Colour (0xff4765a0);
+        //[UserPaintCustomArguments] Customize the painting arguments here..
+        //[/UserPaintCustomArguments]
+        g.setColour (fillColour);
+        g.fillRect (x, y, width, height);
+    }
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -111,9 +117,9 @@ void AboutComponent::resized()
 void AboutComponent::mouseDown (const MouseEvent& e)
 {
     //[UserCode_mouseDown] -- Add your code here...
-    DBG("DOWNL");
-    if (isOnDesktop() || isVisible())
-        gui.commander().invokeDirectly (Commands::showAbout, true);
+    // FIXME:
+//    if (isOnDesktop() || isVisible())
+//        gui.commander().invokeDirectly (Commands::showAbout, true);
     //[/UserCode_mouseDown]
 }
 
@@ -125,16 +131,15 @@ void AboutComponent::mouseDown (const MouseEvent& e)
 
 //==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="AboutComponent" template="../../Templates/ElementTemplate.cpp"
-                 componentName="AboutComponent" parentClasses="public Component"
-                 constructorParams="GuiApp&amp; g" variableInitialisers="gui(g)"
+<JUCER_COMPONENT documentType="Component" className="AboutComponent" componentName="AboutComponent"
+                 parentClasses="public Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="524" initialHeight="460">
   <METHODS>
@@ -147,12 +152,14 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="0Cc 40 302 72" textCol="fff5f5f5"
          edTextCol="ff000000" edBkgCol="0" labelText="Element" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Arial Black"
-         fontsize="86.5" bold="1" italic="0" justification="36"/>
+         fontsize="86.5" kerning="0" bold="1" italic="0" justification="36"
+         typefaceStyle="Bold"/>
   <LABEL name="new label" id="8a84133becd36d77" memberName="label2" virtualName=""
          explicitFocusOrder="0" pos="8 208 224 24" textCol="ffe6e6e6"
          edTextCol="ff000000" edBkgCol="0" labelText="Element v0.1.1 (build 1)"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14" bold="0" italic="0" justification="33"/>
+         fontname="Default font" fontsize="14" kerning="0" bold="0" italic="0"
+         justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -161,6 +168,5 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
-//[/EndFile]
-
 } /* namespace Element */
+//[/EndFile]

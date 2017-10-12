@@ -8,7 +8,7 @@
 #include "gui/HorizontalListBox.h"
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
-#include "gui/GuiApp.h"
+ 
 #include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
 #include "session/NodeModel.h"

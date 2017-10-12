@@ -3,6 +3,7 @@
     Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
+#if 0
 #ifndef ELEMENT_GUIAPP_H
 #define ELEMENT_GUIAPP_H
 
@@ -103,3 +104,5 @@ namespace Element {
 }
     
 #endif /* ELEMENT_GUIAPP_H */
+#endif
+

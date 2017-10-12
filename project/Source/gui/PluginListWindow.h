@@ -31,7 +31,7 @@ class PluginListWindow : public Window
 {
 public:
     PluginListWindow (Globals& world, const File& deadmansFile = File::nonexistent)
-        : Window ("Plugin Manager", gui),
+        : Window ("Plugin Manager"),
           pluginList (world.getPluginManager().availablePlugins()),
           pluginManager (world.getPluginManager())
     {

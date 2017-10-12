@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 4.3.1
+  Created with Projucer version: 5.1.2
 
   ------------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "gui/GuiApp.h"
 #include "session/DeviceManager.h"
 #include "Globals.h"
 //[/Headers]
@@ -110,8 +109,8 @@ namespace Element {
     class AudioSettingsComponent : public DevicesComponent
     {
     public:
-        AudioSettingsComponent (GuiApp& gui)
-            : DevicesComponent (gui.globals().getDeviceManager(), 0, 16, 0, 16,
+        AudioSettingsComponent (DeviceManager& devices)
+            : DevicesComponent (devices, 0, 16, 0, 16,
                                 true, true, true, false)
         {
             setSize (300, 400);
@@ -121,8 +120,8 @@ namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (GuiApp& gui_)
-    : gui (gui_)
+PreferencesComponent::PreferencesComponent (Globals& g)
+    : world (g)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -205,7 +204,7 @@ void PreferencesComponent::setPage (const String& uri)
     if (uri == "element://gui/audioEngine")
     {
         groupComponent->setText ("Audio");
-        pageComponent = new AudioSettingsComponent (gui);
+        pageComponent = new AudioSettingsComponent (world.getDeviceManager());
         pageComponent->setName (uri);
     }
     else if (uri == "element://gui/application")
@@ -240,8 +239,8 @@ void PreferencesComponent::setPage (const String& uri)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="GuiApp&amp; gui_"
-                 variableInitialisers="gui (gui_)" snapPixels="4" snapActive="1"
+                 parentClasses="public Component" constructorParams="Globals&amp; g"
+                 variableInitialisers="world (g)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">
   <BACKGROUND backgroundColour="ff3b3b3b"/>
