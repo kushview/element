@@ -79,12 +79,12 @@ public:
 
 protected:
 
-    template<class NoteSink>
-    inline void foreachNote (NoteSink sink)
+    template<class Handler>
+    inline void foreachNote (Handler handle)
     {
         for (int i = 0; i < notes.size(); ++i)
             if (NoteClipItem* note = notes.getUnchecked(i))
-                sink (note);
+                handle (note);
     }
 
     /** Add a note to the editor. */
