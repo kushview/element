@@ -40,7 +40,7 @@ class PreferencesComponent  : public Component
 {
 public:
     //==============================================================================
-    PreferencesComponent ();
+    PreferencesComponent (Globals& g);
     ~PreferencesComponent();
 
     //==============================================================================
@@ -57,6 +57,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
+    Globals& world;
     //[/UserVariables]
 
     //==============================================================================

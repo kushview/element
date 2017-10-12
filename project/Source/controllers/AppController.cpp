@@ -34,6 +34,8 @@ void AppController::deactivate()
 void AppController::run()
 {
     activate();
+    if (auto* gui = findChild<GuiController>())
+        gui->run();
 }
 
 void AppController::handleMessage (const Message& msg)
@@ -83,8 +85,7 @@ void AppController::handleMessage (const Message& msg)
 
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
-    // FIXME
-    return nullptr;
+    return findChild<GuiController>();
 }
 
 void AppController::getAllCommands (Array<CommandID>& cids)

@@ -120,7 +120,8 @@ namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent ()
+PreferencesComponent::PreferencesComponent (Globals& g)
+    : world (g)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -203,7 +204,7 @@ void PreferencesComponent::setPage (const String& uri)
     if (uri == "element://gui/audioEngine")
     {
         groupComponent->setText ("Audio");
-        pageComponent = new Component(); // FIXME: new AudioSettingsComponent (gui);
+        pageComponent = new AudioSettingsComponent (world.getDeviceManager());
         pageComponent->setName (uri);
     }
     else if (uri == "element://gui/application")
@@ -238,9 +239,10 @@ void PreferencesComponent::setPage (const String& uri)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="4" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="1" initialWidth="600" initialHeight="500">
+                 parentClasses="public Component" constructorParams="Globals&amp; g"
+                 variableInitialisers="world (g)" snapPixels="4" snapActive="1"
+                 snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
+                 initialHeight="500">
   <BACKGROUND backgroundColour="ff3b3b3b"/>
   <GENERICCOMPONENT name="Page List" id="c2205f1e30617b7c" memberName="pageList"
                     virtualName="" explicitFocusOrder="0" pos="8 8 184 480" class="PageList"
