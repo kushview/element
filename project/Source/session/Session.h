@@ -23,12 +23,16 @@ namespace Element {
     {
     public:
         virtual ~Session();
-
+        
+        inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
+        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
+        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
+        
+        ValueTree getValueTree() const { return objectData; }
         bool loadData (const ValueTree& data);
-
         void clear();
 
-        inline String name() const { return node().getProperty (Slugs::name, "Invalid Session"); }
+        inline String getName() const { return node().getProperty(Slugs::name, "Invalid Session"); }
         inline Value getNamevalue() { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
 

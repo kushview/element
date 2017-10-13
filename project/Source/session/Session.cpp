@@ -88,10 +88,10 @@ namespace Element {
     void Session::setMissingProperties (bool resetExisting)
     {
         if (! node().hasProperty (Slugs::name) || resetExisting)
-            setProperty (Slugs::name, "Untited Session");
-
-        if (! node().hasProperty ("tempo") || resetExisting)
-            setProperty ("tempo", (double) 120.f);
+            setProperty (Slugs::name, "Untitled Session");
+        if (! node().hasProperty (Slugs::tempo) || resetExisting)
+            setProperty (Slugs::tempo, (double) 120.f);
+        objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
     }
 
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)

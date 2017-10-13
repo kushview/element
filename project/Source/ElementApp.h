@@ -19,6 +19,7 @@ namespace Tags
     const Identifier arc                = "arc";
     const Identifier arcs               = "arcs";
     const Identifier graph              = "graph";
+    const Identifier graphs             = "graphs";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
     const Identifier port               = "port";

@@ -17,7 +17,7 @@ namespace Element {
 
     String SessionDocument::getDocumentTitle()
     {
-        return (session != nullptr) ? session->name() : "Unknown";
+        return (session != nullptr) ? session->getName() : "Unknown";
     }
 
     Result SessionDocument::loadDocument (const File& file)
