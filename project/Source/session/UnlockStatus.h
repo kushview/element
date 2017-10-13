@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#define EL_LITE_VERSION_DEV
 
 namespace Element {
     
@@ -13,13 +14,26 @@ class UnlockStatus :  public kv::EDDOnlineUnlockStatus
 public:
     UnlockStatus (Globals&);
     ~UnlockStatus() { }
-    
-    void loadAll()
+
+    inline void loadAll()
     {
         load();
         loadProps();
         dump();
     }
+
+    inline var isFullVersion() const
+    {
+       #ifdef EL_LITE_VERSION_DEV
+        if (! (bool) isUnlocked())
+            return var (0);
+        return props [fullKey];
+       #else
+        return isUnlocked();
+       #endif
+    }
+    
+    void launchProUpgradeUrl();
     
     String getProductID() override;
     bool doesProductIDMatch (const String& returnedIDFromServer) override;
@@ -30,16 +44,13 @@ public:
     URL getServerAuthenticationURL() override;
     StringArray getLocalMachineIDs() override;
 
-    inline var isFullVersion() const
-    {
-       #ifdef EL_LITE_VERSION_DEV
-        if (! (bool) isUnlocked())
-            return var (false);
-        return props["f"];
-       #else
-        return isUnlocked();
-       #endif
-    }
+private:
+    static const char* propsKey;
+    static const char* fullKey;
+    static const char* priceIdKey;
+    
+    Settings& settings;
+    ValueTree props;
     
     inline void dump()
     {
@@ -47,23 +58,18 @@ public:
         DBG("UNLOCKED: " << ((bool) isUnlocked() ? "yes" : "no"));
         DBG("LICENSE:  " << getLicenseKey());
         DBG("FULL:     " << ((bool) isFullVersion() ? "yes" : "no"));
+        DBG("PRICE ID  " << (int) getProperty ("price_id"));
        #endif
     }
     
-private:
-    Settings& settings;
-    ValueTree props;
-    
     inline void loadProps()
     {
-        props = ValueTree ("props");
+        props = ValueTree (propsKey);
        #ifdef EL_LITE_VERSION_DEV
-        const String idsStr = getProperty("price_ids").toString();
-        StringArray pids;
-        pids.addTokens (idsStr, ",", "'");
-        for (const auto& pid : pids)
-            if (2 == atoi (pid.toRawUTF8()))
-                props.setProperty ("f", true, nullptr);
+        const var priceId = getProperty(priceIdKey);
+        const var two (2);
+        if (two == priceId)
+            props.setProperty (fullKey, 1, nullptr);
        #endif
     }
 };

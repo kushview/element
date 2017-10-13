@@ -194,7 +194,9 @@ public:
         controller = startup->controller.release();
         startup = nullptr;
         controller->run();
-        CurrentVersion::checkAfterDelay (5000);
+        const bool checkUpdatesOnStart = false;
+        if (checkUpdatesOnStart)
+            CurrentVersion::checkAfterDelay (5000);
     }
     
 private:

@@ -30,6 +30,10 @@
 #endif
 
 namespace Element {
+    const char* UnlockStatus::propsKey = "props";
+    const char* UnlockStatus::fullKey = "f";
+    const char* UnlockStatus::priceIdKey = "price_id";
+    
     UnlockStatus::UnlockStatus (Globals& g) : settings (g.getSettings()) { }
     String UnlockStatus::getProductID() { return EL_PRODUCT_ID; }
     bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
@@ -43,6 +47,16 @@ namespace Element {
     {
         if (auto* const props = settings.getUserSettings())
             props->setValue (EL_LICENSE_SETTINGS_KEY, data);
+    }
+    
+    void UnlockStatus::launchProUpgradeUrl()
+    {
+        // http://kushview.dev/checkout/?edd_action=sl_license_upgrade&license_id=129&upgrade_id=3
+        URL url (EL_BASE_URL "/checkout/");
+        url.withParameter("edd_action", "sl_license_upgrade")
+           .withParameter("license_id", "129")
+           .withParameter("upgrade_id", "3")
+           .launchInDefaultBrowser();
     }
     
     String UnlockStatus::getState()

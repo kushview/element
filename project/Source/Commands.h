@@ -204,4 +204,143 @@ namespace Commands {
 
        return true;
    }
+    
+    inline void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
+    {
+        if (Commands::devicePadPress <= commandID && (Commands::devicePadPress + 13) > commandID)
+        {
+            result.setInfo (("Pad Press"), "Triggers sounds.", "Beat Thang Hardware", ApplicationCommandInfo::dontTriggerVisualFeedback);
+            result.addDefaultKeypress ('A', ModifierKeys::noModifiers);
+        }
+        else if (Commands::devicePadRelease <= commandID && (Commands::devicePadRelease + 13) > commandID)
+            result.setInfo (("Pad Release"), "Ends playing sounds.", "Beat Thang Hardware", 0);
+        
+        if (result.description.isNotEmpty())
+            return;
+        
+        if (Commands::getDeviceTrackInfo (commandID, result))
+            return;
+        
+        switch (commandID)
+        {
+            case Commands::exportAudio:
+                result.setInfo ("Export Audio", "Export to an audio file", "Exporting", 0);
+                break;
+            case Commands::exportMidi:
+                result.setInfo ("Exort MIDI", "Export to a MIDI file", "Exporting", 0);
+                break;
+                
+            case Commands::sessionClose:
+                //            result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
+                result.setInfo ("Close Session", "Close the current session", "Session", 0);
+                break;
+            case Commands::sessionNew:
+                //            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+                result.setInfo ("New Session", "Create a new session", "Session", 0);
+                break;
+            case Commands::sessionOpen:
+                //            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
+                result.setInfo ("Open Session", "Open an existing session", "Session", 0);
+                break;
+            case Commands::sessionSave:
+                //            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.setInfo ("Save Session", "Save the current session", "Session", 0);
+                break;
+            case Commands::sessionSaveAs:
+                //            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.setInfo ("Save Session As", "Save the current session with a new name", "Session", 0);
+                break;
+                
+            case Commands::showPreferences:
+                result.setInfo ("Show Preferences", "Element Preferences", "Application", 0);
+                result.addDefaultKeypress (',', ModifierKeys::commandModifier);
+                break;
+                
+            case Commands::showAbout:
+                result.setInfo ("Show About", "About this program", "Application", 0);
+                break;
+            case Commands::showLegacyView:
+                result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", "Interfaces", 0);
+                break;
+            case Commands::showPluginManager:
+                result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
+                break;
+            case Commands::checkNewerVersion:
+                result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
+                break;
+                
+            case Commands::mediaNew:
+                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+                result.setInfo ("New Media", "Close the current media", "Application", 0);
+                break;
+            case Commands::mediaClose:
+                result.setInfo ("Close Media", "Close the current media", "Application", 0);
+                break;
+            case Commands::mediaOpen:
+                result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
+                result.setInfo ("Open Media", "Opens a type of supported media", "Session Media", 0);
+                break;
+            case Commands::mediaSave:
+                result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
+                result.setInfo ("Close Media", "Saves the currently viewed object", "Session Media", 0);
+                break;
+            case Commands::mediaSaveAs:
+                result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+                result.setInfo ("Close Media", "Saves the current object with another name", "Session Media", 0);
+                break;
+                
+            case Commands::signIn:
+                result.setInfo ("Sign In", "Saves the current object with another name", "Application", 0);
+                break;
+            case Commands::signOut:
+                result.setInfo ("Sign Out", "Saves the current object with another name", "Application",   0);
+                break;
+                
+            case Commands::quit:
+                result.setActive (false);
+                result.setInfo("Quit", "Quit the app", "Application", 0);
+                result.addDefaultKeypress ('q', ModifierKeys::commandModifier);
+                break;
+            case Commands::undo:
+                result.setInfo ("Undo", "Undo the last operation", "Application", 0);
+                break;
+            case Commands::redo:
+                result.setInfo ("Redo", "Redo the last operation", "Application", 0);
+                break;
+            case Commands::cut:
+                result.setInfo ("Cut", "Cut", "Application", 0);
+                break;
+            case Commands::copy:
+                result.setInfo ("Copy", "Copy", "Application", 0);
+                break;
+            case Commands::paste:
+                result.setInfo ("Paste", "Paste", "Application", 0);
+                break;
+            case Commands::selectAll:
+                result.setInfo ("Select All", "Select all", "Application", 0);
+                break;
+                
+            case Commands::transportRewind:
+                result.setInfo ("Rewind", "Transport Rewind", "Playback", 0);
+                result.addDefaultKeypress ('j', 0);
+                break;
+            case Commands::transportForward:
+                result.setInfo ("Forward", "Transport Fast Forward", "Playback", 0);
+                result.addDefaultKeypress ('l', 0);
+                break;
+            case Commands::transportPlay:
+                result.setInfo ("Play", "Transport Play", "Playback", 0);
+                result.addDefaultKeypress (KeyPress::spaceKey, 0);
+                break;
+            case Commands::transportRecord:
+                result.setInfo ("Record", "Transport Record", "Playback", 0);
+                break;
+            case Commands::transportSeekZero:
+                result.setInfo ("Seek Start", "Seek to Beginning", "Playback", 0);
+                break;
+            case Commands::transportStop:
+                result.setInfo ("Stop", "Transport Stop", "Playback", 0);
+                break;
+        }
+    }
 }}
