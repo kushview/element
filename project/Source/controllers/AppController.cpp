@@ -91,10 +91,10 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 void AppController::getAllCommands (Array<CommandID>& cids)
 {
     cids.addArray ({
-        Commands::mediaNew,  Commands::mediaOpen,
-        Commands::mediaSave, Commands::mediaSaveAs,
-        Commands::signIn,    Commands::signOut,
-        Commands::sessionNew
+        Commands::mediaNew,   Commands::mediaOpen,
+        Commands::mediaSave,  Commands::mediaSaveAs,
+        Commands::signIn,     Commands::signOut,
+        Commands::sessionNew, Commands::sessionSave
     });
 }
 
@@ -115,6 +115,9 @@ bool AppController::perform (const InvocationInfo& info)
     {
         case Commands::sessionNew:
             findChild<GuiController>()->newSession();
+            break;
+        case Commands::sessionSave:
+            findChild<GuiController>()->saveSession();
             break;
         
         case Commands::mediaNew:

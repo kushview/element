@@ -65,7 +65,7 @@ public:
         return StringArray (names, MainMenu::NumMenus);
     }
 
-    PopupMenu getMenuForIndex (int, const String& name) override
+    PopupMenu getMenuForIndex (int index, const String& name) override
     {
         PopupMenu menu;
         if (name == "File")
@@ -84,14 +84,6 @@ public:
 
     void menuItemSelected (int index, int menu) override
     {
-        #if 0
-        if (index == 999)
-            owner.app().commander().invokeDirectly(Commands::showPluginManager, true);
-        #endif
-        
-        if (index == 1001) {
-            ViewHelpers::postMessageFor (&owner, new Message());
-        }
     }
     
     // Command Target
@@ -168,6 +160,7 @@ private:
        #if ! JUCE_MAC
         menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
        #endif
+        menu.addItem (383838383, "Online Documentation");
     }
     
 private:
