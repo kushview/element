@@ -186,7 +186,7 @@
               file="Source/gui/SequencerComponent.cpp"/>
         <FILE id="qvSqR4" name="SequencerComponent.h" compile="0" resource="0"
               file="Source/gui/SequencerComponent.h"/>
-        <FILE id="BAapOh" name="SessionDocument.cpp" compile="0" resource="0"
+        <FILE id="BAapOh" name="SessionDocument.cpp" compile="1" resource="0"
               file="Source/gui/SessionDocument.cpp"/>
         <FILE id="otOrmC" name="SessionDocument.h" compile="0" resource="0"
               file="Source/gui/SessionDocument.h"/>

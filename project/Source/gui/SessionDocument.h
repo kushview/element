@@ -3,19 +3,17 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_SESSION_DOCUMENT_H
-#define ELEMENT_SESSION_DOCUMENT_H
+#pragma once
 
 #include "ElementApp.h"
+#include "session/Session.h"
 
 namespace Element {
-
-    class Session;
 
     class SessionDocument :  public FileBasedDocument
     {
     public:
-        SessionDocument (Session& session);
+        SessionDocument (SessionPtr);
         ~SessionDocument();
 
         String getDocumentTitle();
@@ -25,11 +23,9 @@ namespace Element {
         void setLastDocumentOpened (const File& file);
 
     private:
-        Session& session;
+        SessionPtr session;
         File lastSession;
         friend class Session;
         void onSessionChanged();
     };
 }
-
-#endif // ELEMENT_SESSION_DOCUMENT_H

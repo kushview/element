@@ -231,46 +231,23 @@ namespace Commands {
                 break;
                 
             case Commands::sessionClose:
-                //            result.addDefaultKeypress ('w', ModifierKeys::commandModifier);
                 result.setInfo ("Close Session", "Close the current session", "Session", 0);
                 break;
             case Commands::sessionNew:
-                //            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
                 result.setInfo ("New Session", "Create a new session", "Session", 0);
                 break;
             case Commands::sessionOpen:
-                //            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
                 result.setInfo ("Open Session", "Open an existing session", "Session", 0);
                 break;
             case Commands::sessionSave:
-                //            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setInfo ("Save Session", "Save the current session", "Session", 0);
                 break;
             case Commands::sessionSaveAs:
-                //            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setInfo ("Save Session As", "Save the current session with a new name", "Session", 0);
                 break;
                 
-            case Commands::showPreferences:
-                result.setInfo ("Show Preferences", "Element Preferences", "Application", 0);
-                result.addDefaultKeypress (',', ModifierKeys::commandModifier);
-                break;
-                
-            case Commands::showAbout:
-                result.setInfo ("Show About", "About this program", "Application", 0);
-                break;
-            case Commands::showLegacyView:
-                result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", "Interfaces", 0);
-                break;
-            case Commands::showPluginManager:
-                result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
-                break;
-            case Commands::checkNewerVersion:
-                result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
-                break;
-                
             case Commands::mediaNew:
-                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
                 result.setInfo ("New Media", "Close the current media", "Application", 0);
                 break;
             case Commands::mediaClose:
@@ -287,6 +264,23 @@ namespace Commands {
             case Commands::mediaSaveAs:
                 result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setInfo ("Close Media", "Saves the current object with another name", "Session Media", 0);
+                break;
+                
+            case Commands::showPreferences:
+                result.setInfo ("Show Preferences", "Element Preferences", "Application", 0);
+                result.addDefaultKeypress (',', ModifierKeys::commandModifier);
+                break;
+            case Commands::showAbout:
+                result.setInfo ("Show About", "About this program", "Application", 0);
+                break;
+            case Commands::showLegacyView:
+                result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", "Interfaces", 0);
+                break;
+            case Commands::showPluginManager:
+                result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
+                break;
+            case Commands::checkNewerVersion:
+                result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
                 break;
                 
             case Commands::signIn:

@@ -132,6 +132,7 @@ void GuiController::showSplash() { }
 
 void GuiController::run()
 {
+    sessionDoc = new SessionDocument (session());
     content = new ContentComponent (controller);
     content->setSize (800, 600);
     mainWindow = new MainWindow (commander());
@@ -236,9 +237,9 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 
 void GuiController::getAllCommands (Array <CommandID>& commands)
 {
-    Commands::getDevicePadCommands (commands);
-    Commands::getDeviceTrackCommands (commands);
-    Commands::getApplicationCommands (commands);
+//    Commands::getDevicePadCommands (commands);
+//    Commands::getDeviceTrackCommands (commands);
+//    Commands::getApplicationCommands (commands);
 }
 
 void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)

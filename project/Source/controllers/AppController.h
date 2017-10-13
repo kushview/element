@@ -1,6 +1,5 @@
 
-#ifndef EL_APP_CONTROLLER_H
-#define EL_APP_CONTROLLER_H
+#pragma once
 
 #include "controllers/Controller.h"
 #include "session/CommandManager.h"
@@ -41,5 +40,3 @@ private:
 };
 
 }
-
-#endif

@@ -113,13 +113,15 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
-//        menu.addSubMenu ("New", makeFileNewMenu());
-//        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::mediaNew, "New Graph");
-        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open");
+        menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open...");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
         menu.addCommandItem (&cmd, Commands::mediaSaveAs, "Save As...");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::sessionClose, "Close Session");
+        menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session...");
         
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::signIn, "Authorize...");
@@ -131,29 +133,18 @@ private:
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
        #endif
-       
-       #if 0
-        ApplicationCommandManager* acm = &owner.app().commander();
-        menu.addCommandItem (acm, Commands::sessionNew, "New Session");
-        menu.addCommandItem (acm, Commands::sessionOpen, "Open Session");
-        menu.addCommandItem (acm, Commands::sessionClose, "Close Session");
-        menu.addSeparator();
-        menu.addCommandItem (acm, Commands::sessionSave, "Save Session...");
-        menu.addCommandItem (acm, Commands::sessionSaveAs, "Save Session As...");
-       #endif
     }
     
     void buildEditMenu (PopupMenu& menu)
     {
-        ApplicationCommandManager* acm = &cmd;
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::undo, "Undo");
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::redo, "Redo");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::undo, "Undo");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::redo, "Redo");
         menu.addSeparator();
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::cut, "Cut");
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::copy, "Copy");
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::paste, "Paste");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::cut, "Cut");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::copy, "Copy");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::paste, "Paste");
         menu.addSeparator();
-        menu.addCommandItem (acm, StandardApplicationCommandIDs::selectAll, "Select All");
+        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::selectAll, "Select All");
     }
     
     void buildViewMenu (PopupMenu& menu)

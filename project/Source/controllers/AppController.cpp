@@ -93,7 +93,8 @@ void AppController::getAllCommands (Array<CommandID>& cids)
     cids.addArray ({
         Commands::mediaNew,  Commands::mediaOpen,
         Commands::mediaSave, Commands::mediaSaveAs,
-        Commands::signIn,    Commands::signOut
+        Commands::signIn,    Commands::signOut,
+        Commands::sessionNew
     });
 }
 
@@ -112,6 +113,10 @@ bool AppController::perform (const InvocationInfo& info)
     bool res = true;
     switch (info.commandID)
     {
+        case Commands::sessionNew:
+            findChild<GuiController>()->newSession();
+            break;
+        
         case Commands::mediaNew:
 		{
             if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", 
