@@ -22,7 +22,7 @@ namespace Element {
             : session (s)
         {
             engine = g.getAudioEngine();
-            assert (engine != nullptr);
+            jassert (engine != nullptr);
             playMonitor = engine->transport()->monitor();
         }
 

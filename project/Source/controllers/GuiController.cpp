@@ -238,9 +238,10 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 void GuiController::getAllCommands (Array <CommandID>& commands)
 {
     commands.addArray ({
-        Commands::showAbout,
-        Commands::showPluginManager,
-        Commands::showPreferences
+        (CommandID) Commands::showAbout,
+		(CommandID) Commands::showPluginManager,
+		(CommandID) Commands::showPreferences,
+		(CommandID) Commands::quit
     });
 }
 
