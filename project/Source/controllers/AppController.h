@@ -22,6 +22,7 @@ public:
     void activate() override { Controller::activate(); }
     void deactivate() override;
     
+
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;

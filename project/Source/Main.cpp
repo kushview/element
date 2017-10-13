@@ -14,12 +14,14 @@
 #include "Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
+#include "Messages.h"
 #include "Version.h"
 #include "Settings.h"
 
 namespace Element {
 
-class Startup : private Thread
+class Startup : public ActionBroadcaster,
+                private Thread
 {
 public:
     Startup (Globals& w, const bool useThread = false, const bool splash = false)
@@ -32,6 +34,18 @@ public:
 
     void launchApplication()
     {
+        Settings& settings (world.getSettings());
+        DeviceManager& devices (world.getDeviceManager());
+        auto* props = settings.getUserSettings();
+        if (ScopedXml dxml = props->getXmlValue ("devices"))
+        {
+            devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
+        }
+        else
+        {
+            devices.initialiseWithDefaultDevices (16, 16);
+        }
+        
         if (usingThread)
         {
             startThread();
@@ -92,15 +106,6 @@ private:
         PluginManager& plugins (world.getPluginManager());
         auto* props = settings.getUserSettings();
         
-        if (ScopedXml dxml = props->getXmlValue ("devices"))
-        {
-            devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
-        }
-        else
-        {
-            devices.initialiseWithDefaultDevices (16, 16);
-        }
-        
         AudioEnginePtr engine = new AudioEngine (world);
         world.setEngine (engine); // this will also instantiate the session
         SessionPtr session = world.getSession();
@@ -119,14 +124,14 @@ private:
         world.loadModule ("test");
         controller = new AppController (world);
         
-        if (usingThread)
-        {
-            // post a message to finish launching
+        if (usingThread) {
+            sendActionMessage ("finishedLaunching");
         }
     }
 };
 
-class Application : public JUCEApplication
+class Application : public JUCEApplication,
+                    public ActionListener
 {
 public:
     Application() { }
@@ -149,7 +154,13 @@ public:
         world->getUnlockStatus().loadAll();
         launchApplication();
     }
-
+    
+    void actionListenerCallback (const String& message) override
+    {
+        if (message == "finishedLaunching")
+            finishLaunching();
+    }
+    
     void shutdown() override
     {
         if (! world || ! controller)
@@ -215,9 +226,10 @@ private:
         if (nullptr != controller)
             return;
         
-        startup = new Startup (*world, false, false);
+        startup = new Startup (*world, true, true);
+        startup->addActionListener (this);
         startup->launchApplication();
-        if (! startup->isUsingThread())
+        if (startup && !startup->isUsingThread())
             finishLaunching();
     }
     

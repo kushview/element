@@ -26,7 +26,6 @@ GuiController::GuiController (Globals& w, AppController& a)
       windowManager (nullptr),
       mainWindow (nullptr)
 {
-    LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     windowManager = new WindowManager();
     commander().registerAllCommandsForTarget (this);
 }
@@ -47,6 +46,7 @@ GuiController::~GuiController()
 
 void GuiController::activate()
 {
+    LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     Controller::activate();
 }
 

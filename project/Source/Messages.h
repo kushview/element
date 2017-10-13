@@ -75,6 +75,11 @@ public:
     const PluginDescription description;
 };
 
+class FinishedLaunchingMessage : public Message {
+public:
+    FinishedLaunchingMessage() { }
+    ~FinishedLaunchingMessage() { }
+};
 }
 
 
