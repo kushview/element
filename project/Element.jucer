@@ -176,8 +176,10 @@
               file="Source/gui/PreferencesComponent.cpp"/>
         <FILE id="ZVdKzn" name="PreferencesComponent.h" compile="0" resource="0"
               file="Source/gui/PreferencesComponent.h"/>
-        <FILE id="WpP2mo" name="RackView.cpp" compile="1" resource="0" file="Source/gui/RackView.cpp"/>
-        <FILE id="Wenhme" name="RackView.h" compile="0" resource="0" file="Source/gui/RackView.h"/>
+        <FILE id="WpP2mo" name="RackContentView.cpp" compile="1" resource="0"
+              file="Source/gui/RackContentView.cpp"/>
+        <FILE id="Wenhme" name="RackContentView.h" compile="0" resource="0"
+              file="Source/gui/RackContentView.h"/>
         <FILE id="cFOhb6" name="SequencerClipItem.cpp" compile="0" resource="0"
               file="Source/gui/SequencerClipItem.cpp"/>
         <FILE id="Daatdg" name="SequencerClipItem.h" compile="0" resource="0"
@@ -186,6 +188,10 @@
               file="Source/gui/SequencerComponent.cpp"/>
         <FILE id="qvSqR4" name="SequencerComponent.h" compile="0" resource="0"
               file="Source/gui/SequencerComponent.h"/>
+        <FILE id="zckoQ5" name="SessionContentView.cpp" compile="1" resource="0"
+              file="Source/gui/SessionContentView.cpp"/>
+        <FILE id="tdGPPl" name="SessionContentView.h" compile="0" resource="0"
+              file="Source/gui/SessionContentView.h"/>
         <FILE id="BAapOh" name="SessionDocument.cpp" compile="1" resource="0"
               file="Source/gui/SessionDocument.cpp"/>
         <FILE id="otOrmC" name="SessionDocument.h" compile="0" resource="0"

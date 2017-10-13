@@ -27,13 +27,14 @@ namespace Element {
     Session::Session()
         : ObjectModel (Tags::session)
     {
-        setMissingProperties (true);
         priv = new Private (*this);
+        setMissingProperties (true);
+        objectData.addListener (this);
     }
 
     Session::~Session()
     {
-        projectState.removeListener (this);
+        objectData.removeListener (this);
         clear();
 
         priv = nullptr;
@@ -54,8 +55,6 @@ namespace Element {
     bool Session::loadData (const ValueTree &data)
     {
         clear();
-        projectState = ObjectModel::setData (data);
-        ValueTree nd = node().getOrCreateChildWithName ("assets", nullptr);
         return true;
     }
 
@@ -96,25 +95,31 @@ namespace Element {
 
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
+        sendChangeMessage();
     }
 
     void Session::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
     {
+        sendChangeMessage();
     }
 
     void Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
     {
+        sendChangeMessage();
     }
 
     void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int)
     {
+        sendChangeMessage();
     }
 
     void Session::valueTreeParentChanged (ValueTree& tree)
     {
+        sendChangeMessage();
     }
 
     void Session::valueTreeRedirected (ValueTree& tree)
     {
+        sendChangeMessage();
     }
 }

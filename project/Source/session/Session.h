@@ -17,9 +17,10 @@ namespace Element {
     class Pattern;
     
     /** Session, the main interface between the engine and model layers */
-    class Session :  public ReferenceCountedObject,
-                     public ObjectModel,
-                     public ValueTree::Listener
+    class Session : public ObjectModel,
+                    public ReferenceCountedObject,
+                    public ChangeBroadcaster,
+                    public ValueTree::Listener
     {
     public:
         virtual ~Session();
@@ -46,7 +47,6 @@ namespace Element {
         inline void setProperty (const Identifier& prop, const var& val) { node().setProperty (prop, val, nullptr); }
 
         friend class ValueTree;
-        ValueTree projectState;
         virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);
         virtual void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded);
         virtual void valueTreeChildRemoved (ValueTree& parentTree, ValueTree& childWhichHasBeenRemoved, int);

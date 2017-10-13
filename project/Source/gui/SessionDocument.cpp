@@ -9,11 +9,18 @@
 namespace Element {
 
     SessionDocument::SessionDocument (SessionPtr s)
-        : FileBasedDocument ("*.els", "*.els", "Open Session", "Save Session"),
+        : FileBasedDocument (".els", "*.els", "Open Session", "Save Session"),
           session (s)
-    { }
+    {
+        if (session)
+            session->addChangeListener (this);
+    }
 
-    SessionDocument::~SessionDocument() { }
+    SessionDocument::~SessionDocument()
+    {
+        if (session)
+            session->removeChangeListener (this);
+    }
 
     String SessionDocument::getDocumentTitle()
     {
@@ -65,5 +72,10 @@ namespace Element {
     void SessionDocument::onSessionChanged()
     {
         changed();
+    }
+    
+    void SessionDocument::changeListenerCallback (ChangeBroadcaster*)
+    {
+        onSessionChanged();
     }
 }

@@ -1,20 +1,20 @@
 /*
-    TransportBar.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+  ==============================================================================
 
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
+  This is an automatically generated GUI class created by the Projucer!
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
+  Be careful when adding custom code to these files, as only the code within
+  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
+  and re-saved.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+  Created with Projucer version: 5.1.2
+
+  ------------------------------------------------------------------------------
+
+  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
+  Copyright (c) 2015 - ROLI Ltd.
+
+  ==============================================================================
 */
 
 //[Headers] You can add your own extra header files here...
@@ -24,15 +24,17 @@
 #include "TransportBar.h"
 
 
-namespace Element {
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
 TransportBar::TransportBar (SessionRef sess)
     : session(sess)
 {
+    //[Constructor_pre] You can add your own custom stuff here..
+    //[/Constructor_pre]
+
     addAndMakeVisible (play = new TextButton ("play"));
     play->setButtonText (TRANS("Play"));
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
@@ -52,7 +54,7 @@ TransportBar::TransportBar (SessionRef sess)
 
     addAndMakeVisible (barLabel = new Label ("barLabel",
                                              TRANS("0")));
-    barLabel->setFont (Font (15.00f, Font::plain));
+    barLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     barLabel->setJustificationType (Justification::centredLeft);
     barLabel->setEditable (false, false, false);
     barLabel->setColour (Label::textColourId, Colours::white);
@@ -61,7 +63,7 @@ TransportBar::TransportBar (SessionRef sess)
 
     addAndMakeVisible (subLabel = new Label ("subLabel",
                                              TRANS("0")));
-    subLabel->setFont (Font (15.00f, Font::plain));
+    subLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     subLabel->setJustificationType (Justification::centredLeft);
     subLabel->setEditable (false, false, false);
     subLabel->setColour (Label::textColourId, Colours::white);
@@ -70,7 +72,7 @@ TransportBar::TransportBar (SessionRef sess)
 
     addAndMakeVisible (beatLabel = new Label ("beatLabel",
                                               TRANS("0")));
-    beatLabel->setFont (Font (15.00f, Font::plain));
+    beatLabel->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     beatLabel->setJustificationType (Justification::centredLeft);
     beatLabel->setEditable (false, false, false);
     beatLabel->setColour (Label::textColourId, Colours::white);
@@ -85,7 +87,7 @@ TransportBar::TransportBar (SessionRef sess)
 
 
     //[UserPreSize]
-    
+
     //[/UserPreSize]
 
     setSize (260, 16);
@@ -194,15 +196,15 @@ void TransportBar::sliderValueChanged (Slider* sliderThatWasMoved)
 
 //==============================================================================
 #if 0
-/*  -- Introjucer information section --
+/*  -- Projucer information section --
 
-    This is where the Introjucer stores the metadata that describe this GUI layout, so
+    This is where the Projucer stores the metadata that describe this GUI layout, so
     make changes in here at your peril!
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="TransportBar" template="../../Templates/ElementTemplate.cpp"
-                 componentName="" parentClasses="public Component" constructorParams="SessionRef sess"
+<JUCER_COMPONENT documentType="Component" className="TransportBar" componentName=""
+                 parentClasses="public Component" constructorParams="SessionRef sess"
                  variableInitialisers="session(sess)" snapPixels="8" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="260"
                  initialHeight="16">
@@ -220,21 +222,22 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="89 0 24 16" textCol="ffffffff" edTextCol="ff000000"
          edBkgCol="0" labelText="0" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="subLabel" id="3d1ad303b55f2919" memberName="subLabel" virtualName=""
          explicitFocusOrder="0" pos="137 0 24 16" textCol="ffffffff" edTextCol="ff000000"
          edBkgCol="0" labelText="0" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         bold="0" italic="0" justification="33"/>
+         kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="beatLabel" id="7ee24b93825298ab" memberName="beatLabel"
          virtualName="" explicitFocusOrder="0" pos="113 0 24 16" textCol="ffffffff"
          edTextCol="ff000000" edBkgCol="0" labelText="0" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" bold="0" italic="0" justification="33"/>
+         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
   <SLIDER name="bpmSlider" id="6a1f8c1a830748e6" memberName="bpmSlider"
           virtualName="" explicitFocusOrder="0" pos="0 0 80 16" min="20"
           max="240" int="1" style="IncDecButtons" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="16" skewFactor="1"/>
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="16" skewFactor="1"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -253,6 +256,7 @@ void TransportBar::setBeatTime (const float t)
     // text = String (1 + std::floor (4.f * (t - static_cast<float> (beats))));
     // beatLabel->setText (text, dontSendNotification);
 }
-//[/EndFile]
 
-} /* namespace Element */
+} /* namespace element */
+
+//[/EndFile]

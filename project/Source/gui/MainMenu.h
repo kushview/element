@@ -105,7 +105,7 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
-#define SHOW_SESSION 0
+#define SHOW_SESSION 1
 #if SHOW_SESSION
         menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
         menu.addSeparator();

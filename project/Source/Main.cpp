@@ -113,7 +113,7 @@ private:
         {
             const ValueTree node (ValueTree::fromXml (*xml));
             session->getGraphsValueTree().addChild (node, 0, nullptr);
-            DBG("Session Loaded:\n" << session->getValueTree().toXmlString());
+            DBG("[EC] lastGraph added to Session");
         }
         
         plugins.addDefaultFormats();

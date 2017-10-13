@@ -21,10 +21,7 @@ AppController::AppController (Globals& g)
     g.getCommandManager().setFirstCommandTarget (this);
 }
 
-AppController::~AppController()
-{
-
-}
+AppController::~AppController() { }
 
 void AppController::deactivate()
 {
@@ -132,7 +129,7 @@ bool AppController::perform (const InvocationInfo& info)
 
         case Commands::mediaOpen:
         {
-            FileChooser chooser ("Open a graph", File(), "*.elgraph;*.elg");
+            FileChooser chooser ("Open a graph", File(), "*.elg");
             if (chooser.browseForFileToOpen())
             {
                 lastSavedFile = chooser.getResult();
@@ -151,9 +148,9 @@ bool AppController::perform (const InvocationInfo& info)
             if (! status.isFullVersion())
             {
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Unauthorized", "Saving is only available with a paid version of this software. Visit https://kushview.net/products/element to purchase a copy");
+                    "Unauthorized", "Saving individual graphs is not available in Element Lite.\nVisit https://kushview.net/products/element to purchase a copy");
             }
-            else
+            else if (status.isFullVersion())
             {
                 auto& graph (world.getAudioEngine()->getRootGraph());
                 
