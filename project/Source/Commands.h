@@ -234,7 +234,7 @@ namespace Commands {
                 result.setInfo ("Close Session", "Close the current session", "Session", 0);
                 break;
             case Commands::sessionNew:
-                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+//                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
                 result.setInfo ("New Session", "Create a new session", "Session", 0);
                 break;
             case Commands::sessionOpen:
@@ -248,6 +248,7 @@ namespace Commands {
                 break;
                 
             case Commands::mediaNew:
+                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
                 result.setInfo ("New Media", "Close the current media", "Application", 0);
                 break;
             case Commands::mediaClose:

@@ -105,18 +105,26 @@ private:
     
     void buildFileMenu (PopupMenu& menu)
     {
+#define SHOW_SESSION 0
+#if SHOW_SESSION
         menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
         menu.addSeparator();
+#else
+        menu.addCommandItem (&cmd, Commands::mediaNew, "New Graph");
+        menu.addSeparator();
+#endif
         menu.addCommandItem (&cmd, Commands::mediaOpen, "Open...");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
         menu.addCommandItem (&cmd, Commands::mediaSaveAs, "Save As...");
+        
+#if SHOW_SESSION
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::sessionClose, "Close Session");
         menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session...");
-        
+#endif
         menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::signIn, "Authorize...");
+        menu.addCommandItem (&cmd, Commands::signIn, "Manage License");
         
        #if ! JUCE_MAC
         menu.addSeparator();
@@ -160,7 +168,6 @@ private:
        #if ! JUCE_MAC
         menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
        #endif
-        menu.addItem (383838383, "Online Documentation");
     }
     
 private:
