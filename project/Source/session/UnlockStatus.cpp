@@ -49,14 +49,21 @@ namespace Element {
             props->setValue (EL_LICENSE_SETTINGS_KEY, data);
     }
     
+    static URL elGetProUpgradeUrl()
+    {
+        return URL (EL_BASE_URL "/products/element?pro_upgrade=1");
+    }
+    
     void UnlockStatus::launchProUpgradeUrl()
     {
-        // http://kushview.dev/checkout/?edd_action=sl_license_upgrade&license_id=129&upgrade_id=3
-        URL url (EL_BASE_URL "/checkout/");
-        url.withParameter("edd_action", "sl_license_upgrade")
-           .withParameter("license_id", "129")
-           .withParameter("upgrade_id", "3")
-           .launchInDefaultBrowser();
+        elGetProUpgradeUrl().launchInDefaultBrowser();
+
+//        // http://kushview.dev/checkout/?edd_action=sl_license_upgrade&license_id=129&upgrade_id=3
+//        URL url (EL_BASE_URL "/checkout/");
+//        url.withParameter("edd_action", "sl_license_upgrade")
+//           .withParameter("license_id", "129")
+//           .withParameter("upgrade_id", "3")
+//           .launchInDefaultBrowser();
     }
     
     String UnlockStatus::getState()
