@@ -82,7 +82,8 @@ void EngineController::activate()
     auto& settings (globals.getSettings());
     auto& devices (globals.getDeviceManager());
     
-    AudioEnginePtr engine (globals.getAudioEngine());
+    auto engine (globals.getAudioEngine());
+    auto session (globals.getSession());
     RootGraph& graph (engine->getRootGraph());
     
     if (auto* device = devices.getCurrentAudioDevice())
@@ -90,11 +91,8 @@ void EngineController::activate()
     
     root = new RootGraphController (engine->getRootGraph(), globals.getPluginManager());
     
-    if (ScopedXml xml = settings.getLastGraph())
-    {
-        const Node lastGraph (ValueTree::fromXml (*xml), false);
-        setRootNode (lastGraph);
-    }
+    if (session->getNumGraphs() > 0)
+        setRootNode (Node (session->getGraphValueTree (0)));
     
     engine->activate();
     devices.addChangeListener (this);

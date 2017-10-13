@@ -103,10 +103,17 @@ private:
         
         AudioEnginePtr engine = new AudioEngine (world);
         world.setEngine (engine); // this will also instantiate the session
-        plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine));
-        plugins.restoreUserPlugins (settings);
+        SessionPtr session = world.getSession();
+        if (ScopedXml xml = settings.getLastGraph())
+        {
+            const ValueTree node (ValueTree::fromXml (*xml));
+            session->getGraphsValueTree().addChild (node, 0, nullptr);
+            DBG("Session Loaded:\n" << session->getValueTree().toXmlString());
+        }
         
+        plugins.addDefaultFormats();
+        plugins.addFormat(new InternalFormat (*engine));
+        plugins.restoreUserPlugins (settings);
         // global data is ready, so now we can start using it;
         
         world.loadModule ("test");
@@ -167,7 +174,6 @@ public:
             settings.setLastGraph (engine->createGraphTree());
         }
         
-       
         engine = nullptr;
         controller = nullptr;
         world->setEngine (nullptr);
