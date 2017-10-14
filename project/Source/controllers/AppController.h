@@ -19,9 +19,8 @@ public:
     inline Globals& getWorld() { return getGlobals(); }
     inline Globals& getGlobals() { return world; }
     
-    void activate() override { Controller::activate(); }
+    void activate() override;
     void deactivate() override;
-    
 
 protected:
     friend class ApplicationCommandTarget;

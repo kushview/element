@@ -51,11 +51,6 @@ namespace Element {
         void runDialog (const String& uri);
         void runDialog (Component* c, const String& title = String::empty);
         
-        /** Get the global URI/URID keychain
-         Not in use now, but will be utilized for sending/receiving LV2 Atoms
-         from the engine (realtime engine notifications) */
-        const URIs* uris();
-        
         /** Open an existing session */
         void openSession();
         

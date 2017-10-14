@@ -191,43 +191,16 @@ SessionRef GuiController::session()
     return sessionRef;
 }
 
-const URIs* GuiController::uris()
-{
-    return nullptr; jassertfalse;
-    //    Globals* w (dynamic_cast<Globals*> (&world()));
-    //    return w != nullptr ? w->uris.get() : nullptr;
-}
-
 void GuiController::openSession()
 {
-    if (sessionDoc->loadFromUserSpecifiedFile (true)) {
-        mainWindow->setName (sessionDoc->getDocumentTitle());
-        content->stabilize();
-    }
 }
 
 void GuiController::newSession()
 {
-    if (sessionDoc->hasChangedSinceSaved())
-        sessionDoc->save (true, true);
-    sessionDoc->setFile (File::nonexistent);
-    sessionDoc->setChangedFlag (false);
-    content->stabilize();
-    mainWindow->setName (session()->getProperty (Slugs::name));
 }
 
 void GuiController::saveSession (bool saveAs)
 {
-    if (! sessionDoc)
-        return;
-    
-    if (! saveAs) {
-        sessionDoc->save (true, true);
-    } else {
-        sessionDoc->saveAs (File::nonexistent, true, true, true);
-    }
-    
-    mainWindow->setName (sessionDoc->getDocumentTitle());
 }
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()

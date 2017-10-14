@@ -27,6 +27,10 @@
         <FILE id="cSUiJ4" name="GuiController.cpp" compile="1" resource="0"
               file="Source/controllers/GuiController.cpp"/>
         <FILE id="Tyum0W" name="GuiController.h" compile="0" resource="0" file="Source/controllers/GuiController.h"/>
+        <FILE id="fdOpQ6" name="SessionController.cpp" compile="1" resource="0"
+              file="Source/controllers/SessionController.cpp"/>
+        <FILE id="BaCFvB" name="SessionController.h" compile="0" resource="0"
+              file="Source/controllers/SessionController.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>

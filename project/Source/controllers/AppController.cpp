@@ -2,6 +2,7 @@
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
+#include "controllers/SessionController.h"
 #include "engine/GraphProcessor.h"
 #include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
@@ -17,11 +18,17 @@ AppController::AppController (Globals& g)
 {
     addChild (new GuiController (g, *this));
     addChild (new EngineController ());
+    addChild (new SessionController ());
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);
 }
 
 AppController::~AppController() { }
+
+void AppController::activate()
+{
+    Controller::activate();
+}
 
 void AppController::deactivate()
 {
@@ -111,10 +118,19 @@ bool AppController::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::sessionNew:
-            findChild<GuiController>()->newSession();
+            findChild<SessionController>()->newSession();
             break;
         case Commands::sessionSave:
-            findChild<GuiController>()->saveSession();
+            findChild<SessionController>()->saveSession();
+            break;
+        case Commands::sessionSaveAs:
+            findChild<SessionController>()->saveSession (true);
+            break;
+        case Commands::sessionOpen:
+            findChild<SessionController>()->openSession();
+            break;
+        case Commands::sessionClose:
+            findChild<SessionController>()->closeSession();
             break;
         
         case Commands::mediaNew:

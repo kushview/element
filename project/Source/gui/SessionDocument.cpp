@@ -32,11 +32,9 @@ namespace Element {
         if (nullptr == session)
             return Result::fail ("No session data target");
 
-        if (XmlElement* e = XmlDocument::parse (file))
+        if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
         {
             ValueTree newData (ValueTree::fromXml (*e));
-            delete e;
-
             if (! newData.isValid() && newData.hasType ("session"))
                 return Result::fail ("Not a valid session file");
 
@@ -55,10 +53,10 @@ namespace Element {
     {
         if (! session)
             return Result::fail ("Nil session");
-
+        
         if (ScopedPointer<XmlElement> e = session->createXml())
         {
-            Result res (e->writeToFile (file, String::empty)
+            Result res (e->writeToFile (file, String())
                     ? Result::ok() : Result::fail ("Error writing session file"));
             return res;
         }

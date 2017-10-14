@@ -226,7 +226,7 @@ private:
         if (nullptr != controller)
             return;
         
-        startup = new Startup (*world, true, true);
+        startup = new Startup (*world, false, false);
         startup->addActionListener (this);
         startup->launchApplication();
         if (startup && !startup->isUsingThread())
