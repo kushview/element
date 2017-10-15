@@ -28,7 +28,7 @@ TreePanelBase::TreePanelBase (const String& treeviewID)
     addAndMakeVisible (&tree);
     tree.setRootItemVisible (false);
     tree.setDefaultOpenness (true);
-    tree.setColour (TreeView::backgroundColourId, LookAndFeel_E1::backgroundColor);
+    tree.setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
     tree.setIndentSize (14);
     tree.getViewport()->setScrollBarThickness (14);
 }
@@ -118,10 +118,10 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& ar
 Colour TreeItemBase::getBackgroundColour() const
 {
 #if 0
-    Colour background (LookAndFeel_E1::backgroundColor);
+    Colour background (LookAndFeel_KV1::backgroundColor);
 
     if (isSelected())
-        background = background.overlaidWith (LookAndFeel_E1::elementBlue.darker(0.600006f));
+        background = background.overlaidWith (LookAndFeel_KV1::elementBlue.darker(0.600006f));
 #else
     const Colour background (0x000000);
 #endif
@@ -142,7 +142,7 @@ void TreeItemBase::paintContent (Graphics& g, const Rectangle<int>& area)
 {
     g.setFont (getFont());
     g.setColour (isMissing() ? getContrastingColour (Colours::red, 0.8f)
-                             : LookAndFeel_E1::textColor);
+                             : LookAndFeel_KV1::textColor);
 
     g.drawFittedText (getDisplayName(), area, Justification::centredLeft, 1, 0.8f);
 }

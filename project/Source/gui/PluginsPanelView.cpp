@@ -24,7 +24,7 @@ namespace Element {
     
     void PluginsPanelView::paint (Graphics& g)
     {
-        g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+        g.fillAll (LookAndFeel_KV1::widgetBackgroundColor);
     }
     
     void PluginsPanelView::changeListenerCallback (ChangeBroadcaster* src)

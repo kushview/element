@@ -87,7 +87,7 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter(0.1));
         g.fillRect (getLocalBounds());
     }
     
@@ -155,7 +155,7 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_E1::contentBackgroundColor.brighter(0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter(0.1));
         g.fillRect (getLocalBounds());
         
         const Colour lineColor (0xff545454);
@@ -341,15 +341,9 @@ public:
     ContentContainer (ContentComponent& cc, AppController& app)
         : owner (cc)
     {
-        addAndMakeVisible (dummy1 = new ConnectionGrid());
+        addAndMakeVisible (content1 = new ContentView());
         addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
-        addAndMakeVisible (dummy2 = new Component());
-        
-        AudioEnginePtr e (app.getGlobals().getAudioEngine());
-        GraphProcessor& graph (e->getRootGraph());
-        const Node root (graph.getGraphModel());
-        dummy1->setNode (root);
-        
+        addAndMakeVisible (content2 = new ContentView());
         updateLayout();
         resized();
     }
@@ -358,16 +352,47 @@ public:
     
     void resized() override
     {
-        Component* comps[] = { dummy1.get(), bar.get(), dummy2.get() };
+        Component* comps[] = { 0, bar.get(), 0 };
+        comps[0] = content1.get();
+        comps[2] = content2.get();
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
+    }
+    
+    void setNode (const Node& node)
+    {
+        if (auto* grid = dynamic_cast<ConnectionGrid*> (content1.get()))
+            grid->setNode (node);
+    }
+    
+    void setMainView (ContentView* view)
+    {
+        if (content1)
+            removeChildComponent (content1);
+        content1 = view;
+        if (content1)
+        {
+            addAndMakeVisible (content1);
+            content1->willBecomeActive();
+        }
+        resized();
+    }
+    
+    void setAccessoryView (ContentView* view)
+    {
+        if (content2)
+            removeChildComponent (content2);
+        content1 = view;
+        if (content2)
+            addAndMakeVisible (content2);
+        resized();
     }
     
 private:
     ContentComponent& owner;
     StretchableLayoutManager layout;
     ScopedPointer<StretchableLayoutResizerBar> bar;
-    ScopedPointer<ConnectionGrid> dummy1;
-    ScopedPointer<Component> dummy2;
+    ScopedPointer<ContentView> content1;
+    ScopedPointer<ContentView> content2;
     
     void updateLayout()
     {
@@ -387,6 +412,10 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (container = new ContentContainer (*this, controller));
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar());
+    
+    container->setMainView (new ConnectionGrid ());
+    const Node node (getGlobals().getSession()->getGraphValueTree(0));
+    setCurrentNode (node);
     
     toolBarVisible = true;
     toolBarSize = 32;
@@ -438,7 +467,7 @@ bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc;elg;wav"))
+        if (file.hasFileExtension ("elc;elg;els"))
             return true;
     }
     return false;
@@ -482,12 +511,20 @@ void ContentComponent::post (Message* message)
     controller.postMessage (message);
 }
 
-void ContentComponent::stabilize() { }
+void ContentComponent::stabilize()
+{
+    auto session = getGlobals().getSession();
+    setCurrentNode (Node (session->getGraphValueTree (0), false));
+    if (auto* window = findParentComponentOfClass<DocumentWindow>())
+        window->setName ("Element - " + session->getName());
+}
 
 void ContentComponent::setCurrentNode (const Node& node)
 {
     if (auto* audioPanel = nav->getAudioIOPanel())
         audioPanel->setNode (node);
+    if (node.hasNodeType (Tags::graph))
+        container->setNode (node);
 }
 
 void ContentComponent::updateLayout()
@@ -511,6 +548,13 @@ void ContentComponent::resizerMouseUp()
     layout.setItemLayout (1, 4, 4, 4);
     layout.setItemLayout (2, 300, -1, 400);
     resized();
+}
+    
+void ContentComponent::setContentView (ContentView* view)
+{
+    jassert (view && container);
+    ScopedPointer<ContentView> deleter (view);
+    container->setMainView (deleter.release());
 }
 }
 

@@ -81,8 +81,8 @@ public:
             }
         }
         
-        g.setColour (rowIsSelected ? LookAndFeel_E1::elementBlue
-                        : LookAndFeel_E1::backgroundColor);
+        g.setColour (rowIsSelected ? LookAndFeel_KV1::elementBlue
+                        : LookAndFeel_KV1::backgroundColor);
         g.fillRect (0, 0, width, height - 1);
         
         if (text.isNotEmpty())

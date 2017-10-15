@@ -4,8 +4,8 @@
 */
 
 #include "ElementApp.h"
-
 #include "controllers/AppController.h"
+#include "controllers/SessionController.h"
 #include "engine/InternalFormat.h"
 #include "engine/GraphProcessor.h"
 #include "session/DeviceManager.h"
@@ -102,22 +102,13 @@ private:
     void run() override
     {
         Settings& settings (world.getSettings());
-        DeviceManager& devices (world.getDeviceManager());
         PluginManager& plugins (world.getPluginManager());
-        auto* props = settings.getUserSettings();
-        
         AudioEnginePtr engine = new AudioEngine (world);
         world.setEngine (engine); // this will also instantiate the session
         SessionPtr session = world.getSession();
-        if (ScopedXml xml = settings.getLastGraph())
-        {
-            const ValueTree node (ValueTree::fromXml (*xml));
-            session->getGraphsValueTree().addChild (node, 0, nullptr);
-            DBG("[EC] lastGraph added to Session");
-        }
         
         plugins.addDefaultFormats();
-        plugins.addFormat(new InternalFormat (*engine));
+        plugins.addFormat (new InternalFormat (*engine));
         plugins.restoreUserPlugins (settings);
         // global data is ready, so now we can start using it;
         
@@ -180,11 +171,6 @@ public:
         if (ScopedXml el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el);
         
-        if (status.isUnlocked())
-        {
-            settings.setLastGraph (engine->createGraphTree());
-        }
-        
         engine = nullptr;
         controller = nullptr;
         world->setEngine (nullptr);
@@ -194,7 +180,26 @@ public:
 
     void systemRequestedQuit() override
     {
-        Application::quit();
+        if (! controller)
+        {
+            Application::quit();
+            return;
+        }
+        
+        // - 0 if the third button was pressed ('cancel')
+        // - 1 if the first button was pressed ('yes')
+        // - 2 if the middle button was pressed ('no')
+        const int res = AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
+           "Save Session", "This session may have changes. Would you like to save before exiting?");
+        
+        if (res == 1)
+        {
+            auto* sc = controller->findChild<SessionController>();
+            sc->saveSession();
+        }
+        
+        if (res != 0)
+            Application::quit();
     }
 
     void anotherInstanceStarted (const String& /*commandLine*/) override

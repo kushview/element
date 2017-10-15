@@ -26,7 +26,7 @@ namespace Element {
         virtual ~Session();
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
-        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
+        
         inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
         
         ValueTree getValueTree() const { return objectData; }
@@ -39,10 +39,11 @@ namespace Element {
 
         XmlElement* createXml();
         
+        void saveGraphState();
     protected:
         Session();
         friend class Globals;
-
+ 
         /** Set a property.  This is a wrapper around the internal ValueTree */
         inline void setProperty (const Identifier& prop, const var& val) { node().setProperty (prop, val, nullptr); }
 
@@ -57,8 +58,11 @@ namespace Element {
     private:
         class Private;
         ScopedPointer<Private> priv;
+        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
         void polishXml (XmlElement& e);
         void setMissingProperties (bool resetExisting = false);
+        
+        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);
     };
     
     typedef ReferenceCountedObjectPtr<Session> SessionPtr;

@@ -137,7 +137,7 @@ public:
     String getDisplayName() const override { return "Plugins"; }
     void setName (const String&) override { }
     bool isMissing() override { return false; }
-    Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_E1::elementBlue); }
+    Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_KV1::elementBlue); }
     void addSubItems() override
     {
         KnownPluginList& known (plugins.availablePlugins());
@@ -164,7 +164,7 @@ public:
     String getDisplayName() const override { return "Session"; }
     virtual void setName (const String&) override { }
     virtual bool isMissing() override { return false; }
-    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
     virtual void addSubItems() override
     {
         addSubItem (new EngineItem());
@@ -190,7 +190,7 @@ private:
         String getDisplayName()  const override { return "Engine"; }
         void setName (const String&)  override { }
         bool isMissing() override { return false; }
-        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
     
         void addSubItems() override
         {
@@ -236,7 +236,7 @@ private:
         String getDisplayName()  const override { return getRenamingName(); }
         void setName (const String&)  override { }
         bool isMissing() override { return false; }
-        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_E1::elementBlue); }
+        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
     
         void itemDoubleClicked (const MouseEvent& ev) override
         {
@@ -331,7 +331,7 @@ NavigationView::~NavigationView()
 
 void NavigationView::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel_E1::backgroundColor);
+    g.fillAll (LookAndFeel_KV1::backgroundColor);
 }
 
 void NavigationView::resized()

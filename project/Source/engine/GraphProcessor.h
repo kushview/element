@@ -314,9 +314,9 @@ public:
     virtual void fillInPluginDescription (PluginDescription& d) const override;
 
     inline ValueTree getGraphState() const { return getGraphModel(); }
-    inline ValueTree getGraphModel() const { return graphModel; }
-    inline ValueTree getNodesModel() const { return nodesModel; }
-    inline ValueTree getArcsModel()  const { return arcsModel; }
+    inline ValueTree getGraphModel() const { jassertfalse; return graphModel; }
+    inline ValueTree getNodesModel() const { jassertfalse; return nodesModel; }
+    inline ValueTree getArcsModel()  const { jassertfalse; return arcsModel; }
 
 protected:
     virtual GraphNode* createNode (uint32 nodeId, AudioProcessor* proc) { return new GraphNode (nodeId, proc); }
@@ -351,20 +351,6 @@ private:
     void buildRenderingSequence();
     bool isAnInputTo (uint32 possibleInputId, uint32 possibleDestinationId, int recursionCheck) const;
 
-#if 0
-    friend class ValueTree;
-    virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged,
-                                           const Identifier& property) override;
-    virtual void valueTreeChildAdded (ValueTree& parentTree,
-                                      ValueTree& childWhichHasBeenAdded) override;
-    virtual void valueTreeChildRemoved (ValueTree& parentTree,
-                                        ValueTree& childWhichHasBeenRemoved,
-                                        int indexFromWhichChildWasRemoved) override;
-    virtual void valueTreeChildOrderChanged (ValueTree& parentTreeWhoseChildrenHaveMoved,
-                                             int oldIndex, int newIndex) override;
-    virtual void valueTreeParentChanged (ValueTree& treeWhoseParentHasChanged) override;
-    virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override;
-#endif
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphProcessor)
 };
 

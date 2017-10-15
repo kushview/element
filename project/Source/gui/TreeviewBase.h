@@ -128,7 +128,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel_E1::backgroundColor);
+        g.fillAll (LookAndFeel_KV1::backgroundColor);
         if (emptyTreeMessage.getValue() != var::null && (rootItem == nullptr || rootItem->getNumSubItems() == 0))
             drawEmptyPanelMessage (*this, g, emptyTreeMessage.getValue());
     }

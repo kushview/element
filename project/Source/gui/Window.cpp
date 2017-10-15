@@ -28,7 +28,7 @@ namespace Element {
 
 
     Window::Window (const String& name)
-        : DocumentWindow (name, LookAndFeel_E1::widgetBackgroundColor,
+        : DocumentWindow (name, LookAndFeel_KV1::widgetBackgroundColor,
                           DocumentWindow::closeButton | DocumentWindow::minimiseButton, true)
     {
        #if JUCE_IOS

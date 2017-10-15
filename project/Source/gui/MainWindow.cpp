@@ -7,18 +7,20 @@
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
 #include "session/CommandManager.h"
+#include "Globals.h"
 
 namespace Element {
-    MainWindow::MainWindow (CommandManager& cmd)
-        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false)
+    MainWindow::MainWindow (Globals& g)
+        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
+          world (g)
     {
         setUsingNativeTitleBar (true);
         setResizable (true, false);
         
-        mainMenu = new MainMenu (*this, cmd);
+        mainMenu = new MainMenu (*this, g.getCommandManager());
         mainMenu->setupMenu();
         
-        addKeyListener (cmd.getKeyMappings());
+        addKeyListener (g.getCommandManager().getKeyMappings());
     }
 
     MainWindow::~MainWindow()

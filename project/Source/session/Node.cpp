@@ -38,6 +38,16 @@ namespace Element {
         // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
     }
     
+    ValueTree Node::makeArc (const Arc& arc)
+    {
+        ValueTree model (Tags::arc);
+        model.setProperty (Tags::sourceNode, (int) arc.sourceNode, nullptr);
+        model.setProperty (Tags::sourcePort, (int) arc.sourcePort, nullptr);
+        model.setProperty (Tags::destNode,   (int) arc.destNode, nullptr);
+        model.setProperty (Tags::destPort,   (int) arc.destPort, nullptr);
+        return model;
+    }
+    
     const bool Node::canConnectTo (const Node& o) const
     {
         if (objectData.getParent() != o.objectData.getParent() || objectData == o.objectData)
@@ -72,10 +82,9 @@ namespace Element {
         stabilizePropertyString (Slugs::name, "Default Node");
     }
 
-    GraphNodePtr Node::getGraphNode() const
+    GraphNode* Node::getGraphNode() const
     {
-        var val = objectData.getProperty ("object", var::null);
-        return dynamic_cast<GraphNode*> (val.getObject());
+        return dynamic_cast<GraphNode*> (objectData.getProperty (Tags::object, var::null).getObject());
     }
     
     void Node::getPorts (PortArray& ports, PortType type, bool isInput) const

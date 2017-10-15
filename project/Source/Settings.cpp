@@ -12,12 +12,17 @@ Settings::Settings()
     opts.applicationName     = "Element";
     opts.filenameSuffix      = "conf";
     opts.osxLibrarySubFolder = "Application Support";
-    opts.storageFormat       = PropertiesFile::storeAsXML;
+    opts.storageFormat       = PropertiesFile::storeAsCompressedBinary;
 
+   #if JUCE_DEBUG
+    opts.applicationName     = "ElementDebug";
+    opts.storageFormat       = PropertiesFile::storeAsXML;
+   #endif
+    
    #if JUCE_LINUX
     opts.folderName          = ".config/Element";
    #else
-    opts.folderName          = opts.applicationName;
+    opts.folderName          = "Element";
    #endif
 
     setStorageParameters (opts);

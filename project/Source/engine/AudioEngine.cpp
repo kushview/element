@@ -63,9 +63,9 @@ class AudioEngine::Private : public AudioIODeviceCallback,
 {
 public:
     Private (AudioEngine& e)
-    : engine (e),sampleRate (0), blockSize (0), isPrepared (false),
-      numInputChans (0), numOutputChans (0),
-      tempBuffer (1, 1)
+        : engine (e),sampleRate (0), blockSize (0), isPrepared (false),
+          numInputChans (0), numOutputChans (0),
+          tempBuffer (1, 1)
     {
         graph.setPlayHead (&transport);
     }

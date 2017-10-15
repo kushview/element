@@ -3,8 +3,7 @@
     Copyright (c) 2016-2017 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_CONTENT_COMPONENT_H
-#define EL_CONTENT_COMPONENT_H
+#pragma once
 
 #include "engine/GraphNode.h"
 #include "session/Session.h"
@@ -21,7 +20,8 @@ class RackView;
 class TransportBar;
 
 class ContentView : public Component {
-    
+public:
+    virtual void willBecomeActive() { }
 };
 
 class ContentComponent :  public Component,
@@ -37,6 +37,7 @@ public:
     void paint (Graphics &g) override;
     void resized() override;
 
+    void setContentView (ContentView* view);
     void setCurrentNode (const Node& node);
     void setRackViewComponent (Component* comp);
     void setRackViewNode (GraphNodePtr node);
@@ -76,5 +77,3 @@ private:
 };
 
 }
-
-#endif // ELEMENT_CONTENT_COMPONENT_H

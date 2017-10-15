@@ -4,6 +4,7 @@
 #include "controllers/Controller.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
+#include "session/Node.h"
 
 namespace Element {
 
@@ -60,16 +61,21 @@ public:
 
     void clear();
 
-    /** The special channel index used to refer to a filter's midi channel. */
-    static const int midiChannelNumber;
-
+    void setNodeModel (const Node& node);
+    
+    void savePluginStates();
+    
 private:
     PluginManager& pluginManager;
     GraphProcessor& processor;
+    ValueTree graph, arcs, nodes;
 
     uint32 lastUID;
     uint32 getNextUID() noexcept;
     inline void changed() { sendChangeMessage(); }
+    GraphNode* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
+                             uint32 nodeId = 0);
+    void processorArcsChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphController)
 };

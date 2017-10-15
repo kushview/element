@@ -3,12 +3,13 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_MAIN_MENU_H
-#define ELEMENT_MAIN_MENU_H
+#pragma once
 
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
+#include "session/Session.h"
 #include "session/CommandManager.h"
+#include "session/Node.h"
 #include "session/UnlockStatus.h"
 #include "Commands.h"
 #include "Globals.h"
@@ -29,7 +30,7 @@ public:
     };
 
     MainMenu (MainWindow& parent, CommandManager& c)
-        : owner (parent), cmd(c) { }
+        : owner (parent), world (parent.getWorld()), cmd(c) { }
 
     void setupMenu()
     {
@@ -84,6 +85,16 @@ public:
 
     void menuItemSelected (int index, int menu) override
     {
+        auto session = world.getSession();
+       #if JUCE_DEBUG
+        if (index == 1000)
+        {
+            DBG("[EL] === SESSION DUMP ===");
+            auto data = session->getValueTree().createCopy();
+            Node::sanitizeProperties (data, true);
+            DBG(data.toXmlString());
+        }
+       #endif
     }
     
     // Command Target
@@ -113,7 +124,7 @@ private:
         menu.addCommandItem (&cmd, Commands::mediaNew, "New Graph");
         menu.addSeparator();
 #endif
-        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open...");
+        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open File...");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::mediaSave, "Save");
         menu.addCommandItem (&cmd, Commands::mediaSaveAs, "Save As...");
@@ -128,7 +139,7 @@ private:
         
        #if ! JUCE_MAC
         menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::showPreferences, "Check For Updates..");
+        menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
         menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
@@ -159,8 +170,7 @@ private:
     
     void buildDebugMenu (PopupMenu& menu)
     {
-        menu.addItem (1000, "Reset settings file");
-        menu.addItem (1001, "Authenticate Trial");
+        menu.addItem (1000, "Dump Session to Console");
     }
     
     void buildHelpMenu (PopupMenu& menu)
@@ -171,9 +181,8 @@ private:
     }
     
 private:
+    Globals& world;
     CommandManager& cmd;
 };
-
 }
 
-#endif // ELEMENT_MAIN_MENU_H

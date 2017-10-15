@@ -41,7 +41,7 @@ struct UnlockForm::OverlayComp  : public Component,
     {
         g.fillAll (Colours::transparentBlack.withAlpha (0.50f));
         
-        g.setColour (LookAndFeel_E1::textColor);
+        g.setColour (LookAndFeel_KV1::textColor);
         g.setFont (15.0f);
         
         g.drawFittedText (TRANS("Contacting XYZ...").replace ("XYZ", form.status.getWebsiteName()),
@@ -141,7 +141,7 @@ struct LicenseInfo : public Component,
         addAndMakeVisible (licenseKey);
         licenseKey.setText (String("License: ") + f.status.getLicenseKey(), dontSendNotification);
         licenseKey.setJustificationType (Justification::centred);
-        licenseKey.setColour (Label::textColourId, kv::LookAndFeel_E1::textColor);
+        licenseKey.setColour (Label::textColourId, kv::LookAndFeel_KV1::textColor);
         
         addAndMakeVisible (refreshButton);
         refreshButton.setButtonText ("Refresh");
@@ -153,7 +153,7 @@ struct LicenseInfo : public Component,
     }
     
     void paint (Graphics&g) override {
-       g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+       g.fillAll (LookAndFeel_KV1::widgetBackgroundColor);
     }
     
     void resized() override
@@ -289,7 +289,7 @@ UnlockForm::~UnlockForm()
 
 void UnlockForm::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel_E1::widgetBackgroundColor);
+    g.fillAll (LookAndFeel_KV1::widgetBackgroundColor);
 }
 
 void UnlockForm::resized()

@@ -72,6 +72,7 @@ namespace Commands {
         showLegacyView         = 0x9001,
         showPluginManager      = 0x9002,
         showPreferences        = 0x9003,
+        showSessionConfig      = 0x9004,
 
         mediaClose             = 0x9010,
         mediaOpen              = 0x9011,
@@ -280,6 +281,11 @@ namespace Commands {
             case Commands::showPluginManager:
                 result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
                 break;
+            case Commands::showSessionConfig:
+                result.setInfo ("Session Settings", "Session Settings", "Session", 0);
+                result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
+                break;
+            
             case Commands::checkNewerVersion:
                 result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
                 break;

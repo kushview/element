@@ -3,12 +3,8 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_SIGNALS_H
-#define EL_SIGNALS_H
+#pragma once
 
-#include <boost/bind.hpp>
-#include <boost/intrusive/list.hpp>
-#include <boost/intrusive/slist_hook.hpp>
 #include <boost/signals2/signal.hpp>
 #include "ElementApp.h"
 
@@ -19,5 +15,3 @@ typedef boost::signals2::signal<void(float)> FloatSignal;
 typedef boost::signals2::signal<void(const String&)> StringSignal;
 
 }
-
-#endif

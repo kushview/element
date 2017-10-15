@@ -12,8 +12,9 @@
 
 namespace Element {
 
-namespace GraphLog {
-    void print (GraphController& g)
+namespace Logging
+{
+    void dump (GraphController& g)
     {
         DBG("[EL] graph: " << g.getGraph().getName());
         for (int i = 0; i < g.getNumFilters(); ++i)
@@ -44,16 +45,20 @@ void EngineController::addConnection (const uint32 s, const uint32 sp, const uin
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
 {
     jassert (root);
-    root->getGraph().connectChannels(PortType::Audio, s, sc, d, dc);
+    auto src = root->getNodeForId (s);
+    auto dst = root->getNodeForId (d);
+    if (!src || !dst)
+        return;
+    addConnection (src->nodeId, src->getPortForChannel (PortType::Audio, sc, false),
+                   dst->nodeId, dst->getPortForChannel (PortType::Audio, sc, true));
 }
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    jassert(root);
-    root->getGraph().removeConnection (s, sp, d, dp);
-    root->sendChangeMessage();
+    jassert (root);
+    root->removeConnection (s, sp, d, dp);
 }
-    
+
 void EngineController::addPlugin (const PluginDescription& d)
 {
     if (! root)
@@ -79,7 +84,6 @@ void EngineController::activate()
     
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
-    auto& settings (globals.getSettings());
     auto& devices (globals.getDeviceManager());
     
     auto engine (globals.getAudioEngine());
@@ -109,19 +113,7 @@ void EngineController::deactivate()
     if (root)
     {
         root->removeChangeListener (this);
-        const auto nodes = root->getGraph().getNodesModel();
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
-            const Node node (nodes.getChild (i), false);
-            ValueTree tree = node.node();
-            MemoryBlock state;
-            if (GraphNodePtr obj = root->getNodeForId (node.getNodeId()))
-                if (auto* proc = obj->getAudioProcessor())
-                    proc->getStateInformation (state);
-            if (state.getSize() > 0)
-                tree.setProperty ("state", state.toBase64Encoding(), nullptr);
-        }
-        
+        root->savePluginStates();
         root = nullptr;
     }
 }
@@ -134,47 +126,13 @@ void EngineController::clear()
 
 void EngineController::setRootNode (const Node& newRootNode)
 {
-    if (! newRootNode.hasNodeType (Tags::graph)) {
+    if (! newRootNode.hasNodeType (Tags::graph))
+    {
         jassertfalse; // needs to be a graph
         return;
     }
-    
-    root->clear();
-    
-    const ValueTree nodes (newRootNode.getNodesValueTree());
-    const ValueTree arcs (newRootNode.getArcsValueTree());
-    
-    for (int i = 0; i < nodes.getNumChildren(); ++i)
-    {
-        const Node node (nodes.getChild (i), false);
-        PluginDescription desc; node.getPluginDescription (desc);
-        const uint32 nodeId = root->addFilter (&desc, 0.0, 0.0, node.getNodeId());
-        jassert(nodeId == node.getNodeId());
-        if (GraphNodePtr obj = root->getNodeForId (nodeId))
-        {
-            MemoryBlock state;
-            if (state.fromBase64Encoding (node.node().getProperty("state").toString()))
-                obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
-        }
-    }
-    
-    jassert (nodes.getNumChildren() == root->getNumFilters());
-    
-    for (int i = 0; i < arcs.getNumChildren(); ++i)
-    {
-        const ValueTree arc (arcs.getChild (i));
-        addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
-                       (uint32)(int) arc.getProperty (Tags::sourcePort),
-                       (uint32)(int) arc.getProperty (Tags::destNode),
-                       (uint32)(int) arc.getProperty (Tags::destPort));
-    }
-    
-    jassert (arcs.getNumChildren() == root->getNumConnections ());
-    
-    auto graphModel = root->getGraph().getGraphModel();
-    const auto graphArcs = root->getGraph().getArcsModel();
-    graphModel.removeChild (graphArcs, nullptr);
-    graphModel.addChild (graphArcs, -1, nullptr);
+
+    root->setNodeModel (newRootNode);
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
@@ -188,12 +146,15 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     {
         if (auto* device = devices.getCurrentAudioDevice())
         {
+            auto session = app->getWorld().getSession();
+            auto nodes = session->getGraphValueTree(0).getChildWithName(Tags::nodes);
             processor.suspendProcessing (true);
             processor.setPlayConfigFor (device);
-            for (int i = processor.getNumNodes(); --i >= 0;)
+            for (int i = nodes.getNumChildren(); --i >= 0;)
             {
-                GraphNodePtr node = processor.getNode (i);
-                if (node->isAudioIONode())
+                const Node model (nodes.getChild(i), false);
+                GraphNodePtr node = model.getGraphNode();
+                if (node && node->isAudioIONode())
                 {
                     (dynamic_cast<IOP*>(node->getProcessor()))->releaseResources();
                     (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
@@ -201,6 +162,10 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
                                                                                device->getCurrentBufferSizeSamples());
                     processor.removeIllegalConnections();
                     node->resetPorts();
+                    auto newPorts = node->getMetadata().getChildWithName(Tags::ports).createCopy();
+                    auto data = model.getValueTree();
+                    data.removeChild(model.getPortsValueTree(), nullptr);
+                    data.addChild(newPorts, -1, nullptr);
                 }
             }
             

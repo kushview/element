@@ -47,6 +47,11 @@ public:
         return nullptr;
     }
     
+    template<class T> inline T* findSibling() const
+    {
+        return (parent != nullptr) ? parent->findChild<T>() : nullptr;
+    }
+    
     inline int getNumChildren() const { return children.size(); }
     inline Controller* getChild (const int index) const
     {

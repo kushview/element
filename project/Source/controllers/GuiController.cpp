@@ -11,6 +11,7 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"
+#include "gui/SessionContentView.h"
 #include "gui/ConnectionGrid.h"
 #include "session/MediaManager.h"
 #include "session/UnlockStatus.h"
@@ -135,7 +136,7 @@ void GuiController::run()
     sessionDoc = new SessionDocument (session());
     content = new ContentComponent (controller);
     content->setSize (800, 600);
-    mainWindow = new MainWindow (commander());
+    mainWindow = new MainWindow (world);
     mainWindow->setContentNonOwned (content.get(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     PropertiesFile* pf = globals().getSettings().getUserSettings();
@@ -214,7 +215,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         (CommandID) Commands::showAbout,
 		(CommandID) Commands::showPluginManager,
 		(CommandID) Commands::showPreferences,
-		(CommandID) Commands::quit
+		(CommandID) Commands::quit,
+        (CommandID) Commands::showSessionConfig
     });
 }
 
@@ -256,6 +258,9 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showPreferences:
             runDialog (ELEMENT_PREFERENCES);
+            break;
+        case Commands::showSessionConfig:
+            content->setContentView (new SessionContentView());
             break;
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();

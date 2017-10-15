@@ -11,7 +11,7 @@
 namespace Element {
 namespace ViewHelpers {
 
-typedef LookAndFeel_E1 LF;
+typedef LookAndFeel_KV1 LF;
 
 void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding)
 {

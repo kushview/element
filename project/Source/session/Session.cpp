@@ -6,9 +6,11 @@
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
 #include "engine/Transport.h"
-#include "session/Session.h"
+#include "session/Node.h"
 #include "MediaManager.h"
 #include "Globals.h"
+
+#include "session/Session.h"
 
 namespace Element {
     class Session::Private
@@ -51,20 +53,20 @@ namespace Element {
         setMissingProperties (true);
     }
 
-
     bool Session::loadData (const ValueTree &data)
     {
-        clear();
+        if (! data.hasType (Tags::session))
+            return false;
+        objectData.removeListener (this);
+        objectData = data;
+        objectData.addListener (this);
         return true;
     }
 
     XmlElement* Session::createXml()
     {
-        ValueTree saveData = node().createCopy();
-        const ValueTree d = saveData.getChildWithName (Slugs::graph);
-        if (d.isValid())
-            saveData.removeChild (d, nullptr);
-        
+        ValueTree saveData = objectData.createCopy();
+        Node::sanitizeProperties (saveData, true);
         XmlElement* e = saveData.createXml();
         if (nullptr != e)
             polishXml (*e);
@@ -74,27 +76,32 @@ namespace Element {
 
     void Session::polishXml (XmlElement &e)
     {
-        // remove generated properties from the engine
-        const char* sa[] = { "node", "block", nullptr };
-        StringArray trackAtts (sa);
-
-        forEachXmlChildElementWithTagName (e, s, "sequence")
-            forEachXmlChildElementWithTagName (*s, t, "track")
-                for (const auto& a : trackAtts)
-                    t->removeAttribute (a);
+        // noop
     }
 
     void Session::setMissingProperties (bool resetExisting)
     {
-        if (! node().hasProperty (Slugs::name) || resetExisting)
-            setProperty (Slugs::name, "Untitled Session");
-        if (! node().hasProperty (Slugs::tempo) || resetExisting)
-            setProperty (Slugs::tempo, (double) 120.f);
-        objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
+        if (resetExisting)
+            objectData.removeAllProperties (nullptr);
+        if (! node().hasProperty (Tags::name))
+            setProperty (Tags::name, "Untitled");
+        if (! node().hasProperty (Slugs::tempo))
+            setProperty (Tags::tempo, (double) 120.f);
+        
+        if (resetExisting)
+            objectData.removeAllChildren (nullptr);
+        
+        ValueTree graphs = objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
+        ValueTree root = graphs.getOrCreateChildWithName (Tags::node, nullptr);
+        root.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
+        root.setProperty (Tags::name, "Root", nullptr);
+        ValueTree nodes = root.getOrCreateChildWithName (Tags::nodes, nullptr);
     }
 
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
+        if (property == Tags::object)
+            return;
         sendChangeMessage();
     }
 
@@ -121,5 +128,27 @@ namespace Element {
     void Session::valueTreeRedirected (ValueTree& tree)
     {
         sendChangeMessage();
+    }
+    
+    void Session::saveGraphState()
+    {
+        auto graphs = getGraphsValueTree();
+        for (int i = 0; i < graphs.getNumChildren(); ++i)
+        {
+            auto graph = graphs.getChild (i);
+            auto nodes = graph.getChildWithName(Tags::nodes);
+            for (int j = 0; j < nodes.getNumChildren(); ++j)
+            {
+                Node node (nodes.getChild (j), false);
+                if (GraphNodePtr ptr = node.getGraphNode())
+                {
+                    MemoryBlock state;
+                    if (auto* proc = ptr->getAudioProcessor())
+                        proc->getStateInformation (state);
+                    if (state.getSize() > 0)
+                        node.setProperty (Tags::state, state.toBase64Encoding());
+                }
+            }
+        }
     }
 }

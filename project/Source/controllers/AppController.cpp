@@ -10,6 +10,7 @@
 #include "Globals.h"
 #include "Messages.h"
 #include "Settings.h"
+#include "Version.h"
 
 namespace Element {
 
@@ -38,8 +39,16 @@ void AppController::deactivate()
 void AppController::run()
 {
     activate();
+    
     if (auto* gui = findChild<GuiController>())
         gui->run();
+    
+    if (auto* sc = findChild<SessionController>())
+    {
+        const auto lastSession = getWorld().getSettings().getUserSettings()->getValue ("lastSession");
+        if (File::isAbsolutePath (lastSession))
+            sc->openFile (File (lastSession));
+    }
 }
 
 void AppController::handleMessage (const Message& msg)
@@ -95,10 +104,11 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 void AppController::getAllCommands (Array<CommandID>& cids)
 {
     cids.addArray ({
-        Commands::mediaNew,   Commands::mediaOpen,
-        Commands::mediaSave,  Commands::mediaSaveAs,
-        Commands::signIn,     Commands::signOut,
-        Commands::sessionNew, Commands::sessionSave
+        Commands::mediaNew,    Commands::mediaOpen,
+        Commands::mediaSave,   Commands::mediaSaveAs,
+        Commands::signIn,      Commands::signOut,
+        Commands::sessionNew,  Commands::sessionSave,
+        Commands::checkNewerVersion
     });
 }
 
@@ -126,9 +136,6 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::sessionSaveAs:
             findChild<SessionController>()->saveSession (true);
             break;
-        case Commands::sessionOpen:
-            findChild<SessionController>()->openSession();
-            break;
         case Commands::sessionClose:
             findChild<SessionController>()->closeSession();
             break;
@@ -143,18 +150,17 @@ bool AppController::perform (const InvocationInfo& info)
             }
         } break;
 
+        case Commands::sessionOpen:
         case Commands::mediaOpen:
         {
-            FileChooser chooser ("Open a graph", File(), "*.elg");
+            FileChooser chooser ("Open Media", File(), "*.elg;*.elc;*.els");
             if (chooser.browseForFileToOpen())
             {
                 lastSavedFile = chooser.getResult();
-                FileInputStream stream (lastSavedFile);
-                const ValueTree g (ValueTree::readFromStream (stream));
-                if (g.isValid())
-                {
-                    const Node node (g, false);
-                    ec->setRootNode (node);
+                if (lastSavedFile.hasFileExtension ("elc")) {
+                    DBG("[AC] open elc file");
+                } else {
+                    findChild<SessionController>()->openFile (lastSavedFile);
                 }
             }
         } break;
@@ -170,7 +176,7 @@ bool AppController::perform (const InvocationInfo& info)
             {
                 auto& graph (world.getAudioEngine()->getRootGraph());
                 
-                if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elgraph"))
+                if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elg"))
                 {
                     const ValueTree model (graph.getGraphState());
                     FileOutputStream stream (lastSavedFile);
@@ -179,7 +185,7 @@ bool AppController::perform (const InvocationInfo& info)
                 
                 else
                 {
-                    FileChooser chooser ("Save current graph", File(), "*.elgraph");
+                    FileChooser chooser ("Save current graph", File(), "*.elg");
                     if (chooser.browseForFileToSave (true))
                     {
                         lastSavedFile = chooser.getResult();
@@ -191,7 +197,8 @@ bool AppController::perform (const InvocationInfo& info)
             }
         } break;
         
-        case Commands::mediaSaveAs: {
+        case Commands::mediaSaveAs:
+        {
             if (! status.isFullVersion())
             {
                 String msg = "Saving is available in Element Pro.\n";
@@ -235,6 +242,10 @@ bool AppController::perform (const InvocationInfo& info)
                 status.load();
             }
         } break;
+        
+        case Commands::checkNewerVersion:
+            CurrentVersion::checkAfterDelay (20, true);
+            break;
         
         default: res = false; break;
     }

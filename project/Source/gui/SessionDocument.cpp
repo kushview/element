@@ -32,21 +32,21 @@ namespace Element {
         if (nullptr == session)
             return Result::fail ("No session data target");
 
+        String error;
         if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
         {
             ValueTree newData (ValueTree::fromXml (*e));
             if (! newData.isValid() && newData.hasType ("session"))
-                return Result::fail ("Not a valid session file");
-
-            if (session->loadData (newData)) {
-                session->setName (file.getFileNameWithoutExtension());
-                return Result::ok();
-            }
-
-            return Result::fail ("Could not load session data");
+                error = "Not a valid session file";
+            if (error.isEmpty() && !session->loadData (newData))
+                error = "Could not load session data";
         }
-
-        return Result::fail ("Could not read session file");
+        else
+        {
+            error = "Not a valid session file";
+        }
+        
+        return (error.isNotEmpty()) ? Result::fail (error) : Result::ok();
     }
 
     Result SessionDocument::saveDocument (const File& file)
@@ -54,8 +54,10 @@ namespace Element {
         if (! session)
             return Result::fail ("Nil session");
         
+        session->saveGraphState();
         if (ScopedPointer<XmlElement> e = session->createXml())
         {
+            DBG("[EL] saving session to " << file.getFullPathName());
             Result res (e->writeToFile (file, String())
                     ? Result::ok() : Result::fail ("Error writing session file"));
             return res;

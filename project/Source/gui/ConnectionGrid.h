@@ -3,16 +3,16 @@
     Copyright (C) 2016  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_CONNECTION_GRID_H
-#define EL_CONNECTION_GRID_H
+#pragma once
 
 #include "ElementApp.h"
+#include "gui/ContentComponent.h"
 
 namespace Element {
     
 class Node;
 
-class ConnectionGrid : public Component,
+class ConnectionGrid : public ContentView,
                        public DragAndDropTarget
 {
 public:
@@ -54,5 +54,3 @@ private:
 };
 
 }
-
-#endif  // EL_CONNECTION_GRID_H

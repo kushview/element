@@ -154,14 +154,14 @@ namespace Element {
             if (useHighlighting &&
                     (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
             {
-                g.setColour (kv::LookAndFeel_E1::elementBlue.withAlpha (0.3f));
+                g.setColour (kv::LookAndFeel_KV1::elementBlue.withAlpha (0.3f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
             else
             {
                 g.setColour (matrix.connected (row, column) ?
-                             Colour (kv::LookAndFeel_E1::elementBlue.brighter()) :
-                             Colour (kv::LookAndFeel_E1::defaultMatrixCellOffColor));
+                             Colour (kv::LookAndFeel_KV1::elementBlue.brighter()) :
+                             Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
         
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
@@ -282,7 +282,7 @@ namespace Element {
 
         void paintEmptyMessage (Graphics& g, const int width, const int height)
         {
-//            g.setColour (LookAndFeel_E1::textColor);
+//            g.setColour (LookAndFeel_KV1::textColor);
 //            g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
         }
         
@@ -296,8 +296,8 @@ namespace Element {
             String text = node.getName();
             text << " - " << port.getName();
             
-            g.setColour (rowIsSelected ? LookAndFeel_E1::widgetBackgroundColor.brighter()
-                                       : LookAndFeel_E1::widgetBackgroundColor);
+            g.setColour (rowIsSelected ? LookAndFeel_KV1::widgetBackgroundColor.brighter()
+                                       : LookAndFeel_KV1::widgetBackgroundColor);
             if (isSource)
                 g.fillRect (0, 0, width - 1, height - 1);
             else
@@ -722,7 +722,7 @@ namespace Element {
     
     void ConnectionGrid::paint (Graphics& g)
     {
-        g.fillAll (LookAndFeel_E1::contentBackgroundColor);
+        g.fillAll (LookAndFeel_KV1::contentBackgroundColor);
     }
     
     void ConnectionGrid::resized()

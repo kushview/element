@@ -25,6 +25,7 @@ public:
     RootGraph();
     ~RootGraph() { }
     
+    void setValueTree (const ValueTree& tree);
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
     

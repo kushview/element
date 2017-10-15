@@ -75,12 +75,22 @@ namespace Element {
             setMissingProperties();
         }
         
+        static void sanitizeProperties (ValueTree node, const bool recursive = false)
+        {
+            node.removeProperty (Tags::object, nullptr);
+            if (recursive)
+                for (int i = 0; i < node.getNumChildren(); ++i)
+                    sanitizeProperties (node.getChild(i), recursive);
+        }
+        
+        static ValueTree makeArc (const kv::Arc& arc);
+        
         const uint32 getNodeId() const { return (uint32)(int64) getProperty ("id"); }
         const Identifier getNodeType() const { return Identifier (getProperty(Slugs::type).toString()); }
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
         const String getName() const { return getProperty (Slugs::name); }
         
-        GraphNodePtr getGraphNode() const;
+        GraphNode* getGraphNode() const;
         const int getNumAudioIns()  const { return (int) getProperty ("numAudioIns", 0); }
         const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
         
