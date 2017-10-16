@@ -720,10 +720,6 @@ GraphProcessor::GraphProcessor()
       currentAudioOutputBuffer (1, 1),
       currentMidiInputBuffer (nullptr)
 {
-    graphModel = createGraphModel();
-    nodesModel = graphModel.getOrCreateChildWithName (Tags::nodes, nullptr);
-    arcsModel  = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
-    
     for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
         ioNodes[i] = KV_INVALID_PORT;
 }
@@ -741,11 +737,6 @@ const String GraphProcessor::getName() const
 
 void GraphProcessor::clear()
 {
-    arcsModel = graphModel.getOrCreateChildWithName (Tags::arcs, nullptr);
-    nodesModel = graphModel.getOrCreateChildWithName (Tags::nodes, nullptr);
-    arcsModel.removeAllChildren (nullptr);
-    nodesModel.removeAllChildren (nullptr);
-    
     nodes.clear();
     connections.clear();
     //triggerAsyncUpdate();
@@ -795,13 +786,12 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     newProcessor->setPlayHead (getPlayHead());
     if (auto* iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor))
         iop->setParentGraph (this);
+    
     if (GraphNodePtr node = createNode (nodeId, newProcessor))
     {
         node->setParentGraph (this);
         node->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (node);
-        nodesModel.addChild (node->getMetadata(), -1, nullptr);
-        jassert(getNumNodes() == nodesModel.getNumChildren());
         triggerAsyncUpdate();
         
         return node;
@@ -820,9 +810,7 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
         if (nodes.getUnchecked(i)->nodeId == nodeId)
         {
             nodes.remove(i);
-            nodesModel.removeChild (n->metadata, nullptr);
-            jassert(getNumNodes() == nodesModel.getNumChildren());
-
+         
             // triggerAsyncUpdate();
             // do this syncronoously so it wont try processing with a null graph
             handleAsyncUpdate();
@@ -903,8 +891,6 @@ bool GraphProcessor::addConnection (const uint32 sourceNode, const uint32 source
     ArcSorter sorter;
     Connection* c = new Connection (sourceNode, sourcePort, destNode, destPort);
     connections.addSorted (sorter, c);
-    arcsModel.addChild (c->arc, -1, nullptr);
-    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
     return true;
 }
@@ -922,10 +908,7 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
 
 void GraphProcessor::removeConnection (const int index)
 {
-    const auto* const connection = connections [index];
     connections.remove (index);
-    if (connection) arcsModel.removeChild (connection->arc, nullptr);
-    jassert(arcsModel.getNumChildren() == connections.size());
     triggerAsyncUpdate();
 }
 
@@ -947,7 +930,7 @@ bool GraphProcessor::removeConnection (const uint32 sourceNode, const uint32 sou
             doneAnything = true;
         }
     }
-
+    
     return doneAnything;
 }
 
@@ -965,8 +948,6 @@ bool GraphProcessor::disconnectNode (const uint32 nodeId)
             doneAnything = true;
         }
     }
-    
-    jassert (arcsModel.getNumChildren() == connections.size());
     
     return doneAnything;
 }

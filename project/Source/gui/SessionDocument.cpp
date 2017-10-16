@@ -74,8 +74,9 @@ namespace Element {
         changed();
     }
     
-    void SessionDocument::changeListenerCallback (ChangeBroadcaster*)
+    void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)
     {
-        onSessionChanged();
+        if (cb == session.get())
+            onSessionChanged();
     }
 }

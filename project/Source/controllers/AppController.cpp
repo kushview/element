@@ -174,11 +174,10 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else if (status.isFullVersion())
             {
-                auto& graph (world.getAudioEngine()->getRootGraph());
-                
                 if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elg"))
                 {
-                    const ValueTree model (graph.getGraphState());
+                    jassertfalse; // handle this
+                    const ValueTree model ("node");
                     FileOutputStream stream (lastSavedFile);
                     model.writeToStream (stream);
                 }
@@ -189,7 +188,8 @@ bool AppController::perform (const InvocationInfo& info)
                     if (chooser.browseForFileToSave (true))
                     {
                         lastSavedFile = chooser.getResult();
-                        const ValueTree model (graph.getGraphState());
+                        const ValueTree model ("node");
+                        jassertfalse; // handle this
                         FileOutputStream stream (lastSavedFile);
                         model.writeToStream (stream);
                     }
@@ -212,7 +212,8 @@ bool AppController::perform (const InvocationInfo& info)
                 if (chooser.browseForFileToSave (true))
                 {
                     lastSavedFile = chooser.getResult();
-                    const ValueTree model (graph.getGraphState());
+                    const ValueTree model ("node");
+                    jassertfalse; //handle
                     FileOutputStream stream (lastSavedFile);
                     model.writeToStream (stream);
                 }

@@ -313,11 +313,6 @@ public:
 
     virtual void fillInPluginDescription (PluginDescription& d) const override;
 
-    inline ValueTree getGraphState() const { return getGraphModel(); }
-    inline ValueTree getGraphModel() const { jassertfalse; return graphModel; }
-    inline ValueTree getNodesModel() const { jassertfalse; return nodesModel; }
-    inline ValueTree getArcsModel()  const { jassertfalse; return arcsModel; }
-
 protected:
     virtual GraphNode* createNode (uint32 nodeId, AudioProcessor* proc) { return new GraphNode (nodeId, proc); }
     virtual void preRenderNodes() { }
@@ -328,10 +323,6 @@ private:
     ReferenceCountedArray<GraphNode> nodes;
     OwnedArray<Connection> connections;
     uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
-
-    ValueTree graphModel;
-    ValueTree nodesModel;
-    ValueTree arcsModel;
     
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;

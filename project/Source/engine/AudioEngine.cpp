@@ -254,9 +254,7 @@ Transport* AudioEngine::transport()            { return &priv->transport; }
 
 ValueTree AudioEngine::createGraphTree()
 {
-    if (! priv)
-        return ValueTree();
-    return priv->graph.getGraphModel().createCopy();
+    return ValueTree();
 }
 
 void AudioEngine::restoreFromGraphTree (const ValueTree&) { }

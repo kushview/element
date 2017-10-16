@@ -100,8 +100,12 @@ namespace Element {
 
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
-        if (property == Tags::object)
+        if (property == Tags::object ||
+            (tree.hasType(Tags::node) && property == Tags::state))
+        {
             return;
+        }
+        
         sendChangeMessage();
     }
 
@@ -112,23 +116,13 @@ namespace Element {
 
     void Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
     {
-        sendChangeMessage();
+         sendChangeMessage();
     }
 
-    void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int)
-    {
-        sendChangeMessage();
-    }
+    void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int) {  }
 
-    void Session::valueTreeParentChanged (ValueTree& tree)
-    {
-        sendChangeMessage();
-    }
-
-    void Session::valueTreeRedirected (ValueTree& tree)
-    {
-        sendChangeMessage();
-    }
+    void Session::valueTreeParentChanged (ValueTree& tree) { }
+    void Session::valueTreeRedirected (ValueTree& tree) { }
     
     void Session::saveGraphState()
     {

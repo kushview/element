@@ -92,13 +92,13 @@ void SessionController::newSession()
     
     if (res == 1 || res == 2)
     {
+        document->setFile (File::nonexistent);
         currentSession->clear();
+        document->setChangedFlag (false);
         if (auto* ec = findSibling<EngineController>())
             ec->setRootNode (Node (currentSession->getGraphValueTree(0), false));
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
-        document->setFile (File::nonexistent);
-        document->setChangedFlag (false);
     }
 }
 
