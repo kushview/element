@@ -230,7 +230,6 @@ namespace Commands {
             case Commands::exportMidi:
                 result.setInfo ("Exort MIDI", "Export to a MIDI file", "Exporting", 0);
                 break;
-                
             case Commands::sessionClose:
                 result.setInfo ("Close Session", "Close the current session", "Session", 0);
                 break;
@@ -242,6 +241,7 @@ namespace Commands {
                 result.setInfo ("Open Session", "Open an existing session", "Session", 0);
                 break;
             case Commands::sessionSave:
+                result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
                 result.setInfo ("Save Session", "Save the current session", "Session", 0);
                 break;
             case Commands::sessionSaveAs:
@@ -260,7 +260,6 @@ namespace Commands {
                 result.setInfo ("Open Media", "Opens a type of supported media", "Session Media", 0);
                 break;
             case Commands::mediaSave:
-                result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
                 result.setInfo ("Close Media", "Saves the currently viewed object", "Session Media", 0);
                 break;
             case Commands::mediaSaveAs:
@@ -283,7 +282,6 @@ namespace Commands {
                 break;
             case Commands::showSessionConfig:
                 result.setInfo ("Session Settings", "Session Settings", "Session", 0);
-                result.addDefaultKeypress ('t', ModifierKeys::commandModifier);
                 break;
             
             case Commands::checkNewerVersion:
