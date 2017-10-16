@@ -8,7 +8,8 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
- 
+#include "gui/NavigationView.h"
+#include "gui/SessionTreePanel.h"
 #include "gui/LookAndFeel.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -18,7 +19,7 @@
 
 #include "gui/ContentComponent.h"
 
-#define EL_USE_AUDIO_PANEL 0
+#define EL_USE_AUDIO_PANEL 1
 
 namespace Element {
 
@@ -264,10 +265,7 @@ public:
         for (int i = 0; i < getNumPanels(); ++i)
             comps.add (getPanel (i));
         for (int i = 0; i < comps.size(); ++i)
-        {
-            removePanel (comps[i]);
-            this->removePanel(0);
-        }
+            removePanel (comps [i]);
         names.clear();
         comps.clear();
     }
@@ -275,16 +273,18 @@ public:
     void updateContent()
     {
         clearPanels();
-        
         Component* c = nullptr;
-#if EL_USE_AUDIO_PANEL
-        names.add ("Audio");
-        c = new AudioIOPanelView();
+        
+//        names.add ("Navigation");
+//        c = new NavigationView ();
+//        addPanel (-1, c, true);
+//        setPanelHeaderSize (c, headerHeight);
+        
+        names.add ("Graphs");
+        c = new SessionGraphsListBox();
         addPanel (-1, c, true);
         setPanelHeaderSize (c, headerHeight);
-        setMaximumPanelSize (c, 160);
-        setPanelSize (c, 60, false);
-#endif
+        
         names.add ("Plugins");
         c = new PluginsPanelView (globals.getPluginManager());
         addPanel (-1, c, true);
@@ -293,6 +293,7 @@ public:
     
     AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
     PluginsPanelView* getPluginsPanel() { return findPanel<PluginsPanelView>(); }
+    SessionGraphsListBox* getSessionPanel() { return findPanel<SessionGraphsListBox>(); }
     
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
@@ -414,7 +415,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (toolBar = new Toolbar());
     
     container->setMainView (new ConnectionGrid ());
-    const Node node (getGlobals().getSession()->getGraphValueTree(0));
+    const Node node (getGlobals().getSession()->getGraph(0));
     setCurrentNode (node);
     
     toolBarVisible = true;
@@ -495,16 +496,6 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         }
     }
 }
-    
-void ContentComponent::setRackViewComponent (Component* comp)
-{
-    
-}
-
-void ContentComponent::setRackViewNode (GraphNodePtr node)
-{
-    
-}
 
 void ContentComponent::post (Message* message)
 {
@@ -514,9 +505,11 @@ void ContentComponent::post (Message* message)
 void ContentComponent::stabilize()
 {
     auto session = getGlobals().getSession();
-    setCurrentNode (Node (session->getGraphValueTree (0), false));
+    setCurrentNode (session->getGraph (0));
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
+    if (auto* sp = nav->getSessionPanel())
+        sp->setSession (session);
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

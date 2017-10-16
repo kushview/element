@@ -1,5 +1,4 @@
-#ifndef EL_NAVIGATION_VIEW_H
-#define EL_NAVIGATION_VIEW_H
+#pragma once
 
 #include "ElementApp.h"
 #include "gui/TreeviewBase.h"
@@ -10,7 +9,7 @@ class NavigationList;
 class NavigationTree;
 class PluginManager;
 
-class NavigationView    : public Component
+class NavigationView : public Component
 {
 public:
     NavigationView();
@@ -33,7 +32,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NavigationView)
 };
 
-
 class PluginTreeView : public TreePanelBase
 {
 public:
@@ -47,7 +45,4 @@ private:
     PluginManager& plugins;
 };
 
-
 }
-
-#endif  // EL_NAVIGATION_VIEW_H

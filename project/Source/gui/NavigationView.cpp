@@ -243,10 +243,7 @@ private:
             if (! node || ! instance)
                 return;
             
-            PluginDescription desc;
-            instance->fillInPluginDescription (desc);
-            auto* cc = this->getOwnerView()->findParentComponentOfClass<ContentComponent>();
-            cc->setRackViewNode (node);
+
         }
         
         GraphNodePtr node;

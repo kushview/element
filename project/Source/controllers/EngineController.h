@@ -18,6 +18,8 @@ public:
     void addPlugin (const PluginDescription&);
     void removeNode (const uint32);
     
+    void addGraph();
+    void addSubGraph();
     void addConnection (const uint32, const uint32, const uint32, const uint32);
     void connectChannels (const uint32, const int, const uint32, const int);
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
@@ -27,6 +29,7 @@ public:
     
 private:
     ScopedPointer<RootGraphController> root;
+    OwnedArray<RootGraphController> rootGraphs;
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
 };

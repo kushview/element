@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "session/Node.h"
 
 namespace Element {
     class AssetTree;
@@ -26,8 +27,8 @@ namespace Element {
         virtual ~Session();
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
+        inline Node getGraph (const int index) const { return Node (getGraphValueTree(index), false); }
         
-        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
         
         ValueTree getValueTree() const { return objectData; }
         bool loadData (const ValueTree& data);
@@ -61,6 +62,7 @@ namespace Element {
         inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
         void polishXml (XmlElement& e);
         void setMissingProperties (bool resetExisting = false);
+        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);
     };

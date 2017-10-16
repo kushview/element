@@ -85,6 +85,7 @@ namespace Commands {
         sessionNew             = 0x9022,
         sessionSave            = 0x9023,
         sessionSaveAs          = 0x9024,
+        sessionAddGraph        = 0x9025,
 
         exportAudio            = 0x9030,
         exportMidi             = 0x9031,
@@ -109,6 +110,7 @@ namespace Commands {
        static const char* const editing       = "Editing";
        static const char* const view          = "View";
        static const char* const windows       = "Windows";
+       static const char* const session       = "Session";
    }
     
     inline void getApplicationCommands (Array<CommandID>& commands)
@@ -122,6 +124,7 @@ namespace Commands {
             Commands::sessionOpen,
             Commands::sessionSave,
             Commands::sessionSaveAs,
+            Commands::sessionAddGraph,
             
             Commands::showAbout,
             Commands::showLegacyView,
@@ -245,8 +248,12 @@ namespace Commands {
                 result.setInfo ("Save Session", "Save the current session", "Session", 0);
                 break;
             case Commands::sessionSaveAs:
-                result.setInfo ("Save Session As", "Save the current session with a new name", "Session", 0);
+                result.setInfo ("Save Session As", "Save the current session with a new name",
+                                Categories::session, 0);
                 break;
+            case Commands::sessionAddGraph:
+                result.setInfo ("Add Graph", "Add a new graph to the session",
+                                Categories::session, 0);
                 
             case Commands::mediaNew:
 //                result.addDefaultKeypress ('n', ModifierKeys::commandModifier);

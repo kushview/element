@@ -200,7 +200,7 @@
               file="Source/gui/SessionDocument.cpp"/>
         <FILE id="otOrmC" name="SessionDocument.h" compile="0" resource="0"
               file="Source/gui/SessionDocument.h"/>
-        <FILE id="qKvsna" name="SessionTreePanel.cpp" compile="0" resource="0"
+        <FILE id="qKvsna" name="SessionTreePanel.cpp" compile="1" resource="0"
               file="Source/gui/SessionTreePanel.cpp" xcodeResource="0"/>
         <FILE id="QhIgwr" name="SessionTreePanel.h" compile="0" resource="0"
               file="Source/gui/SessionTreePanel.h"/>

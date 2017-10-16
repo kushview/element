@@ -154,8 +154,8 @@ private:
 class TreeItemComponent   : public Component
 {
 public:
-
-    TreeItemComponent (TreeItemBase& i)  : item (i)
+    TreeItemComponent (TreeItemBase& i)
+        : item (i)
     {
         setInterceptsMouseClicks (false, true);
     }

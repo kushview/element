@@ -59,7 +59,7 @@ public:
     StringArray getMenuBarNames() override
     {
        #if JUCE_DEBUG
-        const char* const names[] = { "File", "Window", "Debug", "Help", nullptr };
+        const char* const names[] = { "File", "Session", "Debug", "Help", nullptr };
        #else
         const char* const names[] = { "File", "Window", "Help", nullptr };
        #endif
@@ -71,7 +71,7 @@ public:
         PopupMenu menu;
         if (name == "File")
             buildFileMenu (menu);
-        else if (name == "Window")
+        else if (name == "Session")
             buildWindowMenu (menu);
         else if (name == "Help")
             buildHelpMenu (menu);
@@ -147,12 +147,19 @@ private:
     
     void buildViewMenu (PopupMenu& menu)
     {
-
+        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+    }
+    
+    void buildSessionMenu (PopupMenu& menu)
+    {
+        menu.addCommandItem (&cmd, Commands::sessionAddGraph, "Add Graph");
+        menu.addItem (2000, "Clear Session", false, false);
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&cmd, Commands::showPluginManager);
+        buildViewMenu (menu);
+        buildSessionMenu (menu);
     }
     
     void buildDebugMenu (PopupMenu& menu)

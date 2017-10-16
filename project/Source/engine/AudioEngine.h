@@ -14,11 +14,8 @@ namespace Element {
 class Globals;
 class ClipFactory;
 class EngineControl;
-class GraphProcessor;
-class PatternInterface;
-class Pattern;
 class Transport;
-    
+
 class RootGraph : public GraphProcessor
 {
 public:
@@ -49,16 +46,10 @@ public:
 
     void activate();
     void deactivate();
-
-    ValueTree createGraphTree();
-    void restoreFromGraphTree (const ValueTree&);
     
-    // Member access
     Globals& globals();
     RootGraph& getRootGraph();
     Transport* transport();
-
-    // Engine methods
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     

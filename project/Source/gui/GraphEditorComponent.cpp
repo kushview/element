@@ -176,7 +176,7 @@ public:
                 if (GraphNodePtr gnp = graph.getNodeForId (filterID))
                     if (auto* i = gnp->getAudioPluginInstance())
                         if (auto* c = i->getActiveEditor())
-                            cc->setRackViewComponent (c);
+                        { }
                 embedded = nullptr;
                 graph.removeFilter (filterID);
                 return;
@@ -239,7 +239,7 @@ public:
         else if (ScopedPointer<Component> ed = instance->createEditorIfNeeded())
         {
             if (ContentComponent* content = findParentComponentOfClass<ContentComponent>())
-                content->setRackViewComponent (ed.release());
+            { }
         }
     }
     

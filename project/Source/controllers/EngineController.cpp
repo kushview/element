@@ -96,7 +96,7 @@ void EngineController::activate()
     root = new RootGraphController (engine->getRootGraph(), globals.getPluginManager());
     
     if (session->getNumGraphs() > 0)
-        setRootNode (Node (session->getGraphValueTree (0)));
+        setRootNode (session->getGraph (0));
     
     engine->activate();
     devices.addChangeListener (this);
@@ -147,7 +147,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
         if (auto* device = devices.getCurrentAudioDevice())
         {
             auto session = app->getWorld().getSession();
-            auto nodes = session->getGraphValueTree(0).getChildWithName(Tags::nodes);
+            auto nodes = session->getGraph(0).node().getChildWithName(Tags::nodes);
             processor.suspendProcessing (true);
             processor.setPlayConfigFor (device);
             for (int i = nodes.getNumChildren(); --i >= 0;)

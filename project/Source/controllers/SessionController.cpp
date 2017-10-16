@@ -53,7 +53,7 @@ void SessionController::openFile (const File& file)
         if (result.wasOk())
         {
             if (auto* ec = findSibling<EngineController>())
-                ec->setRootNode (Node (currentSession->getGraphValueTree(0), false));
+                ec->setRootNode (currentSession->getGraph (0));
             if (auto* gc = findSibling<GuiController>())
                 gc->stabilizeContent();
         }
@@ -96,7 +96,7 @@ void SessionController::newSession()
         currentSession->clear();
         document->setChangedFlag (false);
         if (auto* ec = findSibling<EngineController>())
-            ec->setRootNode (Node (currentSession->getGraphValueTree(0), false));
+            ec->setRootNode (currentSession->getGraph (0));
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
     }

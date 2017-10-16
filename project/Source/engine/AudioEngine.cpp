@@ -252,11 +252,4 @@ Globals& AudioEngine::globals() { return world; }
 RootGraph& AudioEngine::getRootGraph()         { return priv->graph; }
 Transport* AudioEngine::transport()            { return &priv->transport; }
 
-ValueTree AudioEngine::createGraphTree()
-{
-    return ValueTree();
-}
-
-void AudioEngine::restoreFromGraphTree (const ValueTree&) { }
-
 }

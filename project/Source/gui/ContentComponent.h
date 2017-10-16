@@ -39,8 +39,6 @@ public:
 
     void setContentView (ContentView* view);
     void setCurrentNode (const Node& node);
-    void setRackViewComponent (Component* comp);
-    void setRackViewNode (GraphNodePtr node);
     void stabilize();
     
     void post (Message*);

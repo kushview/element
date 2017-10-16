@@ -108,6 +108,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::mediaSave,   Commands::mediaSaveAs,
         Commands::signIn,      Commands::signOut,
         Commands::sessionNew,  Commands::sessionSave,
+        Commands::sessionAddGraph,
         Commands::checkNewerVersion
     });
 }
@@ -139,7 +140,10 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::sessionClose:
             findChild<SessionController>()->closeSession();
             break;
-        
+        case Commands::sessionAddGraph:
+            
+            break;
+            
         case Commands::mediaNew:
 		{
             if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", 
@@ -207,8 +211,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
-                GraphProcessor& graph (world.getAudioEngine()->getRootGraph());
-                FileChooser chooser ("Save current graph", File(), "*.elgraph");
+                FileChooser chooser ("Save current graph", File(), "*.elg");
                 if (chooser.browseForFileToSave (true))
                 {
                     lastSavedFile = chooser.getResult();

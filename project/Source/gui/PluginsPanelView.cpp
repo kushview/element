@@ -4,7 +4,8 @@
 
 #include "gui/PluginsPanelView.h"
 
-namespace Element {
+namespace Element
+{
     PluginsPanelView::PluginsPanelView (PluginManager& pm)
     {
         addAndMakeVisible (pluginTree = new PluginTreeView (pm));
