@@ -803,7 +803,7 @@ namespace Element
         ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
     }
     
-    void ConnectionGrid::willBecomeActive()
+    void ConnectionGrid::didBecomeActive()
     {
         auto session = ViewHelpers::findContentComponent(this)->getSession();
         setNode (session->getGraph (0));

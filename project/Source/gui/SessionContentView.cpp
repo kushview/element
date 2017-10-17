@@ -47,7 +47,7 @@ namespace Element {
         
     }
     
-    void SessionContentView::willBecomeActive()
+    void SessionContentView::didBecomeActive()
     {
         if (auto* cc = ViewHelpers::findContentComponent (this))
             props->setSession (cc->getGlobals().getSession());

@@ -22,6 +22,7 @@ class TransportBar;
 class ContentView : public Component {
 public:
     virtual void willBecomeActive() { }
+    virtual void didBecomeActive() { }
 };
 
 class ContentComponent :  public Component,

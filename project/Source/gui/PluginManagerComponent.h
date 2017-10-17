@@ -139,7 +139,7 @@ public:
     PluginManagerContentView();
     ~PluginManagerContentView();
     void resized() override;
-    void willBecomeActive() override;
+    void didBecomeActive() override;
 
 private:
     ScopedPointer<PluginListComponent> pluginList;

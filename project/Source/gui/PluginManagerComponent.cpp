@@ -601,7 +601,7 @@ PluginManagerContentView::PluginManagerContentView() { }
 
 PluginManagerContentView::~PluginManagerContentView() { }
 
-void PluginManagerContentView::willBecomeActive()
+void PluginManagerContentView::didBecomeActive()
 {
     jassert (ViewHelpers::getGlobals (this));
     auto& world (*ViewHelpers::getGlobals (this));

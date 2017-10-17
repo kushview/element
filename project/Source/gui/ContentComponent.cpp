@@ -449,8 +449,9 @@ public:
         content1 = view;
         if (content1)
         {
-            addAndMakeVisible (content1);
             content1->willBecomeActive();
+            addAndMakeVisible (content1);
+            content1->didBecomeActive();
         }
         resized();
     }
@@ -461,7 +462,11 @@ public:
             removeChildComponent (content2);
         content1 = view;
         if (content2)
+        {
+            content2->willBecomeActive();
             addAndMakeVisible (content2);
+            content2->didBecomeActive();
+        }
         resized();
     }
     

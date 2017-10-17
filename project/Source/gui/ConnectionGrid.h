@@ -29,7 +29,7 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
     
-    void willBecomeActive() override;
+    void didBecomeActive() override;
 #if 0
     void itemDragEnter (const SourceDetails& dragSourceDetails) override;
     void itemDragMove (const SourceDetails& dragSourceDetails) override;

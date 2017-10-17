@@ -3,8 +3,7 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_APP_H
-#define ELEMENT_APP_H
+#pragma once
 
 #if HAVE_JUCE_CORE
  #include <juce/juce.h>
@@ -43,5 +42,3 @@ namespace Tags
     const Identifier state              = "state";
 }
 }
-
-#endif  // ELEMENT_APP_H

@@ -11,7 +11,7 @@ public:
     ~SessionContentView();
     
     void resized() override;
-    void willBecomeActive() override;
+    void didBecomeActive() override;
 
 private:
     ScopedPointer<SessionPropertyPanel> props;

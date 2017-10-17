@@ -12,10 +12,7 @@
 
 namespace Element {
 
-RootGraph::RootGraph()
-{
-    
-}
+RootGraph::RootGraph() { }
     
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
@@ -201,6 +198,7 @@ private:
     friend class AudioEngine;
     AudioEngine& engine;
     RootGraph graph;
+    OwnedArray<RootGraph> graphs;
     Transport transport;
     
     CriticalSection lock;
