@@ -35,16 +35,18 @@ namespace Element {
         void clear();
 
         inline String getName() const { return node().getProperty(Slugs::name, "Invalid Session"); }
-        inline Value getNamevalue() { return getPropertyAsValue (Slugs::name); }
+        inline Value getNameValue() { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
 
         XmlElement* createXml();
         
         void saveGraphState();
+        
     protected:
         Session();
         friend class Globals;
  
+        
         /** Set a property.  This is a wrapper around the internal ValueTree */
         inline void setProperty (const Identifier& prop, const var& val) { node().setProperty (prop, val, nullptr); }
 

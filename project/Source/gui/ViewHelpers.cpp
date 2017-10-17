@@ -6,6 +6,7 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "session/Node.h"
+#include "session/CommandManager.h"
 #include "Globals.h"
 
 namespace Element {
@@ -57,6 +58,26 @@ ContentComponent* findContentComponent (Component* c)
     if (auto* cc = c->findParentComponentOfClass<ContentComponent>())
         return cc;
     return nullptr;
+}
+
+Globals* getGlobals (Component* c)
+{
+    if (auto* cc = findContentComponent(c))
+        return &cc->getGlobals();
+    return nullptr;
+}
+
+SessionPtr getSession (Component* c)
+{
+    if (auto* cc = findContentComponent(c))
+        return cc->getSession();
+    return nullptr;
+}
+
+bool invokeDirectly (Component* c, const int commandID, bool async) {
+    if (auto* g = getGlobals (c))
+        return g->getCommandManager().invokeDirectly(commandID, async);
+    return false;
 }
 
 GraphNodePtr findGraphNodeFor (Component* c, const Node& node)

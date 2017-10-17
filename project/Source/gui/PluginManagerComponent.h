@@ -28,6 +28,7 @@
 #define EL_PLUGIN_MANAGER_COMPONENT_H
 
 #include "JuceHeader.h"
+#include "gui/ContentComponent.h"
 
 namespace Element {
 //==============================================================================
@@ -132,6 +133,17 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListComponent)
 };
 
+class PluginManagerContentView : public ContentView
+{
+public:
+    PluginManagerContentView();
+    ~PluginManagerContentView();
+    void resized() override;
+    void willBecomeActive() override;
+
+private:
+    ScopedPointer<PluginListComponent> pluginList;
+};
 }
 
 #endif   // EL_PLUGIN_MANAGER_COMPONENT_H

@@ -24,7 +24,10 @@
  ==============================================================================
 */
 
+#include "gui/ViewHelpers.h"
 #include "gui/PluginManagerComponent.h"
+#include "session/PluginManager.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -591,6 +594,30 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
                                           TRANS("Note that the following files appeared to be plugin files, but failed to load correctly")
                                           + ":\n\n"
                                           + shortNames.joinIntoString (", "));
+}
+    
+    
+PluginManagerContentView::PluginManagerContentView() { }
+
+PluginManagerContentView::~PluginManagerContentView() { }
+
+void PluginManagerContentView::willBecomeActive()
+{
+    jassert (ViewHelpers::getGlobals (this));
+    auto& world (*ViewHelpers::getGlobals (this));
+    auto& plugins (world.getPluginManager());
+    auto& list (plugins.availablePlugins());
+    if (pluginList)
+        pluginList = nullptr;
+    pluginList = new Element::PluginListComponent (
+        plugins.formats(), list, File::nonexistent, nullptr);
+    addAndMakeVisible (pluginList);
+}
+
+void PluginManagerContentView::resized()
+{
+    if (pluginList)
+        pluginList->setBounds (getLocalBounds());
 }
     
 }

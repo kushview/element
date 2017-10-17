@@ -5,11 +5,13 @@
 
 #include "controllers/AppController.h"
 #include "engine/GraphProcessor.h"
+#include "Commands.h"
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
 #include "gui/NavigationView.h"
 #include "gui/SessionTreePanel.h"
+#include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -44,7 +46,7 @@ public:
     
     void mouseUp (const MouseEvent& ev) override
     {
-        StretchableLayoutResizerBar::mouseUp(ev);
+        StretchableLayoutResizerBar::mouseUp (ev);
         owner.resizerMouseUp();
     }
     
@@ -58,31 +60,45 @@ class ContentComponent::Toolbar : public Component,
 {
 public:
     Toolbar()
-        : grid ("Grid"),
-          graph("Graph"),
-          title ("No selection")
+        : graph ("e"), title ("Session Name")
     {
-        // addAndMakeVisible (title);
-//        addAndMakeVisible (grid);
-//        grid.setColour (TextButton::buttonColourId, Colors::toggleOrange.darker());
-//        grid.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
-//        grid.setToggleState (true, dontSendNotification);
-//        grid.addListener (this);
+        addAndMakeVisible (title);
+        title.setText ("", dontSendNotification);
         
-//        addAndMakeVisible (graph);
-//        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
-//        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-//        graph.addListener (this);
+        addAndMakeVisible (graph);
+        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
+        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+        graph.addListener (this);
+        
+        // addAndMakeVisible (trim);
+        trim.setColour (Slider::rotarySliderFillColourId, LookAndFeel::elementBlue);
+        trim.setName ("Trim");
+        trim.setSliderStyle (Slider::RotaryVerticalDrag);
+        trim.setRange (-70, 9.0);
     }
     
     ~Toolbar() { }
     
+    void setSession (SessionPtr s)
+    {
+        session = s;
+        if (session)
+        {
+            title.getTextValue().referTo (session->getNameValue());
+        }
+        resized();
+    }
+    
     void resized() override
     {
         Rectangle<int> r (getLocalBounds());
-        // graph.setBounds (r.removeFromRight(60).reduced(1 ,3));
-        grid.setBounds (r.removeFromRight(60).reduced(1, 3));
         r.removeFromLeft (10);
+        graph.setBounds (r.removeFromLeft (graph.getHeight()).reduced (1 ,6));
+        
+        r.removeFromRight (10);
+        trim.setBounds (r.removeFromRight (r.getHeight()).reduced(1));
+        
+        r.removeFromRight (10);
         title.setBounds (r);
     }
     
@@ -94,23 +110,17 @@ public:
     
     void buttonClicked (Button* btn) override
     {
-        if (btn->getToggleState())
-            return;
-        const bool nextState = !btn->getToggleState();
-        grid.setToggleState (false, dontSendNotification);
-        graph.setToggleState (false, dontSendNotification);
         if (btn == &graph) {
-            
-        } else if (btn == &grid) {
-            
+            ViewHelpers::invokeDirectly (this, Commands::showPatchBay, true);
         }
-        btn->setToggleState (nextState, dontSendNotification);
     }
-    
-    Value& getTitleValue() { return title.getTextValue(); }
+
 private:
-    TextButton grid, graph;
+    SessionPtr session;
+    TextButton graph;
     Label title;
+    Slider trim;
+    Label dbLabel;
 };
 
 class ContentComponent::StatusBar : public Component,
@@ -261,34 +271,23 @@ public:
     
     void clearPanels()
     {
-        Array<Component*> comps;
-        for (int i = 0; i < getNumPanels(); ++i)
-            comps.add (getPanel (i));
         for (int i = 0; i < comps.size(); ++i)
-            removePanel (comps [i]);
-        names.clear();
-        comps.clear();
+            removePanel (comps.getUnchecked (i));
+        comps.clearQuick (true);
     }
     
     void updateContent()
     {
         clearPanels();
         Component* c = nullptr;
-        
-//        names.add ("Navigation");
-//        c = new NavigationView ();
+        c = new SessionGraphsListBox();
+        auto *h = new ElementsHeader (*this, *c);
+        addPanelInternal (-1, c, "Elements", h);
+//        names.add ("Elements");
+//        c = new SessionGraphsListBox();
 //        addPanel (-1, c, true);
 //        setPanelHeaderSize (c, headerHeight);
-        
-        names.add ("Graphs");
-        c = new SessionGraphsListBox();
-        addPanel (-1, c, true);
-        setPanelHeaderSize (c, headerHeight);
-        
-        names.add ("Plugins");
-        c = new PluginsPanelView (globals.getPluginManager());
-        addPanel (-1, c, true);
-        setPanelHeaderSize (c, headerHeight);
+//        setCustomPanelHeader (c, new Header (*this), true);
     }
     
     AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
@@ -307,9 +306,85 @@ public:
 private:
     typedef Element::LookAndFeel ELF;
     Globals& globals;
-    StringArray names;
     int headerHeight;
     int defaultPanelHeight;
+    
+    StringArray names;
+    OwnedArray<Component> comps;
+    void addPanelInternal (const int index, Component* comp, const String& name = String(),
+                           Component* header = nullptr)
+    {
+        jassert(comp);
+        if (name.isNotEmpty())
+            comp->setName (name);
+        addPanel (index, comps.insert(index, comp), false);
+        setPanelHeaderSize (comp, headerHeight);
+        if (!header)
+            header = new Header (*this, *comp);
+        setCustomPanelHeader (comp, header, true);
+    }
+    
+    class Header : public Component
+    {
+    public:
+        Header (NavigationConcertinaPanel& _parent, Component& _panel)
+            : parent(_parent), panel(_panel)
+        {
+            addAndMakeVisible (text);
+            text.setColour (Label::textColourId, ELF::textColor);
+        }
+        
+        virtual ~Header() { }
+
+        virtual void resized() override
+        {
+            text.setBounds (4, 1, 100, getHeight() - 2);
+        }
+        
+        virtual void paint (Graphics& g) override
+        {
+            getLookAndFeel().drawConcertinaPanelHeader (
+                g, getLocalBounds(), false, false, parent, panel);
+        }
+        
+    protected:
+        NavigationConcertinaPanel& parent;
+        Component& panel;
+        Label text;
+    };
+    
+    class ElementsHeader : public Header,
+                            public ButtonListener
+    {
+    public:
+        ElementsHeader (NavigationConcertinaPanel& _parent, Component& _panel)
+            : Header (_parent, _panel)
+        {
+            addAndMakeVisible (addButton);
+            addButton.setButtonText ("+");
+            addButton.addListener (this);
+            setInterceptsMouseClicks (false, true);
+            
+        }
+        
+        void resized() override
+        {
+            const int padding = 4;
+            const int buttonSize = getHeight() - (padding * 2);
+            addButton.setBounds (getWidth() - padding - buttonSize,
+                                 padding, buttonSize, buttonSize);
+        }
+        
+        void buttonClicked (Button*) override
+        {
+            if (auto* cc = findParentComponentOfClass<ContentComponent>())
+                cc->getGlobals().getCommandManager().invokeDirectly (
+                    (int)Commands::sessionAddGraph, true);
+        }
+        
+    private:
+        TextButton addButton;
+    };
     
     class LookAndFeel : public Element::LookAndFeel
     {
@@ -321,16 +396,18 @@ private:
                                         bool isMouseOver, bool isMouseDown,
                                         ConcertinaPanel& panel, Component& comp)
         {
+#if 0
             auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
             int i = p->getNumPanels();
             while (--i >= 0) {
                 if (p->getPanel(i) == &comp)
                     break;
             }
+#endif
             ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
             g.setColour (Colours::white);
             Rectangle<int> r (area.withTrimmedLeft (20));
-            g.drawText (p->getNames()[i], 20, 0, r.getWidth(), r.getHeight(),
+            g.drawText (comp.getName(), 20, 0, r.getWidth(), r.getHeight(),
                         Justification::centredLeft);
         }
     } lookAndFeel;
@@ -423,8 +500,11 @@ ContentComponent::ContentComponent (AppController& ctl_)
     statusBarVisible = true;
     statusBarSize = 22;
     
+    setSize (600, 600);
     updateLayout();
     resized();
+    
+    nav->expandPanelFully (nav->getSessionPanel(), false);
 }
 
 ContentComponent::~ContentComponent()
@@ -433,6 +513,7 @@ ContentComponent::~ContentComponent()
 }
 
 Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }
+SessionPtr ContentComponent::getSession() { return getGlobals().getSession(); }
     
 void ContentComponent::childBoundsChanged (Component* child)
 {
@@ -510,6 +591,7 @@ void ContentComponent::stabilize()
         window->setName ("Element - " + session->getName());
     if (auto* sp = nav->getSessionPanel())
         sp->setSession (session);
+    toolBar->setSession (session);
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

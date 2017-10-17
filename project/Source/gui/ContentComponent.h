@@ -43,7 +43,7 @@ public:
     
     void post (Message*);
     Globals& getGlobals();
-    SessionRef getSession() const { return SessionRef(); }
+    SessionPtr getSession();
     
     bool isInterestedInFileDrag (const StringArray &files) override;
     void filesDropped (const StringArray &files, int x, int y) override;

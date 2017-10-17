@@ -104,13 +104,28 @@ ApplicationCommandTarget* AppController::getNextCommandTarget()
 void AppController::getAllCommands (Array<CommandID>& cids)
 {
     cids.addArray ({
-        Commands::mediaNew,    Commands::mediaOpen,
-        Commands::mediaSave,   Commands::mediaSaveAs,
-        Commands::signIn,      Commands::signOut,
-        Commands::sessionNew,  Commands::sessionSave,
+        Commands::mediaNew,
+        Commands::mediaOpen,
+        Commands::mediaSave,
+        Commands::mediaSaveAs,
+        
+        Commands::signIn,
+        Commands::signOut,
+        
+        Commands::sessionNew,
+        Commands::sessionSave,
+        Commands::sessionOpen,
         Commands::sessionAddGraph,
+        Commands::sessionDuplicateGraph,
+        Commands::sessionDeleteGraph,
+        Commands::sessionInsertPlugin,
+        
+        Commands::importGraph,
+        Commands::exportGraph,
+        
         Commands::checkNewerVersion
     });
+    cids.addArray({ Commands::copy, Commands::paste });
 }
 
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -128,6 +143,9 @@ bool AppController::perform (const InvocationInfo& info)
     bool res = true;
     switch (info.commandID)
     {
+        case Commands::sessionOpen:
+            findChild<SessionController>()->openFile (lastSavedFile);
+            break;
         case Commands::sessionNew:
             findChild<SessionController>()->newSession();
             break;
@@ -141,7 +159,9 @@ bool AppController::perform (const InvocationInfo& info)
             findChild<SessionController>()->closeSession();
             break;
         case Commands::sessionAddGraph:
-            
+        case Commands::sessionDuplicateGraph:
+        case Commands::sessionDeleteGraph:
+            DBG("Session add, dup, or delete Graph");
             break;
             
         case Commands::mediaNew:
@@ -154,21 +174,6 @@ bool AppController::perform (const InvocationInfo& info)
             }
         } break;
 
-        case Commands::sessionOpen:
-        case Commands::mediaOpen:
-        {
-            FileChooser chooser ("Open Media", File(), "*.elg;*.elc;*.els");
-            if (chooser.browseForFileToOpen())
-            {
-                lastSavedFile = chooser.getResult();
-                if (lastSavedFile.hasFileExtension ("elc")) {
-                    DBG("[AC] open elc file");
-                } else {
-                    findChild<SessionController>()->openFile (lastSavedFile);
-                }
-            }
-        } break;
-            
         case Commands::mediaSave:
         {
             if (! status.isFullVersion())
@@ -225,15 +230,13 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            {
-                auto* form = new UnlockForm (status, "Enter your license key.",
-                                             false, false, true, true);
-                DialogWindow::LaunchOptions opts;
-                opts.content.setOwned (form);
-                opts.resizable = false;
-                opts.dialogTitle = "License Manager";
-                opts.runModal();
-            }
+            auto* form = new UnlockForm (status, "Enter your license key.",
+                                         false, false, true, true);
+            DialogWindow::LaunchOptions opts;
+            opts.content.setOwned (form);
+            opts.resizable = false;
+            opts.dialogTitle = "License Manager";
+            opts.runModal();
         } break;
         
         case Commands::signOut:

@@ -212,12 +212,15 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 void GuiController::getAllCommands (Array <CommandID>& commands)
 {
     commands.addArray ({
-        (CommandID) Commands::showAbout,
-		(CommandID) Commands::showPluginManager,
-		(CommandID) Commands::showPreferences,
-		(CommandID) Commands::quit,
-        (CommandID) Commands::showSessionConfig
+        Commands::showAbout,
+		Commands::showPluginManager,
+		Commands::showPreferences,
+        Commands::showSessionConfig,
+        Commands::showGraphConfig,
+        Commands::showPatchBay
     });
+    
+    commands.add (Commands::quit);
 }
 
 void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -236,7 +239,7 @@ bool GuiController::perform (const InvocationInfo& info)
             {
                 about = new AboutComponent();
                 about->centreWithSize(about->getWidth(), about->getHeight());
-                about->setVisible(true);
+                about->setVisible (true);
                 about->addToDesktop(0);
             }
             else if (about->isVisible())
@@ -246,15 +249,14 @@ bool GuiController::perform (const InvocationInfo& info)
             }
             else
             {
-                about->setVisible(true);
+                about->setVisible (true);
                 about->addToDesktop(0);
             }
             return true;
             break;
         }
         case Commands::showPluginManager:
-            openWindow (ELEMENT_PLUGIN_MANAGER);
-            return true;
+            content->setContentView (new PluginManagerContentView());
             break;
         case Commands::showPreferences:
             runDialog (ELEMENT_PREFERENCES);
@@ -262,6 +264,14 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showSessionConfig:
             content->setContentView (new SessionContentView());
             break;
+        case Commands::showGraphConfig:
+            content->setContentView (new SessionContentView());
+            break;
+        case Commands::showPatchBay:
+            content->setContentView (new ConnectionGrid());
+            break;
+            
+            
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;

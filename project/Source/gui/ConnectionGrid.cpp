@@ -13,10 +13,13 @@
 #include "session/PluginManager.h"
 #include "session/Node.h"
 #include "Messages.h"
+#include "Globals.h"
 
 #include "gui/ConnectionGrid.h"
 
-namespace Element {
+namespace Element
+{
+
     // Spacing between each patch point
     static const int gridPadding = 1;
     
@@ -38,6 +41,42 @@ namespace Element {
         return false;
     }
     
+    class PluginsPopupMenu : public PopupMenu
+    {
+    public:
+        PluginsPopupMenu (Component* sender)
+        {
+            jassert (sender);
+            auto* cc = ViewHelpers::findContentComponent (sender);
+            jassert (cc);
+            plugins = &cc->getGlobals().getPluginManager();
+        }
+        
+        bool isPluginResultCode (const int resultCode) {
+            return plugins->availablePlugins().getIndexChosenByMenu (resultCode) >= 0;
+        }
+        
+        const PluginDescription* getPluginDescription (int resultCode)
+        {
+            jassert (plugins);
+            const int index = plugins->availablePlugins().getIndexChosenByMenu (resultCode);
+            return index >= 0 ? plugins->availablePlugins().getType (index) : nullptr;
+        }
+        
+        void addPluginItems()
+        {
+            if (hasAddedPlugins)
+                return;
+            hasAddedPlugins = true;
+            plugins->availablePlugins().addToMenu (*this, KnownPluginList::sortByManufacturer);
+        }
+        
+    private:
+        Component* sender;
+        PluginManager* plugins;
+        bool hasAddedPlugins = false;
+    };
+    
     class NodePopupMenu : public PopupMenu
     {
     public:
@@ -52,7 +91,9 @@ namespace Element {
             LastItem
         };
         
-        NodePopupMenu()
+        typedef std::initializer_list<ItemIds> ItemList;
+        
+        NodePopupMenu ()
         {
             for (int item = AddAudioInputNode; item < LastItem; ++item)
                 addItem (item, getNameForItem ((ItemIds) item));
@@ -61,6 +102,9 @@ namespace Element {
         NodePopupMenu (const Node& n)
             : node (n)
         {
+            addItem (RemoveNode, getNameForItem (RemoveNode));
+            return;
+            
             for (int item = RemoveNode; item < LastItem; ++item) {
                 if (item == AddAudioInputNode)
                     addSeparator();
@@ -320,8 +364,19 @@ namespace Element {
             if (! ev.mods.isPopupMenu())
                 return;
             
-            NodePopupMenu menu;
-            handleNodeMenuResult (menu.show(), Node());
+            PluginsPopupMenu menu (this);
+            menu.addSectionHeader ("Plugins");
+            menu.addPluginItems();
+            const int result = menu.show();
+            if (menu.isPluginResultCode (result))
+            {
+                if (const auto* desc = menu.getPluginDescription (result))
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
+            }
+            else
+            {
+                DBG("handle menu result");
+            }
         }
         
         void listBoxItemClicked (int row, const MouseEvent& ev, bool isSource)
@@ -501,7 +556,6 @@ namespace Element {
         void listBoxItemClicked (int row, const MouseEvent& ev) override
         {
             matrix->listBoxItemClicked (row, ev, true);
-            jassert (row == getSelectedRow());
         }
 
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
@@ -585,7 +639,6 @@ namespace Element {
         void listBoxItemClicked (int row, const MouseEvent& ev) override
         {
             matrix->listBoxItemClicked (row, ev, false);
-            jassert (row == getSelectedRow());
         }
         
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
@@ -748,5 +801,11 @@ namespace Element {
         desc.pluginFormatName = sd.description[1];
         desc.fileOrIdentifier = sd.description[2];
         ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+    }
+    
+    void ConnectionGrid::willBecomeActive()
+    {
+        auto session = ViewHelpers::findContentComponent(this)->getSession();
+        setNode (session->getGraph (0));
     }
 }

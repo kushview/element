@@ -4,10 +4,12 @@
 
 #include "ElementApp.h"
 #include "engine/GraphNode.h"
+#include "session/Session.h"
 
 namespace Element {
 
 class ContentComponent;
+    class Globals;
 class Node;
 
 namespace ViewHelpers {
@@ -21,6 +23,15 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 /** Finds the content component by traversing parent component(s) */
 ContentComponent* findContentComponent (Component* c);
 
+/** Get World */
+Globals* getGlobals (Component* c);
+
+/** Get Session */
+SessionPtr getSession (Component* c);
+
+/** Invoke a command directly */
+bool invokeDirectly (Component* c, const int commandID, bool async);
+    
 /** Post a message to AppController
  
     This works by finding the ContentComponent and letting it handle message posting.

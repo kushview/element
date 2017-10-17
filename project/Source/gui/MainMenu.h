@@ -23,9 +23,9 @@ public:
     enum RootNames
     {
        #if JUCE_DEBUG
-        File, Window, DebugItem, Help, NumMenus
+        File, Edit, Window, DebugItem, Help, NumMenus
        #else
-        File, Window, Help, NumMenus
+        File, Edit, Window, Help, NumMenus
        #endif
     };
 
@@ -39,6 +39,7 @@ public:
         macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
         macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
         macMenu->addSeparator();
+        macMenu->addCommandItem (&cmd, Commands::signIn, "Manage License");
         macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
        #else
@@ -59,9 +60,10 @@ public:
     StringArray getMenuBarNames() override
     {
        #if JUCE_DEBUG
-        const char* const names[] = { "File", "Session", "Debug", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "Window",
+                                      "Debug", "Help", nullptr };
        #else
-        const char* const names[] = { "File", "Window", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "Window", "Help", nullptr };
        #endif
         return StringArray (names, MainMenu::NumMenus);
     }
@@ -69,9 +71,12 @@ public:
     PopupMenu getMenuForIndex (int index, const String& name) override
     {
         PopupMenu menu;
+        
         if (name == "File")
             buildFileMenu (menu);
-        else if (name == "Session")
+        else if (name == "Edit")
+            buildEditMenu (menu);
+        else if (name == "Window")
             buildWindowMenu (menu);
         else if (name == "Help")
             buildHelpMenu (menu);
@@ -86,6 +91,12 @@ public:
     void menuItemSelected (int index, int menu) override
     {
         auto session = world.getSession();
+        
+        if (index == 6000 && menu == Help)
+        {
+            URL ("http://kushview.net/products/element/").launchInDefaultBrowser();
+        }
+        
        #if JUCE_DEBUG
         if (index == 1000)
         {
@@ -107,27 +118,23 @@ private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
     
-    PopupMenu makeFileNewMenu()
-    {
-        PopupMenu menu;
-        menu.addItem (2000, "Graph");
-        return menu;
-    }
-    
     void buildFileMenu (PopupMenu& menu)
     {
         menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
         menu.addSeparator();
 
-        menu.addCommandItem (&cmd, Commands::mediaOpen, "Open File...");
+        menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
         menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
+
         menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::signIn, "Manage License");
+        menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
+        menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
         
        #if ! JUCE_MAC
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
         menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
+        menu.addCommandItem (&cmd, Commands::signIn, "Manage License");
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
        #endif
@@ -135,41 +142,46 @@ private:
     
     void buildEditMenu (PopupMenu& menu)
     {
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::undo, "Undo");
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::redo, "Redo");
+        menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
+        menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
+        menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete selected graph");
         menu.addSeparator();
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::cut, "Cut");
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::copy, "Copy");
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::paste, "Paste");
+
+        menu.addCommandItem (&cmd, Commands::copy, "Copy");
+        menu.addCommandItem (&cmd, Commands::paste, "Paste");
         menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
+#if 0
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::selectAll, "Select All");
-    }
-    
-    void buildViewMenu (PopupMenu& menu)
-    {
-        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-    }
-    
-    void buildSessionMenu (PopupMenu& menu)
-    {
-        menu.addCommandItem (&cmd, Commands::sessionAddGraph, "Add Graph");
-        menu.addItem (2000, "Clear Session", false, false);
+#endif
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-        buildViewMenu (menu);
-        buildSessionMenu (menu);
+//        menu.addItem (8383838, "Patch Bay", true, true);
+        menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
+        
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");
+        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Show Graph Properties");
+//        menu.addItem (5585855, "Show Session Properties");
+//        menu.addItem (3838383, "Show Graph Properties");
+
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+
     }
     
     void buildDebugMenu (PopupMenu& menu)
     {
-        menu.addItem (1000, "Dump Session to Console");
+        menu.addItem (1000, "Dump session to console");
     }
     
     void buildHelpMenu (PopupMenu& menu)
     {
+        menu.addItem (6000, "Online documentation");
        #if ! JUCE_MAC
+        menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
        #endif
     }
