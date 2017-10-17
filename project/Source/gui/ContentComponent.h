@@ -43,6 +43,7 @@ public:
     void stabilize();
     
     void post (Message*);
+    AppController& getAppController() { return controller; }
     Globals& getGlobals();
     SessionPtr getSession();
     

@@ -234,27 +234,8 @@ bool GuiController::perform (const InvocationInfo& info)
     switch (info.commandID)
     {
         case Commands::showAbout:
-        {
-            if (! about)
-            {
-                about = new AboutComponent();
-                about->centreWithSize(about->getWidth(), about->getHeight());
-                about->setVisible (true);
-                about->addToDesktop(0);
-            }
-            else if (about->isVisible())
-            {
-                about->setVisible (false);
-                about->removeFromDesktop();
-            }
-            else
-            {
-                about->setVisible (true);
-                about->addToDesktop(0);
-            }
-            return true;
+            toggleAboutScreen();
             break;
-        }
         case Commands::showPluginManager:
             content->setContentView (new PluginManagerContentView());
             break;
@@ -271,7 +252,6 @@ bool GuiController::perform (const InvocationInfo& info)
             content->setContentView (new ConnectionGrid());
             break;
             
-            
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
@@ -287,4 +267,26 @@ void GuiController::stabilizeContent()
         content->stabilize();
     }
 }
+    
+void GuiController::toggleAboutScreen()
+{
+    if (! about)
+    {
+        about = new AboutComponent();
+        about->centreWithSize(about->getWidth(), about->getHeight());
+        about->setVisible (true);
+        about->addToDesktop(0);
+    }
+    else if (about->isVisible())
+    {
+        about->setVisible (false);
+        about->removeFromDesktop();
+    }
+    else
+    {
+        about->setVisible (true);
+        about->addToDesktop(0);
+    }
+}
+    
 }

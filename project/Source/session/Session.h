@@ -27,7 +27,8 @@ namespace Element {
         virtual ~Session();
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
-        inline Node getGraph (const int index) const { return Node (getGraphValueTree(index), false); }
+        inline Node getGraph (const int index) const { return Node (getGraphValueTree (index), false); }
+        bool addGraph (const Node& node);
         
         
         ValueTree getValueTree() const { return objectData; }

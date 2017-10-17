@@ -12,10 +12,10 @@
 namespace Element {
 
 SessionGraphsListBox::SessionGraphsListBox (Session* s)
-    : session (s)
+    : session (nullptr)
 {
     setModel (this);
-    updateContent();
+    setSession (s);
 }
     
 SessionGraphsListBox::~SessionGraphsListBox()

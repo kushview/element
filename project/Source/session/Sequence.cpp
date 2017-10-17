@@ -23,7 +23,7 @@ namespace Element {
         {
             engine = g.getAudioEngine();
             jassert (engine != nullptr);
-            playMonitor = engine->transport()->monitor();
+            playMonitor = nullptr;
         }
 
         ~Private() { }

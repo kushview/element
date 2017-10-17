@@ -1,6 +1,7 @@
 
 #include "ElementApp.h"
 #include "controllers/AppController.h"
+#include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
 #include "gui/PluginWindow.h"
 #include "session/DeviceManager.h"
@@ -40,6 +41,50 @@ void EngineController::addConnection (const uint32 s, const uint32 sp, const uin
 {
     jassert (root);
     root->addConnection (s, sp, d, dp);
+}
+
+void EngineController::addGraph()
+{
+    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto engine  = world.getAudioEngine();
+    auto session = world.getSession();
+    
+    ScopedPointer<RootGraph> newGraph = new RootGraph();
+    if (engine->addGraph (newGraph.get()))
+    {
+        newGraph.release();
+        Node node (Tags::graph);
+        node.setProperty (Tags::name, "New Graph");
+        session->addGraph (node);
+        setRootNode (node);
+        findSibling<GuiController>()->stabilizeContent();
+    }
+    else
+    {
+        AlertWindow::showMessageBoxAsync (
+            AlertWindow::InfoIcon, "Elements", "Could not add new graph to session.");
+    }
+}
+
+void EngineController::removeGraph (int index)
+{
+    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto engine  = world.getAudioEngine();
+    auto session = world.getSession();
+    if (auto* g = engine->getGraph (index))
+    {
+        if (engine->removeGraph (g))
+        {
+            auto model = session->getGraph(index).getValueTree();
+            model.getParent().removeChild (model, nullptr);
+            findSibling<GuiController>()->stabilizeContent();
+        }
+    }
+    else
+    {
+        AlertWindow::showMessageBoxAsync (
+            AlertWindow::InfoIcon, "Elements", "Could not find graph for removal");
+    }
 }
 
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
@@ -132,6 +177,7 @@ void EngineController::setRootNode (const Node& newRootNode)
         return;
     }
 
+    DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
 }
 

@@ -159,9 +159,13 @@ bool AppController::perform (const InvocationInfo& info)
             findChild<SessionController>()->closeSession();
             break;
         case Commands::sessionAddGraph:
+            findChild<EngineController>()->addGraph();
+            break;
         case Commands::sessionDuplicateGraph:
-        case Commands::sessionDeleteGraph:
             DBG("Session add, dup, or delete Graph");
+            break;
+        case Commands::sessionDeleteGraph:
+            findChild<EngineController>()->removeGraph();
             break;
             
         case Commands::mediaNew:

@@ -162,10 +162,11 @@ void GraphController::setNodeModel (const Node& node)
         PluginDescription desc; node.getPluginDescription (desc);
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
+            DBG("[EL] loaded: " << node.getName());
             MemoryBlock state;
             if (state.fromBase64Encoding (node.node().getProperty(Tags::state).toString()))
                 obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
-            node.getValueTree().setProperty(Tags::object, obj.get(), nullptr);
+            node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
         }
         else
         {

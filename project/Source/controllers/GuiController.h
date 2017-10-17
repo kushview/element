@@ -90,6 +90,7 @@ namespace Element {
         Element::LookAndFeel      lookAndFeel;
         
         void showSplash();
+        void toggleAboutScreen();
     };
 }
 

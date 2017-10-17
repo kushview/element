@@ -64,11 +64,17 @@ public:
           numInputChans (0), numOutputChans (0),
           tempBuffer (1, 1)
     {
-        graph.setPlayHead (&transport);
+        graphs.add (new RootGraph ());
     }
 
     ~Private()
     {
+        if (isPrepared)
+        {
+            jassertfalse;
+            releaseResources();
+            isPrepared = false;
+        }
     }
 
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
@@ -121,6 +127,7 @@ public:
         }
         
         const ScopedLock sl (lock);
+        auto& graph (*graphs.getUnchecked (0));
         
         const bool shouldProcess = true;
         if (shouldProcess)
@@ -156,7 +163,6 @@ public:
         const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
         
         const ScopedLock sl (lock);
-        
         sampleRate      = newSampleRate;
         blockSize       = newBlockSize;
         numInputChans   = numChansIn;
@@ -168,13 +174,10 @@ public:
         if (isPrepared)
         {
             isPrepared = false;
-            graph.releaseResources();
+            releaseResources();
         }
         
-        graph.setPlayConfigDetails (numInputChans, numOutputChans, sampleRate, blockSize);
-        graph.setPlayHead (&transport);
-        graph.prepareToPlay (sampleRate, blockSize);
-    
+        prepareToPlay (sampleRate, blockSize);
         isPrepared = true;
     }
     
@@ -182,7 +185,7 @@ public:
     {
         const ScopedLock sl (lock);
         if (isPrepared)
-            graph.releaseResources();
+            releaseResources();
         isPrepared  = false;
         sampleRate  = 0.0;
         blockSize   = 0;
@@ -194,24 +197,66 @@ public:
         messageCollector.addMessageToQueue (message);
     }
 
+    void addGraph (RootGraph* graph)
+    {
+        if (isPrepared)
+            prepareGraph (graph, sampleRate, blockSize);
+        ScopedLock sl (lock);
+        graphs.add (graph);
+    }
+    
+    void removeGraph (RootGraph* graph)
+    {
+        {
+            ScopedLock sl (lock);
+            jassert (graphs.contains (graph));
+            graphs.removeObject (graph, false);
+        }
+        
+        if (isPrepared)
+            graph->releaseResources();
+        
+        
+        deleteAndZero (graph);
+    }
+    
 private:
     friend class AudioEngine;
-    AudioEngine& engine;
-    RootGraph graph;
+    AudioEngine&    engine;
+    Transport       transport;
     OwnedArray<RootGraph> graphs;
-    Transport transport;
     
     CriticalSection lock;
     double sampleRate   = 0.0;
     int blockSize       = 0;
     bool isPrepared     = false;
+    int graphIndex      = -1;
     
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
     AudioSampleBuffer tempBuffer;
-    
     MidiBuffer incomingMidi;
     MidiMessageCollector messageCollector;
+    
+    void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
+    {
+        graph->setPlayConfigDetails (numInputChans, numOutputChans,
+                                     sampleRate, blockSize);
+        graph->setPlayHead (&transport);
+        graph->prepareToPlay (sampleRate, estimatedBlockSize);
+    }
+    
+    void prepareToPlay (double sampleRate, int estimatedBlockSize)
+    {
+        for (auto* graph : graphs)
+            prepareGraph (graph, sampleRate, estimatedBlockSize);
+    }
+    
+    void releaseResources()
+    {
+        for (auto* graph : graphs)
+            graph->releaseResources();
+    }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
 };
@@ -230,24 +275,44 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::activate()
 {
-    auto& devices (globals().getDeviceManager());
+    auto& devices (world.getDeviceManager());
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
 }
 
 void AudioEngine::deactivate()
 {
-    auto& devices (globals().getDeviceManager());
+    auto& devices (world.getDeviceManager());
     devices.removeMidiInputCallback (String::empty, &getMidiInputCallback());
-    priv->graph.clear();
-    priv->graph.reset();
 }
 
 AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }
 MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (priv != nullptr); return *priv; }
 
-Globals& AudioEngine::globals() { return world; }
+RootGraph& AudioEngine::getRootGraph()
+{
+    return *getGraph(0);
+}
 
-RootGraph& AudioEngine::getRootGraph()         { return priv->graph; }
-Transport* AudioEngine::transport()            { return &priv->transport; }
+bool AudioEngine::addGraph (RootGraph* graph)
+{
+    jassert (priv && graph);
+    priv->addGraph (graph);
+    return true;
+}
+    
+bool AudioEngine::removeGraph (RootGraph* graph)
+{
+    jassert (priv && graph);
+    priv->removeGraph (graph);
+    return true;
+}
+    
+RootGraph* AudioEngine::getGraph (const int index)
+{
+    ScopedLock sl (priv->lock);
+    if (isPositiveAndBelow(index, priv->graphs.size()))
+        return priv->graphs.getUnchecked (index);
+    return nullptr;
+}
 
 }

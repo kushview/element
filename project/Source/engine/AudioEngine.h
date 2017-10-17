@@ -47,9 +47,11 @@ public:
     void activate();
     void deactivate();
     
-    Globals& globals();
+    bool addGraph (RootGraph* graph);
+    bool removeGraph (RootGraph* graph);
+    
     RootGraph& getRootGraph();
-    Transport* transport();
+    RootGraph* getGraph (const int index);
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     

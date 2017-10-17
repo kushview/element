@@ -19,7 +19,9 @@ public:
     void removeNode (const uint32);
     
     void addGraph();
+    void removeGraph (int index = -1);
     void addSubGraph();
+    
     void addConnection (const uint32, const uint32, const uint32, const uint32);
     void connectChannels (const uint32, const int, const uint32, const int);
     void removeConnection (const uint32, const uint32, const uint32, const uint32);

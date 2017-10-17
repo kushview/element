@@ -5,7 +5,11 @@
 
 #pragma once
 
+#include "controllers/AppController.h"
+#include "controllers/EngineController.h"
+#include "gui/ContentComponent.h"
 #include "gui/TreeviewBase.h"
+#include "gui/ViewHelpers.h"
 #include "session/Session.h"
 
 namespace Element {
@@ -25,14 +29,29 @@ public:
     {
         session = s;
         updateContent();
+        if (session && session->getNumGraphs() > 0)
+            selectRow (0);
     }
     
     Node getSelectedGraph() { return session ? session->getGraph (getSelectedRow()) : Node(); }
     
+    void listBoxItemClicked (int row, const MouseEvent& ev) override
+    {
+        if (ev.mods.isPopupMenu())
+            return;
+        const Node graph (getSelectedGraph());
+        DBG(graph.getValueTree().toXmlString());
+//        if (auto* cc = ViewHelpers::findContentComponent(this))
+//            if (auto* ec = cc->getAppController().findChild<EngineController>()) {
+//                
+//                
+//                ec->setRootNode (graph);
+//            }
+    }
 #if 0
     virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                Component* existingComponentToUpdate);
-    virtual void listBoxItemClicked (int row, const MouseEvent&);
+    
     virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
     virtual void backgroundClicked (const MouseEvent&);
     virtual void selectedRowsChanged (int lastRowSelected);

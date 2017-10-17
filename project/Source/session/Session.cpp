@@ -48,6 +48,14 @@ namespace Element {
         }
     }
     
+    bool Session::addGraph (const Element::Node &node)
+    {
+        jassert(! node.getValueTree().getParent().isValid());
+        auto graphs = getGraphsValueTree();
+        graphs.addChild (node.getValueTree(), -1, nullptr);
+        return true;
+    }
+    
     void Session::clear()
     {
         setMissingProperties (true);
