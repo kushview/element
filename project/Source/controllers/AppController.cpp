@@ -182,7 +182,7 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::importGraph:
         {
             FileChooser chooser ("Import Graph", lastSavedFile, "*.elg");
-            if ((bool) world.getUnlockStatus().isFullVersion() && chooser.browseForFileToOpen())
+            if (world.getUnlockStatus().isFullVersion() && chooser.browseForFileToOpen())
                 findChild<SessionController>()->importGraph (chooser.getResult());
             else
                 Element::showProductLockedAlert();
@@ -191,7 +191,7 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::exportGraph:
         {
             FileChooser chooser ("Export Graph", lastSavedFile, "*.elg");
-            if ((bool) world.getUnlockStatus().isFullVersion() && chooser.browseForFileToSave (true))
+            if (world.getUnlockStatus().isFullVersion() && chooser.browseForFileToSave (true))
                 findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
                                                              chooser.getResult(), false);
             else
