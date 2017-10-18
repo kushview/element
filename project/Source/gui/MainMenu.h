@@ -146,27 +146,18 @@ private:
         menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
         menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete selected graph");
         menu.addSeparator();
-
         menu.addCommandItem (&cmd, Commands::copy, "Copy");
         menu.addCommandItem (&cmd, Commands::paste, "Paste");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
-#if 0
-        menu.addCommandItem (&cmd, StandardApplicationCommandIDs::selectAll, "Select All");
-#endif
     }
     
     void buildWindowMenu (PopupMenu& menu)
     {
-//        menu.addItem (8383838, "Patch Bay", true, true);
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
-        
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");
         menu.addCommandItem (&cmd, Commands::showGraphConfig, "Show Graph Properties");
-//        menu.addItem (5585855, "Show Session Properties");
-//        menu.addItem (3838383, "Show Graph Properties");
-
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
 
@@ -175,6 +166,7 @@ private:
     void buildDebugMenu (PopupMenu& menu)
     {
         menu.addItem (1000, "Dump session to console");
+        menu.addItem (1001, "Report bug");
     }
     
     void buildHelpMenu (PopupMenu& menu)

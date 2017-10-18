@@ -25,33 +25,22 @@ public:
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                            bool rowIsSelected) override;
 
-    inline void setSession (Session* s)
+    inline void setSession (Session* s, const bool selectActiveGraph = true)
     {
         session = s;
         updateContent();
-        if (session && session->getNumGraphs() > 0)
+        if (session && session->getNumGraphs() > 0 && selectActiveGraph)
+            selectRow (session->getActiveGraphIndex());
+        else
             selectRow (0);
     }
     
     Node getSelectedGraph() { return session ? session->getGraph (getSelectedRow()) : Node(); }
     
-    void listBoxItemClicked (int row, const MouseEvent& ev) override
-    {
-        if (ev.mods.isPopupMenu())
-            return;
-        const Node graph (getSelectedGraph());
-        DBG(graph.getValueTree().toXmlString());
-//        if (auto* cc = ViewHelpers::findContentComponent(this))
-//            if (auto* ec = cc->getAppController().findChild<EngineController>()) {
-//                
-//                
-//                ec->setRootNode (graph);
-//            }
-    }
 #if 0
     virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                                Component* existingComponentToUpdate);
-    
+    void listBoxItemClicked (int row, const MouseEvent& ev) override
     virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
     virtual void backgroundClicked (const MouseEvent&);
     virtual void selectedRowsChanged (int lastRowSelected);

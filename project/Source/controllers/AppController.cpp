@@ -135,22 +135,22 @@ void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
 
 bool AppController::perform (const InvocationInfo& info)
 {
-    EngineController* ec = findChild<EngineController>();
-    jassert (ec);
-    
     auto& status (world.getUnlockStatus());
 	auto& settings(getGlobals().getSettings());
     bool res = true;
     switch (info.commandID)
     {
         case Commands::sessionOpen:
-            findChild<SessionController>()->openFile (lastSavedFile);
-            break;
+        {
+            FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
+            if (chooser.browseForFileToOpen())
+                findChild<SessionController>()->openFile (chooser.getResult());
+        } break;
         case Commands::sessionNew:
             findChild<SessionController>()->newSession();
             break;
         case Commands::sessionSave:
-            findChild<SessionController>()->saveSession();
+            findChild<SessionController>()->saveSession (false);
             break;
         case Commands::sessionSaveAs:
             findChild<SessionController>()->saveSession (true);
@@ -162,7 +162,7 @@ bool AppController::perform (const InvocationInfo& info)
             findChild<EngineController>()->addGraph();
             break;
         case Commands::sessionDuplicateGraph:
-            DBG("Session add, dup, or delete Graph");
+            findChild<EngineController>()->duplicateGraph();
             break;
         case Commands::sessionDeleteGraph:
             findChild<EngineController>()->removeGraph();
@@ -174,7 +174,7 @@ bool AppController::perform (const InvocationInfo& info)
 											  "This will clear the current graph, are you sure?"))
             {
                 lastSavedFile = File();
-                ec->clear();
+                findChild<EngineController>()->clear();
             }
         } break;
 

@@ -54,9 +54,9 @@ void EngineController::addGraph()
     {
         newGraph.release();
         Node node (Tags::graph);
-        node.setProperty (Tags::name, "New Graph");
-        session->addGraph (node);
+        node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
         setRootNode (node);
+        session->addGraph (node, true);
         findSibling<GuiController>()->stabilizeContent();
     }
     else
@@ -66,11 +66,50 @@ void EngineController::addGraph()
     }
 }
 
+void EngineController::duplicateGraph()
+{
+    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto engine  = world.getAudioEngine();
+    auto session = world.getSession();
+    
+    ScopedPointer<RootGraph> newGraph = new RootGraph();
+    if (engine->addGraph (newGraph.get()))
+    {
+        newGraph.release();
+        Node node (session->getCurrentGraph().getValueTree().createCopy());
+        node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
+        setRootNode (node);
+        session->addGraph (node, true);
+        findSibling<GuiController>()->stabilizeContent();
+    }
+    else
+    {
+        AlertWindow::showMessageBoxAsync (
+            AlertWindow::InfoIcon, "Elements", "Could not duplicate graph.");
+    }
+}
+    
 void EngineController::removeGraph (int index)
 {
     auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
+    
+    Node node;
+    if (isPositiveAndBelow (index, session->getNumGraphs()))
+        node = session->getGraph (index);
+    else
+        node = session->getCurrentGraph();
+    
+    ValueTree graphs = session->getValueTree().getChildWithName (Tags::graphs);
+    index = graphs.indexOf (node.getValueTree());
+    graphs.removeChild (index, nullptr);
+    index = jmin (index, graphs.getNumChildren() - 1);
+    graphs.setProperty ("active", index, nullptr);
+    findSibling<GuiController>()->stabilizeContent();
+    
+#if 0
+    // enable this when multiple graph rendering is fully supported.
     if (auto* g = engine->getGraph (index))
     {
         if (engine->removeGraph (g))
@@ -85,6 +124,7 @@ void EngineController::removeGraph (int index)
         AlertWindow::showMessageBoxAsync (
             AlertWindow::InfoIcon, "Elements", "Could not find graph for removal");
     }
+#endif
 }
 
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
@@ -179,6 +219,47 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
+    
+    
+    GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+    for (int i = 0; i < root->getNumFilters(); ++i)
+    {
+        GraphNodePtr node = root->getNode (i);
+        if (node->isMidiIONode() || node->isAudioIONode())
+        {
+            auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
+            ioNodes [proc->getType()] = node;
+        }
+    }
+    
+    for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
+    {
+        if (nullptr != ioNodes [t])
+            continue;
+        
+        PluginDescription desc;
+        desc.pluginFormatName = "Internal";
+        
+        switch (t)
+        {
+            case IOProcessor::audioInputNode:
+                desc.fileOrIdentifier = "audio.input";
+                break;
+            case IOProcessor::audioOutputNode:
+                desc.fileOrIdentifier = "audio.output";
+                break;
+            case IOProcessor::midiInputNode:
+                desc.fileOrIdentifier = "midi.input";
+                break;
+            case IOProcessor::midiOutputNode:
+                desc.fileOrIdentifier = "midi.output";
+                break;
+        }
+        
+        auto nodeId = root->addFilter (&desc);
+        ioNodes[t] = root->getNodeForId (nodeId);
+        jassert(ioNodes[t] != nullptr);
+    }
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)

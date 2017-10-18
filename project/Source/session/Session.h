@@ -9,13 +9,8 @@
 #include "session/Node.h"
 
 namespace Element {
-    class AssetTree;
     class Session;
-    class EngineControl;
     class Globals;
-    class Instrument;
-    class MediaManager;
-    class Pattern;
     
     /** Session, the main interface between the engine and model layers */
     class Session : public ObjectModel,
@@ -28,8 +23,10 @@ namespace Element {
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
         inline Node getGraph (const int index) const { return Node (getGraphValueTree (index), false); }
-        bool addGraph (const Node& node);
+        Node getCurrentGraph() const;
+        int getActiveGraphIndex() const;
         
+        bool addGraph (const Node &node, const bool setActive);
         
         ValueTree getValueTree() const { return objectData; }
         bool loadData (const ValueTree& data);
@@ -47,7 +44,6 @@ namespace Element {
         Session();
         friend class Globals;
  
-        
         /** Set a property.  This is a wrapper around the internal ValueTree */
         inline void setProperty (const Identifier& prop, const var& val) { node().setProperty (prop, val, nullptr); }
 

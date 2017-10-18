@@ -33,9 +33,9 @@ namespace Commands {
         sessionSave,
         sessionSaveAs,
         sessionAddGraph,
-        sessionDuplicateGraph,
-        sessionDeleteGraph,
-        sessionInsertPlugin,
+        sessionDuplicateGraph = 900,
+        sessionDeleteGraph    = 901,
+        sessionInsertPlugin   = 902,
         
         exportAudio            = 0x0400,
         exportMidi,
@@ -143,32 +143,26 @@ namespace Commands {
                 break;
             case Commands::sessionSave:
                 result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-                result.setInfo ("Save Session", "Save the current session", "Session", 0);
+                result.setInfo ("Save Session", "Save the current session", Categories::session, 0);
                 break;
             case Commands::sessionSaveAs:
-                result.setInfo ("Save Session As", "Save the current session with a new name",
-                                Categories::session, 0);
+                result.setInfo ("Save Session As", "Save the current session with a new name", Categories::session, 0);
                 break;
             case Commands::sessionAddGraph:
-                result.addDefaultKeypress('n', ModifierKeys::shiftModifier |
-                                               ModifierKeys::commandModifier);
-                result.setInfo ("Add Graph", "Add a new graph to the session",
-                                Categories::session, 0);
+                result.addDefaultKeypress('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
+                result.setInfo ("Add Graph", "Add a new graph to the session", Categories::session, 0);
+                break;
             case Commands::sessionDuplicateGraph:
-                result.addDefaultKeypress ('d', ModifierKeys::shiftModifier |
-                                                ModifierKeys::commandModifier);
-                result.setInfo ("Duplicate Graph", "Duplicate the current graph",
-                                Categories::application, 0);
+                result.addDefaultKeypress ('d', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
+                result.setInfo ("Duplicate Graph", "Duplicate the current graph", Categories::session, 0);
                 break;
             case Commands::sessionDeleteGraph:
-                result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::shiftModifier);
-                result.setInfo ("Delete Graph", "Deletes the current graph",
-                                Categories::application, 0);
+                result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
+                result.setInfo ("Delete Graph", "Deletes the current graph", Categories::session, 0);
                 break;
             case Commands::sessionInsertPlugin:
                 result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-                result.setInfo ("Insert Plugin", "Add a plugin in the current graph",
-                                Categories::application, Info::isDisabled);
+                result.setInfo ("Insert Plugin", "Add a plugin in the current graph", Categories::session, Info::isDisabled);
                 break;
 
             // MARK: Media Commands
@@ -213,11 +207,9 @@ namespace Commands {
                 result.setInfo ("Patch Bay", "Show the patch bay", "Session", 0);
                 break;
             
-            
             case Commands::checkNewerVersion:
                 result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
                 break;
-                
                 
             case Commands::signIn:
                 result.setInfo ("Sign In", "Saves the current object with another name", "Application", 0);

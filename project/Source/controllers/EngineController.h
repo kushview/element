@@ -20,6 +20,7 @@ public:
     
     void addGraph();
     void removeGraph (int index = -1);
+    void duplicateGraph();
     void addSubGraph();
     
     void addConnection (const uint32, const uint32, const uint32, const uint32);

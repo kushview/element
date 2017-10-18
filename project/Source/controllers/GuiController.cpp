@@ -5,7 +5,6 @@
 #include "engine/AudioEngine.h"
 #include "gui/NewSessionView.h"
 #include "gui/AboutComponent.h"
-#include "gui/Alerts.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"

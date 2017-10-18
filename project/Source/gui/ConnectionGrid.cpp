@@ -806,6 +806,6 @@ namespace Element
     void ConnectionGrid::didBecomeActive()
     {
         auto session = ViewHelpers::findContentComponent(this)->getSession();
-        setNode (session->getGraph (0));
+        setNode (session->getCurrentGraph());
     }
 }

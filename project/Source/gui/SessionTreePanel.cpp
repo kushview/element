@@ -15,12 +15,12 @@ SessionGraphsListBox::SessionGraphsListBox (Session* s)
     : session (nullptr)
 {
     setModel (this);
-    setSession (s);
+    updateContent();
 }
     
 SessionGraphsListBox::~SessionGraphsListBox()
 {
-    setModel(nullptr);
+    setModel (nullptr);
     session = nullptr;
 }
 

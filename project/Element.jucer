@@ -83,30 +83,10 @@
         <FILE id="gEA8Kx" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
       </GROUP>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
-        <GROUP id="{24EFBAD2-4D95-6C48-A3DB-6659AC1B755E}" name="alerts">
-          <FILE id="pQt8vm" name="AlertBackground.cpp" compile="1" resource="0"
-                file="Source/gui/alerts/AlertBackground.cpp"/>
-          <FILE id="c5E3el" name="AlertBackground.h" compile="0" resource="0"
-                file="Source/gui/alerts/AlertBackground.h"/>
-          <FILE id="q3kd1d" name="InfoAlertButtonBar.cpp" compile="1" resource="0"
-                file="Source/gui/alerts/InfoAlertButtonBar.cpp"/>
-          <FILE id="g0TC4L" name="InfoAlertButtonBar.h" compile="0" resource="0"
-                file="Source/gui/alerts/InfoAlertButtonBar.h"/>
-          <FILE id="udShkU" name="OkCancelAlertButtonBar.cpp" compile="1" resource="0"
-                file="Source/gui/alerts/OkCancelAlertButtonBar.cpp"/>
-          <FILE id="sVZZC7" name="OkCancelAlertButtonBar.h" compile="0" resource="0"
-                file="Source/gui/alerts/OkCancelAlertButtonBar.h"/>
-          <FILE id="a1WE6p" name="YesNoCancelButtonBar.cpp" compile="1" resource="0"
-                file="Source/gui/alerts/YesNoCancelButtonBar.cpp"/>
-          <FILE id="HslPdQ" name="YesNoCancelButtonBar.h" compile="0" resource="0"
-                file="Source/gui/alerts/YesNoCancelButtonBar.h"/>
-        </GROUP>
         <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
               file="Source/gui/AboutComponent.cpp"/>
         <FILE id="rBDuhD" name="AboutComponent.h" compile="0" resource="0"
               file="Source/gui/AboutComponent.h"/>
-        <FILE id="lSY9NC" name="Alerts.cpp" compile="1" resource="0" file="Source/gui/Alerts.cpp"/>
-        <FILE id="KB9gFt" name="Alerts.h" compile="0" resource="0" file="Source/gui/Alerts.h"/>
         <FILE id="Lmq0O0" name="AssetTreeView.cpp" compile="1" resource="0"
               file="Source/gui/AssetTreeView.cpp"/>
         <FILE id="KsEoBI" name="AssetTreeView.h" compile="0" resource="0" file="Source/gui/AssetTreeView.h"/>

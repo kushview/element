@@ -151,14 +151,14 @@ void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
 
 void GraphController::setNodeModel (const Node& node)
 {
-    clear();
+    processor.clear();
     graph   = node.getValueTree();
     arcs    = node.getArcsValueTree();
     nodes   = node.getNodesValueTree();
     Array<ValueTree> failed;
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
-        Node node (nodes.getChild(i), false);
+        Node node (nodes.getChild (i), false);
         PluginDescription desc; node.getPluginDescription (desc);
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {

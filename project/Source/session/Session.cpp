@@ -48,12 +48,30 @@ namespace Element {
         }
     }
     
-    bool Session::addGraph (const Element::Node &node)
+    bool Session::addGraph (const Node &node, const bool setActive)
     {
         jassert(! node.getValueTree().getParent().isValid());
         auto graphs = getGraphsValueTree();
         graphs.addChild (node.getValueTree(), -1, nullptr);
+        if (setActive)
+            graphs.setProperty ("active", graphs.indexOf(node.getValueTree()), nullptr);
         return true;
+    }
+    
+    Node Session::getCurrentGraph() const
+    {
+        const int index = getActiveGraphIndex();
+        if (isPositiveAndBelow (index, getNumGraphs()))
+            return getGraph (index);
+    
+        ValueTree graphs = getGraphsValueTree();
+        graphs.setProperty ("active", graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
+        return  graphs.getNumChildren() > 0 ? getGraph(0) : Node();
+    }
+    
+    int Session::getActiveGraphIndex() const
+    {
+        return getGraphsValueTree().getProperty ("active", -1);
     }
     
     void Session::clear()

@@ -28,15 +28,11 @@ namespace Element {
 class ContentComponent::Resizer : public StretchableLayoutResizerBar
 {
 public:
-    Resizer (ContentComponent& contentComponent,
-             StretchableLayoutManager* layoutToUse,
-             int itemIndexInLayout,
-             bool isBarVertical)
+    Resizer (ContentComponent& contentComponent, StretchableLayoutManager* layoutToUse,
+             int itemIndexInLayout, bool isBarVertical)
         : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
           owner (contentComponent)
-    {
-        
-    }
+    { }
     
     void mouseDown (const MouseEvent& ev) override
     {
@@ -60,7 +56,7 @@ class ContentComponent::Toolbar : public Component,
 {
 public:
     Toolbar()
-        : graph ("e"), title ("Session Name")
+        : graph ("e"), title ("Session Title")
     {
         addAndMakeVisible (title);
         title.setText ("", dontSendNotification);
@@ -235,6 +231,39 @@ private:
     }
 };
 
+class ElementsNavigationPanel : public SessionGraphsListBox
+{
+public:
+    ElementsNavigationPanel() {
+        
+    }
+    bool keyPressed(const KeyPress& kp) override
+    {
+        // Allows menu command to pass through, maybe a better way
+        // to do this.
+        if (kp.getKeyCode() == KeyPress::backspaceKey)
+            return Component::keyPressed (kp);
+        return ListBox::keyPressed (kp);
+    }
+    
+    void listBoxItemClicked (int row, const MouseEvent& ev) override
+    {
+        if (ev.mods.isPopupMenu())
+            return;
+        const Node graph (getSelectedGraph());
+        if (auto* cc = ViewHelpers::findContentComponent (this))
+        {
+            auto session (cc->getSession());
+            auto graphs = graph.getValueTree().getParent();
+            graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
+            
+            if (auto* ec = cc->getAppController().findChild<EngineController>())
+                ec->setRootNode (graph);
+            cc->setCurrentNode (graph);
+        }
+    }
+};
+
 class NavigationConcertinaPanel : public ConcertinaPanel {
 public:
     NavigationConcertinaPanel (Globals& g)
@@ -280,14 +309,9 @@ public:
     {
         clearPanels();
         Component* c = nullptr;
-        c = new SessionGraphsListBox();
+        c = new ElementsNavigationPanel();
         auto *h = new ElementsHeader (*this, *c);
         addPanelInternal (-1, c, "Elements", h);
-//        names.add ("Elements");
-//        c = new SessionGraphsListBox();
-//        addPanel (-1, c, true);
-//        setPanelHeaderSize (c, headerHeight);
-//        setCustomPanelHeader (c, new Header (*this), true);
     }
     
     AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
@@ -364,7 +388,6 @@ private:
             addButton.setButtonText ("+");
             addButton.addListener (this);
             setInterceptsMouseClicks (false, true);
-            
         }
         
         void resized() override
@@ -396,14 +419,6 @@ private:
                                         bool isMouseOver, bool isMouseDown,
                                         ConcertinaPanel& panel, Component& comp)
         {
-#if 0
-            auto* p = dynamic_cast<NavigationConcertinaPanel*> (&panel);
-            int i = p->getNumPanels();
-            while (--i >= 0) {
-                if (p->getPanel(i) == &comp)
-                    break;
-            }
-#endif
             ELF::drawConcertinaPanelHeader (g, area, isMouseOver, isMouseDown, panel, comp);
             g.setColour (Colours::white);
             Rectangle<int> r (area.withTrimmedLeft (20));
@@ -591,7 +606,8 @@ void ContentComponent::post (Message* message)
 void ContentComponent::stabilize()
 {
     auto session = getGlobals().getSession();
-    setCurrentNode (session->getGraph (0));
+    const Node graph = session->getCurrentGraph();
+    setCurrentNode (graph);
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
     if (auto* sp = nav->getSessionPanel())

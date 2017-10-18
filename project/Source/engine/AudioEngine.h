@@ -16,6 +16,8 @@ class ClipFactory;
 class EngineControl;
 class Transport;
 
+typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
+
 class RootGraph : public GraphProcessor
 {
 public:
@@ -31,6 +33,7 @@ public:
     const String getOutputChannelName (int channelIndex) const override;
 
 private:
+    GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
     StringArray audioInputNames;
     StringArray audioOutputNames;
