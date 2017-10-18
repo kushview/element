@@ -107,7 +107,6 @@ void EngineController::removeGraph (int index)
     index = jmin (index, graphs.getNumChildren() - 1);
     graphs.setProperty ("active", index, nullptr);
     findSibling<GuiController>()->stabilizeContent();
-    
 #if 0
     // enable this when multiple graph rendering is fully supported.
     if (auto* g = engine->getGraph (index))
@@ -140,7 +139,8 @@ void EngineController::connectChannels (const uint32 s, const int sc, const uint
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    jassert (root);
+    if (! root)
+        return;
     root->removeConnection (s, sp, d, dp);
 }
 
@@ -219,7 +219,6 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
-    
     
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     for (int i = 0; i < root->getNumFilters(); ++i)

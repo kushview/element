@@ -427,7 +427,20 @@ private:
         }
     } lookAndFeel;
 };
-    
+
+class EmptyContentView : public ContentView
+{
+public:
+    void paint (Graphics& g) override
+    {
+        g.fillAll (LookAndFeel::contentBackgroundColor);
+        g.setColour (LookAndFeel::textColor);
+        g.setFont (16.f);
+        g.drawFittedText ("Session is empty.\nPress Shift+Cmd+N to add a graph.",
+                   0, 0, getWidth(), getHeight(), Justification::centred, 2);
+    }
+};
+
 class ContentContainer : public Component
 {
 public:
@@ -486,6 +499,7 @@ public:
     }
     
 private:
+    friend class ContentComponent;
     ContentComponent& owner;
     StretchableLayoutManager layout;
     ScopedPointer<StretchableLayoutResizerBar> bar;
@@ -606,8 +620,16 @@ void ContentComponent::post (Message* message)
 void ContentComponent::stabilize()
 {
     auto session = getGlobals().getSession();
-    const Node graph = session->getCurrentGraph();
-    setCurrentNode (graph);
+    if (session->getNumGraphs() > 0)
+    {
+        const Node graph = session->getCurrentGraph();
+        setCurrentNode (graph);
+    }
+    else
+    {
+        setContentView (new EmptyContentView());
+    }
+    
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
     if (auto* sp = nav->getSessionPanel())
@@ -617,8 +639,13 @@ void ContentComponent::stabilize()
 
 void ContentComponent::setCurrentNode (const Node& node)
 {
+    if (nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()))
+        if (getSession()->getNumGraphs() > 0)
+            setContentView(new ConnectionGrid());
+    
     if (auto* audioPanel = nav->getAudioIOPanel())
         audioPanel->setNode (node);
+    
     if (node.hasNodeType (Tags::graph))
         container->setNode (node);
 }

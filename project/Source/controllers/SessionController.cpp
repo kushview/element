@@ -53,7 +53,7 @@ void SessionController::openFile (const File& file)
         if (result.wasOk())
         {
             if (auto* ec = findSibling<EngineController>())
-                ec->setRootNode (currentSession->getGraph (0));
+                ec->setRootNode (currentSession->getCurrentGraph());
             if (auto* gc = findSibling<GuiController>())
                 gc->stabilizeContent();
         }
