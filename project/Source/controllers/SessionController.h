@@ -20,6 +20,9 @@ public:
     void saveSession (const bool saveAs = false);
     void newSession();
     
+    void exportGraph (const Node& node, const File& targetFile, const bool askToOverwrite);
+    void importGraph (const File& file);
+    
 private:
     SessionPtr currentSession;
     ScopedPointer<SessionDocument> document;

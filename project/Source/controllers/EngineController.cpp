@@ -56,6 +56,7 @@ void EngineController::addGraph()
         Node node (Tags::graph);
         node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
         setRootNode (node);
+        addMissingIONodes();
         session->addGraph (node, true);
         findSibling<GuiController>()->stabilizeContent();
     }
@@ -88,7 +89,7 @@ void EngineController::duplicateGraph()
             AlertWindow::InfoIcon, "Elements", "Could not duplicate graph.");
     }
 }
-    
+
 void EngineController::removeGraph (int index)
 {
     auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
@@ -107,23 +108,6 @@ void EngineController::removeGraph (int index)
     index = jmin (index, graphs.getNumChildren() - 1);
     graphs.setProperty ("active", index, nullptr);
     findSibling<GuiController>()->stabilizeContent();
-#if 0
-    // enable this when multiple graph rendering is fully supported.
-    if (auto* g = engine->getGraph (index))
-    {
-        if (engine->removeGraph (g))
-        {
-            auto model = session->getGraph(index).getValueTree();
-            model.getParent().removeChild (model, nullptr);
-            findSibling<GuiController>()->stabilizeContent();
-        }
-    }
-    else
-    {
-        AlertWindow::showMessageBoxAsync (
-            AlertWindow::InfoIcon, "Elements", "Could not find graph for removal");
-    }
-#endif
 }
 
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
@@ -219,7 +203,10 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
-    
+}
+
+void EngineController::addMissingIONodes()
+{
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     for (int i = 0; i < root->getNumFilters(); ++i)
     {

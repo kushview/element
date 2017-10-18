@@ -43,6 +43,7 @@ void SessionController::openFile (const File& file)
             {
                 DBG("[EL] add graph to session");
                 const Node model (node, true);
+                currentSession->addGraph (node, true);
             }
         }
     }
@@ -60,6 +61,30 @@ void SessionController::openFile (const File& file)
     }
 }
 
+void SessionController::exportGraph (const Node& node, const File& targetFile, const bool askToOverwrite)
+{
+    if (! node.hasNodeType (Tags::graph)) {
+        jassertfalse;
+        return;
+    }
+    
+    ValueTree data = node.getValueTree().createCopy();
+    Node::sanitizeProperties (data, true);
+    
+   #if EL_SAVE_BINARY_FORMAT
+    FileOutputStream stream (targetFile);
+    data.writeToStream (stream);
+   #else
+    if (ScopedPointer<XmlElement> e = data.createXml())
+        e->writeToFile (targetFile, String());
+   #endif
+}
+
+void SessionController::importGraph (const File& file)
+{
+    
+}
+    
 void SessionController::closeSession()
 {
     DBG("[SC] close session");

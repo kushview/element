@@ -27,7 +27,8 @@ public:
     Startup (Globals& w, const bool useThread = false, const bool splash = false)
         : Thread ("ElementStartup"),
           world (w), usingThread (useThread),
-          showSplash (splash)
+          showSplash (splash),
+        isFirstRun (false)
     { }
 
     ~Startup() { }
@@ -35,6 +36,7 @@ public:
     void launchApplication()
     {
         Settings& settings (world.getSettings());
+        isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
         DeviceManager& devices (world.getDeviceManager());
         auto* props = settings.getUserSettings();
         if (ScopedXml dxml = props->getXmlValue ("devices"))
@@ -68,6 +70,7 @@ private:
     Globals& world;
     const bool usingThread;
     const bool showSplash;
+    bool isFirstRun;
     
     class StartupScreen :  public SplashScreen
     {
@@ -109,6 +112,33 @@ private:
         
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
+        if (isFirstRun)
+        {
+//            KnownPluginList& listToAddResultsTo,
+//            AudioPluginFormat& formatToLookFor,
+//            FileSearchPath directoriesToSearch,
+//            bool searchRecursively,
+//            const File& deadMansPedalFile,
+//            bool allowPluginsWhichRequireAsynchronousInstantiation = false)
+//
+            auto& formats (plugins.formats());
+            for (int i = 0; i < formats.getNumFormats(); ++i)
+            {
+                auto* format = formats.getFormat (i);
+                if (! format->canScanForPlugins())
+                    continue;
+                PluginDirectoryScanner scanner (plugins.availablePlugins(), *format,
+                                                format->getDefaultLocationsToSearch(),
+                                                true, File::nonexistent, false);
+                String name;
+                DBG("[EL] Scanning for " << format->getName() << " plugins...");
+                while (scanner.scanNextFile (true, name))
+                {
+                    DBG("[EL]  " << name);
+                }
+            }
+        }
+        
         plugins.restoreUserPlugins (settings);
         // global data is ready, so now we can start using it;
         

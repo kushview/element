@@ -109,19 +109,22 @@ namespace Element {
     {
         if (resetExisting)
             objectData.removeAllProperties (nullptr);
-        if (! node().hasProperty (Tags::name))
+        if (! objectData.hasProperty (Tags::name))
             setProperty (Tags::name, "Untitled");
-        if (! node().hasProperty (Slugs::tempo))
+        if (! objectData.hasProperty (Slugs::tempo))
             setProperty (Tags::tempo, (double) 120.f);
         
         if (resetExisting)
             objectData.removeAllChildren (nullptr);
         
         ValueTree graphs = objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
-        ValueTree root = graphs.getOrCreateChildWithName (Tags::node, nullptr);
-        root.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
-        root.setProperty (Tags::name, "Root", nullptr);
-        ValueTree nodes = root.getOrCreateChildWithName (Tags::nodes, nullptr);
+        if (graphs.getNumChildren() <= 0)
+        {
+            ValueTree root = graphs.getOrCreateChildWithName (Tags::node, nullptr);
+            root.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
+            root.setProperty (Tags::name, "Graph 1", nullptr);
+            ValueTree nodes = root.getOrCreateChildWithName (Tags::nodes, nullptr);
+        }
     }
 
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)

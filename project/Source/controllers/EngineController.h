@@ -35,6 +35,7 @@ private:
     OwnedArray<RootGraphController> rootGraphs;
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
+    void addMissingIONodes();
 };
     
 }

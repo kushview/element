@@ -14,6 +14,14 @@
 
 namespace Element {
 
+static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
+{
+    String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature.\nGet a copy @ https://kushview.net"
+                                     : msg;
+    if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
+        URL("https://kushview.net/products/element/").launchInDefaultBrowser();
+}
+    
 AppController::AppController (Globals& g)
     : world (g)
 {
@@ -49,6 +57,9 @@ void AppController::run()
         if (File::isAbsolutePath (lastSession))
             sc->openFile (File (lastSession));
     }
+    
+    if (auto* gui = findChild<GuiController>())
+        gui->stabilizeContent();
 }
 
 void AppController::handleMessage (const Message& msg)
@@ -167,70 +178,30 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::sessionDeleteGraph:
             findChild<EngineController>()->removeGraph();
             break;
+        
+        case Commands::importGraph:
+        {
+            FileChooser chooser ("Import Graph", lastSavedFile, "*.elg");
+            if ((bool) world.getUnlockStatus().isFullVersion() && chooser.browseForFileToOpen())
+                findChild<SessionController>()->importGraph (chooser.getResult());
+            else
+                Element::showProductLockedAlert();
+        } break;
             
-        case Commands::mediaNew:
-		{
-            if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Graph", 
-											  "This will clear the current graph, are you sure?"))
-            {
-                lastSavedFile = File();
-                findChild<EngineController>()->clear();
-            }
+        case Commands::exportGraph:
+        {
+            FileChooser chooser ("Export Graph", lastSavedFile, "*.elg");
+            if ((bool) world.getUnlockStatus().isFullVersion() && chooser.browseForFileToSave (true))
+                findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
+                                                             chooser.getResult(), false);
+            else
+                Element::showProductLockedAlert();
         } break;
 
+        case Commands::mediaNew:
         case Commands::mediaSave:
-        {
-            if (! status.isFullVersion())
-            {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Unauthorized", "Saving individual graphs is not available in Element Lite.\nVisit https://kushview.net/products/element to purchase a copy");
-            }
-            else if (status.isFullVersion())
-            {
-                if (lastSavedFile.existsAsFile() && lastSavedFile.hasFileExtension ("elg"))
-                {
-                    jassertfalse; // handle this
-                    const ValueTree model ("node");
-                    FileOutputStream stream (lastSavedFile);
-                    model.writeToStream (stream);
-                }
-                
-                else
-                {
-                    FileChooser chooser ("Save current graph", File(), "*.elg");
-                    if (chooser.browseForFileToSave (true))
-                    {
-                        lastSavedFile = chooser.getResult();
-                        const ValueTree model ("node");
-                        jassertfalse; // handle this
-                        FileOutputStream stream (lastSavedFile);
-                        model.writeToStream (stream);
-                    }
-                }
-            }
-        } break;
-        
         case Commands::mediaSaveAs:
-        {
-            if (! status.isFullVersion())
-            {
-                String msg = "Saving is available in Element Pro.\n";
-                msg << "Visit https://kushview.net/products/element to purchase a copy";
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Unauthorized", msg);
-            }
-            else
-            {
-                FileChooser chooser ("Save current graph", File(), "*.elg");
-                if (chooser.browseForFileToSave (true))
-                {
-                    lastSavedFile = chooser.getResult();
-                    const ValueTree model ("node");
-                    jassertfalse; //handle
-                    FileOutputStream stream (lastSavedFile);
-                    model.writeToStream (stream);
-                }
-            }
-        } break;
+            break;
         
         case Commands::signIn:
         {
