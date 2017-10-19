@@ -143,8 +143,6 @@
         <FILE id="jydhsn" name="NewSessionView.h" compile="0" resource="0"
               file="Source/gui/NewSessionView.h"/>
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
-        <FILE id="BKStDb" name="PluginListWindow.h" compile="0" resource="0"
-              file="Source/gui/PluginListWindow.h"/>
         <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="Source/gui/PluginManagerComponent.cpp"/>
         <FILE id="DqoFQ0" name="PluginManagerComponent.h" compile="0" resource="0"

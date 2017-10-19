@@ -42,10 +42,9 @@ public:
         return list.getNumTypes() + list.getBlacklistedFiles().size();
     }
     
-    void paintRowBackground (Graphics& g, int /*rowNumber*/, int /*width*/, int /*height*/, bool rowIsSelected) override
+    void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
-        if (rowIsSelected)
-            g.fillAll (owner.findColour (TextEditor::highlightColourId));
+        ViewHelpers::drawBasicTextRow (String(), g, width, height, rowIsSelected);
     }
     
     enum
@@ -136,17 +135,16 @@ public:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableModel)
 };
 
-//==============================================================================
 PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, KnownPluginList& listToEdit,
                                           const File& deadMansPedal, PropertiesFile* const props,
                                           bool allowPluginsWhichRequireAsynchronousInstantiation)
 : formatManager (manager),
-list (listToEdit),
-deadMansPedalFile (deadMansPedal),
-optionsButton ("Options..."),
-propertiesToUse (props),
-allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-numThreads (allowAsync ? 1 : 0)
+  list (listToEdit),
+  deadMansPedalFile (deadMansPedal),
+  optionsButton ("Options..."),
+  propertiesToUse (props),
+  allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
+  numThreads (allowAsync ? 1 : 0)
 {
     tableModel = new TableModel (*this, listToEdit);
     

@@ -38,6 +38,53 @@ namespace Element {
         // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
     }
     
+    bool Node::isProbablyGraphNode (const ValueTree& data)
+    {
+        return data.hasType (Tags::node) &&
+            Tags::graph.toString() == data.getProperty(Tags::type).toString();
+    }
+    
+    ValueTree Node::parse (const File& file)
+    {
+        ValueTree data;
+        
+        if (ScopedPointer<XmlElement> e = XmlDocument::parse(file))
+        {
+            ValueTree xml = ValueTree::fromXml (*e);
+            if (xml.hasType (Tags::node))
+                data = xml;
+        }
+        else
+        {
+            FileInputStream input (file);
+            data = ValueTree::readFromStream (input);
+        }
+        
+        if (data.isValid() && data.hasType (Tags::node))
+        {
+            Node::sanitizeProperties (data);
+            return data;
+        }
+        
+        return ValueTree();
+    }
+    
+    bool Node::writeToFile (const File& targetFile) const
+    {
+        ValueTree data = objectData.createCopy();
+        sanitizeProperties (data, true);
+        
+       #if EL_SAVE_BINARY_FORMAT
+        FileOutputStream stream (targetFile);
+        data.writeToStream (stream);
+        return true;
+       #else
+        if (ScopedPointer<XmlElement> e = data.createXml())
+            return e->writeToFile (targetFile, String());
+       #endif
+        return false;
+    }
+    
     ValueTree Node::makeArc (const Arc& arc)
     {
         ValueTree model (Tags::arc);

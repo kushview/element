@@ -1,5 +1,5 @@
 
-#include "gui/PluginWindow.h"
+
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "engine/AudioEngine.h"
@@ -8,10 +8,11 @@
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
-#include "gui/PluginListWindow.h"
 #include "gui/SessionDocument.h"
 #include "gui/SessionContentView.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/PluginWindow.h"
+#include "gui/PluginManagerComponent.h"
 #include "session/MediaManager.h"
 #include "session/UnlockStatus.h"
 
@@ -72,22 +73,7 @@ Globals& GuiController::globals()
     return world;
 }
 
-void GuiController::openWindow (const String& uri)
-{
-    if (uri == ELEMENT_PLUGIN_MANAGER)
-    {
-        for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;) {
-            if (PluginListWindow* w = dynamic_cast<PluginListWindow*> (DocumentWindow::getTopLevelWindow (i))) {
-                w->closeButtonPressed();
-                mainWindow->refreshMenu();
-                return;
-            }
-        }
-        
-        windowManager->push (new PluginListWindow (globals()));
-        mainWindow->refreshMenu();
-    }
-}
+void GuiController::openWindow (const String& uri) { }
 
 void GuiController::openWindow (Component* c)
 {
@@ -98,9 +84,6 @@ void GuiController::openWindow (Component* c)
 
 bool GuiController::isWindowOpen (const String&)
 {
-    for (int i = DocumentWindow::getNumTopLevelWindows(); --i >= 0;)
-        if (PluginListWindow* w = dynamic_cast<PluginListWindow*>(DocumentWindow::getTopLevelWindow (i)))
-            return w->isShowing();
     return false;
 }
 

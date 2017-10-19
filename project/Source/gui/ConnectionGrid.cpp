@@ -735,11 +735,12 @@ namespace Element
                 newNumCols == ins.size());
         
         resetMatrix();
-        
         if (auto* grid = findParentComponentOfClass<ConnectionGrid>())
         {
             grid->sources->updateContent();
+            grid->sources->repaint();
             grid->destinations->updateContent();
+            grid->destinations->repaint();
         }
         
         repaint();

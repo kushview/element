@@ -256,7 +256,6 @@ public:
             auto session (cc->getSession());
             auto graphs = graph.getValueTree().getParent();
             graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
-            
             if (auto* ec = cc->getAppController().findChild<EngineController>())
                 ec->setRootNode (graph);
             cc->setCurrentNode (graph);
@@ -641,7 +640,7 @@ void ContentComponent::setCurrentNode (const Node& node)
 {
     if (nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()))
         if (getSession()->getNumGraphs() > 0)
-            setContentView(new ConnectionGrid());
+            setContentView (new ConnectionGrid());
     
     if (auto* audioPanel = nav->getAudioIOPanel())
         audioPanel->setNode (node);

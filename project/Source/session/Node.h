@@ -75,6 +75,10 @@ namespace Element {
             setMissingProperties();
         }
         
+        static bool isProbablyGraphNode (const ValueTree& data);
+        static ValueTree parse (const File& file);
+        bool writeToFile (const File& file) const;
+        
         static void sanitizeProperties (ValueTree node, const bool recursive = false)
         {
             node.removeProperty (Tags::object, nullptr);

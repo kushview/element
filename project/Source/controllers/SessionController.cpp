@@ -34,17 +34,16 @@ void SessionController::deactivate()
 
 void SessionController::openFile (const File& file)
 {
+    bool didSomething = true;
+    
     if (file.hasFileExtension ("elg"))
     {
-        if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
+        const ValueTree node (Node::parse (file));
+        if (Node::isProbablyGraphNode (node))
         {
-            const ValueTree node (ValueTree::fromXml (*e));
-            if (node.hasType (Tags::graph))
-            {
-                DBG("[EL] add graph to session");
-                const Node model (node, true);
-                currentSession->addGraph (node, true);
-            }
+            const Node model (node, true);
+            DBG("[EL] add graph to session: " << model.getName());
+            currentSession->addGraph (node, true);
         }
     }
     else if (file.hasFileExtension ("els"))
@@ -55,36 +54,36 @@ void SessionController::openFile (const File& file)
         {
             if (auto* ec = findSibling<EngineController>())
                 ec->setRootNode (currentSession->getCurrentGraph());
-            if (auto* gc = findSibling<GuiController>())
-                gc->stabilizeContent();
         }
     }
+    else
+    {
+        didSomething = false;
+    }
+    
+    if (didSomething)
+        if (auto* gc = findSibling<GuiController>())
+            gc->stabilizeContent();
 }
 
 void SessionController::exportGraph (const Node& node, const File& targetFile, const bool askToOverwrite)
 {
+    ignoreUnused (askToOverwrite);
     if (! node.hasNodeType (Tags::graph)) {
         jassertfalse;
         return;
     }
     
-    ValueTree data = node.getValueTree().createCopy();
-    Node::sanitizeProperties (data, true);
-    
-   #if EL_SAVE_BINARY_FORMAT
-    FileOutputStream stream (targetFile);
-    data.writeToStream (stream);
-   #else
-    if (ScopedPointer<XmlElement> e = data.createXml())
-        e->writeToFile (targetFile, String());
-   #endif
+    TemporaryFile tempFile (targetFile);
+    if (node.writeToFile (tempFile.getFile()))
+        tempFile.overwriteTargetFileWithTemporary();
 }
 
 void SessionController::importGraph (const File& file)
 {
-    
+    openFile (file);
 }
-    
+
 void SessionController::closeSession()
 {
     DBG("[SC] close session");
