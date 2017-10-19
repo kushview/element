@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#define EL_LITE_VERSION_DEV
+//#define EL_LITE_VERSION_DEV
 
 namespace Element {
     
