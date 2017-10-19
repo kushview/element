@@ -55,9 +55,10 @@ namespace Element {
     class Node : public ObjectModel
     {
     public:
-        Node() : ObjectModel (Tags::node)
+        /** New, invalid node */
+        Node() : ObjectModel()
         {
-            setMissingProperties();
+           
         }
         
         Node (const ValueTree& data, const bool setMissing = true)
@@ -75,11 +76,16 @@ namespace Element {
             setMissingProperties();
         }
         
+        /** Creates an empty graph model */
         static Node createGraph();
-        static bool isProbablyGraphNode (const ValueTree& data);
-        static ValueTree parse (const File& file);
-        bool writeToFile (const File& file) const;
         
+        /** Returns true if the value tree is probably a graph node */
+        static bool isProbablyGraphNode (const ValueTree& data);
+
+        /** Load a node from file */
+        static ValueTree parse (const File& file);
+        
+        /** Removes properties that can't be saved to a file. e.g. object properties */
         static void sanitizeProperties (ValueTree node, const bool recursive = false)
         {
             node.removeProperty (Tags::object, nullptr);
@@ -88,9 +94,13 @@ namespace Element {
                     sanitizeProperties (node.getChild(i), recursive);
         }
         
+        /** Create a value tree version of an arc */
         static ValueTree makeArc (const kv::Arc& arc);
-        
-        const uint32 getNodeId() const { return (uint32)(int64) getProperty ("id"); }
+
+        /** Returns true if the underlying data is probably a node */
+        bool isValid() const { return objectData.hasType (Tags::node); }
+
+        const uint32 getNodeId() const { return (uint32)(int64) getProperty (Tags::id); }
         const Identifier getNodeType() const { return Identifier (getProperty(Slugs::type).toString()); }
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
         const String getName() const { return getProperty (Slugs::name); }
@@ -100,10 +110,10 @@ namespace Element {
         const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
         
         const bool canConnectTo (const Node& o) const;
-        ValueTree getArcsValueTree()  const { return objectData.getChildWithName(Tags::arcs); }
-        ValueTree getNodesValueTree() const { return objectData.getChildWithName(Tags::nodes); }
+        ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
+        ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
-        ValueTree getPortsValueTree() const { return objectData.getChildWithName(Tags::ports); }
+        ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
         
         void getPorts (PortArray& ports, PortType type, bool isInput) const;
         void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
@@ -113,15 +123,27 @@ namespace Element {
         
         void getPluginDescription (PluginDescription&) const;
         
+        /** Write the contents of this node to file */
+        bool writeToFile (const File& file) const;
+    
     private:
         void setMissingProperties();
     };
     
     typedef Node NodeModel;
     
-    class PortArray : public Array<Port> { };
-    class NodeArray : public Array<Node> {
+    class PortArray : public Array<Port>
+    {
     public:
+        PortArray() { }
+        ~PortArray() { }
+    };
+    
+    class NodeArray : public Array<Node>
+    {
+    public:
+        NodeArray() { }
+        ~NodeArray() { }
         void sortByName();
     };
     
