@@ -146,6 +146,7 @@ namespace Commands {
                 result.setInfo ("Save Session", "Save the current session", Categories::session, 0);
                 break;
             case Commands::sessionSaveAs:
+                result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
                 result.setInfo ("Save Session As", "Save the current session with a new name", Categories::session, 0);
                 break;
             case Commands::sessionAddGraph:
