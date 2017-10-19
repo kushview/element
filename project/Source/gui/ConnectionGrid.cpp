@@ -363,10 +363,11 @@ namespace Element
             PluginsPopupMenu menu (this);
             if (isRootGraph)
             {
-                menu.addItem (1, "Audio Inputs", true, true);
-                menu.addItem (2, "Audio Outputs", true, true);
-                menu.addItem (3, "MIDI Input", true, true);
-                menu.addItem (4, "MIDI Output", true, true);
+                menu.addSectionHeader ("Graph I/O");
+                menu.addItem (1, "Audio Inputs",    true, graph.hasAudioInputNode());
+                menu.addItem (2, "Audio Outputs",   true, graph.hasAudioOutputNode());
+                menu.addItem (3, "MIDI Input",      true, graph.hasMidiInputNode());
+                menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
             }
             
             menu.addSectionHeader ("Plugins");
@@ -379,7 +380,50 @@ namespace Element
             }
             else
             {
-                DBG("handle menu result");
+                PluginDescription desc;
+                desc.pluginFormatName = "Internal";
+                bool hasRequestedType = false;
+                bool failure = false;
+                ValueTree node;
+                
+                switch (result)
+                {
+                    case 1:
+                        desc.fileOrIdentifier = "audio.input";
+                        hasRequestedType = graph.hasAudioInputNode();
+                        break;
+                    case 2:
+                        desc.fileOrIdentifier = "audio.output";
+                        hasRequestedType = graph.hasAudioOutputNode();
+                        break;
+                    case 3:
+                        desc.fileOrIdentifier = "midi.input";
+                        hasRequestedType = graph.hasMidiInputNode();
+                        break;
+                    case 4:
+                        desc.fileOrIdentifier = "midi.output";
+                        hasRequestedType = graph.hasMidiOutputNode();
+                        break;
+                    default:
+                        failure = true;
+                        break;
+                }
+               
+                if (failure)
+                {
+                    DBG("[EL] unkown menu result: " << result);
+                }
+                else if (hasRequestedType)
+                {
+                    const ValueTree node = graph.getNodesValueTree()
+                        .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                    const Node model (node, false);
+                    ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
+                }
+                else
+                {
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                }
             }
         }
         
@@ -773,9 +817,11 @@ namespace Element
     
     void ConnectionGrid::setNode (const Node& newNode)
     {
-        jassert (newNode.hasNodeType (Tags::graph)); // need a graph at the moment
+        ValueTree newNodes = newNode.hasNodeType(Tags::graph) ? newNode.getNodesValueTree()
+                                                              : ValueTree (Tags::nodes);
+        
         jassert (this->matrix != nullptr);
-        matrix->nodeModels = newNode.getNodesValueTree();
+        matrix->nodeModels = newNodes;
     }
     
     void ConnectionGrid::paint (Graphics& g)

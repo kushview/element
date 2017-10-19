@@ -105,7 +105,11 @@ namespace Element {
         const uint32 getNodeId() const { return (uint32)(int64) getProperty (Tags::id); }
 
         /** Returns an Identifier indicating this nodes type */
-        const Identifier getNodeType() const { return Identifier (getProperty(Slugs::type).toString()); }
+        const Identifier getNodeType() const
+        {
+            auto type = getProperty(Slugs::type).toString();
+            return type.isNotEmpty() ? type : Identifier ("unknown");
+        }
 
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
         
@@ -121,6 +125,23 @@ namespace Element {
         void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
         void getAudioInputs (PortArray& ports) const;
         void getAudioOutputs (PortArray& ports) const;
+        
+        bool hasChildNode (const var& format, const var& identifier) const
+        {
+            auto nodes = getNodesValueTree();
+            for (int i = 0; i < nodes.getNumChildren(); ++i)
+            {
+                auto child = nodes.getChild(i);
+                if (child[Tags::format] == format && child[Tags::identifier] == identifier)
+                    return true;
+            }
+            return false;
+        }
+        
+        bool hasAudioInputNode() const      { return hasChildNode ("Internal", "audio.input"); }
+        bool hasAudioOutputNode() const     { return hasChildNode ("Internal", "audio.output"); }
+        bool hasMidiInputNode() const       { return hasChildNode ("Internal", "midi.input"); }
+        bool hasMidiOutputNode() const      { return hasChildNode ("Internal", "midi.output"); }
         
         void getPluginDescription (PluginDescription&) const;
         
