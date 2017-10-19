@@ -125,6 +125,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::sessionNew,
         Commands::sessionSave,
+        Commands::sessionSaveAs,
         Commands::sessionOpen,
         Commands::sessionAddGraph,
         Commands::sessionDuplicateGraph,

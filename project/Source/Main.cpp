@@ -114,13 +114,6 @@ private:
         plugins.addFormat (new InternalFormat (*engine));
         if (isFirstRun)
         {
-//            KnownPluginList& listToAddResultsTo,
-//            AudioPluginFormat& formatToLookFor,
-//            FileSearchPath directoriesToSearch,
-//            bool searchRecursively,
-//            const File& deadMansPedalFile,
-//            bool allowPluginsWhichRequireAsynchronousInstantiation = false)
-//
             auto& formats (plugins.formats());
             for (int i = 0; i < formats.getNumFormats(); ++i)
             {
@@ -232,10 +225,11 @@ public:
             Application::quit();
     }
 
-    void anotherInstanceStarted (const String& /*commandLine*/) override
+    void anotherInstanceStarted (const String& commandLine) override
     {
         if (! controller)
             return;
+        DBG("[EL] Instance started: " << commandLine);
     }
 
     void finishLaunching()

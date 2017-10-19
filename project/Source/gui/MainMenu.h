@@ -125,6 +125,7 @@ private:
 
         menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
         menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
+        menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
 
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
