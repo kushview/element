@@ -62,9 +62,11 @@ namespace Element {
         Node (const ValueTree& data, const bool setMissing = true)
             : ObjectModel (data)
         {
-            jassert (data.hasType (Tags::node));
             if (setMissing)
+            {
+                jassert (data.hasType (Tags::node));
                 setMissingProperties();
+            }
         }
         
         Node (const Identifier& nodeType)
