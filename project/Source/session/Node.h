@@ -56,11 +56,8 @@ namespace Element {
     class Node : public ObjectModel
     {
     public:
-        /** New, invalid node */
-        Node() : ObjectModel()
-        {
-           
-        }
+        /** Create an invalid node */
+        Node() : ObjectModel() { }
         
         Node (const ValueTree& data, const bool setMissing = true)
             : ObjectModel (data)
@@ -100,10 +97,18 @@ namespace Element {
 
         /** Returns true if the underlying data is probably a node */
         bool isValid() const { return objectData.hasType (Tags::node); }
-
+        
+        /** Returns true if this node is probably a graph */
+        bool isGraph() const { return isProbablyGraphNode (objectData); }
+        
+        /** Returns the nodeId as defined in the engine */
         const uint32 getNodeId() const { return (uint32)(int64) getProperty (Tags::id); }
+
+        /** Returns an Identifier indicating this nodes type */
         const Identifier getNodeType() const { return Identifier (getProperty(Slugs::type).toString()); }
+
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
+        
         const String getName() const { return getProperty (Slugs::name); }
         
         GraphNode* getGraphNode() const;
@@ -111,14 +116,9 @@ namespace Element {
         const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
         
         const bool canConnectTo (const Node& o) const;
-        ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
-        ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
-        ValueTree getParentArcsNode() const;
-        ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-        
+
         void getPorts (PortArray& ports, PortType type, bool isInput) const;
         void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
-        
         void getAudioInputs (PortArray& ports) const;
         void getAudioOutputs (PortArray& ports) const;
         
@@ -127,6 +127,11 @@ namespace Element {
         /** Write the contents of this node to file */
         bool writeToFile (const File& file) const;
     
+        ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
+        ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
+        ValueTree getParentArcsNode() const;
+        ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
+
     private:
         void setMissingProperties();
     };

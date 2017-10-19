@@ -3,23 +3,15 @@
     Copyright (C) 2016  Kushview, LLC.  All rights reserved.
 */
 
-#include "ElementApp.h"
+#include "gui/GuiCommon.h"
 #include "engine/GraphProcessor.h"
 #include "gui/HorizontalListBox.h"
-#include "gui/ViewHelpers.h"
-#include "gui/ContentComponent.h"
- 
-#include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"
-#include "session/Node.h"
-#include "Messages.h"
-#include "Globals.h"
 
 #include "gui/ConnectionGrid.h"
 
 namespace Element
 {
-
     // Spacing between each patch point
     static const int gridPadding = 1;
     
@@ -150,7 +142,7 @@ namespace Element
         ~PatchMatrix()
         {
             nodeModels.removeListener (this);
-            graphModel.removeListener(this);
+            graphModel.removeListener (this);
         }
         
         
@@ -169,8 +161,8 @@ namespace Element
         
         const int getAudioChannelForIndex (const int index, const bool isSource) const
         {
-            return isSource ? audioOutChannels.getUnchecked(index)
-                            : audioInChannels.getUnchecked(index);
+            return isSource ? audioOutChannels.getUnchecked (index)
+                            : audioInChannels.getUnchecked (index);
         }
         
         void updateContent();
@@ -198,7 +190,7 @@ namespace Element
             if (useHighlighting &&
                     (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
             {
-                g.setColour (kv::LookAndFeel_KV1::elementBlue.withAlpha (0.3f));
+                g.setColour (LookAndFeel::elementBlue.withAlpha (0.3f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
             else
@@ -788,7 +780,7 @@ namespace Element
     
     void ConnectionGrid::paint (Graphics& g)
     {
-        g.fillAll (LookAndFeel_KV1::contentBackgroundColor);
+        g.fillAll (LookAndFeel::contentBackgroundColor);
     }
     
     void ConnectionGrid::resized()
@@ -798,7 +790,7 @@ namespace Element
     
     void ConnectionGrid::mouseDown (const MouseEvent& ev)
     {
-        DBG("DOWN");
+        Component::mouseDown (ev);
     }
     
     bool ConnectionGrid::isInterestedInDragSource (const SourceDetails& sd)

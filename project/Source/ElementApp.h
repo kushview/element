@@ -32,6 +32,7 @@ namespace Tags
     const Identifier destPort           = "destPort";
     const Identifier destChannel        = "destChannel";
     
+    const Identifier identifier         = "identifier";
     const Identifier format             = "format";
     const Identifier flow               = "flow";
     const Identifier input              = "input";

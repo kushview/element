@@ -7,22 +7,25 @@ namespace Element {
     
 static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 {
+    p.setProperty (Tags::format,        pd.pluginFormatName, nullptr);
+    p.setProperty (Tags::identifier,    pd.fileOrIdentifier, nullptr);
+    
+#if 0
     p.setProperty (Slugs::name, pd.name, nullptr);
     if (pd.descriptiveName != pd.name)
         p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
     
-    p.setProperty ("format",       pd.pluginFormatName, nullptr);
-    p.setProperty ("category",     pd.category, nullptr);
-    p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
-    p.setProperty ("version",      pd.version, nullptr);
-    p.setProperty ("file",         pd.fileOrIdentifier, nullptr);
     p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
     p.setProperty ("isInstrument", pd.isInstrument, nullptr);
     p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
+    
     p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
     p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
     p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
-    // p.setProperty ("isSuspended",  plugin->isSuspended(), nullptr);
+    p.setProperty ("category",     pd.category, nullptr);
+    p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
+    p.setProperty ("version",      pd.version, nullptr);
+#endif
 }
 
 GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) noexcept
