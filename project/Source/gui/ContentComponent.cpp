@@ -525,7 +525,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (toolBar = new Toolbar());
     
     container->setMainView (new ConnectionGrid ());
-    const Node node (getGlobals().getSession()->getGraph(0));
+    const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
     
     toolBarVisible = true;

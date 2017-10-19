@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "engine/GraphNode.h"
+
 namespace Element {
     
     class NodeArray;
