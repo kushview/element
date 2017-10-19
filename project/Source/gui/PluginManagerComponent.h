@@ -24,8 +24,7 @@
  ==============================================================================
  */
 
-#ifndef EL_PLUGIN_MANAGER_COMPONENT_H
-#define EL_PLUGIN_MANAGER_COMPONENT_H
+#pragma once
 
 #include "JuceHeader.h"
 #include "gui/ContentComponent.h"
@@ -145,5 +144,3 @@ private:
     ScopedPointer<PluginListComponent> pluginList;
 };
 }
-
-#endif   // EL_PLUGIN_MANAGER_COMPONENT_H

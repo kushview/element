@@ -32,7 +32,6 @@ public:
     Toolbar* getToolbar() const;
     void updateGraphNode (GraphNode* newNode, Component* newEditor);
     
-    // component/document window
     void moved();
     void closeButtonPressed();
     void resized();
@@ -43,6 +42,5 @@ private:
 };
 
 }
-
 
 #endif // ELEMENT_PLUGIN_WINDOW_H

@@ -85,6 +85,16 @@ namespace Element {
         return false;
     }
     
+    Node Node::createGraph()
+    {
+        Node node (Tags::graph);
+        ValueTree root = node.getValueTree();
+        root.setProperty (Tags::name, "Graph 1", nullptr);
+        root.getOrCreateChildWithName (Tags::nodes, nullptr);
+        root.getOrCreateChildWithName (Tags::arcs, nullptr);
+        return node;
+    }
+
     ValueTree Node::makeArc (const Arc& arc)
     {
         ValueTree model (Tags::arc);

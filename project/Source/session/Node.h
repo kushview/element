@@ -75,6 +75,7 @@ namespace Element {
             setMissingProperties();
         }
         
+        static Node createGraph();
         static bool isProbablyGraphNode (const ValueTree& data);
         static ValueTree parse (const File& file);
         bool writeToFile (const File& file) const;

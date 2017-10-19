@@ -364,7 +364,19 @@ namespace Element
             if (! ev.mods.isPopupMenu())
                 return;
             
+            const bool isRootGraph = graphModel.getParent().hasType(Tags::graphs) &&
+                                     graphModel.getParent().getParent().hasType(Tags::session);
+            const Node graph (graphModel);
+            
             PluginsPopupMenu menu (this);
+            if (isRootGraph)
+            {
+                menu.addItem (1, "Audio Inputs", true, true);
+                menu.addItem (2, "Audio Outputs", true, true);
+                menu.addItem (3, "MIDI Input", true, true);
+                menu.addItem (4, "MIDI Output", true, true);
+            }
+            
             menu.addSectionHeader ("Plugins");
             menu.addPluginItems();
             const int result = menu.show();
