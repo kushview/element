@@ -28,8 +28,8 @@ public:
         currentSession->freezeChangeNotification = true;
         const File file = (document) ? document->getLastDocumentOpened() : File();
         document = new SessionDocument (currentSession);
-        document->setLastDocumentOpened (file);
-        document->setChangedFlag(false);
+        document->setFile (file);
+        document->setChangedFlag (false);
         currentSession->freezeChangeNotification = wasFrozen;
         jassert(! hasSessionChanged());
     }
