@@ -28,10 +28,11 @@ static void buildCommandLine (CommandLine& cli, const String& c) {
 
 CommandLine::CommandLine (const String& c)
     : fullScreen (false),
-      port (3123)
+      port (3123),
+      commandLine (c)
 {
     if (c.isNotEmpty())
-        buildCommandLine (*this, c);
+        buildCommandLine (*this, commandLine);
 }
 
 class Globals::Impl

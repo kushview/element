@@ -26,6 +26,8 @@ struct CommandLine
     explicit CommandLine (const String& cli = String::empty);
     bool fullScreen;
     int port;
+    
+    const String commandLine;
 };
 
 class Globals : public WorldBase

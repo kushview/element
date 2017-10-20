@@ -75,7 +75,7 @@ private:
     class StartupScreen :  public SplashScreen
     {
     public:
-        StartupScreen()
+        StartupScreen ()
             : SplashScreen ("Element", 600, 400, true)
         {
             addAndMakeVisible (text);
@@ -157,6 +157,8 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
+        DBG("Element v" << getApplicationVersion());
+        DBG("[EL] " << commandLine);
         if (sendCommandLineToPreexistingInstance())
         {
             quit();
@@ -231,7 +233,16 @@ public:
     {
         if (! controller)
             return;
-        DBG("[EL] Instance started: " << commandLine);
+        if (auto* sc = controller->findChild<SessionController>())
+        {
+            const auto path = commandLine.unquoted().trim();
+            if (File::isAbsolutePath (path))
+            {
+                const File file (path);
+                if (file.hasFileExtension ("els"))
+                    sc->openFile (File (path));
+            }
+        }
     }
 
     void finishLaunching()
@@ -245,9 +256,21 @@ public:
         const bool checkUpdatesOnStart = false;
         if (checkUpdatesOnStart)
             CurrentVersion::checkAfterDelay (5000);
+        
+        if (auto* sc = controller->findChild<SessionController>())
+        {
+            const auto path = world->cli.commandLine.unquoted().trim();
+            if (File::isAbsolutePath (path))
+            {
+                const File file (path);
+                if (file.hasFileExtension ("els"))
+                    sc->openFile (File (path));
+            }
+        }
     }
     
 private:
+    String launchCommandLine;
     ScopedPointer<Globals>       world;
     ScopedPointer<AppController> controller;
     ScopedPointer<Startup>       startup;
