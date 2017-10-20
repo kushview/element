@@ -54,24 +54,24 @@ namespace Element {
         auto graphs = getGraphsValueTree();
         graphs.addChild (node.getValueTree(), -1, nullptr);
         if (setActive)
-            graphs.setProperty ("active", graphs.indexOf(node.getValueTree()), nullptr);
+            graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), nullptr);
         return true;
     }
     
-    Node Session::getCurrentGraph() const
+    Node Session::getActiveGraph() const
     {
         const int index = getActiveGraphIndex();
         if (isPositiveAndBelow (index, getNumGraphs()))
             return getGraph (index);
     
         ValueTree graphs = getGraphsValueTree();
-        graphs.setProperty ("active", graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
+        graphs.setProperty (Tags::active, graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
         return  graphs.getNumChildren() > 0 ? getGraph(0) : Node();
     }
     
     int Session::getActiveGraphIndex() const
     {
-        return getGraphsValueTree().getProperty ("active", -1);
+        return getGraphsValueTree().getProperty (Tags::active, -1);
     }
     
     void Session::clear()
@@ -93,26 +93,18 @@ namespace Element {
     {
         ValueTree saveData = objectData.createCopy();
         Node::sanitizeProperties (saveData, true);
-        XmlElement* e = saveData.createXml();
-        if (nullptr != e)
-            polishXml (*e);
-
-        return e;
-    }
-
-    void Session::polishXml (XmlElement &e)
-    {
-        // noop
+        return saveData.createXml();
     }
 
     void Session::setMissingProperties (bool resetExisting)
     {
         if (resetExisting)
             objectData.removeAllProperties (nullptr);
+
         if (! objectData.hasProperty (Tags::name))
             setProperty (Tags::name, "Untitled");
         if (! objectData.hasProperty (Slugs::tempo))
-            setProperty (Tags::tempo, (double) 120.f);
+            setProperty (Tags::tempo, (double) 120.0);
         
         if (resetExisting)
             objectData.removeAllChildren (nullptr);
@@ -120,6 +112,13 @@ namespace Element {
         ValueTree graphs = objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
     }
 
+    void Session::notifyChanged()
+    {
+        if (freezeChangeNotification)
+            return;
+        sendChangeMessage();
+    }
+    
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
         if (property == Tags::object ||
@@ -128,17 +127,17 @@ namespace Element {
             return;
         }
         
-        sendChangeMessage();
+        notifyChanged();
     }
 
     void Session::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
     {
-        sendChangeMessage();
+        notifyChanged();
     }
 
     void Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
     {
-         sendChangeMessage();
+        notifyChanged();
     }
 
     void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int) {  }

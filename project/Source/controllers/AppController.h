@@ -14,7 +14,7 @@ class AppController :  public Controller,
 public:
     AppController (Globals&);
     ~AppController();
-
+    
     inline CommandManager& getCommandManager() { return commands; }
     inline Globals& getWorld() { return getGlobals(); }
     inline Globals& getGlobals() { return world; }
@@ -22,6 +22,14 @@ public:
     void activate() override;
     void deactivate() override;
 
+    class Child : public Controller {
+    public:
+        Child() { }
+        virtual ~Child() { }
+        
+        Globals& getWorld();
+    };
+    
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;

@@ -26,7 +26,8 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
     }
 
     g.setColour ((selected) ? LF::textColor.brighter(0.2f) : LF::textColor);
-    g.drawText (text, padding, 0, w - padding, h, Justification::centredLeft);
+    if (text.isNotEmpty())
+        g.drawText (text, padding, 0, w - padding, h, Justification::centredLeft);
 
     g.restoreState();
 }

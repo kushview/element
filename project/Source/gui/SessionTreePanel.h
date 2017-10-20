@@ -22,8 +22,8 @@ public:
     ~SessionGraphsListBox();
     
     int getNumRows() override;
-    void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
-                           bool rowIsSelected) override;
+    virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
+                                   bool rowIsSelected) override;
 
     inline void setSession (Session* s, const bool selectActiveGraph = true)
     {
@@ -35,7 +35,8 @@ public:
             selectRow (0);
     }
     
-    Node getSelectedGraph() { return session ? session->getGraph (getSelectedRow()) : Node(); }
+    Node getGraph (int index)   { return session ? session->getGraph (index) : Node(); }
+    Node getSelectedGraph()     { return getGraph (getSelectedRow()); }
     
 #if 0
     virtual Component* refreshComponentForRow (int rowNumber, bool isRowSelected,

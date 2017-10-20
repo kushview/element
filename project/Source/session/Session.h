@@ -23,7 +23,8 @@ namespace Element {
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
         inline Node getGraph (const int index) const { return Node (getGraphValueTree(index), false); }
-        Node getCurrentGraph() const;
+        Node getCurrentGraph() const { return getActiveGraph();}
+        Node getActiveGraph() const;
         int getActiveGraphIndex() const;
         
         bool addGraph (const Node &node, const bool setActive);
@@ -31,9 +32,9 @@ namespace Element {
         ValueTree getValueTree() const { return objectData; }
         bool loadData (const ValueTree& data);
         void clear();
-
-        inline String getName() const { return node().getProperty(Slugs::name, "Invalid Session"); }
-        inline Value getNameValue() { return getPropertyAsValue (Slugs::name); }
+        
+        inline String getName() const   { return objectData.getProperty(Slugs::name, "Invalid Session"); }
+        inline Value getNameValue()     { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
 
         XmlElement* createXml();
@@ -58,10 +59,14 @@ namespace Element {
     private:
         class Private;
         ScopedPointer<Private> priv;
-        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
-        void polishXml (XmlElement& e);
         void setMissingProperties (bool resetExisting = false);
-        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild (index); }
+        
+        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
+        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
+        
+        friend class SessionController;
+        bool freezeChangeNotification = false;
+        void notifyChanged();
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);
     };

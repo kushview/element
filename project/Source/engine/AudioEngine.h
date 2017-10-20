@@ -52,9 +52,10 @@ public:
     
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
+    RootGraph* getGraph (const int index);
     
     RootGraph& getRootGraph();
-    RootGraph* getGraph (const int index);
+    
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     

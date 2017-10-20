@@ -12,6 +12,7 @@ public:
     
     void resized() override;
     void didBecomeActive() override;
+    void paint (Graphics& g) override;
 
 private:
     ScopedPointer<SessionPropertyPanel> props;

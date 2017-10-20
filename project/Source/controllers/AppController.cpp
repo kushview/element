@@ -21,6 +21,13 @@ static void showProductLockedAlert (const String& msg = String(), const String& 
     if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
         URL("https://kushview.net/products/element/").launchInDefaultBrowser();
 }
+
+    Globals& AppController::Child::getWorld()
+    {
+        auto* app = dynamic_cast<AppController*> (getRoot());
+        jassert(app);
+        return app->getWorld();
+    }
     
 AppController::AppController (Globals& g)
     : world (g)
@@ -194,7 +201,7 @@ bool AppController::perform (const InvocationInfo& info)
             FileChooser chooser ("Export Graph", lastSavedFile, "*.elg");
             if (world.getUnlockStatus().isFullVersion() && chooser.browseForFileToSave (true))
                 findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
-                                                             chooser.getResult(), false);
+                                                             chooser.getResult());
             else
                 Element::showProductLockedAlert();
         } break;

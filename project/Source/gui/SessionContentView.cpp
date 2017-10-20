@@ -1,7 +1,6 @@
 
+#include "gui/GuiCommon.h"
 #include "gui/SessionContentView.h"
-#include "gui/ViewHelpers.h"
-#include "Globals.h"
 
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;
@@ -54,6 +53,9 @@ namespace Element {
         resized();
     }
     
+    void SessionContentView::paint (Graphics& g) {
+        g.fillAll(LookAndFeel::contentBackgroundColor);
+    }
     void SessionContentView::resized()
     {
         props->setBounds (getLocalBounds());

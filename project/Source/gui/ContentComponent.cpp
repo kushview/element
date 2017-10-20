@@ -246,6 +246,8 @@ public:
         return ListBox::keyPressed (kp);
     }
     
+    void paintListBoxItem (int, Graphics&, int, int, bool) override { }
+    
     void listBoxItemClicked (int row, const MouseEvent& ev) override
     {
         if (ev.mods.isPopupMenu())
@@ -261,6 +263,64 @@ public:
             cc->setCurrentNode (graph);
         }
     }
+    
+    Component* refreshComponentForRow (int row, bool isSelected, Component* c) override
+    {
+        Row* r = (nullptr == c) ? new Row (*this) : dynamic_cast<Row*> (c);
+        jassert(r);
+        r->updateContent (getGraph(row), row, isSelected);
+        return r;
+    }
+    
+private:
+    class Row : public Component{
+    public:
+        Row (ElementsNavigationPanel& _owner) : owner (_owner)
+        {
+            addAndMakeVisible(text);
+            text.setJustificationType (Justification::centredLeft);
+            text.setInterceptsMouseClicks (false, false);
+            text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.brighter());
+        }
+        
+        void updateContent (const Node& _node, int _row, bool _selected)
+        {
+            node        = _node;
+            row         = _row;
+            selected    = _selected;
+            if (node.isValid())
+                text.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+        }
+        
+        void mouseDown (const MouseEvent& ev) override
+        {
+            owner.selectRow (row);
+         
+            if (ev.getNumberOfClicks() == 2) {
+                if (! text.isBeingEdited())
+                    text.showEditor();
+            } else {
+                owner.listBoxItemClicked (row, ev);
+            }
+        }
+        
+        void paint (Graphics& g) override
+        {
+            ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
+        }
+        
+        void resized() override
+        {
+            text.setBounds (10, 0, getWidth() - 40, getHeight());
+        }
+        
+    private:
+        ElementsNavigationPanel& owner;
+        Node node;
+        Label text;
+        int row = 0;
+        bool selected = false;
+    };
 };
 
 class NavigationConcertinaPanel : public ConcertinaPanel {

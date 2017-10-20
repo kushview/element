@@ -18,7 +18,7 @@ void SessionController::activate()
 
 void SessionController::deactivate()
 {
-    auto& world = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto& world = getWorld();
     auto& settings (world.getSettings());
     auto* props = settings.getUserSettings();
     
@@ -29,6 +29,7 @@ void SessionController::deactivate()
         document = nullptr;
     }
     
+    currentSession->clear();
     currentSession = nullptr;
 }
 
@@ -52,8 +53,10 @@ void SessionController::openFile (const File& file)
         Result result = document->loadFrom (file, true);
         if (result.wasOk())
         {
+            currentSession->freezeChangeNotification = true;
             if (auto* ec = findSibling<EngineController>())
                 ec->setRootNode (currentSession->getCurrentGraph());
+            currentSession->freezeChangeNotification = false;
         }
     }
     else
@@ -66,9 +69,8 @@ void SessionController::openFile (const File& file)
             gc->stabilizeContent();
 }
 
-void SessionController::exportGraph (const Node& node, const File& targetFile, const bool askToOverwrite)
+void SessionController::exportGraph (const Node& node, const File& targetFile)
 {
-    ignoreUnused (askToOverwrite);
     if (! node.hasNodeType (Tags::graph)) {
         jassertfalse;
         return;
@@ -116,14 +118,15 @@ void SessionController::newSession()
     
     if (res == 1 || res == 2)
     {
+        currentSession->freezeChangeNotification = true;
         currentSession->clear();
         if (auto* ec = findSibling<EngineController>())
             if (currentSession->getNumGraphs() > 0)
                 ec->setRootNode (currentSession->getCurrentGraph());
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
-        document->setFile (File::nonexistent);
-        document->setChangedFlag (false);
+        document = new SessionDocument (currentSession);
+        currentSession->freezeChangeNotification = false;
     }
 }
 

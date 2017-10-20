@@ -1,12 +1,12 @@
 
 #pragma once
 
-#include "controllers/Controller.h"
+#include "controllers/AppController.h"
 #include "gui/SessionDocument.h"
 #include "session/Session.h"
 
 namespace Element {
-class SessionController : public Controller
+class SessionController : public AppController::Child
 {
 public:
     SessionController() { }
@@ -20,7 +20,7 @@ public:
     void saveSession (const bool saveAs = false);
     void newSession();
     
-    void exportGraph (const Node& node, const File& targetFile, const bool askToOverwrite);
+    void exportGraph (const Node& node, const File& targetFile);
     void importGraph (const File& file);
     
 private:
