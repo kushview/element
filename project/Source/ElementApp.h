@@ -16,6 +16,7 @@ namespace Element {
 namespace Tags
 {
     using namespace kv::Slugs;
+    const Identifier active             = "active";
     const Identifier arc                = "arc";
     const Identifier arcs               = "arcs";
     const Identifier graph              = "graph";

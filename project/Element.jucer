@@ -278,7 +278,6 @@
       <FILE id="ItTH1t" name="Tests.h" compile="0" resource="0" file="../tests/Tests.h"/>
       <FILE id="ujRJ4A" name="wscript_build" compile="0" resource="0" file="../tests/wscript_build"/>
     </GROUP>
-    <FILE id="wnLFot" name="wscript" compile="0" resource="0" file="../wscript"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=0"

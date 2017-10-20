@@ -106,7 +106,9 @@ void EngineController::removeGraph (int index)
     index = graphs.indexOf (node.getValueTree());
     graphs.removeChild (index, nullptr);
     index = jmin (index, graphs.getNumChildren() - 1);
-    graphs.setProperty ("active", index, nullptr);
+    graphs.setProperty (Tags::active, index, nullptr);
+    node = session->getCurrentGraph();
+    setRootNode (node);
     findSibling<GuiController>()->stabilizeContent();
 }
 
