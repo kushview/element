@@ -123,6 +123,8 @@ void SessionController::newSession()
         if (auto* ec = findSibling<EngineController>())
             if (currentSession->getNumGraphs() > 0)
                 ec->setRootNode (currentSession->getCurrentGraph());
+            else
+                ec->clear();
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
         document = new SessionDocument (currentSession);

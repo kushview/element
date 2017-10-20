@@ -209,17 +209,19 @@ public:
             return;
         }
         
+        auto* sc = controller->findChild<SessionController>();
+        
         // - 0 if the third button was pressed ('cancel')
         // - 1 if the first button was pressed ('yes')
         // - 2 if the middle button was pressed ('no')
-        const int res = AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
-           "Save Session", "This session may have changes. Would you like to save before exiting?");
+        
+        const int res = !sc->hasSessionChanged() ? 2
+            : AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
+                                               "Save Session",
+                                               "This session may have changes. Would you like to save before exiting?");
         
         if (res == 1)
-        {
-            auto* sc = controller->findChild<SessionController>();
             sc->saveSession();
-        }
         
         if (res != 0)
             Application::quit();

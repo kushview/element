@@ -2,6 +2,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "controllers/SessionController.h"
 #include "engine/AudioEngine.h"
 #include "gui/NewSessionView.h"
 #include "gui/AboutComponent.h"
@@ -126,6 +127,7 @@ void GuiController::run()
     mainWindow->addKeyListener (commander().getKeyMappings());
     mainWindow->addToDesktop();
     mainWindow->setVisible (true);
+    findSibling<SessionController>()->resetChanges();
 }
 
 bool GuiController::shutdownApp()

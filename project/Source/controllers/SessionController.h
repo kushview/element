@@ -19,6 +19,20 @@ public:
     void closeSession();
     void saveSession (const bool saveAs = false);
     void newSession();
+    bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
+    inline void resetChanges()
+    {
+        if (! document)
+            return;
+        const bool wasFrozen = currentSession->freezeChangeNotification;
+        currentSession->freezeChangeNotification = true;
+        const File file = (document) ? document->getLastDocumentOpened() : File();
+        document = new SessionDocument (currentSession);
+        document->setLastDocumentOpened (file);
+        document->setChangedFlag(false);
+        currentSession->freezeChangeNotification = wasFrozen;
+        jassert(! hasSessionChanged());
+    }
     
     void exportGraph (const Node& node, const File& targetFile);
     void importGraph (const File& file);

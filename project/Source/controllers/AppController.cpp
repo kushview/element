@@ -67,6 +67,9 @@ void AppController::run()
     
     if (auto* gui = findChild<GuiController>())
         gui->stabilizeContent();
+    
+    if (auto* sc = findChild<SessionController>())
+        sc->resetChanges();
 }
 
 void AppController::handleMessage (const Message& msg)
