@@ -55,10 +55,6 @@ public:
             activeDialogs.add (dialog);
             dialog->addToDesktop();
             dialog->setVisible (true);
-            dialog->runModalLoop();
-
-            if (activeDialogs.contains (dialog))
-                activeDialogs.remove (activeDialogs.indexOf (dialog), true);
         }
     }
 
