@@ -19,7 +19,14 @@
 
 //[Headers] You can add your own extra header files here...
 #include "session/DeviceManager.h"
+#include "session/PluginManager.h"
+#include "gui/GuiCommon.h"
 #include "Globals.h"
+#include "Settings.h"
+
+#define EL_AUDIO_ENGINE_PREFERENCE_NAME "Audio Engine"
+#define EL_APPLICATION_PREFERENCE_NAME  "Application"
+
 //[/Headers]
 
 #include "PreferencesComponent.h"
@@ -27,8 +34,6 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
-
-
     class PreferencesComponent::PageList :  public ListBox,
                                             public ListBoxModel
     {
@@ -51,30 +56,23 @@ namespace Element {
             return pageNames.size();
         }
 
-        virtual void paintListBoxItem (int rowNumber,
-                                       Graphics& g,
-                                       int width, int height,
+        void paint (Graphics& g) {
+            g.fillAll (LookAndFeel::widgetBackgroundColor.darker (0.45));
+        }
+        virtual void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                        bool rowIsSelected)
         {
-            if (rowNumber < pageNames.size())
-            {
-                if (rowIsSelected)
-                {
-                    g.setColour (Colour (0xff444444));
-                    g.fillRect (0, 0, width, height);
-                }
-
-                g.setFont (font);
-                g.setColour (Colours::whitesmoke);
-                g.drawText (pageNames[rowNumber], 10, 0, width - 10, height, Justification::left, true);
-            }
+            if (! isPositiveAndBelow (rowNumber, pageNames.size()))
+                return;
+            ViewHelpers::drawBasicTextRow(pageNames[rowNumber], g, width, height, rowIsSelected);
         }
 
         void listBoxItemClicked (int row, const MouseEvent& e)
         {
-            if (uri != pageURIs[row]) {
-                uri = pageURIs [row];
-                owner.setPage (uri);
+            if (isPositiveAndBelow (row, pageNames.size()) && page != pageNames [row])
+            {
+                page = pageNames [row];
+                owner.setPage (page);
             }
         }
 
@@ -85,6 +83,9 @@ namespace Element {
             return tool;
         }
 
+        int indexOfPage (const String& name) const {
+            return pageNames.indexOf (name);
+        }
 
     private:
         friend class PreferencesComponent;
@@ -92,19 +93,121 @@ namespace Element {
         void addItem (const String& name, const String& identifier)
         {
             pageNames.addIfNotAlreadyThere (name);
-            pageURIs.addIfNotAlreadyThere (identifier);
             updateContent();
         }
 
         Font font;
         PreferencesComponent& owner;
-
         StringArray pageNames;
-        StringArray pageURIs;
-        String      uri;
-
+        String page;
     };
 
+    class AppPreferencesComponent : public Component,
+                                    public ButtonListener
+    {
+    public:
+        AppPreferencesComponent (Globals& w)
+            : plugins (w.getPluginManager()),
+              settings (w.getSettings())
+        {
+            addAndMakeVisible (activeFormats);
+            activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
+            activeFormats.setFont (Font (18.0, Font::bold));
+            addAndMakeVisible (formatNotice);
+            formatNotice.setText ("Note: enabled format changes take effect upon restart", dontSendNotification);
+            formatNotice.setFont (Font (12.0, Font::italic));
+           #if JUCE_MAC
+            availableFormats.addArray ({ "AudioUnit", "VST", "VST3" });
+           #else
+            availableFormats.addArray ({ "VST", "VST3" });
+           #endif
+            for (const auto& f : availableFormats)
+            {
+                auto* toggle = formatToggles.add (new ToggleButton (f));
+                addAndMakeVisible (toggle);
+                toggle->setButtonText (nameForFormat (f));
+                toggle->setColour (ToggleButton::textColourId, LookAndFeel::textColor);
+                toggle->setColour (ToggleButton::tickColourId, Colours::black);
+                toggle->addListener (this);
+            }
+            
+            updateToggleStates();
+        }
+
+        void resized() override
+        {
+            const int spacingBetweenSections = 6;
+            const int toggleInset = 4;
+            
+            Rectangle<int> r (getLocalBounds());
+            activeFormats.setBounds (r.removeFromTop (24));
+            formatNotice.setBounds (r.removeFromTop (14));
+            
+            r.removeFromTop (spacingBetweenSections);
+            
+            for (auto* c : formatToggles)
+            {
+                auto r2 = r.removeFromTop (18);
+                c->setBounds (r2.removeFromRight (getWidth() - toggleInset));
+                r.removeFromTop (4);
+            }
+        }
+        
+        void paint (Graphics&) override { }
+        
+        void buttonClicked (Button*) {
+            writeSetting();
+        }
+        
+    private:
+        PluginManager&  plugins;
+        Settings&       settings;
+        
+        Label activeFormats;
+        
+        OwnedArray<ToggleButton> formatToggles;
+        StringArray availableFormats;
+        
+        Label formatNotice;
+        
+        const String key = "enabledPluginFormats";
+        bool hasChanged = false;
+        
+        String nameForFormat (const String& name)
+        {
+            if (name == "AudioUnit")
+                return "Audio Unit";
+            return name;
+        }
+        
+        void updateToggleStates()
+        {
+            auto& formats = plugins.formats();
+            for (auto* c : formatToggles)
+            {
+                c->setToggleState (false, dontSendNotification);
+                for (int i = 0; i < formats.getNumFormats(); ++i)
+                {
+                    if (formats.getFormat(i)->getName() == c->getName())
+                        { c->setToggleState(true, dontSendNotification); break; }
+                }
+            }
+        }
+        
+        void writeSetting()
+        {
+            StringArray toks;
+            for (auto* c : formatToggles)
+            {
+                if (c->getToggleState())
+                    toks.add (c->getName());
+            }
+            
+            const auto value = toks.joinIntoString(",");
+            settings.getUserSettings()->setValue (key, value);
+        }
+    };
+    
     typedef AudioDeviceSelectorComponent DevicesComponent;
     class AudioSettingsComponent : public DevicesComponent
     {
@@ -146,10 +249,10 @@ PreferencesComponent::PreferencesComponent (Globals& g)
 
 
     //[Constructor] You can add your own custom stuff here..
-    // pageList->addItem ("Application",  "element://gui/application");
-    pageList->addItem ("Audio Engine", "element://gui/audioEngine");
-    // pageList->addItem ("MIDI Devices", "element://gui/midiDevices");
-    setPage ("element://gui/audioEngine");
+    // addPage (EL_APPLICATION_PREFERENCE_NAME);
+    addPage (EL_AUDIO_ENGINE_PREFERENCE_NAME);
+    
+    setPage (EL_AUDIO_ENGINE_PREFERENCE_NAME);
     //[/Constructor]
 }
 
@@ -171,9 +274,8 @@ PreferencesComponent::~PreferencesComponent()
 void PreferencesComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
+    g.fillAll (LookAndFeel::widgetBackgroundColor);
     //[/UserPrePaint]
-
-    g.fillAll (Colour (0xff3b3b3b));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -194,35 +296,39 @@ void PreferencesComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void PreferencesComponent::addPage (const String& name) {
+    pageList->addItem (name, name);
+}
 
-void PreferencesComponent::setPage (const String& uri)
+Component* PreferencesComponent::createPageForName (const String& name) {
+    if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
+        return new AudioSettingsComponent (world.getDeviceManager());
+    } else if (name == EL_APPLICATION_PREFERENCE_NAME) {
+        return new AppPreferencesComponent (world);
+    }
+    return nullptr;
+}
+
+void PreferencesComponent::setPage (const String& name)
 {
-    if (nullptr != pageComponent && uri == pageComponent->getName())
+    if (nullptr != pageComponent && name == pageComponent->getName())
         return;
 
-    Rectangle<int> b = pageComponent->getBounds();
-    if (uri == "element://gui/audioEngine")
+    if (pageComponent)
+        removeChildComponent (pageComponent);
+
+    pageComponent = createPageForName (name);
+    if (pageComponent)
     {
-        groupComponent->setText ("Audio");
-        pageComponent = new AudioSettingsComponent (world.getDeviceManager());
-        pageComponent->setName (uri);
-    }
-    else if (uri == "element://gui/application")
-    {
-        groupComponent->setText ("Application");
-        pageComponent = new Component(); //new AppSettingsComponent (gui);
-        pageComponent->setName (uri);
+        pageComponent->setName (name);
+        addAndMakeVisible (pageComponent);
+        pageList->selectRow (pageList->indexOfPage (name));
     }
     else
     {
-        groupComponent->setText ("None");
-        pageComponent = new Component();
-        pageComponent->setName ("nil");
+        pageComponent = new Component (name);
     }
-
-    pageList->selectRow (pageList->pageURIs.indexOf (uri));
-    pageComponent->setBounds (b);
-    addAndMakeVisible (pageComponent);
+    resized();
 }
 
 } /* namespace Element */
@@ -243,7 +349,7 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="world (g)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">
-  <BACKGROUND backgroundColour="ff3b3b3b"/>
+  <BACKGROUND backgroundColour="3b3b3b"/>
   <GENERICCOMPONENT name="Page List" id="c2205f1e30617b7c" memberName="pageList"
                     virtualName="" explicitFocusOrder="0" pos="8 8 184 480" class="PageList"
                     params="*this"/>

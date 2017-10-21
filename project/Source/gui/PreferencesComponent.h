@@ -45,8 +45,9 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setPage (const String& uri);
-
+    void setPage (const String& name);
+    void addPage (const String& name);
+    Component* createPageForName (const String& name);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -58,6 +59,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
     Globals& world;
+    OwnedArray<Component> pages;
     //[/UserVariables]
 
     //==============================================================================
