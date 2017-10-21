@@ -171,6 +171,37 @@ namespace Element {
         }
     }
     
+    void Node::getPossibleSources (NodeArray& a) const
+    {
+        ValueTree nodes = objectData.getParent();
+        if (! nodes.hasType (Tags::nodes))
+            return;
+        
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        {
+            const Node child (nodes.getChild (i));
+            if (child.getNodeId() == getNodeId())
+                continue;
+            if (child.canConnectTo (*this))
+                a.add (child);
+        }
+    }
+    
+    void Node::getPossibleDestinations (NodeArray& a) const
+    {
+        ValueTree nodes = objectData.getParent();
+        if (! nodes.hasType (Tags::nodes))
+            return;
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        {
+            const Node child (nodes.getChild (i));
+            if (child.getNodeId() == getNodeId())
+                continue;
+            if (canConnectTo (child))
+                a.add (child);
+        }
+    }
+
     void NodeArray::sortByName()
     {
         NameSorter sorter;

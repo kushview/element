@@ -157,6 +157,9 @@ namespace Element {
 
         void resetPorts();
         
+        void getPossibleSources (NodeArray& nodes) const;
+        void getPossibleDestinations (NodeArray& nodes) const;
+        
     private:
         void setMissingProperties();
     };

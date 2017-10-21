@@ -88,47 +88,129 @@ namespace Element
         
         typedef std::initializer_list<ItemIds> ItemList;
         
-        NodePopupMenu ()
-        {
-            for (int item = AddAudioInputNode; item < LastItem; ++item)
-                addItem (item, getNameForItem ((ItemIds) item));
-        }
+        explicit NodePopupMenu() { }
         
-        NodePopupMenu (const Node& n, bool showInputs = false, bool showOutputs = false)
+        NodePopupMenu (const Node& n)     // Display sibling outputs
             : node (n)
         {
-            addItem (RemoveNode, getNameForItem (RemoveNode));
+            addMainItems (true);
+        }
+        
+        NodePopupMenu (const Node& n, const Port& p)
+            : node (n), port(p)
+        {
+            addMainItems (true);
+            NodeArray siblings;
+            addSeparator();
             
-            if (! (showInputs || showOutputs))
-                return;
-            
-            ValueTree parent = node.getValueTree().getParent().getParent();
-            
-            if (parent.hasType (Tags::node))
+            if (port.isInput())
             {
-                ValueTree nodes = parent.getChildWithName (Tags::nodes);
-                PopupMenu inputs, outputs;
-                
-                for (int i = 0; i < nodes.getNumChildren(); ++i)
+                PopupMenu items;
+                node.getPossibleSources (siblings);
+                for (auto& src : siblings)
                 {
-                    const Node child (nodes.getChild (i));
-                    inputs.addItem (100 + i, child.getName());
-                    outputs.addItem (200 + i, child.getName());
+                    PopupMenu srcMenu;
+                    PortArray ports;
+                    src.getPorts (ports, PortType::Audio, false);
+                    if (ports.isEmpty())
+                        continue;
+                    for (const auto& p : ports)
+                        addItemInternal (srcMenu, p.getName(), new SingleConnectOp (src, p, node, port));
+                    items.addSubMenu (src.getName(), srcMenu);
                 }
                 
-                addSeparator();
-                if (showInputs)
-                    addSubMenu ("Inputs", inputs);
-                if (showOutputs)
-                    addSubMenu ("Outputs", outputs);
+                addSubMenu ("Sources", items);
+            }
+            else
+            {
+                PopupMenu items;
+                node.getPossibleDestinations (siblings);
+                for (auto& dst : siblings)
+                {
+                    PopupMenu srcMenu;
+                    PortArray ports;
+                    dst.getPorts (ports, PortType::Audio, true);
+                    if (ports.isEmpty())
+                        continue;
+                    for (const auto& p : ports)
+                        addItemInternal (srcMenu, p.getName(), new SingleConnectOp (node, port, dst, p));
+                    items.addSubMenu (dst.getName(), srcMenu);
+                }
+                
+                addSubMenu ("Destinations", items);
             }
         }
         
-        const Node node;
+        ~NodePopupMenu()
+        {
+            resultMap.clear();
+            deleter.clearQuick (true);
+        }
+        
+        
+        Message* createMessageForResultCode (const int result)
+        {
+            if (auto* op = resultMap [result])
+                return op->createMessage();
+            return nullptr;
+        }
         
     private:
-        const int sourceOffset = 0;
-        const int destinationOffset = 1024;
+        const Node node;
+        const Port port;
+        const int firstResultOpId = 1024;
+        int currentResultOpId = 1024;
+        
+        struct ResultOp
+        {
+            ResultOp() { }
+            virtual ~ResultOp () { }
+            virtual bool isActive() { return true; }
+            virtual bool isTicked() { return false; }
+            virtual Message* createMessage() =0;
+            
+            JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResultOp);
+        };
+        
+        struct SingleConnectOp : public ResultOp
+        {
+            SingleConnectOp (const Node& sn, const Port& sp, const Node& dn, const Port& dp)
+                : sourceNode(sn), destNode(dn),  sourcePort (sp), destPort (dp)
+            { }
+            
+            const Node sourceNode, destNode;
+            const Port sourcePort, destPort;
+            
+            bool isTicked()
+            {
+                return connectionExists (sourceNode.getParentArcsNode(),
+                                         sourceNode.getNodeId(), sourcePort.getIndex(),
+                                         destNode.getNodeId(), destPort.getIndex());
+            }
+            
+            Message* createMessage()
+            {
+                return new AddConnectionMessage (sourceNode.getNodeId(), sourcePort.getIndex(),
+                                                 destNode.getNodeId(), destPort.getIndex());
+            }
+        };
+        
+        HashMap<int, ResultOp*> resultMap;
+        OwnedArray<ResultOp> deleter;
+        
+        void addMainItems (const bool showHeader)
+        {
+            if (showHeader)
+                addSectionHeader (node.getName());
+            addItem (RemoveNode, getNameForItem (RemoveNode));
+        }
+        
+        void addItemInternal (PopupMenu& menu, const String& name, ResultOp* op)
+        {
+            menu.addItem (currentResultOpId, name, op->isActive(), op->isTicked());
+            resultMap.set (currentResultOpId, deleter.add (op));
+            ++currentResultOpId;
+        }
         
         String getNameForItem (ItemIds item)
         {
@@ -322,7 +404,23 @@ namespace Element
         void showMenuForNode (const Node& node)
         {
             NodePopupMenu menu (node);
-            handleNodeMenuResult (menu.show(), node);
+            const int result = menu.show();
+            if (auto* message = menu.createMessageForResultCode (result)) {
+                ViewHelpers::postMessageFor (this, message);
+                return;
+            }
+            handleNodeMenuResult (result, node);
+        }
+        
+        void showMenuForNodeAndPort (const Node& n, const Port& p)
+        {
+            NodePopupMenu menu (n, p);
+            const int result = menu.show();
+            if (auto* message = menu.createMessageForResultCode (result)) {
+                ViewHelpers::postMessageFor (this, message);
+                return;
+            }
+            handleNodeMenuResult (result, n);
         }
         
     private:
@@ -453,8 +551,9 @@ namespace Element
         void listBoxItemClicked (int row, const MouseEvent& ev, bool isSource)
         {
             const Node node (getNode (row, isSource));
+            const Port port (getPort (row, isSource));
             if (ev.mods.isPopupMenu())
-                showMenuForNode (node);
+                showMenuForNodeAndPort (node, port);
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 cc->setCurrentNode (node);
         }
