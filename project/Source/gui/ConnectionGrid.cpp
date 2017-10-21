@@ -69,6 +69,9 @@ namespace Element
         bool hasAddedPlugins = false;
     };
     
+    
+    // MARK: Node Popup Menu
+    
     class NodePopupMenu : public PopupMenu
     {
     public:
@@ -91,21 +94,41 @@ namespace Element
                 addItem (item, getNameForItem ((ItemIds) item));
         }
         
-        NodePopupMenu (const Node& n)
+        NodePopupMenu (const Node& n, bool showInputs = false, bool showOutputs = false)
             : node (n)
         {
             addItem (RemoveNode, getNameForItem (RemoveNode));
-            return;
             
-            for (int item = RemoveNode; item < LastItem; ++item) {
-                if (item == AddAudioInputNode)
-                    addSeparator();
-                addItem (item, getNameForItem ((ItemIds) item));
+            if (! (showInputs || showOutputs))
+                return;
+            
+            ValueTree parent = node.getValueTree().getParent().getParent();
+            
+            if (parent.hasType (Tags::node))
+            {
+                ValueTree nodes = parent.getChildWithName (Tags::nodes);
+                PopupMenu inputs, outputs;
+                
+                for (int i = 0; i < nodes.getNumChildren(); ++i)
+                {
+                    const Node child (nodes.getChild (i));
+                    inputs.addItem (100 + i, child.getName());
+                    outputs.addItem (200 + i, child.getName());
+                }
+                
+                addSeparator();
+                if (showInputs)
+                    addSubMenu ("Inputs", inputs);
+                if (showOutputs)
+                    addSubMenu ("Outputs", outputs);
             }
         }
         
         const Node node;
+        
     private:
+        const int sourceOffset = 0;
+        const int destinationOffset = 1024;
         
         String getNameForItem (ItemIds item)
         {
