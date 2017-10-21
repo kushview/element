@@ -159,6 +159,18 @@ namespace Element {
         getPorts (ports, PortType::Audio, false);
     }
     
+    void Node::resetPorts()
+    {
+        if (GraphNodePtr ptr = getGraphNode())
+        {
+            ptr->resetPorts();
+            ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
+            ValueTree ports = getPortsValueTree();
+            objectData.removeChild (ports, nullptr);
+            objectData.addChild (newPorts, -1, nullptr);
+        }
+    }
+    
     void NodeArray::sortByName()
     {
         NameSorter sorter;

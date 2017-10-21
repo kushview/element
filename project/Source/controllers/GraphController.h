@@ -65,6 +65,13 @@ public:
     
     void savePluginStates();
     
+    /** Rebuilds the arcs model according to the GraphProcessor */
+    inline void syncArcsModel()
+    {
+        processor.removeIllegalConnections();
+        processorArcsChanged();
+    }
+    
 private:
     PluginManager& pluginManager;
     GraphProcessor& processor;

@@ -208,6 +208,14 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
+    ValueTree nodes = newRootNode.getNodesValueTree();
+    for (int i = nodes.getNumChildren(); --i >= 0;)
+    {
+        Node model (nodes.getChild(i), false);
+        GraphNodePtr node = model.getGraphNode();
+        if (node && node->isAudioIONode())
+            model.resetPorts();
+    }
 }
 
 void EngineController::addMissingIONodes()
@@ -265,12 +273,13 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
         if (auto* device = devices.getCurrentAudioDevice())
         {
             auto session = app->getWorld().getSession();
-            auto nodes = session->getGraph(0).node().getChildWithName(Tags::nodes);
+            auto nodes = session->getActiveGraph().getValueTree().getChildWithName(Tags::nodes);
             processor.suspendProcessing (true);
             processor.setPlayConfigFor (device);
+            
             for (int i = nodes.getNumChildren(); --i >= 0;)
             {
-                const Node model (nodes.getChild(i), false);
+                Node model (nodes.getChild(i), false);
                 GraphNodePtr node = model.getGraphNode();
                 if (node && node->isAudioIONode())
                 {
@@ -278,15 +287,12 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
                     (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
                     (dynamic_cast<IOP*>(node->getProcessor()))->prepareToPlay (device->getCurrentSampleRate(),
                                                                                device->getCurrentBufferSizeSamples());
-                    processor.removeIllegalConnections();
-                    node->resetPorts();
-                    auto newPorts = node->getMetadata().getChildWithName(Tags::ports).createCopy();
-                    auto data = model.getValueTree();
-                    data.removeChild(model.getPortsValueTree(), nullptr);
-                    data.addChild(newPorts, -1, nullptr);
+
+                    model.resetPorts();
                 }
             }
             
+            root->syncArcsModel();
             processor.suspendProcessing (false);
         }
     }

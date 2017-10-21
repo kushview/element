@@ -113,6 +113,7 @@ public:
 private:
     friend class GraphProcessor;
     friend class EngineController;
+    friend class Node;
 
     const ScopedPointer<AudioProcessor> proc;
     bool isPrepared;

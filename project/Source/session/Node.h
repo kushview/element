@@ -155,6 +155,8 @@ namespace Element {
         ValueTree getParentArcsNode() const;
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
 
+        void resetPorts();
+        
     private:
         void setMissingProperties();
     };
