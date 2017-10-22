@@ -206,9 +206,11 @@ namespace Commands {
                 result.setInfo ("Graph Settings", "Graph Settings", "Session", Info::isDisabled);
                 break;
             case Commands::showPatchBay:
+                result.addDefaultKeypress (KeyPress::F1Key, 0);
                 result.setInfo ("Patch Bay", "Show the patch bay", "Session", 0);
                 break;
             case Commands::showGraphEditor:
+                result.addDefaultKeypress (KeyPress::F2Key, 0);
                 result.setInfo ("Graph Editor", "Show the graph editor", "Session", 0);
                 break;
             
