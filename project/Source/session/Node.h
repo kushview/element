@@ -76,6 +76,9 @@ namespace Element {
             setMissingProperties();
         }
         
+        static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
+                                      const uint32 destNode, const uint32 destPort);
+        
         /** Creates an empty graph model */
         static Node createGraph();
         
@@ -96,7 +99,12 @@ namespace Element {
         
         /** Create a value tree version of an arc */
         static ValueTree makeArc (const kv::Arc& arc);
+        static Arc arcFromValueTree (const ValueTree& data);
 
+        /** returns the number of connections on this node */
+        int getNumConnections() const;
+        ValueTree getConnectionValueTree (const int index) const;
+        
         /** Returns true if the underlying data is probably a node */
         bool isValid() const { return objectData.hasType (Tags::node); }
         
@@ -113,11 +121,22 @@ namespace Element {
             return type.isNotEmpty() ? type : Identifier ("unknown");
         }
 
+        /** Set relative position */
+        void setRelativePosition (const double x, const double y);
+        void getRelativePosition (double& x, double& y) const;
+        
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
         
         const String getName() const { return getProperty (Slugs::name); }
         
         GraphNode* getGraphNode() const;
+        
+        int getNumNodes() const         { return getNodesValueTree().getNumChildren(); }
+        Node getNode (const int index)  const { return Node (getNodesValueTree().getChild(index), false); }
+        
+        /** Returns a child graph node object by id */
+        GraphNode* getGraphNodeForId (const uint32) const;
+        
         const int getNumAudioIns()  const { return (int) getProperty ("numAudioIns", 0); }
         const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
         
@@ -155,10 +174,16 @@ namespace Element {
         ValueTree getParentArcsNode() const;
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
 
-        void resetPorts();
+        
         
         void getPossibleSources (NodeArray& nodes) const;
         void getPossibleDestinations (NodeArray& nodes) const;
+        
+        Node getNodeById (const uint32 nodeId) const;
+        void resetPorts();
+        Port getPort (const int index) const;
+        bool canConnect (const uint32 sourceNode, const uint32 sourcePort,
+                         const uint32 destNode, const uint32 destPort) const;
         
     private:
         void setMissingProperties();

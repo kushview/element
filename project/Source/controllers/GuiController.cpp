@@ -1,5 +1,4 @@
 
-
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/SessionController.h"
@@ -8,6 +7,7 @@
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
+#include "gui/GraphEditorView.h"
 #include "gui/MainWindow.h"
 #include "gui/SessionDocument.h"
 #include "gui/SessionContentView.h"
@@ -201,7 +201,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
 		Commands::showPreferences,
         Commands::showSessionConfig,
         Commands::showGraphConfig,
-        Commands::showPatchBay
+        Commands::showPatchBay,
+        Commands::showGraphEditor
     });
     
     commands.add (Commands::quit);
@@ -234,6 +235,9 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showPatchBay:
             content->setContentView (new ConnectionGrid());
+            break;
+        case Commands::showGraphEditor:
+            content->setContentView (new GraphEditorView());
             break;
             
         case Commands::quit:

@@ -156,6 +156,7 @@ private:
     void buildWindowMenu (PopupMenu& menu)
     {
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
+        menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");
         menu.addCommandItem (&cmd, Commands::showGraphConfig, "Show Graph Properties");

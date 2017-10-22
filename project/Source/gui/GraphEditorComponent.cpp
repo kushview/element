@@ -1,35 +1,25 @@
 /*
     GraphEditorComponent.cpp - This file is part of Element
     Copyright (C) 2016  Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 #include "ElementApp.h"
 #include "controllers/GraphController.h"
+#include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
-#include "gui/GraphEditorComponent.h"
+#include "gui/ContextMenus.h"
 #include "gui/PluginWindow.h"
 #include "session/PluginManager.h"
+#include "session/Node.h"
+
+#include "gui/GraphEditorComponent.h"
 
 namespace Element {
 class PinComponent   : public Component,
                        public SettableTooltipClient
 {
 public:
-    PinComponent (GraphController& graph_, const uint32 filterID_,
+    PinComponent (const Node& graph_, const uint32 filterID_,
                   const uint32 index_, const bool isInput_,
                   const PortType type_)
         : filterID (filterID_),
@@ -38,16 +28,9 @@ public:
           isInput (isInput_),
           graph (graph_)
     {
-        if (const GraphNodePtr node = graph.getNodeForId (filterID_))
+        if (const GraphNodePtr node = graph.getGraphNodeForId (filterID_))
         {
             String tip;
-
-          #if 0
-            if (isInput)
-                tip = bus.inputBuses.getReference(index_).name;
-            else
-                tip = bus.outputBuses.getReference(index_).name;
-          #endif
             
             if (tip.isEmpty())
             {
@@ -76,12 +59,12 @@ public:
     {
         switch (this->type)
         {
-            case PortType::Audio: return Colours::lightgreen; break;
+            case PortType::Audio:   return Colours::lightgreen; break;
             case PortType::Control: return Colours::lightblue;  break;
             default: break;
         }
         
-        return Colours::black;
+        return Colours::orange;
     }
 
     void mouseDown (const MouseEvent& e)
@@ -109,8 +92,7 @@ public:
     const bool   isInput;
 
 private:
-    GraphController& graph;
-
+    Node graph;
     GraphEditorComponent* getGraphPanel() const noexcept
     {
         return findParentComponentOfClass<GraphEditorComponent>();
@@ -122,19 +104,15 @@ private:
 class FilterComponent    : public Component
 {
 public:
-    FilterComponent (GraphController& graph_, const uint32 filterID_)
-        : graph (graph_),
-          filterID (filterID_),
-          numInputs (0),
-          numOutputs (0),
-          pinSize (16),
-          font (13.0f, Font::bold),
-          numIns (0),
-          numOuts (0)
+    FilterComponent (const Node& graph_, const Node& node_)
+        : graph (graph_), node(node_),
+          filterID (node_.getNodeId()),
+          numInputs (0), numOutputs (0),
+          pinSize (16), font (13.0f, Font::bold),
+          numIns (0), numOuts (0)
     {
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
-
         setSize (150, 60);
     }
 
@@ -150,57 +128,16 @@ public:
 
         if (e.mods.isPopupMenu())
         {
-            GraphNodePtr node = graph.getNodeForId (filterID);
-            auto* instance = node->getAudioPluginInstance();
-            const PluginDescription desc (instance->getPluginDescription());
-
-            PopupMenu menu;
-            menu.addItem (1, "Remove this block...");
-            menu.addItem (2, "Disconnect all ports");
-            menu.addSeparator();
-            
-            if (desc.pluginFormatName != "Internal")
-            {
-                menu.addItem (3, "Show plugin UI");
-                menu.addItem (4, "Show generic UI");
-            }
-            
-            const int r = menu.show();
-
-            if (r == 1)
-            {
-                PluginWindow::closeCurrentlyOpenWindowsFor (filterID);
-                
-                // FIXME: Hack gui management: Fix in EL-54
-                auto* cc = findParentComponentOfClass<ContentComponent>();
-                if (GraphNodePtr gnp = graph.getNodeForId (filterID))
-                    if (auto* i = gnp->getAudioPluginInstance())
-                        if (auto* c = i->getActiveEditor())
-                        { }
-                embedded = nullptr;
-                graph.removeFilter (filterID);
-                return;
-            }
-            else if (r == 2)
-            {
-                graph.disconnectFilter (filterID);
-            }
-            else if (r == 3 || r == 4)
-            {
-                if (GraphNodePtr f = graph.getNodeForId (filterID))
-                {
-                    if (PluginWindow* win = getGraphPanel()->getOrCreateWindowForNode (f, r == 4))
-                        win->toFront (true);
-                }
-            }
+            NodePopupMenu menu (node);
+            if (auto* message = menu.showAndCreateMessage())
+                ViewHelpers::postMessageFor (this, message);
         }
     }
 
     void updatePosition()
     {
-        double x = 0.0f, y = 0.0f;
-//        graph.getNodePosition (filterID, x, y);
-        setCentreRelative ((float) x, (float) y);
+        node.getRelativePosition (relativeX, relativeY);
+        setCentreRelative (relativeX, relativeY);
         getGraphPanel()->updateConnectorComponents();
     }
     
@@ -214,33 +151,17 @@ public:
         if (getParentComponent() != nullptr)
             pos = getParentComponent()->getLocalPoint (nullptr, pos);
         
-//        graph.setNodePosition (filterID,
-//                               (pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-//                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-//
+        node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+                                  (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+        node.getRelativePosition (relativeX, relativeY);
+
         updatePosition();
     }
 
     void makeEditorActive()
     {
-        const GraphNodePtr f = graph.getNodeForId (filterID);
-        if (! f) return;
-        
-        auto* instance = f->getAudioPluginInstance();
-        if (! instance) return;
-        
-        const PluginDescription desc (instance->getPluginDescription());
-        
-        if (desc.pluginFormatName != "Internal")
-        {
-            if (PluginWindow* const w = getGraphPanel()->getOrCreateWindowForNode (f, false))
-                w->toFront (true);
-        }
-        else if (ScopedPointer<Component> ed = instance->createEditorIfNeeded())
-        {
-            if (ContentComponent* content = findParentComponentOfClass<ContentComponent>())
-            { }
-        }
+        if (GraphNodePtr ptr = node.getGraphNode())
+            ViewHelpers::presentPluginWindow (ptr);
     }
     
     void mouseUp (const MouseEvent& e)
@@ -251,7 +172,8 @@ public:
         }
         else if (! e.mouseWasClicked())
         {
-            graph.sendChangeMessage();
+            // FIXME:
+            // graph.sendChangeMessage();
         }
     }
 
@@ -267,7 +189,7 @@ public:
     void paint (Graphics& g)
     {
         g.setColour (Colours::lightgrey);
-
+        
         const int x = 4;
         const int y = pinSize;
         const int w = getWidth() - x * 2;
@@ -317,7 +239,7 @@ public:
 
     void update()
     {
-        const GraphNodePtr f (graph.getNodeForId (filterID));
+        const GraphNodePtr f (graph.getGraphNodeForId (filterID));
 
         if (f == nullptr)
         {
@@ -326,12 +248,12 @@ public:
         }
 
         numIns = numOuts = 0;
-        for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
+        for (uint32 i = 0; i < f->getNumPorts(); ++i)
         {
-            if (PortType::Control == f->getProcessor()->getPortType(i))
+            if (PortType::Control == f->getPortType(i))
                 continue;
             
-            if (f->getProcessor()->isPortInput (i))
+            if (f->isPortInput (i))
                 ++numIns;
             else
                 ++numOuts;
@@ -342,21 +264,16 @@ public:
 
         w = jmax (w, (jmax (numIns, numOuts) + 1) * 20);
 
-        const int textWidth = font.getStringWidth (f->getProcessor()->getName());
+        const int textWidth = font.getStringWidth (f->getAudioProcessor()->getName());
         w = jmax (w, 16 + jmin (textWidth, 300));
         if (textWidth > 300)
             h = 100;
 
         setSize (w, h);
 
-        setName (f->getProcessor()->getName());
-
-        {
-            double x, y;
-            x = y = 0.0f;
-//            graph.getNodePosition (filterID, x, y);
-            setCentreRelative ((float) x, (float) y);
-        }
+        setName (f->getAudioProcessor()->getName());
+        node.getRelativePosition (relativeX, relativeY);
+        setCentreRelative ((float) relativeX, (float) relativeY);
 
         if (numIns != numInputs || numOuts != numOutputs)
         {
@@ -365,13 +282,13 @@ public:
 
             deleteAllChildren();
 
-            for (uint32 i = 0; i < f->getProcessor()->getNumPorts(); ++i)
+            for (uint32 i = 0; i < f->getNumPorts(); ++i)
             {
-                const PortType t (f->getProcessor()->getPortType (i));
-                if (t ==PortType::Control)
+                const PortType t (f->getPortType (i));
+                if (t == PortType::Control)
                     continue;
                 
-                const bool isInput (f->getProcessor()->isPortInput (i));
+                const bool isInput (f->isPortInput (i));
                 addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
             }
 
@@ -379,9 +296,12 @@ public:
         }
     }
 
-    GraphController& graph;
+    Node graph;
+    Node node;
     const uint32 filterID;
     int numInputs, numOutputs;
+    double relativeX = 0.5f;
+    double relativeY = 0.5f;
 
 private:
     int pinSize;
@@ -405,7 +325,7 @@ class ConnectorComponent   : public Component,
                              public SettableTooltipClient
 {
 public:
-    ConnectorComponent (GraphController& graph_)
+    ConnectorComponent (const Node& graph_)
         : sourceFilterID (0),
           destFilterID (0),
           sourceFilterChannel (0),
@@ -533,7 +453,8 @@ public:
         {
             dragging = true;
 
-            graph.removeConnection (sourceFilterID, sourceFilterChannel, destFilterID, destFilterChannel);
+            ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                sourceFilterID, (uint32)sourceFilterChannel, destFilterID, (uint32)destFilterChannel));
 
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
@@ -544,7 +465,6 @@ public:
                                                  isNearerSource ? destFilterID : 0,
                                                  destFilterChannel,
                                                  e);
-
         }
         else if (dragging)
         {
@@ -606,7 +526,7 @@ public:
     int sourceFilterChannel, destFilterChannel;
 
 private:
-    GraphController& graph;
+    Node graph;
     float lastInputX, lastInputY, lastOutputX, lastOutputY;
     Path linePath, hitPath;
     bool dragging;
@@ -628,44 +548,49 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConnectorComponent)
 };
 
-GraphEditorComponent::GraphEditorComponent (GraphController& graph_)
-    :  graph (graph_)
+GraphEditorComponent::GraphEditorComponent()
 {
-    graph.addChangeListener (this);
     setOpaque (true);
+    data.addListener (this);
 }
 
 GraphEditorComponent::~GraphEditorComponent()
 {
-    graph.removeChangeListener (this);
+    data.removeListener (this);
     draggingConnector = nullptr;
     deleteAllChildren();
 }
 
+void GraphEditorComponent::setNode (const Node& n)
+{
+    jassert (n.hasNodeType(Tags::graph));
+    graph = n;
+    data = graph.getValueTree();
+    draggingConnector = nullptr;
+    updateComponents();
+}
+
 void GraphEditorComponent::paint (Graphics& g)
 {
-    g.fillAll (Colour (0xff303030));
+    g.fillAll (LookAndFeel::contentBackgroundColor);
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        PopupMenu m;
-        m.addSectionHeader ("Plugins");
-        KnownPluginList& plugs (graph.plugins().availablePlugins());
-        plugs.addToMenu (m, KnownPluginList::sortByManufacturer);
-        
-        const int res = m.show();
-        
-        if (const PluginDescription* desc = plugs.getType (plugs.getIndexChosenByMenu (res)))
-            createNewPlugin (desc, e.x, e.y);
+        PluginsPopupMenu menu (this);
+        menu.addSectionHeader("Plugins");
+        menu.addPluginItems();
+        const int result = menu.show();
+        if (const auto* desc = menu.getPluginDescription (result))
+            ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
     }
 }
 
 void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x, int y)
 {
-    graph.addFilter (desc, x / (double) getWidth(), y / (double) getHeight());
+    DBG("[EL] GraphEditorComponent::createNewPlugin(...)");
 }
 
 FilterComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
@@ -727,14 +652,15 @@ void GraphEditorComponent::onGraphChanged()
 
 void GraphEditorComponent::updateConnectorComponents()
 {
+    const ValueTree arcs = graph.getArcsValueTree();
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
         
         if (cc != nullptr && cc != draggingConnector)
         {
-            if (graph.getConnectionBetween (cc->sourceFilterID, cc->sourceFilterChannel,
-                                            cc->destFilterID, cc->destFilterChannel) == nullptr)
+            if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel,
+                                                cc->destFilterID, (uint32) cc->destFilterChannel))
             {
                 delete cc;
             }
@@ -750,8 +676,9 @@ void GraphEditorComponent::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
     {
-        const GraphProcessor::Connection* const c = graph.getConnection (i);
-        ConnectorComponent* connector = getComponentForConnection (*c);
+        const ValueTree c = graph.getConnectionValueTree (i);
+        const Arc arc (Node::arcFromValueTree (c));
+        ConnectorComponent* connector = getComponentForConnection (arc);
         
         if (connector == nullptr)
         {
@@ -759,59 +686,62 @@ void GraphEditorComponent::updateComponents()
             addAndMakeVisible (connector);
         }
         
-        connector->setInput (c->sourceNode, c->sourcePort);
-        connector->setOutput (c->destNode, c->destPort);
+        connector->setInput (arc.sourceNode, arc.sourcePort);
+        connector->setOutput (arc.destNode, arc.destPort);
         connector->update();
     }
     
-    for (int i = graph.getNumFilters(); --i >= 0;)
+    for (int i = graph.getNumNodes(); --i >= 0;)
     {
-        const GraphNodePtr f (graph.getNode (i));
-        FilterComponent* comp = getComponentForFilter (f->nodeId);
+        const Node node (graph.getNode (i));
+        FilterComponent* comp = getComponentForFilter (node.getNodeId());
         if (comp == nullptr)
         {
-            comp = new FilterComponent (graph, f->nodeId);
+            comp = new FilterComponent (graph, node);
             addAndMakeVisible (comp);
         }
         
         comp->update();
     }
-    
+
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i))) {
             fc->update();
+        }
     }
 
+    const ValueTree arcs = graph.getArcsValueTree();
+    
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
 
         if (cc != nullptr && cc != draggingConnector && ! cc->isDragging())
         {
-            if (graph.getConnectionBetween (cc->sourceFilterID, cc->sourceFilterChannel,
-                                            cc->destFilterID, cc->destFilterChannel) == nullptr)
+            if (Node::connectionExists (arcs, cc->sourceFilterID, cc->sourceFilterChannel,
+                                              cc->destFilterID, cc->destFilterChannel))
             {
-                delete cc;
+                cc->update();
             }
             else
             {
-                cc->update();
+                delete cc;
             }
         }
     }
 }
 
-void GraphEditorComponent::beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
-                                          const uint32 destFilterID, const int destFilterChannel,
-                                          const MouseEvent& e)
+void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,
+                                               const uint32 destNode, const int destFilterChannel,
+                                               const MouseEvent& e)
 {
     draggingConnector = dynamic_cast <ConnectorComponent*> (e.originalComponent);
     if (draggingConnector == nullptr)
         draggingConnector = new ConnectorComponent (graph);
 
-    draggingConnector->setInput (sourceFilterID, sourceFilterChannel);
-    draggingConnector->setOutput (destFilterID, destFilterChannel);
+    draggingConnector->setInput (sourceNode, sourceFilterChannel);
+    draggingConnector->setOutput (destNode, destFilterChannel);
 
     addAndMakeVisible (draggingConnector);
     draggingConnector->toFront (false);
@@ -847,7 +777,7 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
                 dstFilter = pin->filterID;
                 dstChannel = pin->port;
             }
-
+            
             if (graph.canConnect (srcFilter, srcChannel, dstFilter, dstChannel))
             {
                 x = pin->getParentComponent()->getX() + pin->getX() + pin->getWidth() / 2;
@@ -926,8 +856,9 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             dstFilter = pin->filterID;
             dstChannel = pin->port;
         }
-
-        graph.addConnection (srcFilter, srcChannel, dstFilter, dstChannel);
+        
+        ViewHelpers::postMessageFor (this, new AddConnectionMessage (srcFilter, (uint32)srcChannel,
+                                                                     dstFilter, (uint32)dstChannel));
     }
 }
 
@@ -983,6 +914,16 @@ bool shouldDrawDragImageWhenOver()
     return true;
 }
 
+void GraphEditorComponent::valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
+{
+    if (childWhichHasBeenAdded.hasType (Tags::node) ||
+        childWhichHasBeenAdded.hasType (Tags::arc) ||
+        childWhichHasBeenAdded.hasType (Tags::nodes) ||
+        childWhichHasBeenAdded.hasType (Tags::arcs))
+    {
+        updateComponents();
+    }
+}
 
 class TooltipBar   : public Component,
                      private Timer

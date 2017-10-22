@@ -127,6 +127,12 @@ namespace Element {
         return dynamic_cast<GraphNode*> (objectData.getProperty (Tags::object, var::null).getObject());
     }
     
+    GraphNode* Node::getGraphNodeForId (const uint32 nodeId) const
+    {
+        const Node node (getNodeById (nodeId));
+        return node.isValid() ? node.getGraphNode() : nullptr;
+    }
+    
     void Node::getPorts (PortArray& ports, PortType type, bool isInput) const
     {
         const ValueTree portList (getPortsValueTree());
@@ -202,9 +208,78 @@ namespace Element {
         }
     }
 
+    Arc Node::arcFromValueTree (const ValueTree& data)
+    {
+        Arc arc ((uint32)(int) data.getProperty (Tags::sourceNode, (int) KV_INVALID_NODE),
+                 (uint32)(int) data.getProperty (Tags::sourcePort, (int) KV_INVALID_PORT),
+                 (uint32)(int) data.getProperty (Tags::destNode, (int) KV_INVALID_NODE),
+                 (uint32)(int) data.getProperty (Tags::destPort, (int) KV_INVALID_PORT));
+        return arc;
+    }
+    
+    int Node::getNumConnections() const     { return getArcsValueTree().getNumChildren(); }
+    ValueTree Node::getConnectionValueTree (const int index) const { return getArcsValueTree().getChild (index);  }
+    
     void NodeArray::sortByName()
     {
         NameSorter sorter;
         this->sort (sorter);
+    }
+    
+    bool Node::connectionExists (const ValueTree& arcs,
+                                 const uint32 sourceNode, const uint32 sourcePort,
+                                 const uint32 destNode, const uint32 destPort)
+    {
+        for (int i = arcs.getNumChildren(); --i >= 0;)
+        {
+            const ValueTree arc (arcs.getChild (i));
+            if (static_cast<int> (sourceNode) == (int) arc.getProperty (Tags::sourceNode) &&
+                static_cast<int> (sourcePort) == (int) arc.getProperty (Tags::sourcePort) &&
+                static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) &&
+                static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
+            {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    Node Node::getNodeById (const uint32 nodeId) const
+    {
+        const ValueTree nodes = getNodesValueTree();
+        Node node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
+        return node;
+    }
+    
+    Port Node::getPort (const int index) const
+    {
+        Port port (getPortsValueTree().getChildWithProperty (Tags::index, index));
+        return port;
+    }
+    
+    bool Node::canConnect (const uint32 sourceNode, const uint32 sourcePort,
+                           const uint32 destNode, const uint32 destPort) const
+    {
+        const Node sn (getNodeById (sourceNode));
+        const Node dn (getNodeById (destNode));
+        if (!sn.isValid() || !dn.isValid())
+            return false;
+        
+        const Port dp (dn.getPort ((int) destPort));
+        const Port sp (sn.getPort ((int) sourcePort));
+        return sp.getType().canConnect (dp.getType());
+    }
+    
+    void Node::setRelativePosition (const double x, const double y)
+    {
+        setProperty ("relativeX", x);
+        setProperty ("relativeY", y);
+    }
+
+    void Node::getRelativePosition (double& x, double& y) const
+    {
+        x = (double) getProperty ("relativeX", 0.5f);
+        y = (double) getProperty ("relativeY", 0.5f);
     }
 }

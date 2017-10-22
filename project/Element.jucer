@@ -102,6 +102,9 @@
               file="Source/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
               file="Source/gui/ContentComponent.h"/>
+        <FILE id="sKIHTU" name="ContextMenus.cpp" compile="1" resource="0"
+              file="Source/gui/ContextMenus.cpp"/>
+        <FILE id="UeLvAw" name="ContextMenus.h" compile="0" resource="0" file="Source/gui/ContextMenus.h"/>
         <FILE id="N6IdK1" name="GraphEditorComponent.cpp" compile="1" resource="0"
               file="Source/gui/GraphEditorComponent.cpp"/>
         <FILE id="RZD4Q9" name="GraphEditorComponent.h" compile="0" resource="0"

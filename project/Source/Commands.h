@@ -20,6 +20,7 @@ namespace Commands {
         showSessionConfig,
         showGraphConfig,
         showPatchBay,
+        showGraphEditor,
 
         mediaClose,
         mediaOpen,
@@ -206,6 +207,9 @@ namespace Commands {
                 break;
             case Commands::showPatchBay:
                 result.setInfo ("Patch Bay", "Show the patch bay", "Session", 0);
+                break;
+            case Commands::showGraphEditor:
+                result.setInfo ("Graph Editor", "Show the graph editor", "Session", 0);
                 break;
             
             case Commands::checkNewerVersion:
