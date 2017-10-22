@@ -148,8 +148,6 @@ namespace Element
         {
             if (matrix.isNotEmpty())
                 return PatchMatrixComponent::paint (g);
-            
-            paintEmptyMessage (g, getWidth(), getHeight());
         }
         
         void handleNodeMenuResult (const int result, const Node& node)
@@ -225,12 +223,6 @@ namespace Element
         PortArray ins, outs;
         Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels,
                    midiInIndexes, midiOutIndexes, midiInChannels, midiOutChannels;
-
-        void paintEmptyMessage (Graphics& g, const int width, const int height)
-        {
-//            g.setColour (LookAndFeel_KV1::textColor);
-//            g.drawFittedText ("Nothing to see here...", 0, 0, width, height, Justification::centred, 2);
-        }
         
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected, bool isSource)

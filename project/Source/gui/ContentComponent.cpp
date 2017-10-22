@@ -260,7 +260,7 @@ public:
             graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
             if (auto* ec = cc->getAppController().findChild<EngineController>())
                 ec->setRootNode (graph);
-            cc->setCurrentNode (graph);
+            cc->stabilize();
         }
     }
     
@@ -694,6 +694,11 @@ void ContentComponent::stabilize()
     if (auto* sp = nav->getSessionPanel())
         sp->setSession (session);
     toolBar->setSession (session);
+    
+    if (container->content1)
+        container->content1->stabilizeContent();
+    if (container->content2)
+        container->content2->stabilizeContent();
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

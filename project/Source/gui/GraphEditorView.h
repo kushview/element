@@ -17,6 +17,7 @@ public:
     ~GraphEditorView();
     
     void didBecomeActive() override;
+    void stabilizeContent() override;
     void paint (Graphics& g) override;
     void resized() override;
     

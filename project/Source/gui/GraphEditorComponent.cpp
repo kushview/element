@@ -579,12 +579,74 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
+        const bool isRootGraph = data.getParent().hasType(Tags::graphs) &&
+                                 data.getParent().getParent().hasType(Tags::session);
+        
         PluginsPopupMenu menu (this);
-        menu.addSectionHeader("Plugins");
+        if (isRootGraph)
+        {
+            menu.addSectionHeader ("Graph I/O");
+            menu.addItem (1, "Audio Inputs",    true, graph.hasAudioInputNode());
+            menu.addItem (2, "Audio Outputs",   true, graph.hasAudioOutputNode());
+            menu.addItem (3, "MIDI Input",      true, graph.hasMidiInputNode());
+            menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
+        }
+        
+        menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
         const int result = menu.show();
-        if (const auto* desc = menu.getPluginDescription (result))
-            ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
+        if (menu.isPluginResultCode (result))
+        {
+            if (const auto* desc = menu.getPluginDescription (result))
+                ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
+        }
+        else
+        {
+            PluginDescription desc;
+            desc.pluginFormatName = "Internal";
+            bool hasRequestedType = false;
+            bool failure = false;
+            ValueTree node;
+            
+            switch (result)
+            {
+                case 1:
+                    desc.fileOrIdentifier = "audio.input";
+                    hasRequestedType = graph.hasAudioInputNode();
+                    break;
+                case 2:
+                    desc.fileOrIdentifier = "audio.output";
+                    hasRequestedType = graph.hasAudioOutputNode();
+                    break;
+                case 3:
+                    desc.fileOrIdentifier = "midi.input";
+                    hasRequestedType = graph.hasMidiInputNode();
+                    break;
+                case 4:
+                    desc.fileOrIdentifier = "midi.output";
+                    hasRequestedType = graph.hasMidiOutputNode();
+                    break;
+                default:
+                    failure = true;
+                    break;
+            }
+            
+            if (failure)
+            {
+                DBG("[EL] unkown menu result: " << result);
+            }
+            else if (hasRequestedType)
+            {
+                const ValueTree node = graph.getNodesValueTree()
+                .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                const Node model (node, false);
+                ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
+            }
+            else
+            {
+                ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+            }
+        }
     }
 }
 

@@ -17,10 +17,19 @@ namespace Element {
     {
     }
 
+    void GraphEditorView::stabilizeContent()
+    {
+        graph.removeAllChildren();
+        if (auto session = ViewHelpers::getSession (this)) {
+         
+            graph.setNode (session->getCurrentGraph());
+        }
+        graph.updateComponents();
+    }
+    
     void GraphEditorView::didBecomeActive()
     {
-        if (auto session = ViewHelpers::getSession (this))
-            graph.setNode (session->getCurrentGraph());
+        stabilizeContent();
     }
     
     void GraphEditorView::paint (Graphics& g)

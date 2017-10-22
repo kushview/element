@@ -19,10 +19,12 @@ class Node;
 class RackView;
 class TransportBar;
 
-class ContentView : public Component {
+class ContentView : public Component
+{
 public:
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
+    virtual void stabilizeContent() { }
 };
 
 class ContentComponent :  public Component,
