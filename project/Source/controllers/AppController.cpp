@@ -5,6 +5,7 @@
 #include "controllers/SessionController.h"
 #include "engine/GraphProcessor.h"
 #include "gui/UnlockForm.h"
+#include "gui/GuiCommon.h"
 #include "session/UnlockStatus.h"
 #include "Commands.h"
 #include "Globals.h"
@@ -54,6 +55,8 @@ void AppController::deactivate()
 void AppController::run()
 {
     activate();
+    auto session = getWorld().getSession();
+
     
     if (auto* gui = findChild<GuiController>())
         gui->run();
@@ -66,7 +69,16 @@ void AppController::run()
     }
     
     if (auto* gui = findChild<GuiController>())
+    {
+        const Node graph (session->getCurrentGraph());
         gui->stabilizeContent();
+        if (graph.isValid())
+        {
+            for (int i = graph.getNumNodes(); --i >= 0;)
+                if ((bool) graph.getNode(i).getProperty ("windowVisible", false))
+                    ViewHelpers::presentPluginWindow (graph.getNode (i));
+        }
+    }
     
     if (auto* sc = findChild<SessionController>())
         sc->resetChanges();
