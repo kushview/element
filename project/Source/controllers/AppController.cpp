@@ -117,6 +117,24 @@ void AppController::handleMessage (const Message& msg)
             ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
         }
     }
+    else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
+    {
+        ValueTree parent (dnm->node.getValueTree().getParent());
+        if (parent.hasType (Tags::nodes))
+            parent = parent.getParent();
+        jassert (parent.hasType(Tags::node));
+        const Node graph (parent, false);
+        Node newNode (dnm->node.getValueTree().createCopy(), false);
+        if (newNode.isValid() && graph.isValid())
+        {
+            newNode.getValueTree().removeProperty (Tags::id, 0);
+            ec->addNode (newNode);
+        }
+    }
+    else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))
+    {
+        ec->disconnectNode (dnm2->node);
+    }
     else
     {
         handled = false;

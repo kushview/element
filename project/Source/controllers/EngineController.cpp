@@ -133,6 +133,18 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
     root->removeConnection (s, sp, d, dp);
 }
 
+void EngineController::addNode (const Node& node)
+{
+    if (! root)
+        return;
+    
+    if (KV_INVALID_NODE == root->addNode (node))
+    {
+        AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+            "Duplicate Node", String("Could not duplicate node: ") + node.getName());
+    }
+}
+
 void EngineController::addPlugin (const PluginDescription& d)
 {
     if (! root)
@@ -147,6 +159,13 @@ void EngineController::removeNode (const uint32 nodeId)
         return;
     PluginWindow::closeCurrentlyOpenWindowsFor (nodeId);
     root->removeFilter (nodeId);
+}
+
+void EngineController::disconnectNode (const Node& node)
+{
+    if (! root)
+        return;
+    root->disconnectFilter (node.getNodeId());
 }
 
 void EngineController::activate()

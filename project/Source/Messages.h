@@ -75,6 +75,22 @@ public:
     const PluginDescription description;
 };
 
+class DuplicateNodeMessage : public Message {
+public:
+    DuplicateNodeMessage (const Node& n)
+        : Message(), node (n) { }
+    DuplicateNodeMessage() { }
+    const Node node;
+};
+
+class DisconnectNodeMessage : public Message {
+public:
+    DisconnectNodeMessage (const Node& n)
+        : Message(), node (n) { }
+    DisconnectNodeMessage() { }
+    const Node node;
+};
+
 class FinishedLaunchingMessage : public Message {
 public:
     FinishedLaunchingMessage() { }

@@ -283,4 +283,19 @@ namespace Element {
         x = (double) getProperty ("relativeX", 0.5f);
         y = (double) getProperty ("relativeY", 0.5f);
     }
+    
+    Node Node::getParentGraph() const
+    {
+        ValueTree parent = objectData.getParent();
+        
+        while (! isProbablyGraphNode (parent))
+        {
+            if (! parent.isValid())
+                break;
+            parent = parent.getParent();
+        }
+        
+        return isProbablyGraphNode (parent) ? Node (parent, false)
+                                            : Node();
+    }
 }

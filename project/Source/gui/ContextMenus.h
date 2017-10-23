@@ -51,10 +51,7 @@ public:
     {
         Duplicate = 1,
         RemoveNode,
-        AddAudioInputNode,
-        AddAudioOutputNode,
-        AddMidiInputNode,
-        AddMidiOutputNode,
+        Disconnect,
         LastItem
     };
     
@@ -69,7 +66,7 @@ public:
     }
     
     NodePopupMenu (const Node& n, const Port& p)
-    : node (n), port(p)
+        : node (n), port(p)
     {
         addMainItems (true);
         NodeArray siblings;
@@ -124,7 +121,10 @@ public:
     {
         if (result == RemoveNode)
             return new RemoveNodeMessage (node);
-        
+        if (result == Duplicate)
+            return new DuplicateNodeMessage (node);
+        if (result == Disconnect)
+            return new DisconnectNodeMessage (node);
         if (auto* op = resultMap [result])
             return op->createMessage();
         return nullptr;
@@ -154,7 +154,7 @@ private:
     struct SingleConnectOp : public ResultOp
     {
         SingleConnectOp (const Node& sn, const Port& sp, const Node& dn, const Port& dp)
-        : sourceNode(sn), destNode(dn),  sourcePort (sp), destPort (dp)
+            : sourceNode(sn), destNode(dn),  sourcePort (sp), destPort (dp)
         { }
         
         const Node sourceNode, destNode;
@@ -181,6 +181,9 @@ private:
     {
         if (showHeader)
             addSectionHeader (node.getName());
+        addItem (Disconnect, getNameForItem (Disconnect));
+        addItem (Duplicate,  getNameForItem (Duplicate));
+        addSeparator();
         addItem (RemoveNode, getNameForItem (RemoveNode));
     }
     
@@ -195,12 +198,9 @@ private:
     {
         switch (item)
         {
+            case Disconnect: return "Disconnect"; break;
             case Duplicate:  return "Duplicate"; break;
             case RemoveNode: return "Remove"; break;
-            case AddAudioInputNode: return "Add audio inputs"; break;
-            case AddAudioOutputNode: return "Add audio outputs"; break;
-            case AddMidiInputNode: return "Add MIDI Input"; break;
-            case AddMidiOutputNode: return "Add MIDI Output"; break;
             default: jassertfalse; break;
         }
         return "Unknown Item";

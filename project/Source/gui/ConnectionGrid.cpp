@@ -158,32 +158,8 @@ namespace Element
                     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
                 } break;
                     
-                case NodePopupMenu::AddAudioInputNode: {
-                    PluginDescription desc;
-                    desc.fileOrIdentifier = "audio.input";
-                    desc.pluginFormatName = "Internal";
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
-                } break;
-                    
-                case NodePopupMenu::AddAudioOutputNode: {
-                    PluginDescription desc;
-                    desc.fileOrIdentifier = "audio.output";
-                    desc.pluginFormatName = "Internal";
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
-                } break;
-                    
-                case NodePopupMenu::AddMidiInputNode: {
-                    PluginDescription desc;
-                    desc.fileOrIdentifier = "midi.input";
-                    desc.pluginFormatName = "Internal";
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
-                } break;
-                    
-                case NodePopupMenu::AddMidiOutputNode: {
-                    PluginDescription desc;
-                    desc.fileOrIdentifier = "midi.output";
-                    desc.pluginFormatName = "Internal";
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                case NodePopupMenu::Duplicate: {
+                    ViewHelpers::postMessageFor (this, new DuplicateNodeMessage (node));
                 } break;
             }
         }
@@ -192,7 +168,8 @@ namespace Element
         {
             NodePopupMenu menu (node);
             const int result = menu.show();
-            if (auto* message = menu.createMessageForResultCode (result)) {
+            if (auto* message = menu.createMessageForResultCode (result))
+            {
                 ViewHelpers::postMessageFor (this, message);
                 return;
             }
@@ -203,7 +180,8 @@ namespace Element
         {
             NodePopupMenu menu (n, p);
             const int result = menu.show();
-            if (auto* message = menu.createMessageForResultCode (result)) {
+            if (auto* message = menu.createMessageForResultCode (result))
+            {
                 ViewHelpers::postMessageFor (this, message);
                 return;
             }

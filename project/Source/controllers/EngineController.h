@@ -15,7 +15,13 @@ public:
     void activate() override;
     void deactivate() override;
     
+    /** Adds a new node to the current graph. */
+    void addNode (const Node& node);
+    
+    /** Adds a plugin by description to the current graph */
     void addPlugin (const PluginDescription&);
+    
+    /** Removes a node from the current graph */
     void removeNode (const uint32);
     
     void addGraph();
@@ -26,6 +32,7 @@ public:
     void addConnection (const uint32, const uint32, const uint32, const uint32);
     void connectChannels (const uint32, const int, const uint32, const int);
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
+    void disconnectNode (const Node& node);
     
     void clear();
     void setRootNode (const Node&);

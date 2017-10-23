@@ -39,6 +39,53 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
         node = processor.addNode (instance, nodeId);
     return node;
 }
+
+uint32 GraphController::addNode (const Node& newNode)
+{
+    if (! newNode.isValid())
+    {
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create filter"),
+                                     "Cannot instantiate node without a description");
+        return KV_INVALID_NODE;
+    }
+    
+    uint32 nodeId = KV_INVALID_NODE;
+    PluginDescription desc; newNode.getPluginDescription (desc);
+    
+    if (auto* node = createFilter (&desc, 0, 0))
+    {
+        nodeId = node->nodeId;
+        ValueTree data = newNode.getValueTree().createCopy();
+        data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
+            .setProperty (Tags::object, node, nullptr);
+        
+        data.removeProperty ("relativeX", nullptr);
+        data.removeProperty ("relativeY", nullptr);
+        data.removeProperty ("windowX", nullptr);
+        data.removeProperty ("windowY", nullptr);
+        data.removeProperty ("windowVisible", nullptr);
+
+        const Node n (data, false);
+        
+        {
+            MemoryBlock state;
+            if (state.fromBase64Encoding (data.getProperty(Tags::state).toString()))
+                node->getAudioProcessor()->setStateInformation (state.getData(), (int) state.getSize());
+        }
+        
+        node->getAudioProcessor()->suspendProcessing (n.isBypassed());
+        nodes.addChild (data, -1, nullptr);
+        changed();
+    }
+    else
+    {
+        nodeId = KV_INVALID_NODE;
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, "Couldn't create filter",
+                                     "The plugin could not be instantiated");
+    }
+    
+    return nodeId;
+}
     
 uint32 GraphController::addFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {

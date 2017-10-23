@@ -100,6 +100,8 @@ namespace Element {
         static ValueTree makeArc (const kv::Arc& arc);
         static Arc arcFromValueTree (const ValueTree& data);
 
+        Node getParentGraph() const;
+        
         bool isBypassed() const { return objectData.getProperty (Tags::bypass, false); }
         Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
         
