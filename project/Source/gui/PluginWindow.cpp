@@ -16,7 +16,8 @@ public:
     ~PluginWindowToolbar() { }
 };
 
-class PluginWindowContent : public Component
+class PluginWindowContent : public Component,
+                            public ComponentListener
 {
 public:
     PluginWindowContent (Component* const _editor)
@@ -24,23 +25,32 @@ public:
     {
         addAndMakeVisible (toolbar = new PluginWindowToolbar());
         addAndMakeVisible (editor);
-        setSize (editor->getWidth(), editor->getHeight());
-        toolbar->setBounds (0, 0, getWidth(), 48);
+        toolbar->setBounds (0, 0, getWidth(), 24);
+        setSize (editor->getWidth(), editor->getHeight() + toolbar->getHeight());
         resized();
     }
     
-    ~PluginWindowContent() { }
+    ~PluginWindowContent()
+    {
+        editor = nullptr;
+        toolbar = nullptr;
+        leftPanel = nullptr;
+        rightPanel = nullptr;
+    }
     
-    void resized()
+    void resized() override
     {
         Rectangle<int> r (getLocalBounds());
         
         if (toolbar->getThickness())
-        {
             toolbar->setBounds (r.removeFromTop (toolbar->getThickness()));
-        }
         
         editor->setBounds (r);
+    }
+    
+    void componentMovedOrResized (Component&, bool wasMoved, bool wasResized) override
+    {
+
     }
     
     Toolbar* getToolbar() const { return toolbar.get(); }
@@ -55,9 +65,9 @@ PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
       owner (node)
 {
-    setUsingNativeTitleBar(true);
+    setUsingNativeTitleBar (true);
     setSize (400, 300);
-    setContentOwned (ui, true);
+    setContentOwned (new PluginWindowContent (ui), true);
     setTopLeftPosition (owner->properties.getWithDefault ("windowLastX", Random::getSystemRandom().nextInt (500)),
                         owner->properties.getWithDefault ("windowLastY", Random::getSystemRandom().nextInt (500)));
     owner->properties.set ("windowVisible", true);
