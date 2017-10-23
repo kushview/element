@@ -13,18 +13,13 @@ namespace Element {
         addAndMakeVisible (graph);
     }
     
-    GraphEditorView::~GraphEditorView()
-    {
-        DBG("GraphEditorView::~GraphEditorView()");
-    }
+    GraphEditorView::~GraphEditorView() { }
 
     void GraphEditorView::stabilizeContent()
     {
         graph.deleteAllChildren();
-        if (auto session = ViewHelpers::getSession (this)) {
-         
+        if (auto session = ViewHelpers::getSession (this))
             graph.setNode (session->getCurrentGraph());
-        }
         graph.updateComponents();
     }
     

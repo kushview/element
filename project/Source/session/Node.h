@@ -174,7 +174,12 @@ namespace Element {
         ValueTree getParentArcsNode() const;
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
 
-        
+        /** Returns true if this is a root graph on the session */
+        bool isRootGraph() const
+        {
+            return objectData.getParent().hasType (Tags::graphs) &&
+                   objectData.getParent().getParent().hasType (Tags::session);
+        }
         
         void getPossibleSources (NodeArray& nodes) const;
         void getPossibleDestinations (NodeArray& nodes) const;

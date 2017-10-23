@@ -258,12 +258,10 @@ namespace Element
             if (! ev.mods.isPopupMenu())
                 return;
             
-            const bool isRootGraph = graphModel.getParent().hasType(Tags::graphs) &&
-                                     graphModel.getParent().getParent().hasType(Tags::session);
             const Node graph (graphModel);
             
             PluginsPopupMenu menu (this);
-            if (isRootGraph)
+            if (graph.isRootGraph())
             {
                 menu.addSectionHeader ("Graph I/O");
                 menu.addItem (1, "Audio Inputs",    true, graph.hasAudioInputNode());

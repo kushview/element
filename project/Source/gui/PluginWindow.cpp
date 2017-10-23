@@ -12,26 +12,41 @@ static Array <PluginWindow*> activePluginWindows;
 class PluginWindowToolbar : public Toolbar
 {
 public:
+    enum Items {
+        BypassPlugin = 1
+    };
+    
     PluginWindowToolbar() { }
     ~PluginWindowToolbar() { }
 };
 
 class PluginWindowContent : public Component,
-                            public ComponentListener
+                            public ComponentListener,
+                            public ButtonListener
 {
 public:
-    PluginWindowContent (Component* const _editor)
-        : editor (_editor)
+    PluginWindowContent (Component* const _editor, GraphNode* _node)
+        : editor (_editor), node (_node)
     {
         addAndMakeVisible (toolbar = new PluginWindowToolbar());
-        addAndMakeVisible (editor);
         toolbar->setBounds (0, 0, getWidth(), 24);
+        
+        addAndMakeVisible (editor);
+        
+        addAndMakeVisible (bypassButton);
+        
+        bypassButton.setButtonText ("Bypass");
+        bypassButton.setToggleState (_node->getAudioProcessor()->isSuspended(), dontSendNotification);
+        bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
+        bypassButton.addListener (this);
+        
         setSize (editor->getWidth(), editor->getHeight() + toolbar->getHeight());
         resized();
     }
     
     ~PluginWindowContent()
     {
+        bypassButton.removeListener (this);
         editor = nullptr;
         toolbar = nullptr;
         leftPanel = nullptr;
@@ -43,9 +58,23 @@ public:
         Rectangle<int> r (getLocalBounds());
         
         if (toolbar->getThickness())
-            toolbar->setBounds (r.removeFromTop (toolbar->getThickness()));
+        {
+            auto r2 = r.removeFromTop (toolbar->getThickness());
+            toolbar->setBounds (r2);
+            r2.removeFromRight(4);
+            bypassButton.changeWidthToFitText();
+            bypassButton.setBounds (r2.removeFromRight(bypassButton.getWidth()).reduced (1));
+        }
         
         editor->setBounds (r);
+    }
+    
+    void buttonClicked (Button*) override
+    {
+        const bool desiredBypassState = !node->getAudioProcessor()->isSuspended();
+        node->getAudioProcessor()->suspendProcessing (desiredBypassState);
+        bypassButton.setToggleState (node->getAudioProcessor()->isSuspended(),
+                                     dontSendNotification);
     }
     
     void componentMovedOrResized (Component&, bool wasMoved, bool wasResized) override
@@ -57,21 +86,25 @@ public:
     
 private:
     ScopedPointer<PluginWindowToolbar> toolbar;
+    TextButton bypassButton;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
+    GraphNodePtr node;
 };
 
 PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
     : DocumentWindow (ui->getName(), Colours::lightgrey,
-                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
+                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       owner (node)
 {
     setUsingNativeTitleBar (true);
     setSize (400, 300);
-    setContentOwned (new PluginWindowContent (ui), true);
+    setContentOwned (new PluginWindowContent (ui, owner), true);
     setTopLeftPosition (owner->properties.getWithDefault ("windowLastX", Random::getSystemRandom().nextInt (500)),
                         owner->properties.getWithDefault ("windowLastY", Random::getSystemRandom().nextInt (500)));
     owner->properties.set ("windowVisible", true);
     setVisible (true);
+    addToDesktop();
+    
     activePluginWindows.add (this);
 }
 
