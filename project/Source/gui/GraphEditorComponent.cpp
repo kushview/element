@@ -317,8 +317,7 @@ private:
         return findParentComponentOfClass<GraphEditorComponent>();
     }
 
-    FilterComponent (const FilterComponent&);
-    FilterComponent& operator= (const FilterComponent&);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FilterComponent);
 };
 
 class ConnectorComponent   : public Component,
@@ -563,10 +562,11 @@ GraphEditorComponent::~GraphEditorComponent()
 
 void GraphEditorComponent::setNode (const Node& n)
 {
-    jassert (n.hasNodeType(Tags::graph));
+    jassert (n.hasNodeType (Tags::graph));
     graph = n;
     data = graph.getValueTree();
     draggingConnector = nullptr;
+    deleteAllChildren();
     updateComponents();
 }
 

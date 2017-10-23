@@ -15,6 +15,7 @@ namespace Element {
     
     GraphEditorView::~GraphEditorView()
     {
+        DBG("graph ed view");
     }
 
     void GraphEditorView::stabilizeContent()
