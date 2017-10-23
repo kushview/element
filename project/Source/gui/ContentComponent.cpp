@@ -547,7 +547,7 @@ public:
     {
         if (content2)
             removeChildComponent (content2);
-        content1 = view;
+        content2 = view;
         if (content2)
         {
             content2->willBecomeActive();

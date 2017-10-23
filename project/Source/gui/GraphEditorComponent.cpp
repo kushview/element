@@ -638,7 +638,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             else if (hasRequestedType)
             {
                 const ValueTree node = graph.getNodesValueTree()
-                .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
+                  .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
                 const Node model (node, false);
                 ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
             }
@@ -718,7 +718,6 @@ void GraphEditorComponent::updateConnectorComponents()
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
-        
         if (cc != nullptr && cc != draggingConnector)
         {
             if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel,

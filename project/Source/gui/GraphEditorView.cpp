@@ -15,12 +15,12 @@ namespace Element {
     
     GraphEditorView::~GraphEditorView()
     {
-        DBG("graph ed view");
+        DBG("GraphEditorView::~GraphEditorView()");
     }
 
     void GraphEditorView::stabilizeContent()
     {
-        graph.removeAllChildren();
+        graph.deleteAllChildren();
         if (auto session = ViewHelpers::getSession (this)) {
          
             graph.setNode (session->getCurrentGraph());
