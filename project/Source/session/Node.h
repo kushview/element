@@ -78,7 +78,6 @@ namespace Element {
         
         static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
                                       const uint32 destNode, const uint32 destPort);
-        
         /** Creates an empty graph model */
         static Node createGraph();
         
@@ -101,6 +100,9 @@ namespace Element {
         static ValueTree makeArc (const kv::Arc& arc);
         static Arc arcFromValueTree (const ValueTree& data);
 
+        bool isBypassed() const { return objectData.getProperty (Tags::bypass, false); }
+        Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
+        
         /** returns the number of connections on this node */
         int getNumConnections() const;
         ValueTree getConnectionValueTree (const int index) const;

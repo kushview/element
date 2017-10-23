@@ -53,10 +53,10 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
     if (auto* node = createFilter (desc, x, y, nodeId))
     {
         nodeId = node->nodeId;
-        node->properties.set ("x", x);
-        node->properties.set ("y", y);
         ValueTree model = node->getMetadata().createCopy();
         model.setProperty (Tags::object, node, nullptr);
+        const Node n (model, false);
+        node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);
         changed();
     }
@@ -167,6 +167,8 @@ void GraphController::setNodeModel (const Node& node)
             if (state.fromBase64Encoding (node.node().getProperty(Tags::state).toString()))
                 obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+            if (node.getValueTree().getProperty (Tags::bypass, false))
+                obj->getAudioProcessor()->suspendProcessing (true);
         }
         else
         {

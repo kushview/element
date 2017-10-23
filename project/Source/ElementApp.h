@@ -19,6 +19,7 @@ namespace Tags
     const Identifier active             = "active";
     const Identifier arc                = "arc";
     const Identifier arcs               = "arcs";
+    const Identifier bypass             = "bypass";
     const Identifier graph              = "graph";
     const Identifier graphs             = "graphs";
     const Identifier node               = "node";

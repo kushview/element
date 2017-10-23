@@ -4,6 +4,7 @@
 */
 
 #include "engine/GraphNode.h"
+#include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 
 namespace Element {
@@ -26,7 +27,7 @@ class PluginWindowContent : public Component,
 {
 public:
     PluginWindowContent (Component* const _editor, GraphNode* _node)
-        : editor (_editor), node (_node)
+        : editor (_editor), object(_node)
     {
         addAndMakeVisible (toolbar = new PluginWindowToolbar());
         toolbar->setBounds (0, 0, getWidth(), 24);
@@ -36,7 +37,25 @@ public:
         addAndMakeVisible (bypassButton);
         
         bypassButton.setButtonText ("Bypass");
-        bypassButton.setToggleState (_node->getAudioProcessor()->isSuspended(), dontSendNotification);
+        bypassButton.setToggleState (node.isBypassed(), dontSendNotification);
+        bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
+        bypassButton.addListener (this);
+        
+        setSize (editor->getWidth(), editor->getHeight() + toolbar->getHeight());
+        resized();
+    }
+    
+    PluginWindowContent (Component* const _editor, const Node& _node)
+        : editor (_editor), object(_node.getGraphNode()), node(_node)
+    {
+        addAndMakeVisible (toolbar = new PluginWindowToolbar());
+        toolbar->setBounds (0, 0, getWidth(), 24);
+        
+        addAndMakeVisible (editor);
+        
+        addAndMakeVisible (bypassButton);
+        bypassButton.setButtonText ("B");
+        bypassButton.setToggleState (object->getAudioProcessor()->isSuspended(), dontSendNotification);
         bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
         bypassButton.addListener (this);
         
@@ -69,18 +88,19 @@ public:
         editor->setBounds (r);
     }
     
-    void buttonClicked (Button*) override
+    void buttonClicked (Button* button) override
     {
-        const bool desiredBypassState = !node->getAudioProcessor()->isSuspended();
-        node->getAudioProcessor()->suspendProcessing (desiredBypassState);
-        bypassButton.setToggleState (node->getAudioProcessor()->isSuspended(),
-                                     dontSendNotification);
+        if (button == &bypassButton)
+        {
+            const bool desiredBypassState = !object->getAudioProcessor()->isSuspended();
+            object->getAudioProcessor()->suspendProcessing (desiredBypassState);
+            const bool isNowSuspended = object->getAudioProcessor()->isSuspended();
+            bypassButton.setToggleState (isNowSuspended, dontSendNotification);
+            node.setProperty (Tags::bypass, isNowSuspended);
+        }
     }
     
-    void componentMovedOrResized (Component&, bool wasMoved, bool wasResized) override
-    {
-
-    }
+    void componentMovedOrResized (Component&, bool wasMoved, bool wasResized) override { }
     
     Toolbar* getToolbar() const { return toolbar.get(); }
     
@@ -88,7 +108,8 @@ private:
     ScopedPointer<PluginWindowToolbar> toolbar;
     TextButton bypassButton;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
-    GraphNodePtr node;
+    GraphNodePtr object;
+    Node node;
 };
 
 PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
@@ -108,6 +129,26 @@ PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
     activePluginWindows.add (this);
 }
 
+PluginWindow::PluginWindow (Component* const ui, const Node& n)
+    : DocumentWindow (ui->getName(), Colours::lightgrey,
+                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
+      owner (n.getGraphNode()), node(n)
+{
+    setUsingNativeTitleBar (true);
+    setSize (400, 300);
+    setContentOwned (new PluginWindowContent (ui, node), true);
+    if (node.isValid())
+    {
+        setTopLeftPosition (node.getValueTree().getProperty ("windowX", Random::getSystemRandom().nextInt (500)),
+                            node.getValueTree().getProperty ("windowY", Random::getSystemRandom().nextInt (500)));
+        node.getValueTree().setProperty ("windowVisible", true, 0);
+    }
+    
+    setVisible (true);
+    addToDesktop();
+    activePluginWindows.add (this);
+}
+    
 PluginWindow::~PluginWindow()
 {
     activePluginWindows.removeFirstMatchingValue (this);
@@ -179,11 +220,11 @@ void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
     
 PluginWindow* PluginWindow::createWindowFor (GraphNode* node)
 {
-    AudioPluginInstance* plug (node->getAudioPluginInstance());
+    auto* plug (node->getAudioProcessor());
     if (! plug->hasEditor())
         return nullptr;
     
-    AudioProcessorEditor* editor = plug->createEditorIfNeeded();
+    auto* editor = plug->createEditorIfNeeded();
     return (editor != nullptr) ? new PluginWindow (editor, node) : nullptr;
 }
 
@@ -192,17 +233,44 @@ PluginWindow* PluginWindow::createWindowFor (GraphNode* node, Component* ed)
     return new PluginWindow (ed, node);
 }
 
+PluginWindow* PluginWindow::getWindowFor (const Node& node)
+{
+    return getWindowFor (node.getGraphNode());
+}
+
+PluginWindow* PluginWindow::createWindowFor (const Node& node)
+{
+    GraphNodePtr object = node.getGraphNode();
+    AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    if (! proc)
+        return nullptr;
+    if (!proc->hasEditor())
+        return nullptr;
+    
+    auto* editor = proc->createEditorIfNeeded();
+    return (editor != nullptr) ? createWindowFor (node, editor) : nullptr;
+}
+
+PluginWindow* PluginWindow::createWindowFor (const Node& n, Component* e) {
+    return new PluginWindow (e, n);
+}
+
+PluginWindow* PluginWindow::getOrCreateWindowFor (const Node& node)
+{
+    if (auto* w = getWindowFor (node))
+        return w;
+    return createWindowFor (node);
+}
+
 void PluginWindow::moved()
 {
-    owner->properties.set ("windowLastX", getX());
-    owner->properties.set ("windowLastY", getY());
+    node.setProperty ("windowX", getX());
+    node.setProperty ("windowY", getY());
 }
 
 void PluginWindow::closeButtonPressed()
 {
-    if (owner) {
-        owner->properties.set ("windowVisible", false);
-    }
+    node.setProperty ("windowVisible", false);
     delete this;
 }
 

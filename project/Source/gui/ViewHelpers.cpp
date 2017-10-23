@@ -98,9 +98,9 @@ void postMessageFor (Component* c, Message* m)
     deleter = nullptr;
 }
 
-void presentPluginWindow (GraphNodePtr ptr)
+void presentPluginWindow (const Node& node)
 {
-    auto* window = PluginWindow::getWindowFor (ptr);
+    auto* window = PluginWindow::getWindowFor (node);
     if (window)
     {
         window->setVisible (true);
@@ -108,7 +108,7 @@ void presentPluginWindow (GraphNodePtr ptr)
         return;
     }
     
-    window = PluginWindow::createWindowFor (ptr);
+    window = PluginWindow::createWindowFor (node);
     if (window)
     {
         window->setVisible (true);

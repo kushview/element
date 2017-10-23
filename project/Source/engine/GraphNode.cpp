@@ -249,9 +249,10 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
                          GraphProcessor* const parentGraph)
 {
     parent = parentGraph;
+    AudioProcessor* instance = proc.get();
+    
     if (! isPrepared)
     {
-        AudioProcessor* instance = proc.get();
         instance->setPlayConfigDetails (instance->getTotalNumInputChannels(),
                                         instance->getTotalNumOutputChannels(),
                                         sampleRate, blockSize);
@@ -270,14 +271,16 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
             inRMS.add (avf);
         }
 
-        outRMS.clearQuick(true);
+        outRMS.clearQuick (true);
         for (int i = 0; i < instance->getTotalNumOutputChannels(); ++i)
         {
             AtomicValue<float>* avf = new AtomicValue<float>();
             avf->set(0);
             outRMS.add(avf);
         }
-
+        
+        if (metadata.getProperty (Tags::bypass, false))
+            instance->suspendProcessing (true);
         isPrepared = true;
     }
 }

@@ -117,9 +117,10 @@ namespace Element {
     
     void Node::setMissingProperties()
     {
-        objectData.getOrCreateChildWithName(Tags::nodes, nullptr);
-        stabilizePropertyString (Slugs::type, "default");
-        stabilizePropertyString (Slugs::name, "Default Node");
+        stabilizePropertyString (Tags::type, "default");
+        stabilizePropertyString (Tags::name, "Default Node");
+        stabilizeProperty (Tags::bypass, false);
+        objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     }
 
     GraphNode* Node::getGraphNode() const

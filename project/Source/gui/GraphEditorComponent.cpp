@@ -160,8 +160,8 @@ public:
 
     void makeEditorActive()
     {
-        if (GraphNodePtr ptr = node.getGraphNode())
-            ViewHelpers::presentPluginWindow (ptr);
+        if (node.isValid())
+            ViewHelpers::presentPluginWindow (node);
     }
     
     void mouseUp (const MouseEvent& e)

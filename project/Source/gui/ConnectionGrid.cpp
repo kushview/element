@@ -510,8 +510,7 @@ namespace Element
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
         {
             const Node node (matrix->getNode (row, true));
-            if (auto ptr = ViewHelpers::findGraphNodeFor (this, node))
-                ViewHelpers::presentPluginWindow (ptr);
+            ViewHelpers::presentPluginWindow (node);
         }
         
         void backgroundClicked (const MouseEvent& ev) override
@@ -593,8 +592,7 @@ namespace Element
         void listBoxItemDoubleClicked (int row, const MouseEvent&) override
         {
             const Node node (matrix->getNode (row, false));
-            if (auto ptr = ViewHelpers::findGraphNodeFor (this, node))
-                ViewHelpers::presentPluginWindow (ptr);
+            ViewHelpers::presentPluginWindow (node);
         }
         
         void backgroundClicked (const MouseEvent& ev) override
