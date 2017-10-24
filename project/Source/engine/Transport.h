@@ -15,9 +15,9 @@ namespace Element
         Transport();
         ~Transport();
 
-        inline void requestPlayState (bool p) { while (! playState.set (p)) {} }
-        inline void requestRecordState (bool r) { while (! recordState.set (r)) {} }
-        inline void requestTempo (const double bpm) { while (! nextTempo.set (bpm)) {} }
+        inline void requestPlayState (bool p) { while (! playState.set (p)) { } }
+        inline void requestRecordState (bool r) { while (! recordState.set (r)) { } }
+        inline void requestTempo (const double bpm) { while (! nextTempo.set (bpm)) { } }
 
         void preProcess (int nframes);
         void postProcess (int nframes);

@@ -9,6 +9,7 @@
 #include "engine/Engine.h"
 #include "engine/GraphProcessor.h"
 #include "session/DeviceManager.h"
+#include "session/Session.h"
 namespace Element {
 
 class Globals;
@@ -50,10 +51,11 @@ public:
     void activate();
     void deactivate();
     
+    void setSession (SessionPtr);
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
-    RootGraph* getGraph (const int index);
     
+    RootGraph* getGraph (const int index);
     RootGraph& getRootGraph();
     
     AudioIODeviceCallback& getAudioIODeviceCallback() override;

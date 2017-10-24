@@ -178,9 +178,9 @@ void EngineController::activate()
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
     auto& devices (globals.getDeviceManager());
-    
     auto engine (globals.getAudioEngine());
     auto session (globals.getSession());
+    engine->setSession (session);
     RootGraph& graph (engine->getRootGraph());
     
     if (auto* device = devices.getCurrentAudioDevice())
@@ -225,6 +225,11 @@ void EngineController::setRootNode (const Node& newRootNode)
         return;
     }
 
+    DBG("[EL] updating engine/session in set Root Node: FIXME");
+    auto engine = (dynamic_cast<AppController*> (getRoot()))->getGlobals().getAudioEngine();
+    auto session = (dynamic_cast<AppController*> (getRoot()))->getGlobals().getSession();
+    engine->setSession (session);
+    
     DBG("[EL] setting root node: " << newRootNode.getName());
     root->setNodeModel (newRootNode);
     ValueTree nodes = newRootNode.getNodesValueTree();

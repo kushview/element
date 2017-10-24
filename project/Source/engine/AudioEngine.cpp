@@ -59,7 +59,8 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
 }
 
 class AudioEngine::Private : public AudioIODeviceCallback,
-                             public MidiInputCallback
+                             public MidiInputCallback,
+                             public ValueListener
 {
 public:
     Private (AudioEngine& e)
@@ -68,10 +69,12 @@ public:
           tempBuffer (1, 1)
     {
         graphs.add (new RootGraph ());
+        tempoValue.addListener (this);
     }
 
     ~Private()
     {
+        tempoValue.removeListener (this);
         if (isPrepared)
         {
             jassertfalse;
@@ -223,11 +226,34 @@ public:
         deleteAndZero (graph);
     }
     
+    void setSession (SessionPtr s)
+    {
+        session = s;
+        if (session)
+            tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
+        else
+            tempoValue = tempoValue.getValue(); // drop reference?
+        
+        valueChanged (tempoValue);
+    }
+    
+    void valueChanged (Value& value) override
+    {
+        if (tempoValue.refersToSameSourceAs (value))
+        {
+            const float tempo = (float) tempoValue.getValue();
+            transport.requestTempo (tempo);
+        }
+    }
+    
 private:
     friend class AudioEngine;
     AudioEngine&    engine;
     Transport       transport;
     OwnedArray<RootGraph> graphs;
+    SessionPtr session;
+    Value tempoValue;
+    Atomic<float> nextTempo;
     
     CriticalSection lock;
     double sampleRate   = 0.0;
@@ -318,4 +344,10 @@ RootGraph* AudioEngine::getGraph (const int index)
     return nullptr;
 }
 
+void AudioEngine::setSession (SessionPtr session)
+{
+    if (priv)
+        priv->setSession (session);
+}
+    
 }

@@ -127,6 +127,9 @@ namespace Element {
             return;
         }
         
+        if (tree == objectData && property == Tags::tempo) {
+        
+        }
         notifyChanged();
     }
 

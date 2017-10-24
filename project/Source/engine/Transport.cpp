@@ -16,9 +16,7 @@ namespace Element {
         playPos.reset (new Monitor (a, 0));
     }
 
-
     Transport::~Transport() { }
-
 
     void Transport::preProcess (int nframes)
     {
@@ -44,6 +42,7 @@ namespace Element {
     {
         if (getTempo() != nextTempo.get())
         {
+            DBG("[EL] tempo change in transport: " << getTempo() << " -> " << nextTempo.get());
             setTempo (nextTempo.get());
             nextTempo.set (getTempo());
         }
