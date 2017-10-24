@@ -66,6 +66,13 @@ public:
     ~PluginWindowContent()
     {
         bypassButton.removeListener (this);
+        if (object && editor)
+        {
+            if (auto* proc = object->getAudioProcessor())
+                if (auto* const e = dynamic_cast<AudioProcessorEditor*> (editor.get()))
+                    proc->editorBeingDeleted (e);
+        }
+        
         editor = nullptr;
         toolbar = nullptr;
         leftPanel = nullptr;

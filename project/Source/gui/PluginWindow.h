@@ -1,5 +1,4 @@
-#ifndef ELEMENT_PLUGIN_WINDOW_H
-#define ELEMENT_PLUGIN_WINDOW_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -50,5 +49,3 @@ private:
 };
 
 }
-
-#endif // ELEMENT_PLUGIN_WINDOW_H

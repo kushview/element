@@ -72,21 +72,125 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
 };
 
+
+class CombFilter
+{
+public:
+    CombFilter() noexcept   : bufferSize (0), bufferIndex (0), last (0)  { }
+    
+    void setSize (const int size)
+    {
+        if (size != bufferSize)
+        {
+            bufferIndex = 0;
+            buffer.malloc ((size_t) size);
+            bufferSize = size;
+        }
+        
+        clear();
+    }
+    
+    void clear() noexcept
+    {
+        last = 0;
+        buffer.clear ((size_t) bufferSize);
+    }
+    
+    void free()
+    {
+        last = 0;
+        buffer.free();
+    }
+    
+    float process (const float input, const float damp, const float feedbackLevel) noexcept
+    {
+        const float output = buffer[bufferIndex];
+        last = (output * (1.0f - damp)) + (last * damp);
+        JUCE_UNDENORMALISE (last);
+        
+        float temp = input + (last * feedbackLevel);
+        JUCE_UNDENORMALISE (temp);
+        buffer[bufferIndex] = temp;
+        bufferIndex = (bufferIndex + 1) % bufferSize;
+        return output;
+    }
+    
+private:
+    HeapBlock<float> buffer;
+    int bufferSize, bufferIndex;
+    float last;
+    
+    JUCE_DECLARE_NON_COPYABLE (CombFilter)
+};
+
+class AllPassFilter
+{
+public:
+    AllPassFilter() noexcept : bufferSize (0), bufferIndex (0) {}
+    
+    void setSize (const int size)
+    {
+        if (size != bufferSize)
+        {
+            bufferIndex = 0;
+            buffer.malloc ((size_t) size);
+            bufferSize = size;
+        }
+        
+        clear();
+    }
+    
+    void clear() noexcept
+    {
+        buffer.clear ((size_t) bufferSize);
+    }
+    
+    void free()
+    {
+        buffer.free();
+    }
+    
+    float process (const float input) noexcept
+    {
+        const float bufferedValue = buffer [bufferIndex];
+        float temp = input + (bufferedValue * 0.5f);
+        JUCE_UNDENORMALISE (temp);
+        buffer [bufferIndex] = temp;
+        bufferIndex = (bufferIndex + 1) % bufferSize;
+        return bufferedValue - input;
+    }
+    
+private:
+    HeapBlock<float> buffer;
+    int bufferSize, bufferIndex;
+    
+    JUCE_DECLARE_NON_COPYABLE (AllPassFilter)
+};
+
 class CombFilterProcessor : public BaseProcessor
 {
 private:
     const bool stereo;
+    AudioParameterFloat* length   = nullptr;
+    AudioParameterFloat* damping  = nullptr;
+    AudioParameterFloat* feedback = nullptr;
     
 public:
     explicit CombFilterProcessor (const bool _stereo = false)
         : BaseProcessor(),
           stereo (_stereo)
     {
-        setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1,
-                              44100.0, 1024);
+        setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
+        addParameter (length   = new AudioParameterFloat ("length",   "Buffer Length",  1.f, 500.f, 90.f));
+        lastLength = *length;
+        addParameter (damping  = new AudioParameterFloat ("damping",  "Damping",        0.f, 1.f, 0.f));
+        addParameter (feedback = new AudioParameterFloat ("feedback", "Feedback Level", 0.f, 1.f, 0.5f));
     }
     
-    virtual ~CombFilterProcessor() { }
+    virtual ~CombFilterProcessor()
+    {
+        length = nullptr;
+    }
     
     const String getName() const override { return "Comb Filter"; }
 
@@ -106,22 +210,38 @@ public:
     
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
     {
+        lastLength = *length;
+        for (int i = 0; i < 2; ++i)
+            comb[i].setSize (*length * sampleRate * 0.001);
         setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1,
                               sampleRate, maximumExpectedSamplesPerBlock);
     }
     
     void releaseResources() override
     {
-        
+        for (int i = 0; i < 2; ++i)
+            comb[i].free();
     }
     
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
+    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
     {
-        buffer.clear (0, buffer.getNumSamples());
+        if (lastLength != *length)
+        {
+            for (int i = 0; i < 2; ++i)
+                comb[i].setSize (*length * getSampleRate() * 0.001);
+            lastLength = *length;
+        }
+        
+        const int numChans = jmin (2, buffer.getNumChannels());
+        const auto** input = buffer.getArrayOfReadPointers();
+        auto** output = buffer.getArrayOfWritePointers();
+        for (int c = 0; c < numChans; ++c)
+            for (int i = 0; i < buffer.getNumSamples(); ++i)
+                output[c][i] = comb[0].process (input[c][i], *damping, *feedback);
     }
 
-    AudioProcessorEditor* createEditor() override   { return nullptr; }
-    bool hasEditor() const override                 { return false; }
+    AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
+    bool hasEditor() const override                 { return true; }
     
     double getTailLengthSeconds() const override    { return 0.0; };
     bool acceptsMidi() const override               { return false; }
@@ -134,6 +254,10 @@ public:
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
     void getStateInformation (juce::MemoryBlock& destData) override    { ignoreUnused (destData); }
     void setStateInformation (const void* data, int sizeInBytes) override { ignoreUnused (data, sizeInBytes); }
+
+private:
+    CombFilter comb[2];
+    float lastLength;
 };
 
 }
