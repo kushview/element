@@ -89,13 +89,15 @@ public:
         {
             buffer.realloc (static_cast<size_t> ( proposedSize));
             allocatedSize = proposedSize;
-            clear();
         }
         
         bufferSize = numSamples;
-        if (bufferIndex >= bufferSize) {
+        if (bufferIndex >= bufferSize)
+        {
             bufferIndex = 0;
         }
+        
+        clear();
     }
     
     void clear() noexcept
@@ -186,6 +188,13 @@ private:
     AudioParameterFloat* feedback = nullptr;
     
 public:
+    /*
+         // Freeverb tunings
+         25.306122448979592, 26.938775510204082,
+         28.956916099773243, 30.748299319727891,
+         32.244897959183673, 33.80952380952381,
+         35.306122448979592, 36.666666666666667
+     */
     explicit CombFilterProcessor (const bool _stereo = false)
         : BaseProcessor(),
           stereo (_stereo)
@@ -218,11 +227,14 @@ public:
         desc.version            = "1.0.0";
     }
     
+    int spreadForChannel (const int c) const {
+        return c * 28;
+    }
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
     {
         lastLength = *length;
         for (int i = 0; i < 2; ++i)
-            comb[i].setSize (*length * sampleRate * 0.001);
+            comb[i].setSize (spreadForChannel(i) + (*length * sampleRate * 0.001));
         setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1,
                               sampleRate, maximumExpectedSamplesPerBlock);
     }
