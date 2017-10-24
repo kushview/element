@@ -76,48 +76,58 @@ private:
 class CombFilter
 {
 public:
-    CombFilter() noexcept   : bufferSize (0), bufferIndex (0), last (0)  { }
+    CombFilter() noexcept
+        : bufferSize(0), bufferIndex(0), allocatedSize(0), last(0) { }
     
-    void setSize (const int size)
+    void setSize (const int numSamples)
     {
-        if (size != bufferSize)
+        if (numSamples == bufferSize)
+            return;
+        
+        const int proposedSize = nextPowerOfTwo (numSamples);
+        if (proposedSize > allocatedSize)
         {
-            bufferIndex = 0;
-            buffer.malloc ((size_t) size);
-            bufferSize = size;
+            buffer.realloc (static_cast<size_t> ( proposedSize));
+            allocatedSize = proposedSize;
+            clear();
         }
         
-        clear();
+        bufferSize = numSamples;
+        if (bufferIndex >= bufferSize) {
+            bufferIndex = 0;
+        }
     }
     
     void clear() noexcept
     {
         last = 0;
+        bufferIndex = 0;
         buffer.clear ((size_t) bufferSize);
     }
     
     void free()
     {
         last = 0;
+        bufferSize = 0;
         buffer.free();
     }
     
     float process (const float input, const float damp, const float feedbackLevel) noexcept
     {
-        const float output = buffer[bufferIndex];
+        const float output = buffer [bufferIndex];
         last = (output * (1.0f - damp)) + (last * damp);
         JUCE_UNDENORMALISE (last);
         
         float temp = input + (last * feedbackLevel);
         JUCE_UNDENORMALISE (temp);
-        buffer[bufferIndex] = temp;
+        buffer [bufferIndex] = temp;
         bufferIndex = (bufferIndex + 1) % bufferSize;
         return output;
     }
     
 private:
     HeapBlock<float> buffer;
-    int bufferSize, bufferIndex;
+    int bufferSize, bufferIndex, allocatedSize;
     float last;
     
     JUCE_DECLARE_NON_COPYABLE (CombFilter)
@@ -227,8 +237,9 @@ public:
     {
         if (lastLength != *length)
         {
+            const int newSize = roundToIntAccurate (*length * getSampleRate() * 0.001);
             for (int i = 0; i < 2; ++i)
-                comb[i].setSize (*length * getSampleRate() * 0.001);
+                comb[i].setSize (newSize);
             lastLength = *length;
         }
         
@@ -237,7 +248,7 @@ public:
         auto** output = buffer.getArrayOfWritePointers();
         for (int c = 0; c < numChans; ++c)
             for (int i = 0; i < buffer.getNumSamples(); ++i)
-                output[c][i] = comb[0].process (input[c][i], *damping, *feedback);
+                output[c][i] = comb[c].process (input[c][i], *damping, *feedback);
     }
 
     AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
@@ -252,8 +263,30 @@ public:
     void setCurrentProgram (int index) override                        { ignoreUnused (index); };
     const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
-    void getStateInformation (juce::MemoryBlock& destData) override    { ignoreUnused (destData); }
-    void setStateInformation (const void* data, int sizeInBytes) override { ignoreUnused (data, sizeInBytes); }
+    
+    void getStateInformation (juce::MemoryBlock& destData) override
+    {
+        ValueTree state (Tags::state);
+        state.setProperty ("damping",  (float) *damping, 0);
+        state.setProperty ("feedback", (float) *feedback, 0);
+        state.setProperty ("length",   (float) *length, 0);
+        if (ScopedPointer<XmlElement> e = state.createXml())
+            AudioProcessor::copyXmlToBinary (*e, destData);
+    }
+    
+    void setStateInformation (const void* data, int sizeInBytes) override
+    {
+        if (ScopedPointer<XmlElement> e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
+        {
+            auto state = ValueTree::fromXml (*e);
+            if (state.isValid())
+            {
+                *damping  = (float) state.getProperty ("damping",  (float) *damping);
+                *feedback = (float) state.getProperty ("feedback", (float) *feedback);
+                *length   = (float) state.getProperty ("length",   (float) *length);
+            }
+        }
+    }
 
 private:
     CombFilter comb[2];
