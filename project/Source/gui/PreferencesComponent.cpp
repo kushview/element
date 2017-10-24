@@ -155,7 +155,8 @@ namespace Element {
         
         void paint (Graphics&) override { }
         
-        void buttonClicked (Button*) {
+        void buttonClicked (Button*) override
+        {
             writeSetting();
         }
         

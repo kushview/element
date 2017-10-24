@@ -1,24 +1,9 @@
 /*
     InternalFormat.h - This file is part of Element
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_INTERNAL_FORMAT_H
-#define ELEMENT_INTERNAL_FORMAT_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -74,11 +59,9 @@ namespace Element {
         String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
         bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
         StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override { return StringArray(); }
-        
 
     protected:
-        void createPluginInstance (const PluginDescription&, double initialSampleRate,
-                                   int initialBufferSize, void* userData,
+        void createPluginInstance (const PluginDescription&, double initialSampleRate, int initialBufferSize, void* userData,
                                    void (*callback) (void*, AudioPluginInstance*, const String&)) override;
         bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
     
@@ -95,6 +78,34 @@ namespace Element {
         
         AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
     };
-}
 
-#endif   // ELEMENT_INTERNAL_FORMAT_H
+    class ElementAudioPluginFormat   : public AudioPluginFormat
+    {
+    public:
+        ElementAudioPluginFormat();
+        ~ElementAudioPluginFormat() { }
+        
+        // AudioPluginFormat
+        String getName() const                                      override { return "Element"; }
+        bool fileMightContainThisPluginType (const String&)         override { return true; }
+        FileSearchPath getDefaultLocationsToSearch()                override { return FileSearchPath(); }
+        bool canScanForPlugins() const                              override { return true; }
+        void findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String&) override;
+        bool doesPluginStillExist (const PluginDescription&)        override { return true; }
+        String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
+        bool pluginNeedsRescanning (const PluginDescription&)       override { return false; }
+        StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override;
+        
+    protected:
+        void createPluginInstance (const PluginDescription&, double initialSampleRate, int initialBufferSize, void* userData,
+                                   void (*callback) (void*, AudioPluginInstance*, const String&)) override;
+        bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
+        
+    private:
+        PluginDescription reverbDesc;
+        PluginDescription combFilterDesc;
+        PluginDescription allPassFilterDesc;
+        
+        AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
+    };
+}

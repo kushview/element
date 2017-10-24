@@ -7,6 +7,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
+#include "engine/CombFilterProcessor.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "session/Session.h"
 #include "Globals.h"
@@ -110,6 +111,89 @@ namespace Element {
     }
     
     bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
+    {
+        return false;
+    }
+    
+    
+    // MARK: Element Format
+    
+    ElementAudioPluginFormat::ElementAudioPluginFormat()
+    {
+
+    }
+    
+    void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
+    {
+        if (fileOrId == "element.reverb")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->pluginFormatName = getName();
+            desc->name = "eVerb";
+            desc->manufacturerName = "Element";
+            desc->category = "Effect";
+            desc->fileOrIdentifier = fileOrId;
+            desc->numInputChannels = 2;
+            desc->numInputChannels = 2;
+        }
+        else if (fileOrId == "element.combFilter")
+        {
+            auto* desc = ds.add (new PluginDescription());
+            desc->pluginFormatName = getName();
+            desc->name = "Comb Filter (mono)";
+            desc->manufacturerName = "Element";
+            desc->category = "Effect";
+            desc->fileOrIdentifier = fileOrId + ".mono";
+            desc->numInputChannels = 1;
+            desc->numOutputChannels = 1;
+            
+            desc = ds.add (new PluginDescription (*desc));
+            desc->name = "Comb Filter (stereo)";
+            desc->fileOrIdentifier = fileOrId + ".stereo";
+            desc->numInputChannels = 2;
+            desc->numOutputChannels = 2;
+        }
+        else if (fileOrId == "element.allPassFilter")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->pluginFormatName = getName();
+            desc->name = "Element Reverb";
+            desc->manufacturerName = "Element";
+            desc->category = "Effect";
+            desc->fileOrIdentifier = fileOrId + ".mono";
+            desc->numInputChannels = 1;
+            desc->numOutputChannels = 1;
+        }
+    }
+    
+    StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
+    {
+        StringArray results;
+        results.add ("element.reverb");
+        results.add ("element.combFilter");
+        return results;
+    }
+    
+    AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, double, int)
+    {
+        if (desc.fileOrIdentifier == "element.combFilter.mono")
+            return new CombFilterProcessor (false);
+        else if (desc.fileOrIdentifier == "element.combFilter.stereo")
+            return new CombFilterProcessor (true);
+        return nullptr;
+    }
+    
+    void ElementAudioPluginFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
+                                                         int initialBufferSize, void* userData,
+                                                         void (*callback) (void*, AudioPluginInstance*, const String&))
+    {
+        if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
+            callback (userData, i, String::empty);
+        else
+            callback (userData, 0, String::empty);
+    }
+    
+    bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
     {
         return false;
     }

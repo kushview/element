@@ -44,6 +44,8 @@
         <FILE id="xp1iJH" name="ClipFactory.h" compile="0" resource="0" file="Source/engine/ClipFactory.h"/>
         <FILE id="fZkHE0" name="ClipSource.cpp" compile="1" resource="0" file="Source/engine/ClipSource.cpp"/>
         <FILE id="K1qC5U" name="ClipSource.h" compile="0" resource="0" file="Source/engine/ClipSource.h"/>
+        <FILE id="zx5h5o" name="CombFilterProcessor.h" compile="0" resource="0"
+              file="Source/engine/CombFilterProcessor.h"/>
         <FILE id="kBJmQL" name="DataType.h" compile="0" resource="0" file="Source/engine/DataType.h"/>
         <FILE id="q8nmE2" name="Engine.h" compile="0" resource="0" file="Source/engine/Engine.h"/>
         <FILE id="yTyIOL" name="GraphNode.cpp" compile="1" resource="0" file="Source/engine/GraphNode.cpp"/>

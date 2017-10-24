@@ -112,6 +112,7 @@ private:
         
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
+        plugins.addFormat (new ElementAudioPluginFormat());
         if (isFirstRun)
         {
             auto& formats (plugins.formats());
