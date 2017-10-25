@@ -562,8 +562,7 @@ GraphEditorComponent::~GraphEditorComponent()
 
 void GraphEditorComponent::setNode (const Node& n)
 {
-    jassert (n.hasNodeType (Tags::graph));
-    graph = n;
+    graph = n.isValid() && n.isGraph() ? n : Node (Tags::graph);
     data = graph.getValueTree();
     draggingConnector = nullptr;
     deleteAllChildren();

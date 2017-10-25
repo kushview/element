@@ -7,7 +7,12 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
+
 #include "engine/CombFilterProcessor.h"
+#include "engine/AllPassFilterProcessor.h"
+#include "engine/VolumeProcessor.h"
+#include "engine/WetDryProcessor.h"
+
 #include "engine/MidiSequenceProcessor.h"
 #include "session/Session.h"
 #include "Globals.h"

@@ -33,8 +33,11 @@
               file="Source/controllers/SessionController.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
+        <FILE id="mrVjkP" name="AllPassFilterProcessor.h" compile="0" resource="0"
+              file="Source/engine/AllPassFilterProcessor.h"/>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="Source/engine/AudioEngine.h"/>
+        <FILE id="suk5ui" name="BaseProcessor.h" compile="0" resource="0" file="Source/engine/BaseProcessor.h"/>
         <FILE id="V0jXER" name="Buffer.cpp" compile="0" resource="0" file="Source/engine/Buffer.cpp"/>
         <FILE id="ndMomL" name="Buffer.h" compile="0" resource="0" file="Source/engine/Buffer.h"/>
         <FILE id="vT7kmd" name="BufferFactory.cpp" compile="0" resource="0"
@@ -83,6 +86,10 @@
               file="Source/engine/SequencerTrack.h"/>
         <FILE id="NCc172" name="Transport.cpp" compile="1" resource="0" file="Source/engine/Transport.cpp"/>
         <FILE id="gEA8Kx" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
+        <FILE id="U2vAXo" name="VolumeProcessor.h" compile="0" resource="0"
+              file="Source/engine/VolumeProcessor.h"/>
+        <FILE id="DZxm7q" name="WetDryProcessor.h" compile="0" resource="0"
+              file="Source/engine/WetDryProcessor.h"/>
       </GROUP>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
         <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
