@@ -136,7 +136,7 @@ namespace Element {
             desc->numInputChannels = 2;
             desc->numInputChannels = 2;
         }
-        else if (fileOrId == "element.combFilter")
+        else if (fileOrId == "element.comb")
         {
             auto* desc = ds.add (new PluginDescription());
             desc->pluginFormatName = getName();
@@ -153,16 +153,39 @@ namespace Element {
             desc->numInputChannels = 2;
             desc->numOutputChannels = 2;
         }
-        else if (fileOrId == "element.allPassFilter")
+        else if (fileOrId == "element.allPass")
         {
-            auto* const desc = ds.add (new PluginDescription());
+            auto* desc = ds.add (new PluginDescription());
             desc->pluginFormatName = getName();
-            desc->name = "Element Reverb";
+            desc->name = "AllPass Filter (mono)";
             desc->manufacturerName = "Element";
             desc->category = "Effect";
             desc->fileOrIdentifier = fileOrId + ".mono";
             desc->numInputChannels = 1;
             desc->numOutputChannels = 1;
+            
+            desc = ds.add (new PluginDescription (*desc));
+            desc->name = "AllPass Filter (stereo)";
+            desc->fileOrIdentifier = fileOrId + ".stereo";
+            desc->numInputChannels = 2;
+            desc->numOutputChannels = 2;
+        }
+        else if (fileOrId == "element.volume")
+        {
+            auto* desc = ds.add (new PluginDescription());
+            desc->pluginFormatName = getName();
+            desc->name = "Volume (mono)";
+            desc->manufacturerName = "Element";
+            desc->category = "Effect";
+            desc->fileOrIdentifier = fileOrId + ".mono";
+            desc->numInputChannels = 1;
+            desc->numOutputChannels = 1;
+            
+            desc = ds.add (new PluginDescription (*desc));
+            desc->name = "Volume (stereo)";
+            desc->fileOrIdentifier = fileOrId + ".stereo";
+            desc->numInputChannels = 2;
+            desc->numOutputChannels = 2;
         }
     }
     
@@ -170,17 +193,35 @@ namespace Element {
     {
         StringArray results;
         results.add ("element.reverb");
-        results.add ("element.combFilter");
+        results.add ("element.comb");
+        results.add ("element.allPass");
+        results.add ("element.volume");
         return results;
     }
     
     AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, double, int)
     {
-        if (desc.fileOrIdentifier == "element.combFilter.mono")
-            return new CombFilterProcessor (false);
-        else if (desc.fileOrIdentifier == "element.combFilter.stereo")
-            return new CombFilterProcessor (true);
-        return nullptr;
+        ScopedPointer<BaseProcessor> base;
+        
+        if (desc.fileOrIdentifier == "element.comb.mono")
+            base = new CombFilterProcessor (false);
+        
+        else if (desc.fileOrIdentifier == "element.comb.stereo")
+            base = new CombFilterProcessor (true);
+        
+        else if (desc.fileOrIdentifier == "element.allPass.mono")
+            base = new AllPassFilterProcessor (false);
+        
+        else if (desc.fileOrIdentifier == "element.allPass.stereo")
+            base = new AllPassFilterProcessor (true);
+        
+        else if (desc.fileOrIdentifier == "element.volume.mono")
+            base = new VolumeProcessor (-30.0, 12.0, false);
+        
+        else if (desc.fileOrIdentifier == "element.volume.stereo")
+            base = new VolumeProcessor (-30.0, 12.0, true);
+        
+        return base != nullptr ? base.release() : nullptr;
     }
     
     void ElementAudioPluginFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
