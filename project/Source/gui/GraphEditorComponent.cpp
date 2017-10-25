@@ -732,6 +732,13 @@ void GraphEditorComponent::updateConnectorComponents()
         }
     }
 }
+
+void GraphEditorComponent::updateFilterComponents()
+{
+    for (int i = getNumChildComponents(); --i >= 0;)
+        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+            fc->update();
+}
     
 void GraphEditorComponent::updateComponents()
 {
@@ -749,7 +756,6 @@ void GraphEditorComponent::updateComponents()
         
         connector->setInput (arc.sourceNode, arc.sourcePort);
         connector->setOutput (arc.destNode, arc.destPort);
-        connector->update();
     }
     
     for (int i = graph.getNumNodes(); --i >= 0;)
@@ -761,36 +767,10 @@ void GraphEditorComponent::updateComponents()
             comp = new FilterComponent (graph, node);
             addAndMakeVisible (comp);
         }
-        
-        comp->update();
     }
 
-    for (int i = getNumChildComponents(); --i >= 0;)
-    {
-        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i))) {
-            fc->update();
-        }
-    }
-
-    const ValueTree arcs = graph.getArcsValueTree();
-    
-    for (int i = getNumChildComponents(); --i >= 0;)
-    {
-        ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
-
-        if (cc != nullptr && cc != draggingConnector && ! cc->isDragging())
-        {
-            if (Node::connectionExists (arcs, cc->sourceFilterID, cc->sourceFilterChannel,
-                                              cc->destFilterID, cc->destFilterChannel))
-            {
-                cc->update();
-            }
-            else
-            {
-                delete cc;
-            }
-        }
-    }
+    updateFilterComponents();
+    updateConnectorComponents();
 }
 
 void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,

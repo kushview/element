@@ -58,7 +58,10 @@ private:
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
+    
+    void updateFilterComponents();
     void updateConnectorComponents();
+    
     void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
                              const uint32 destFilterID, const int destFilterChannel,
                              const MouseEvent& e);
