@@ -41,6 +41,7 @@ public:
     void resized() override;
 
     void setContentView (ContentView* view);
+    String getMainViewName() const;
     void setCurrentNode (const Node& node);
     void stabilize();
     

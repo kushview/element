@@ -5,19 +5,24 @@
 
 #include "controllers/AppController.h"
 #include "engine/GraphProcessor.h"
-#include "Commands.h"
+
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/GraphEditorView.h"
 #include "gui/NavigationView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
+
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
 #include "session/UnlockStatus.h"
+
+#include "Commands.h"
 #include "Globals.h"
+#include "Settings.h"
 
 #include "gui/ContentComponent.h"
 
@@ -573,6 +578,24 @@ private:
     }
 };
 
+static ContentView* createLastContentView (Settings& settings)
+{
+    auto* props = settings.getUserSettings();
+    const String lastContentView = props->getValue ("lastContentView");
+    ScopedPointer<ContentView> view;
+    
+    if (lastContentView.isEmpty())
+        view = new ConnectionGrid();
+    else if (lastContentView == "PatchBay")
+        view = new ConnectionGrid();
+    else if (lastContentView == "GraphEditor")
+        view = new GraphEditorView();
+    else
+        view = new ConnectionGrid();
+    
+    return view ? view.release() : nullptr;
+}
+    
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
 {
@@ -584,7 +607,8 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar());
     
-    container->setMainView (new ConnectionGrid ());
+    container->setMainView (createLastContentView (controller.getGlobals().getSettings()));
+    
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
     
@@ -607,6 +631,13 @@ ContentComponent::~ContentComponent()
 
 Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }
 SessionPtr ContentComponent::getSession() { return getGlobals().getSession(); }
+
+String ContentComponent::getMainViewName() const
+{
+    if (container && container->content1)
+        return container->content1->getName();
+    return String();
+}
     
 void ContentComponent::childBoundsChanged (Component* child)
 {

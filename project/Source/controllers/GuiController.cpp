@@ -24,7 +24,8 @@
 namespace Element {
 
 GuiController::GuiController (Globals& w, AppController& a)
-    : controller(a), world(w),
+    : AppController::Child(),
+      controller(a), world(w),
       windowManager (nullptr),
       mainWindow (nullptr)
 {
@@ -54,7 +55,12 @@ void GuiController::activate()
 
 void GuiController::deactivate()
 {
-    PluginWindow::closeAllCurrentlyOpenWindows();
+    auto* const props (getWorld().getSettings().getUserSettings());
+    if (content)
+    {
+        props->setValue ("lastContentView", content->getMainViewName());
+    }
+    
     Controller::deactivate();
 }
 
@@ -62,6 +68,7 @@ void GuiController::closeAllWindows()
 {
     if (! windowManager)
         return;
+    PluginWindow::closeAllCurrentlyOpenWindows();
     windowManager->closeAll();
 }
 

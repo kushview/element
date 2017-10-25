@@ -10,6 +10,7 @@ namespace Element {
     
     GraphEditorView::GraphEditorView()
     {
+        setName ("GraphEditor");
         addAndMakeVisible (graph);
     }
     

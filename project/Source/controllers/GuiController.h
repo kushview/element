@@ -3,7 +3,7 @@
 #define EL_GUI_CONTROLLER_H
 
 #include "ElementApp.h"
-#include "controllers/Controller.h"
+#include "controllers/AppController.h"
 #include "session/Session.h"
 #include "gui/LookAndFeel.h"
 #include "gui/PreferencesComponent.h"
@@ -20,7 +20,7 @@ namespace Element {
     class MainWindow;
     class SessionDocument;
     
-    class GuiController : public Controller,
+    class GuiController : public AppController::Child,
                           public ApplicationCommandTarget
     {
     public:

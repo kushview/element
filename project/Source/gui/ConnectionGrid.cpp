@@ -675,6 +675,8 @@ namespace Element
     
     ConnectionGrid::ConnectionGrid()
     {
+        setName ("PatchBay"); // Don't change this
+        
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix ());
         quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
