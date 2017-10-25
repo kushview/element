@@ -1,17 +1,17 @@
-#ifndef EL_HORIZONTAL_LISTBOX_H
-#define EL_HORIZONTAL_LISTBOX_H
+#pragma once
 
 #include "JuceHeader.h"
 
 /**
- A horizontal list of items that can be scrolled vertically.
- 
- To create a list, you'll need to create a subclass of ListBoxModel. This can
- either paint each row of the list and respond to events via callbacks, or for
- more specialised tasks, it can supply a custom component to fill each row.
- 
- @see ComboBox, TableListBox
- */
+    A horizontal list of items that can be scrolled vertically.
+
+    To create a list, you'll need to create a subclass of ListBoxModel. This can
+    either paint each row of the list and respond to events via callbacks, or for
+    more specialised tasks, it can supply a custom component to fill each row.
+
+    @see juce::ComboBox, juce::TableListBox
+*/
+
 class HorizontalListBox  : public Component,
                            public SettableTooltipClient
 {
@@ -422,6 +422,3 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HorizontalListBox)
 };
-
-
-#endif   // EL_HORIZONTAL_LISTBOX_H

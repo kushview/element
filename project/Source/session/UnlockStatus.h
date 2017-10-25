@@ -2,7 +2,14 @@
 #pragma once
 
 #include "ElementApp.h"
-//#define EL_LITE_VERSION_DEV
+
+#ifndef EL_LITE_VERSION_DEV
+ #define EL_LITE_VERSION_DEV 0
+#endif
+
+#ifndef EL_DISABLE_UNLOCKING
+ #define EL_DISABLE_UNLOCKING 0
+#endif
 
 namespace Element {
     
@@ -24,10 +31,14 @@ public:
 
     inline var isFullVersion() const
     {
-       #ifdef EL_LITE_VERSION_DEV
+       #if EL_DISABLE_UNLOCKING
+        return var(true);
+        
+       #elif EL_LITE_VERSION_DEV
         if (! (bool) isUnlocked())
             return var (0);
         return props [fullKey];
+        
        #else
         return isUnlocked();
        #endif
@@ -55,17 +66,17 @@ private:
     inline void dump()
     {
        #if JUCE_DEBUG
-        DBG("UNLOCKED: " << ((bool) isUnlocked() ? "yes" : "no"));
-        DBG("LICENSE:  " << getLicenseKey());
-        DBG("FULL:     " << ((bool) isFullVersion() ? "yes" : "no"));
-        DBG("PRICE ID  " << (int) getProperty ("price_id"));
+        DBG("[EL] unlocked: " << ((bool) isUnlocked() ? "yes" : "no"));
+        DBG("[EL] license:  " << getLicenseKey());
+        DBG("[EL] full:     " << ((bool) isFullVersion() ? "yes" : "no"));
+        DBG("[EL] price id  " << (int) getProperty ("price_id"));
        #endif
     }
     
     inline void loadProps()
     {
         props = ValueTree (propsKey);
-       #ifdef EL_LITE_VERSION_DEV
+       #if EL_LITE_VERSION_DEV
         const var priceId = getProperty(priceIdKey);
         const var two (2);
         if (two == priceId)
