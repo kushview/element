@@ -187,6 +187,12 @@ namespace Element {
             desc->numInputChannels = 2;
             desc->numOutputChannels = 2;
         }
+        else if (fileOrId == "element.wetDry")
+        {
+            auto* desc = ds.add (new PluginDescription());
+            WetDryProcessor wetDry;
+            wetDry.fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -196,6 +202,7 @@ namespace Element {
         results.add ("element.comb");
         results.add ("element.allPass");
         results.add ("element.volume");
+        results.add ("element.wetDry");
         return results;
     }
     
@@ -220,6 +227,9 @@ namespace Element {
         
         else if (desc.fileOrIdentifier == "element.volume.stereo")
             base = new VolumeProcessor (-30.0, 12.0, true);
+        
+        else if (desc.fileOrIdentifier == "element.wetDry")
+            base = new WetDryProcessor();
         
         return base != nullptr ? base.release() : nullptr;
     }
