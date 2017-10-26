@@ -77,6 +77,8 @@ void EngineController::duplicateGraph()
     if (engine->addGraph (newGraph.get()))
     {
         newGraph.release();
+        root->savePluginStates();
+        
         Node node (session->getCurrentGraph().getValueTree().createCopy());
         node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
         setRootNode (node);

@@ -261,14 +261,8 @@ void GraphController::savePluginStates()
 {
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
-        ValueTree tree = nodes.getChild (i);
-        const Node node (tree, false);
-        MemoryBlock state;
-        if (GraphNodePtr obj = node.getGraphNode())
-            if (auto* proc = obj->getAudioProcessor())
-                proc->getStateInformation (state);
-        if (state.getSize() > 0)
-            tree.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+        Node node (nodes.getChild (i), false);
+        node.savePluginState();
     }
 }
 

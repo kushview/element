@@ -196,6 +196,8 @@ namespace Element {
         bool canConnect (const uint32 sourceNode, const uint32 sourcePort,
                          const uint32 destNode, const uint32 destPort) const;
         
+        void savePluginState();
+        
     private:
         void setMissingProperties();
     };

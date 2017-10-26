@@ -298,4 +298,17 @@ namespace Element {
         return isProbablyGraphNode (parent) ? Node (parent, false)
                                             : Node();
     }
+    
+    void Node::savePluginState()
+    {
+        if (! isValid())
+            return;
+        
+        MemoryBlock state;
+        if (GraphNodePtr obj = getGraphNode())
+            if (auto* proc = obj->getAudioProcessor())
+                proc->getStateInformation (state);
+        if (state.getSize() > 0)
+            objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+    }
 }
