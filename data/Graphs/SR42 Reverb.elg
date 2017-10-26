@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<node type="graph" name="SR42 Reverb" bypass="0">
+  <nodes>
+    <node format="Internal" identifier="audio.input" id="35" name="Device"
+          type="plugin" numAudioIns="0" numAudioOuts="2" bypass="0" relativeX="0.48766328011611032034"
+          relativeY="0.07014681892332789992">
+      <nodes/>
+      <ports>
+        <port index="0" type="audio" flow="output" name="Front Left"/>
+        <port index="1" type="audio" flow="output" name="Front Right"/>
+      </ports>
+    </node>
+    <node format="Internal" identifier="audio.output" id="36" name="Device"
+          type="plugin" numAudioIns="2" numAudioOuts="0" bypass="0" relativeX="0.4525139664804469497"
+          relativeY="0.87539432176656151174">
+      <nodes/>
+      <ports>
+        <port index="0" type="audio" flow="input" name="Front Left"/>
+        <port index="1" type="audio" flow="input" name="Front Right"/>
+      </ports>
+    </node>
+    <node format="Element" identifier="element.comb.stereo" id="48" name="Comb Filter"
+          type="plugin" numAudioIns="2" numAudioOuts="2" bypass="0" state="75.VMjLgHD....OyQWXzUFHjEVavklam0iHvHBHlUVYjIVXisVOh.iK0HBHrUlamQGZ8HhLx3RNzTyL3XCN3XSM4XiM2jiM3fiHu3C."
+          relativeX="0.18156424581005586871" relativeY="0.29495268138801261637"
+          windowX="415" windowY="148" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+        <port index="5" type="control" flow="input" name="Param"/>
+        <port index="6" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.comb.stereo" id="49" name="Comb Filter"
+          type="plugin" numAudioIns="2" numAudioOuts="2" bypass="0" state="95.VMjLgXE....OyQWXzUFHjEVavklam0iHv3hMvfiL1DCLzfyM4LyM4HyMxPiMwHBHlUVYjIVXisVOh.iK0HBHrUlamQGZ8HhL03RMvjyM0bSN4TiMvTCM1fyM0HxK9.."
+          relativeX="0.59651669085631353617" relativeY="0.29363784665579117927"
+          windowX="415" windowY="277" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+        <port index="5" type="control" flow="input" name="Param"/>
+        <port index="6" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.comb.stereo" name="Comb Filter"
+          type="plugin" numAudioIns="2" numAudioOuts="2" bypass="0" id="50"
+          state="112.VMjLgbF....OyQWXzUFHjEVavklam0iHv3RM2PSMv.SN2bSN4LCLwDCM2PiMwHBHlUVYjIVXisVOh.iK1LiMyLiL0bSL0.iM0.CLxPCMwPiHfvVYtcFcn0iHzLiKx.CL4TCNxTSL4TyLwHSMh7hO.."
+          relativeX="0.80261248185776490338" relativeY="0.29526916802610114754"
+          windowX="415" windowY="535" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+        <port index="5" type="control" flow="input" name="Param"/>
+        <port index="6" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.comb.stereo" name="Comb Filter"
+          type="plugin" numAudioIns="2" numAudioOuts="2" bypass="0" id="51"
+          state="95.VMjLgXE....OyQWXzUFHjEVavklam0iHv3xM0bSMv.SM3fCN4LCN4.yL3.CN1HBHlUVYjIVXisVOh.iK0HBHrUlamQGZ8HxLx3BN1DSNzXSLvTSN0bCLyDiL0HxK9.."
+          relativeX="0.3831640058055152398" relativeY="0.29363784665579117927"
+          windowX="415" windowY="406" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+        <port index="5" type="control" flow="input" name="Param"/>
+        <port index="6" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.allPass.stereo" id="52"
+          name="AllPass Filter" type="plugin" numAudioIns="2" numAudioOuts="2"
+          bypass="0" state="47.VMjLgXB....OyQWXzUFHrUlamQGZ8HxLz3RN3jCLyXSM1.CL0fSM4LyM0HxK9.."
+          relativeX="0.35849056603773582497" relativeY="0.45513866231647637228"
+          windowX="834" windowY="932" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.allPass.stereo" id="53"
+          name="AllPass Filter" type="plugin" numAudioIns="2" numAudioOuts="2"
+          bypass="0" state="45.VMjLgPB....OyQWXzUFHrUlamQGZ8HBNw3hLyXiM1LCNwfyL0jyL2TiHu3C."
+          relativeX="0.35893854748603354343" relativeY="0.58359621451104104484"
+          windowX="408" windowY="923" windowVisible="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="output" name="Left"/>
+        <port index="3" type="audio" flow="output" name="Right"/>
+        <port index="4" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+    <node format="Element" identifier="element.wetDry" id="58" name="Wet/Dry"
+          type="plugin" numAudioIns="4" numAudioOuts="2" relativeX="0.4483240223463687002"
+          relativeY="0.73186119873817034875" windowX="166" windowY="354"
+          windowVisible="0" state="86.VMjLgzD....OyQWXzUFH2UFcLUlckwVOh.iKvLCMzPyLyHiL0XSNwLSL3TSLwjiMh.BYxkGSkYWYr0iHv3BNzLyLvPyL4TiM2TiM0jSL2jiM4HxK9.."
+          bypass="0">
+      <ports>
+        <port index="0" type="audio" flow="input" name="Left"/>
+        <port index="1" type="audio" flow="input" name="Right"/>
+        <port index="2" type="audio" flow="input" name="Left Surround"/>
+        <port index="3" type="audio" flow="input" name="Right Surround"/>
+        <port index="4" type="audio" flow="output" name="Left"/>
+        <port index="5" type="audio" flow="output" name="Right"/>
+        <port index="6" type="control" flow="input" name="Param"/>
+        <port index="7" type="control" flow="input" name="Param"/>
+      </ports>
+      <nodes/>
+    </node>
+  </nodes>
+  <arcs>
+    <arc sourceNode="35" sourcePort="0" destNode="48" destPort="0"/>
+    <arc sourceNode="35" sourcePort="1" destNode="48" destPort="1"/>
+    <arc sourceNode="35" sourcePort="0" destNode="49" destPort="0"/>
+    <arc sourceNode="35" sourcePort="1" destNode="49" destPort="1"/>
+    <arc sourceNode="35" sourcePort="0" destNode="50" destPort="0"/>
+    <arc sourceNode="35" sourcePort="1" destNode="50" destPort="1"/>
+    <arc sourceNode="35" sourcePort="0" destNode="51" destPort="0"/>
+    <arc sourceNode="35" sourcePort="1" destNode="51" destPort="1"/>
+    <arc sourceNode="35" sourcePort="0" destNode="58" destPort="2"/>
+    <arc sourceNode="35" sourcePort="1" destNode="58" destPort="3"/>
+    <arc sourceNode="48" sourcePort="2" destNode="52" destPort="0"/>
+    <arc sourceNode="48" sourcePort="3" destNode="52" destPort="1"/>
+    <arc sourceNode="49" sourcePort="2" destNode="52" destPort="0"/>
+    <arc sourceNode="49" sourcePort="3" destNode="52" destPort="1"/>
+    <arc sourceNode="50" sourcePort="2" destNode="52" destPort="0"/>
+    <arc sourceNode="50" sourcePort="3" destNode="52" destPort="1"/>
+    <arc sourceNode="51" sourcePort="2" destNode="52" destPort="0"/>
+    <arc sourceNode="51" sourcePort="3" destNode="52" destPort="1"/>
+    <arc sourceNode="52" sourcePort="2" destNode="53" destPort="0"/>
+    <arc sourceNode="52" sourcePort="3" destNode="53" destPort="1"/>
+    <arc sourceNode="53" sourcePort="2" destNode="58" destPort="0"/>
+    <arc sourceNode="53" sourcePort="3" destNode="58" destPort="1"/>
+    <arc sourceNode="58" sourcePort="4" destNode="36" destPort="0"/>
+    <arc sourceNode="58" sourcePort="5" destNode="36" destPort="1"/>
+  </arcs>
+</node>
