@@ -69,7 +69,8 @@ namespace Element
             repaint();
         }
         
-        void mouseMove (const MouseEvent& ev) override {
+        void mouseMove (const MouseEvent& ev) override
+        {
             PatchMatrixComponent::mouseMove (ev);
             
             if (useHighlighting)
@@ -474,7 +475,9 @@ namespace Element
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected, true);
+            matrix->paintListBoxItem (rowNumber, g, width, height,
+                                      matrix->mouseIsOverRow (rowNumber) || rowIsSelected,
+                                      true);
         }
         
         void listWasScrolled() override
@@ -556,7 +559,9 @@ namespace Element
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected, false);
+            matrix->paintListBoxItem (rowNumber, g, width, height,
+                                      matrix->mouseIsOverColumn (rowNumber) || rowIsSelected,
+                                      false);
         }
         
         void listWasScrolled() override

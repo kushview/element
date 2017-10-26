@@ -83,6 +83,9 @@ private:
     inline void changed() { sendChangeMessage(); }
     GraphNode* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
                              uint32 nodeId = 0);
+    GraphNode* createPlaceholder (const Node& node);
+    
+    
     void processorArcsChanged();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphController)

@@ -3,9 +3,6 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_TIMELINE_H
-#define ELEMENT_TIMELINE_H
+#pragma once
 
 #include "ElementApp.h"
-
-#endif // TIMELINE_H

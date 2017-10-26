@@ -1,5 +1,6 @@
 
 #include "controllers/GraphController.h"
+#include "engine/PlaceholderProcessor.h"
 #include "session/PluginManager.h"
 
 namespace Element {
@@ -35,11 +36,21 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     String errorMessage;
     auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
     GraphNode* node = nullptr;
+    
     if (instance != nullptr)
         node = processor.addNode (instance, nodeId);
+    
     return node;
 }
 
+GraphNode* GraphController::createPlaceholder (const Node& node)
+{
+    PluginDescription desc; node.getPluginDescription (desc);
+    auto* ph = new PlaceholderProcessor ();
+    ph->setupFor (node, 44100.0, 1024);
+    return processor.addNode (ph, node.getNodeId());
+}
+    
 uint32 GraphController::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
@@ -209,13 +220,18 @@ void GraphController::setNodeModel (const Node& node)
         PluginDescription desc; node.getPluginDescription (desc);
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
-            DBG("[EL] loaded: " << node.getName());
             MemoryBlock state;
             if (state.fromBase64Encoding (node.node().getProperty(Tags::state).toString()))
                 obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
             if (node.getValueTree().getProperty (Tags::bypass, false))
                 obj->getAudioProcessor()->suspendProcessing (true);
+        }
+        else if (GraphNodePtr obj = createPlaceholder (node))
+        {
+            DBG("[EL] couldn't create node: " << node.getName() << ". Creating placeholder");
+            node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+            node.getValueTree().setProperty ("placeholder", obj.get(), nullptr);
         }
         else
         {
