@@ -8,6 +8,18 @@ const Colour Colors::toggleBlue     = Colour (0xff33aaf9);
 const Colour Colors::toggleGreen    = Colour (0xff92e75e);
 const Colour Colors::toggleOrange   = Colour (0xfffaa63a);
 
+LookAndFeel::LookAndFeel()
+{
+    setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
+    setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
+    setColour (Slider::thumbColourId, Colours::black);
+    setColour (Slider::textBoxTextColourId, LookAndFeel::textColor);
+    setColour (Slider::trackColourId, Colours::red);
+}
+
+
+// MARK: Concertina Panel
+
 void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& area,
                                              bool isMouseOver, bool isMouseDown,
                                              ConcertinaPanel& panel, Component& comp)
@@ -17,6 +29,7 @@ void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& 
     g.fillRect (r);
 }
 
+    
 // MARK: Property Panel
 
 void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& name,
@@ -30,18 +43,38 @@ void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& nam
 void LookAndFeel::drawPropertyComponentBackground (Graphics& g, int width, int height,
                                                    PropertyComponent& pc)
 {
-    LookAndFeel_KV1::drawPropertyComponentBackground (g, width, height, pc);
+    g.setColour (pc.findColour (PropertyComponent::backgroundColourId));
+    g.fillRect (0, 0, width, height - 1);
+}
+
+static int getPropertyComponentIndent (PropertyComponent& component)
+{
+    return jmin (10, component.getWidth() / 10);
 }
     
 void LookAndFeel::drawPropertyComponentLabel (Graphics& g, int width, int height,
-                                              PropertyComponent& pc)
+                                              PropertyComponent& component)
 {
-    LookAndFeel_KV1::drawPropertyComponentLabel (g, width, height, pc);
-}
+    ignoreUnused (width);
     
-Rectangle<int> LookAndFeel::getPropertyComponentContentPosition (PropertyComponent& pc)
+    const auto indent = getPropertyComponentIndent (component);
+    
+    g.setColour (component.findColour (PropertyComponent::labelTextColourId)
+                 .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
+    
+    g.setFont (jmin (height, 24) * 0.65f);
+    
+    auto r = getPropertyComponentContentPosition (component);
+    
+    g.drawFittedText (component.getName(),
+                      indent, r.getY(), r.getX() - 5, r.getHeight(),
+                      Justification::centredLeft, 2);
+}
+
+Rectangle<int> LookAndFeel::getPropertyComponentContentPosition (PropertyComponent& component)
 {
-    return LookAndFeel_KV1::getPropertyComponentContentPosition (pc);
+    const auto textW = jmin (200, component.getWidth() / 2);
+    return { textW, 0, component.getWidth() - textW, component.getHeight() - 1 };
 }
-    
+
 }

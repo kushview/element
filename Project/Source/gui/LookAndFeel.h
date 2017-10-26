@@ -16,7 +16,7 @@ struct Colors
 class LookAndFeel : public LookAndFeel_KV1
 {
 public:
-    LookAndFeel() { }
+    LookAndFeel();
     ~LookAndFeel() { }
     
     // MARK: Concertina Panel
