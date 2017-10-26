@@ -21,12 +21,13 @@ class PinComponent   : public Component,
 public:
     PinComponent (const Node& graph_, const uint32 filterID_,
                   const uint32 index_, const bool isInput_,
-                  const PortType type_)
+                  const PortType type_, const bool verticle_)
         : filterID (filterID_),
           port (index_),
           type (type_),
           isInput (isInput_),
-          graph (graph_)
+          graph (graph_),
+          verticle (verticle_)
     {
         if (const GraphNodePtr node = graph.getGraphNodeForId (filterID_))
         {
@@ -49,8 +50,24 @@ public:
         const float h = (float) getHeight();
 
         Path p;
-        p.addEllipse (w * 0.25f, h * 0.25f, w * 0.5f, h * 0.5f);
-        p.addRectangle (w * 0.4f, isInput ? (0.5f * h) : 0.0f, w * 0.2f, h * 0.5f);
+        if (verticle)
+        {
+            p.addEllipse (w * 0.25f, h * 0.25f, w * 0.5f, h * 0.5f);
+            p.addRectangle (w * 0.4f,
+                            isInput ? (0.5f * h) : 0.0f,
+                            w * 0.2f,
+                            h * 0.5f);
+        }
+        else
+        {
+            p.addEllipse (w * 0.25f, h * 0.25f, w * 0.5f, h * 0.5f);
+            p.addRectangle (isInput ? (0.5f * w) : 0.0f,
+                            h * 0.4f,
+                            w * 0.5f,
+                            h * 0.2f);
+
+        }
+        
         g.setColour (getColor());
         g.fillPath (p);
     }
@@ -93,6 +110,7 @@ public:
 
 private:
     Node graph;
+    bool verticle;
     GraphEditorComponent* getGraphPanel() const noexcept
     {
         return findParentComponentOfClass<GraphEditorComponent>();
@@ -104,16 +122,17 @@ private:
 class FilterComponent    : public Component
 {
 public:
-    FilterComponent (const Node& graph_, const Node& node_)
+    FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
         : graph (graph_), node(node_),
           filterID (node_.getNodeId()),
           numInputs (0), numOutputs (0),
           pinSize (16), font (13.0f, Font::bold),
-          numIns (0), numOuts (0)
+          numIns (0), numOuts (0), vertical(vertical_)
     {
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
-        setSize (150, 60);
+        
+        setSize (vertical ? 150 : 170, 60);
     }
 
     ~FilterComponent()
@@ -137,7 +156,8 @@ public:
     void updatePosition()
     {
         node.getRelativePosition (relativeX, relativeY);
-        setCentreRelative (relativeX, relativeY);
+        vertical ? setCentreRelative (relativeX, relativeY)
+                 : setCentreRelative (relativeY, relativeX);
         getGraphPanel()->updateConnectorComponents();
     }
     
@@ -151,10 +171,17 @@ public:
         if (getParentComponent() != nullptr)
             pos = getParentComponent()->getLocalPoint (nullptr, pos);
         
-        node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-                                  (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-        node.getRelativePosition (relativeX, relativeY);
-
+        if (vertical)
+        {
+            node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+                                      (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+        }
+        else
+        {
+            node.setRelativePosition ((pos.getY() + getHeight() / 2) / (double) getParentHeight(),
+                                      (pos.getX() + getWidth() / 2) / (double) getParentWidth());
+        }
+        
         updatePosition();
     }
 
@@ -183,40 +210,74 @@ public:
             if (getChildComponent(i)->getBounds().contains (x, y))
                 return true;
 
-        return x >= 3 && x < getWidth() - 6 && y >= pinSize && y < getHeight() - pinSize;
+        return vertical ? x >= 3 && x < getWidth() - 6 && y >= pinSize && y < getHeight() - pinSize
+                        : y >= 3 && y < getHeight() - 6 && x >= pinSize && x < getWidth() - pinSize;
     }
 
+    Rectangle<int> getBoxRectangle() const
+    {
+        if (vertical)
+        {
+            const int x = 4;
+            const int y = pinSize;
+            const int w = getWidth() - x * 2;
+            const int h = getHeight() - pinSize * 2;
+            
+            return Rectangle<int> (x, y, w, h);
+        }
+
+        const int x = pinSize;
+        const int y = 4;
+        const int w = getWidth() - pinSize * 2;
+        const int h = getHeight() - y * 2;
+        
+        return Rectangle<int> (x, y, w, h);
+    }
+    
     void paint (Graphics& g)
     {
         g.setColour (Colours::lightgrey);
         
-        const int x = 4;
-        const int y = pinSize;
-        const int w = getWidth() - x * 2;
-        const int h = getHeight() - pinSize * 2;
-
-        g.fillRect (x, y, w, h);
+        const auto box (getBoxRectangle());
+        g.fillRect (box);
 
         g.setColour (Colours::black);
         g.setFont (font);
         g.drawFittedText (getName(), getLocalBounds().reduced (4, 2), Justification::centred, 2);
 
         g.setColour (Colours::grey);
-        g.drawRect (x, y, w, h);
+        g.drawRect (box);
     }
 
     void resized()
     {
         int indexIn = 0, indexOut = 0;
-        for (int i = 0; i < getNumChildComponents(); ++i)
+        if (vertical)
         {
-            if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+            for (int i = 0; i < getNumChildComponents(); ++i)
             {
-                const int total = pc->isInput ? numIns : numOuts;
-                const int index = pc->isInput ? indexIn++ : indexOut++;
-                pc->setBounds (proportionOfWidth ((1 + index) / (total + 1.0f)) - pinSize / 2,
-                               pc->isInput ? 0 : (getHeight() - pinSize),
-                               pinSize, pinSize);
+                if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+                {
+                    const int total = pc->isInput ? numIns : numOuts;
+                    const int index = pc->isInput ? indexIn++ : indexOut++;
+                    pc->setBounds (proportionOfWidth ((1 + index) / (total + 1.0f)) - pinSize / 2,
+                                   pc->isInput ? 0 : (getHeight() - pinSize),
+                                   pinSize, pinSize);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < getNumChildComponents(); ++i)
+            {
+                if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+                {
+                    const int total = pc->isInput ? numIns : numOuts;
+                    const int index = pc->isInput ? indexIn++ : indexOut++;
+                    pc->setBounds (pc->isInput ? 0 : (getWidth() - pinSize),
+                                   proportionOfHeight ((1 + index) / (total + 1.0f)) - pinSize / 2,
+                                   pinSize, pinSize);
+                }
             }
         }
     }
@@ -239,6 +300,7 @@ public:
 
     void update()
     {
+        vertical = getGraphPanel()->isLayoutVertical();
         const GraphNodePtr f (graph.getGraphNodeForId (filterID));
 
         if (f == nullptr)
@@ -262,18 +324,19 @@ public:
         int w = 100;
         int h = 60;
 
-        w = jmax (w, (jmax (numIns, numOuts) + 1) * 20);
-
+        w = vertical ? jmax (w, (jmax (numIns, numOuts) + 1) * 20) : 120;
+        h = vertical ? h : jmax (h, (jmax (numIns, numOuts) + 1) * 20);
+        
         const int textWidth = font.getStringWidth (f->getAudioProcessor()->getName());
         w = jmax (w, 16 + jmin (textWidth, 300));
-        if (textWidth > 300)
+        
+        if (vertical && textWidth > 300)
             h = 100;
-
+        
         setSize (w, h);
 
         setName (f->getAudioProcessor()->getName());
-        node.getRelativePosition (relativeX, relativeY);
-        setCentreRelative ((float) relativeX, (float) relativeY);
+        updatePosition();
 
         if (numIns != numInputs || numOuts != numOutputs)
         {
@@ -289,25 +352,28 @@ public:
                     continue;
                 
                 const bool isInput (f->isPortInput (i));
-                addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t));
+                addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t, vertical));
             }
 
             resized();
         }
     }
+    
+    const uint32 filterID;
 
+private:
     Node graph;
     Node node;
-    const uint32 filterID;
     int numInputs, numOutputs;
     double relativeX = 0.5f;
     double relativeY = 0.5f;
-
-private:
     int pinSize;
     Point<int> originalPos;
     Font font;
     int numIns, numOuts;
+    bool vertical = true;
+    
+    
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
 
@@ -325,15 +391,11 @@ class ConnectorComponent   : public Component,
 {
 public:
     ConnectorComponent (const Node& graph_)
-        : sourceFilterID (0),
-          destFilterID (0),
-          sourceFilterChannel (0),
-          destFilterChannel (0),
+        : sourceFilterID (0), destFilterID (0),
+          sourceFilterChannel (0), destFilterChannel (0),
           graph (graph_),
-          lastInputX (0),
-          lastInputY (0),
-          lastOutputX (0),
-          lastOutputY (0)
+          lastInputX (0), lastInputY (0),
+          lastOutputX (0), lastOutputY (0)
     {
         setAlwaysOnTop (true);
     }
@@ -494,30 +556,46 @@ public:
 
         linePath.clear();
         linePath.startNewSubPath (x1, y1);
-        linePath.cubicTo (x1, y1 + (y2 - y1) * 0.33f,
-                          x2, y1 + (y2 - y1) * 0.66f,
-                          x2, y2);
-
+        const bool vertical = getGraphPanel()->isLayoutVertical();
+        
+        if (vertical)
+        {
+            linePath.cubicTo (x1, y1 + (y2 - y1) * 0.33f,
+                              x2, y1 + (y2 - y1) * 0.66f,
+                              x2, y2);
+        }
+        else
+        {
+            linePath.cubicTo (x1 + (x2 - x1) * 0.33f, y1,
+                              x1 + (x2 - x1) * 0.66f, y2,
+                              x2, y2);
+        }
+        
         PathStrokeType wideStroke (8.0f);
         wideStroke.createStrokedPath (hitPath, linePath);
 
         PathStrokeType stroke (2.5f);
         stroke.createStrokedPath (linePath, linePath);
 
-        const float arrowW = 5.0f;
-        const float arrowL = 4.0f;
+        const bool showArrow = false;
+        
+        if (showArrow)
+        {
+            const float arrowW = 5.0f;
+            const float arrowL = 4.0f;
 
-        Path arrow;
-        arrow.addTriangle (-arrowL, arrowW,
-                           -arrowL, -arrowW,
-                           arrowL, 0.0f);
+            Path arrow;
+            arrow.addTriangle (-arrowL, arrowW,
+                               -arrowL, -arrowW,
+                               arrowL, 0.0f);
 
-        arrow.applyTransform (AffineTransform::identity
-                                .rotated (float_Pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
-                                .translated ((x1 + x2) * 0.5f,
-                                             (y1 + y2) * 0.5f));
+            arrow.applyTransform (AffineTransform::identity
+                                    .rotated (float_Pi * 0.5f - (float) atan2 (x2 - x1, y2 - y1))
+                                    .translated ((x1 + x2) * 0.5f,
+                                                 (y1 + y2) * 0.5f));
 
-        linePath.addPath (arrow);
+            linePath.addPath (arrow);
+        }
         linePath.setUsingNonZeroWinding (true);
     }
 
@@ -569,6 +647,16 @@ void GraphEditorComponent::setNode (const Node& n)
     updateComponents();
 }
 
+void GraphEditorComponent::setVerticalLayout (const bool isVertical)
+{
+    if (verticalLayout == isVertical)
+        return;
+    verticalLayout = isVertical;
+    draggingConnector = nullptr;
+    deleteAllChildren();
+    updateComponents();
+}
+
 void GraphEditorComponent::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel::contentBackgroundColor);
@@ -590,6 +678,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             menu.addItem (3, "MIDI Input",      true, graph.hasMidiInputNode());
             menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
         }
+        menu.addSeparator();
+        menu.addItem (5, "Change orientation...");
+        menu.addSeparator();
         
         menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
@@ -624,6 +715,10 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                 case 4:
                     desc.fileOrIdentifier = "midi.output";
                     hasRequestedType = graph.hasMidiOutputNode();
+                    break;
+                case 5:
+                    setVerticalLayout (! isLayoutVertical());
+                    return;
                     break;
                 default:
                     failure = true;
@@ -763,7 +858,7 @@ void GraphEditorComponent::updateComponents()
         FilterComponent* comp = getComponentForFilter (node.getNodeId());
         if (comp == nullptr)
         {
-            comp = new FilterComponent (graph, node);
+            comp = new FilterComponent (graph, node, verticalLayout);
             addAndMakeVisible (comp);
         }
     }

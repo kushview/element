@@ -27,6 +27,9 @@ public:
 
     void setNode (const Node& n);
     
+    bool isLayoutVertical() const { return verticalLayout; }
+    void setVerticalLayout (const bool isVertical);
+    
     void paint (Graphics& g) override;
     void resized() override;
     void mouseDown (const MouseEvent& e) override;
@@ -34,7 +37,6 @@ public:
     void changeListenerCallback (ChangeBroadcaster*) override;
     void onGraphChanged();
     void updateComponents();
-
 
     bool isInterestedInDragSource (const SourceDetails& /*details*/) override;
     // void itemDragEnter (const SourceDetails& dragSourceDetails) override;
@@ -48,12 +50,16 @@ protected:
     void createNewPlugin (const PluginDescription* desc, int x, int y);
     
 private:
-    Node graph;
-    ValueTree data;
     friend class ConnectorComponent;
     friend class FilterComponent;
     friend class PinComponent;
+    
+    Node graph;
+    ValueTree data;
+    
     ScopedPointer<ConnectorComponent> draggingConnector;
+    
+    bool verticalLayout = true;
     
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
