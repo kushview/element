@@ -482,7 +482,7 @@ namespace Element
         
         void listWasScrolled() override
         {
-            if (auto *scroll = getVerticalScrollBar())
+            if (auto *scroll = &getVerticalScrollBar())
             {
                 matrix->setOffsetY (-roundDoubleToInt (scroll->getCurrentRangeStart()));
                 matrix->repaint();

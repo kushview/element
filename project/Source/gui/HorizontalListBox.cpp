@@ -773,16 +773,16 @@ void HorizontalListBox::mouseWheelMove (const MouseEvent& e, const MouseWheelDet
 {
     bool eventWasUsed = false;
     
-    if (wheel.deltaX != 0 && viewport->getHorizontalScrollBar()->isVisible())
+    if (wheel.deltaX != 0 && viewport->getHorizontalScrollBar().isVisible())
     {
         eventWasUsed = true;
-        viewport->getHorizontalScrollBar()->mouseWheelMove (e, wheel);
+        viewport->getHorizontalScrollBar().mouseWheelMove (e, wheel);
     }
     
-    if (wheel.deltaY != 0 && viewport->getVerticalScrollBar()->isVisible())
+    if (wheel.deltaY != 0 && viewport->getVerticalScrollBar().isVisible())
     {
         eventWasUsed = true;
-        viewport->getVerticalScrollBar()->mouseWheelMove (e, wheel);
+        viewport->getVerticalScrollBar().mouseWheelMove (e, wheel);
     }
     
     if (! eventWasUsed)
@@ -821,12 +821,12 @@ int HorizontalListBox::getVisibleContentWidth() const noexcept
 
 ScrollBar* HorizontalListBox::getVerticalScrollBar() const noexcept
 {
-    return viewport->getVerticalScrollBar();
+    return &viewport->getVerticalScrollBar();
 }
 
 ScrollBar* HorizontalListBox::getHorizontalScrollBar() const noexcept
 {
-    return viewport->getHorizontalScrollBar();
+    return &viewport->getHorizontalScrollBar();
 }
 
 void HorizontalListBox::colourChanged()
