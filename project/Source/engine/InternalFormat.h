@@ -75,6 +75,7 @@ namespace Element {
         PluginDescription sequencerDesc;
         PluginDescription patternDesc;
         PluginDescription metroDesc;
+        PluginDescription placeholderDesc;
         
         AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
     };

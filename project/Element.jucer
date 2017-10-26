@@ -74,6 +74,8 @@
               file="Source/engine/MidiSequenceProcessor.cpp"/>
         <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
               file="Source/engine/MidiSequenceProcessor.h"/>
+        <FILE id="MMMOIT" name="PlaceholderProcessor.h" compile="0" resource="0"
+              file="Source/engine/PlaceholderProcessor.h"/>
         <FILE id="erSmKq" name="SequenceCursor.cpp" compile="0" resource="0"
               file="Source/engine/SequenceCursor.cpp"/>
         <FILE id="zhtJ2H" name="SequenceCursor.h" compile="0" resource="0"

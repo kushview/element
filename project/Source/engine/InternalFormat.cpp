@@ -8,12 +8,13 @@
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 
-#include "engine/CombFilterProcessor.h"
 #include "engine/AllPassFilterProcessor.h"
+#include "engine/CombFilterProcessor.h"
+#include "engine/PlaceholderProcessor.h"
 #include "engine/VolumeProcessor.h"
 #include "engine/WetDryProcessor.h"
-
 #include "engine/MidiSequenceProcessor.h"
+
 #include "session/Session.h"
 #include "Globals.h"
 
@@ -47,6 +48,12 @@ namespace Element {
             MidiSequenceProcessor p (engine);
             p.fillInPluginDescription (metroDesc);
         }
+        
+        {
+            PlaceholderProcessor p;
+            p.fillInPluginDescription (placeholderDesc);
+            
+        }
     }
 
     AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
@@ -74,6 +81,10 @@ namespace Element {
         else if (desc.fileOrIdentifier == metroDesc.fileOrIdentifier)
         {
             return new MidiSequenceProcessor (engine);
+        }
+        else if (desc.fileOrIdentifier == "element.placeholder")
+        {
+            return new PlaceholderProcessor();
         }
         else if (desc.name == "Sequencer")
         {
@@ -105,6 +116,7 @@ namespace Element {
     {
         for (int i = 0; i < (int) audioOutputPort; ++i)
             results.add (new PluginDescription (*description ((InternalFormat::ID) i)));
+        results.add (new PluginDescription (placeholderDesc));
     }
     
     void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,

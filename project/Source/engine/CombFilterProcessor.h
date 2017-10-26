@@ -67,53 +67,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE (CombFilter)
 };
 
-class AllPassFilter
-{
-public:
-    AllPassFilter() noexcept : bufferSize (0), bufferIndex (0) {}
-    
-    void setSize (const int size)
-    {
-        if (size != bufferSize)
-        {
-            bufferIndex = 0;
-            buffer.malloc ((size_t) size);
-            bufferSize = size;
-        }
-        
-        clear();
-    }
-    
-    void clear() noexcept
-    {
-        bufferIndex = 0;
-        buffer.clear ((size_t) bufferSize);
-    }
-    
-    void free()
-    {
-        bufferSize = 0;
-        bufferIndex = 0;
-        buffer.free();
-    }
-    
-    float process (const float input) noexcept
-    {
-        const float bufferedValue = buffer [bufferIndex];
-        float temp = input + (bufferedValue * 0.5f);
-        JUCE_UNDENORMALISE (temp);
-        buffer [bufferIndex] = temp;
-        bufferIndex = (bufferIndex + 1) % bufferSize;
-        return bufferedValue - input;
-    }
-    
-private:
-    HeapBlock<float> buffer;
-    int bufferSize, bufferIndex;
-    
-    JUCE_DECLARE_NON_COPYABLE (AllPassFilter)
-};
-
 class CombFilterProcessor : public BaseProcessor
 {
 private:

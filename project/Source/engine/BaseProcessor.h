@@ -9,7 +9,7 @@ namespace Element {
     public:
         BaseProcessor() { }
         virtual ~BaseProcessor() { }
-        
+
 #if 0
         // Audio Processor Template
         virtual const String getName() const = 0;

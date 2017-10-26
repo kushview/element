@@ -642,6 +642,7 @@ void GraphEditorComponent::setNode (const Node& n)
 {
     graph = n.isValid() && n.isGraph() ? n : Node (Tags::graph);
     data = graph.getValueTree();
+    verticalLayout = graph.getProperty ("vertical", true);
     draggingConnector = nullptr;
     deleteAllChildren();
     updateComponents();
@@ -652,6 +653,10 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
     if (verticalLayout == isVertical)
         return;
     verticalLayout = isVertical;
+    
+    if (graph.isValid() && graph.isGraph())
+        graph.setProperty ("vertical", verticalLayout);
+    
     draggingConnector = nullptr;
     deleteAllChildren();
     updateComponents();
