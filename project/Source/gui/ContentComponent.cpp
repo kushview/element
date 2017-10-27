@@ -503,8 +503,13 @@ public:
         g.fillAll (LookAndFeel::contentBackgroundColor);
         g.setColour (LookAndFeel::textColor);
         g.setFont (16.f);
-        g.drawFittedText ("Session is empty.\nPress Shift+Cmd+N to add a graph.",
-                   0, 0, getWidth(), getHeight(), Justification::centred, 2);
+        
+       #if JUCE_MAC
+        const String msg ("Session is empty.\nPress Shift+Cmd+N to add a graph.");
+       #else
+        const String msg ("Session is empty.\nPress Shift+Ctl+N to add a graph.");
+       #endif
+        g.drawFittedText (msg, 0, 0, getWidth(), getHeight(), Justification::centred, 2);
     }
 };
 

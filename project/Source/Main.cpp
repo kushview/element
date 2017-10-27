@@ -160,13 +160,14 @@ public:
 
     void initialise (const String&  commandLine ) override
     {
-        DBG("Element v" << getApplicationVersion());
-        DBG("[EL] " << commandLine);
         if (sendCommandLineToPreexistingInstance())
         {
             quit();
             return;
         }
+        
+        Logger::writeToLog ("Element v" + getApplicationVersion());
+        Logger::writeToLog ("Copyright (c) 2017-2018 Kushview, LLC.  All rights reserved.");
         
         initializeModulePath();
         world = new Globals (commandLine);
@@ -236,6 +237,7 @@ public:
     {
         if (! controller)
             return;
+        
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -243,7 +245,9 @@ public:
             {
                 const File file (path);
                 if (file.hasFileExtension ("els"))
-                    sc->openFile (File (path));
+                    sc->openFile (file);
+                else if (file.hasFileExtension("elg"))
+                    sc->importGraph (file);
             }
         }
     }
