@@ -198,6 +198,11 @@ namespace Element {
         
         void savePluginState();
         
+        int getNumPrograms() const;
+        String getProgramName (const int index) const;
+        void setCurrentProgram (const int index);
+        int getCurrentProgram() const;
+        
     private:
         void setMissingProperties();
     };

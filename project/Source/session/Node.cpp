@@ -311,4 +311,34 @@ namespace Element {
         if (state.getSize() > 0)
             objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
     }
+    
+    void Node::setCurrentProgram (const int index)
+    {
+        if (auto* obj = getGraphNode())
+            obj->getAudioProcessor()->setCurrentProgram (index);
+    }
+    
+    int Node::getCurrentProgram() const
+    {
+        if (auto* obj = getGraphNode())
+            return (const_cast<AudioProcessor*>(obj->getAudioProcessor()))->getCurrentProgram();
+        
+        return -1;
+    }
+    
+    String Node::getProgramName (const int index) const
+    {
+        if (auto* obj = getGraphNode())
+            return obj->getAudioProcessor()->getProgramName (index);
+        
+        return String();
+    }
+    
+    int Node::getNumPrograms() const
+    {
+        if (auto* obj = getGraphNode())
+            return obj->getAudioProcessor()->getNumPrograms();
+        
+        return 0;
+    }
 }

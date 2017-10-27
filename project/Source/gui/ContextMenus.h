@@ -110,6 +110,15 @@ public:
         }
     }
     
+    void getProgramsMenu (PopupMenu& menu)
+    {
+        const int offset = 10000;
+        const int current = node.getCurrentProgram();
+        for (int i = 0; i < node.getNumPrograms(); ++i) {
+            menu.addItem (offset + i, node.getProgramName (i), true, i == current);
+        }
+    }
+    
     ~NodePopupMenu()
     {
         resultMap.clear();
@@ -127,6 +136,11 @@ public:
             return new DisconnectNodeMessage (node);
         if (auto* op = resultMap [result])
             return op->createMessage();
+        if (result >= 10000)
+        {
+            Node(node).setCurrentProgram (result - 10000);
+        }
+        
         return nullptr;
     }
     

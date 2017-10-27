@@ -174,6 +174,9 @@ namespace Element
         void showMenuForNode (const Node& node)
         {
             NodePopupMenu menu (node);
+            PopupMenu programs; menu.getProgramsMenu(programs);
+            menu.addSubMenu ("Programs", programs);
+            
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
             {
@@ -186,6 +189,8 @@ namespace Element
         void showMenuForNodeAndPort (const Node& n, const Port& p)
         {
             NodePopupMenu menu (n, p);
+            PopupMenu programs; menu.getProgramsMenu(programs);
+            menu.addSubMenu ("Programs", programs);
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
             {
@@ -475,8 +480,7 @@ namespace Element
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            matrix->paintListBoxItem (rowNumber, g, width, height,
-                                      matrix->mouseIsOverRow (rowNumber) || rowIsSelected,
+            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected,
                                       true);
         }
         
@@ -559,8 +563,7 @@ namespace Element
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected) override
         {
-            matrix->paintListBoxItem (rowNumber, g, width, height,
-                                      matrix->mouseIsOverColumn (rowNumber) || rowIsSelected,
+            matrix->paintListBoxItem (rowNumber, g, width, height, rowIsSelected,
                                       false);
         }
         
