@@ -7,18 +7,25 @@ namespace Element {
 
     class ReverbProcessor : public BaseProcessor
     {
+        AudioParameterFloat* roomSize;
+        AudioParameterFloat* damping;
+        AudioParameterFloat* wetLevel;
+        AudioParameterFloat* dryLevel;
+        AudioParameterFloat* width;
+        
     public:
         explicit ReverbProcessor()
             : BaseProcessor()
         {
             setPlayConfigDetails (2, 2, 44100.0, 1024);
-            addParameter (new AudioParameterFloat (Tags::volume.toString(), "Volume", minDb, maxDb, 0.f));
+            addParameter (roomSize = new AudioParameterFloat ("roomSize", "Room Size", 0.0f, 1.0f, params.roomSize));
+            addParameter (damping  = new AudioParameterFloat ("damping",  "Damping",   0.0f, 1.0f, params.damping));
+            addParameter (wetLevel = new AudioParameterFloat ("wetLevel", "Wet Level", 0.0f, 1.0f, params.wetLevel));
+            addParameter (dryLevel = new AudioParameterFloat ("dryLevel", "Dry Level", 0.0f, 1.0f, params.dryLevel));
+            addParameter (width    = new AudioParameterFloat ("width",    "Width",     0.0f, 1.0f, params.width));
         }
 
-        virtual ~ReverbProcessor()
-        {
-
-        }
+        virtual ~ReverbProcessor() { }
 
         const String getName() const override { return "eVerb"; }
         
@@ -26,7 +33,7 @@ namespace Element {
         {
             desc.name = getName();
             desc.fileOrIdentifier   = "element.reverb";
-            desc.descriptiveName    = "Simple Reverb node"
+            desc.descriptiveName    = "Simple Reverb";
             desc.numInputChannels   = 2;
             desc.numOutputChannels  = 2;
             desc.hasSharedContainer = false;
@@ -36,9 +43,34 @@ namespace Element {
             desc.version            = "1.0.0";
         }
         
-        void prepareToPlay (double sampleRate, int maxBlockSize) override { setPlayConfigDetails (2, 2, sampleRate, maxBlockSize); }
+        void prepareToPlay (double sampleRate, int maxBlockSize) override
+        {
+            setPlayConfigDetails (2, 2, sampleRate, maxBlockSize);
+            verb.setSampleRate (sampleRate);
+        }
+        
         void releaseResources() override { }
-        void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override { }
+        void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
+        {
+            params.roomSize = (float) *roomSize;
+            params.damping  = (float) *damping;
+            params.wetLevel = (float) *wetLevel;
+            params.dryLevel = (float) *dryLevel;
+            params.width    = (float) *width;
+            
+            if (paramsChanged())
+                verb.setParameters (params);
+            
+            verb.processStereo (buffer.getWritePointer (0),
+                                buffer.getWritePointer (1),
+                                buffer.getNumSamples());
+            
+            lastParams.roomSize = params.roomSize;
+            lastParams.damping  = params.damping;
+            lastParams.wetLevel = params.wetLevel;
+            lastParams.dryLevel = params.dryLevel;
+            lastParams.width    = params.width;
+        }
         
         AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
         bool hasEditor() const override                 { return true; }
@@ -56,6 +88,11 @@ namespace Element {
         void getStateInformation (juce::MemoryBlock& destData) override
         {
             ValueTree state (Tags::state);
+            state.setProperty ("roomSize", (float)*roomSize, nullptr);
+            state.setProperty ("damping",  (float)*damping,  nullptr);
+            state.setProperty ("wetLevel", (float)*wetLevel, nullptr);
+            state.setProperty ("dryLevel", (float)*dryLevel, nullptr);
+            state.setProperty ("width",    (float)*width,    nullptr);
             if (ScopedPointer<XmlElement> e = state.createXml())
                 AudioProcessor::copyXmlToBinary (*e, destData);
         }
@@ -67,9 +104,26 @@ namespace Element {
                 auto state = ValueTree::fromXml (*e);
                 if (state.isValid())
                 {
-                    
+                    *roomSize = params.roomSize = ((float) state.getProperty ("roomSize", 0.0));
+                    *damping  = params.damping  = ((float) state.getProperty ("damping", 0.0));
+                    *wetLevel = params.wetLevel = ((float) state.getProperty ("wetLevel", 0.0));
+                    *dryLevel = params.dryLevel = ((float) state.getProperty ("dryLevel", 0.0));
+                    *width    = params.width    = ((float) state.getProperty ("width", 0.0));
                 }
             }
+        }
+        
+    private:
+        Reverb verb;
+        Reverb::Parameters params, lastParams;
+        
+        bool paramsChanged() const noexcept
+        {
+            return params.roomSize != (float) *roomSize ||
+            params.damping  != (float) *damping ||
+            params.wetLevel != (float) *wetLevel ||
+            params.dryLevel != (float) *dryLevel ||
+            params.width    != (float) *width;
         }
     };
 }

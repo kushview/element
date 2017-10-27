@@ -211,6 +211,12 @@ namespace Element {
             WetDryProcessor wetDry;
             wetDry.fillInPluginDescription (*desc);
         }
+        else if (fileOrId == "element.reverb")
+        {
+            auto* desc = ds.add (new PluginDescription());
+            ReverbProcessor reverb;
+            reverb.fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -221,6 +227,7 @@ namespace Element {
         results.add ("element.allPass");
         results.add ("element.volume");
         results.add ("element.wetDry");
+        results.add ("element.reverb");
         return results;
     }
     
@@ -248,6 +255,9 @@ namespace Element {
         
         else if (desc.fileOrIdentifier == "element.wetDry")
             base = new WetDryProcessor();
+        
+        else if (desc.fileOrIdentifier == "element.reverb")
+            base = new ReverbProcessor();
         
         return base != nullptr ? base.release() : nullptr;
     }
