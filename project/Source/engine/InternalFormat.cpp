@@ -10,10 +10,11 @@
 
 #include "engine/AllPassFilterProcessor.h"
 #include "engine/CombFilterProcessor.h"
+#include "engine/MidiSequenceProcessor.h"
 #include "engine/PlaceholderProcessor.h"
+#include "engine/ReverbProcessor.h"
 #include "engine/VolumeProcessor.h"
 #include "engine/WetDryProcessor.h"
-#include "engine/MidiSequenceProcessor.h"
 
 #include "session/Session.h"
 #include "Globals.h"
