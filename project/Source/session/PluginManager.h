@@ -46,6 +46,8 @@ public:
         return nullptr;
     }
 
+    void scanInternalPlugins();
+    
     void saveUserPlugins (ApplicationProperties&);
     void restoreUserPlugins (ApplicationProperties&);
     void restoreUserPlugins (const XmlElement& xml);

@@ -93,7 +93,7 @@ KnownPluginList& PluginManager::availablePlugins()
 
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
-    ScopedXml elm (priv->allPlugins.createXml());
+    ScopedXml elm (priv->allPlugins.createXml ());
     settings.getUserSettings()->setValue ("plugin-list", elm.get());
 }
 
@@ -112,6 +112,26 @@ void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
 void PluginManager::restoreUserPlugins (const XmlElement& xml)
 {
     priv->allPlugins.recreateFromXml (xml);
+    scanInternalPlugins();
+}
+
+void PluginManager::scanInternalPlugins()
+{
+    for (int i = 0; i < formats().getNumFormats(); ++i)
+    {
+        auto* format = formats().getFormat (i);
+        
+        if (format->getName() != "Element")
+            continue;
+        
+        PluginDirectoryScanner scanner (availablePlugins(), *format,
+                                        format->getDefaultLocationsToSearch(),
+                                        true, File::nonexistent, false);
+        String name;
+        while (scanner.scanNextFile (true, name)) { DBG("NAME: " << format->getName());}
+        
+        break;
+    }
 }
 
 }

@@ -113,6 +113,7 @@ private:
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
         plugins.addFormat (new ElementAudioPluginFormat());
+        
         if (isFirstRun)
         {
             auto& formats (plugins.formats());
@@ -132,9 +133,10 @@ private:
                 }
             }
         }
-        
-        plugins.restoreUserPlugins (settings);
-        // global data is ready, so now we can start using it;
+        else
+        {
+            plugins.restoreUserPlugins (settings);
+        }
         
         world.loadModule ("test");
         controller = new AppController (world);
