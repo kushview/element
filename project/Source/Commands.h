@@ -21,7 +21,9 @@ namespace Commands {
         showGraphConfig,
         showPatchBay,
         showGraphEditor,
-
+        
+        rotateContentView,
+        
         mediaClose,
         mediaOpen,
         mediaNew,
@@ -65,52 +67,6 @@ namespace Commands {
        static const char* const windows       = "Windows";
        static const char* const session       = "Session";
    }
-    
-    inline void getApplicationCommands (Array<CommandID>& commands)
-    {
-        const CommandID cmds[] = {
-            Commands::exportAudio,
-            Commands::exportMidi,
-            
-            Commands::sessionClose,
-            Commands::sessionNew,
-            Commands::sessionOpen,
-            Commands::sessionSave,
-            Commands::sessionSaveAs,
-            Commands::sessionAddGraph,
-            
-            Commands::showAbout,
-            Commands::showLegacyView,
-            Commands::showPreferences,
-            Commands::showPluginManager,
-            
-            Commands::mediaClose,
-            Commands::mediaSave,
-            Commands::mediaSaveAs,
-            
-            Commands::checkNewerVersion,
-            
-            Commands::signIn,
-            Commands::signOut,
-            
-            Commands::transportRewind,
-            Commands::transportForward,
-            Commands::transportPlay,
-            Commands::transportRecord,
-            Commands::transportSeekZero,
-            Commands::transportStop,
-            
-            Commands::quit,
-            Commands::undo,
-            Commands::redo,
-            Commands::cut,
-            Commands::copy,
-            Commands::paste,
-            Commands::selectAll
-        };
-        
-        commands.addArray (cmds, numElementsInArray (cmds));
-    }
     
     inline void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
     {
@@ -214,6 +170,11 @@ namespace Commands {
                 result.setInfo ("Graph Editor", "Show the graph editor", "Session", 0);
                 break;
             
+            case Commands::rotateContentView:
+                result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
+                result.setInfo ("Rotate View...", "Show the graph editor", "Session", 0);
+                break;
+                
             case Commands::checkNewerVersion:
                 result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
                 break;

@@ -209,7 +209,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showSessionConfig,
         Commands::showGraphConfig,
         Commands::showPatchBay,
-        Commands::showGraphEditor
+        Commands::showGraphEditor,
+        Commands::rotateContentView
     });
     
     commands.add (Commands::quit);
@@ -235,16 +236,19 @@ bool GuiController::perform (const InvocationInfo& info)
             runDialog (ELEMENT_PREFERENCES);
             break;
         case Commands::showSessionConfig:
-            content->setContentView (new SessionContentView());
+            content->setContentView ("SessionSettings");
             break;
         case Commands::showGraphConfig:
-            content->setContentView (new SessionContentView());
+            content->setContentView ("GraphSettings");
             break;
         case Commands::showPatchBay:
-            content->setContentView (new ConnectionGrid());
+            content->setContentView ("PatchBay");
             break;
         case Commands::showGraphEditor:
-            content->setContentView (new GraphEditorView());
+            content->setMainView ("GraphEditor");
+            break;
+        case Commands::rotateContentView:
+            content->nextMainView();
             break;
             
         case Commands::quit:

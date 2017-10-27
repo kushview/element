@@ -94,7 +94,11 @@ public:
         
         if (index == 6000 && menu == Help)
         {
-            URL ("http://kushview.net/products/element/").launchInDefaultBrowser();
+            URL ("https://kushview.net/products/element/").launchInDefaultBrowser();
+        }
+        else if (index == 7000 && menu == Help)
+        {
+            URL ("https://kushview.net/feedback/").launchInDefaultBrowser();
         }
         
        #if JUCE_DEBUG
@@ -157,12 +161,12 @@ private:
     {
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
         menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
+        menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");
         menu.addCommandItem (&cmd, Commands::showGraphConfig, "Show Graph Properties");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-
     }
     
     void buildDebugMenu (PopupMenu& menu)
@@ -173,7 +177,8 @@ private:
     
     void buildHelpMenu (PopupMenu& menu)
     {
-        menu.addItem (6000, "Online documentation");
+        menu.addItem (6000, "Online documentation...");
+        menu.addItem (7000, "Submit Feedback...");
        #if ! JUCE_MAC
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showAbout, "About Element");

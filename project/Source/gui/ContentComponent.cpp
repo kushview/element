@@ -14,6 +14,8 @@
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
+#include "gui/PluginManagerComponent.h"
+#include "gui/SessionContentView.h"
 
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -647,6 +649,26 @@ void ContentComponent::mouseDown (const MouseEvent& ev)
 {
     Component::mouseDown (ev);
 }
+void ContentComponent::setMainView (const String& name)
+{
+    if (name == "PatchBay") {
+        setContentView (new ConnectionGrid());
+    } else if (name == "GraphEditor") {
+        setContentView (new GraphEditorView());
+    } else if (name == "PluginManager") {
+        setContentView (new PluginManagerContentView());
+    } else if (name == "SessionSettings" || name == "SessionProperties") {
+        setContentView (new SessionContentView());
+    }
+}
+
+void ContentComponent::nextMainView()
+{
+    // only have two rotatable views as of now
+    const String nextName = getMainViewName() == "GraphEditor" ? "PatchBay" : "GraphEditor";
+    setMainView (nextName);
+}
+    
 
 void ContentComponent::paint (Graphics &g)
 {
