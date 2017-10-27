@@ -17,3 +17,4 @@
 #include "Commands.h"
 #include "Messages.h"
 #include "Globals.h"
+#include "Settings.h"

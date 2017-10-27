@@ -15,7 +15,8 @@
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 #include "gui/PluginManagerComponent.h"
-#include "gui/SessionContentView.h"
+#include "gui/SessionSettingsView.h"
+#include "gui/GraphSettingsView.h"
 
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -659,6 +660,8 @@ void ContentComponent::setMainView (const String& name)
         setContentView (new PluginManagerContentView());
     } else if (name == "SessionSettings" || name == "SessionProperties") {
         setContentView (new SessionContentView());
+    } else if (name == "GraphSettings") {
+        setContentView (new GraphSettingsView());
     }
 }
 

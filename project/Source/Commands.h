@@ -159,7 +159,7 @@ namespace Commands {
                 result.setInfo ("Session Settings", "Session Settings", "Session", 0);
                 break;
             case Commands::showGraphConfig:
-                result.setInfo ("Graph Settings", "Graph Settings", "Session", Info::isDisabled);
+                result.setInfo ("Graph Settings", "Graph Settings", "Session", 0);
                 break;
             case Commands::showPatchBay:
                 result.addDefaultKeypress (KeyPress::F1Key, 0);

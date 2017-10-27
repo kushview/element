@@ -3,22 +3,11 @@
 #include "controllers/GuiController.h"
 #include "controllers/SessionController.h"
 #include "engine/AudioEngine.h"
-#include "gui/NewSessionView.h"
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
-#include "gui/GraphEditorView.h"
 #include "gui/MainWindow.h"
-#include "gui/SessionDocument.h"
-#include "gui/SessionContentView.h"
-#include "gui/ConnectionGrid.h"
 #include "gui/PluginWindow.h"
-#include "gui/PluginManagerComponent.h"
-#include "session/MediaManager.h"
-#include "session/UnlockStatus.h"
-
-#include "Globals.h"
-#include "Settings.h"
 #include "Version.h"
 
 namespace Element {
@@ -230,19 +219,19 @@ bool GuiController::perform (const InvocationInfo& info)
             toggleAboutScreen();
             break;
         case Commands::showPluginManager:
-            content->setContentView (new PluginManagerContentView());
+            content->setMainView ("PluginManager");
             break;
         case Commands::showPreferences:
             runDialog (ELEMENT_PREFERENCES);
             break;
         case Commands::showSessionConfig:
-            content->setContentView ("SessionSettings");
+            content->setMainView ("SessionSettings");
             break;
         case Commands::showGraphConfig:
-            content->setContentView ("GraphSettings");
+            content->setMainView ("GraphSettings");
             break;
         case Commands::showPatchBay:
-            content->setContentView ("PatchBay");
+            content->setMainView ("PatchBay");
             break;
         case Commands::showGraphEditor:
             content->setMainView ("GraphEditor");
