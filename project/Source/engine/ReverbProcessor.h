@@ -46,21 +46,23 @@ namespace Element {
         void prepareToPlay (double sampleRate, int maxBlockSize) override
         {
             setPlayConfigDetails (2, 2, sampleRate, maxBlockSize);
+            verb.reset();
             verb.setSampleRate (sampleRate);
         }
         
         void releaseResources() override { }
         void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
         {
-            params.roomSize = (float) *roomSize;
-            params.damping  = (float) *damping;
-            params.wetLevel = (float) *wetLevel;
-            params.dryLevel = (float) *dryLevel;
-            params.width    = (float) *width;
-            
             if (paramsChanged())
+            {
+                params.roomSize = (float) *roomSize;
+                params.damping  = (float) *damping;
+                params.wetLevel = (float) *wetLevel;
+                params.dryLevel = (float) *dryLevel;
+                params.width    = (float) *width;
                 verb.setParameters (params);
-            
+            }
+
             verb.processStereo (buffer.getWritePointer (0),
                                 buffer.getWritePointer (1),
                                 buffer.getNumSamples());
@@ -70,6 +72,12 @@ namespace Element {
             lastParams.wetLevel = params.wetLevel;
             lastParams.dryLevel = params.dryLevel;
             lastParams.width    = params.width;
+        }
+        
+        void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midi) override
+        {
+            verb.reset();
+            BaseProcessor::processBlockBypassed (buffer, midi);
         }
         
         AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
@@ -120,10 +128,10 @@ namespace Element {
         bool paramsChanged() const noexcept
         {
             return params.roomSize != (float) *roomSize ||
-            params.damping  != (float) *damping ||
-            params.wetLevel != (float) *wetLevel ||
-            params.dryLevel != (float) *dryLevel ||
-            params.width    != (float) *width;
+                params.damping  != (float) *damping ||
+                params.wetLevel != (float) *wetLevel ||
+                params.dryLevel != (float) *dryLevel ||
+                params.width    != (float) *width;
         }
     };
 }
