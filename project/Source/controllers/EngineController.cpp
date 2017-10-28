@@ -13,20 +13,6 @@
 
 namespace Element {
 
-namespace Logging
-{
-    void dump (GraphController& g)
-    {
-        DBG("[EL] graph: " << g.getGraph().getName());
-        for (int i = 0; i < g.getNumFilters(); ++i)
-        {
-            PluginDescription d;
-            g.getNode(i)->getPluginDescription (d);
-            DBG("[EL] GC Node Name: " << d.name);
-        }
-    }
-}
-
 EngineController::EngineController() { }
 EngineController::~EngineController()
 {
@@ -39,8 +25,8 @@ EngineController::~EngineController()
 
 void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    jassert (root);
-    root->addConnection (s, sp, d, dp);
+    if (root)
+        root->addConnection (s, sp, d, dp);
 }
 
 void EngineController::addGraph()
@@ -78,19 +64,19 @@ void EngineController::duplicateGraph()
     if (engine->addGraph (newGraph.get()))
     {
         newGraph.release();
-        root->savePluginStates();
-        
         Node node (session->getCurrentGraph().getValueTree().createCopy());
         node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
         session->addGraph (node, true);
         setRootNode (node);
-        findSibling<GuiController>()->stabilizeContent();
+        
     }
     else
     {
         AlertWindow::showMessageBoxAsync (
             AlertWindow::InfoIcon, "Elements", "Could not duplicate graph.");
     }
+    
+    findSibling<GuiController>()->stabilizeContent();
 }
 
 void EngineController::removeGraph (int index)
@@ -108,13 +94,22 @@ void EngineController::removeGraph (int index)
     ValueTree graphs = session->getValueTree().getChildWithName (Tags::graphs);
     index = graphs.indexOf (node.getValueTree());
     graphs.removeChild (index, nullptr);
+    
+    if (auto* g = engine->getGraph (index))
+    {
+        jassert (g == &root->getGraph());
+        root = nullptr;
+        engine->removeGraph (g);
+    }
+    
     index = jmin (index, graphs.getNumChildren() - 1);
     graphs.setProperty (Tags::active, index, nullptr);
     node = session->getCurrentGraph();
     if (node.isValid())
         setRootNode (node);
-    else if (session->getNumGraphs() <= 0)
+    else if (root && session->getNumGraphs() <= 0)
         root->clear();
+    
     findSibling<GuiController>()->stabilizeContent();
 }
 
@@ -138,10 +133,7 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
 
 void EngineController::addNode (const Node& node)
 {
-    if (! root)
-        return;
-    
-    if (KV_INVALID_NODE == root->addNode (node))
+    if (root && KV_INVALID_NODE == root->addNode (node))
     {
         AlertWindow::showMessageBox (AlertWindow::InfoIcon,
             "Duplicate Node", String("Could not duplicate node: ") + node.getName());
@@ -157,7 +149,6 @@ void EngineController::addPlugin (const PluginDescription& d)
 
 void EngineController::removeNode (const uint32 nodeId)
 {
-    jassert (root);
     if (! root)
         return;
     PluginWindow::closeCurrentlyOpenWindowsFor (nodeId);
@@ -186,7 +177,10 @@ void EngineController::activate()
     engine->setSession (session);
 
     if (session->getNumGraphs() > 0)
+    {
+        DBG ("[EL] loading current graph in engine activate");
         setRootNode (session->getCurrentGraph());
+    }
     
     engine->activate();
     devices.addChangeListener (this);
@@ -198,6 +192,7 @@ void EngineController::deactivate()
     auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
+    engine->setSession (nullptr);
     devices.removeChangeListener (this);
     if (root)
     {
@@ -221,17 +216,33 @@ void EngineController::setRootNode (const Node& newRootNode)
         return;
     }
 
-    DBG("[EL] updating engine/session in set Root Node: FIXME");
-    auto engine  = getWorld().getAudioEngine();
-    auto session = getWorld().getSession();
+    auto engine   = getWorld().getAudioEngine();
+    auto session  = getWorld().getSession();
     auto& devices = getWorld().getDeviceManager();
-    engine->setSession (session);
     
-    const int index = session->getValueTree().getChildWithName(Tags::graphs).indexOf (newRootNode.getValueTree());
+    const int index = session->getValueTree().getChildWithName(Tags::graphs).indexOf (newRootNode.getValueTree ());
+    
+    if (root)
+    {
+        root->savePluginStates();
+    }
+    
+    for (int i = 0; i < session->getNumGraphs(); ++i)
+    {
+        if (nullptr != engine->getGraph (i))
+            continue;
+        engine->addGraph (new RootGraph());
+    }
+
     if (auto* proc = engine->getGraph (index))
+    {
         root = new RootGraphController (*proc, getWorld().getPluginManager());
+    }
     else
+    {
+        DBG("[EL] couldn't find graph processor for node.");
         root = nullptr;
+    }
     
     if (root)
     {

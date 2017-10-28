@@ -128,7 +128,7 @@ void PluginManager::scanInternalPlugins()
                                         format->getDefaultLocationsToSearch(),
                                         true, File::nonexistent, false);
         String name;
-        while (scanner.scanNextFile (true, name)) { DBG("NAME: " << format->getName());}
+        while (scanner.scanNextFile (true, name)) {}
         
         break;
     }
