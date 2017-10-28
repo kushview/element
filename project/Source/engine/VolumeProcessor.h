@@ -17,8 +17,8 @@ namespace Element {
     public:
         explicit VolumeProcessor (const double minDb, const double maxDb,
                                   const bool _stereo = false)
-        : BaseProcessor(),
-        stereo (_stereo)
+            : BaseProcessor(),
+              stereo (_stereo)
         {
             setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
             addParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
