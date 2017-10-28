@@ -52,19 +52,20 @@ void EngineController::addGraph()
     ScopedPointer<RootGraph> newGraph = new RootGraph();
     if (engine->addGraph (newGraph.get()))
     {
-        newGraph.release();
         Node node (Tags::graph);
         node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
+        session->addGraph (node, true);
         setRootNode (node);
         addMissingIONodes();
-        session->addGraph (node, true);
-        findSibling<GuiController>()->stabilizeContent();
+        newGraph.release();
     }
     else
     {
         AlertWindow::showMessageBoxAsync (
             AlertWindow::InfoIcon, "Elements", "Could not add new graph to session.");
     }
+    
+    findSibling<GuiController>()->stabilizeContent();
 }
 
 void EngineController::duplicateGraph()
@@ -81,8 +82,8 @@ void EngineController::duplicateGraph()
         
         Node node (session->getCurrentGraph().getValueTree().createCopy());
         node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
-        setRootNode (node);
         session->addGraph (node, true);
+        setRootNode (node);
         findSibling<GuiController>()->stabilizeContent();
     }
     else
@@ -183,15 +184,9 @@ void EngineController::activate()
     auto engine (globals.getAudioEngine());
     auto session (globals.getSession());
     engine->setSession (session);
-    RootGraph& graph (engine->getRootGraph());
-    
-    if (auto* device = devices.getCurrentAudioDevice())
-        graph.setPlayConfigFor (device);
-    
-    root = new RootGraphController (engine->getRootGraph(), globals.getPluginManager());
-    
+
     if (session->getNumGraphs() > 0)
-        setRootNode (session->getGraph (0));
+        setRootNode (session->getCurrentGraph());
     
     engine->activate();
     devices.addChangeListener (this);
@@ -200,8 +195,7 @@ void EngineController::activate()
 void EngineController::deactivate()
 {
     Controller::deactivate();
-    auto* app =   dynamic_cast<AppController*> (getRoot());
-    auto& globals (app->getWorld());
+    auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
     devices.removeChangeListener (this);
@@ -221,26 +215,45 @@ void EngineController::clear()
 
 void EngineController::setRootNode (const Node& newRootNode)
 {
-    if (! newRootNode.hasNodeType (Tags::graph))
+    if (! newRootNode.isRootGraph())
     {
         jassertfalse; // needs to be a graph
         return;
     }
 
     DBG("[EL] updating engine/session in set Root Node: FIXME");
-    auto engine = (dynamic_cast<AppController*> (getRoot()))->getGlobals().getAudioEngine();
-    auto session = (dynamic_cast<AppController*> (getRoot()))->getGlobals().getSession();
+    auto engine  = getWorld().getAudioEngine();
+    auto session = getWorld().getSession();
+    auto& devices = getWorld().getDeviceManager();
     engine->setSession (session);
     
-    DBG("[EL] setting root node: " << newRootNode.getName());
-    root->setNodeModel (newRootNode);
-    ValueTree nodes = newRootNode.getNodesValueTree();
-    for (int i = nodes.getNumChildren(); --i >= 0;)
+    const int index = session->getValueTree().getChildWithName(Tags::graphs).indexOf (newRootNode.getValueTree());
+    if (auto* proc = engine->getGraph (index))
+        root = new RootGraphController (*proc, getWorld().getPluginManager());
+    else
+        root = nullptr;
+    
+    if (root)
     {
-        Node model (nodes.getChild(i), false);
-        GraphNodePtr node = model.getGraphNode();
-        if (node && node->isAudioIONode())
-            model.resetPorts();
+        DBG("[EL] setting root node: " << newRootNode.getName());
+        root->setNodeModel (newRootNode);
+        if (auto* device = devices.getCurrentAudioDevice())
+            root->getRootGraph().setPlayConfigFor (device);
+        
+        ValueTree nodes = newRootNode.getNodesValueTree();
+        for (int i = nodes.getNumChildren(); --i >= 0;)
+        {
+            Node model (nodes.getChild(i), false);
+            GraphNodePtr node = model.getGraphNode();
+            if (node && node->isAudioIONode())
+                model.resetPorts();
+        }
+        
+        engine->setCurrentGraph (index);
+    }
+    else
+    {
+        DBG("[EL] no graph controller for node: " << newRootNode.getName());
     }
 }
 

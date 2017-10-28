@@ -84,9 +84,9 @@ bool invokeDirectly (Component* c, const int commandID, bool async) {
 GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
 {
     auto* cc = findContentComponent (c);
-    if (! cc) return nullptr;
-    auto& graph (cc->getGlobals().getAudioEngine()->getRootGraph());
-    return graph.getNodeForId (node.getNodeId());
+    if (! cc)
+        return nullptr;
+    return nullptr;
 }
 
 void postMessageFor (Component* c, Message* m)

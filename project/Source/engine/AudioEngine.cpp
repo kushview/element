@@ -68,8 +68,8 @@ public:
           numInputChans (0), numOutputChans (0),
           tempBuffer (1, 1)
     {
-        graphs.add (new RootGraph ());
         tempoValue.addListener (this);
+        currentGraph.set (-1);
     }
 
     ~Private()
@@ -82,14 +82,20 @@ public:
             isPrepared = false;
         }
     }
-
+    
+    RootGraph* getCurrentGraph() const
+    {
+        return isPositiveAndBelow (currentGraph.get(), graphs.size()) ? graphs.getUnchecked(currentGraph.get())
+                                                                      : nullptr;
+    }
+    
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
     {
         transport.preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
-        incomingMidi.clear();
+        messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
         
         int totalNumChans = 0;
         
@@ -133,32 +139,36 @@ public:
         }
         
         const ScopedLock sl (lock);
-        auto& graph (*graphs.getUnchecked (0));
+        auto* const graph = getCurrentGraph();
+        const bool shouldProcess = graph != nullptr;
         
-        const bool shouldProcess = true;
         if (shouldProcess)
         {
             const int64 remainingFrames = transport.getRemainingFrames();
             ignoreUnused (remainingFrames);
-            const ScopedLock sl2 (graph.getCallbackLock());
+            const ScopedLock sl2 (graph->getCallbackLock());
             
-            if (graph.isSuspended())
+            if (graph->isSuspended())
             {
                 for (int i = 0; i < numOutputChannels; ++i)
                     zeromem (outputChannelData[i], sizeof (float) * (size_t) numSamples);
             }
             else
             {
-                messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
                 AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-                graph.processBlock (buffer, incomingMidi);
-                if (transport.isPlaying()) {
-                    transport.advance (numSamples);
-                }
+                graph->processBlock (buffer, incomingMidi);
             }
         }
+        else
+        {
+            for (int i = 0; i < numOutputChannels; ++i)
+                zeromem (outputChannelData[i], sizeof (float) * (size_t)numSamples);
+        }
         
+        if (transport.isPlaying())
+            transport.advance (numSamples);
         transport.postProcess (numSamples);
+        incomingMidi.clear();
     }
     
     void audioDeviceAboutToStart (AudioIODevice* const device) override
@@ -222,19 +232,35 @@ public:
         if (isPrepared)
             graph->releaseResources();
         
-        
         deleteAndZero (graph);
     }
     
     void setSession (SessionPtr s)
     {
         session = s;
+        OwnedArray<RootGraph> newGraphs;
+        
         if (session)
+        {
+            const int numGraphs = session->getNumGraphs();
+            while (newGraphs.size() < numGraphs)
+            {
+                auto* graph = newGraphs.add (new RootGraph());
+                if (isPrepared)
+                    prepareGraph (graph, sampleRate, blockSize);
+            }
+            
             tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
+        }
         else
+        {
             tempoValue = tempoValue.getValue(); // drop reference?
+        }
         
         valueChanged (tempoValue);
+        
+        ScopedLock sl (lock);
+        graphs.swapWith (newGraphs);
     }
     
     void valueChanged (Value& value) override
@@ -259,8 +285,7 @@ private:
     double sampleRate   = 0.0;
     int blockSize       = 0;
     bool isPrepared     = false;
-    int graphIndex      = -1;
-    
+    Atomic<int> currentGraph;
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
     AudioSampleBuffer tempBuffer;
@@ -317,18 +342,13 @@ void AudioEngine::deactivate()
 AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }
 MidiInputCallback&      AudioEngine::getMidiInputCallback()     { jassert (priv != nullptr); return *priv; }
 
-RootGraph& AudioEngine::getRootGraph()
-{
-    return *getGraph(0);
-}
-
 bool AudioEngine::addGraph (RootGraph* graph)
 {
     jassert (priv && graph);
     priv->addGraph (graph);
     return true;
 }
-    
+
 bool AudioEngine::removeGraph (RootGraph* graph)
 {
     jassert (priv && graph);
@@ -339,9 +359,15 @@ bool AudioEngine::removeGraph (RootGraph* graph)
 RootGraph* AudioEngine::getGraph (const int index)
 {
     ScopedLock sl (priv->lock);
-    if (isPositiveAndBelow(index, priv->graphs.size()))
+    if (isPositiveAndBelow (index, priv->graphs.size()))
         return priv->graphs.getUnchecked (index);
     return nullptr;
+}
+
+void AudioEngine::setCurrentGraph (const int index)
+{
+    if (priv)
+        priv->currentGraph.set (index);
 }
 
 void AudioEngine::setSession (SessionPtr session)

@@ -1,11 +1,11 @@
-#include "controllers/Controller.h"
+#include "controllers/AppController.h"
 
 namespace Element {
     
 class RootGraphController;
 class Node;
     
-class EngineController : public Controller,
+class EngineController : public AppController::Child,
                          private ChangeListener
 {
 public:
