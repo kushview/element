@@ -202,7 +202,7 @@ private:
         if (showHeader)
             addSectionHeader (node.getName());
         addItem (Disconnect, getNameForItem (Disconnect));
-        addItem (Duplicate,  getNameForItem (Duplicate));
+        addItem (Duplicate,  getNameForItem (Duplicate), ! node.isIONode());
         addSeparator();
         addItem (RemoveNode, getNameForItem (RemoveNode));
     }

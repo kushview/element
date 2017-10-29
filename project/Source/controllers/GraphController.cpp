@@ -297,4 +297,10 @@ void GraphController::processorArcsChanged()
     changed();
 }
 
+// MARK: Root Graph Controller
+void RootGraphController::unloadGraph()
+{
+    getRootGraph().clear();
+}
+    
 }

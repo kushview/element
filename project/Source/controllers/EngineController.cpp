@@ -31,7 +31,7 @@ void EngineController::addConnection (const uint32 s, const uint32 sp, const uin
 
 void EngineController::addGraph()
 {
-    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto& world  = getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
@@ -68,7 +68,6 @@ void EngineController::duplicateGraph()
         node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
         session->addGraph (node, true);
         setRootNode (node);
-        
     }
     else
     {
@@ -222,11 +221,14 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     const int index = session->getValueTree().getChildWithName(Tags::graphs).indexOf (newRootNode.getValueTree ());
     
+    /* Unload the existing graph if necessary */
     if (root)
     {
         root->savePluginStates();
+        root->unloadGraph();
     }
     
+    /* Ensure enough processors allocated for number of graphs on the session */
     for (int i = 0; i < session->getNumGraphs(); ++i)
     {
         if (nullptr != engine->getGraph (i))
@@ -246,7 +248,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     if (root)
     {
-        DBG("[EL] setting root node: " << newRootNode.getName());
+        DBG("[EL] setting root: " << newRootNode.getName());
         root->setNodeModel (newRootNode);
         if (auto* device = devices.getCurrentAudioDevice())
             root->getRootGraph().setPlayConfigFor (device);
@@ -324,10 +326,11 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& devices (app->getWorld().getDeviceManager());
-    auto& processor (root->getRootGraph());
+   
     
-    if (cb == (ChangeBroadcaster*) &devices)
+    if (cb == (ChangeBroadcaster*) &devices && root != nullptr)
     {
+        auto& processor (root->getRootGraph());
         if (auto* device = devices.getCurrentAudioDevice())
         {
             auto session = app->getWorld().getSession();

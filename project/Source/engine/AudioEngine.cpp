@@ -93,7 +93,8 @@ public:
     {
         MidiBuffer::Iterator iter (buf);
         MidiMessage msg; int frame = 0;
-        while (iter.getNextEvent(msg, frame)) {
+        while (iter.getNextEvent (msg, frame))
+        {
             if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
                 DBG("got it: " << frame);
             }
@@ -107,7 +108,6 @@ public:
         transport.preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
         messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
-        traceMidi (incomingMidi);
         
         int totalNumChans = 0;
         

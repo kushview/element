@@ -97,9 +97,15 @@ public:
         : GraphController (graph, plugins),
           root (graph)
     { }
+    
     ~RootGraphController() { }
     
+    /** REturn the underlying RootGraph processor */
     RootGraph& getRootGraph() const { return root; }
+    
+    /** Unload graph nodes without clearing the model */
+    void unloadGraph();
+
 private:
     RootGraph& root;
 };

@@ -153,6 +153,22 @@ namespace Element {
         void getAudioInputs (PortArray& ports) const;
         void getAudioOutputs (PortArray& ports) const;
         
+        inline bool isAudioIONode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                (objectData.getProperty(Tags::identifier) == "audio.input" ||
+                 objectData.getProperty(Tags::identifier) == "audio.output");
+        }
+        
+        inline bool isMidiIONode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                (objectData.getProperty(Tags::identifier) == "midi.input" ||
+                 objectData.getProperty(Tags::identifier) == "midi.output");
+        }
+        
+        inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
+        
         bool hasChildNode (const var& format, const var& identifier) const
         {
             auto nodes = getNodesValueTree();
