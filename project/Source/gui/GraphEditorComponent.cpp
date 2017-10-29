@@ -148,6 +148,7 @@ public:
         if (e.mods.isPopupMenu())
         {
             NodePopupMenu menu (node);
+            menu.addProgramsMenu();
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
         }
@@ -231,7 +232,7 @@ public:
         const int w = getWidth() - pinSize * 2;
         const int h = getHeight() - y * 2;
         
-        return Rectangle<int> (x, y, w, h);
+        return { x, y, w, h };
     }
     
     void paint (Graphics& g)
@@ -683,6 +684,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             menu.addItem (3, "MIDI Input",      true, graph.hasMidiInputNode());
             menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
         }
+        
         menu.addSeparator();
         menu.addItem (5, "Change orientation...");
         menu.addSeparator();
@@ -693,7 +695,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         if (menu.isPluginResultCode (result))
         {
             if (const auto* desc = menu.getPluginDescription (result))
-                ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
+                ViewHelpers::postMessageFor (this, new LoadPluginMessage (
+                    *desc, e.position.getX() / getWidth(), e.position.getY() / getHeight()));
         }
         else
         {
@@ -743,6 +746,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             }
             else
             {
+                DBG("X: " << e.position.getX() / (float)getWidth() <<
+                   " Y: " << e.position.getY() / (float)getHeight());
                 ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
             }
         }

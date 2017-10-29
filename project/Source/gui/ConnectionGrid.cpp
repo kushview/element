@@ -174,7 +174,7 @@ namespace Element
         void showMenuForNode (const Node& node)
         {
             NodePopupMenu menu (node);
-            PopupMenu programs; menu.getProgramsMenu(programs);
+            PopupMenu programs; menu.getProgramsMenu (programs);
             menu.addSubMenu ("Programs", programs);
             
             const int result = menu.show();

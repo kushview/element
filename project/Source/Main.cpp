@@ -167,7 +167,7 @@ public:
         }
         
         Logger::writeToLog ("Element v" + getApplicationVersion());
-        Logger::writeToLog ("Copyright (c) 2017-2018 Kushview, LLC.  All rights reserved.");
+        Logger::writeToLog ("Copyright (c) 2017-2018 Kushview, LLC.  All rights reserved.\n");
         
         initializeModulePath();
         world = new Globals (commandLine);

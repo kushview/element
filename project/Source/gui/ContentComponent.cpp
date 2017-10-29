@@ -281,14 +281,22 @@ public:
     }
     
 private:
-    class Row : public Component{
+    class Row : public Component,
+                public Label::Listener
+    {
     public:
         Row (ElementsNavigationPanel& _owner) : owner (_owner)
         {
-            addAndMakeVisible(text);
+            addAndMakeVisible (text);
             text.setJustificationType (Justification::centredLeft);
             text.setInterceptsMouseClicks (false, false);
-            text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.brighter());
+            text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.darker());
+            text.setColour (Label::backgroundWhenEditingColourId, Colours::black);
+            text.addListener (this);
+        }
+        
+        ~Row() {
+            text.removeListener (this);
         }
         
         void updateContent (const Node& _node, int _row, bool _selected)
@@ -304,28 +312,54 @@ private:
         {
             owner.selectRow (row);
          
-            if (ev.getNumberOfClicks() == 2) {
+            if (ev.getNumberOfClicks() == 2)
+            {
                 if (! text.isBeingEdited())
+                {
                     text.showEditor();
-            } else {
-                owner.listBoxItemClicked (row, ev);
+                }
+            }
+            else
+            {
+                if (! text.isBeingEdited())
+                    owner.listBoxItemClicked (row, ev);
             }
         }
         
         void paint (Graphics& g) override
         {
-            ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
+            if (text.isBeingEdited())
+                g.fillAll (Colours::black);
+            else
+                ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
         }
         
         void resized() override
         {
-            text.setBounds (10, 0, getWidth() - 40, getHeight());
+            text.setBounds (10, 0, getWidth() - 10, getHeight());
+        }
+        
+        void labelTextChanged (Label*) override {}
+        void editorShown (Label*, TextEditor&) override
+        {
+            savedText = text.getText();
+            text.setInterceptsMouseClicks (true, true);
+            repaint();
+        }
+        
+        void editorHidden (Label*, TextEditor&) override
+        {
+            if (text.getText().isEmpty())
+                text.setText (savedText.isNotEmpty() ? savedText : "Untitled", dontSendNotification);
+            text.setInterceptsMouseClicks (false, false);
+            repaint (0, 0, 20, getHeight());
         }
         
     private:
         ElementsNavigationPanel& owner;
         Node node;
         Label text;
+        String savedText;
         int row = 0;
         bool selected = false;
     };

@@ -15,6 +15,10 @@ LookAndFeel::LookAndFeel()
     setColour (Slider::thumbColourId, Colours::black);
     setColour (Slider::textBoxTextColourId, LookAndFeel::textColor);
     setColour (Slider::trackColourId, Colours::red);
+    
+    setColour (TextEditor::highlightColourId, Colours::yellow);
+    setColour (TextEditor::outlineColourId, Colours::black);
+    setColour (TextEditor::focusedOutlineColourId, Colours::black);
 }
 
 

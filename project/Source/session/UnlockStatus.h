@@ -4,7 +4,7 @@
 #include "ElementApp.h"
 
 #ifndef EL_LITE_VERSION_DEV
- #define EL_LITE_VERSION_DEV 0
+ #define EL_LITE_VERSION_DEV 1
 #endif
 
 #ifndef EL_DISABLE_UNLOCKING
@@ -77,7 +77,7 @@ private:
     {
         props = ValueTree (propsKey);
        #if EL_LITE_VERSION_DEV
-        const var priceId = getProperty(priceIdKey);
+        const var priceId = getProperty (priceIdKey);
         const var two (2);
         if (two == priceId)
             props.setProperty (fullKey, 1, nullptr);

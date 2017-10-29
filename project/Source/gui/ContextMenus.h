@@ -59,8 +59,8 @@ public:
     
     explicit NodePopupMenu() { }
     
-    NodePopupMenu (const Node& n)     // Display sibling outputs
-    : node (n)
+    NodePopupMenu (const Node& n)
+        : node (n)
     {
         addMainItems (true);
     }
@@ -110,7 +110,13 @@ public:
         }
     }
     
-    void getProgramsMenu (PopupMenu& menu)
+    inline void addProgramsMenu (const String& subMenuName = "Programs")
+    {
+        PopupMenu programs; getProgramsMenu (programs);
+        addSubMenu (subMenuName, programs);
+    }
+    
+    inline void getProgramsMenu (PopupMenu& menu)
     {
         const int offset = 10000;
         const int current = node.getCurrentProgram();
