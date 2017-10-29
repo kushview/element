@@ -59,13 +59,15 @@ public:
         bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
         bypassButton.addListener (this);
         
-        setSize (editor->getWidth(), editor->getHeight() + toolbar->getHeight());
+        const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
+        setSize (editor->getWidth(), height);
         resized();
     }
     
     ~PluginWindowContent()
     {
         bypassButton.removeListener (this);
+        
         if (object && editor)
         {
             if (auto* proc = object->getAudioProcessor())
@@ -73,15 +75,15 @@ public:
                     proc->editorBeingDeleted (e);
         }
         
-        editor = nullptr;
-        toolbar = nullptr;
-        leftPanel = nullptr;
-        rightPanel = nullptr;
+        editor      = nullptr;
+        toolbar     = nullptr;
+        leftPanel   = nullptr;
+        rightPanel  = nullptr;
     }
     
     void resized() override
     {
-        Rectangle<int> r (getLocalBounds());
+        auto r (getLocalBounds());
         
         if (toolbar->getThickness())
         {
@@ -92,7 +94,7 @@ public:
             bypassButton.setBounds (r2.removeFromRight(bypassButton.getWidth()).reduced (1));
         }
         
-        editor->setBounds (r);
+        editor->setBounds (0, r.getY(), getWidth(), editor->getHeight());
     }
     
     void buttonClicked (Button* button) override
@@ -119,25 +121,8 @@ private:
     Node node;
 };
 
-PluginWindow::PluginWindow (Component* const ui, GraphNode* node)
-    : DocumentWindow (ui->getName(), Colours::lightgrey,
-                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
-      owner (node)
-{
-    setUsingNativeTitleBar (true);
-    setSize (400, 300);
-    setContentOwned (new PluginWindowContent (ui, owner), true);
-    setTopLeftPosition (owner->properties.getWithDefault ("windowLastX", Random::getSystemRandom().nextInt (500)),
-                        owner->properties.getWithDefault ("windowLastY", Random::getSystemRandom().nextInt (500)));
-    owner->properties.set ("windowVisible", true);
-    setVisible (true);
-    addToDesktop();
-    
-    activePluginWindows.add (this);
-}
-
 PluginWindow::PluginWindow (Component* const ui, const Node& n)
-    : DocumentWindow (ui->getName(), Colours::lightgrey,
+    : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       owner (n.getGraphNode()), node(n)
 {
@@ -227,17 +212,14 @@ void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
     
 PluginWindow* PluginWindow::createWindowFor (GraphNode* node)
 {
-    auto* plug (node->getAudioProcessor());
-    if (! plug->hasEditor())
-        return nullptr;
-    
-    auto* editor = plug->createEditorIfNeeded();
-    return (editor != nullptr) ? new PluginWindow (editor, node) : nullptr;
+    jassertfalse;
+    return nullptr;
 }
 
 PluginWindow* PluginWindow::createWindowFor (GraphNode* node, Component* ed)
 {
-    return new PluginWindow (ed, node);
+    jassertfalse;
+    return nullptr;
 }
 
 PluginWindow* PluginWindow::getWindowFor (const Node& node)

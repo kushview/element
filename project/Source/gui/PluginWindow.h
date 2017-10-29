@@ -43,7 +43,6 @@ public:
 
 private:
     PluginWindow (Component* const uiComp, const Node& node);
-    PluginWindow (Component* const uiComp, GraphNode* node);
     GraphNode* owner;
     Node node;
 };
