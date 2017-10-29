@@ -161,6 +161,7 @@ private:
     {
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
         menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
+        menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");

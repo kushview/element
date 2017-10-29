@@ -31,6 +31,8 @@ public:
      */
     virtual void dismiss();
     
+    void setMode (int);
+    
     /** @internal */
     void paint (Graphics&) override;
     /** @internal */

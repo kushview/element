@@ -86,6 +86,7 @@ struct UnlockForm::OverlayComp  : public Component,
         title << (failed ? " Failed" : " Complete");
         return TRANS (title);
     }
+    
     void timerCallback() override
     {
         spinner.setVisible (false);
@@ -116,7 +117,13 @@ struct UnlockForm::OverlayComp  : public Component,
         delete this;
         
         if (worked && action != Check)
+        {
             f.dismiss();
+        }
+        else if (!worked && action == Deactivate)
+        {
+            f.setMode (Activate);
+        }
     }
     
     const Action action;
@@ -364,7 +371,7 @@ void UnlockForm::lookAndFeelChanged()
     Colour labelCol (findColour (TextEditor::backgroundColourId).contrasting (0.5f));
     emailBox.setTextToShowWhenEmpty (TRANS ("Email or Username"), labelCol);
     passwordBox.setTextToShowWhenEmpty (TRANS ("Password"), labelCol);
-    licenseBox.setTextToShowWhenEmpty (TRANS ("Serial Number"), labelCol);
+    licenseBox.setTextToShowWhenEmpty (TRANS ("License Key"), labelCol);
 }
 
 void UnlockForm::showBubbleMessage (const String& text, Component& target)
@@ -420,6 +427,19 @@ void UnlockForm::attemptRegistration()
         resized();
         unlockingOverlay->enterModalState();
     }
+}
+
+void UnlockForm::setMode (int mode)
+{
+    if (mode == OverlayComp::Activate && info != nullptr)
+    {
+        if (auto* c = info.getComponent())
+        {
+            removeChildComponent (c);
+            delete c;
+        }
+    }
+    resized();
 }
 
 void UnlockForm::dismiss()
