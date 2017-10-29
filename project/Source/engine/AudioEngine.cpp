@@ -89,6 +89,17 @@ public:
                                                                       : nullptr;
     }
     
+    void traceMidi (MidiBuffer& buf)
+    {
+        MidiBuffer::Iterator iter (buf);
+        MidiMessage msg; int frame = 0;
+        while (iter.getNextEvent(msg, frame)) {
+            if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
+                DBG("got it: " << frame);
+            }
+        }
+    }
+    
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
@@ -96,6 +107,7 @@ public:
         transport.preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
         messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+        traceMidi (incomingMidi);
         
         int totalNumChans = 0;
         
@@ -364,6 +376,12 @@ RootGraph* AudioEngine::getGraph (const int index)
     return nullptr;
 }
 
+void AudioEngine::addMidiMessage (const MidiMessage msg)
+{
+    if (priv)
+        priv->messageCollector.addMessageToQueue (msg);
+}
+    
 void AudioEngine::setCurrentGraph (const int index)
 {
     if (priv)

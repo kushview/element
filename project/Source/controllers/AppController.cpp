@@ -174,6 +174,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::importGraph,
         Commands::exportGraph,
+        Commands::panic,
         
         Commands::checkNewerVersion
     });
@@ -239,6 +240,20 @@ bool AppController::perform (const InvocationInfo& info)
                 Element::showProductLockedAlert();
         } break;
 
+        case Commands::panic:
+        {
+            auto e = getWorld().getAudioEngine();
+            for (int c = 1; c <= 16; ++c)
+            {
+                auto msg = MidiMessage::allNotesOff (c);
+                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
+                e->addMidiMessage (msg);
+                msg = MidiMessage::allSoundOff(c);
+                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
+                e->addMidiMessage (msg);
+            }
+        }  break;
+            
         case Commands::mediaNew:
         case Commands::mediaSave:
         case Commands::mediaSaveAs:

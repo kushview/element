@@ -44,7 +44,9 @@ namespace Commands {
         exportMidi,
         exportGraph,
         importGraph,
-
+        
+        panic,
+        
         checkNewerVersion      = 0x0500,
 
         signIn,
@@ -84,6 +86,10 @@ namespace Commands {
                 break;
             case Commands::exportGraph:
                 result.setInfo ("Exort Graph", "Export graph to file", "Exporting", 0);
+                break;
+            case Commands::panic:
+                result.addDefaultKeypress ('p', ModifierKeys::altModifier | ModifierKeys::commandModifier);
+                result.setInfo ("Panic", "Sends all notes off to the engine", "Engine", 0);
                 break;
                 
             // MARK: Session Commands

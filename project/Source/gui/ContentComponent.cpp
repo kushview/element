@@ -125,6 +125,10 @@ public:
         {
             ViewHelpers::invokeDirectly (this, Commands::rotateContentView, true);
         }
+        else  if (btn == &panicBtn)
+        {
+            ViewHelpers::invokeDirectly (this, Commands::panic, true);
+        }
     }
 
 private:

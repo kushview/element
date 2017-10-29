@@ -173,6 +173,7 @@ private:
     {
         menu.addItem (1000, "Dump session to console");
         menu.addItem (1001, "Report bug");
+        menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     
     void buildHelpMenu (PopupMenu& menu)

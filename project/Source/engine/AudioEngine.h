@@ -51,6 +51,11 @@ public:
     void activate();
     void deactivate();
     
+    /** Adds a message to the MIDI input.  This can be used by Controllers and UI
+        components that send MIDI in a non-realtime critical situation. DO NOT call
+        this from the audio thread */
+    void addMidiMessage (const MidiMessage msg);
+    
     void setSession (SessionPtr);
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
