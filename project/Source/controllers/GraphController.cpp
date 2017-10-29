@@ -98,7 +98,7 @@ uint32 GraphController::addNode (const Node& newNode)
     return nodeId;
 }
     
-uint32 GraphController::addFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
+uint32 GraphController::addFilter (const PluginDescription* desc, double rx, double ry, uint32 nodeId)
 {
     if (! desc)
     {
@@ -108,11 +108,15 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double x, doub
         return KV_INVALID_NODE;
     }
 
-    if (auto* node = createFilter (desc, x, y, nodeId))
+    if (auto* node = createFilter (desc, rx, ry, nodeId))
     {
         nodeId = node->nodeId;
+        
         ValueTree model = node->getMetadata().createCopy();
-        model.setProperty (Tags::object, node, nullptr);
+        model.setProperty (Tags::object, node, nullptr)
+             .setProperty ("relativeX", rx, 0)
+             .setProperty ("relativeY", ry, 0);
+        
         const Node n (model, false);
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);

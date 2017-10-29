@@ -93,7 +93,7 @@ void AppController::handleMessage (const Message& msg)
 
     if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
-        ec->addPlugin (lpm->description);
+        ec->addPlugin (lpm->description, lpm->relativeX, lpm->relativeY);
     }
     else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
     {

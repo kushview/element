@@ -696,7 +696,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         {
             if (const auto* desc = menu.getPluginDescription (result))
                 ViewHelpers::postMessageFor (this, new LoadPluginMessage (
-                    *desc, e.position.getX() / getWidth(), e.position.getY() / getHeight()));
+                    *desc, e.position.getX() / getWidth(),
+                           e.position.getY() / getHeight()));
         }
         else
         {

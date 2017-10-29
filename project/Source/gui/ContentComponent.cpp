@@ -64,15 +64,22 @@ class ContentComponent::Toolbar : public Component,
 {
 public:
     Toolbar()
-        : graph ("e"), title ("Session Title")
+        : viewBtn ("e"),
+          panicBtn ("!"),
+          title ("Session Title")
     {
         addAndMakeVisible (title);
         title.setText ("", dontSendNotification);
         
-        addAndMakeVisible (graph);
-        graph.setColour (TextButton::buttonColourId, Colors::toggleBlue.darker());
-        graph.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-        graph.addListener (this);
+        addAndMakeVisible (viewBtn);
+        viewBtn.setColour (TextButton::buttonColourId, Colors::toggleBlue);
+        viewBtn.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+        viewBtn.addListener (this);
+        
+        addAndMakeVisible (panicBtn);
+        panicBtn.setColour (TextButton::buttonColourId, Colors::toggleOrange);
+        panicBtn.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
+        panicBtn.addListener (this);
         
         // addAndMakeVisible (trim);
         trim.setColour (Slider::rotarySliderFillColourId, LookAndFeel::elementBlue);
@@ -97,10 +104,10 @@ public:
     {
         Rectangle<int> r (getLocalBounds());
         r.removeFromLeft (10);
-        graph.setBounds (r.removeFromLeft (graph.getHeight()).reduced (1 ,6));
+        viewBtn.setBounds (r.removeFromLeft (viewBtn.getHeight()).reduced (1 ,6));
         
         r.removeFromRight (10);
-        trim.setBounds (r.removeFromRight (r.getHeight()).reduced(1));
+        panicBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
         
         r.removeFromRight (10);
         title.setBounds (r);
@@ -114,14 +121,15 @@ public:
     
     void buttonClicked (Button* btn) override
     {
-        if (btn == &graph) {
-            ViewHelpers::invokeDirectly (this, Commands::showPatchBay, true);
+        if (btn == &viewBtn)
+        {
+            ViewHelpers::invokeDirectly (this, Commands::rotateContentView, true);
         }
     }
 
 private:
     SessionPtr session;
-    TextButton graph;
+    TextButton viewBtn, panicBtn;
     Label title;
     Slider trim;
     Label dbLabel;

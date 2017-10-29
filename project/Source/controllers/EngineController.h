@@ -19,7 +19,7 @@ public:
     void addNode (const Node& node);
     
     /** Adds a plugin by description to the current graph */
-    void addPlugin (const PluginDescription&);
+    void addPlugin (const PluginDescription& desc, const float rx = 0.5f, const float ry = 0.5f);
     
     /** Removes a node from the current graph */
     void removeNode (const uint32);

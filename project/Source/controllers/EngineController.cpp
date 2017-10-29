@@ -140,11 +140,11 @@ void EngineController::addNode (const Node& node)
     }
 }
 
-void EngineController::addPlugin (const PluginDescription& d)
+void EngineController::addPlugin (const PluginDescription& desc, const float rx, const float ry)
 {
     if (! root)
         return;
-    root->addFilter (&d);
+    root->addFilter (&desc, rx, ry);
 }
 
 void EngineController::removeNode (const uint32 nodeId)
