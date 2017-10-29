@@ -288,24 +288,32 @@ void EngineController::addMissingIONodes()
         
         PluginDescription desc;
         desc.pluginFormatName = "Internal";
-        
+        double rx = 0.5f, ry = 0.5f;
         switch (t)
         {
             case IOProcessor::audioInputNode:
                 desc.fileOrIdentifier = "audio.input";
+                rx = .25;
+                ry = .25;
                 break;
             case IOProcessor::audioOutputNode:
                 desc.fileOrIdentifier = "audio.output";
+                rx = .25;
+                ry = .75;
                 break;
             case IOProcessor::midiInputNode:
                 desc.fileOrIdentifier = "midi.input";
+                rx = .75;
+                ry = .25;
                 break;
             case IOProcessor::midiOutputNode:
                 desc.fileOrIdentifier = "midi.output";
+                rx = .75;
+                ry = .75;
                 break;
         }
         
-        auto nodeId = root->addFilter (&desc);
+        auto nodeId = root->addFilter (&desc, rx, ry);
         ioNodes[t] = root->getNodeForId (nodeId);
         jassert(ioNodes[t] != nullptr);
     }

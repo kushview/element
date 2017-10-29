@@ -109,6 +109,12 @@ public:
         r.removeFromRight (10);
         panicBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
         
+        if (trim.isVisible())
+        {
+            r.removeFromRight (10);
+            trim.setBounds (r.removeFromRight (getHeight()));
+        }
+        
         r.removeFromRight (10);
         title.setBounds (r);
     }
