@@ -197,6 +197,7 @@ public:
         numOutputChans  = numChansOut;
         
         messageCollector.reset (sampleRate);
+        keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
         
         if (isPrepared)
@@ -212,6 +213,7 @@ public:
     void audioDeviceStopped() override
     {
         const ScopedLock sl (lock);
+        keyboardState.removeListener (&messageCollector);
         if (isPrepared)
             releaseResources();
         isPrepared  = false;
@@ -303,6 +305,7 @@ private:
     AudioSampleBuffer tempBuffer;
     MidiBuffer incomingMidi;
     MidiMessageCollector messageCollector;
+    MidiKeyboardState keyboardState;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -394,4 +397,9 @@ void AudioEngine::setSession (SessionPtr session)
         priv->setSession (session);
 }
     
+    MidiKeyboardState& AudioEngine::getKeyboardState()
+    {
+        jassert(priv);
+        return priv->keyboardState;
+    }
 }

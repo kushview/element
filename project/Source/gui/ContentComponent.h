@@ -18,6 +18,7 @@ class NavigationConcertinaPanel;
 class Node;
 class RackView;
 class TransportBar;
+class VirtualKeyboardView;
 
 class ContentView : public Component
 {
@@ -39,11 +40,15 @@ public:
     void mouseDown (const MouseEvent&) override;
     void paint (Graphics &g) override;
     void resized() override;
-
-    void setContentView (ContentView* view);
+    
     void setMainView (const String& name);
+    void setAccessoryView (const String& name);
     String getMainViewName() const;
     void nextMainView();
+    
+    bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
+    void setVirtualKeyboardVisible (const bool isVisible);
+    void toggleVirtualKeyboard();
     
     void setCurrentNode (const Node& node);
     void stabilize();
@@ -72,14 +77,19 @@ private:
     class StatusBar; friend class StatusBar;
     ScopedPointer<StatusBar> statusBar;
     
+    ScopedPointer<VirtualKeyboardView> keyboard;
+    
     bool statusBarVisible;
     int statusBarSize;
     bool toolBarVisible;
     int toolBarSize;
+    bool virtualKeyboardVisible = false;
+    int virtualKeyboardSize = 80;
     
     void resizerMouseDown();
     void resizerMouseUp();
     void updateLayout();
+    void setContentView (ContentView* view, const bool accessory = false);
 };
 
 }

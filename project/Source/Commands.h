@@ -22,6 +22,7 @@ namespace Commands {
         showPatchBay,
         showGraphEditor,
         
+        toggleVirtualKeyboard,
         rotateContentView,
         
         mediaClose,
@@ -176,6 +177,9 @@ namespace Commands {
                 result.setInfo ("Graph Editor", "Show the graph editor", "Session", 0);
                 break;
             
+            case Commands::toggleVirtualKeyboard:
+                result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", "Session", 0);
+                break;
             case Commands::rotateContentView:
                 result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
                 result.setInfo ("Rotate View...", "Show the graph editor", "Session", 0);

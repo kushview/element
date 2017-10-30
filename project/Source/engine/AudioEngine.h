@@ -63,6 +63,8 @@ public:
     void setCurrentGraph (const int index);
     RootGraph* getGraph (const int index);
     
+    MidiKeyboardState& getKeyboardState();
+    
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     

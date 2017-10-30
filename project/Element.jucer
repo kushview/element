@@ -154,13 +154,6 @@
               file="Source/gui/NavigationView.cpp"/>
         <FILE id="nbrl8E" name="NavigationView.h" compile="0" resource="0"
               file="Source/gui/NavigationView.h"/>
-        <FILE id="ZVkvZh" name="NewFileWizard.cpp" compile="1" resource="0"
-              file="Source/gui/NewFileWizard.cpp"/>
-        <FILE id="AP7kUF" name="NewFileWizard.h" compile="0" resource="0" file="Source/gui/NewFileWizard.h"/>
-        <FILE id="ubNZhk" name="NewSessionView.cpp" compile="1" resource="0"
-              file="Source/gui/NewSessionView.cpp"/>
-        <FILE id="jydhsn" name="NewSessionView.h" compile="0" resource="0"
-              file="Source/gui/NewSessionView.h"/>
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
         <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="Source/gui/PluginManagerComponent.cpp"/>
@@ -212,6 +205,10 @@
         <FILE id="qirVaF" name="UnlockForm.h" compile="0" resource="0" file="Source/gui/UnlockForm.h"/>
         <FILE id="hfURVC" name="ViewHelpers.cpp" compile="1" resource="0" file="Source/gui/ViewHelpers.cpp"/>
         <FILE id="bkdWVL" name="ViewHelpers.h" compile="0" resource="0" file="Source/gui/ViewHelpers.h"/>
+        <FILE id="JRWXH2" name="VirtualKeyboardView.cpp" compile="1" resource="0"
+              file="Source/gui/VirtualKeyboardView.cpp"/>
+        <FILE id="DTbhRj" name="VirtualKeyboardView.h" compile="0" resource="0"
+              file="Source/gui/VirtualKeyboardView.h"/>
         <FILE id="TJ8hvg" name="Window.cpp" compile="1" resource="0" file="Source/gui/Window.cpp"/>
         <FILE id="WfFCIC" name="Window.h" compile="0" resource="0" file="Source/gui/Window.h"/>
         <FILE id="qis1vl" name="WindowManager.cpp" compile="1" resource="0"

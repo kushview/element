@@ -45,9 +45,10 @@ void GuiController::activate()
 void GuiController::deactivate()
 {
     auto* const props (getWorld().getSettings().getUserSettings());
-    if (content)
+    if (props && content)
     {
         props->setValue ("lastContentView", content->getMainViewName());
+        props->setValue ("virtualKeyboard", (bool)content->isVirtualKeyboardVisible());
     }
     
     Controller::deactivate();
@@ -199,6 +200,7 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showGraphConfig,
         Commands::showPatchBay,
         Commands::showGraphEditor,
+        Commands::toggleVirtualKeyboard,
         Commands::rotateContentView
     });
     
@@ -235,6 +237,9 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showGraphEditor:
             content->setMainView ("GraphEditor");
+            break;
+        case Commands::toggleVirtualKeyboard:
+            content->toggleVirtualKeyboard();
             break;
         case Commands::rotateContentView:
             content->nextMainView();

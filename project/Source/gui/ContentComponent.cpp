@@ -17,6 +17,7 @@
 #include "gui/PluginManagerComponent.h"
 #include "gui/SessionSettingsView.h"
 #include "gui/GraphSettingsView.h"
+#include "gui/VirtualKeyboardView.h"
 
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -565,6 +566,8 @@ public:
     }
 };
 
+// MARK: COntent container
+
 class ContentContainer : public Component
 {
 public:
@@ -582,8 +585,9 @@ public:
     
     void resized() override
     {
-        Component* comps[] = { 0, bar.get(), 0 };
+        Component* comps[] = { 0, 0, 0 };
         comps[0] = content1.get();
+        comps[1] = bar.get();
         comps[2] = content2.get();
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
     }
@@ -605,6 +609,7 @@ public:
             addAndMakeVisible (content1);
             content1->didBecomeActive();
         }
+        updateLayout();
         resized();
     }
     
@@ -619,7 +624,16 @@ public:
             addAndMakeVisible (content2);
             content2->didBecomeActive();
         }
+        updateLayout();
         resized();
+    }
+    
+    void setShowAccessoryView (const bool show)
+    {
+        if (showAccessoryView == show)
+            return;
+        showAccessoryView = show;
+        updateLayout();
     }
     
 private:
@@ -630,11 +644,23 @@ private:
     ScopedPointer<ContentView> content1;
     ScopedPointer<ContentView> content2;
     
+    bool showAccessoryView = false;
+    int barSize = 4;
+    
     void updateLayout()
     {
-        layout.setItemLayout (0, 200, -1.0, 200);
-        layout.setItemLayout (1, 0, 0, 0);
-        layout.setItemLayout (2, 0, -1.0, 0);
+        if (showAccessoryView)
+        {
+            layout.setItemLayout (0, 200, -1.0, 200);
+            layout.setItemLayout (1, barSize, barSize, barSize);
+            layout.setItemLayout (2, 1, -1.0, 0);
+        }
+        else
+        {
+            layout.setItemLayout (0, 200, -1.0, 200);
+            layout.setItemLayout (1, 0, 0, 0);
+            layout.setItemLayout (2, 0, -1.0, 0);
+        }
     }
 };
 
@@ -655,6 +681,12 @@ static ContentView* createLastContentView (Settings& settings)
     
     return view ? view.release() : nullptr;
 }
+
+    static bool virtualKeyboardSetting (Settings& settings)
+    {
+        auto* props = settings.getUserSettings();
+        return props == nullptr ? false : props->getBoolValue ("virtualKeyboard");
+    }
     
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
@@ -668,6 +700,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (toolBar = new Toolbar());
     
     container->setMainView (createLastContentView (controller.getGlobals().getSettings()));
+    setVirtualKeyboardVisible (virtualKeyboardSetting (controller.getGlobals().getSettings()));
     
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
@@ -722,6 +755,13 @@ void ContentComponent::setMainView (const String& name)
     }
 }
 
+void ContentComponent::setAccessoryView (const String& name)
+{
+    if (name == "PatchBay") {
+        setContentView (new ConnectionGrid());
+    }
+}
+    
 void ContentComponent::nextMainView()
 {
     // only have two rotatable views as of now
@@ -739,10 +779,12 @@ void ContentComponent::resized()
 {
     Rectangle<int> r (getLocalBounds());
     
-    if (toolBarVisible)
+    if (toolBarVisible && toolBar)
         toolBar->setBounds (r.removeFromTop (toolBarSize));
-    if (statusBarVisible)
+    if (statusBarVisible && statusBar)
         statusBar->setBounds (r.removeFromBottom (statusBarSize));
+    if (virtualKeyboardVisible && keyboard)
+        keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
     
     Component* comps[3] = { nav.get(), bar1.get(), container.get() };
     layout.layOutComponents (comps, 3, r.getX(), r.getY(),
@@ -849,13 +891,39 @@ void ContentComponent::resizerMouseUp()
     layout.setItemLayout (2, 300, -1, 400);
     resized();
 }
-    
-void ContentComponent::setContentView (ContentView* view)
+
+void ContentComponent::setContentView (ContentView* view, const bool accessory)
 {
     jassert (view && container);
     ScopedPointer<ContentView> deleter (view);
-    container->setMainView (deleter.release());
+    (accessory) ? container->setAccessoryView (deleter.release())
+                : container->setMainView (deleter.release());
 }
+void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
+{
+    if (isVisible == virtualKeyboardVisible)
+        return;
+    
+    if (isVisible)
+    {
+        if (! keyboard) keyboard = new VirtualKeyboardView();
+        keyboard->willBecomeActive();
+        addAndMakeVisible (keyboard);
+        keyboard->didBecomeActive();
+    }
+    else
+    {
+        keyboard = nullptr;
+    }
+    
+    virtualKeyboardVisible = isVisible;
+    updateLayout();
+    resized();
 }
 
+void ContentComponent::toggleVirtualKeyboard()
+{
+    setVirtualKeyboardVisible (! virtualKeyboardVisible);
+}
 
+}
