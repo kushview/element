@@ -24,8 +24,9 @@
 #include "Globals.h"
 #include "Settings.h"
 
+#define EL_GENERAL_SETTINGS_NAME "General"
 #define EL_AUDIO_ENGINE_PREFERENCE_NAME "Audio Engine"
-#define EL_APPLICATION_PREFERENCE_NAME  "Application"
+#define EL_PLUGINS_PREFERENCE_NAME  "Plugins"
 
 //[/Headers]
 
@@ -102,11 +103,69 @@ namespace Element {
         String page;
     };
 
-    class AppPreferencesComponent : public Component,
-                                    public ButtonListener
+    class SettingsPage : public Component
     {
     public:
-        AppPreferencesComponent (Globals& w)
+    };
+    
+    class GeneralSettingsPage : public SettingsPage,
+                                public ButtonListener,
+                                public ValueListener
+    {
+    public:
+        enum ComboBoxIDs
+        {
+            ClockSourceInternal  = 1,
+            ClockSourceMidiClock = 2
+        };
+        
+        GeneralSettingsPage()
+        {
+            addAndMakeVisible (clockSourceLabel);
+            clockSourceLabel.setText ("Clock Source", dontSendNotification);
+            clockSourceLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (clockSourceBox);
+            clockSourceBox.addItem ("Internal / Session", ClockSourceInternal);
+            clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
+            clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
+            clockSource.setValue ((int) ClockSourceInternal);
+            clockSource.addListener (this);
+        }
+        
+        virtual ~GeneralSettingsPage()
+        {
+            clockSource.removeListener (this);
+        }
+        
+        void resized() override
+        {
+            const int spacingBetweenSections = 6;
+            Rectangle<int> r (getLocalBounds());
+            clockSourceLabel.setBounds (r.removeFromTop (22));
+            r.removeFromTop (spacingBetweenSections);
+            clockSourceBox.setBounds (r.removeFromTop (22));
+        }
+        
+        void buttonClicked (Button*) override { }
+        
+        void valueChanged (Value& value) override
+        {
+            if (! value.refersToSameSourceAs (clockSource))
+                return;
+            DBG("Clock source changed");
+        }
+        
+    private:
+        Label clockSourceLabel;
+        ComboBox clockSourceBox;
+        Value clockSource;
+    };
+    
+    class PluginsPreferencesComponent : public Component,
+                                        public ButtonListener
+    {
+    public:
+        PluginsPreferencesComponent (Globals& w)
             : plugins (w.getPluginManager()),
               settings (w.getSettings())
         {
@@ -250,10 +309,9 @@ PreferencesComponent::PreferencesComponent (Globals& g)
 
 
     //[Constructor] You can add your own custom stuff here..
-    // addPage (EL_APPLICATION_PREFERENCE_NAME);
+    addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_ENGINE_PREFERENCE_NAME);
-    
-    setPage (EL_AUDIO_ENGINE_PREFERENCE_NAME);
+    setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
 
@@ -301,12 +359,16 @@ void PreferencesComponent::addPage (const String& name) {
     pageList->addItem (name, name);
 }
 
-Component* PreferencesComponent::createPageForName (const String& name) {
-    if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
+Component* PreferencesComponent::createPageForName (const String& name)
+{
+    if (name == EL_GENERAL_SETTINGS_NAME) {
+        return new GeneralSettingsPage();
+    } else if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
         return new AudioSettingsComponent (world.getDeviceManager());
-    } else if (name == EL_APPLICATION_PREFERENCE_NAME) {
-        return new AppPreferencesComponent (world);
+    } else if (name == EL_PLUGINS_PREFERENCE_NAME) {
+        return new PluginsPreferencesComponent (world);
     }
+
     return nullptr;
 }
 

@@ -70,6 +70,7 @@ public:
     {
         tempoValue.addListener (this);
         currentGraph.set (-1);
+        processMidiClock.set (0);
     }
 
     ~Private()
@@ -93,6 +94,7 @@ public:
     {
         MidiBuffer::Iterator iter (buf);
         MidiMessage msg; int frame = 0;
+        
         while (iter.getNextEvent (msg, frame))
         {
             if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
@@ -196,6 +198,9 @@ public:
         numInputChans   = numChansIn;
         numOutputChans  = numChansOut;
         
+        midiClock.reset (Time::getMillisecondCounterHiRes() * 0.001, (double)blockSize / sampleRate, 1.0);
+        midiClock.setParams ((double)blockSize / sampleRate, 1.0);
+        
         messageCollector.reset (sampleRate);
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
@@ -225,6 +230,13 @@ public:
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         messageCollector.addMessageToQueue (message);
+        
+        if (message.isMidiClock() && processMidiClock.get() > 0)
+        {
+            midiClock.update (message.getTimeStamp());
+            const double bpm = 60.0 / (midiClock.timeDiff() * 24.0);
+            transport.requestTempo (bpm);
+        }
     }
 
     void addGraph (RootGraph* graph)
@@ -306,6 +318,9 @@ private:
     MidiBuffer incomingMidi;
     MidiMessageCollector messageCollector;
     MidiKeyboardState keyboardState;
+    
+    Atomic<int> processMidiClock;
+    DelayLockedLoop midiClock;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
