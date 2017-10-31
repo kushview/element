@@ -229,6 +229,8 @@
         <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
               file="Source/session/DeviceManager.cpp"/>
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="Source/session/DeviceManager.h"/>
+        <FILE id="KmL6Qv" name="GoogleAnalyticsDestination.h" compile="0" resource="0"
+              file="Source/session/GoogleAnalyticsDestination.h"/>
         <FILE id="L3dN2b" name="Graph.cpp" compile="1" resource="0" file="Source/session/Graph.cpp"/>
         <FILE id="vWMbjH" name="Graph.h" compile="0" resource="0" file="Source/session/Graph.h"/>
         <FILE id="EePoMm" name="MediaManager.cpp" compile="1" resource="0"
@@ -346,6 +348,7 @@
         <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
         <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
         <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
@@ -394,6 +397,7 @@
         <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
         <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
         <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
     <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
@@ -425,10 +429,12 @@
         <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
+    <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>

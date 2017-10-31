@@ -11,6 +11,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
+#include "session/GoogleAnalyticsDestination.h"
 #include "Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
@@ -35,6 +36,8 @@ public:
 
     void launchApplication()
     {
+        setupAnalytics();
+        
         Settings& settings (world.getSettings());
         isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
         DeviceManager& devices (world.getDeviceManager());
@@ -145,6 +148,19 @@ private:
             sendActionMessage ("finishedLaunching");
         }
     }
+    
+    void setupAnalytics()
+    {
+        // Add an analytics identifier for the user. Make sure you don't collect
+        // identifiable information accidentally if you haven't asked for permission!
+        Analytics::getInstance()->setUserId ("annonymous");
+        
+        StringPairArray userData;
+        userData.set ("group", "beta");
+        Analytics::getInstance()->setUserProperties (userData);
+        Analytics::getInstance()->addDestination (new GoogleAnalyticsDestination());
+        Analytics::getInstance()->logEvent ("startup", {});
+    }
 };
 
 class Application : public JUCEApplication,
@@ -185,6 +201,8 @@ public:
     {
         if (! world || ! controller)
             return;
+        
+        Analytics::getInstance()->logEvent ("startup", {});
         
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
