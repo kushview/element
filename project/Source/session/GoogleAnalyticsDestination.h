@@ -51,12 +51,12 @@ public:
             
             if (event.name == "startup")
             {
-                data.set ("ec",  "info");
+                data.set ("ec",  "lifecycle");
                 data.set ("ea",  "appStarted");
             }
             else if (event.name == "shutdown")
             {
-                data.set ("ec",  "info");
+                data.set ("ec",  "lifecycle");
                 data.set ("ea",  "appStopped");
             }
             else if (event.name == "button_press")

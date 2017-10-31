@@ -202,7 +202,7 @@ public:
         if (! world || ! controller)
             return;
         
-        Analytics::getInstance()->logEvent ("startup", {});
+        Analytics::getInstance()->logEvent ("shutdown", {});
         
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
