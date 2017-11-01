@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
+#include "session/UnlockStatus.h"
 #include "gui/GuiCommon.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -120,7 +121,8 @@ namespace Element {
         
         GeneralSettingsPage (Globals& world)
             : settings (world.getSettings()),
-              engine (world.getAudioEngine())
+              engine (world.getAudioEngine()),
+              status (world.getUnlockStatus())
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -130,10 +132,18 @@ namespace Element {
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
             
-            const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
-                ? ClockSourceInternal : ClockSourceMidiClock;
-            clockSource.setValue (source);
-            clockSource.addListener (this);
+            if (status.isFullVersion())
+            {
+                const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
+                    ? ClockSourceInternal : ClockSourceMidiClock;
+                clockSource.setValue (source);
+                clockSource.addListener (this);
+            }
+            else
+            {
+                clockSource.setValue ((int) ClockSourceInternal);
+                clockSourceBox.setEnabled (false);
+            }
         }
         
         virtual ~GeneralSettingsPage()
@@ -155,10 +165,12 @@ namespace Element {
             if (! value.refersToSameSourceAs (clockSource))
                 return;
             
+            if (! status.isFullVersion())
+                return;
+            
             const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
             settings.getUserSettings()->setValue ("clockSource", val);
             engine->applySettings (settings);
-            
         }
         
     private:
@@ -167,6 +179,7 @@ namespace Element {
         Value clockSource;
         Settings& settings;
         AudioEnginePtr engine;
+        UnlockStatus& status;
     };
     
     class PluginSettingsComponent : public Component,

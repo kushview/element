@@ -33,11 +33,25 @@ public:
     { }
 
     ~Startup() { }
+    
+    void updateSettingsIfNeeded()
+    {
+        UnlockStatus& status (world.getUnlockStatus());
+        Settings& settings (world.getSettings());
 
+        if (! status.isFullVersion())
+        {
+            auto* props = settings.getUserSettings();
+            props->setValue ("clockSource", "internal");
+            settings.saveIfNeeded();
+        }
+    }
+    
     void launchApplication()
     {
-        setupAnalytics();
-        
+        updateSettingsIfNeeded();
+        // setupAnalytics();
+
         Settings& settings (world.getSettings());
         isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
         DeviceManager& devices (world.getDeviceManager());
