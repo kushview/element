@@ -10,11 +10,13 @@
 #include "engine/GraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
+
 namespace Element {
 
 class Globals;
 class ClipFactory;
 class EngineControl;
+class Settings;
 class Transport;
 
 typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
@@ -55,6 +57,8 @@ public:
         components that send MIDI in a non-realtime critical situation. DO NOT call
         this from the audio thread */
     void addMidiMessage (const MidiMessage msg);
+    
+    void applySettings (Settings&);
     
     void setSession (SessionPtr);
     bool addGraph (RootGraph* graph);

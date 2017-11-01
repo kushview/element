@@ -9,6 +9,7 @@
 #include "engine/MidiClipSource.h"
 #include "engine/Transport.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -231,11 +232,20 @@ public:
     {
         messageCollector.addMessageToQueue (message);
         
+        static double timeOfLastUpdate = 0.0;
+        
         if (message.isMidiClock() && processMidiClock.get() > 0)
         {
             midiClock.update (message.getTimeStamp());
-            const double bpm = 60.0 / (midiClock.timeDiff() * 24.0);
-            transport.requestTempo (bpm);
+            
+            if (message.getTimeStamp() - timeOfLastUpdate >= 1.0)
+            {
+                const double bpm = 60.0 / (midiClock.timeDiff() * 24.0);
+                transport.requestTempo (bpm);
+                timeOfLastUpdate = message.getTimeStamp();
+                lastKnownTimeDiff = midiClock.timeDiff();
+                DBG("clock bpm: " << bpm << " @ " << message.getTimeStamp());
+            }
         }
     }
 
@@ -298,6 +308,18 @@ public:
         }
     }
     
+    void resetMidiClock()
+    {
+        // This helps compensate spikes in tempo change from not precisely knowing
+        // the first time stamp. TODO: improve midi clock.
+        auto timestamp = Time::getMillisecondCounterHiRes() * 0.001;
+        if (lastKnownTimeDiff >= 0.0)
+            timestamp -= lastKnownTimeDiff;
+        lastKnownTimeDiff = 0.0;
+        ScopedLock sl (lock);
+        midiClock.reset (timestamp, (double)blockSize / sampleRate, 1.0);
+    }
+    
 private:
     friend class AudioEngine;
     AudioEngine&    engine;
@@ -321,6 +343,7 @@ private:
     
     Atomic<int> processMidiClock;
     DelayLockedLoop midiClock;
+    double lastKnownTimeDiff = 0.0;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -377,6 +400,14 @@ bool AudioEngine::addGraph (RootGraph* graph)
     jassert (priv && graph);
     priv->addGraph (graph);
     return true;
+}
+
+void AudioEngine::applySettings (Settings& settings)
+{
+    const bool useMidiClock = settings.getUserSettings()->getValue("clockSource") == "midiClock";
+    if (useMidiClock)
+        priv->resetMidiClock();
+    priv->processMidiClock.set (useMidiClock ? 1 : 0);
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

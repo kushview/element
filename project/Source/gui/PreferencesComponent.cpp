@@ -119,7 +119,9 @@ namespace Element {
             ClockSourceMidiClock = 2
         };
         
-        GeneralSettingsPage()
+        GeneralSettingsPage (Globals& world)
+            : settings (world.getSettings()),
+              engine (world.getAudioEngine())
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -128,7 +130,10 @@ namespace Element {
             clockSourceBox.addItem ("Internal / Session", ClockSourceInternal);
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
-            clockSource.setValue ((int) ClockSourceInternal);
+            
+            const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
+                ? ClockSourceInternal : ClockSourceMidiClock;
+            clockSource.setValue (source);
             clockSource.addListener (this);
         }
         
@@ -152,20 +157,25 @@ namespace Element {
         {
             if (! value.refersToSameSourceAs (clockSource))
                 return;
-            DBG("Clock source changed");
+            
+            const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
+            settings.getUserSettings()->setValue ("clockSource", val);
+            engine->applySettings (settings);
         }
         
     private:
         Label clockSourceLabel;
         ComboBox clockSourceBox;
         Value clockSource;
+        Settings& settings;
+        AudioEnginePtr engine;
     };
     
-    class PluginsPreferencesComponent : public Component,
+    class PluginSettingsComponent : public Component,
                                         public ButtonListener
     {
     public:
-        PluginsPreferencesComponent (Globals& w)
+        PluginSettingsComponent (Globals& w)
             : plugins (w.getPluginManager()),
               settings (w.getSettings())
         {
@@ -355,18 +365,20 @@ void PreferencesComponent::resized()
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void PreferencesComponent::addPage (const String& name) {
-    pageList->addItem (name, name);
+void PreferencesComponent::addPage (const String& name)
+{
+    if (! pageList->pageNames.contains (name))
+        pageList->addItem (name, name);
 }
 
 Component* PreferencesComponent::createPageForName (const String& name)
 {
     if (name == EL_GENERAL_SETTINGS_NAME) {
-        return new GeneralSettingsPage();
+        return new GeneralSettingsPage (world);
     } else if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
         return new AudioSettingsComponent (world.getDeviceManager());
     } else if (name == EL_PLUGINS_PREFERENCE_NAME) {
-        return new PluginsPreferencesComponent (world);
+        return new PluginSettingsComponent (world);
     }
 
     return nullptr;
@@ -378,9 +390,12 @@ void PreferencesComponent::setPage (const String& name)
         return;
 
     if (pageComponent)
+    {
         removeChildComponent (pageComponent);
+    }
 
     pageComponent = createPageForName (name);
+    
     if (pageComponent)
     {
         pageComponent->setName (name);

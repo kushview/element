@@ -110,6 +110,7 @@ private:
         Settings& settings (world.getSettings());
         PluginManager& plugins (world.getPluginManager());
         AudioEnginePtr engine = new AudioEngine (world);
+        engine->applySettings (settings);
         world.setEngine (engine); // this will also instantiate the session
         SessionPtr session = world.getSession();
         
