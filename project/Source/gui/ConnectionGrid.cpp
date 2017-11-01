@@ -39,7 +39,6 @@ namespace Element
             graphModel.removeListener (this);
         }
         
-        
         const Node getNode (const int index, const bool isSource) const
         {
             return nodes [isSource ? audioOutIndexes [index]

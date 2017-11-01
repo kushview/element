@@ -236,13 +236,22 @@ public:
     {
         messageCollector.addMessageToQueue (message);
         
+        static const int numTicksForSync = 48;
         static double timeOfLastUpdate = 0.0;
         
         if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
         {
-            midiClock.update (message.getTimeStamp());
+            if (midiClockTicks <= 0)
+            {
+                midiClock.reset (message.getTimeStamp(), (double)blockSize / sampleRate, 1.0);
+                midiClock.setParams ((double)blockSize / sampleRate, 1.0);
+            }
+            else
+            {
+                midiClock.update (message.getTimeStamp());
+            }
             
-            if (message.getTimeStamp() - timeOfLastUpdate >= 1.0)
+            if (midiClockTicks >= numTicksForSync && message.getTimeStamp() - timeOfLastUpdate >= 1.0)
             {
                 const double bpm = 60.0 / (midiClock.timeDiff() * 24.0);
                 transport.requestTempo (bpm);
@@ -251,6 +260,8 @@ public:
                 
                 DBG("[EL] clock bpm: " << bpm << " @ " << message.getTimeStamp());
             }
+            
+            ++midiClockTicks;
         }
     }
 
@@ -332,21 +343,26 @@ public:
         }
         else if (externalClockValue.refersToSameSourceAs (value))
         {
-            sessionWantsExternalClock.set ((bool)value.getValue() ? 1 : 0);
+            const bool wantsClock = (bool)value.getValue();
+            if (wantsClock) resetMidiClock();
+            sessionWantsExternalClock.set (wantsClock ? 1 : 0);
             DBG("[EL] sessionWantsExternalClock = " << sessionWantsExternalClock.get());
         }
     }
     
-    void resetMidiClock()
+    void resetMidiClock ()
     {
         // This helps compensate spikes in tempo change from not precisely knowing
         // the first time stamp. TODO: improve midi clock.
         auto timestamp = Time::getMillisecondCounterHiRes() * 0.001;
+
+        ScopedLock sl (lock);
         if (lastKnownTimeDiff >= 0.0)
             timestamp -= lastKnownTimeDiff;
         lastKnownTimeDiff = 0.0;
-        ScopedLock sl (lock);
+        midiClockTicks = 0;
         midiClock.reset (timestamp, (double)blockSize / sampleRate, 1.0);
+        midiClock.setParams ((double)blockSize / sampleRate, 1.0);
     }
     
 private:
@@ -376,6 +392,7 @@ private:
     Atomic<int> processMidiClock;
     DelayLockedLoop midiClock;
     double lastKnownTimeDiff = 0.0;
+    int midiClockTicks = 0;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
