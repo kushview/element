@@ -56,8 +56,10 @@ void SessionController::openFile (const File& file)
         if (result.wasOk())
         {
             currentSession->freezeChangeNotification = true;
-            if (auto* ec = findSibling<EngineController>()) {
+            if (auto* ec = findSibling<EngineController>())
+            {
                 ec->setRootNode (currentSession->getCurrentGraph());
+                getWorld().getAudioEngine()->refreshSession();
             }
             currentSession->freezeChangeNotification = false;
         }

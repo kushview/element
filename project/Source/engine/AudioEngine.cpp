@@ -70,13 +70,17 @@ public:
           tempBuffer (1, 1)
     {
         tempoValue.addListener (this);
+        externalClockValue.addListener (this);
         currentGraph.set (-1);
         processMidiClock.set (0);
+        sessionWantsExternalClock.set (0);
     }
 
     ~Private()
     {
         tempoValue.removeListener (this);
+        externalClockValue.removeListener (this);
+        
         if (isPrepared)
         {
             jassertfalse;
@@ -234,7 +238,7 @@ public:
         
         static double timeOfLastUpdate = 0.0;
         
-        if (message.isMidiClock() && processMidiClock.get() > 0)
+        if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
         {
             midiClock.update (message.getTimeStamp());
             
@@ -244,7 +248,8 @@ public:
                 transport.requestTempo (bpm);
                 timeOfLastUpdate = message.getTimeStamp();
                 lastKnownTimeDiff = midiClock.timeDiff();
-                DBG("clock bpm: " << bpm << " @ " << message.getTimeStamp());
+                
+                DBG("[EL] clock bpm: " << bpm << " @ " << message.getTimeStamp());
             }
         }
     }
@@ -271,9 +276,31 @@ public:
         deleteAndZero (graph);
     }
     
+    void connectSessionValues()
+    {
+        if (session)
+        {
+            tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
+            externalClockValue.referTo (session->getPropertyAsValue ("externalSync"));
+        }
+        else
+        {
+            tempoValue = tempoValue.getValue();
+            externalClockValue = externalClockValue.getValue();
+        }
+    }
+    
     void setSession (SessionPtr s)
     {
+        auto oldSession = session;
         session = s;
+        connectSessionValues();
+        
+        // If it's the same object, then don't replace graphs
+        // FIXME: need better management of root graphs
+        if (oldSession == session)
+            return;
+        
         OwnedArray<RootGraph> newGraphs;
         
         if (session)
@@ -285,15 +312,11 @@ public:
                 if (isPrepared)
                     prepareGraph (graph, sampleRate, blockSize);
             }
-            
-            tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
         }
         else
         {
-            tempoValue = tempoValue.getValue(); // drop reference?
+            //noop
         }
-        
-        valueChanged (tempoValue);
         
         ScopedLock sl (lock);
         graphs.swapWith (newGraphs);
@@ -304,7 +327,13 @@ public:
         if (tempoValue.refersToSameSourceAs (value))
         {
             const float tempo = (float) tempoValue.getValue();
-            transport.requestTempo (tempo);
+            if (sessionWantsExternalClock.get() <= 0)
+                transport.requestTempo (tempo);
+        }
+        else if (externalClockValue.refersToSameSourceAs (value))
+        {
+            sessionWantsExternalClock.set ((bool)value.getValue() ? 1 : 0);
+            DBG("[EL] sessionWantsExternalClock = " << sessionWantsExternalClock.get());
         }
     }
     
@@ -326,6 +355,7 @@ private:
     Transport       transport;
     OwnedArray<RootGraph> graphs;
     SessionPtr session;
+    
     Value tempoValue;
     Atomic<float> nextTempo;
     
@@ -341,6 +371,8 @@ private:
     MidiMessageCollector messageCollector;
     MidiKeyboardState keyboardState;
     
+    Value externalClockValue;
+    Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
     DelayLockedLoop midiClock;
     double lastKnownTimeDiff = 0.0;
@@ -442,10 +474,22 @@ void AudioEngine::setSession (SessionPtr session)
     if (priv)
         priv->setSession (session);
 }
+
+void AudioEngine::refreshSession()
+{
+    if (priv)
+        priv->connectSessionValues();
+}
+
+MidiKeyboardState& AudioEngine::getKeyboardState()
+{
+    jassert(priv);
+    return priv->keyboardState;
+}
     
-    MidiKeyboardState& AudioEngine::getKeyboardState()
-    {
-        jassert(priv);
-        return priv->keyboardState;
-    }
+Transport::MonitorPtr AudioEngine::getTransportMonitor() const
+{
+    return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
+}
+    
 }

@@ -194,6 +194,8 @@
               file="Source/gui/SessionTreePanel.cpp" xcodeResource="0"/>
         <FILE id="QhIgwr" name="SessionTreePanel.h" compile="0" resource="0"
               file="Source/gui/SessionTreePanel.h"/>
+        <FILE id="EO4hhC" name="TempoAndMeterBar.h" compile="0" resource="0"
+              file="Source/gui/TempoAndMeterBar.h"/>
         <FILE id="u0qA7E" name="Timeline.h" compile="0" resource="0" file="Source/gui/Timeline.h"/>
         <FILE id="qYfDuN" name="TransportBar.cpp" compile="1" resource="0"
               file="Source/gui/TransportBar.cpp"/>

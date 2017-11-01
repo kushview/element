@@ -8,6 +8,7 @@
 #include "ElementApp.h"
 #include "engine/Engine.h"
 #include "engine/GraphProcessor.h"
+#include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
 
@@ -17,7 +18,6 @@ class Globals;
 class ClipFactory;
 class EngineControl;
 class Settings;
-class Transport;
 
 typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
 
@@ -61,6 +61,8 @@ public:
     void applySettings (Settings&);
     
     void setSession (SessionPtr);
+    void refreshSession();
+    
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
     
@@ -68,7 +70,7 @@ public:
     RootGraph* getGraph (const int index);
     
     MidiKeyboardState& getKeyboardState();
-    
+    Transport::MonitorPtr getTransportMonitor() const;
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     

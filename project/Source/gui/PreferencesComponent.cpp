@@ -109,7 +109,6 @@ namespace Element {
     };
     
     class GeneralSettingsPage : public SettingsPage,
-                                public ButtonListener,
                                 public ValueListener
     {
     public:
@@ -151,8 +150,6 @@ namespace Element {
             clockSourceBox.setBounds (r.removeFromTop (22));
         }
         
-        void buttonClicked (Button*) override { }
-        
         void valueChanged (Value& value) override
         {
             if (! value.refersToSameSourceAs (clockSource))
@@ -161,6 +158,7 @@ namespace Element {
             const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
             settings.getUserSettings()->setValue ("clockSource", val);
             engine->applySettings (settings);
+            
         }
         
     private:

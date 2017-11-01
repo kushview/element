@@ -5,46 +5,43 @@
 
 #include "Transport.h"
 
-namespace Element {
+namespace Element
+{
 
+Transport::Transport()
+    : playState (false),
+      recordState (false)
+{
+    monitor = new Monitor();
+    monitor->tempo.set (getTempo());
+}
 
-    Transport::Transport()
-        : playState (false),
-          recordState (false)
-    {
-        Array<int> a;
-        playPos.reset (new Monitor (a, 0));
+Transport::~Transport() { }
+
+void Transport::preProcess (int nframes)
+{
+    if (recording != recordState.get()) {
+        
     }
 
-    Transport::~Transport() { }
-
-    void Transport::preProcess (int nframes)
-    {
-        if (recording != recordState.get()) {
-            recording = recordState.get();
-        }
-
-        if (playing != playState.get()) {
-            playing = playState.get();
-        }
-
-        if (playing) {
-            playPos->set (getPositionBeats());
-        }
+    if (playing != playState.get()) {
+        
     }
 
-    Shared<Monitor> Transport::monitor()
-    {
-        return playPos;
+    if (playing) {
+        
     }
+}
 
-    void Transport::postProcess (int nframes)
+void Transport::postProcess (int nframes)
+{
+    if (getTempo() != nextTempo.get())
     {
-        if (getTempo() != nextTempo.get())
-        {
-            DBG("[EL] tempo change in transport: " << getTempo() << " -> " << nextTempo.get());
-            setTempo (nextTempo.get());
-            nextTempo.set (getTempo());
-        }
+        DBG("[EL] tempo change in transport: " << getTempo() << " -> " << nextTempo.get());
+        setTempo (nextTempo.get());
+        nextTempo.set (getTempo());
+        monitor->tempo.set (nextTempo.get());
     }
+}
+
 }

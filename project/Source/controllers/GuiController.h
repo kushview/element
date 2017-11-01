@@ -21,7 +21,8 @@ namespace Element {
     class SessionDocument;
     
     class GuiController : public AppController::Child,
-                          public ApplicationCommandTarget
+                          public ApplicationCommandTarget,
+                          public Timer
     {
     public:
         GuiController (Globals& w, AppController& a);
@@ -31,7 +32,7 @@ namespace Element {
         void deactivate() override;
         
         void run();
-        
+        void timerCallback() override;
         CommandManager& commander();
         
         AppController& getAppController() const { return controller; }

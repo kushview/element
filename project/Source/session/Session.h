@@ -37,8 +37,9 @@ namespace Element {
         inline Value getNameValue()     { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
 
-        XmlElement* createXml();
+        inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
         
+        XmlElement* createXml();
         void saveGraphState();
         
     protected:

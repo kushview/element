@@ -6,6 +6,8 @@
 #include "controllers/AppController.h"
 #include "engine/GraphProcessor.h"
 
+#include "gui/TempoAndMeterBar.h"
+
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
@@ -87,6 +89,8 @@ public:
         trim.setName ("Trim");
         trim.setSliderStyle (Slider::RotaryVerticalDrag);
         trim.setRange (-70, 9.0);
+        
+        addAndMakeVisible (tempoBar);
     }
     
     ~Toolbar() { }
@@ -94,35 +98,34 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
+        
         if (session)
         {
             title.getTextValue().referTo (session->getNameValue());
+            tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
+            tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
         }
+        
         resized();
     }
     
     void resized() override
     {
         Rectangle<int> r (getLocalBounds());
-        r.removeFromLeft (10);
-        viewBtn.setBounds (r.removeFromLeft (viewBtn.getHeight()).reduced (1 ,6));
+        
+        const int tempoBarWidth = jmax (120, tempoBar.getWidth());
+        tempoBar.setBounds (10, 8, tempoBarWidth, getHeight() - 16);
         
         r.removeFromRight (10);
         panicBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
         
-        if (trim.isVisible())
-        {
-            r.removeFromRight (10);
-            trim.setBounds (r.removeFromRight (getHeight()));
-        }
-        
-        r.removeFromRight (10);
-        title.setBounds (r);
+        r.removeFromRight (4);
+        viewBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
     }
     
     void paint (Graphics& g) override
     {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter(0.1));
+        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
         g.fillRect (getLocalBounds());
     }
     
@@ -144,6 +147,7 @@ private:
     Label title;
     Slider trim;
     Label dbLabel;
+    TempoAndMeterBar tempoBar;
 };
 
 class ContentComponent::StatusBar : public Component,

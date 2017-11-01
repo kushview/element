@@ -36,14 +36,22 @@ GuiController::~GuiController()
     LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
+void GuiController::timerCallback()
+{
+    
+}
+    
 void GuiController::activate()
 {
     LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     Controller::activate();
+    startTimer (1000);
 }
 
 void GuiController::deactivate()
 {
+    stopTimer();
+    
     auto* const props (getWorld().getSettings().getUserSettings());
     if (props && content)
     {

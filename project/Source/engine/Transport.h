@@ -12,6 +12,13 @@ namespace Element
     class Transport : public Shuttle
     {
     public:
+        class Monitor : public ReferenceCountedObject {
+        public:
+            Atomic<float> tempo;
+        };
+        
+        typedef ReferenceCountedObjectPtr<Monitor> MonitorPtr;
+        
         Transport();
         ~Transport();
 
@@ -22,11 +29,11 @@ namespace Element
         void preProcess (int nframes);
         void postProcess (int nframes);
 
-        Shared<Monitor> monitor();
+        inline MonitorPtr getMonitor() const { return monitor; }
 
     private:
         AtomicValue<bool> playState, recordState;
         AtomicValue<double> nextTempo;
-        Shared<Monitor> playPos;
+        MonitorPtr monitor;
     };
 }
