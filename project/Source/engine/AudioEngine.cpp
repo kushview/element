@@ -344,7 +344,15 @@ public:
         else if (externalClockValue.refersToSameSourceAs (value))
         {
             const bool wantsClock = (bool)value.getValue();
-            if (wantsClock) resetMidiClock();
+            if (wantsClock)
+            {
+                resetMidiClock();
+            }
+            else
+            {
+                transport.requestTempo ((float) tempoValue.getValue());
+            }
+            
             sessionWantsExternalClock.set (wantsClock ? 1 : 0);
             DBG("[EL] sessionWantsExternalClock = " << sessionWantsExternalClock.get());
         }
