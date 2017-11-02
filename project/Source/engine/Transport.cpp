@@ -37,7 +37,6 @@ void Transport::postProcess (int nframes)
 {
     if (getTempo() != nextTempo.get())
     {
-        DBG("[EL] tempo change in transport: " << getTempo() << " -> " << nextTempo.get());
         setTempo (nextTempo.get());
         nextTempo.set (getTempo());
         monitor->tempo.set (nextTempo.get());
