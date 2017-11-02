@@ -98,10 +98,15 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
+        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
+        auto& settings (ViewHelpers::getGlobals(this)->getSettings());
+        auto* props = settings.getUserSettings();
+        const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
         
         if (session)
         {
             title.getTextValue().referTo (session->getNameValue());
+            tempoBar.setUseExtButton (showExt);
             tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
         }

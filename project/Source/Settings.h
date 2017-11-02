@@ -3,8 +3,7 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_SETTINGS_H
-#define EL_SETTINGS_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -24,5 +23,3 @@ private:
 };
 
 }
-
-#endif // EL_SETTINGS_H

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.1.2
+  Created with Projucer version: 5.2.0
 
   ------------------------------------------------------------------------------
 
@@ -108,7 +108,7 @@ namespace Element {
     {
     public:
     };
-    
+
     class GeneralSettingsPage : public SettingsPage,
                                 public ValueListener
     {
@@ -118,11 +118,12 @@ namespace Element {
             ClockSourceInternal  = 1,
             ClockSourceMidiClock = 2
         };
-        
-        GeneralSettingsPage (Globals& world)
+
+        GeneralSettingsPage (Globals& world, GuiController& g)
             : settings (world.getSettings()),
               engine (world.getAudioEngine()),
-              status (world.getUnlockStatus())
+              status (world.getUnlockStatus()),
+              gui (g)
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -131,7 +132,7 @@ namespace Element {
             clockSourceBox.addItem ("Internal / Session", ClockSourceInternal);
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
-            
+
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -145,12 +146,12 @@ namespace Element {
                 clockSourceBox.setEnabled (false);
             }
         }
-        
+
         virtual ~GeneralSettingsPage()
         {
             clockSource.removeListener (this);
         }
-        
+
         void resized() override
         {
             const int spacingBetweenSections = 6;
@@ -159,20 +160,21 @@ namespace Element {
             r.removeFromTop (spacingBetweenSections);
             clockSourceBox.setBounds (r.removeFromTop (22));
         }
-        
+
         void valueChanged (Value& value) override
         {
             if (! value.refersToSameSourceAs (clockSource))
                 return;
-            
+
             if (! status.isFullVersion())
                 return;
-            
+
             const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
             settings.getUserSettings()->setValue ("clockSource", val);
             engine->applySettings (settings);
+            gui.stabilizeContent();
         }
-        
+
     private:
         Label clockSourceLabel;
         ComboBox clockSourceBox;
@@ -180,8 +182,9 @@ namespace Element {
         Settings& settings;
         AudioEnginePtr engine;
         UnlockStatus& status;
+        GuiController& gui;
     };
-    
+
     class PluginSettingsComponent : public Component,
                                         public ButtonListener
     {
@@ -189,6 +192,7 @@ namespace Element {
         PluginSettingsComponent (Globals& w)
             : plugins (w.getPluginManager()),
               settings (w.getSettings())
+        
         {
             addAndMakeVisible (activeFormats);
             activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
@@ -210,7 +214,7 @@ namespace Element {
                 toggle->setColour (ToggleButton::tickColourId, Colours::black);
                 toggle->addListener (this);
             }
-            
+
             updateToggleStates();
         }
 
@@ -218,13 +222,13 @@ namespace Element {
         {
             const int spacingBetweenSections = 6;
             const int toggleInset = 4;
-            
+
             Rectangle<int> r (getLocalBounds());
             activeFormats.setBounds (r.removeFromTop (24));
             formatNotice.setBounds (r.removeFromTop (14));
-            
+
             r.removeFromTop (spacingBetweenSections);
-            
+
             for (auto* c : formatToggles)
             {
                 auto r2 = r.removeFromTop (18);
@@ -232,35 +236,35 @@ namespace Element {
                 r.removeFromTop (4);
             }
         }
-        
+
         void paint (Graphics&) override { }
-        
+
         void buttonClicked (Button*) override
         {
             writeSetting();
         }
-        
+
     private:
         PluginManager&  plugins;
         Settings&       settings;
-        
+
         Label activeFormats;
-        
+
         OwnedArray<ToggleButton> formatToggles;
         StringArray availableFormats;
-        
+
         Label formatNotice;
-        
+
         const String key = "enabledPluginFormats";
         bool hasChanged = false;
-        
+
         String nameForFormat (const String& name)
         {
             if (name == "AudioUnit")
                 return "Audio Unit";
             return name;
         }
-        
+
         void updateToggleStates()
         {
             auto& formats = plugins.formats();
@@ -274,7 +278,7 @@ namespace Element {
                 }
             }
         }
-        
+
         void writeSetting()
         {
             StringArray toks;
@@ -283,12 +287,12 @@ namespace Element {
                 if (c->getToggleState())
                     toks.add (c->getName());
             }
-            
+
             const auto value = toks.joinIntoString(",");
             settings.getUserSettings()->setValue (key, value);
         }
     };
-    
+
     typedef AudioDeviceSelectorComponent DevicesComponent;
     class AudioSettingsComponent : public DevicesComponent
     {
@@ -304,8 +308,8 @@ namespace Element {
 //[/MiscUserDefs]
 
 //==============================================================================
-PreferencesComponent::PreferencesComponent (Globals& g)
-    : world (g)
+PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
+    : world (g), gui(_gui)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -385,7 +389,7 @@ void PreferencesComponent::addPage (const String& name)
 Component* PreferencesComponent::createPageForName (const String& name)
 {
     if (name == EL_GENERAL_SETTINGS_NAME) {
-        return new GeneralSettingsPage (world);
+        return new GeneralSettingsPage (world, gui);
     } else if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
         return new AudioSettingsComponent (world.getDeviceManager());
     } else if (name == EL_PLUGINS_PREFERENCE_NAME) {
@@ -406,7 +410,7 @@ void PreferencesComponent::setPage (const String& name)
     }
 
     pageComponent = createPageForName (name);
-    
+
     if (pageComponent)
     {
         pageComponent->setName (name);
@@ -434,8 +438,8 @@ void PreferencesComponent::setPage (const String& name)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PreferencesComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Globals&amp; g"
-                 variableInitialisers="world (g)" snapPixels="4" snapActive="1"
+                 parentClasses="public Component" constructorParams="Globals&amp; g, GuiController&amp; _gui"
+                 variableInitialisers="world (g), gui(_gui)" snapPixels="4" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="1" initialWidth="600"
                  initialHeight="500">
   <BACKGROUND backgroundColour="3b3b3b"/>

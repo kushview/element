@@ -33,9 +33,14 @@ public:
     void resized() override
     {
         auto r (getLocalBounds());
-        int w = Font(18).getStringWidth ("EXT");
-        extButton.setBounds (r.removeFromLeft (w + 10));
-        r.removeFromLeft (2);
+        
+        if (extButton.isVisible())
+        {
+            int w = Font(18).getStringWidth ("EXT");
+            extButton.setBounds (r.removeFromLeft (w + 10));
+            r.removeFromLeft (2);
+        }
+        
         tempoLabel.setBounds (r.removeFromLeft (60));
     }
     
@@ -46,7 +51,7 @@ public:
     {
         stabilize();
         
-        if (v.refersToSameSourceAs (extButton.getToggleStateValue()))
+        if (extButton.isVisible() && v.refersToSameSourceAs (extButton.getToggleStateValue()))
         {
             if (extButton.getToggleState())
                 startTimer (1000.0);
@@ -55,6 +60,15 @@ public:
         }
         
         repaint();
+    }
+    
+    void setUseExtButton (const bool useIt) {
+        if (useIt == extButton.isVisible())
+            return;
+        
+        extButton.setVisible (useIt);
+        stabilize();
+        resized();
     }
     
     void timerCallback() override
@@ -81,7 +95,7 @@ private:
     
     void stabilize()
     {
-        if (extButton.getToggleState())
+        if (extButton.isVisible() && extButton.getToggleState())
         {
             tempoLabel.setEnabled (false);
         }

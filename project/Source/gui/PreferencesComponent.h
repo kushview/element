@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.1.2
+  Created with Projucer version: 5.2.0
 
   ------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@
 #include "ElementApp.h"
 
 namespace Element {
-
+    class GuiController;
 //[/Headers]
 
 
@@ -40,7 +40,7 @@ class PreferencesComponent  : public Component
 {
 public:
     //==============================================================================
-    PreferencesComponent (Globals& g);
+    PreferencesComponent (Globals& g, GuiController& _gui);
     ~PreferencesComponent();
 
     //==============================================================================
@@ -59,6 +59,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     class PageList;
     Globals& world;
+    GuiController& gui;
     OwnedArray<Component> pages;
     //[/UserVariables]
 
