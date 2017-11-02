@@ -354,7 +354,6 @@ public:
             }
             
             sessionWantsExternalClock.set (wantsClock ? 1 : 0);
-            DBG("[EL] sessionWantsExternalClock = " << sessionWantsExternalClock.get());
         }
     }
     
