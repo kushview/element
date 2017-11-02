@@ -7,6 +7,7 @@
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
+#include "engine/MidiClock.h"
 #include "engine/Transport.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -61,7 +62,8 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
 
 class AudioEngine::Private : public AudioIODeviceCallback,
                              public MidiInputCallback,
-                             public ValueListener
+                             public ValueListener,
+                             public MidiClock::Listener
 {
 public:
     Private (AudioEngine& e)
@@ -74,10 +76,12 @@ public:
         currentGraph.set (-1);
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
+        midiClock.addListener (this);
     }
 
     ~Private()
     {
+        midiClock.removeListener (this);
         tempoValue.removeListener (this);
         externalClockValue.removeListener (this);
         
@@ -203,8 +207,7 @@ public:
         numInputChans   = numChansIn;
         numOutputChans  = numChansOut;
         
-        midiClock.reset (Time::getMillisecondCounterHiRes() * 0.001, (double)blockSize / sampleRate, 1.0);
-        midiClock.setParams ((double)blockSize / sampleRate, 1.0);
+        midiClock.reset (sampleRate, blockSize);
         
         messageCollector.reset (sampleRate);
         keyboardState.addListener (&messageCollector);
@@ -235,34 +238,8 @@ public:
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
         messageCollector.addMessageToQueue (message);
-        
-        static const int numTicksForSync = 48;
-        static double timeOfLastUpdate = 0.0;
-        
         if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
-        {
-            if (midiClockTicks <= 0)
-            {
-                midiClock.reset (message.getTimeStamp(), (double)blockSize / sampleRate, 1.0);
-                midiClock.setParams ((double)blockSize / sampleRate, 1.0);
-            }
-            else
-            {
-                midiClock.update (message.getTimeStamp());
-            }
-            
-            if (midiClockTicks >= numTicksForSync && message.getTimeStamp() - timeOfLastUpdate >= 1.0)
-            {
-                const double bpm = 60.0 / (midiClock.timeDiff() * 24.0);
-                transport.requestTempo (bpm);
-                timeOfLastUpdate = message.getTimeStamp();
-                lastKnownTimeDiff = midiClock.timeDiff();
-                
-                DBG("[EL] clock bpm: " << bpm << " @ " << message.getTimeStamp());
-            }
-            
-            ++midiClockTicks;
-        }
+            midiClock.process (message);
     }
 
     void addGraph (RootGraph* graph)
@@ -359,18 +336,17 @@ public:
     
     void resetMidiClock ()
     {
-        // This helps compensate spikes in tempo change from not precisely knowing
-        // the first time stamp. TODO: improve midi clock.
-        auto timestamp = Time::getMillisecondCounterHiRes() * 0.001;
-
-        ScopedLock sl (lock);
-        if (lastKnownTimeDiff >= 0.0)
-            timestamp -= lastKnownTimeDiff;
-        lastKnownTimeDiff = 0.0;
-        midiClockTicks = 0;
-        midiClock.reset (timestamp, (double)blockSize / sampleRate, 1.0);
-        midiClock.setParams ((double)blockSize / sampleRate, 1.0);
+        midiClock.reset (sampleRate, blockSize);
     }
+    
+    void midiClockTempoChanged (const float bpm) override
+    {
+        if (sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0)
+            transport.requestTempo (bpm);
+    }
+    
+    void midiClockSignalAcquired()  override { }
+    void midiClockSignalDropped()   override { }
     
 private:
     friend class AudioEngine;
@@ -397,9 +373,7 @@ private:
     Value externalClockValue;
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
-    DelayLockedLoop midiClock;
-    double lastKnownTimeDiff = 0.0;
-    int midiClockTicks = 0;
+    MidiClock midiClock;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {

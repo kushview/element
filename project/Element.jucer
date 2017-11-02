@@ -67,6 +67,8 @@
               file="Source/engine/MidiClipSource.cpp"/>
         <FILE id="MVLD5m" name="MidiClipSource.h" compile="0" resource="0"
               file="Source/engine/MidiClipSource.h"/>
+        <FILE id="eRJxFL" name="MidiClock.cpp" compile="1" resource="0" file="Source/engine/MidiClock.cpp"/>
+        <FILE id="UspN3i" name="MidiClock.h" compile="0" resource="0" file="Source/engine/MidiClock.h"/>
         <FILE id="r5MLNe" name="MidiDataBase.cpp" compile="0" resource="0"
               file="Source/engine/MidiDataBase.cpp"/>
         <FILE id="ww06U1" name="MidiDataBase.h" compile="0" resource="0" file="Source/engine/MidiDataBase.h"/>
