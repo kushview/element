@@ -192,7 +192,7 @@ namespace Element {
         PluginSettingsComponent (Globals& w)
             : plugins (w.getPluginManager()),
               settings (w.getSettings())
-        
+
         {
             addAndMakeVisible (activeFormats);
             activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
