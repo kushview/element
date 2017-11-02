@@ -62,7 +62,8 @@ public:
         repaint();
     }
     
-    void setUseExtButton (const bool useIt) {
+    void setUseExtButton (const bool useIt)
+    {
         if (useIt == extButton.isVisible())
             return;
         

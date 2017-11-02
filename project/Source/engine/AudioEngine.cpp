@@ -338,7 +338,7 @@ public:
         if (tempoValue.refersToSameSourceAs (value))
         {
             const float tempo = (float) tempoValue.getValue();
-            if (sessionWantsExternalClock.get() <= 0)
+            if (sessionWantsExternalClock.get() <= 0 || processMidiClock.get() <= 0)
                 transport.requestTempo (tempo);
         }
         else if (externalClockValue.refersToSameSourceAs (value))
