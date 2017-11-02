@@ -41,7 +41,7 @@ void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
 
 const String RootGraph::getName() const { return graphName; }
     
-const String RootGraph::getInputChannelName (int c) const { return audioInputNames [c]; }
+const String RootGraph::getInputChannelName (int c) const { return audioInputNames[c]; }
     
 const String RootGraph::getOutputChannelName (int c) const { return audioOutputNames[c]; }
 
