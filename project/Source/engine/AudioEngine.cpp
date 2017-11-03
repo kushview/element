@@ -14,11 +14,8 @@
 
 namespace Element {
 
-RootGraph::RootGraph()
-{
+RootGraph::RootGraph() { }
 
-}
-    
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
     jassert (device);
@@ -121,6 +118,8 @@ public:
         messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
         
         int totalNumChans = 0;
+        
+        ScopedNoDenormals denormals;
         
         if (numInputChannels > numOutputChannels)
         {

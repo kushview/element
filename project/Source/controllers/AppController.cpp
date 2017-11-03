@@ -183,7 +183,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
 
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
-    Commands::getCommandInfo (commandID, result);
+    findChild<GuiController>()->getCommandInfo (commandID, result);
 }
 
 bool AppController::perform (const InvocationInfo& info)

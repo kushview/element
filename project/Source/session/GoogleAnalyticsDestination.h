@@ -6,6 +6,8 @@
 #define GA_KEY_3 "UA-658"
 #define GA_KEY_4 "86096-11"
 
+#define EL_OFFLINE_GA 0
+
 namespace Element {
 
 class GoogleAnalyticsDestination  : public ThreadedAnalyticsDestination
@@ -120,6 +122,7 @@ public:
 private:
     void saveUnloggedEvents (const std::deque<AnalyticsEvent>& eventsToSave) override
     {
+#if EL_OFFLINE_GA
         // Save unsent events to disk. Here we use XML as a serialisation format, but
         // you can use anything else as long as the restoreUnloggedEvents method can
         // restore events from disk. If you're saving very large numbers of events then
@@ -157,10 +160,12 @@ private:
         }
         
         xml->writeToFile (savedEventsFile, {});
+#endif
     }
     
     void restoreUnloggedEvents (std::deque<AnalyticsEvent>& restoredEventQueue) override
     {
+#if EL_OFFLINE_GA
         XmlDocument savedEvents (savedEventsFile);
         ScopedPointer<XmlElement> xml = savedEvents.getDocumentElement();
         
@@ -199,6 +204,7 @@ private:
         }
         
         savedEventsFile.deleteFile();
+#endif
     }
     
     const int initialPeriodMs = 1000;

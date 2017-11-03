@@ -12,6 +12,7 @@
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
 #include "gui/GraphEditorView.h"
+#include "gui/MainWindow.h"
 #include "gui/NavigationView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
@@ -863,6 +864,9 @@ void ContentComponent::stabilize()
         container->content1->stabilizeContent();
     if (container->content2)
         container->content2->stabilizeContent();
+    
+    if (auto* main = findParentComponentOfClass<MainWindow>())
+        main->refreshMenu();
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

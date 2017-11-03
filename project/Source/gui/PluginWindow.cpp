@@ -144,6 +144,7 @@ PluginWindow::PluginWindow (Component* const ui, const Node& n)
 PluginWindow::~PluginWindow()
 {
     activePluginWindows.removeFirstMatchingValue (this);
+    node.setProperty ("windowVisible", false);
     clearContentComponent();
 }
 
@@ -259,7 +260,6 @@ void PluginWindow::moved()
 
 void PluginWindow::closeButtonPressed()
 {
-    node.setProperty ("windowVisible", false);
     delete this;
 }
 

@@ -50,7 +50,7 @@ public:
     void launchApplication()
     {
         updateSettingsIfNeeded();
-        // setupAnalytics();
+        setupAnalytics();
 
         Settings& settings (world.getSettings());
         isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();

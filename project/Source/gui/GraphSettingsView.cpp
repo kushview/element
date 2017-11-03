@@ -36,6 +36,7 @@ namespace Element {
     
     GraphSettingsView::GraphSettingsView()
     {
+        setName ("GraphSettings");
         addAndMakeVisible (props = new GraphPropertyPanel());
     }
     

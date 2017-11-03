@@ -38,6 +38,7 @@ namespace Element {
     
     SessionContentView::SessionContentView()
     {
+        setName ("SessionSettings");
         addAndMakeVisible (props = new SessionPropertyPanel());
     }
     

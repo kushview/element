@@ -7,6 +7,7 @@
 
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
+#include "gui/PluginWindow.h"
 #include "session/Session.h"
 #include "session/CommandManager.h"
 #include "session/Node.h"
@@ -23,14 +24,14 @@ public:
     enum RootNames
     {
        #if JUCE_DEBUG
-        File, Edit, Window, DebugItem, Help, NumMenus
+        File, Edit, View, Window, DebugItem, Help, NumMenus
        #else
-        File, Edit, Window, Help, NumMenus
+        File, Edit, View, Window, Help, NumMenus
        #endif
     };
 
     MainMenu (MainWindow& parent, CommandManager& c)
-        : owner (parent), world (parent.getWorld()), cmd(c) { }
+        : owner (parent), world (parent.getWorld()), cmd (c) { }
 
     void setupMenu()
     {
@@ -60,10 +61,9 @@ public:
     StringArray getMenuBarNames() override
     {
        #if JUCE_DEBUG
-        const char* const names[] = { "File", "Edit", "Window",
-                                      "Debug", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "View", "Window", "Debug", "Help", nullptr };
        #else
-        const char* const names[] = { "File", "Edit", "Window", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "View", "Window", "Help", nullptr };
        #endif
         return StringArray (names, MainMenu::NumMenus);
     }
@@ -76,6 +76,8 @@ public:
             buildFileMenu (menu);
         else if (name == "Edit")
             buildEditMenu (menu);
+        else if (name == "View")
+            buildViewMenu (menu);
         else if (name == "Window")
             buildWindowMenu (menu);
         else if (name == "Help")
@@ -99,6 +101,10 @@ public:
         else if (index == 7000 && menu == Help)
         {
             URL ("https://kushview.net/feedback/").launchInDefaultBrowser();
+        }
+        else if (index == 2000 && menu == Window)
+        {
+            PluginWindow::closeAllCurrentlyOpenWindows();
         }
         
        #if JUCE_DEBUG
@@ -157,7 +163,7 @@ private:
         menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
     }
     
-    void buildWindowMenu (PopupMenu& menu)
+    void buildViewMenu (PopupMenu& menu)
     {
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
         menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
@@ -166,10 +172,15 @@ private:
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
         menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Show Session Properties");
-        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Show Graph Properties");
+        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
+        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+    }
+    
+    void buildWindowMenu (PopupMenu& menu)
+    {
+        menu.addItem (2000, "Close plugin windows...");
     }
     
     void buildDebugMenu (PopupMenu& menu)
