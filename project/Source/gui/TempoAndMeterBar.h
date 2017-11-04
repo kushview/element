@@ -54,9 +54,16 @@ public:
         if (extButton.isVisible() && v.refersToSameSourceAs (extButton.getToggleStateValue()))
         {
             if (extButton.getToggleState())
+            {
+                // smooth session to engine tempo
+                tempoLabel.engineTempo = (float) tempoLabel.tempoValue.getValue();
+                tempoLabel.repaint();
                 startTimer (1000.0);
+            }
             else
+            {
                 stopTimer();
+            }
         }
         
         repaint();
@@ -69,6 +76,12 @@ public:
         
         extButton.setVisible (useIt);
         stabilize();
+        if (useIt)
+        {
+            // smooth session to engine tempo
+            tempoLabel.engineTempo = (float) tempoLabel.tempoValue.getValue();
+            tempoLabel.repaint();
+        }
         resized();
     }
     

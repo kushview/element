@@ -3,9 +3,6 @@
 #define GA_KEY_1 "UA-658"
 #define GA_KEY_2 "86096-12"
 
-#define GA_KEY_3 "UA-658"
-#define GA_KEY_4 "86096-11"
-
 #define EL_OFFLINE_GA 0
 
 namespace Element {
