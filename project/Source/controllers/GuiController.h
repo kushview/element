@@ -78,6 +78,7 @@ namespace Element {
         void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform (const InvocationInfo& info) override;
 
+        ContentComponent* getContentComponent();
     private:
         AppController& controller;
         Globals& world;

@@ -114,7 +114,7 @@ public:
                                 const int numSamples) override
     {
         jassert (sampleRate > 0 && blockSize > 0);
-        messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
+        
         int totalNumChans = 0;
         ScopedNoDenormals denormals;
         
@@ -197,10 +197,13 @@ public:
     
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
     {
+        const int numSamples = buffer.getNumSamples();
+        messageCollector.removeNextBlockOfMessages (midi, numSamples);
+        
         const ScopedLock sl (lock);
         auto* const graph = getCurrentGraph();
         const bool shouldProcess = graph != nullptr;
-        const int numSamples = buffer.getNumSamples();
+        
         
         transport.preProcess (numSamples);
         

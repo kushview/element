@@ -12,6 +12,8 @@
  #include "JuceHeader.h"
 #endif
 
+using namespace kv;
+
 namespace Element {
 namespace Tags
 {

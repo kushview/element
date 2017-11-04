@@ -25,14 +25,21 @@ GuiController::GuiController (Globals& w, AppController& a)
 GuiController::~GuiController()
 {
     PropertiesFile* pf = globals().getSettings().getUserSettings();
-    pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
     
-    closeAllWindows();
-    mainWindow->setVisible (false);
-    mainWindow->removeFromDesktop();
+    if (mainWindow)
+    {
+        pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+        closeAllWindows();
+        mainWindow->setVisible (false);
+        mainWindow->removeFromDesktop();
+        mainWindow = nullptr;
+    }
     
-    mainWindow = nullptr;
-    windowManager = nullptr;
+    if (windowManager)
+    {
+        windowManager = nullptr;
+    }
+    
     LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 
@@ -119,13 +126,23 @@ void GuiController::runDialog (Component* c, const String& title)
 
 void GuiController::showSplash() { }
 
+ContentComponent* GuiController::getContentComponent()
+{
+    if (! content)
+    {
+        content = new ContentComponent (controller);
+        content->setSize (800, 600);
+    }
+    
+    return content.get();
+}
+
 void GuiController::run()
 {
     sessionDoc = new SessionDocument (session());
-    content = new ContentComponent (controller);
-    content->setSize (800, 600);
+    
     mainWindow = new MainWindow (world);
-    mainWindow->setContentNonOwned (content.get(), true);
+    mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     PropertiesFile* pf = globals().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
