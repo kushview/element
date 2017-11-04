@@ -255,7 +255,7 @@ public:
         // - 2 if the middle button was pressed ('no')
         
         const int res = !sc->hasSessionChanged() ? 2
-            : AlertWindow::showYesNoCancelBox (AlertWindow::WarningIcon,
+            : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon,
                                                "Save Session",
                                                "This session may have changes. Would you like to save before exiting?");
         
