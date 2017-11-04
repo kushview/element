@@ -290,14 +290,18 @@ public:
         if (ev.mods.isPopupMenu())
             return;
         const Node graph (getSelectedGraph());
+        
         if (auto* cc = ViewHelpers::findContentComponent (this))
         {
             auto session (cc->getSession());
-            auto graphs = graph.getValueTree().getParent();
-            graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
-            if (auto* ec = cc->getAppController().findChild<EngineController>())
-                ec->setRootNode (graph);
-            cc->stabilize();
+            if (row != session->getActiveGraphIndex())
+            {
+                auto graphs = graph.getValueTree().getParent();
+                graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
+                if (auto* ec = cc->getAppController().findChild<EngineController>())
+                    ec->setRootNode (graph);
+                cc->stabilize();
+            }
         }
     }
     
@@ -351,7 +355,9 @@ private:
             else
             {
                 if (! text.isBeingEdited())
+                {
                     owner.listBoxItemClicked (row, ev);
+                }
             }
         }
         
@@ -508,7 +514,7 @@ private:
     };
     
     class ElementsHeader : public Header,
-                            public ButtonListener
+                           public ButtonListener
     {
     public:
         ElementsHeader (NavigationConcertinaPanel& _parent, Component& _panel)
