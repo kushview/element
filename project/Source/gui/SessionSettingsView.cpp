@@ -29,10 +29,12 @@ namespace Element {
         SessionPtr session;
         static void getSessionProperties (PropertyArray& props, SessionPtr s)
         {
-            props.add (new TextPropertyComponent (s->getPropertyAsValue(Slugs::name),
+            props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::name),
                                                   "Name", 256, false));
-            props.add (new SliderPropertyComponent (s->getPropertyAsValue(Slugs::tempo),
+            props.add (new SliderPropertyComponent (s->getPropertyAsValue (Tags::tempo),
                                                     "Tempo", 20, 240, 1));
+            props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::notes),
+                                                  "Notes", 512, true));
         }
     };
     

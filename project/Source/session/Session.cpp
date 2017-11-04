@@ -103,8 +103,10 @@ namespace Element {
 
         if (! objectData.hasProperty (Tags::name))
             setProperty (Tags::name, "Untitled");
-        if (! objectData.hasProperty (Slugs::tempo))
+        if (! objectData.hasProperty (Tags::tempo))
             setProperty (Tags::tempo, (double) 120.0);
+        if (! objectData.hasProperty (Tags::notes))
+            setProperty (Tags::notes, String());
         
         if (resetExisting)
             objectData.removeAllChildren (nullptr);

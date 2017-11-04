@@ -26,6 +26,7 @@ namespace Tags
     const Identifier graphs             = "graphs";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
+    const Identifier notes              = "notes";
     const Identifier port               = "port";
     const Identifier ports              = "ports";
     
