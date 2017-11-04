@@ -32,21 +32,30 @@ int Version::asHexInteger (const String& versionString)
 }
 
 CurrentVersion::CurrentVersion()
-    : version (ProjectInfo::versionString),
+    : Thread("elVersionCheck"),
+      version (ProjectInfo::versionString),
       hasChecked (false) { }
 
-CurrentVersion::~CurrentVersion() { }
+CurrentVersion::~CurrentVersion()
+{
+    if (isThreadRunning())
+        stopThread (1000);
+}
 
 void CurrentVersion::checkAfterDelay (const int milliseconds, const bool showUpToDate)
 {
     auto* cv = new CurrentVersion();
+    cv->timeout = milliseconds;
     cv->hasChecked = false;
     cv->shouldShowUpToDateMessage = showUpToDate;
-    cv->startTimer (milliseconds);
+    cv->startThread();
 }
 
 bool CurrentVersion::isNewerVersionAvailable()
 {
+    if (hasChecked)
+        return result;
+    
    #if TEST_CURRENT_VERSION
     const URL url ("http://kushview.dev/?edd_action=get_version&item_id=15");
    #else
@@ -58,23 +67,28 @@ bool CurrentVersion::isNewerVersionAvailable()
     if (res.failed() || !data.isObject())
         return false;
     
-    DBG("Running: " << ProjectInfo::projectName << " v" << ProjectInfo::versionString);
-    DBG("Latest: " << data["name"].toString() << " v" << data["stable_version"].toString());
     permalink   = data["homepage"].toString();
     version     = data["stable_version"].toString();
     
     return Version::asHexInteger(version) > ProjectInfo::versionNumber;
 }
 
+void CurrentVersion::run()
+{
+    hasChecked = false;
+    result = isNewerVersionAvailable();
+    hasChecked = true;
+    startTimer (timeout);
+}
+
 void CurrentVersion::timerCallback()
 {
     stopTimer();
-    if (hasChecked)
-        return;
-    hasChecked = true;
-    if (isNewerVersionAvailable())
+    
+    if (result)
     {
-        if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, "New Version", "A new version is available", "Download"))
+        if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "New Version",
+                                          "A new version is available: " + version, "Download"))
         {
             URL(permalink).launchInDefaultBrowser();
         }

@@ -16,7 +16,9 @@ struct Version
     static int asHexInteger (const String& versionString);
 };
 
-class CurrentVersion : private Timer
+class CurrentVersion : private Timer,
+                       public DeletedAtShutdown,
+                       public Thread
 {
 public:
     CurrentVersion();
@@ -27,11 +29,15 @@ public:
     
     /** Returns true if a newer version is available for download */
     bool isNewerVersionAvailable();
-
+    
+    void run() override;
+    
 private:
     String permalink, version;
     bool hasChecked;
     bool shouldShowUpToDateMessage;
+    bool result = false;
+    int timeout = 0;
     
     friend class Timer;
     void timerCallback() override;

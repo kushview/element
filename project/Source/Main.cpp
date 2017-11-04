@@ -293,10 +293,10 @@ public:
         controller = startup->controller.release();
         startup = nullptr;
         controller->run();
-        const bool checkUpdatesOnStart = false;
+        const bool checkUpdatesOnStart = world->getSettings().checkForUpdates();
         if (checkUpdatesOnStart)
-            CurrentVersion::checkAfterDelay (5000);
-        
+            CurrentVersion::checkAfterDelay (12 * 1000, false);
+
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = world->cli.commandLine.unquoted().trim();
