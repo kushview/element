@@ -36,6 +36,34 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
+    
+    class SettingButton : public Button
+    {
+    public:
+        SettingButton (const String& name = String()) : Button (name) { }
+        ~SettingButton() { }
+        
+    protected:
+        
+        void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override
+        {
+            const bool isOn = getToggleState();
+            
+            g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+            String text = getButtonText();
+            if (text.isEmpty())
+            {
+                text = (getToggleState()) ? "yes" : "no";
+            }
+            
+            g.setFont (12.f);
+            g.setColour (Colours::black);
+            g.drawText (text, getLocalBounds(), Justification::centred);
+            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+            g.drawRect (0, 0, getWidth(), getHeight());
+        }
+    };
+    
     class PreferencesComponent::PageList :  public ListBox,
                                             public ListBoxModel
     {
@@ -133,6 +161,14 @@ namespace Element {
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
 
+            addAndMakeVisible (checkForUpdatesLabel);
+            checkForUpdatesLabel.setText ("Check for updates on startup", dontSendNotification);
+            checkForUpdatesLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible(checkForUpdates);
+            checkForUpdates.setClickingTogglesState (true);
+            checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
+            checkForUpdates.getToggleStateValue().addListener (this);
+            
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -155,23 +191,42 @@ namespace Element {
         void resized() override
         {
             const int spacingBetweenSections = 6;
+            const int settingHeight = 22;
+            const int toggleWidth = 40;
+            const int toggleHeight = 18;
+            
             Rectangle<int> r (getLocalBounds());
-            clockSourceLabel.setBounds (r.removeFromTop (22));
+            auto r2 = r.removeFromTop (settingHeight);
+            clockSourceLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+            clockSourceBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+            
             r.removeFromTop (spacingBetweenSections);
-            clockSourceBox.setBounds (r.removeFromTop (22));
+            r2 = r.removeFromTop (settingHeight);
+            checkForUpdatesLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+            checkForUpdates.setBounds (r2.removeFromLeft (toggleWidth)
+                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
         }
 
         void valueChanged (Value& value) override
         {
-            if (! value.refersToSameSourceAs (clockSource))
-                return;
+            if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
+            {
+                settings.getUserSettings()->setValue (
+                    Settings::checkForUpdatesKey, checkForUpdates.getToggleState());
+                jassert(settings.checkForUpdates() == checkForUpdates.getToggleState());
+            }
+            
+            // clock source
+            else if (value.refersToSameSourceAs (clockSource) && status.isFullVersion())
+            {
+                if (! status.isFullVersion())
+                    return;
 
-            if (! status.isFullVersion())
-                return;
-
-            const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
-            settings.getUserSettings()->setValue ("clockSource", val);
-            engine->applySettings (settings);
+                const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
+                settings.getUserSettings()->setValue ("clockSource", val);
+                engine->applySettings (settings);
+            }
+            
             gui.stabilizeContent();
         }
 
@@ -179,6 +234,10 @@ namespace Element {
         Label clockSourceLabel;
         ComboBox clockSourceBox;
         Value clockSource;
+        
+        Label checkForUpdatesLabel;
+        SettingButton checkForUpdates;
+        
         Settings& settings;
         AudioEnginePtr engine;
         UnlockStatus& status;

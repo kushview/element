@@ -6,6 +6,9 @@
 #include "Settings.h"
 
 namespace Element {
+
+const char* Settings::checkForUpdatesKey =      "checkForUpdates";
+    
 Settings::Settings()
 {
     PropertiesFile::Options opts;
@@ -30,6 +33,13 @@ Settings::Settings()
 
 Settings::~Settings() { }
 
+bool Settings::checkForUpdates() const
+{
+    if (auto* props = getProps())
+        return props->getBoolValue (checkForUpdatesKey);
+    return false;
+}
+    
 PropertiesFile* Settings::getProps() const {
     return (const_cast<Settings*> (this))->getUserSettings();
 }

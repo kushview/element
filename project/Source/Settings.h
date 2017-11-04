@@ -15,9 +15,12 @@ public:
     Settings();
     ~Settings();
     
+    static const char* checkForUpdatesKey;
+    
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
-
+    bool checkForUpdates() const;
+    
 private:
     PropertiesFile* getProps() const;
 };
