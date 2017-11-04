@@ -113,12 +113,9 @@ public:
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
     {
-        transport.preProcess (numSamples);
         jassert (sampleRate > 0 && blockSize > 0);
         messageCollector.removeNextBlockOfMessages (incomingMidi, numSamples);
-        
         int totalNumChans = 0;
-        
         ScopedNoDenormals denormals;
         
         if (numInputChannels > numOutputChannels)
@@ -159,7 +156,7 @@ public:
                 ++totalNumChans;
             }
         }
-        
+#if 0
         const ScopedLock sl (lock);
         auto* const graph = getCurrentGraph();
         const bool shouldProcess = graph != nullptr;
@@ -191,6 +188,46 @@ public:
             transport.advance (numSamples);
         transport.postProcess (numSamples);
         incomingMidi.clear();
+#else
+        AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
+        processCurrentGraph (buffer, incomingMidi);
+#endif
+        
+    }
+    
+    void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
+    {
+        const ScopedLock sl (lock);
+        auto* const graph = getCurrentGraph();
+        const bool shouldProcess = graph != nullptr;
+        const int numSamples = buffer.getNumSamples();
+        
+        transport.preProcess (numSamples);
+        
+        if (shouldProcess)
+        {
+            const ScopedLock sl2 (graph->getCallbackLock());
+            
+            if (graph->isSuspended())
+            {
+                graph->processBlockBypassed (buffer, midi);
+            }
+            else
+            {
+                graph->processBlock (buffer, midi);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < buffer.getNumChannels(); ++i)
+                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t)numSamples);
+        }
+        
+        if (transport.isPlaying())
+            transport.advance (numSamples);
+        transport.postProcess (numSamples);
+        
+        midi.clear();
     }
     
     void audioDeviceAboutToStart (AudioIODevice* const device) override
@@ -199,8 +236,14 @@ public:
         const int newBlockSize     = device->getCurrentBufferSizeSamples();
         const int numChansIn       = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
-        
+        audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
+    }
+    
+    void audioAboutToStart (const double newSampleRate, const int newBlockSize,
+                            const int numChansIn, const int numChansOut)
+    {
         const ScopedLock sl (lock);
+        
         sampleRate      = newSampleRate;
         blockSize       = newBlockSize;
         numInputChans   = numChansIn;
@@ -223,6 +266,11 @@ public:
     }
     
     void audioDeviceStopped() override
+    {
+        audioStopped();
+    }
+    
+    void audioStopped()
     {
         const ScopedLock sl (lock);
         keyboardState.removeListener (&messageCollector);
@@ -487,6 +535,27 @@ MidiKeyboardState& AudioEngine::getKeyboardState()
 Transport::MonitorPtr AudioEngine::getTransportMonitor() const
 {
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
+}
+    
+    
+    
+void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize,
+                                           const int numIns, const int numOuts)
+{
+    if (priv)
+        priv->audioAboutToStart (sampleRate, blockSize, numIns, numOuts);
+}
+
+void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi)
+{
+    if (priv)
+        priv->processCurrentGraph (buffer, midi);
+}
+
+void AudioEngine::releaseExternalResources()
+{
+    if (priv)
+        priv->audioStopped();
 }
     
 }

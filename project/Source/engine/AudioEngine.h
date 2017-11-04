@@ -74,6 +74,14 @@ public:
     AudioIODeviceCallback& getAudioIODeviceCallback() override;
     MidiInputCallback& getMidiInputCallback() override;
     
+    /** For use by external systems only! e.g. the AU/VST version of Element and
+        possibly things like rendering in the future
+     */
+    void prepareExternalPlayback (const double sampleRate, const int blockSize,
+                                  const int numIns, const int numOuts);
+    void processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi);
+    void releaseExternalResources();
+    
 private:
     class Private;
     ScopedPointer<Private> priv;
