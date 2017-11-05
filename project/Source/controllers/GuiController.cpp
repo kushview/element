@@ -131,7 +131,7 @@ ContentComponent* GuiController::getContentComponent()
     if (! content)
     {
         content = new ContentComponent (controller);
-        content->setSize (800, 600);
+        content->setSize (760, 480);
     }
     
     return content.get();
@@ -475,9 +475,8 @@ bool GuiController::perform (const InvocationInfo& info)
 
 void GuiController::stabilizeContent()
 {
-    if (this->content) {
-        content->stabilize();
-    }
+    if (auto* cc = getContentComponent())
+        cc->stabilize();
 }
     
 void GuiController::toggleAboutScreen()

@@ -726,7 +726,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     statusBarVisible = true;
     statusBarSize = 22;
     
-    setSize (600, 600);
+    setSize (760, 480);
     updateLayout();
     resized();
     

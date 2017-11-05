@@ -217,6 +217,7 @@ void GraphController::setNodeModel (const Node& node)
     graph   = node.getValueTree();
     arcs    = node.getArcsValueTree();
     nodes   = node.getNodesValueTree();
+    
     Array<ValueTree> failed;
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
@@ -246,18 +247,23 @@ void GraphController::setNodeModel (const Node& node)
     for (const auto& n : failed)
         nodes.removeChild (n, nullptr);
     
-    jassert (nodes.getNumChildren() == getNumFilters());
+    jassert (nodes.getNumChildren() == processor.getNumNodes());
     
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         const ValueTree arc (arcs.getChild (i));
-        processor.addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
+        bool worked = processor.addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
                                  (uint32)(int) arc.getProperty (Tags::sourcePort),
                                  (uint32)(int) arc.getProperty (Tags::destNode),
                                  (uint32)(int) arc.getProperty (Tags::destPort));
+        if (! worked)
+        {
+            DBG("failed connection");
+        }
     }
     
-    jassert (arcs.getNumChildren() == getNumConnections());
+    jassert (arcs.getNumChildren() == processor.getNumConnections());
+    DBG("wanted: " << arcs.getNumChildren() << " got: " << processor.getNumConnections());
     processorArcsChanged();
 }
 

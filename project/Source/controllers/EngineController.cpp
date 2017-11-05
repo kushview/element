@@ -268,6 +268,8 @@ void EngineController::setRootNode (const Node& newRootNode)
     {
         DBG("[EL] no graph controller for node: " << newRootNode.getName());
     }
+    
+    engine->refreshSession();
 }
 
 void EngineController::addMissingIONodes()
