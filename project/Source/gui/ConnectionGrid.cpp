@@ -221,7 +221,13 @@ namespace Element
             const Port port (getPort (rowNumber, isSource));
             
             String text = node.getName();
-            text << " - " << port.getName();
+            
+            {
+                String portName = port.getName();
+                if (portName.isEmpty())
+                    portName <<  port.getType().getName() << " " << (1 + port.getChannel());
+                text << " - " << portName;
+            }
             
             g.setColour (rowIsSelected ? LookAndFeel_KV1::widgetBackgroundColor.brighter()
                                        : LookAndFeel_KV1::widgetBackgroundColor);

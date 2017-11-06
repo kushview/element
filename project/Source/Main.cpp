@@ -238,6 +238,8 @@ public:
         world->setEngine (nullptr);
         world->unloadModules();
         world = nullptr;
+        
+        Analytics::getInstance()->deleteInstance();
     }
 
     void systemRequestedQuit() override

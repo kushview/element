@@ -27,10 +27,11 @@ public:
     static PluginWindow* getOrCreateWindowFor (GraphNode* node);
     static PluginWindow* getFirstWindow();
     
-    static void closeCurrentlyOpenWindowsFor (const Node& node);
-    static void closeCurrentlyOpenWindowsFor (GraphNode* const node);
-    static void closeCurrentlyOpenWindowsFor (const uint32 nodeId);
-    static void closeAllCurrentlyOpenWindows();
+    static void closeCurrentlyOpenWindowsFor (GraphProcessor&, const bool windowVisible = true);
+    static void closeCurrentlyOpenWindowsFor (const Node& node, const bool windowVisible = false);
+    static void closeCurrentlyOpenWindowsFor (GraphNode* const node, const bool windowVisible = false);
+    static void closeCurrentlyOpenWindowsFor (const uint32 nodeId, const bool windowVisible = false);
+    static void closeAllCurrentlyOpenWindows (const bool windowVisible = false);
 
     ~PluginWindow();
 
@@ -45,6 +46,8 @@ private:
     PluginWindow (Component* const uiComp, const Node& node);
     GraphNode* owner;
     Node node;
+    
+    static void deleteWindow (const int, const bool);
 };
 
 }

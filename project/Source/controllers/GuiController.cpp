@@ -137,6 +137,13 @@ ContentComponent* GuiController::getContentComponent()
     return content.get();
 }
 
+void GuiController::showPluginWindowsFor (const Node& node)
+{
+    for (int i = 0; i < node.getNumNodes(); ++i)
+        if ((bool) node.getNode(i).getProperty ("windowVisible", false))
+            ViewHelpers::presentPluginWindow (node.getNode (i));
+}
+
 void GuiController::run()
 {
     sessionDoc = new SessionDocument (session());

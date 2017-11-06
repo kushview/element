@@ -13,6 +13,7 @@
 #include "gui/ConnectionGrid.h"
 #include "gui/GraphEditorView.h"
 #include "gui/MainWindow.h"
+#include "gui/MainMenu.h"
 #include "gui/NavigationView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
@@ -69,7 +70,6 @@ class ContentComponent::Toolbar : public Component,
 public:
     Toolbar()
         : viewBtn ("e"),
-          panicBtn ("!"),
           title ("Session Title")
     {
         addAndMakeVisible (title);
@@ -90,6 +90,9 @@ public:
         trim.setName ("Trim");
         trim.setSliderStyle (Slider::RotaryVerticalDrag);
         trim.setRange (-70, 9.0);
+        
+        addAndMakeVisible (menuBtn);
+        menuBtn.addListener (this);
         
         addAndMakeVisible (tempoBar);
     }
@@ -120,13 +123,25 @@ public:
         Rectangle<int> r (getLocalBounds());
         
         const int tempoBarWidth = jmax (120, tempoBar.getWidth());
-        tempoBar.setBounds (10, 8, tempoBarWidth, getHeight() - 16);
+        const int tempoBarHeight = getHeight() - 16;
+        
+        tempoBar.setBounds (10, 8, tempoBarWidth, tempoBarHeight);
         
         r.removeFromRight (10);
-        panicBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
+        
+        if (menuBtn.isVisible())
+        {
+            menuBtn.setBounds (r.removeFromRight(tempoBarHeight)
+                                .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            r.removeFromRight (4);
+        }
+        
+        panicBtn.setBounds (r.removeFromRight(tempoBarHeight)
+                             .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
         
         r.removeFromRight (4);
-        viewBtn.setBounds (r.removeFromRight (viewBtn.getHeight()).reduced (1 ,6));
+        viewBtn.setBounds (r.removeFromRight(tempoBarHeight)
+                            .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
     }
     
     void paint (Graphics& g) override
@@ -145,11 +160,21 @@ public:
         {
             ViewHelpers::invokeDirectly (this, Commands::panic, true);
         }
+        else if (btn == &menuBtn)
+        {
+            PopupMenu menu;
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+                MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
+            if (99999 == menu.show())
+                PluginWindow::closeAllCurrentlyOpenWindows (false);
+        }
     }
 
 private:
     SessionPtr session;
-    TextButton viewBtn, panicBtn;
+    SettingButton menuBtn;
+    SettingButton viewBtn;
+    PanicButton panicBtn;
     Label title;
     Slider trim;
     Label dbLabel;
@@ -228,6 +253,12 @@ public:
     
     void updateLabels()
     {
+       #if EL_RUNNING_AS_PLUGIN
+        sampleRateLabel.setText ("", dontSendNotification);
+        streamingStatusLabel.setText ("", dontSendNotification);
+        statusLabel.setText ("Plugin", dontSendNotification);
+        
+       #else
         if (auto* dev = devices.getCurrentAudioDevice())
         {
             devices.getCpuUsage();
@@ -252,6 +283,7 @@ public:
             streamingStatusLabel.setText ("", dontSendNotification);
             statusLabel.setText ("No Device", dontSendNotification);
         }
+       #endif
     }
     
 private:
@@ -698,11 +730,11 @@ static ContentView* createLastContentView (Settings& settings)
     return view ? view.release() : nullptr;
 }
 
-    static bool virtualKeyboardSetting (Settings& settings)
-    {
-        auto* props = settings.getUserSettings();
-        return props == nullptr ? false : props->getBoolValue ("virtualKeyboard");
-    }
+static bool virtualKeyboardSetting (Settings& settings)
+{
+    auto* props = settings.getUserSettings();
+    return props == nullptr ? false : props->getBoolValue ("virtualKeyboard");
+}
     
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)

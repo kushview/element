@@ -123,8 +123,8 @@ class FilterComponent    : public Component
 {
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
-        : graph (graph_), node(node_),
-          filterID (node_.getNodeId()),
+        : filterID (node_.getNodeId()),
+          graph (graph_), node(node_),
           numInputs (0), numOutputs (0),
           pinSize (16), font (13.0f, Font::bold),
           numIns (0), numOuts (0), vertical(vertical_)

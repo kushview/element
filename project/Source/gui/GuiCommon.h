@@ -8,6 +8,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"

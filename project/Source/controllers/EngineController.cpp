@@ -224,6 +224,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     /* Unload the existing graph if necessary */
     if (root)
     {
+        PluginWindow::closeCurrentlyOpenWindowsFor (root->getGraph(), true);
         root->savePluginStates();
         root->unloadGraph();
     }
@@ -263,6 +264,9 @@ void EngineController::setRootNode (const Node& newRootNode)
         }
         
         engine->setCurrentGraph (index);
+        
+        if (auto* gui = findSibling<GuiController>())
+            gui->showPluginWindowsFor (newRootNode);
     }
     else
     {

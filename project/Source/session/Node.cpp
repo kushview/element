@@ -21,6 +21,14 @@ namespace Element {
     }
     
     
+    int Port::getChannel() const
+    {
+        const Node node (objectData.getParent().getParent());
+        if (auto* g = node.getGraphNode())
+            return g->getChannelPort (getIndex());
+        return -1;
+    }
+    
     bool Node::isProbablyGraphNode (const ValueTree& data)
     {
         return data.hasType (Tags::node) &&

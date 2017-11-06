@@ -20,7 +20,8 @@ namespace Element {
         Port (const ValueTree& p) : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
         ~Port() { }
         
-        int getChannel() const { return 0; }
+        int getChannel() const;
+        
         
         const bool isInput() const
         {

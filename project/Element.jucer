@@ -110,6 +110,8 @@
               file="Source/gui/AudioIOPanelView.cpp"/>
         <FILE id="CqOHs6" name="AudioIOPanelView.h" compile="0" resource="0"
               file="Source/gui/AudioIOPanelView.h"/>
+        <FILE id="jVVEl0" name="Buttons.cpp" compile="1" resource="0" file="Source/gui/Buttons.cpp"/>
+        <FILE id="dsmRAw" name="Buttons.h" compile="0" resource="0" file="Source/gui/Buttons.h"/>
         <FILE id="sg07lP" name="ConnectionGrid.cpp" compile="1" resource="0"
               file="Source/gui/ConnectionGrid.cpp"/>
         <FILE id="EZVC8d" name="ConnectionGrid.h" compile="0" resource="0"

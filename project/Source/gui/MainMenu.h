@@ -123,7 +123,62 @@ public:
     void getAllCommands (Array <CommandID>&) override { }
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
     bool perform (const InvocationInfo& info) override { return false; }
-
+    
+    static void buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
+    {
+        menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
+        menu.addSeparator();
+        
+        menu.addCommandItem (&cmd, Commands::sessionOpen,   "Open Session...");
+        menu.addCommandItem (&cmd, Commands::sessionSave,   "Save Session");
+        menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
+        
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
+        menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
+    }
+    
+    static void buildEditMenu (CommandManager& cmd, PopupMenu& menu)
+    {
+        menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
+        menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
+        menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete selected graph");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::copy, "Copy");
+        menu.addCommandItem (&cmd, Commands::paste, "Paste");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
+    }
+    
+    static void buildViewMenu (CommandManager& cmd, PopupMenu& menu)
+    {
+        menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
+        menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
+        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+    }
+    
+    static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu) {
+        buildSessionMenu (cmd, menu);
+        menu.addSeparator();
+        buildEditMenu(cmd, menu);
+        menu.addSeparator();
+        buildViewMenu(cmd, menu);
+        menu.addSeparator();
+        menu.addItem (99999, "Close all plugin windows...");
+       #if 0
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
+       #endif
+    }
+    
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
@@ -151,33 +206,8 @@ private:
        #endif
     }
     
-    void buildEditMenu (PopupMenu& menu)
-    {
-        menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
-        menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
-        menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete selected graph");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::copy, "Copy");
-        menu.addCommandItem (&cmd, Commands::paste, "Paste");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
-    }
-    
-    void buildViewMenu (PopupMenu& menu)
-    {
-        menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
-        menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
-        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
-        menu.addSeparator();
-        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-    }
-    
+    void buildEditMenu (PopupMenu& menu) { buildEditMenu (cmd, menu); }
+    void buildViewMenu (PopupMenu& menu) { buildViewMenu (cmd, menu); }
     void buildWindowMenu (PopupMenu& menu)
     {
         menu.addItem (2000, "Close plugin windows...");

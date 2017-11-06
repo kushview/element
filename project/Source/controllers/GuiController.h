@@ -70,6 +70,9 @@ namespace Element {
         /** Get a reference to Sesison data */
         SessionRef session();
         
+        /** show plugin windows for a given node */
+        void showPluginWindowsFor (const Node& node);
+        
         void stabilizeContent();
         
         /* Command manager... */

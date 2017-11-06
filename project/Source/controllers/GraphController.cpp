@@ -263,7 +263,6 @@ void GraphController::setNodeModel (const Node& node)
     }
     
     jassert (arcs.getNumChildren() == processor.getNumConnections());
-    DBG("wanted: " << arcs.getNumChildren() << " got: " << processor.getNumConnections());
     processorArcsChanged();
 }
 

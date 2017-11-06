@@ -37,32 +37,6 @@
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
     
-    class SettingButton : public Button
-    {
-    public:
-        SettingButton (const String& name = String()) : Button (name) { }
-        ~SettingButton() { }
-        
-    protected:
-        
-        void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override
-        {
-            const bool isOn = getToggleState();
-            
-            g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
-            String text = getButtonText();
-            if (text.isEmpty())
-            {
-                text = (getToggleState()) ? "yes" : "no";
-            }
-            
-            g.setFont (12.f);
-            g.setColour (Colours::black);
-            g.drawText (text, getLocalBounds(), Justification::centred);
-            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
-            g.drawRect (0, 0, getWidth(), getHeight());
-        }
-    };
     
     class PreferencesComponent::PageList :  public ListBox,
                                             public ListBoxModel
@@ -157,7 +131,7 @@ namespace Element {
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
             clockSourceLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (clockSourceBox);
-            clockSourceBox.addItem ("Internal / Session", ClockSourceInternal);
+            clockSourceBox.addItem ("Internal", ClockSourceInternal);
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
 

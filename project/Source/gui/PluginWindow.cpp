@@ -144,29 +144,45 @@ PluginWindow::PluginWindow (Component* const ui, const Node& n)
 PluginWindow::~PluginWindow()
 {
     activePluginWindows.removeFirstMatchingValue (this);
-    node.setProperty ("windowVisible", false);
     clearContentComponent();
 }
 
-void PluginWindow::closeCurrentlyOpenWindowsFor (GraphNode* const node)
+void PluginWindow::deleteWindow (const int index, const bool windowVisible)
 {
-    if (node)
-        closeCurrentlyOpenWindowsFor (node->nodeId);
+    auto* window = activePluginWindows.getUnchecked (index);
+    window->node.setProperty ("windowVisible", windowVisible);
+    deleteAndZero (window);
+}
+    
+void PluginWindow::closeCurrentlyOpenWindowsFor (GraphProcessor& proc, const bool windowVisible)
+{
+    for (int i = 0; i < proc.getNumNodes(); ++i)
+        if (auto node = proc.getNode (i))
+            for (int i = activePluginWindows.size(); --i >= 0;)
+                if (activePluginWindows.getUnchecked(i)->owner == node)
+                    { deleteWindow (i, windowVisible); break; }
 }
 
-void PluginWindow::closeCurrentlyOpenWindowsFor (const uint32 nodeId)
+void PluginWindow::closeCurrentlyOpenWindowsFor (GraphNode* const node, const bool windowVisible)
+{
+    for (int i = activePluginWindows.size(); --i >= 0;)
+        if (activePluginWindows.getUnchecked(i)->owner == node)
+            { deleteWindow (i, windowVisible); break; }
+}
+
+void PluginWindow::closeCurrentlyOpenWindowsFor (const uint32 nodeId, const bool windowVisible)
 {
     for (int i = activePluginWindows.size(); --i >= 0;)
         if (activePluginWindows.getUnchecked(i)->owner->nodeId == nodeId)
-            { delete activePluginWindows.getUnchecked(i); break; }
+            { deleteWindow (i, windowVisible); break; }
 }
 
-void PluginWindow::closeAllCurrentlyOpenWindows()
+void PluginWindow::closeAllCurrentlyOpenWindows (const bool windowVisible)
 {
     if (activePluginWindows.size() > 0)
     {
         for (int i = activePluginWindows.size(); --i >= 0;)
-            delete activePluginWindows.getUnchecked(i);
+            deleteWindow (i, windowVisible);
         MessageManager::getInstance()->runDispatchLoopUntil (50);
     }
 }
@@ -260,7 +276,16 @@ void PluginWindow::moved()
 
 void PluginWindow::closeButtonPressed()
 {
-    delete this;
+    const int index = activePluginWindows.indexOf (this);
+    if (index > 0)
+    {
+        deleteWindow (index, false);
+    }
+    else
+    {
+        node.setProperty ("windowVisible", false);
+        delete this;
+    }
 }
 
 }

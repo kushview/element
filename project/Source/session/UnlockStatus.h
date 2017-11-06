@@ -78,8 +78,8 @@ private:
         props = ValueTree (propsKey);
        #if EL_LITE_VERSION_DEV
         const var priceId = getProperty (priceIdKey);
-        const var two (2);
-        if (two == priceId)
+        const var two (2); const var zero(0);
+        if (two == priceId || zero == priceId)
             props.setProperty (fullKey, 1, nullptr);
        #endif
     }
