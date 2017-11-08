@@ -96,9 +96,10 @@ static const char* pluginListKey()
 {
    #if JUCE_MAC
 	return Settings::pluginListKey;
+   #elif JUCE_64BIT
+	return Settings::pluginListKey64;
    #else
-	return SystemStats::SystemStats::isOperatingSystem64Bit()
-		? Settings::pluginListKey64 : Settings::pluginListKey;
+	return Settings::pluginListKey;
    #endif
 }
 
