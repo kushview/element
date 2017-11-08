@@ -52,6 +52,7 @@ public:
         toolbar->setBounds (0, 0, getWidth(), 24);
         
         addAndMakeVisible (editor);
+        editor->addComponentListener (this);
         
         addAndMakeVisible (bypassButton);
         bypassButton.setButtonText ("B");
@@ -59,9 +60,7 @@ public:
         bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
         bypassButton.addListener (this);
         
-        const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
-        setSize (editor->getWidth(), height);
-        resized();
+        updateSize();
     }
     
     ~PluginWindowContent()
@@ -81,8 +80,16 @@ public:
         rightPanel  = nullptr;
     }
     
+    void updateSize()
+    {
+        const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
+        setSize (editor->getWidth(), height);
+        resized();
+    }
+    
     void resized() override
     {
+        editor->removeComponentListener (this);
         auto r (getLocalBounds());
         
         if (toolbar->getThickness())
@@ -94,7 +101,8 @@ public:
             bypassButton.setBounds (r2.removeFromRight(bypassButton.getWidth()).reduced (1));
         }
         
-        editor->setBounds (0, r.getY(), getWidth(), editor->getHeight());
+        editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        editor->addComponentListener (this);
     }
     
     void buttonClicked (Button* button) override
@@ -109,7 +117,14 @@ public:
         }
     }
     
-    void componentMovedOrResized (Component&, bool wasMoved, bool wasResized) override { }
+    void componentMovedOrResized (Component& c, bool wasMoved, bool wasResized) override
+    {
+        if (editor && editor != &c)
+            return;
+        if (wasResized)
+            updateSize();
+        ignoreUnused(wasMoved);
+    }
     
     Toolbar* getToolbar() const { return toolbar.get(); }
     
@@ -129,6 +144,7 @@ PluginWindow::PluginWindow (Component* const ui, const Node& n)
     setUsingNativeTitleBar (true);
     setSize (400, 300);
     setContentOwned (new PluginWindowContent (ui, node), true);
+    
     if (node.isValid())
     {
         setTopLeftPosition (node.getValueTree().getProperty ("windowX", Random::getSystemRandom().nextInt (500)),
@@ -138,6 +154,12 @@ PluginWindow::PluginWindow (Component* const ui, const Node& n)
     
     setVisible (true);
     addToDesktop();
+    
+    if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
+    {
+        setResizable (ed->isResizable(), false);
+    }
+    
     activePluginWindows.add (this);
 }
     
