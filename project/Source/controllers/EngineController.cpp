@@ -120,7 +120,7 @@ void EngineController::connectChannels (const uint32 s, const int sc, const uint
     if (!src || !dst)
         return;
     addConnection (src->nodeId, src->getPortForChannel (PortType::Audio, sc, false),
-                   dst->nodeId, dst->getPortForChannel (PortType::Audio, sc, true));
+                   dst->nodeId, dst->getPortForChannel (PortType::Audio, dc, true));
 }
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
