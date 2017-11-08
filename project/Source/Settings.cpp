@@ -7,8 +7,10 @@
 
 namespace Element {
 
-const char* Settings::checkForUpdatesKey =      "checkForUpdates";
-    
+const char* Settings::checkForUpdatesKey = "checkForUpdates";
+const char* Settings::pluginListKey = "plugin-list";
+const char* Settings::pluginListKey64 = "pluginList64";
+
 Settings::Settings()
 {
     PropertiesFile::Options opts;

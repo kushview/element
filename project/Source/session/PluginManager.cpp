@@ -4,6 +4,7 @@
 */
 
 #include "session/PluginManager.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -91,28 +92,38 @@ KnownPluginList& PluginManager::availablePlugins()
     return priv->allPlugins;
 }
 
+static const char* pluginListKey()
+{
+   #if JUCE_MAC
+	return Settings::pluginListKey;
+   #else
+	return SystemStats::SystemStats::isOperatingSystem64Bit()
+		? Settings::pluginListKey64 : Settings::pluginListKey;
+   #endif
+}
+
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
     ScopedXml elm (priv->allPlugins.createXml ());
-    settings.getUserSettings()->setValue ("plugin-list", elm.get());
+	settings.getUserSettings()->setValue (pluginListKey(), elm.get());
+}
+
+void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
+{
+	if (ScopedXml xml = settings.getUserSettings()->getXmlValue (pluginListKey()))
+		restoreUserPlugins (*xml);
+}
+
+void PluginManager::restoreUserPlugins(const XmlElement& xml)
+{
+	priv->allPlugins.recreateFromXml(xml);
+	scanInternalPlugins();
 }
 
 void PluginManager::setPlayConfig (double sampleRate, int blockSize)
 {
     priv->sampleRate = sampleRate;
     priv->blockSize  = blockSize;
-}
-
-void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
-{
-    if (ScopedXml xml = settings.getUserSettings()->getXmlValue ("plugin-list"))
-        restoreUserPlugins (*xml);
-}
-
-void PluginManager::restoreUserPlugins (const XmlElement& xml)
-{
-    priv->allPlugins.recreateFromXml (xml);
-    scanInternalPlugins();
 }
 
 void PluginManager::scanInternalPlugins()

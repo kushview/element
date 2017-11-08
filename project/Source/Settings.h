@@ -16,6 +16,8 @@ public:
     ~Settings();
     
     static const char* checkForUpdatesKey;
+	static const char* pluginListKey;
+	static const char* pluginListKey64;
     
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
