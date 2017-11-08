@@ -34,26 +34,16 @@ public:
 
     ~Startup() { }
     
-    void updateSettingsIfNeeded()
-    {
-        UnlockStatus& status (world.getUnlockStatus());
-        Settings& settings (world.getSettings());
 
-        if (! status.isFullVersion())
-        {
-            auto* props = settings.getUserSettings();
-            props->setValue ("clockSource", "internal");
-            settings.saveIfNeeded();
-        }
-    }
     
     void launchApplication()
     {
+        Settings& settings (world.getSettings());
+        isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
+        
         updateSettingsIfNeeded();
         setupAnalytics();
 
-        Settings& settings (world.getSettings());
-        isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
         DeviceManager& devices (world.getDeviceManager());
         auto* props = settings.getUserSettings();
         if (ScopedXml dxml = props->getXmlValue ("devices"))
@@ -119,6 +109,19 @@ private:
         Label text;
     };
 
+    void updateSettingsIfNeeded()
+    {
+        UnlockStatus& status (world.getUnlockStatus());
+        Settings& settings (world.getSettings());
+        
+        if (! status.isFullVersion())
+        {
+            auto* props = settings.getUserSettings();
+            props->setValue ("clockSource", "internal");
+            settings.saveIfNeeded();
+        }
+    }
+    
     void run() override
     {
         Settings& settings (world.getSettings());

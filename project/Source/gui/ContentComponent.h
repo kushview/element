@@ -78,7 +78,7 @@ private:
     ScopedPointer<StatusBar> statusBar;
     
     ScopedPointer<VirtualKeyboardView> keyboard;
-    
+        
     bool statusBarVisible;
     int statusBarSize;
     bool toolBarVisible;
