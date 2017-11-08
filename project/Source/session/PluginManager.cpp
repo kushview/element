@@ -117,7 +117,7 @@ void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
 
 void PluginManager::restoreUserPlugins(const XmlElement& xml)
 {
-	priv->allPlugins.recreateFromXml(xml);
+	priv->allPlugins.recreateFromXml (xml);
 	scanInternalPlugins();
 }
 
