@@ -462,14 +462,18 @@ AudioEngine::~AudioEngine()
 
 void AudioEngine::activate()
 {
+   #if ! EL_RUNNING_AS_PLUGIN
     auto& devices (world.getDeviceManager());
     devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
+   #endif
 }
 
 void AudioEngine::deactivate()
 {
+   #if ! EL_RUNNING_AS_PLUGIN
     auto& devices (world.getDeviceManager());
     devices.removeMidiInputCallback (String::empty, &getMidiInputCallback());
+   #endif
 }
 
 AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }

@@ -46,8 +46,8 @@ namespace Element {
         }
         
         {
-            MidiSequenceProcessor p (engine);
-            p.fillInPluginDescription (metroDesc);
+//            MidiSequenceProcessor p (engine);
+//            p.fillInPluginDescription (metroDesc);
         }
         
         {
