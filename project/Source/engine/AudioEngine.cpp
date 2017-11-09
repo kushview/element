@@ -103,6 +103,16 @@ public:
         
         while (iter.getNextEvent (msg, frame))
         {
+            if (msg.isNoteOn())
+            {
+                DBG("NOTE ON");
+                
+            }
+            if (msg.isNoteOff())
+            {
+                DBG("NOTE OFF");
+            }
+            
             if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
                 DBG("got it: " << frame);
             }
@@ -117,7 +127,6 @@ public:
         
         int totalNumChans = 0;
         ScopedNoDenormals denormals;
-        
         if (numInputChannels > numOutputChannels)
         {
             // if there aren't enough output channels for the number of
@@ -204,7 +213,6 @@ public:
         auto* const graph = getCurrentGraph();
         const bool shouldProcess = graph != nullptr;
         
-        
         transport.preProcess (numSamples);
         
         if (shouldProcess)
@@ -230,6 +238,12 @@ public:
             transport.advance (numSamples);
         transport.postProcess (numSamples);
         
+        traceMidi (midi);
+        
+//        if (auto* e = engine.world.getDeviceManager().getDefaultMidiOutput())
+//            e->sendBlockOfMessages (midi, 14.f + Time::getMillisecondCounterHiRes(), sampleRate);
+//
+        
         midi.clear();
     }
     
@@ -240,6 +254,10 @@ public:
         const int numChansIn       = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
+        
+        if (auto* midi = engine.world.getDeviceManager().getDefaultMidiOutput()) {
+            midi->startBackgroundThread();
+        }
     }
     
     void audioAboutToStart (const double newSampleRate, const int newBlockSize,
@@ -271,6 +289,8 @@ public:
     void audioDeviceStopped() override
     {
         audioStopped();
+        if (auto* midi = engine.world.getDeviceManager().getDefaultMidiOutput())
+            midi->stopBackgroundThread();
     }
     
     void audioStopped()
