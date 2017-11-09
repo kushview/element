@@ -137,6 +137,11 @@ private:
         
         if (isFirstRun)
         {
+            if (auto* props = settings.getUserSettings())
+            {
+                props->setValue (Settings::checkForUpdatesKey, true);
+            }
+            
             auto& formats (plugins.formats());
             for (int i = 0; i < formats.getNumFormats(); ++i)
             {
@@ -153,6 +158,8 @@ private:
                     DBG("[EL]  " << name);
                 }
             }
+            
+            settings.saveIfNeeded();
         }
         else
         {
