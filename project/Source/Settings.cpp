@@ -11,6 +11,12 @@ const char* Settings::checkForUpdatesKey = "checkForUpdates";
 const char* Settings::pluginListKey = "plugin-list";
 const char* Settings::pluginListKey64 = "pluginList64";
 
+#if JUCE_MAC || JUCE_32BIT
+ const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";
+#else
+ const char* Settings::lastPluginScanPathPrefix = "pluginScanPath64_";
+#endif
+    
 Settings::Settings()
 {
     PropertiesFile::Options opts;

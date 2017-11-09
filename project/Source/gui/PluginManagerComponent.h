@@ -95,7 +95,6 @@ public:
     TableListBox& getTableListBox() noexcept            { return table; }
     
 private:
-    //==============================================================================
     AudioPluginFormatManager& formatManager;
     KnownPluginList& list;
     File deadMansPedalFile;

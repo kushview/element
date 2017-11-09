@@ -201,7 +201,6 @@ public:
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
 #endif
-        
     }
     
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)

@@ -1,11 +1,11 @@
 
-#include "gui/ViewHelpers.h"
+#include "gui/GuiCommon.h"
 #include "gui/PluginManagerComponent.h"
 #include "session/PluginManager.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
-
 
 class PluginListComponent::TableModel  : public TableListBoxModel
 {
@@ -235,6 +235,10 @@ void PluginListComponent::removeMissingPlugins()
 
 void PluginListComponent::removePluginItem (int index)
 {
+    if (const auto* type = list.getType(index))
+        if (type->pluginFormatName == "Element")
+            return;
+    
     if (index < list.getNumTypes())
         list.removeType (index);
     else
@@ -247,12 +251,20 @@ void PluginListComponent::optionsMenuStaticCallback (int result, PluginListCompo
         pluginList->optionsMenuCallback (result);
 }
 
+static void removeNonElementPlugins (KnownPluginList& list)
+{
+    for (int i = list.getNumTypes(); --i >= 0;) {
+        if (list.getType(i)->pluginFormatName != "Element")
+            list.removeType(i);
+    }
+}
+
 void PluginListComponent::optionsMenuCallback (int result)
 {
     switch (result)
     {
         case 0:   break;
-        case 1:   list.clear(); break;
+        case 1:   removeNonElementPlugins (list); break;
         case 2:   removeSelectedPlugins(); break;
         case 3:   showSelectedFolder(); break;
         case 4:   removeMissingPlugins(); break;
@@ -270,6 +282,7 @@ void PluginListComponent::buttonClicked (Button* button)
     if (button == &optionsButton)
     {
         PopupMenu menu;
+        
         menu.addItem (1, TRANS("Clear list"));
         menu.addItem (2, TRANS("Remove selected plug-in from list"), table.getNumSelectedRows() > 0);
         menu.addItem (3, TRANS("Show folder containing selected plug-in"), canShowSelectedFolder());
@@ -279,9 +292,9 @@ void PluginListComponent::buttonClicked (Button* button)
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
         {
             AudioPluginFormat* const format = formatManager.getFormat (i);
-            
+                
             if (format->canScanForPlugins())
-                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plug-ins");
+                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plugins");
         }
         
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&optionsButton),
@@ -302,14 +315,15 @@ void PluginListComponent::filesDropped (const StringArray& files, int, int)
 
 FileSearchPath PluginListComponent::getLastSearchPath (PropertiesFile& properties, AudioPluginFormat& format)
 {
-    return FileSearchPath (properties.getValue ("lastPluginScanPath_" + format.getName(),
+    return FileSearchPath (properties.getValue (Settings::lastPluginScanPathPrefix + format.getName(),
                                                 format.getDefaultLocationsToSearch().toString()));
 }
 
 void PluginListComponent::setLastSearchPath (PropertiesFile& properties, AudioPluginFormat& format,
                                              const FileSearchPath& newPath)
 {
-    properties.setValue ("lastPluginScanPath_" + format.getName(), newPath.toString());
+    properties.setValue (Settings::lastPluginScanPathPrefix + format.getName(),
+                         newPath.toString());
 }
 
 //==============================================================================
@@ -575,12 +589,17 @@ void PluginManagerContentView::didBecomeActive()
     jassert (ViewHelpers::getGlobals (this));
     auto& world (*ViewHelpers::getGlobals (this));
     auto& plugins (world.getPluginManager());
-    auto& list (plugins.availablePlugins());
+    auto& settings (world.getSettings());
+    
     if (pluginList)
         pluginList = nullptr;
     pluginList = new Element::PluginListComponent (
-        plugins.formats(), list, File::nonexistent, nullptr);
+        plugins.getAudioPluginFormats(),
+        plugins.availablePlugins(),
+        File::nonexistent,
+        settings.getUserSettings());
     addAndMakeVisible (pluginList);
+    resized();
 }
 
 void PluginManagerContentView::resized()
