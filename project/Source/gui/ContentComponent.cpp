@@ -601,6 +601,7 @@ class EmptyContentView : public ContentView
 public:
     void paint (Graphics& g) override
     {
+        setName ("EmptyView");
         g.fillAll (LookAndFeel::contentBackgroundColor);
         g.setColour (LookAndFeel::textColor);
         g.setFont (16.f);
@@ -813,10 +814,11 @@ void ContentComponent::setAccessoryView (const String& name)
 void ContentComponent::nextMainView()
 {
     // only have two rotatable views as of now
+    if (getMainViewName() == "EmptyView")
+        return;
     const String nextName = getMainViewName() == "GraphEditor" ? "PatchBay" : "GraphEditor";
     setMainView (nextName);
 }
-    
 
 void ContentComponent::paint (Graphics &g)
 {

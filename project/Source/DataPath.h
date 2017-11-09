@@ -11,7 +11,12 @@ namespace Element {
         DataPath();
         ~DataPath();
         
+        static const File applicationDataDir();
+
         static const File defaultSettingsFile();
+        static const File defaultLocation();
+        static const File defaultSessionDir();
+        static const File defaultGraphDir();
     };
 }
 
