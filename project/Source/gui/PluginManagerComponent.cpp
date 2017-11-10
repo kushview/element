@@ -137,6 +137,19 @@ PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, Kno
     optionsButton.addListener (this);
     optionsButton.setTriggeredOnMouseDown (true);
     
+    for (int i = 0; i < formatManager.getNumFormats(); ++i)
+    {
+        const auto name = formatManager.getFormat(i)->getName();
+        const bool canScan = formatManager.getFormat(i)->canScanForPlugins();
+        if (name == "Element" || name == "Internal" || !canScan)
+            continue;
+        
+        auto* button = formatButtons.add (new TextButton (name));
+        button->setButtonText ("Scan " + name);
+        button->addListener (this);
+        addAndMakeVisible (button);
+    }
+    
     setSize (400, 600);
     list.addChangeListener (this);
     updateList();
@@ -171,8 +184,16 @@ void PluginListComponent::setNumberOfThreadsForScanning (int num)
 void PluginListComponent::resized()
 {
     Rectangle<int> r (getLocalBounds().reduced (2));
+    auto r2 = r.removeFromBottom (24);
     
-    optionsButton.setBounds (r.removeFromBottom (24));
+    for (auto* b : formatButtons)
+    {
+        b->changeWidthToFitText (24);
+        b->setBounds (r2.removeFromLeft (b->getWidth()));
+        r2.removeFromLeft (4);
+    }
+    r2.removeFromLeft (4);
+    optionsButton.setBounds (r2);
     optionsButton.changeWidthToFitText (24);
     
     r.removeFromBottom (3);
@@ -300,6 +321,18 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&optionsButton),
                             ModalCallbackFunction::forComponent (optionsMenuStaticCallback, this));
     }
+    else
+    {
+        for (int i = 0; i < formatManager.getNumFormats(); ++i)
+        {
+            AudioPluginFormat* const format = formatManager.getFormat (i);
+            if (format->getName() == button->getName())
+            {
+                scanFor (*format);
+                break;
+            }
+        }
+    }
 }
 
 bool PluginListComponent::isInterestedInFileDrag (const StringArray& /*files*/)
@@ -326,18 +359,20 @@ void PluginListComponent::setLastSearchPath (PropertiesFile& properties, AudioPl
                          newPath.toString());
 }
 
-//==============================================================================
-class PluginListComponent::Scanner    : private Timer
+// MARK: Scanner
+
+class PluginListComponent::Scanner : private Timer
 {
 public:
     Scanner (PluginListComponent& plc, AudioPluginFormat& format, PropertiesFile* properties,
              bool allowPluginsWhichRequireAsynchronousInstantiation, int threads,
              const String& title, const String& text)
     : owner (plc), formatToScan (format), propertiesToUse (properties),
-    pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
-    progressWindow (title, text, AlertWindow::NoIcon),
-    progress (0.0), numThreads (threads), allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-    finished (false)
+      pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
+      progressWindow (title, text, AlertWindow::NoIcon),
+      progress (0.0), numThreads (threads),
+      allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
+      finished (false)
     {
         FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
         
@@ -346,11 +381,10 @@ public:
         
         if (path.getNumPaths() > 0) // if the path is empty, then paths aren't used for this format.
         {
-#if ! JUCE_IOS
+           #if ! JUCE_IOS
             if (propertiesToUse != nullptr)
                 path = getLastSearchPath (*propertiesToUse, formatToScan);
-#endif
-            
+           #endif
             pathList.setSize (500, 300);
             pathList.setPath (path);
             
@@ -359,9 +393,8 @@ public:
             pathChooserWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
             
             pathChooserWindow.enterModalState (true,
-                                               ModalCallbackFunction::forComponent (startScanCallback,
-                                                                                    &pathChooserWindow, this),
-                                               false);
+                ModalCallbackFunction::forComponent (startScanCallback, &pathChooserWindow, this),
+                false);
         }
         else
         {

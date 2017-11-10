@@ -113,6 +113,8 @@ private:
     friend struct ContainerDeletePolicy<Scanner>;
     ScopedPointer<Scanner> currentScanner;
     
+    OwnedArray<TextButton> formatButtons;
+    
     void scanFinished (const StringArray&);
     static void optionsMenuStaticCallback (int, PluginListComponent*);
     void optionsMenuCallback (int);
