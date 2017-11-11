@@ -16,6 +16,12 @@ public:
         textColourId  =  0x90000000,
     };
     
+    inline void setYesNoText (const String& y, const String& n)
+    {
+        yes = y; no = n;
+        repaint();
+    }
+    
 protected:
     virtual Colour getTextColour()
     {
@@ -25,6 +31,10 @@ protected:
     
     /** @internal */
     void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+    
+private:
+    String yes = "Yes";
+    String no  = "No";
 };
 
 class PanicButton : public SettingButton {

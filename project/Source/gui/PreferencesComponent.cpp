@@ -26,7 +26,8 @@
 #include "Settings.h"
 
 #define EL_GENERAL_SETTINGS_NAME "General"
-#define EL_AUDIO_ENGINE_PREFERENCE_NAME "Audio Engine"
+#define EL_AUDIO_SETTINGS_NAME "Audio"
+#define EL_MIDI_SETTINGS_NAME "MIDI"
 #define EL_PLUGINS_PREFERENCE_NAME  "Plugins"
 
 //[/Headers]
@@ -36,7 +37,6 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
-    
     
     class PreferencesComponent::PageList :  public ListBox,
                                             public ListBoxModel
@@ -109,9 +109,13 @@ namespace Element {
     class SettingsPage : public Component
     {
     public:
+        SettingsPage() = default;
+        virtual ~SettingsPage() { }
     };
 
-    class PluginSettingsComponent : public Component,
+    // MARK: Plugin Settings (included in general)
+    
+    class PluginSettingsComponent : public SettingsPage,
                                     public ButtonListener
     {
     public:
@@ -220,6 +224,8 @@ namespace Element {
             settings.saveIfNeeded();
         }
     };
+    
+    // MARK: General Settings
     
     class GeneralSettingsPage : public SettingsPage,
                                 public ValueListener
@@ -361,20 +367,191 @@ namespace Element {
         GuiController& gui;
     };
 
-
-
-    typedef AudioDeviceSelectorComponent DevicesComponent;
-    class AudioSettingsComponent : public DevicesComponent
+    // MARK: Audio Settings
+    
+    class AudioSettingsComponent : public SettingsPage
     {
     public:
-        AudioSettingsComponent (DeviceManager& devices)
-            : DevicesComponent (devices, 0, 16, 0, 16,
-                                true, true, true, false)
+        AudioSettingsComponent (DeviceManager& d)
+            : devs (d, 0, 16, 0, 16, false, false, true, false),
+              devices (d)
         {
+            devices.enableInputLevelMeasurement (true);
+            devices.enableOutputLevelMeasurement (true);
+            
+            addAndMakeVisible (devs);
+            devs.setItemHeight (22);
+            
             setSize (300, 400);
         }
+        
+        ~AudioSettingsComponent()
+        {
+            devices.enableInputLevelMeasurement (false);
+            devices.enableOutputLevelMeasurement (false);
+        }
+        
+        void resized() override { devs.setBounds (getLocalBounds()); }
+        
+    private:
+        AudioDeviceSelectorComponent devs;
+        DeviceManager& devices;
     };
 
+    // MARK: MIDI Settings
+    
+    class MidiSettingsPage : public SettingsPage,
+                             public ComboBoxListener,
+                             public ButtonListener,
+                             public ChangeListener
+    {
+    public:
+        MidiSettingsPage (Globals& world)
+            : devices (world.getDeviceManager()),
+              settings (world.getSettings())
+        {
+            addAndMakeVisible (midiOutputLabel);
+            midiOutputLabel.setFont (Font (12.0, Font::bold));
+            midiOutputLabel.setText ("MIDI Output Device", dontSendNotification);
+            
+            addAndMakeVisible (midiOutput);
+            midiOutput.addListener (this);
+            
+            addAndMakeVisible(midiInputHeader);
+            midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
+            midiInputHeader.setFont (Font (12, Font::bold));
+            
+            setSize (300, 400);
+            devices.addChangeListener (this);
+            updateDevices();
+        }
+        
+        ~MidiSettingsPage()
+        {
+            devices.removeChangeListener (this);
+            midiInputs.clearQuick (true);
+            midiOutput.removeListener (this);
+        }
+        
+        void resized() override
+        {
+            const int spacingBetweenSections = 6;
+            const int settingHeight = 22;
+            const int toggleWidth = 40;
+            const int toggleHeight = 18;
+            
+            Rectangle<int> r (getLocalBounds());
+            auto r2 = r.removeFromTop (settingHeight);
+            midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+            midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+            
+            r.removeFromTop (roundDoubleToInt ((double) spacingBetweenSections * 1.5));
+            midiInputHeader.setBounds (r.removeFromTop (24));
+            
+            jassert (midiInputLabels.size() == midiInputs.size());
+            
+            for (int i = 0; i < midiInputs.size(); ++i)
+            {
+                r.removeFromTop (spacingBetweenSections);
+                auto r2 = r.removeFromTop (settingHeight);
+                midiInputLabels.getUnchecked(i)->setBounds (r2.removeFromLeft (getWidth() / 2));
+                midiInputs.getUnchecked(i)->setBounds (
+                    r2.removeFromLeft(toggleWidth).withSizeKeepingCentre (toggleWidth, toggleHeight));
+            }
+        }
+        
+        void buttonClicked (Button* btn) override
+        {
+            if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
+            {
+                devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
+            }
+            else
+            {
+                jassertfalse; // unhandled button press
+            }
+        }
+        
+        void comboBoxChanged (ComboBox* box) override
+        {
+            const auto name = inputs [midiOutput.getSelectedId() - 10];
+            if (box == &midiOutput)
+                devices.setDefaultMidiOutput (name);
+        }
+        
+        void changeListenerCallback (ChangeBroadcaster*) override
+        {
+            updateDevices();
+        }
+        
+    private:
+        DeviceManager& devices;
+        Settings& settings;
+        
+        Label midiOutputLabel;
+        ComboBox midiOutput;
+        Label midiInputHeader;
+        OwnedArray<Label> midiInputLabels;
+        OwnedArray<SettingButton> midiInputs;
+        
+        StringArray inputs;
+        StringArray outputs;
+        
+        void updateDevices()
+        {
+            inputs  = MidiInput::getDevices();
+            outputs = MidiOutput::getDevices();
+            
+            midiOutput.clear (dontSendNotification);
+            midiOutput.setTextWhenNoChoicesAvailable ("<none>");
+            midiInputLabels.clearQuick (true);
+            midiInputs.clearQuick (true);
+            
+            int i = 0;
+            midiOutput.addItem ("<< none >>", 1);
+            midiOutput.addSeparator();
+            for (const auto& name : outputs)
+            {
+                midiOutput.addItem (name, 10 + i);
+                ++i;
+            }
+
+            for (const auto& name : inputs)
+            {
+                auto* label = midiInputLabels.add (new Label());
+                label->setFont (Font (12));
+                label->setText (name, dontSendNotification);
+                addAndMakeVisible (label);
+                
+                auto* btn = midiInputs.add (new SettingButton());
+                btn->setName (name);
+                btn->setClickingTogglesState (true);
+                btn->setYesNoText ("On", "Off");
+                btn->addListener (this);
+                addAndMakeVisible (btn);
+            }
+            
+            updateInputSelection();
+            updateOutputSelection();
+
+            resized();
+        }
+        
+        void updateOutputSelection()
+        {
+            if (auto* out = devices.getDefaultMidiOutput())
+                midiOutput.setSelectedId (10 + outputs.indexOf (out->getName()));
+            else
+                midiOutput.setSelectedId (1);
+        }
+        
+        void updateInputSelection()
+        {
+            for (auto* input : midiInputs)
+                input->setToggleState (devices.isMidiInputEnabled(input->getName()), dontSendNotification);
+        }
+    };
+    
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -405,7 +582,9 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
 
     //[Constructor] You can add your own custom stuff here..
     addPage (EL_GENERAL_SETTINGS_NAME);
-    addPage (EL_AUDIO_ENGINE_PREFERENCE_NAME);
+    addPage (EL_AUDIO_SETTINGS_NAME);
+    addPage (EL_MIDI_SETTINGS_NAME);
+    
     setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
@@ -460,10 +639,12 @@ Component* PreferencesComponent::createPageForName (const String& name)
 {
     if (name == EL_GENERAL_SETTINGS_NAME) {
         return new GeneralSettingsPage (world, gui);
-    } else if (name == EL_AUDIO_ENGINE_PREFERENCE_NAME) {
+    } else if (name == EL_AUDIO_SETTINGS_NAME) {
         return new AudioSettingsComponent (world.getDeviceManager());
     } else if (name == EL_PLUGINS_PREFERENCE_NAME) {
         return new PluginSettingsComponent (world);
+    } else if (name == EL_MIDI_SETTINGS_NAME) {
+        return new MidiSettingsPage (world);
     }
 
     return nullptr;
