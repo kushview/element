@@ -7,9 +7,11 @@
 
 namespace Element {
 
-const char* Settings::checkForUpdatesKey = "checkForUpdates";
-const char* Settings::pluginListKey = "plugin-list";
-const char* Settings::pluginListKey64 = "pluginList64";
+const char* Settings::checkForUpdatesKey        = "checkForUpdates";
+const char* Settings::pluginListKey             = "plugin-list";
+const char* Settings::pluginListKey64           = "pluginList64";
+const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
+const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 
 #if JUCE_MAC || JUCE_32BIT
  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";
@@ -41,17 +43,28 @@ Settings::Settings()
 
 Settings::~Settings() { }
 
+    
 bool Settings::checkForUpdates() const
 {
     if (auto* props = getProps())
-        return props->getBoolValue (checkForUpdatesKey);
+        return props->getBoolValue (checkForUpdatesKey, true);
     return false;
 }
+
+void Settings::setCheckFormUpdates (const bool shouldCheck)
+{
+    if (shouldCheck == checkForUpdates())
+        return;
+    if (auto* p = getProps())
+        p->setValue (checkForUpdatesKey, shouldCheck);
+}
     
-PropertiesFile* Settings::getProps() const {
+PropertiesFile* Settings::getProps() const
+{
     return (const_cast<Settings*> (this))->getUserSettings();
 }
 
+    
 XmlElement* Settings::getLastGraph() const
 {
     if (auto* p = getProps())
@@ -68,4 +81,21 @@ void Settings::setLastGraph (const ValueTree& data)
         if (ScopedXml xml = data.createXml())
             p->setValue ("lastGraph", xml);
 }
+    
+
+bool Settings::scanForPluginsOnStartup() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (scanForPluginsOnStartKey, false);
+    return false;
+}
+    
+void Settings::setScanForPluginsOnStartup (const bool shouldScan)
+{
+    if (shouldScan == scanForPluginsOnStartup())
+        return;
+    if (auto* p = getProps())
+        p->setValue (scanForPluginsOnStartKey, shouldScan);
+}
+
 }

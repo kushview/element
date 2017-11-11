@@ -111,6 +111,116 @@ namespace Element {
     public:
     };
 
+    class PluginSettingsComponent : public Component,
+                                    public ButtonListener
+    {
+    public:
+        PluginSettingsComponent (Globals& w)
+            : plugins (w.getPluginManager()),
+              settings (w.getSettings())
+        
+        {
+            addAndMakeVisible (activeFormats);
+            activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
+            activeFormats.setFont (Font (18.0, Font::bold));
+            addAndMakeVisible (formatNotice);
+            formatNotice.setText ("Note: enabled format changes take effect upon restart", dontSendNotification);
+            formatNotice.setFont (Font (12.0, Font::italic));
+#if JUCE_MAC
+            availableFormats.addArray ({ "AudioUnit", "VST", "VST3" });
+#else
+            availableFormats.addArray ({ "VST", "VST3" });
+#endif
+            for (const auto& f : availableFormats)
+            {
+                auto* toggle = formatToggles.add (new ToggleButton (f));
+                addAndMakeVisible (toggle);
+                toggle->setName (f);
+                toggle->setButtonText (nameForFormat (f));
+                toggle->setColour (ToggleButton::textColourId, LookAndFeel::textColor);
+                toggle->setColour (ToggleButton::tickColourId, Colours::black);
+                toggle->addListener (this);
+            }
+            
+            updateToggleStates();
+        }
+        
+        void resized() override
+        {
+            const int spacingBetweenSections = 6;
+            const int toggleInset = 4;
+            
+            Rectangle<int> r (getLocalBounds());
+            activeFormats.setFont (Font (15, Font::bold));
+            activeFormats.setBounds (r.removeFromTop (18));
+            formatNotice.setBounds (r.removeFromTop (14));
+            
+            r.removeFromTop (spacingBetweenSections);
+            
+            for (auto* c : formatToggles)
+            {
+                auto r2 = r.removeFromTop (18);
+                c->setBounds (r2.removeFromRight (getWidth() - toggleInset));
+                r.removeFromTop (4);
+            }
+        }
+        
+        void paint (Graphics&) override { }
+        
+        void buttonClicked (Button*) override
+        {
+            writeSetting();
+            restoreSetting();
+        }
+        
+    private:
+        PluginManager&  plugins;
+        Settings&       settings;
+        
+        Label activeFormats;
+        
+        OwnedArray<ToggleButton> formatToggles;
+        StringArray availableFormats;
+        
+        Label formatNotice;
+        
+        const String key = Settings::pluginFormatsKey;
+        bool hasChanged = false;
+        
+        String nameForFormat (const String& name)
+        {
+            if (name == "AudioUnit")
+                return "Audio Unit";
+            return name;
+        }
+        
+        void updateToggleStates()
+        {
+            restoreSetting();
+        }
+        
+        void restoreSetting()
+        {
+            StringArray toks;
+            toks.addTokens (settings.getUserSettings()->getValue(key), ",", "'");
+            for (auto* c : formatToggles)
+                c->setToggleState (toks.contains(c->getName()), dontSendNotification);
+        }
+        
+        void writeSetting()
+        {
+            StringArray toks;
+            for (auto* c : formatToggles)
+                if (c->getToggleState())
+                    toks.add (c->getName());
+            
+            toks.trim();
+            const auto value = toks.joinIntoString(",");
+            settings.getUserSettings()->setValue (key, value);
+            settings.saveIfNeeded();
+        }
+    };
+    
     class GeneralSettingsPage : public SettingsPage,
                                 public ValueListener
     {
@@ -122,7 +232,8 @@ namespace Element {
         };
 
         GeneralSettingsPage (Globals& world, GuiController& g)
-            : settings (world.getSettings()),
+            : pluginSettings (world),
+              settings (world.getSettings()),
               engine (world.getAudioEngine()),
               status (world.getUnlockStatus()),
               gui (g)
@@ -143,6 +254,14 @@ namespace Element {
             checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
             checkForUpdates.getToggleStateValue().addListener (this);
             
+            addAndMakeVisible (scanForPlugsLabel);
+            scanForPlugsLabel.setText ("Scan plugins on startup", dontSendNotification);
+            scanForPlugsLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (scanForPlugins);
+            scanForPlugins.setClickingTogglesState (true);
+            scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
+            scanForPlugins.getToggleStateValue().addListener (this);
+            
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -155,6 +274,8 @@ namespace Element {
                 clockSource.setValue ((int) ClockSourceInternal);
                 clockSourceBox.setEnabled (false);
             }
+            
+            // addAndMakeVisible (pluginSettings);
         }
 
         virtual ~GeneralSettingsPage()
@@ -179,15 +300,26 @@ namespace Element {
             checkForUpdatesLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             checkForUpdates.setBounds (r2.removeFromLeft (toggleWidth)
                                          .withSizeKeepingCentre (toggleWidth, toggleHeight));
+            
+            r.removeFromTop (spacingBetweenSections);
+            r2 = r.removeFromTop (settingHeight);
+            scanForPlugsLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+            scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
+                                        .withSizeKeepingCentre (toggleWidth, toggleHeight));
+            
+            if (pluginSettings.isVisible())
+            {
+                r.removeFromTop (spacingBetweenSections * 2);
+                pluginSettings.setBounds (r);
+            }
         }
 
         void valueChanged (Value& value) override
         {
             if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
             {
-                settings.getUserSettings()->setValue (
-                    Settings::checkForUpdatesKey, checkForUpdates.getToggleState());
-                jassert(settings.checkForUpdates() == checkForUpdates.getToggleState());
+                settings.setCheckFormUpdates (checkForUpdates.getToggleState());
+                jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
             }
             
             // clock source
@@ -201,6 +333,12 @@ namespace Element {
                 engine->applySettings (settings);
             }
             
+            else if (value.refersToSameSourceAs (scanForPlugins.getToggleStateValue()))
+            {
+                settings.setScanForPluginsOnStartup (scanForPlugins.getToggleState());
+            }
+            
+            settings.saveIfNeeded();
             gui.stabilizeContent();
         }
 
@@ -212,119 +350,18 @@ namespace Element {
         Label checkForUpdatesLabel;
         SettingButton checkForUpdates;
         
+        Label scanForPlugsLabel;
+        SettingButton scanForPlugins;
+        
+        PluginSettingsComponent pluginSettings;
+        
         Settings& settings;
         AudioEnginePtr engine;
         UnlockStatus& status;
         GuiController& gui;
     };
 
-    class PluginSettingsComponent : public Component,
-                                        public ButtonListener
-    {
-    public:
-        PluginSettingsComponent (Globals& w)
-            : plugins (w.getPluginManager()),
-              settings (w.getSettings())
 
-        {
-            addAndMakeVisible (activeFormats);
-            activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
-            activeFormats.setFont (Font (18.0, Font::bold));
-            addAndMakeVisible (formatNotice);
-            formatNotice.setText ("Note: enabled format changes take effect upon restart", dontSendNotification);
-            formatNotice.setFont (Font (12.0, Font::italic));
-           #if JUCE_MAC
-            availableFormats.addArray ({ "AudioUnit", "VST", "VST3" });
-           #else
-            availableFormats.addArray ({ "VST", "VST3" });
-           #endif
-            for (const auto& f : availableFormats)
-            {
-                auto* toggle = formatToggles.add (new ToggleButton (f));
-                addAndMakeVisible (toggle);
-                toggle->setButtonText (nameForFormat (f));
-                toggle->setColour (ToggleButton::textColourId, LookAndFeel::textColor);
-                toggle->setColour (ToggleButton::tickColourId, Colours::black);
-                toggle->addListener (this);
-            }
-
-            updateToggleStates();
-        }
-
-        void resized() override
-        {
-            const int spacingBetweenSections = 6;
-            const int toggleInset = 4;
-
-            Rectangle<int> r (getLocalBounds());
-            activeFormats.setBounds (r.removeFromTop (24));
-            formatNotice.setBounds (r.removeFromTop (14));
-
-            r.removeFromTop (spacingBetweenSections);
-
-            for (auto* c : formatToggles)
-            {
-                auto r2 = r.removeFromTop (18);
-                c->setBounds (r2.removeFromRight (getWidth() - toggleInset));
-                r.removeFromTop (4);
-            }
-        }
-
-        void paint (Graphics&) override { }
-
-        void buttonClicked (Button*) override
-        {
-            writeSetting();
-        }
-
-    private:
-        PluginManager&  plugins;
-        Settings&       settings;
-
-        Label activeFormats;
-
-        OwnedArray<ToggleButton> formatToggles;
-        StringArray availableFormats;
-
-        Label formatNotice;
-
-        const String key = "enabledPluginFormats";
-        bool hasChanged = false;
-
-        String nameForFormat (const String& name)
-        {
-            if (name == "AudioUnit")
-                return "Audio Unit";
-            return name;
-        }
-
-        void updateToggleStates()
-        {
-            auto& formats = plugins.formats();
-            for (auto* c : formatToggles)
-            {
-                c->setToggleState (false, dontSendNotification);
-                for (int i = 0; i < formats.getNumFormats(); ++i)
-                {
-                    if (formats.getFormat(i)->getName() == c->getName())
-                        { c->setToggleState(true, dontSendNotification); break; }
-                }
-            }
-        }
-
-        void writeSetting()
-        {
-            StringArray toks;
-            for (auto* c : formatToggles)
-            {
-                if (c->getToggleState())
-                    toks.add (c->getName());
-            }
-
-            const auto value = toks.joinIntoString(",");
-            settings.getUserSettings()->setValue (key, value);
-        }
-    };
 
     typedef AudioDeviceSelectorComponent DevicesComponent;
     class AudioSettingsComponent : public DevicesComponent

@@ -40,7 +40,6 @@ public:
     {
         Settings& settings (world.getSettings());
         isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
-        
         updateSettingsIfNeeded();
         setupAnalytics();
 
@@ -125,23 +124,32 @@ private:
     void run() override
     {
         Settings& settings (world.getSettings());
-        PluginManager& plugins (world.getPluginManager());
         AudioEnginePtr engine = new AudioEngine (world);
         engine->applySettings (settings);
         world.setEngine (engine); // this will also instantiate the session
         SessionPtr session = world.getSession();
         
+        setupPlugins();
+        
+        world.loadModule ("test");
+        controller = new AppController (world);
+        
+        if (usingThread)
+            sendActionMessage ("finishedLaunching");
+    }
+    
+    void setupPlugins()
+    {
+        auto& settings (world.getSettings());
+        auto& plugins  (world.getPluginManager());
+        auto  engine   (world.getAudioEngine());
+        
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
         plugins.addFormat (new ElementAudioPluginFormat());
         
-        if (isFirstRun)
+        if (isFirstRun || settings.scanForPluginsOnStartup())
         {
-            if (auto* props = settings.getUserSettings())
-            {
-                props->setValue (Settings::checkForUpdatesKey, true);
-            }
-            
             auto& formats (plugins.formats());
             for (int i = 0; i < formats.getNumFormats(); ++i)
             {
@@ -164,13 +172,6 @@ private:
         else
         {
             plugins.restoreUserPlugins (settings);
-        }
-        
-        world.loadModule ("test");
-        controller = new AppController (world);
-        
-        if (usingThread) {
-            sendActionMessage ("finishedLaunching");
         }
     }
     

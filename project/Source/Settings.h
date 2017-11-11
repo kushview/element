@@ -16,13 +16,26 @@ public:
     ~Settings();
     
     static const char* checkForUpdatesKey;
-	static const char* pluginListKey;
-	static const char* pluginListKey64;
+    static const char* pluginListKey;
+    static const char* pluginListKey64;
+    static const char* pluginFormatsKey;
     static const char* lastPluginScanPathPrefix;
+    static const char* scanForPluginsOnStartKey;
     
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
+    
+    /** Returns true if updates shoul be checked for on launch */
     bool checkForUpdates() const;
+    
+    /** Set if should check updates on start */
+    void setCheckFormUpdates (const bool shouldCheck);
+    
+    /** Returns true if plugins should be scanned on startup */
+    bool scanForPluginsOnStartup() const;
+    
+    /** Set if plugins should be scanned during startup */
+    void setScanForPluginsOnStartup (const bool shouldScan);
     
 private:
     PropertiesFile* getProps() const;
