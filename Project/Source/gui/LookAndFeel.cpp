@@ -3,7 +3,7 @@
 
 namespace Element {
 
-const Colour Colors::elemental      = LookAndFeel_KV1::elementBlue;
+const Colour Colors::elemental      = Colour (0xff4765a0);  // LookAndFeel_KV1::elementBlue;
 const Colour Colors::toggleBlue     = Colour (0xff33aaf9);
 const Colour Colors::toggleGreen    = Colour (0xff92e75e);
 const Colour Colors::toggleOrange   = Colour (0xfffaa63a);
