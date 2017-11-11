@@ -46,7 +46,9 @@ public:
     String getMainViewName() const;
     void nextMainView();
     
+    int getNavSize();
     bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
+    
     void setVirtualKeyboardVisible (const bool isVisible);
     void toggleVirtualKeyboard();
     

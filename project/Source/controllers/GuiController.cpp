@@ -28,7 +28,7 @@ GuiController::~GuiController()
     
     if (mainWindow)
     {
-        pf->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+        
         closeAllWindows();
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
@@ -62,8 +62,11 @@ void GuiController::deactivate()
     auto* const props (getWorld().getSettings().getUserSettings());
     if (props && content)
     {
+        props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
         props->setValue ("lastContentView", content->getMainViewName());
-        props->setValue ("virtualKeyboard", (bool)content->isVirtualKeyboardVisible());
+        props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
+        props->setValue ("navSize",         content->getNavSize());
+        DBG("nav size unload: " << content->getNavSize());
     }
     
     Controller::deactivate();

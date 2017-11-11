@@ -35,34 +35,10 @@
 #include "gui/ContentComponent.h"
 
 #define EL_USE_AUDIO_PANEL 1
+#define EL_NAV_MIN_WIDTH 100
+#define EL_NAV_MAX_WIDTH 360
 
 namespace Element {
-
-class ContentComponent::Resizer : public StretchableLayoutResizerBar
-{
-public:
-    Resizer (ContentComponent& contentComponent, StretchableLayoutManager* layoutToUse,
-             int itemIndexInLayout, bool isBarVertical)
-        : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-          owner (contentComponent)
-    { }
-    
-    void mouseDown (const MouseEvent& ev) override
-    {
-        StretchableLayoutResizerBar::mouseDown (ev);
-        owner.resizerMouseDown();
-    }
-    
-    void mouseUp (const MouseEvent& ev) override
-    {
-        StretchableLayoutResizerBar::mouseUp (ev);
-        owner.resizerMouseUp();
-    }
-    
-private:
-    ContentComponent& owner;
-};
-
 
 class ContentComponent::Toolbar : public Component,
                                   public ButtonListener
@@ -615,7 +591,7 @@ public:
     }
 };
 
-// MARK: COntent container
+// MARK: Content container
 
 class ContentContainer : public Component
 {
@@ -713,6 +689,35 @@ private:
     }
 };
 
+    
+    
+class ContentComponent::Resizer : public StretchableLayoutResizerBar
+{
+public:
+    Resizer (ContentComponent& contentComponent, StretchableLayoutManager* layoutToUse,
+             int itemIndexInLayout, bool isBarVertical)
+    : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+    owner (contentComponent)
+    { }
+    
+    void mouseDown (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseDown (ev);
+        owner.resizerMouseDown();
+    }
+    
+    void mouseUp (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseUp (ev);
+        owner.resizerMouseUp();
+    }
+    
+private:
+    ContentComponent& owner;
+};
+    
+    
+    
 static ContentView* createLastContentView (Settings& settings)
 {
     auto* props = settings.getUserSettings();
@@ -760,8 +765,12 @@ ContentComponent::ContentComponent (AppController& ctl_)
     statusBarSize = 22;
     
     setSize (760, 480);
-    updateLayout();
-    resized();
+    
+    {
+        int navSize = controller.getGlobals().getSettings().getUserSettings()->getIntValue ("navSize", 220);
+        nav->setSize (navSize, getHeight());
+        resizerMouseUp();
+    }
     
     nav->expandPanelFully (nav->getSessionPanel(), false);
 }
@@ -780,15 +789,15 @@ String ContentComponent::getMainViewName() const
         return container->content1->getName();
     return String();
 }
-    
-void ContentComponent::childBoundsChanged (Component* child)
+
+int ContentComponent::getNavSize()
 {
+    return nav != nullptr ? nav->getWidth() : 220;
 }
 
-void ContentComponent::mouseDown (const MouseEvent& ev)
-{
-    Component::mouseDown (ev);
-}
+void ContentComponent::childBoundsChanged (Component* child) { }
+void ContentComponent::mouseDown (const MouseEvent& ev) { Component::mouseDown (ev); }
+
 void ContentComponent::setMainView (const String& name)
 {
     if (name == "PatchBay") {
@@ -924,22 +933,20 @@ void ContentComponent::setCurrentNode (const Node& node)
 
 void ContentComponent::updateLayout()
 {
-    layout.setItemLayout (0, 220, 220, 220);
+    layout.setItemLayout (0, EL_NAV_MIN_WIDTH, EL_NAV_MAX_WIDTH, nav->getWidth());
     layout.setItemLayout (1, 4, 4, 4);
     layout.setItemLayout (2, 300, -1, 400);
 }
 
 void ContentComponent::resizerMouseDown()
 {
-    layout.setItemLayout (0, 220, 220, 220);
-    layout.setItemLayout (1, 4, 4, 4);
-    layout.setItemLayout (2, 300, -1, 400);
+    updateLayout();
     resized();
 }
 
 void ContentComponent::resizerMouseUp()
 {
-    layout.setItemLayout (0, 220, 220, 220);
+    layout.setItemLayout (0, nav->getWidth(), nav->getWidth(), nav->getWidth());
     layout.setItemLayout (1, 4, 4, 4);
     layout.setItemLayout (2, 300, -1, 400);
     resized();
