@@ -79,13 +79,6 @@ namespace Element {
         clear();
 
         priv = nullptr;
-
-        if (refs.load() > 0) {
-            jassertfalse;
-            std::clog << "Session Destroyed with " << refs.load() << " references still existing\n";
-        } else {
-            std::clog << "Session Destroyed with no references\n";
-        }
     }
 
     void Sequence::appendTrack (const String& mediaType)

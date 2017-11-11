@@ -66,7 +66,6 @@ void GuiController::deactivate()
         props->setValue ("lastContentView", content->getMainViewName());
         props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
         props->setValue ("navSize",         content->getNavSize());
-        DBG("nav size unload: " << content->getNavSize());
     }
     
     Controller::deactivate();

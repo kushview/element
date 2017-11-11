@@ -40,12 +40,8 @@ namespace Element {
         clear();
 
         priv = nullptr;
-
-        if (getReferenceCount() > 0) {
-            std::clog << "Session Destroyed with " << getReferenceCount() << " references still existing\n";
-        } else {
-            std::clog << "Session Destroyed with no references\n";
-        }
+        
+        jassert (getReferenceCount() == 0);
     }
     
     bool Session::addGraph (const Node &node, const bool setActive)
