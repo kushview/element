@@ -156,9 +156,11 @@ private:
                 auto* format = formats.getFormat (i);
                 if (! format->canScanForPlugins())
                     continue;
+                
                 PluginDirectoryScanner scanner (plugins.availablePlugins(), *format,
                                                 format->getDefaultLocationsToSearch(),
-                                                true, File::nonexistent, false);
+                                                true, plugins.getDeadAudioPluginsFile(),
+                                                false);
                 String name;
                 DBG("[EL] Scanning for " << format->getName() << " plugins...");
                 while (scanner.scanNextFile (true, name))

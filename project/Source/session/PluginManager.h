@@ -18,6 +18,7 @@ public:
     void addDefaultFormats();
     void addFormat (AudioPluginFormat*);
 
+    const File& getDeadAudioPluginsFile() const;
     KnownPluginList& availablePlugins();
 
     AudioPluginFormatManager& getAudioPluginFormats() { return formats(); }

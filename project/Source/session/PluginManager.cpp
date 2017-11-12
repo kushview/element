@@ -4,7 +4,10 @@
 */
 
 #include "session/PluginManager.h"
+#include "DataPath.h"
 #include "Settings.h"
+
+#define EL_DEAD_AUDIO_PLUGINS_FILENAME "DeadAudioPlugins.txt"
 
 namespace Element {
 
@@ -12,13 +15,14 @@ class PluginManager::Private
 {
 public:
     Private()
-        : sampleRate (44100.0f),
-          blockSize (512)
-    {  }
+    {
+        deadAudioPlugins = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
+    }
 
     ~Private() {  }
 
     KnownPluginList allPlugins;
+    File deadAudioPlugins;
     AudioPluginFormatManager formats;
 
    #if ELEMENT_LV2_PLUGIN_HOST
@@ -26,8 +30,8 @@ public:
     OptionalPtr<SymbolMap> symbols;
    #endif
 
-    double sampleRate;
-    int    blockSize;
+    double sampleRate   = 44100.0;
+    int    blockSize    = 512;
 };
 
 PluginManager::PluginManager()
@@ -54,7 +58,7 @@ void PluginManager::addDefaultFormats()
 
 void PluginManager::addFormat (AudioPluginFormat* fmt)
 {
-    formats().addFormat (fmt);
+    getAudioPluginFormats().addFormat (fmt);
 }
 
 AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& desc, String& errorMsg)
@@ -73,7 +77,7 @@ AudioPluginFormat* PluginManager::format (const String& name)
 {
     for (int i = 0; i < formats().getNumFormats(); ++i)
     {
-        AudioPluginFormat* fmt = priv->formats.getFormat (i);
+        AudioPluginFormat* fmt = formats().getFormat (i);
         if (fmt && fmt->getName() == name)
             return fmt;
     }
@@ -86,11 +90,8 @@ AudioPluginFormatManager& PluginManager::formats()
     return priv->formats;
 }
 
-
-KnownPluginList& PluginManager::availablePlugins()
-{
-    return priv->allPlugins;
-}
+KnownPluginList& PluginManager::availablePlugins() { return priv->allPlugins; }
+const File& PluginManager::getDeadAudioPluginsFile() const { return priv->deadAudioPlugins; }
 
 static const char* pluginListKey()
 {
@@ -138,7 +139,8 @@ void PluginManager::scanInternalPlugins()
         
         PluginDirectoryScanner scanner (availablePlugins(), *format,
                                         format->getDefaultLocationsToSearch(),
-                                        true, File::nonexistent, false);
+                                        true, priv->deadAudioPlugins, false);
+        
         String name;
         while (scanner.scanNextFile (true, name)) {}
         
