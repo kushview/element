@@ -92,6 +92,10 @@
               file="Source/engine/SequencerTrack.cpp"/>
         <FILE id="UMM39Z" name="SequencerTrack.h" compile="0" resource="0"
               file="Source/engine/SequencerTrack.h"/>
+        <FILE id="aG4KEe" name="SubGraphProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/SubGraphProcessor.cpp"/>
+        <FILE id="WgHDwl" name="SubGraphProcessor.h" compile="0" resource="0"
+              file="Source/engine/SubGraphProcessor.h"/>
         <FILE id="NCc172" name="Transport.cpp" compile="1" resource="0" file="Source/engine/Transport.cpp"/>
         <FILE id="gEA8Kx" name="Transport.h" compile="0" resource="0" file="Source/engine/Transport.h"/>
         <FILE id="U2vAXo" name="VolumeProcessor.h" compile="0" resource="0"

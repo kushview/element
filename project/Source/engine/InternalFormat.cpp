@@ -13,6 +13,7 @@
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/ReverbProcessor.h"
+#include "engine/SubGraphProcessor.h"
 #include "engine/VolumeProcessor.h"
 #include "engine/WetDryProcessor.h"
 
@@ -217,6 +218,11 @@ namespace Element {
             ReverbProcessor reverb;
             reverb.fillInPluginDescription (*desc);
         }
+        else if (fileOrId == "element.graph")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            SubGraphProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -228,12 +234,13 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
+        results.add ("element.graph");
         return results;
     }
     
     AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, double, int)
     {
-        ScopedPointer<BaseProcessor> base;
+        ScopedPointer<AudioPluginInstance> base;
         
         if (desc.fileOrIdentifier == "element.comb.mono")
             base = new CombFilterProcessor (false);
@@ -258,6 +265,9 @@ namespace Element {
         
         else if (desc.fileOrIdentifier == "element.reverb")
             base = new ReverbProcessor();
+        
+        else if (desc.fileOrIdentifier == "element.graph")
+            base = new SubGraphProcessor();
         
         return base != nullptr ? base.release() : nullptr;
     }
