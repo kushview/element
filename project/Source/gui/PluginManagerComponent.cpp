@@ -598,9 +598,14 @@ private:
 
 void PluginListComponent::scanFor (AudioPluginFormat& format)
 {
+   #if EL_RUNNING_AS_PLUGIN
+    AlertWindow::showMessageBoxAsync(AlertWindow::NoIcon, "Plugin Scanner",
+                                     "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
+   #else
     currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads,
                                   dialogTitle.isNotEmpty() ? dialogTitle : TRANS("Scanning for plug-ins..."),
                                   dialogText.isNotEmpty()  ? dialogText  : TRANS("Searching for all possible plug-in files..."));
+   #endif
 }
 
 bool PluginListComponent::isScanning() const noexcept

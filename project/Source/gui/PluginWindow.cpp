@@ -112,8 +112,10 @@ public:
         else if (button == &nodeButton)
         {
             NodePopupMenu menu (node);
-           #if EL_RUNNING_AS_PLUGIN
-            menu.clear(); // FIXME: need to have access to app controller via the Plugin Window
+           #if 1
+            menu.clear(); // FIXME: need to have access to app controller via the PluginWindow
+                          // Can't use static objects to account for multiple running Element AU/VST
+                          // instances
            #endif
             menu.addProgramsMenu();
             if (auto* message = menu.showAndCreateMessage())
