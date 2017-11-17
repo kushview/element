@@ -6,6 +6,7 @@
 #include "engine/GraphNode.h"
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
+#include "gui/ContextMenus.h"
 
 namespace Element {
 static Array <PluginWindow*> activePluginWindows;
@@ -54,8 +55,14 @@ public:
         addAndMakeVisible (editor);
         editor->addComponentListener (this);
         
+        addAndMakeVisible (nodeButton);
+        nodeButton.setButtonText ("n");
+        nodeButton.setToggleState (object->getAudioProcessor()->isSuspended(), dontSendNotification);
+        nodeButton.setColour (TextButton::buttonOnColourId, Colours::red);
+        nodeButton.addListener (this);
+        
         addAndMakeVisible (bypassButton);
-        bypassButton.setButtonText ("B");
+        bypassButton.setButtonText ("b");
         bypassButton.setToggleState (object->getAudioProcessor()->isSuspended(), dontSendNotification);
         bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
         bypassButton.addListener (this);
@@ -96,9 +103,15 @@ public:
         {
             auto r2 = r.removeFromTop (toolbar->getThickness());
             toolbar->setBounds (r2);
-            r2.removeFromRight(4);
-            bypassButton.changeWidthToFitText();
-            bypassButton.setBounds (r2.removeFromRight(bypassButton.getWidth()).reduced (1));
+            
+            auto r3 = r2.withSizeKeepingCentre (r2.getWidth(), 16);
+            r3.removeFromRight (4);
+            
+            nodeButton.setBounds (r3.removeFromRight (16));
+            r3.removeFromRight (4);
+            
+            bypassButton.setBounds (r3.removeFromRight (16));
+            r3.removeFromRight (4);
         }
         
         editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
@@ -115,6 +128,13 @@ public:
             bypassButton.setToggleState (isNowSuspended, dontSendNotification);
             node.setProperty (Tags::bypass, isNowSuspended);
         }
+        else if (button == &nodeButton)
+        {
+            NodePopupMenu menu (node);
+            menu.addProgramsMenu();
+            if (auto* message = menu.showAndCreateMessage())
+                ViewHelpers::postMessageFor (this, message);
+        }
     }
     
     void componentMovedOrResized (Component& c, bool wasMoved, bool wasResized) override
@@ -130,7 +150,7 @@ public:
     
 private:
     ScopedPointer<PluginWindowToolbar> toolbar;
-    TextButton bypassButton;
+    SettingButton bypassButton, nodeButton;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
     GraphNodePtr object;
     Node node;

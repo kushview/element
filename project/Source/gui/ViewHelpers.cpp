@@ -58,6 +58,11 @@ ContentComponent* findContentComponent (Component* c)
 {
     if (auto* cc = c->findParentComponentOfClass<ContentComponent>())
         return cc;
+    
+    for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
+        if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
+            return dynamic_cast<ContentComponent*> (main->getContentComponent());
+    
     return nullptr;
 }
 
