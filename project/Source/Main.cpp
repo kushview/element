@@ -321,7 +321,9 @@ private:
             {
                 if (slave->initialiseFromCommandLine (commandLine, pid))
                 {
+				   #if JUCE_MAC
                     Process::setDockIconVisible (false);
+				   #endif
                     juce::shutdownJuce_GUI();
                     return true;
                 }
