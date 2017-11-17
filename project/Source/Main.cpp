@@ -34,8 +34,6 @@ public:
 
     ~Startup() { }
     
-
-    
     void launchApplication()
     {
         Settings& settings (world.getSettings());
@@ -73,6 +71,7 @@ public:
     const bool isUsingThread() const { return usingThread; }
 
 private:
+    friend class Application;
     Globals& world;
     const bool usingThread;
     const bool showSplash;
@@ -134,8 +133,7 @@ private:
         world.loadModule ("test");
         controller = new AppController (world);
         
-        if (usingThread)
-            sendActionMessage ("finishedLaunching");
+        sendActionMessage ("finishedLaunching");
     }
     
     void setupPlugins()
@@ -147,47 +145,19 @@ private:
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
         plugins.addFormat (new ElementAudioPluginFormat());
-        
-        if (isFirstRun || settings.scanForPluginsOnStartup())
-        {
-            auto& formats (plugins.formats());
-            for (int i = 0; i < formats.getNumFormats(); ++i)
-            {
-                auto* format = formats.getFormat (i);
-                if (! format->canScanForPlugins())
-                    continue;
-                
-                PluginDirectoryScanner scanner (plugins.availablePlugins(), *format,
-                                                format->getDefaultLocationsToSearch(),
-                                                true, plugins.getDeadAudioPluginsFile(),
-                                                false);
-                String name;
-                DBG("[EL] Scanning for " << format->getName() << " plugins...");
-                while (scanner.scanNextFile (true, name))
-                {
-                    DBG("[EL]  " << name);
-                }
-            }
-            
-            settings.saveIfNeeded();
-        }
-        else
-        {
-            plugins.restoreUserPlugins (settings);
-        }
+        plugins.restoreUserPlugins (settings);
+        plugins.setPropertiesFile (settings.getUserSettings());
     }
     
     void setupAnalytics()
     {
-        // Add an analytics identifier for the user. Make sure you don't collect
-        // identifiable information accidentally if you haven't asked for permission!
-        Analytics::getInstance()->setUserId ("annonymous");
-        
+        auto* analytics (Analytics::getInstance());
         StringPairArray userData;
         userData.set ("group", "beta");
-        Analytics::getInstance()->setUserProperties (userData);
-        Analytics::getInstance()->addDestination (new GoogleAnalyticsDestination());
-        Analytics::getInstance()->logEvent ("startup", {});
+        analytics->setUserId ("annonymous");
+        analytics->setUserProperties (userData);
+        analytics->addDestination (new GoogleAnalyticsDestination());
+        analytics->logEvent ("startup", {});
     }
 };
 
@@ -202,8 +172,15 @@ public:
     const String getApplicationVersion() override      { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed()    override      { return true; }
 
-    void initialise (const String&  commandLine ) override
+    void initialise (const String& commandLine ) override
     {
+        world = new Globals (commandLine);
+        world->getUnlockStatus().loadAll();
+        initializeModulePath();
+        
+        if (maybeLaunchSlave (commandLine))
+            return;
+        
         if (sendCommandLineToPreexistingInstance())
         {
             quit();
@@ -212,10 +189,7 @@ public:
         
         Logger::writeToLog ("Element v" + getApplicationVersion());
         Logger::writeToLog ("Copyright (c) 2017-2018 Kushview, LLC.  All rights reserved.\n");
-        
-        initializeModulePath();
-        world = new Globals (commandLine);
-        world->getUnlockStatus().loadAll();
+
         launchApplication();
     }
     
@@ -229,6 +203,8 @@ public:
     {
         if (! world || ! controller)
             return;
+
+        slaves.clearQuick (true);
         
         Analytics::getInstance()->logEvent ("shutdown", {});
         
@@ -239,7 +215,7 @@ public:
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
-        
+        plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);
@@ -305,6 +281,9 @@ public:
         if (nullptr != controller || nullptr == startup)
             return;
         
+        if (world->getSettings().scanForPluginsOnStartup() || startup->isFirstRun)
+            world->getPluginManager().scanAudioPlugins();
+    
         controller = startup->controller.release();
         startup = nullptr;
         controller->run();
@@ -326,9 +305,31 @@ public:
     
 private:
     String launchCommandLine;
-    ScopedPointer<Globals>       world;
-    ScopedPointer<AppController> controller;
-    ScopedPointer<Startup>       startup;
+    ScopedPointer<Globals>          world;
+    ScopedPointer<AppController>    controller;
+    ScopedPointer<Startup>          startup;
+    OwnedArray<ChildProcessSlave>   slaves;
+    
+    bool maybeLaunchSlave (const String& commandLine)
+    {
+        slaves.clearQuick (true);
+        slaves.add (world->getPluginManager().createAudioPluginScannerSlave());
+        StringArray processIds = { EL_PLUGIN_SCANNER_PROCESS_ID };
+        for (auto* slave : slaves)
+        {
+            for (const auto& pid : processIds)
+            {
+                if (slave->initialiseFromCommandLine (commandLine, pid))
+                {
+                    Process::setDockIconVisible (false);
+                    juce::shutdownJuce_GUI();
+                    return true;
+                }
+            }
+        }
+        
+        return false;
+    }
     
     void launchApplication()
     {
@@ -338,8 +339,6 @@ private:
         startup = new Startup (*world, false, false);
         startup->addActionListener (this);
         startup->launchApplication();
-        if (startup && !startup->isUsingThread())
-            finishLaunching();
     }
     
     void initializeModulePath()

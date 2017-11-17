@@ -30,6 +30,7 @@
 #include "gui/ContentComponent.h"
 
 namespace Element {
+class PluginManager;
 //==============================================================================
 /**
      A component displaying a list of plugins, with options to scan for them,
@@ -48,10 +49,7 @@ public:
      For info about the deadMansPedalFile, see the PluginDirectoryScanner constructor.
      The properties file, if supplied, is used to store the user's last search paths.
      */
-    PluginListComponent (AudioPluginFormatManager& formatManager,
-                         KnownPluginList& listToRepresent,
-                         const File& deadMansPedalFile,
-                         PropertiesFile* propertiesToUse,
+    PluginListComponent (PluginManager&, PropertiesFile* props = nullptr,
                          bool allowPluginsWhichRequireAsynchronousInstantiation = false);
     
     /** Destructor. */
@@ -95,6 +93,7 @@ public:
     TableListBox& getTableListBox() noexcept            { return table; }
     
 private:
+    PluginManager& plugins;
     AudioPluginFormatManager& formatManager;
     KnownPluginList& list;
     File deadMansPedalFile;

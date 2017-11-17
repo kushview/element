@@ -106,18 +106,18 @@ public:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableModel)
 };
 
-PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, KnownPluginList& listToEdit,
-                                          const File& deadMansPedal, PropertiesFile* const props,
+PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* props,
                                           bool allowPluginsWhichRequireAsynchronousInstantiation)
-: formatManager (manager),
-  list (listToEdit),
-  deadMansPedalFile (deadMansPedal),
-  optionsButton ("Options..."),
-  propertiesToUse (props),
-  allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-  numThreads (allowAsync ? 1 : 0)
+    : plugins(p),
+      formatManager (p.getAudioPluginFormats()),
+      list (p.availablePlugins()),
+      deadMansPedalFile (p.getDeadAudioPluginsFile()),
+      optionsButton ("Options..."),
+      propertiesToUse (props),
+      allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
+      numThreads (allowAsync ? 1 : 0)
 {
-    tableModel = new TableModel (*this, listToEdit);
+    tableModel = new TableModel (*this, list);
     
     TableHeaderComponent& header = table.getHeader();
     
@@ -152,6 +152,7 @@ PluginListComponent::PluginListComponent (AudioPluginFormatManager& manager, Kno
     
     setSize (400, 600);
     list.addChangeListener (this);
+    plugins.addChangeListener (this);
     updateList();
     table.getHeader().reSortTable();
     
@@ -184,26 +185,30 @@ void PluginListComponent::setNumberOfThreadsForScanning (int num)
 void PluginListComponent::resized()
 {
     Rectangle<int> r (getLocalBounds().reduced (2));
-    auto r2 = r.removeFromBottom (24);
+    auto r2 = r.removeFromBottom (24).reduced (0, 2);
     
     for (auto* b : formatButtons)
     {
-        b->changeWidthToFitText (24);
+        b->changeWidthToFitText (r2.getHeight());
         b->setBounds (r2.removeFromLeft (b->getWidth()));
         r2.removeFromLeft (4);
     }
     r2.removeFromLeft (4);
     optionsButton.setBounds (r2);
-    optionsButton.changeWidthToFitText (24);
+    optionsButton.changeWidthToFitText (r2.getHeight());
     
     r.removeFromBottom (3);
     table.setBounds (r);
 }
 
-void PluginListComponent::changeListenerCallback (ChangeBroadcaster*)
+void PluginListComponent::changeListenerCallback (ChangeBroadcaster* cb)
 {
     table.getHeader().reSortTable();
     updateList();
+    
+    if (cb == &plugins) {
+        currentScanner = nullptr;
+    }
 }
 
 void PluginListComponent::updateList()
@@ -342,8 +347,9 @@ bool PluginListComponent::isInterestedInFileDrag (const StringArray& /*files*/)
 
 void PluginListComponent::filesDropped (const StringArray& files, int, int)
 {
-    OwnedArray<PluginDescription> typesFound;
-    list.scanAndAddDragAndDroppedFiles (formatManager, files, typesFound);
+// FIXME
+//    OwnedArray<PluginDescription> typesFound;
+//    list.scanAndAddDragAndDroppedFiles (formatManager, files, typesFound);
 }
 
 FileSearchPath PluginListComponent::getLastSearchPath (PropertiesFile& properties, AudioPluginFormat& format)
@@ -515,8 +521,10 @@ private:
         
         progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         progressWindow.addProgressBarComponent (progress);
+        progress = -1.0;
         progressWindow.enterModalState();
         
+    #if 0
         if (numThreads > 0)
         {
             pool = new ThreadPool (numThreads);
@@ -524,6 +532,9 @@ private:
             for (int i = numThreads; --i >= 0;)
                 pool->addJob (new ScanJob (*this), true);
         }
+    #else
+        owner.plugins.scanAudioPlugins();
+    #endif
         
         startTimer (20);
     }
@@ -536,11 +547,13 @@ private:
     
     void timerCallback() override
     {
+        #if 0
         if (pool == nullptr)
         {
             if (doNextScan())
                 startTimer (20);
         }
+        #endif
         
         if (! progressWindow.isCurrentlyModal())
             finished = true;
@@ -548,7 +561,7 @@ private:
         if (finished)
             finishedScan();
         else
-            progressWindow.setMessage (TRANS("Testing") + ":\n\n" + pluginBeingScanned);
+            progressWindow.setMessage ("Testing plugins...");
     }
     
     bool doNextScan()
@@ -592,7 +605,7 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
 
 bool PluginListComponent::isScanning() const noexcept
 {
-    return currentScanner != nullptr;
+    return plugins.isScanningAudioPlugins();
 }
 
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
@@ -623,14 +636,10 @@ void PluginManagerContentView::didBecomeActive()
     auto& world (*ViewHelpers::getGlobals (this));
     auto& plugins (world.getPluginManager());
     auto& settings (world.getSettings());
-    
+
     if (pluginList)
         pluginList = nullptr;
-    pluginList = new Element::PluginListComponent (
-        plugins.getAudioPluginFormats(),
-        plugins.availablePlugins(),
-        File::nonexistent,
-        settings.getUserSettings());
+    pluginList = new Element::PluginListComponent (plugins, settings.getUserSettings());
     addAndMakeVisible (pluginList);
     resized();
 }

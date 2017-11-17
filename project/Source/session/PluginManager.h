@@ -7,9 +7,11 @@
 
 #include "ElementApp.h"
 
+#define EL_PLUGIN_SCANNER_PROCESS_ID    "pspelbg"
+
 namespace Element {
 
-class PluginManager
+class PluginManager : public ChangeBroadcaster
 {
 public:
     PluginManager();
@@ -30,12 +32,22 @@ public:
     template<class FormatType>
     inline FormatType* format()
     {
-        for (int i = 0; i < formats().getNumFormats(); ++i)
-            if (FormatType* fmt = dynamic_cast<FormatType*> (formats().getFormat (i)))
+        auto& f (getAudioPluginFormats());
+        for (int i = 0; i < f.getNumFormats(); ++i)
+            if (FormatType* fmt = dynamic_cast<FormatType*> (f.getFormat (i)))
                 return fmt;
         return nullptr;
     }
-
+    
+    /** creates a child process slave used in start up */
+    ChildProcessSlave* createAudioPluginScannerSlave();
+    
+    /** Scans for all audio plugin types using a child process */
+    void scanAudioPlugins (const StringArray& formats = StringArray());
+    
+    /** true if a scan is in progress using the child process */
+    bool isScanningAudioPlugins();
+    
     /** Looks for new or updated internal/element plugins */
     void scanInternalPlugins();
     
@@ -55,9 +67,18 @@ public:
 
     void setPlayConfig (double sampleRate, int blockSize);
 
+    /** Give a properties file to be used when settings aren;t available. FIXME */
+    void setPropertiesFile (PropertiesFile* pf) {
+        props = pf;
+    }
+    
 private:
+    PropertiesFile* props = nullptr;
     class Private;
     ScopedPointer<Private> priv;
+    
+    friend class PluginScannerMaster;
+    void scanFinished();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
 };
