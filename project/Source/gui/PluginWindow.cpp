@@ -3,6 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/GuiController.h"
 #include "engine/GraphNode.h"
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
@@ -27,25 +28,6 @@ class PluginWindowContent : public Component,
                             public ButtonListener
 {
 public:
-    PluginWindowContent (Component* const _editor, GraphNode* _node)
-        : editor (_editor), object(_node)
-    {
-        addAndMakeVisible (toolbar = new PluginWindowToolbar());
-        toolbar->setBounds (0, 0, getWidth(), 24);
-        
-        addAndMakeVisible (editor);
-        
-        addAndMakeVisible (bypassButton);
-        
-        bypassButton.setButtonText ("Bypass");
-        bypassButton.setToggleState (node.isBypassed(), dontSendNotification);
-        bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
-        bypassButton.addListener (this);
-        
-        setSize (editor->getWidth(), editor->getHeight() + toolbar->getHeight());
-        resized();
-    }
-    
     PluginWindowContent (Component* const _editor, const Node& _node)
         : editor (_editor), object(_node.getGraphNode()), node(_node)
     {
@@ -57,7 +39,6 @@ public:
         
         addAndMakeVisible (nodeButton);
         nodeButton.setButtonText ("n");
-        nodeButton.setToggleState (object->getAudioProcessor()->isSuspended(), dontSendNotification);
         nodeButton.setColour (TextButton::buttonOnColourId, Colours::red);
         nodeButton.addListener (this);
         
@@ -131,6 +112,9 @@ public:
         else if (button == &nodeButton)
         {
             NodePopupMenu menu (node);
+           #if EL_RUNNING_AS_PLUGIN
+            menu.clear(); // FIXME: need to have access to app controller via the Plugin Window
+           #endif
             menu.addProgramsMenu();
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
@@ -189,6 +173,11 @@ PluginWindow::~PluginWindow()
     clearContentComponent();
 }
 
+ContentComponent* PluginWindow::getElementContentComponent() const
+{
+    return nullptr; // FIXME
+}
+    
 void PluginWindow::deleteWindow (const int index, const bool windowVisible)
 {
     auto* window = activePluginWindows.getUnchecked (index);

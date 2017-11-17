@@ -4,8 +4,10 @@
 
 namespace Element {
 
+class ContentComponent;
 class GraphNode;
-    
+class GuiController;
+
 /** A desktop window containing a plugin's UI. */
 class PluginWindow : public DocumentWindow
 {
@@ -35,6 +37,8 @@ public:
 
     ~PluginWindow();
 
+    ContentComponent* getElementContentComponent() const;
+    
     Toolbar* getToolbar() const;
     void updateGraphNode (GraphNode* newNode, Component* newEditor);
     
