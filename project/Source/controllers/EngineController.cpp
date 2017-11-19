@@ -151,8 +151,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
         auto* format = getWorld().getPluginManager().getAudioPluginFormat (desc.pluginFormatName);
         jassert(format != nullptr);
         auto& list (getWorld().getPluginManager().availablePlugins());
-        OwnedArray<PluginDescription> dummy;
-        if (list.scanAndAddFile (desc.fileOrIdentifier, true, plugs, *format)) {
+        if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format)) {
             getWorld().getPluginManager().saveUserPlugins (getWorld().getSettings());
         }
     }
@@ -163,6 +162,8 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     
     if (plugs.size() > 0)
         root->addFilter (plugs.getFirst(), rx, ry);
+    else
+        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add Plugin", String("Could not add ") + desc.name + " for an unknown reason");
 }
 
 void EngineController::removeNode (const uint32 nodeId)
