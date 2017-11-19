@@ -234,7 +234,8 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
-        results.add ("element.graph");
+        // TODO: Subgraphs
+//        results.add ("element.graph");
         return results;
     }
     
