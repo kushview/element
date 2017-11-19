@@ -517,6 +517,10 @@ void PluginManager::scanInternalPlugins()
         if (format->getName() != "Element")
             continue;
         
+        for (int j = priv->allPlugins.getNumTypes(); --j >= 0;)
+            if (priv->allPlugins.getType(j)->pluginFormatName == "Element")
+                priv->allPlugins.removeType (j);
+        
         PluginDirectoryScanner scanner (availablePlugins(), *format,
                                         format->getDefaultLocationsToSearch(),
                                         true, priv->deadAudioPlugins, false);
