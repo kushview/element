@@ -7,9 +7,16 @@
 #include "DataPath.h"
 #include "Settings.h"
 
-#define EL_DEAD_AUDIO_PLUGINS_FILENAME  "DeadAudioPlugins.txt"
-#define EL_PLUGIN_SCANNER_START_ID      "start"
-#define EL_PLUGIN_SCANNER_FINISHED_ID   "finished"
+#define EL_DEAD_AUDIO_PLUGINS_FILENAME          "DeadAudioPlugins.txt"
+
+#define EL_PLUGIN_SCANNER_WAITING_STATE         "waiting"
+#define EL_PLUGIN_SCANNER_READY_STATE           "ready"
+
+#define EL_PLUGIN_SCANNER_READY_ID              "ready"
+#define EL_PLUGIN_SCANNER_START_ID              "start"
+#define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
+
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       12000  // 12 Seconds
 
 namespace Element {
 
@@ -17,73 +24,144 @@ class PluginScannerMaster : public ChildProcessMaster,
                             public AsyncUpdater
 {
 public:
-    explicit PluginScannerMaster (PluginManager& o) : owner(o) { }
+    explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
     ~PluginScannerMaster() { }
     
     bool startScanning (const StringArray& names = StringArray())
     {
-        if (running)
+        if (isRunning())
             return true;
         
-        slaveState = String();
-        running = launchScanner();
-        return running;
+        {
+            ScopedLock sl (lock);
+            slaveState  = String();
+            running     = false;
+            formatNames = names;
+        }
+        
+        const bool res = launchScanner();
+        
+        {
+            ScopedLock sl (lock);
+            running = res;
+        }
+        
+        return res;
     }
     
     void handleMessageFromSlave (const MemoryBlock& mb) override
     {
-        const String message (mb.toString());
-        const String lastState = slaveState;
-        if (message == EL_PLUGIN_SCANNER_FINISHED_ID)
-        {
-            slaveState = "complete";
-        }
-        else
-        {
-            slaveState = "scanning";
-        }
+        const auto data (mb.toString());
+        const auto type (data.upToFirstOccurrenceOf (":", false, false));
+        const auto message (data.fromFirstOccurrenceOf (":", false, false));
         
-        DBG("scanner message: " << message);
-        if (lastState != slaveState)
-            triggerAsyncUpdate();
+        if (type == "state")
+        {
+            ScopedLock sl (lock);
+            const String lastState = slaveState;
+            slaveState = message;
+            if (lastState != slaveState) {
+                ScopedUnlock sul (lock);
+                triggerAsyncUpdate();
+            }
+        }
+        else if (type == "name")
+        {
+            owner.listeners.call (&PluginScanner::Listener::audioPluginScanStarted, message.trim());
+            ScopedLock sl (lock);
+            pluginBeingScanned = message.trim();
+        }
+        else if (type == "progress")
+        {
+            float newProgress = (float) var(message);
+            owner.listeners.call (&PluginScanner::Listener::audioPluginScanProgress, newProgress);
+            ScopedLock sl (lock);
+            progress = newProgress;
+        }
     }
     
     void handleConnectionLost() override
     {
         // this probably will happen when a plugin crashes.
+        {
+            ScopedLock sl (lock);
+            running = false;
+        }
+        
         triggerAsyncUpdate();
     }
     
     void handleAsyncUpdate() override
     {
-        if (slaveState == "scanning" && running)
+        if (slaveState == "ready" && isRunning())
         {
-            DBG("a plugin crashed or something, still scanning......");
-            running = launchScanner();
+            String msg = "scan:"; msg << formatNames.joinIntoString(",");
+            MemoryBlock mb (msg.toRawUTF8(), msg.length());
+            sendMessageToSlave (mb);
         }
-        else if (slaveState == "complete")
+        else if (slaveState == "scanning")
         {
-            DBG("Slave finished scanning");
-            running = false;
-            owner.scanFinished(); // will delete this object
+            if (! isRunning())
+            {
+                DBG("[EL] a plugin crashed or timed out during scan");
+                const bool res = launchScanner();
+                ScopedLock sl (lock);
+                running = res;
+            }
+            else
+            {
+                DBG("[EL] scanning... and running....");
+            }
+        }
+        else if (slaveState == "finished")
+        {
+            DBG("[EL] slave finished scanning");
+            owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
         }
         else
         {
-            running = false;
-            DBG("slave quit at state: " << slaveState);
-            owner.scanFinished(); // will delete this object
+            DBG("[EL] invalid slave state: " << slaveState);
         }
     }
     
-    bool isScanning() const { return running; }
+    const String getSlaveState() const
+    {
+        ScopedLock sl (lock);
+        return slaveState;
+    }
+    
+    float getProgress() const
+    {
+        ScopedLock sl (lock);
+        return progress;
+    }
+    
+    bool isRunning() const
+    {
+        ScopedLock sl (lock);
+        return running;
+    }
     
 private:
-    PluginManager& owner;
+    PluginScanner& owner;
+
+    CriticalSection lock;
     bool running    = false;
     float progress  = 0.f;
     String slaveState;
+    StringArray formatNames;
+    StringArray faileFiles;
     
-    bool launchScanner (const int timeout = 2000, const int flags = 0)
+    String pluginBeingScanned;
+    
+    void resetScannerVariables()
+    {
+        ScopedLock sl (lock);
+        pluginBeingScanned = String();
+        progress = -1.f;
+    }
+    
+    bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
         return launchSlaveProcess (File::getSpecialLocation (File::currentExecutableFile),
                                    EL_PLUGIN_SCANNER_PROCESS_ID, timeout, flags);
@@ -96,7 +174,25 @@ public:
     PluginScannerSlave() { }
     ~PluginScannerSlave() { }
     
-    void handleMessageFromMaster (const MemoryBlock&) override { }
+    void handleMessageFromMaster (const MemoryBlock& mb) override
+    {
+        const auto data (mb.toString());
+        const auto type (data.upToFirstOccurrenceOf (":", false, false));
+        const auto message (data.fromFirstOccurrenceOf (":", false, false));
+        
+        if (type == "scan")
+        {
+            sendState ("scanning");
+            
+            const auto formats (StringArray::fromTokens (message.trim(), ",", "'"));
+
+            for (const auto& format : formats) {
+                scanFor (format);
+            }
+            
+            sendState ("finished");
+        }
+    }
     
     void handleConnectionMade() override
     {
@@ -104,59 +200,107 @@ public:
         plugins     = new PluginManager();
         plugins->addDefaultFormats();
         plugins->restoreUserPlugins (*settings);
-        
-        sendString (EL_PLUGIN_SCANNER_START_ID);
-        Thread::sleep (1000);
-        
-        auto& formats (plugins->getAudioPluginFormats());
-        for (int i = 0; i < formats.getNumFormats(); ++i)
-        {
-            auto* format = formats.getFormat (i);
-            if (! format->canScanForPlugins())
-                continue;
-            
-            const auto key = String(settings->lastPluginScanPathPrefix) + format->getName();
-            FileSearchPath path (settings->getUserSettings()->getValue (key));
-            
-            PluginDirectoryScanner scanner (plugins->availablePlugins(), *format,
-                                            path, true, plugins->getDeadAudioPluginsFile(),
-                                            false);
-            String name;
-            
-            DBG("[EL] Scanning for " << format->getName() << " plugins...");
-            while (scanner.scanNextFile (true, name))
-            {
-                
-            }
-        }
-        
-        plugins->saveUserPlugins (*settings);
-        settings->saveIfNeeded();
-        sendString (EL_PLUGIN_SCANNER_FINISHED_ID);
+        sendState (EL_PLUGIN_SCANNER_READY_ID);
     }
     
     void handleConnectionLost() override
     {
-        settings = nullptr;
-        plugins = nullptr;
-        exit(1);
+        settings    = nullptr;
+        plugins     = nullptr;
+        scanner     = nullptr;
+        exit(0);
     }
-    
-    void sendString (const String& state)
-    {
-        MemoryBlock mb (state.toRawUTF8(), state.length());
-        sendMessageToMaster (mb);
-    }
-    
+
 private:
     ScopedPointer<Settings> settings;
     ScopedPointer<PluginManager> plugins;
+    ScopedPointer<PluginDirectoryScanner> scanner;
+    String fileOrIdentifier;
+    
+    bool sendState (const String& state)
+    {
+        return sendString ("state", state);
+    }
+    
+    bool sendString (const String& type, const String& message)
+    {
+        String data = type; data << ":" << message.trim();
+        MemoryBlock mb (data.toRawUTF8(), data.length());
+        return sendMessageToMaster (mb);
+    }
+    
+    bool doNextScan()
+    {
+        sendString ("name", scanner->getNextPluginFileThatWillBeScanned());
+        if (scanner->scanNextFile (true, fileOrIdentifier))
+        {
+            sendString ("progress", String (scanner->getProgress()));
+            plugins->saveUserPlugins (*settings);
+            settings->saveIfNeeded();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void scanFor (const String& formatName)
+    {
+        if (plugins == nullptr || settings == nullptr)
+            return;
+        if (auto* format = plugins->getAudioPluginFormat (formatName))
+            scanFor (*format);
+    }
+    
+    void scanFor (AudioPluginFormat& format)
+    {
+        if (plugins == nullptr || settings == nullptr)
+            return;
+        
+        const auto key = String(settings->lastPluginScanPathPrefix) + format.getName();
+        FileSearchPath path (settings->getUserSettings()->getValue (key));
+        scanner = new PluginDirectoryScanner (plugins->availablePlugins(), format,
+                                              path, true, plugins->getDeadAudioPluginsFile(),
+                                              false);
+        
+        while (doNextScan()) { }
+    }
 };
 
-class PluginManager::Private
+// MARK: Plugin Scanner
+
+PluginScanner::PluginScanner() { }
+PluginScanner::~PluginScanner()
+{
+    listeners.clear();
+    master = nullptr;
+}
+
+void PluginScanner::cancel() { master = nullptr; }
+
+bool PluginScanner::isScanning() const { return master && master->isRunning(); }
+
+void PluginScanner::scanForAudioPlugins (const juce::String &formatName)
+{
+    scanForAudioPlugins (StringArray ({ formatName }));
+}
+
+void PluginScanner::scanForAudioPlugins (const StringArray& formats)
+{
+    if (master)
+    {
+        master = nullptr;
+    }
+    
+    master = new PluginScannerMaster (*this);
+    master->startScanning (formats);
+}
+    
+// MARK: Plugin Manager
+    
+class PluginManager::Private : public PluginScanner::Listener
 {
 public:
-    Private()
+    Private (PluginManager& o) : owner (o)
     {
         deadAudioPlugins = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
     }
@@ -179,10 +323,13 @@ public:
         return didSomething;
     }
     
+private:
+    friend class PluginManager;
+    PluginManager& owner;
+    AudioPluginFormatManager formats;
     KnownPluginList allPlugins;
     File deadAudioPlugins;
-    AudioPluginFormatManager formats;
-
+    
    #if ELEMENT_LV2_PLUGIN_HOST
     OptionalPtr<LV2World> lv2;
     OptionalPtr<SymbolMap> symbols;
@@ -191,12 +338,41 @@ public:
     double sampleRate   = 44100.0;
     int    blockSize    = 512;
     
-    ScopedPointer<PluginScannerMaster> master;
+    ScopedPointer<PluginScanner> scanner;
+    
+    void scanAudioPlugins (const StringArray& names)
+    {
+        if (scanner)
+        {
+            scanner->cancel();
+            scanner = nullptr;
+        }
+    
+        StringArray formatsToScan = names;
+        if (formatsToScan.isEmpty())
+            for (int i = 0; i < formats.getNumFormats(); ++i)
+                if (formats.getFormat(i)->getName() != "Element" && formats.getFormat(i)->canScanForPlugins())
+                    formatsToScan.add (formats.getFormat(i)->getName());
+   
+        scanner = new PluginScanner();
+        scanner->addListener (this);
+        scanner->scanForAudioPlugins (formatsToScan);
+    }
+    
+    void audioPluginScanFinished() override
+    {
+        owner.scanFinished();
+    }
+    
+    void audioPluginScanStarted (const String& plugin) override
+    {
+        DBG("[EL] plugin scanned in background: " << plugin);
+    }
 };
 
 PluginManager::PluginManager()
 {
-    priv = new Private();
+    priv = new Private (*this);
    #if ELEMENT_LV2_PLUGIN_HOST
     priv->symbols.setOwned (new SymbolMap ());
     priv->lv2.setOwned (new LV2World());
@@ -226,8 +402,18 @@ ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
     return new PluginScannerSlave();
 }
 
-bool PluginManager::isScanningAudioPlugins() { return (priv && priv->master) ? priv->master->isScanning() : false; }
+PluginScanner* PluginManager::createAudioPluginScanner()
+{
+    auto* scanner = new PluginScanner();
+    return scanner;
+}
     
+bool PluginManager::isScanningAudioPlugins()
+{
+    return (priv && priv->scanner) ? priv->scanner->isScanning()
+                                   : false;
+}
+
 AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& desc, String& errorMsg)
 {
     return formats().createPluginInstance (desc, priv->sampleRate, priv->blockSize, errorMsg);
@@ -275,6 +461,7 @@ void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
     ScopedXml elm (priv->allPlugins.createXml());
 	settings.getUserSettings()->setValue (pluginListKey(), elm.get());
+    settings.saveIfNeeded();
 }
 
 void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
@@ -303,14 +490,15 @@ void PluginManager::setPlayConfig (double sampleRate, int blockSize)
 
 void PluginManager::scanAudioPlugins (const StringArray& names)
 {
-    if (! priv) return;
+    if (! priv)
+        return;
+
     if (isScanningAudioPlugins())
         return;
-    if (! priv->master)
-        priv->master = new PluginScannerMaster (*this);
-    priv->master->startScanning (names);
-}
     
+    priv->scanAudioPlugins (names);
+}
+
 void PluginManager::scanInternalPlugins()
 {
     for (int i = 0; i < formats().getNumFormats(); ++i)
@@ -333,11 +521,11 @@ void PluginManager::scanInternalPlugins()
 
 void PluginManager::scanFinished()
 {
-    if (priv->master)
-        priv->master = nullptr;
-    
+    if (priv->scanner)
+        priv->scanner = nullptr;
+
     jassert(! isScanningAudioPlugins());
-    
+
     if (props && props->reload())
         if (ScopedXml xml = props->getXmlValue (pluginListKey()))
             restoreUserPlugins (*xml);

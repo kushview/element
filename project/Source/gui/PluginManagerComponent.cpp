@@ -367,7 +367,8 @@ void PluginListComponent::setLastSearchPath (PropertiesFile& properties, AudioPl
 
 // MARK: Scanner
 
-class PluginListComponent::Scanner : private Timer
+class PluginListComponent::Scanner : private Timer,
+                                     public PluginScanner::Listener
 {
 public:
     Scanner (PluginListComponent& plc, AudioPluginFormat& format, PropertiesFile* properties,
@@ -421,7 +422,8 @@ private:
     PluginListComponent& owner;
     AudioPluginFormat& formatToScan;
     PropertiesFile* propertiesToUse;
-    ScopedPointer<PluginDirectoryScanner> scanner;
+//    ScopedPointer<PluginDirectoryScanner> scanner;
+    ScopedPointer<PluginScanner> scanner;
     AlertWindow pathChooserWindow, progressWindow;
     FileSearchPathListComponent pathList;
     String pluginBeingScanned;
@@ -509,51 +511,36 @@ private:
     void startScan()
     {
         pathChooserWindow.setVisible (false);
-        
-        scanner = new PluginDirectoryScanner (owner.list, formatToScan, pathList.getPath(),
-                                              true, owner.deadMansPedalFile, allowAsync);
+        scanner = owner.plugins.createAudioPluginScanner();
         
         if (propertiesToUse != nullptr)
         {
             setLastSearchPath (*propertiesToUse, formatToScan, pathList.getPath());
             propertiesToUse->saveIfNeeded();
         }
-        
+
         progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         progressWindow.addProgressBarComponent (progress);
         progress = -1.0;
         progressWindow.enterModalState();
         
-    #if 0
-        if (numThreads > 0)
-        {
-            pool = new ThreadPool (numThreads);
-            
-            for (int i = numThreads; --i >= 0;)
-                pool->addJob (new ScanJob (*this), true);
-        }
-    #else
-        owner.plugins.scanAudioPlugins();
-    #endif
-        
+        scanner->addListener (this);
+        scanner->scanForAudioPlugins (formatToScan.getName());
         startTimer (20);
     }
     
     void finishedScan()
     {
+        if (scanner)
+            scanner->removeListener (this);
         owner.scanFinished (scanner != nullptr ? scanner->getFailedFiles()
-                            : StringArray());
+                                               : StringArray());
     }
     
     void timerCallback() override
     {
-        #if 0
-        if (pool == nullptr)
-        {
-            if (doNextScan())
-                startTimer (20);
-        }
-        #endif
+        if (doNextScan())
+            startTimer (20);
         
         if (! progressWindow.isCurrentlyModal())
             finished = true;
@@ -561,47 +548,46 @@ private:
         if (finished)
             finishedScan();
         else
-            progressWindow.setMessage ("Testing plugins...");
+            progressWindow.setMessage (pluginBeingScanned);
     }
     
     bool doNextScan()
     {
-        if (scanner->scanNextFile (true, pluginBeingScanned))
-        {
-            progress = scanner->getProgress();
-            return true;
-        }
-        
-        finished = true;
-        return false;
+        return true;
     }
     
-    struct ScanJob  : public ThreadPoolJob
+    void audioPluginScanFinished() override
     {
-        ScanJob (Scanner& s)  : ThreadPoolJob ("pluginscan"), scanner (s) {}
-        
-        JobStatus runJob()
-        {
-            while (scanner.doNextScan() && ! shouldExit())
-            {}
-            
-            return jobHasFinished;
-        }
-        
-        Scanner& scanner;
-        
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScanJob)
-    };
+        finished = true;
+    }
+    
+    void audioPluginScanStarted (const String& pluginName) override
+    {
+        pluginBeingScanned = pluginName;
+    }
+    
+    void audioPluginScanProgress (const float reportedProgress) override
+    {
+        this->progress = reportedProgress;
+    }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Scanner)
 };
 
 void PluginListComponent::scanFor (AudioPluginFormat& format)
 {
+    if (format.getName() == "Element")
+    {
+        plugins.scanInternalPlugins();
+        return;
+    }
+    
    #if EL_RUNNING_AS_PLUGIN
     AlertWindow::showMessageBoxAsync(AlertWindow::NoIcon, "Plugin Scanner",
                                      "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
    #else
+    if (auto* world = ViewHelpers::getGlobals (this))
+        plugins.saveUserPlugins (world->getSettings());
     currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads,
                                   dialogTitle.isNotEmpty() ? dialogTitle : TRANS("Scanning for plug-ins..."),
                                   dialogText.isNotEmpty()  ? dialogText  : TRANS("Searching for all possible plug-in files..."));
@@ -610,12 +596,18 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
 
 bool PluginListComponent::isScanning() const noexcept
 {
-    return plugins.isScanningAudioPlugins();
+    return (currentScanner != nullptr || plugins.isScanningAudioPlugins());
 }
 
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
 {
     StringArray shortNames;
+    
+    if (auto* world = ViewHelpers::getGlobals (this))
+    {
+        world->getSettings().getUserSettings()->reload();
+        plugins.restoreUserPlugins (world->getSettings());
+    }
     
     for (int i = 0; i < failedFiles.size(); ++i)
         shortNames.add (File::createFileWithoutCheckingPath (failedFiles[i]).getFileName());

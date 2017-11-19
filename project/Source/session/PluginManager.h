@@ -11,6 +11,9 @@
 
 namespace Element {
 
+class PluginScannerMaster;
+class PluginScanner;
+
 class PluginManager : public ChangeBroadcaster
 {
 public:
@@ -41,6 +44,7 @@ public:
     
     /** creates a child process slave used in start up */
     ChildProcessSlave* createAudioPluginScannerSlave();
+    PluginScanner* createAudioPluginScanner();
     
     /** Scans for all audio plugin types using a child process */
     void scanAudioPlugins (const StringArray& formats = StringArray());
@@ -83,4 +87,49 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
 };
 
+class PluginScanner
+{
+public:
+    PluginScanner();
+    ~PluginScanner();
+    
+    class Listener
+    {
+    public:
+        Listener() { }
+        virtual ~Listener() { }
+        
+        virtual void audioPluginScanFinished() { }
+        virtual void audioPluginScanProgress (const float progress) { ignoreUnused (progress); }
+        virtual void audioPluginScanStarted (const String& name) { }
+    };
+    
+    /** scan for plugins of type */
+    void scanForAudioPlugins (const String& formatName);
+    
+    /** Scan for plugins of multiple types */
+    void scanForAudioPlugins (const StringArray& formats);
+    
+    /** Cancels the current scan operation */
+    void cancel();
+
+    /** is scanning */
+    bool isScanning() const;
+    
+    /** Add a listener */
+    void addListener (Listener* listener)       { listeners.add (listener); }
+
+    /** Remove a listener */
+    void removeListener (Listener* listener)    { listeners.remove (listener); }
+    
+    /** Returns a list of plugins that failed to load */
+    const StringArray& getFailedFiles() const { return failedIdentifiers; }
+    
+private:
+    friend class PluginScannerMaster;
+    ScopedPointer<PluginScannerMaster> master;
+    ListenerList<Listener> listeners;
+    StringArray failedIdentifiers;
+};
+    
 }
