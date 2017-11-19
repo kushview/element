@@ -129,6 +129,8 @@ private:
     void buttonClicked (Button*) override;
     void changeListenerCallback (ChangeBroadcaster*) override;
     
+    void scanWithBackgroundScanner();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListComponent)
 };
 

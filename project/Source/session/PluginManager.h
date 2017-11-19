@@ -44,7 +44,12 @@ public:
     
     /** creates a child process slave used in start up */
     ChildProcessSlave* createAudioPluginScannerSlave();
+    
+    /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();
+    
+    /** gets the internal plugins scanner used for background scanning */
+    PluginScanner* getBackgroundAudioPluginScanner();
     
     /** Scans for all audio plugin types using a child process */
     void scanAudioPlugins (const StringArray& formats = StringArray());
@@ -87,7 +92,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginManager);
 };
 
-class PluginScanner
+class PluginScanner : private Timer
 {
 public:
     PluginScanner();
@@ -127,9 +132,11 @@ public:
     
 private:
     friend class PluginScannerMaster;
+    friend class Timer;
     ScopedPointer<PluginScannerMaster> master;
     ListenerList<Listener> listeners;
     StringArray failedIdentifiers;
+    void timerCallback() override;
 };
     
 }

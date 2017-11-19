@@ -294,6 +294,10 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     master = new PluginScannerMaster (*this);
     master->startScanning (formats);
 }
+
+void PluginScanner::timerCallback()
+{
+}
     
 // MARK: Plugin Manager
     
@@ -407,7 +411,12 @@ PluginScanner* PluginManager::createAudioPluginScanner()
     auto* scanner = new PluginScanner();
     return scanner;
 }
-    
+
+PluginScanner* PluginManager::getBackgroundAudioPluginScanner()
+{
+    return (priv != nullptr) ? priv->scanner.get() : nullptr;
+}
+
 bool PluginManager::isScanningAudioPlugins()
 {
     return (priv && priv->scanner) ? priv->scanner->isScanning()

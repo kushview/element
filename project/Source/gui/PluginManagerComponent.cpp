@@ -106,6 +106,8 @@ public:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TableModel)
 };
 
+// MARK: Plugin LIst Component
+
 PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* props,
                                           bool allowPluginsWhichRequireAsynchronousInstantiation)
     : plugins(p),
@@ -158,6 +160,10 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     
     PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (list, deadMansPedalFile);
     deadMansPedalFile.deleteFile();
+    
+    if (plugins.isScanningAudioPlugins()) {
+        scanWithBackgroundScanner();
+    }
 }
 
 PluginListComponent::~PluginListComponent()
@@ -379,14 +385,14 @@ public:
       progressWindow (title, text, AlertWindow::NoIcon),
       progress (0.0), numThreads (threads),
       allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-      finished (false)
+      finished (false), useBackgroundScanner (false)
     {
         FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
         
         // You need to use at least one thread when scanning plug-ins asynchronously
         jassert (! allowAsync || (numThreads > 0));
         
-        if (path.getNumPaths() > 0) // if the path is empty, then paths aren't used for this format.
+        if (path.getNumPaths() > 0 )
         {
            #if ! JUCE_IOS
             if (propertiesToUse != nullptr)
@@ -408,6 +414,16 @@ public:
             startScan();
         }
     }
+        
+    Scanner (PluginListComponent& plc, PluginManager& plugins, const String& title, const String& text)
+        : owner (plc), formatToScan (*plugins.getAudioPluginFormat("Element")), propertiesToUse (nullptr),
+          pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
+          progressWindow (title, text, AlertWindow::NoIcon),
+            progress (0.0), numThreads (0), allowAsync (false), finished (false),
+      useBackgroundScanner (true)
+    {
+        startScan();
+    }
     
     ~Scanner()
     {
@@ -422,8 +438,8 @@ private:
     PluginListComponent& owner;
     AudioPluginFormat& formatToScan;
     PropertiesFile* propertiesToUse;
-//    ScopedPointer<PluginDirectoryScanner> scanner;
-    ScopedPointer<PluginScanner> scanner;
+    OptionalScopedPointer<PluginScanner> scanner;
+    
     AlertWindow pathChooserWindow, progressWindow;
     FileSearchPathListComponent pathList;
     String pluginBeingScanned;
@@ -431,6 +447,7 @@ private:
     int numThreads;
     bool allowAsync, finished;
     ScopedPointer<ThreadPool> pool;
+    bool useBackgroundScanner = false;
     
     static void startScanCallback (int result, AlertWindow* alert, Scanner* scanner)
     {
@@ -511,7 +528,11 @@ private:
     void startScan()
     {
         pathChooserWindow.setVisible (false);
-        scanner = owner.plugins.createAudioPluginScanner();
+        
+        if (useBackgroundScanner)
+            scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+        else
+            scanner.setOwned (owner.plugins.createAudioPluginScanner());
         
         if (propertiesToUse != nullptr)
         {
@@ -525,7 +546,8 @@ private:
         progressWindow.enterModalState();
         
         scanner->addListener (this);
-        scanner->scanForAudioPlugins (formatToScan.getName());
+        if (! useBackgroundScanner)
+            scanner->scanForAudioPlugins (formatToScan.getName());
         startTimer (20);
     }
     
@@ -647,4 +669,11 @@ void PluginManagerContentView::resized()
         pluginList->setBounds (getLocalBounds());
 }
     
+    void PluginListComponent::scanWithBackgroundScanner()
+    {
+        if (currentScanner) {
+            currentScanner = nullptr;
+        }
+        currentScanner = new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins");
+    }
 }
