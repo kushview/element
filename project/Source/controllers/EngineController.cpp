@@ -5,6 +5,7 @@
 #include "controllers/GraphController.h"
 #include "gui/PluginWindow.h"
 #include "session/DeviceManager.h"
+#include "session/PluginManager.h"
 #include "session/Node.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -139,11 +140,29 @@ void EngineController::addNode (const Node& node)
     }
 }
 
-void EngineController::addPlugin (const PluginDescription& desc, const float rx, const float ry)
+void EngineController::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
 {
     if (! root)
         return;
-    root->addFilter (&desc, rx, ry);
+    
+    OwnedArray<PluginDescription> plugs;
+    if (! verified)
+    {
+        auto* format = getWorld().getPluginManager().getAudioPluginFormat (desc.pluginFormatName);
+        jassert(format != nullptr);
+        auto& list (getWorld().getPluginManager().availablePlugins());
+        OwnedArray<PluginDescription> dummy;
+        if (list.scanAndAddFile (desc.fileOrIdentifier, true, plugs, *format)) {
+            getWorld().getPluginManager().saveUserPlugins (getWorld().getSettings());
+        }
+    }
+    else
+    {
+        plugs.add (new PluginDescription (desc));
+    }
+    
+    if (plugs.size() > 0)
+        root->addFilter (plugs.getFirst(), rx, ry);
 }
 
 void EngineController::removeNode (const uint32 nodeId)

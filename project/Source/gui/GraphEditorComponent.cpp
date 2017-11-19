@@ -694,10 +694,11 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         const int result = menu.show();
         if (menu.isPluginResultCode (result))
         {
-            if (const auto* desc = menu.getPluginDescription (result))
+            bool verified = false;
+            if (const auto* desc = menu.getPluginDescription (result, verified))
                 ViewHelpers::postMessageFor (this, new LoadPluginMessage (
-                    *desc, e.position.getX() / getWidth(),
-                           e.position.getY() / getHeight()));
+                    *desc, verified, e.position.getX() / getWidth(),
+                                     e.position.getY() / getHeight()));
         }
         else
         {
@@ -749,7 +750,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             {
                 DBG("X: " << e.position.getX() / (float)getWidth() <<
                    " Y: " << e.position.getY() / (float)getHeight());
-                ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc, true));
             }
         }
     }

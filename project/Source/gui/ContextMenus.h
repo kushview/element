@@ -16,15 +16,25 @@ public:
         plugins = &cc->getGlobals().getPluginManager();
     }
     
-    bool isPluginResultCode (const int resultCode) {
-        return plugins->availablePlugins().getIndexChosenByMenu (resultCode) >= 0;
+    bool isPluginResultCode (const int resultCode)
+    {
+        return (plugins->availablePlugins().getIndexChosenByMenu (resultCode) >= 0) ||
+               (isPositiveAndBelow (int(resultCode - 20000), unverified.size()));
     }
     
-    const PluginDescription* getPluginDescription (int resultCode)
+    const PluginDescription* getPluginDescription (int resultCode, bool& verified)
     {
         jassert (plugins);
-        const int index = plugins->availablePlugins().getIndexChosenByMenu (resultCode);
-        return index >= 0 ? plugins->availablePlugins().getType (index) : nullptr;
+        int index = plugins->availablePlugins().getIndexChosenByMenu (resultCode);
+        if (index >= 0)
+        {
+            verified = true;
+            return plugins->availablePlugins().getType (index);
+        }
+        
+        verified = false;
+        index = resultCode - 20000;
+        return isPositiveAndBelow(index, unverified.size()) ? unverified.getUnchecked(index) : nullptr;
     }
     
     void addPluginItems()
@@ -33,9 +43,36 @@ public:
             return;
         hasAddedPlugins = true;
         plugins->availablePlugins().addToMenu (*this, KnownPluginList::sortByManufacturer);
+    
+        PopupMenu unvMenu;
+       #if JUCE_MAC
+        StringArray unvFormats = { "AudioUnit", "VST", "VST3" };
+       #else
+        StringArray unvFormats = { "VST", "VST3" };
+       #endif
+        
+        unverified.clearQuick (true);
+        for (const auto& name : unvFormats)
+        {
+            PopupMenu menu;
+            const int lastSize = unverified.size();
+            plugins->getUnverifiedPlugins (name, unverified);
+            auto* format = plugins->getAudioPluginFormat (name);
+            for (int i = lastSize; i < unverified.size(); ++i)
+                menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (
+                    unverified.getUnchecked(i)->fileOrIdentifier));
+            if (menu.getNumItems() > 0)
+                unvMenu.addSubMenu (name, menu);
+        }
+        
+        if (unvMenu.getNumItems() > 0) {
+            addSeparator();
+            addSubMenu ("Unverified", unvMenu);
+        }
     }
     
 private:
+    OwnedArray<PluginDescription> unverified;
     Component* sender;
     PluginManager* plugins;
     bool hasAddedPlugins = false;

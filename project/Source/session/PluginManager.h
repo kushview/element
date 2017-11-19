@@ -81,6 +81,9 @@ public:
         props = pf;
     }
     
+    /** This will get a possible list of plugins. Trying to load this might fail */
+    void getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins);
+    
 private:
     PropertiesFile* props = nullptr;
     class Private;

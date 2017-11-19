@@ -69,10 +69,10 @@ public:
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:
-    LoadPluginMessage (const PluginDescription& d)
-        : Message(), description (d) { }
-    LoadPluginMessage (const PluginDescription& d, const float rx, const float ry)
-        : Message(), description (d), relativeX (rx), relativeY (ry) { }
+    LoadPluginMessage (const PluginDescription& d, const bool v)
+        : Message(), description (d), verified (v) { }
+    LoadPluginMessage (const PluginDescription& d, const bool v, const float rx, const float ry)
+        : Message(), description (d), relativeX (rx), relativeY (ry), verified (v) { }
     ~LoadPluginMessage() { }
     
     /** Descriptoin of the plugin to load */
@@ -83,6 +83,9 @@ public:
 
     /** Relative X of the node UI in a graph editor */
     const float relativeY = 0.5f;
+    
+    /** Whether or not this plugin has been vetted yet */
+    const bool verified;
 };
 
 class DuplicateNodeMessage : public Message {

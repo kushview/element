@@ -527,7 +527,34 @@ void PluginManager::scanInternalPlugins()
         break;
     }
 }
-
+void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins)
+{
+    if (auto* format = getAudioPluginFormat (formatName))
+    {
+        auto& list (availablePlugins());
+        
+        FileSearchPath path;
+        if (props)
+        {
+            const auto key = String(Settings::lastPluginScanPathPrefix) + format->getName();
+            path = FileSearchPath (props->getValue (key));
+        }
+        
+        path.addPath (format->getDefaultLocationsToSearch());
+        
+        const auto files = format->searchPathsForPlugins (path, true);
+        for (const auto& file: files)
+        {
+            if (nullptr != list.getTypeForFile (file))
+                continue;
+            
+            auto* desc = plugins.add (new PluginDescription());
+            desc->pluginFormatName = formatName;
+            desc->fileOrIdentifier = file;
+        }
+    }
+}
+    
 void PluginManager::scanFinished()
 {
     if (priv->scanner)

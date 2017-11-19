@@ -147,6 +147,7 @@ private:
         plugins.addFormat (new ElementAudioPluginFormat());
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
+        plugins.scanInternalPlugins();
     }
     
     void setupAnalytics()
@@ -249,7 +250,6 @@ public:
             : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon,
                                                "Save Session",
                                                "This session may have changes. Would you like to save before exiting?");
-        
         if (res == 1)
             sc->saveSession();
         
@@ -281,14 +281,15 @@ public:
         if (nullptr != controller || nullptr == startup)
             return;
         
-        if (world->getSettings().scanForPluginsOnStartup() || startup->isFirstRun)
+        if (world->getSettings().scanForPluginsOnStartup())
             world->getPluginManager().scanAudioPlugins();
     
         controller = startup->controller.release();
         startup = nullptr;
+        
         controller->run();
-        const bool checkUpdatesOnStart = world->getSettings().checkForUpdates();
-        if (checkUpdatesOnStart)
+
+        if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
         if (auto* sc = controller->findChild<SessionController>())

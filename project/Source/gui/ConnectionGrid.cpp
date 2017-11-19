@@ -270,8 +270,9 @@ namespace Element
             const int result = menu.show();
             if (menu.isPluginResultCode (result))
             {
-                if (const auto* desc = menu.getPluginDescription (result))
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc));
+                bool verified = false;
+                if (const auto* desc = menu.getPluginDescription (result, verified))
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc, verified));
             }
             else
             {
@@ -317,7 +318,7 @@ namespace Element
                 }
                 else
                 {
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc, true));
                 }
             }
         }
@@ -749,7 +750,7 @@ namespace Element
         PluginDescription desc;
         desc.pluginFormatName = sd.description[1];
         desc.fileOrIdentifier = sd.description[2];
-        ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc));
+        ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc, false));
     }
     
     void ConnectionGrid::didBecomeActive()
