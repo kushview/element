@@ -381,8 +381,7 @@
         <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="C:\SDKs\VST_SDK\VST3_SDK"
-            extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
             smallIcon="eG1U6B" bigIcon="eG1U6B" toolset="v140_xp" cppLanguageStandard="stdcpp14"
             windowsTargetPlatformVersion="10.0.16299.0">
       <CONFIGURATIONS>
@@ -430,38 +429,6 @@
         <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
-    <XCODE_IPHONE targetFolder="Builds/iOS" iosScreenOrientation="portraitlandscape"
-                  vst3Folder="" smallIcon="eG1U6B" bigIcon="eG1U6B" iPadScreenOrientation="portraitlandscape"
-                  iosDeviceFamily="1,2">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Element"
-                       enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Element"
-                       enablePluginBinaryCopyStep="1"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
-      </MODULEPATHS>
-    </XCODE_IPHONE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
