@@ -17,7 +17,10 @@ namespace Element {
             auto r = getLocalBounds();
             for (int i = 0; i < segments.size(); ++i)
             {
-                
+                segments[i]->setBounds (r.removeFromLeft (segments[i]->getWidth()));
+                if (auto* div = dividers [i]) {
+                    div->setBounds (r.removeFromLeft (div->getWidth()));
+                }
             }
         }
         
@@ -39,13 +42,16 @@ namespace Element {
             {
                 auto* seg = segments.add (new Label ());
                 seg->getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-                seg->setSize (4 + seg->getFont().getStringWidth (node.getName()), getHeight());
+                seg->setSize (2 + seg->getFont().getStringWidth (node.getName()), getHeight());
+                seg->setJustificationType (Justification::centred);
                 addAndMakeVisible (seg);
                 if (++i != nodes.size())
                 {
                     auto* div = dividers.add (new Label ());
                     div->setText ("/", dontSendNotification);
-                    div->setSize (4 + div->getFont().getStringWidth ("/"), getHeight());
+                    div->setSize (10 + seg->getFont().getStringWidth ("/"), getHeight());
+
+                    div->setJustificationType (Justification::centred);
                     addAndMakeVisible (div);
                 }
             }

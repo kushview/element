@@ -331,7 +331,22 @@ namespace Element
             if (ev.mods.isPopupMenu())
                 showMenuForNodeAndPort (node, port);
             if (auto* cc = ViewHelpers::findContentComponent (this))
+                if (! node.isGraph())
+                    cc->setCurrentNode (node);
+        }
+        
+        void listBoxItemDoubleClicked (int row, const MouseEvent& ev, bool isSource)
+        {
+            const Node node (getNode (row, isSource));
+            if (node.isGraph())
+            {
+                auto* cc = ViewHelpers::findContentComponent(this);
                 cc->setCurrentNode (node);
+            }
+            else
+            {
+                ViewHelpers::presentPluginWindow (node);
+            }
         }
         
         static ValueTree findArc (const ValueTree& arcs, uint32 sourceNode, int sourceChannel, uint32 destNode, int destChannel)
@@ -458,8 +473,8 @@ namespace Element
         
         virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override
         {
-            if (nodeModels != treeWhichHasBeenChanged)
-                return;
+//            if (nodeModels != treeWhichHasBeenChanged)
+//                return;
             graphModel = nodeModels.getParent();
             buildNodeArray();
             resetMatrix();
@@ -505,10 +520,9 @@ namespace Element
             matrix->listBoxItemClicked (row, ev, true);
         }
 
-        void listBoxItemDoubleClicked (int row, const MouseEvent&) override
+        void listBoxItemDoubleClicked (int row, const MouseEvent& ev) override
         {
-            const Node node (matrix->getNode (row, true));
-            ViewHelpers::presentPluginWindow (node);
+            matrix->listBoxItemDoubleClicked (row, ev, true);
         }
         
         void backgroundClicked (const MouseEvent& ev) override
@@ -588,10 +602,9 @@ namespace Element
             matrix->listBoxItemClicked (row, ev, false);
         }
         
-        void listBoxItemDoubleClicked (int row, const MouseEvent&) override
+        void listBoxItemDoubleClicked (int row, const MouseEvent& ev) override
         {
-            const Node node (matrix->getNode (row, false));
-            ViewHelpers::presentPluginWindow (node);
+            matrix->listBoxItemDoubleClicked (row, ev, false);
         }
         
         void backgroundClicked (const MouseEvent& ev) override
@@ -723,7 +736,6 @@ namespace Element
     {
         ValueTree newNodes = newNode.hasNodeType(Tags::graph) ? newNode.getNodesValueTree()
                                                               : ValueTree (Tags::nodes);
-        
         jassert (this->matrix != nullptr);
         matrix->nodeModels = newNodes;
         breadcrumb->setNode (newNode);

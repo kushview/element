@@ -53,6 +53,8 @@ public:
     /** Returns true if an output port */
     bool isPortOutput (const uint32 port) const;
     
+    bool isGraph() const;
+    
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
     

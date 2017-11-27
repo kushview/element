@@ -41,9 +41,10 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
     PluginDescription desc;
     getPluginDescription (desc);
     setNodePropertiesFrom (desc, metadata);
+    const String type = (nullptr == dynamic_cast<GraphProcessor*> (processor_)) ? "plugin" : "graph";
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Slugs::name, proc->getName(), nullptr)
-            .setProperty (Slugs::type, "plugin", nullptr)
+            .setProperty (Slugs::type, type, nullptr)
             .setProperty ("numAudioIns", getNumAudioInputs(), nullptr)
             .setProperty ("numAudioOuts", getNumAudioOutputs(), nullptr);
     resetPorts();
@@ -131,6 +132,10 @@ void GraphNode::suspendProcessing (const bool shouldBeSuspended)
         proc->suspendProcessing (shouldBeSuspended);
 }
 
+bool GraphNode::isGraph() const
+{
+    return (nullptr != dynamic_cast<GraphProcessor*> (proc.get()));
+}
     
 PortType GraphNode::getPortType (const uint32 port) const
 {
