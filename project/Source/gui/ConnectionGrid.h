@@ -9,7 +9,8 @@
 #include "gui/ContentComponent.h"
 
 namespace Element {
-    
+
+class BreadCrumbComponent;
 class Node;
 
 class ConnectionGrid : public ContentView,
@@ -39,6 +40,8 @@ public:
 #endif
     
 private:
+    ScopedPointer<BreadCrumbComponent> breadcrumb;
+    
     friend class PatchMatrix;
     class PatchMatrix; PatchMatrix* matrix;
     

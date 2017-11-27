@@ -4,6 +4,7 @@
 */
 
 #include "gui/GuiCommon.h"
+#include "gui/BreadCrumbComponent.h"
 #include "gui/ContextMenus.h"
 #include "engine/GraphProcessor.h"
 #include "gui/HorizontalListBox.h"
@@ -697,11 +698,15 @@ namespace Element
     {
         setName ("PatchBay"); // Don't change this
         
+        
         addAndMakeVisible (quads = new Quads());
         quads->setQuadrantComponent (Quads::Q1, matrix = new PatchMatrix ());
         quads->setQuadrantComponent (Quads::Q2, sources = new Sources (matrix));
         quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
         quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
+        
+        addAndMakeVisible (breadcrumb = new BreadCrumbComponent());
+        breadcrumb->toFront (false);
         resized();
     }
     
@@ -721,6 +726,7 @@ namespace Element
         
         jassert (this->matrix != nullptr);
         matrix->nodeModels = newNodes;
+        breadcrumb->setNode (newNode);
     }
     
     void ConnectionGrid::paint (Graphics& g)
@@ -730,7 +736,10 @@ namespace Element
     
     void ConnectionGrid::resized()
     {
-        quads->setBounds (getLocalBounds());
+        auto r = getLocalBounds ();
+        breadcrumb->setBounds (r.removeFromTop (24));
+        quads->setBounds (r);
+        
     }
     
     void ConnectionGrid::mouseDown (const MouseEvent& ev)

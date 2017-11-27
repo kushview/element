@@ -11,6 +11,7 @@
 namespace Element {
 
 class AppController;
+class BreadCrumbComponent;
 class ContentContainer;
 class Globals;
 class GraphEditorView;
@@ -23,6 +24,8 @@ class VirtualKeyboardView;
 class ContentView : public Component
 {
 public:
+    ContentView();
+    virtual ~ContentView();
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }

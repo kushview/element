@@ -7,6 +7,7 @@ namespace Element
 SubGraphProcessor::SubGraphProcessor()
 {
     setPlayConfigDetails (2, 2, 44100.f, 512);
+    disableNonMainBuses();
 }
 
 SubGraphProcessor::~SubGraphProcessor() { }
