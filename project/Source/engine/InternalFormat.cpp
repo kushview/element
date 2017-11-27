@@ -234,7 +234,9 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
+       #if EL_USE_SUBGRAPHS
         results.add ("element.graph");
+       #endif
         return results;
     }
     

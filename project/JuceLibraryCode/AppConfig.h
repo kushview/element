@@ -28,6 +28,10 @@
  #pragma warning(disable: 4389) // signed/unsigned mismatch
 #endif
 
+#ifndef EL_USE_SUBGRAPHS
+ #define EL_USE_SUBGRAPHS 0
+#endif
+
 namespace kv { }
 using namespace kv;
 // [END_USER_CODE_SECTION]

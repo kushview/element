@@ -718,8 +718,10 @@ namespace Element
         quads->setQuadrantComponent (Quads::Q3, controls = new Controls (matrix));
         quads->setQuadrantComponent (Quads::Q4, destinations = new Destinations (matrix));
         
+       #if EL_USE_SUBGRAPHS
         addAndMakeVisible (breadcrumb = new BreadCrumbComponent());
         breadcrumb->toFront (false);
+       #endif
         resized();
     }
     
@@ -738,7 +740,8 @@ namespace Element
                                                               : ValueTree (Tags::nodes);
         jassert (this->matrix != nullptr);
         matrix->nodeModels = newNodes;
-        breadcrumb->setNode (newNode);
+        if (breadcrumb)
+            breadcrumb->setNode (newNode);
     }
     
     void ConnectionGrid::paint (Graphics& g)
@@ -749,7 +752,8 @@ namespace Element
     void ConnectionGrid::resized()
     {
         auto r = getLocalBounds ();
-        breadcrumb->setBounds (r.removeFromTop (24));
+        if (breadcrumb)
+            breadcrumb->setBounds (r.removeFromTop (24));
         quads->setBounds (r);
         
     }
