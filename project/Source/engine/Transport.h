@@ -12,9 +12,21 @@ namespace Element
     class Transport : public Shuttle
     {
     public:
-        class Monitor : public ReferenceCountedObject {
+        class Monitor : public ReferenceCountedObject
+        {
         public:
             Atomic<float> tempo;
+            Atomic<bool>  playing;
+            Atomic<bool>  recording;
+            Atomic<int64> positionFrames;
+            
+            inline double getPositionSeconds (const double sampleRate) const {
+                return (double) positionFrames.get() / sampleRate;
+            }
+            
+            inline float getPositionBeats() const {
+                return getPositionSeconds(44100.f) * (tempo.get() / 60.0f);
+            }
         };
         
         typedef ReferenceCountedObjectPtr<Monitor> MonitorPtr;

@@ -69,6 +69,8 @@ public:
     void setCurrentGraph (const int index);
     RootGraph* getGraph (const int index);
     
+    void setPlaying (const bool shouldBePlaying);
+    
     MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;
     AudioIODeviceCallback& getAudioIODeviceCallback() override;

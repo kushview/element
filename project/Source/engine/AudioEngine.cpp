@@ -570,9 +570,13 @@ Transport::MonitorPtr AudioEngine::getTransportMonitor() const
 {
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
 }
-    
-    
-    
+
+void AudioEngine::setPlaying (const bool shouldBePlaying)
+{
+    auto& transport (priv->transport);
+    transport.requestPlayState (shouldBePlaying);
+}
+
 void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize,
                                            const int numIns, const int numOuts)
 {

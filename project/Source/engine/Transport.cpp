@@ -21,11 +21,11 @@ Transport::~Transport() { }
 void Transport::preProcess (int nframes)
 {
     if (recording != recordState.get()) {
-        
+        recording = recordState.get();
     }
 
     if (playing != playState.get()) {
-        
+        playing = playState.get();
     }
 
     if (playing) {
@@ -41,6 +41,10 @@ void Transport::postProcess (int nframes)
         nextTempo.set (getTempo());
         monitor->tempo.set (nextTempo.get());
     }
+    
+    monitor->playing.set (playing);
+    monitor->recording.set (recording);
+    monitor->positionFrames.set (getPositionFrames());
 }
 
 }

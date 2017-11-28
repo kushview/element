@@ -1,77 +1,51 @@
 /*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.2.0
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
-
-  ==============================================================================
+    This file is part of Element
+    Copy right 2018 Kushview, LLC.  All rights reserved
 */
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
-#include "session/Session.h"
 #include "gui/Buttons.h"
+#include "engine/AudioEngine.h"
+#include "session/Session.h"
+
 namespace Element {
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-                                                                    //[/Comments]
-*/
 class TransportBar  : public Component,
-                      public Button::Listener
+                      public Button::Listener,
+                      private Timer
 {
 public:
-    //==============================================================================
     TransportBar ();
     ~TransportBar();
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void setBeatTime (const float t);
     void updateWidth();
     void stabilize();
-    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-    SessionRef session;
-    //[/UserVariables]
+    SessionPtr session;
+    AudioEnginePtr engine;
+    Transport::MonitorPtr monitor;
 
-    //==============================================================================
     ScopedPointer<SettingButton> play;
     ScopedPointer<SettingButton> stop;
     ScopedPointer<SettingButton> record;
     ScopedPointer<DragableIntLabel> barLabel;
     ScopedPointer<DragableIntLabel> beatLabel;
     ScopedPointer<DragableIntLabel> subLabel;
-
-
-    //==============================================================================
+    
+    friend class Timer;
+    void timerCallback() override;
+    
+    bool checkForMonitor();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TransportBar)
 };
 
-//[EndFile] You can add extra defines here...
 } /* namespace element */
-//[/EndFile]
