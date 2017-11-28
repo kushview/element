@@ -9,7 +9,7 @@
 namespace Element {
 
 class ContentComponent;
-    class Globals;
+class Globals;
 class Node;
 
 namespace ViewHelpers {

@@ -217,7 +217,6 @@ public:
         if (shouldProcess)
         {
             const ScopedLock sl2 (graph->getCallbackLock());
-            
             if (graph->isSuspended())
             {
                 graph->processBlockBypassed (buffer, midi);
@@ -230,20 +229,29 @@ public:
         else
         {
             for (int i = 0; i < buffer.getNumChannels(); ++i)
-                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t)numSamples);
+                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
         }
         
-        if (transport.isPlaying())
+        if (isTimeMaster() && transport.isPlaying())
             transport.advance (numSamples);
-        transport.postProcess (numSamples);
         
+        if (transport.isPlaying()) {
+            
+        }
+        
+        transport.postProcess (numSamples);
         traceMidi (midi);
         
+//        // WIP: correct midi output
 //        if (auto* e = engine.world.getDeviceManager().getDefaultMidiOutput())
 //            e->sendBlockOfMessages (midi, 14.f + Time::getMillisecondCounterHiRes(), sampleRate);
 //
         
         midi.clear();
+    }
+    
+    bool isTimeMaster() const {
+        return true;
     }
     
     void audioDeviceAboutToStart (AudioIODevice* const device) override

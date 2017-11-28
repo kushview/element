@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.1.2
+  Created with Projucer version: 5.2.0
 
   ------------------------------------------------------------------------------
 
@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 #include "session/Session.h"
-
+#include "gui/Buttons.h"
 namespace Element {
 //[/Headers]
 
@@ -31,30 +31,26 @@ namespace Element {
 //==============================================================================
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Introjucer.
-
-    Describe your class and how it works here!
                                                                     //[/Comments]
 */
 class TransportBar  : public Component,
-                      public Button::Listener,
-                      public Slider::Listener
+                      public Button::Listener
 {
 public:
     //==============================================================================
-    TransportBar (SessionRef sess);
+    TransportBar ();
     ~TransportBar();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setBeatTime (const float t);
+    void updateWidth();
     void stabilize();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
@@ -64,13 +60,12 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<TextButton> play;
-    ScopedPointer<TextButton> stop;
-    ScopedPointer<TextButton> record;
-    ScopedPointer<Label> barLabel;
-    ScopedPointer<Label> subLabel;
-    ScopedPointer<Label> beatLabel;
-    ScopedPointer<Slider> bpmSlider;
+    ScopedPointer<SettingButton> play;
+    ScopedPointer<SettingButton> stop;
+    ScopedPointer<SettingButton> record;
+    ScopedPointer<DragableIntLabel> barLabel;
+    ScopedPointer<DragableIntLabel> beatLabel;
+    ScopedPointer<DragableIntLabel> subLabel;
 
 
     //==============================================================================
