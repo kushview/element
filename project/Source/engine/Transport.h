@@ -41,7 +41,7 @@ namespace Element
             {
                 float numerator = (float)(1 << beatDivisor.get());
                 float divisor = (float)(1 << beatType.get());
-                divisor = numerator / divisor;
+                divisor = divisor / numerator;
                 divisor *= 60.f;
                 return getPositionSeconds() * (tempo.get() / divisor);
             }

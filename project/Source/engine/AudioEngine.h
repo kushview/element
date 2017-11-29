@@ -87,6 +87,7 @@ public:
     void prepareExternalPlayback (const double sampleRate, const int blockSize,
                                   const int numIns, const int numOuts);
     void processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi);
+    void processExternalPlayhead (AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
     
 private:

@@ -8,8 +8,6 @@
 namespace Element
 {
 
-
-
 class TempoAndMeterBar : public Component,
                          public ValueListener,
                          public Timer
@@ -26,7 +24,7 @@ public:
         
         addAndMakeVisible (meter = new TopMeter (*this));
         
-        setSize (120, 24);
+        setSize (124, 24);
     }
     
     ~TempoAndMeterBar()
@@ -42,11 +40,11 @@ public:
         if (extButton.isVisible())
         {
             int w = Font(18).getStringWidth ("EXT");
-            extButton.setBounds (r.removeFromLeft (w + 10));
+            extButton.setBounds (r.removeFromLeft (w + 4));
             r.removeFromLeft (2);
         }
         
-        tempoLabel.setBounds (r.removeFromLeft (60));
+        tempoLabel.setBounds (r.removeFromLeft (46));
         r.removeFromLeft (2);
         
         meter->setBounds (r.removeFromLeft (42));
@@ -100,7 +98,7 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
             {
                 session = cc->getGlobals().getSession();
-                engine = cc->getGlobals().getAudioEngine();
+                engine  = cc->getGlobals().getAudioEngine();
                 if (engine)
                     monitor = engine->getTransportMonitor();
             }
@@ -121,6 +119,9 @@ public:
                 tempoLabel.engineTempo = monitor->tempo.get();
                 tempoLabel.repaint();
             }
+            
+            meter->updateMeter (monitor->beatsPerBar.get(),
+                                monitor->beatDivisor.get(), false);
         }
     }
     
@@ -142,10 +143,12 @@ private:
         if (extButton.isVisible() && extButton.getToggleState())
         {
             tempoLabel.setEnabled (false);
+            meter->setEnabled (false);
         }
         else
         {
             tempoLabel.setEnabled (true);
+            meter->setEnabled (true);
         }
     }
     

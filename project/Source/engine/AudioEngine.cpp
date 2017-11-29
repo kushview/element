@@ -619,6 +619,23 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
         priv->processCurrentGraph (buffer, midi);
 }
 
+void AudioEngine::processExternalPlayhead (AudioPlayHead* playhead, const int nframes)
+{
+    auto& transport (priv->transport);
+    AudioPlayHead::CurrentPositionInfo pos;
+    playhead->getCurrentPosition (pos);
+
+    transport.requestTempo (pos.bpm);
+    transport.requestMeter (pos.timeSigNumerator, BeatType::fromPosition (pos));
+    transport.requestPlayState (pos.isPlaying);
+    transport.requestRecordState (pos.isRecording);
+    if (transport.getPositionFrames() != pos.timeInSamples)
+        transport.requestAudioFrame (pos.timeInSamples);
+    
+    transport.preProcess (0);
+    transport.postProcess (0);
+}
+
 void AudioEngine::releaseExternalResources()
 {
     if (priv)

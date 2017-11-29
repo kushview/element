@@ -11,7 +11,6 @@ AssetTreeViewItem::AssetTreeViewItem (const AssetItem& i)
     : item (i)
 {
     item.data.addListener (this);
-
 }
 
 AssetTreeViewItem::~AssetTreeViewItem()
@@ -19,8 +18,7 @@ AssetTreeViewItem::~AssetTreeViewItem()
     item.data.addListener (this);
 }
 
-void
-AssetTreeViewItem::addSubItems()
+void AssetTreeViewItem::addSubItems()
 {
     for (int i = 0; i < item.getNumChildren(); ++i)
         if (AssetTreeViewItem* p = createAssetSubItem (item.getChild (i)))

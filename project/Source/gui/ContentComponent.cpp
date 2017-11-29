@@ -95,8 +95,15 @@ public:
         auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
         auto& settings (ViewHelpers::getGlobals(this)->getSettings());
         auto* props = settings.getUserSettings();
-        const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
         
+       #if ! EL_RUNNING_AS_PLUGIN
+        const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
+       #else
+        // Plugin always has host sync option
+        const bool showExt = true;
+        ignoreUnused (props, status);
+       #endif
+       
         if (session)
         {
             title.getTextValue().referTo (session->getNameValue());
