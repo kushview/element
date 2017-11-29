@@ -5,6 +5,39 @@
 
 namespace Element {
 
+class BarLabel : public DragableIntLabel
+{
+public:
+    BarLabel (TransportBar& t) : owner(t)
+    {
+        setDragable (false);
+    }
+    
+    void settingLabelDoubleClicked() override
+    {
+        if (auto e = owner.engine)
+            e->seekToAudioFrame (0);
+    }
+    
+    TransportBar& owner;
+};
+
+class BeatLabel : public DragableIntLabel {
+public:
+    BeatLabel()
+    {
+        setDragable (false);
+    }
+};
+
+class SubBeatLabel : public DragableIntLabel {
+public:
+    SubBeatLabel()
+    {
+        setDragable (false);
+    }
+};
+    
 TransportBar::TransportBar ()
 {
     addAndMakeVisible (play = new SettingButton ("play"));
@@ -12,6 +45,7 @@ TransportBar::TransportBar ()
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
+    play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
     addAndMakeVisible (stop = new SettingButton ("stop"));
     stop->setButtonText (TRANS("Stop"));
@@ -22,16 +56,15 @@ TransportBar::TransportBar ()
     record->setButtonText (TRANS("Rec"));
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
-    record->setColour (TextButton::buttonOnColourId, Colours::red);
-    record->setEnabled (false); // TODO: recording
+    record->setColour (SettingButton::backgroundOnColourId, Colours::red);
 
-    addAndMakeVisible (barLabel = new DragableIntLabel());
+    addAndMakeVisible (barLabel = new BarLabel (*this));
     barLabel->setName ("barLabel");
 
-    addAndMakeVisible (beatLabel = new DragableIntLabel());
+    addAndMakeVisible (beatLabel = new BeatLabel());
     beatLabel->setName ("beatLabel");
 
-    addAndMakeVisible (subLabel = new DragableIntLabel());
+    addAndMakeVisible (subLabel = new SubBeatLabel());
     subLabel->setName ("subLabel");
 
     setBeatTime (0.f);
@@ -70,10 +103,12 @@ void TransportBar::timerCallback()
 {
     if (! checkForMonitor())
         return;
-    
+
     if (play->getToggleState() != monitor->playing.get())
         play->setToggleState (monitor->playing.get(), dontSendNotification);
-    
+    if (record->getToggleState() != monitor->recording.get())
+        record->setToggleState (monitor->recording.get(), dontSendNotification);
+
     setBeatTime (monitor->getPositionBeats());
 }
 
@@ -104,25 +139,27 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == stop)
     {
         engine->setPlaying (false);
+        engine->seekToAudioFrame (0);
     }
     else if (buttonThatWasClicked == record)
     {
-
+        engine->setRecording (! monitor->recording.get());
     }
 }
 
 void TransportBar::setBeatTime (const float t)
 {
-    const float beatsPerBar = 4.f;
-    const int bars = std::floor (t / beatsPerBar);
-    const int beats = std::floor (t);
-    
-    barLabel->tempoValue = bars + 1;
-    beatLabel->tempoValue = (beats % 4) + 1;
-    subLabel->tempoValue = 1;
-    
-    for (auto* c : { barLabel.get(), beatLabel.get(), subLabel.get() })
-        c->repaint();
+    if (checkForMonitor())
+    {
+        int bars = 0, beats = 0, sub = 0;
+        monitor->getBarsAndBeats (bars, beats, sub);
+        barLabel->tempoValue  = bars + 1;
+        beatLabel->tempoValue = beats + 1;
+        subLabel->tempoValue  = sub + 1;
+        
+        for (auto* c : { barLabel.get(), beatLabel.get(), subLabel.get() })
+            c->repaint();
+    }
 }
 
 void TransportBar::stabilize()

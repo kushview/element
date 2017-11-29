@@ -11,6 +11,7 @@ struct Colors
     static const Colour toggleBlue;
     static const Colour toggleGreen;
     static const Colour toggleOrange;
+    static const Colour toggleRed;
 };
 
 class LookAndFeel : public LookAndFeel_KV1

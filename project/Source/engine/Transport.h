@@ -15,17 +15,41 @@ namespace Element
         class Monitor : public ReferenceCountedObject
         {
         public:
-            Atomic<float> tempo;
-            Atomic<bool>  playing;
-            Atomic<bool>  recording;
-            Atomic<int64> positionFrames;
-            
-            inline double getPositionSeconds (const double sampleRate) const {
-                return (double) positionFrames.get() / sampleRate;
+            Monitor()
+            {
+                sampleRate.set (44100.0);
+                beatsPerBar.set (4);
+                beatType.set (2);
             }
             
-            inline float getPositionBeats() const {
-                return getPositionSeconds(44100.f) * (tempo.get() / 60.0f);
+            Atomic<int>    beatsPerBar;
+            Atomic<int>    beatType;
+            Atomic<double> sampleRate;
+            Atomic<float>  tempo;
+            Atomic<bool>   playing;
+            Atomic<bool>   recording;
+            Atomic<int64>  positionFrames;
+            
+            inline double getPositionSeconds() const
+            {
+                return (double) positionFrames.get() / sampleRate.get();
+            }
+            
+            inline float getPositionBeats() const
+            {
+                float divisor = (float)(1 << beatType.get());
+                divisor = 4.f / divisor;
+                divisor *= 60.f;
+                return getPositionSeconds() * (tempo.get() / divisor);
+            }
+            
+            inline void getBarsAndBeats (int& bars, int& beats, int& subBeats,
+                                         int subDivisions = 4)
+            {
+                float t  = getPositionBeats();
+                bars     = std::floor(t / beatsPerBar.get());
+                beats    = (int)std::floor(t) % beatsPerBar.get();
+                subBeats = (int)std::floor(t * subDivisions) % subDivisions;
             }
         };
         
@@ -33,19 +57,31 @@ namespace Element
         
         Transport();
         ~Transport();
-
+        
+        int getBeatsPerBar()    const { return getTimeScale().beatsPerBar(); }
+        int getBeatType()       const { return getTimeScale().beatType(); }
+        
         inline void requestPlayState (bool p) { while (! playState.set (p)) { } }
+        inline void requestPlayPause() { requestPlayState (! playState.get()); }
         inline void requestRecordState (bool r) { while (! recordState.set (r)) { } }
         inline void requestTempo (const double bpm) { while (! nextTempo.set (bpm)) { } }
+        void requestMeter (int beatsPerBar, int beatType);
+        
+        void requestAudioFrame (const int64 frame);
 
         void preProcess (int nframes);
         void postProcess (int nframes);
 
         inline MonitorPtr getMonitor() const { return monitor; }
-
+        
     private:
         AtomicValue<bool> playState, recordState;
         AtomicValue<double> nextTempo;
+        Atomic<int> nextBeatsPerBar, nextBeatType;
+        
+        Atomic<bool> seekWanted;
+        AtomicValue<int64> seekFrame;
+        
         MonitorPtr monitor;
     };
 }

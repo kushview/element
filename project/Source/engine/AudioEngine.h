@@ -70,6 +70,11 @@ public:
     RootGraph* getGraph (const int index);
     
     void setPlaying (const bool shouldBePlaying);
+    void setRecording (const bool shouldBeRecording);
+    void seekToAudioFrame (const int64 frame);
+    void setMeter (int beatsPerBar, int beatType);
+    
+    void togglePlayPause();
     
     MidiKeyboardState& getKeyboardState();
     Transport::MonitorPtr getTransportMonitor() const;

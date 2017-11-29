@@ -176,7 +176,9 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::exportGraph,
         Commands::panic,
         
-        Commands::checkNewerVersion
+        Commands::checkNewerVersion,
+        
+        Commands::transportPlay
     });
     cids.addArray({ Commands::copy, Commands::paste });
 }
@@ -221,6 +223,10 @@ bool AppController::perform (const InvocationInfo& info)
             findChild<EngineController>()->removeGraph();
             break;
         
+        case Commands::transportPlay:
+            getWorld().getAudioEngine()->togglePlayPause();
+            break;
+            
         case Commands::importGraph:
         {
             FileChooser chooser ("Import Graph", lastSavedFile, "*.elg");
@@ -277,6 +283,7 @@ bool AppController::perform (const InvocationInfo& info)
                 auto* props = settings.getUserSettings();
                 props->removeValue("L");
                 props->save();
+                props->reload();
                 status.load();
             }
         } break;

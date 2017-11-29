@@ -6,7 +6,9 @@ namespace Element {
 void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
 {
     const bool isOn = getToggleState();
-    Colour fill = isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter();
+//    Colour fill = isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter();
+    
+    Colour fill = findColour (isOn ? backgroundOnColourId : backgroundColourId);
     if (isOn)
     {
         
@@ -28,7 +30,7 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
         text = (getToggleState()) ? yes : no;
     
     g.setFont (12.f);
-    g.setColour (Colours::black);
+    g.setColour (getTextColour());
     g.drawText (text, getLocalBounds(), Justification::centred);
     g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
     g.drawRect (0, 0, getWidth(), getHeight());

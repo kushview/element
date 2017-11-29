@@ -8,6 +8,8 @@
 namespace Element
 {
 
+
+
 class TempoAndMeterBar : public Component,
                          public ValueListener,
                          public Timer
@@ -18,10 +20,13 @@ public:
         addAndMakeVisible (extButton);
 
         addAndMakeVisible (tempoLabel);
-        setSize (120, 24);
         
         tempoLabel.tempoValue.addListener (this);
         extButton.getToggleStateValue().addListener (this);
+        
+        addAndMakeVisible (meter = new TopMeter (*this));
+        
+        setSize (120, 24);
     }
     
     ~TempoAndMeterBar()
@@ -42,6 +47,9 @@ public:
         }
         
         tempoLabel.setBounds (r.removeFromLeft (60));
+        r.removeFromLeft (2);
+        
+        meter->setBounds (r.removeFromLeft (42));
     }
     
     Value& getTempoValue()          { return tempoLabel.tempoValue; }
@@ -85,13 +93,25 @@ public:
         resized();
     }
     
-    void timerCallback() override
+    bool checkMonitor()
     {
-        if (monitor == nullptr)
+        if (monitor == nullptr || engine == nullptr)
         {
             if (auto* cc = ViewHelpers::findContentComponent (this))
-                monitor = cc->getGlobals().getAudioEngine()->getTransportMonitor();
+            {
+                engine = cc->getGlobals().getAudioEngine();
+                if (engine)
+                    monitor = engine->getTransportMonitor();
+            }
         }
+        
+        return monitor != nullptr;
+    }
+    
+    void timerCallback() override
+    {
+        if (! checkMonitor())
+            return;
         
         if (extButton.getToggleState() && !tempoLabel.isEnabled() && monitor)
         {
@@ -104,8 +124,8 @@ public:
     }
     
 private:
-    
     Transport::MonitorPtr monitor;
+    AudioEnginePtr engine;
     
     void stabilize()
     {
@@ -220,6 +240,20 @@ private:
         float engineTempo = 0.f;
         int lastY = 0;
     } tempoLabel;
+    
+    class TopMeter : public TimeSignatureSetting {
+    public:
+        TopMeter (TempoAndMeterBar& o) : owner(o) { }
+        void meterChanged() override
+        {
+            if (owner.checkMonitor())
+                if (auto e = owner.engine)
+                    e->setMeter (getBeatsPerBar(), getBeatType());
+        }
+        
+        TempoAndMeterBar& owner;
+    };
+    ScopedPointer<TopMeter> meter;
 };
 
 }

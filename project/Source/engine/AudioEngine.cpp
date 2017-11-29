@@ -571,10 +571,34 @@ Transport::MonitorPtr AudioEngine::getTransportMonitor() const
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
 }
 
+void AudioEngine::setMeter (int beatsPerBar, int beatType)
+{
+    auto& transport (priv->transport);
+    transport.requestMeter (beatsPerBar, beatType);
+}
+
+void AudioEngine::togglePlayPause()
+{
+    auto& transport (priv->transport);
+    transport.requestPlayPause();
+}
+
 void AudioEngine::setPlaying (const bool shouldBePlaying)
 {
     auto& transport (priv->transport);
     transport.requestPlayState (shouldBePlaying);
+}
+
+void AudioEngine::setRecording (const bool shouldBeRecording)
+{
+    auto& transport (priv->transport);
+    transport.requestRecordState (shouldBeRecording);
+}
+
+void AudioEngine::seekToAudioFrame (const int64 frame)
+{
+    auto& transport (priv->transport);
+    transport.requestAudioFrame (frame);
 }
 
 void AudioEngine::prepareExternalPlayback (const double sampleRate, const int blockSize,

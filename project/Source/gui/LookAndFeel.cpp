@@ -1,5 +1,6 @@
 
 #include "LookAndFeel.h"
+#include "gui/Buttons.h"
 
 namespace Element {
 
@@ -7,6 +8,7 @@ const Colour Colors::elemental      = Colour (0xff4765a0);  // LookAndFeel_KV1::
 const Colour Colors::toggleBlue     = Colour (0xff33aaf9);
 const Colour Colors::toggleGreen    = Colour (0xff92e75e);
 const Colour Colors::toggleOrange   = Colour (0xfffaa63a);
+const Colour Colors::toggleRed      = Colours::red;
 
 LookAndFeel::LookAndFeel()
 {
@@ -19,6 +21,11 @@ LookAndFeel::LookAndFeel()
     setColour (TextEditor::highlightColourId, Colours::yellow);
     setColour (TextEditor::outlineColourId, Colours::black);
     setColour (TextEditor::focusedOutlineColourId, Colours::black);
+    
+    setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
+    setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);
+    setColour (SettingButton::textColourId, Colours::black);
+    setColour (SettingButton::textDisabledColourId, Colours::darkgrey);
 }
 
 
