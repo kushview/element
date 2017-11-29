@@ -46,5 +46,8 @@ namespace Tags
     
     const Identifier session            = "session";
     const Identifier state              = "state";
+    
+    const Identifier beatsPerBar        = "beatsPerBar";
+    const Identifier beatDivisor        = "beatDivisor";
 }
 }

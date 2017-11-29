@@ -20,10 +20,12 @@ namespace Element
                 sampleRate.set (44100.0);
                 beatsPerBar.set (4);
                 beatType.set (2);
+                beatDivisor.set (2);
             }
             
             Atomic<int>    beatsPerBar;
             Atomic<int>    beatType;
+            Atomic<int>    beatDivisor;
             Atomic<double> sampleRate;
             Atomic<float>  tempo;
             Atomic<bool>   playing;
@@ -37,8 +39,9 @@ namespace Element
             
             inline float getPositionBeats() const
             {
+                float numerator = (float)(1 << beatDivisor.get());
                 float divisor = (float)(1 << beatType.get());
-                divisor = 4.f / divisor;
+                divisor = numerator / divisor;
                 divisor *= 60.f;
                 return getPositionSeconds() * (tempo.get() / divisor);
             }
@@ -77,7 +80,7 @@ namespace Element
     private:
         AtomicValue<bool> playState, recordState;
         AtomicValue<double> nextTempo;
-        Atomic<int> nextBeatsPerBar, nextBeatType;
+        Atomic<int> nextBeatsPerBar, nextBeatDivisor;
         
         Atomic<bool> seekWanted;
         AtomicValue<int64> seekFrame;

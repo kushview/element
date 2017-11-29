@@ -95,10 +95,11 @@ public:
     
     bool checkMonitor()
     {
-        if (monitor == nullptr || engine == nullptr)
+        if (monitor == nullptr || engine == nullptr || session == nullptr)
         {
             if (auto* cc = ViewHelpers::findContentComponent (this))
             {
+                session = cc->getGlobals().getSession();
                 engine = cc->getGlobals().getAudioEngine();
                 if (engine)
                     monitor = engine->getTransportMonitor();
@@ -123,9 +124,18 @@ public:
         }
     }
     
+    void stabilizeWithSession (const bool notify = false)
+    {
+        session = ViewHelpers::getSession (this);
+        if (! session) return;
+        meter->updateMeter (session->getProperty (Tags::beatsPerBar),
+                            session->getProperty (Tags::beatDivisor), notify);
+    }
+    
 private:
     Transport::MonitorPtr monitor;
     AudioEnginePtr engine;
+    SessionPtr session;
     
     void stabilize()
     {
@@ -241,14 +251,22 @@ private:
         int lastY = 0;
     } tempoLabel;
     
-    class TopMeter : public TimeSignatureSetting {
+    class TopMeter : public TimeSignatureSetting
+    {
     public:
         TopMeter (TempoAndMeterBar& o) : owner(o) { }
         void meterChanged() override
         {
             if (owner.checkMonitor())
+            {
                 if (auto e = owner.engine)
-                    e->setMeter (getBeatsPerBar(), getBeatType());
+                    e->setMeter (getBeatsPerBar(), getBeatDivisor());
+                if (auto s = owner.session)
+                {
+                    s->getValueTree().setProperty (Tags::beatsPerBar, getBeatsPerBar(), 0);
+                    s->getValueTree().setProperty (Tags::beatDivisor, getBeatDivisor(), 0);
+                }
+            }
         }
         
         TempoAndMeterBar& owner;

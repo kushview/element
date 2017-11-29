@@ -146,7 +146,7 @@ public:
     TimeSignatureSetting()
     {
         beatsPerBar.setValue (4);
-        beatType.setValue (BeatType::QuarterNote);
+        beatDivisor.setValue (BeatType::QuarterNote);
     }
     
     ~TimeSignatureSetting() { }
@@ -158,7 +158,7 @@ public:
         g.fillAll (isOn ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
         
         String text = beatsPerBar.toString();
-        text << " / " << String (BeatType ((BeatType::ID)(int) beatType.getValue()).divisor());
+        text << " / " << String (BeatType ((BeatType::ID)(int) beatDivisor.getValue()).divisor());
         
         if (text.isNotEmpty())
         {
@@ -171,34 +171,37 @@ public:
         g.drawRect (0, 0, getWidth(), getHeight());
     }
     
-    void updateMeter (int bpb, BeatType type, const bool notify = false)
+    void updateMeter (int bpb, int div, const bool notify = false)
     {
         if (bpb < 1) bpb = 1;
         if (bpb > 99) bpb = 99;
         
-        if (bpb == (int)beatsPerBar.getValue() && (int)beatType.getValue() == (int)type)
+        if (bpb == (int)beatsPerBar.getValue() && (int)beatDivisor.getValue() == div)
             return;
         
         beatsPerBar.setValue (bpb);
-        beatType.setValue ((int) type);
+        beatDivisor.setValue (div);
         if (notify)
             meterChanged ();
+        
+        repaint();
     }
     
     virtual void meterChanged () { }
     int getBeatsPerBar()    const { return (int) beatsPerBar.getValue(); }
-    int getBeatType()       const { return (int) beatType.getValue(); }
+    int getBeatType()       const { return (int) BeatType::QuarterNote; } // quarter note
+    int getBeatDivisor()    const { return (int) beatDivisor.getValue(); }
     
     void mouseDown (const MouseEvent& ev) override
     {
             if (! isEnabled())
                 return;
         
-        isDraggingBeatType = ev.x >= (getWidth() / 2);
+        isDraggingBeatDivisor = ev.x >= (getWidth() / 2);
         lastY = ev.getDistanceFromDragStartY();
     }
     
-    Value& getDraggedValue() { return isDraggingBeatType ? beatType : beatsPerBar; }
+    Value& getDraggedValue() { return isDraggingBeatDivisor ? beatDivisor : beatsPerBar; }
     
     void mouseDrag (const MouseEvent& ev) override
     {
@@ -224,20 +227,16 @@ public:
         if (! isEnabled())
             return;
         
-        if (dragging) {
-            String text = beatsPerBar.toString();
-            text << " / " << String (BeatType ((BeatType::ID)(int) beatType.getValue()).divisor());
-            DBG("request time sig: " << text);
+        if (dragging)
             meterChanged();
-        }
         
         dragging = false;
     }
-        
+
 private:
     Value beatsPerBar;
-    Value beatType;
-    bool isDraggingBeatType = false;
+    Value beatDivisor;
+    bool isDraggingBeatDivisor = false;
     int stickyValue = 0;
     int decimalPlaces = 0;
     int lastY = 0;
@@ -247,7 +246,7 @@ private:
     {
         int iVal = value;
         
-        if (isDraggingBeatType)
+        if (isDraggingBeatDivisor)
         {
             if (iVal < 0) iVal = 0;
             if (iVal > BeatType::SixteenthNote) iVal = BeatType::SixteenthNote;

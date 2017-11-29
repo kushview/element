@@ -72,7 +72,7 @@ public:
     void setPlaying (const bool shouldBePlaying);
     void setRecording (const bool shouldBeRecording);
     void seekToAudioFrame (const int64 frame);
-    void setMeter (int beatsPerBar, int beatType);
+    void setMeter (int beatsPerBar, int beatDivisor);
     
     void togglePlayPause();
     

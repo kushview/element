@@ -278,7 +278,7 @@ public:
         numOutputChans  = numChansOut;
         
         midiClock.reset (sampleRate, blockSize);
-        
+       
         messageCollector.reset (sampleRate);
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
@@ -347,6 +347,9 @@ public:
         {
             tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
             externalClockValue.referTo (session->getPropertyAsValue ("externalSync"));
+            
+            transport.requestMeter (session->getProperty (Tags::beatsPerBar, 4),
+                                    session->getProperty (Tags::beatDivisor, 2));
         }
         else
         {
@@ -377,6 +380,8 @@ public:
                 if (isPrepared)
                     prepareGraph (graph, sampleRate, blockSize);
             }
+            
+            
         }
         else
         {
@@ -571,10 +576,10 @@ Transport::MonitorPtr AudioEngine::getTransportMonitor() const
     return (priv != nullptr) ? priv->transport.getMonitor() : nullptr;
 }
 
-void AudioEngine::setMeter (int beatsPerBar, int beatType)
+void AudioEngine::setMeter (int beatsPerBar, int beatDivisor)
 {
     auto& transport (priv->transport);
-    transport.requestMeter (beatsPerBar, beatType);
+    transport.requestMeter (beatsPerBar, beatDivisor);
 }
 
 void AudioEngine::togglePlayPause()

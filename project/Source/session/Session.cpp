@@ -103,6 +103,10 @@ namespace Element {
             setProperty (Tags::tempo, (double) 120.0);
         if (! objectData.hasProperty (Tags::notes))
             setProperty (Tags::notes, String());
+        if (! objectData.hasProperty(Tags::beatsPerBar))
+            setProperty (Tags::beatsPerBar, 4);
+        if (! objectData.hasProperty (Tags::beatDivisor))
+            setProperty (Tags::beatDivisor, (int) BeatType::QuarterNote);
         
         if (resetExisting)
             objectData.removeAllChildren (nullptr);

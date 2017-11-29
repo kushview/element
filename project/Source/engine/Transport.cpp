@@ -19,7 +19,7 @@ Transport::Transport()
     seekFrame.set (0);
     
     nextBeatsPerBar.set (getBeatsPerBar());
-    nextBeatType.set (getBeatType());
+    nextBeatDivisor.set (getBeatType());
     
     setLengthFrames (0);
 }
@@ -54,9 +54,9 @@ void Transport::postProcess (int nframes)
     monitor->recording.set (recording);
     monitor->positionFrames.set (getPositionFrames());
     
-    if (getBeatsPerBar() != nextBeatsPerBar.get() || getBeatType() != nextBeatType.get())
+    if (getBeatsPerBar() != nextBeatsPerBar.get() || getBeatType() != nextBeatDivisor.get())
     {
-        ts.setBeatType ((unsigned short) nextBeatType.get());
+        ts.setBeatType ((unsigned short) nextBeatDivisor.get());
         ts.setBeatsPerBar ((unsigned short) nextBeatsPerBar.get());
         ts.updateScale();
         
@@ -72,14 +72,14 @@ void Transport::postProcess (int nframes)
     }
 }
 
-void Transport::requestMeter (int beatsPerBar, int beatType)
+void Transport::requestMeter (int beatsPerBar, int beatDivisor)
 {
     if (beatsPerBar < 1) beatsPerBar = 1;
     if (beatsPerBar > 99) beatsPerBar = 99;
-    if (beatType < 0) beatType = 0;
-    if (beatType > BeatType::SixteenthNote) beatType = BeatType::SixteenthNote;
+    if (beatDivisor < 0) beatDivisor = 0;
+    if (beatDivisor > BeatType::SixteenthNote) beatDivisor = BeatType::SixteenthNote;
     nextBeatsPerBar.set (beatsPerBar);
-    nextBeatType.set (beatType);
+    nextBeatDivisor.set (beatDivisor);
 }
 
 void Transport::requestAudioFrame (const int64 frame)

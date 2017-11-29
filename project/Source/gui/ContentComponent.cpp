@@ -103,6 +103,7 @@ public:
             tempoBar.setUseExtButton (showExt);
             tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
+            tempoBar.stabilizeWithSession (false);
         }
         
         resized();
@@ -498,6 +499,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
         resizerMouseUp();
     }
     
+    toolBar->setSession (getGlobals().getSession());
     nav->expandPanelFully (nav->getSessionPanel(), false);
 }
 

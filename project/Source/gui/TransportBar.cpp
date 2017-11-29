@@ -109,7 +109,7 @@ void TransportBar::timerCallback()
     if (record->getToggleState() != monitor->recording.get())
         record->setToggleState (monitor->recording.get(), dontSendNotification);
 
-    setBeatTime (monitor->getPositionBeats());
+    stabilize();
 }
 
 void TransportBar::paint (Graphics& g)
@@ -142,7 +142,10 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == stop)
     {
-        engine->setPlaying (false);
+        if (! monitor->playing.get())
+            engine->seekToAudioFrame (0);
+        else
+            engine->setPlaying (false);
     }
     else if (buttonThatWasClicked == record)
     {
@@ -151,6 +154,11 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
 }
 
 void TransportBar::setBeatTime (const float t)
+{
+    
+}
+
+void TransportBar::stabilize()
 {
     if (checkForMonitor())
     {
@@ -163,11 +171,6 @@ void TransportBar::setBeatTime (const float t)
         for (auto* c : { barLabel.get(), beatLabel.get(), subLabel.get() })
             c->repaint();
     }
-}
-
-void TransportBar::stabilize()
-{
-
 }
 
 void TransportBar::updateWidth()
