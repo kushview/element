@@ -119,9 +119,10 @@ void TransportBar::paint (Graphics& g)
 
 void TransportBar::resized()
 {
-    play->setBounds (150, 0, 32, 16);
+    play->setBounds (80, 0, 32, 16);
     stop->setBounds (115, 0, 32, 16);
-    record->setBounds (80, 0, 32, 16);
+    record->setBounds (150, 0, 32, 16);
+    
     barLabel->setBounds (0, 0, 24, 16);
     beatLabel->setBounds (26, 0, 24, 16);
     subLabel->setBounds (52, 0, 24, 16);
@@ -134,12 +135,14 @@ void TransportBar::buttonClicked (Button* buttonThatWasClicked)
     
     if (buttonThatWasClicked == play)
     {
-        engine->setPlaying (! monitor->playing.get());
+        if (monitor->playing.get())
+            engine->seekToAudioFrame (0);
+        else
+            engine->setPlaying (true);
     }
     else if (buttonThatWasClicked == stop)
     {
         engine->setPlaying (false);
-        engine->seekToAudioFrame (0);
     }
     else if (buttonThatWasClicked == record)
     {
@@ -169,7 +172,7 @@ void TransportBar::stabilize()
 
 void TransportBar::updateWidth()
 {
-    setSize (play->getRight(), getHeight());
+    setSize (record->getRight(), getHeight());
 }
 
 } /* namespace element */
