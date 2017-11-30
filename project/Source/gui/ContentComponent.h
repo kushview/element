@@ -50,8 +50,8 @@ public:
     void nextMainView();
     
     int getNavSize();
-    bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
     
+    bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
     void setVirtualKeyboardVisible (const bool isVisible);
     void toggleVirtualKeyboard();
     

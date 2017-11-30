@@ -37,7 +37,14 @@
 
 #include "gui/ContentComponent.h"
 
-#define EL_USE_AUDIO_PANEL 1
+#ifndef EL_USE_ACCESSORY_BUTTONS
+ #define EL_USE_ACCESSORY_BUTTONS 0
+#endif
+
+#ifndef EL_USE_AUDIO_PANEL
+ #define EL_USE_AUDIO_PANEL 1
+#endif
+
 #define EL_NAV_MIN_WIDTH 100
 #define EL_NAV_MAX_WIDTH 360
 
@@ -51,33 +58,18 @@ class ContentComponent::Toolbar : public Component,
 {
 public:
     Toolbar()
-        : viewBtn ("e"),
-          title ("Session Title")
+        : viewBtn ("e")
     {
-        addAndMakeVisible (title);
-        title.setText ("", dontSendNotification);
-        
+       #if EL_USE_ACCESSORY_BUTTONS
         addAndMakeVisible (viewBtn);
-        viewBtn.setColour (TextButton::buttonColourId, Colors::toggleBlue);
-        viewBtn.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-        viewBtn.addListener (this);
-        
         addAndMakeVisible (panicBtn);
-        panicBtn.setColour (TextButton::buttonColourId, Colors::toggleOrange);
-        panicBtn.setColour (TextButton::buttonOnColourId, Colors::toggleOrange);
-        panicBtn.addListener (this);
-        
-        // addAndMakeVisible (trim);
-        trim.setColour (Slider::rotarySliderFillColourId, LookAndFeel::elementBlue);
-        trim.setName ("Trim");
-        trim.setSliderStyle (Slider::RotaryVerticalDrag);
-        trim.setRange (-70, 9.0);
-        
+       #endif
+       #if EL_RUNNING_AS_PLUGIN
         addAndMakeVisible (menuBtn);
-        menuBtn.addListener (this);
-        
+       #endif
+        for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
+            b->addListener (this);
         addAndMakeVisible (tempoBar);
-        
         addAndMakeVisible (transport);
     }
     
@@ -100,7 +92,6 @@ public:
        
         if (session)
         {
-            title.getTextValue().referTo (session->getNameValue());
             tempoBar.setUseExtButton (showExt);
             tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
@@ -124,16 +115,22 @@ public:
         if (menuBtn.isVisible())
         {
             menuBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                                .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+                   .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
             r.removeFromRight (4);
         }
         
-        panicBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                             .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+        if (panicBtn.isVisible())
+        {
+            panicBtn.setBounds (r.removeFromRight(tempoBarHeight)
+                    .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            r.removeFromRight (4);
+        }
         
-        r.removeFromRight (4);
-        viewBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                            .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+        if (viewBtn.isVisible())
+        {
+            viewBtn.setBounds (r.removeFromRight(tempoBarHeight)
+                                .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+        }
         
         if (transport.isVisible())
         {
@@ -174,9 +171,6 @@ private:
     SettingButton menuBtn;
     SettingButton viewBtn;
     PanicButton panicBtn;
-    Label title;
-    Slider trim;
-    Label dbLabel;
     TempoAndMeterBar tempoBar;
     TransportBar     transport;
 };
@@ -585,7 +579,7 @@ bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc;elg;els"))
+        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst"))
             return true;
     }
     return false;
@@ -610,6 +604,14 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
                     "Apply License File", "Your software could not be unlocked.");
             }
+        }
+        else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&
+                 (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
+        {
+            PluginDescription desc;
+            desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
+            desc.fileOrIdentifier = file.getFullPathName();
+            this->post (new LoadPluginMessage (desc, false));
         }
     }
 }

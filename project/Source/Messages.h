@@ -69,8 +69,8 @@ public:
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:
-    LoadPluginMessage (const PluginDescription& d, const bool v)
-        : Message(), description (d), verified (v) { }
+    LoadPluginMessage (const PluginDescription& pluginDescription, const bool pluginVerified)
+        : Message(), description (pluginDescription), verified (pluginVerified) { }
     LoadPluginMessage (const PluginDescription& d, const bool v, const float rx, const float ry)
         : Message(), description (d), relativeX (rx), relativeY (ry), verified (v) { }
     ~LoadPluginMessage() { }
