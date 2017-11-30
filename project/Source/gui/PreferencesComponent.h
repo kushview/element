@@ -31,9 +31,6 @@ namespace Element {
 //==============================================================================
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Introjucer.
-
-    Describe your class and how it works here!
                                                                     //[/Comments]
 */
 class PreferencesComponent  : public Component

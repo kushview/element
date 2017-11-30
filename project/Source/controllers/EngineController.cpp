@@ -15,6 +15,7 @@
 namespace Element {
 
 EngineController::EngineController() { }
+
 EngineController::~EngineController()
 {
     if (root)

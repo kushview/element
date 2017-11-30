@@ -556,7 +556,7 @@ namespace Element {
 
 //==============================================================================
 PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
-    : world (g), gui(_gui)
+    : world (g), gui (_gui)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]

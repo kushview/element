@@ -71,7 +71,7 @@ TransportBar::TransportBar ()
     setSize (260, 16);
     updateWidth();
     
-    startTimer (44);
+    startTimer (88);
 }
 
 TransportBar::~TransportBar()

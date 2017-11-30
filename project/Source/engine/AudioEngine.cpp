@@ -430,6 +430,15 @@ public:
     void midiClockSignalAcquired()  override { }
     void midiClockSignalDropped()   override { }
     
+    bool isUsingExternalClock() const
+    {
+       #if EL_RUNNING_AS_PLUGIN
+        return sessionWantsExternalClock.get() > 0;
+       #else
+        return sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0;
+       #endif
+    }
+    
 private:
     friend class AudioEngine;
     AudioEngine&    engine;
@@ -456,6 +465,8 @@ private:
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
     MidiClock midiClock;
+    
+    AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
     
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -619,12 +630,16 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
         priv->processCurrentGraph (buffer, midi);
 }
 
+bool AudioEngine::isUsingExternalClock() const {
+    return priv && priv->isUsingExternalClock();
+}
+
 void AudioEngine::processExternalPlayhead (AudioPlayHead* playhead, const int nframes)
 {
-    auto& transport (priv->transport);
-    AudioPlayHead::CurrentPositionInfo pos;
+    auto& pos (priv->hostPos);
     playhead->getCurrentPosition (pos);
 
+    auto& transport (priv->transport);
     transport.requestTempo (pos.bpm);
     transport.requestMeter (pos.timeSigNumerator, BeatType::fromPosition (pos));
     transport.requestPlayState (pos.isPlaying);

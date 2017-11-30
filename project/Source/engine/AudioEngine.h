@@ -60,6 +60,8 @@ public:
     
     void applySettings (Settings&);
     
+    bool isUsingExternalClock() const;
+    
     void setSession (SessionPtr);
     void refreshSession();
     
