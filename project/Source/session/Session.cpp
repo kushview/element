@@ -81,6 +81,7 @@ namespace Element {
             return false;
         objectData.removeListener (this);
         objectData = data;
+        setMissingProperties();
         objectData.addListener (this);
         return true;
     }

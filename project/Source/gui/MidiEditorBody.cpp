@@ -13,15 +13,13 @@ typedef SelectedItemSet<NoteClipItem*>::ItemArray SelectedNotes;
 NoteSelection::NoteSelection() { }
 NoteSelection::~NoteSelection() { }
 
-void
-NoteSelection::itemSelected (NoteClipItem *item)
+void NoteSelection::itemSelected (NoteClipItem *item)
 {
     item->setSelected (true);
     item->repaint();
 }
 
-void
-NoteSelection::itemDeselected  (NoteClipItem *item)
+void NoteSelection::itemDeselected  (NoteClipItem *item)
 {
     item->setSelected (false);
     item->repaint();
