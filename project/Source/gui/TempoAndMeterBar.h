@@ -112,16 +112,20 @@ public:
         if (! checkMonitor())
             return;
         
-        if (extButton.getToggleState() && !tempoLabel.isEnabled() && monitor)
+        // Update labels from monitor if EXT sync is on
+        if (extButton.getToggleState())
         {
-            if (tempoLabel.engineTempo != monitor->tempo.get())
+            if (! tempoLabel.isEnabled())
             {
                 tempoLabel.engineTempo = monitor->tempo.get();
                 tempoLabel.repaint();
             }
             
-            meter->updateMeter (monitor->beatsPerBar.get(),
-                                monitor->beatDivisor.get(), false);
+            if (! meter->isEnabled())
+            {
+                meter->updateMeter (monitor->beatsPerBar.get(),
+                                    monitor->beatDivisor.get(), false);
+            }
         }
     }
     
@@ -143,7 +147,12 @@ private:
         if (extButton.isVisible() && extButton.getToggleState())
         {
             tempoLabel.setEnabled (false);
+            
+           #if EL_RUNNING_AS_PLUGIN
+            // MIDI clock doesn't change the meter, only disable user
+            // interaction in the plugin.
             meter->setEnabled (false);
+           #endif
         }
         else
         {
@@ -155,7 +164,6 @@ private:
     class ExtButton : public Button
     {
     public:
-        
         ExtButton() : Button ("ExtButton")
         {
             setButtonText ("EXT");

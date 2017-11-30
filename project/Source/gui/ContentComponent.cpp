@@ -43,14 +43,8 @@
 
 namespace Element {
 
-    ContentView::ContentView()
-    {
-
-    }
-    
-    ContentView::~ContentView()
-    {
-    }
+ContentView::ContentView() { }
+ContentView::~ContentView() { }
     
 class ContentComponent::Toolbar : public Component,
                                   public ButtonListener
