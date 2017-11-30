@@ -189,7 +189,7 @@ public:
     void makeEditorActive()
     {
         if (node.isValid())
-            ViewHelpers::presentPluginWindow (node);
+            ViewHelpers::presentPluginWindow (this, node);
     }
     
     void mouseUp (const MouseEvent& e)
@@ -1011,6 +1011,10 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
 
 PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
 {
+    // FIXME:
+    jassertfalse;
+    return 0;
+#if 0
     if (PluginWindow* window = PluginWindow::getWindowFor (f))
         return window;
     
@@ -1028,6 +1032,7 @@ PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bo
     }
 
     return w;
+#endif
 }
 
 

@@ -104,7 +104,7 @@ public:
         }
         else if (index == 2000 && menu == Window)
         {
-            PluginWindow::closeAllCurrentlyOpenWindows();
+            ViewHelpers::closePluginWindows (&owner, false);
         }
         
        #if JUCE_DEBUG

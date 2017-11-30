@@ -76,7 +76,7 @@ void AppController::run()
         {
             for (int i = graph.getNumNodes(); --i >= 0;)
                 if ((bool) graph.getNode(i).getProperty ("windowVisible", false))
-                    ViewHelpers::presentPluginWindow (graph.getNode (i));
+                    gui->presentPluginWindow (graph.getNode (i));
         }
     }
     

@@ -3,7 +3,6 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
-#include "gui/PluginWindow.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
@@ -171,7 +170,8 @@ void EngineController::removeNode (const uint32 nodeId)
 {
     if (! root)
         return;
-    PluginWindow::closeCurrentlyOpenWindowsFor (nodeId);
+    if (auto* gui = findSibling<GuiController>())
+        gui->closePluginWindowsFor (nodeId, true);
     root->removeFilter (nodeId);
 }
 
@@ -245,7 +245,8 @@ void EngineController::setRootNode (const Node& newRootNode)
     /* Unload the existing graph if necessary */
     if (root)
     {
-        PluginWindow::closeCurrentlyOpenWindowsFor (root->getGraph(), true);
+        if (auto* gui = findSibling<GuiController>())
+            gui->closeAllPluginWindows();
         root->savePluginStates();
         root->unloadGraph();
     }

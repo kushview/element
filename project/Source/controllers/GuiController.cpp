@@ -18,17 +18,14 @@ GuiController::GuiController (Globals& w, AppController& a)
       windowManager (nullptr),
       mainWindow (nullptr)
 {
-    windowManager = new WindowManager();
+    windowManager = new WindowManager (*this);
     commander().registerAllCommandsForTarget (this);
 }
 
 GuiController::~GuiController()
 {
-    PropertiesFile* pf = globals().getSettings().getUserSettings();
-    
     if (mainWindow)
     {
-        
         closeAllWindows();
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
@@ -76,7 +73,7 @@ void GuiController::closeAllWindows()
 {
     if (! windowManager)
         return;
-    PluginWindow::closeAllCurrentlyOpenWindows();
+    
     windowManager->closeAll();
 }
 
@@ -117,6 +114,10 @@ void GuiController::runDialog (const String& uri)
     }
 }
 
+void GuiController::closePluginWindow (PluginWindow* w) { windowManager->closePluginWindow (w); }
+void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
+void GuiController::closeAllPluginWindows (const bool visible) { windowManager->closeAllPluginWindows (visible); }
+
 void GuiController::runDialog (Component* c, const String& title)
 {
     DialogOptions opts;
@@ -144,13 +145,31 @@ void GuiController::showPluginWindowsFor (const Node& node)
 {
     for (int i = 0; i < node.getNumNodes(); ++i)
         if ((bool) node.getNode(i).getProperty ("windowVisible", false))
-            ViewHelpers::presentPluginWindow (node.getNode (i));
+            presentPluginWindow (node.getNode (i));
+}
+
+void GuiController::presentPluginWindow (const Node& node)
+{
+    if (! windowManager)
+        return;
+    
+    auto* window = windowManager->getPluginWindowFor (node);
+    if (window)
+    {
+        window->setVisible (true);
+        window->toFront (false);
+        return;
+    }
+    
+    window = windowManager->createPluginWindowFor (node);
+    if (window)
+    {
+        window->setVisible (true);
+    }
 }
 
 void GuiController::run()
 {
-    sessionDoc = new SessionDocument (session());
-    
     mainWindow = new MainWindow (world);
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
@@ -164,41 +183,8 @@ void GuiController::run()
 
 bool GuiController::shutdownApp()
 {
-    if (! sessionDoc->hasChangedSinceSaved())
-        return true;
-    
-    bool result = true;
-    
-    {
-        /* - 0 if the third button was pressed (normally used for 'cancel')
-         - 1 if the first button was pressed (normally used for 'yes')
-         - 2 if the middle button was pressed (normally used for 'no') */
-        
-        //int res = Alerts::showYesNoCancel ("Save Session?", );
-        int res = AlertWindow::showYesNoCancelBox (AlertWindow::InfoIcon, "Save Session ?",
-                                                   "The current session has changes. Would you like to save it?",
-                                                   "Save Session", "Just Quit", "Cancel");
-        
-        if (res == 2)
-        {
-            // Just Quit
-        }
-        else if (res == 1)
-        {
-            sessionDoc->save (true, true);
-        }
-        else if (res == 0)
-        {
-            result = false; // cancel shutdown
-        }
-    }
-    
-    if (result)
-    {
-        windowManager->closeAll();
-    }
-    
-    return result;
+    jassertfalse;
+    return true;
 }
 
 SessionRef GuiController::session()

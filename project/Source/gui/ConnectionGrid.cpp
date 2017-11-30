@@ -345,7 +345,7 @@ namespace Element
             }
             else
             {
-                ViewHelpers::presentPluginWindow (node);
+                ViewHelpers::presentPluginWindow (this, node);
             }
         }
         

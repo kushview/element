@@ -41,7 +41,10 @@ bool invokeDirectly (Component* c, const int commandID, bool async);
 void postMessageFor (Component*, Message*);
 
 GraphNodePtr findGraphNodeFor (Component*, const Node&);
-void presentPluginWindow (const Node& node);
+
+void presentPluginWindow (Component*, const Node&);
+void closePluginWindows (Component*, const bool visible = true);
+
 }
 }
 

@@ -18,6 +18,7 @@ namespace Element {
     class Globals;
     class ContentComponent;
     class MainWindow;
+    class PluginWindow;
     class SessionDocument;
     
     class GuiController : public AppController::Child,
@@ -70,8 +71,12 @@ namespace Element {
         /** Get a reference to Sesison data */
         SessionRef session();
         
-        /** show plugin windows for a given node */
+        /** show plugin windows of child nodes */
         void showPluginWindowsFor (const Node& node);
+        
+        /** present a plugin window */
+        void presentPluginWindow (const Node& node);
+        
         
         void stabilizeContent();
         
@@ -82,17 +87,34 @@ namespace Element {
         bool perform (const InvocationInfo& info) override;
 
         ContentComponent* getContentComponent();
+        
+        /** Close all plugin windows housed by this controller */
+        void closeAllPluginWindows (const bool visible = true);
+        
+        /** Close plugin windows for a Node ID
+         
+            @param nodeId   The Node to close windows for
+            @param visible  The visibility state flag, true indicates the window should be open when loaded
+        */
+        void closePluginWindowsFor (uint32 nodeId, const bool visible);
+        
+        /** @internal close a specific plugin window
+            PluginWindows call this when they need deleted
+          */
+        void closePluginWindow (PluginWindow*);
+        
     private:
         AppController& controller;
         Globals& world;
         SessionRef sessionRef;
-        ScopedPointer<SessionDocument> sessionDoc;
-        Scoped<WindowManager>     windowManager;
-        Scoped<MainWindow>        mainWindow;
-        Scoped<ContentComponent>  content;
-        Scoped<AboutComponent>    about;
         
-        Element::LookAndFeel      lookAndFeel;
+        OwnedArray<PluginWindow>         pluginWindows;
+        ScopedPointer<WindowManager>     windowManager;
+        ScopedPointer<MainWindow>        mainWindow;
+        ScopedPointer<ContentComponent>  content;
+        ScopedPointer<AboutComponent>    about;
+        
+        Element::LookAndFeel             lookAndFeel;
         
         void showSplash();
         void toggleAboutScreen();

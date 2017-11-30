@@ -142,10 +142,10 @@ private:
     Node node;
 };
 
-PluginWindow::PluginWindow (Component* const ui, const Node& n)
+PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
-      owner (n.getGraphNode()), node(n)
+      gui (g), owner (n.getGraphNode()), node (n)
 {
     setUsingNativeTitleBar (true);
     setSize (400, 300);
@@ -165,66 +165,16 @@ PluginWindow::PluginWindow (Component* const ui, const Node& n)
     {
         setResizable (ed->isResizable(), false);
     }
-    
-    activePluginWindows.add (this);
 }
     
 PluginWindow::~PluginWindow()
 {
-    activePluginWindows.removeFirstMatchingValue (this);
     clearContentComponent();
 }
 
 ContentComponent* PluginWindow::getElementContentComponent() const
 {
-    return nullptr; // FIXME
-}
-    
-void PluginWindow::deleteWindow (const int index, const bool windowVisible)
-{
-    auto* window = activePluginWindows.getUnchecked (index);
-    window->node.setProperty ("windowVisible", windowVisible);
-    deleteAndZero (window);
-}
-    
-void PluginWindow::closeCurrentlyOpenWindowsFor (GraphProcessor& proc, const bool windowVisible)
-{
-    for (int i = 0; i < proc.getNumNodes(); ++i)
-        if (auto node = proc.getNode (i))
-            for (int i = activePluginWindows.size(); --i >= 0;)
-                if (activePluginWindows.getUnchecked(i)->owner == node)
-                    { deleteWindow (i, windowVisible); break; }
-}
-
-void PluginWindow::closeCurrentlyOpenWindowsFor (GraphNode* const node, const bool windowVisible)
-{
-    for (int i = activePluginWindows.size(); --i >= 0;)
-        if (activePluginWindows.getUnchecked(i)->owner == node)
-            { deleteWindow (i, windowVisible); break; }
-}
-
-void PluginWindow::closeCurrentlyOpenWindowsFor (const uint32 nodeId, const bool windowVisible)
-{
-    for (int i = activePluginWindows.size(); --i >= 0;)
-        if (activePluginWindows.getUnchecked(i)->owner->nodeId == nodeId)
-            { deleteWindow (i, windowVisible); break; }
-}
-
-void PluginWindow::closeAllCurrentlyOpenWindows (const bool windowVisible)
-{
-    if (activePluginWindows.size() > 0)
-    {
-        for (int i = activePluginWindows.size(); --i >= 0;)
-            deleteWindow (i, windowVisible);
-        MessageManager::getInstance()->runDispatchLoopUntil (50);
-    }
-}
-
-PluginWindow* PluginWindow::getOrCreateWindowFor (GraphNode* node)
-{
-    if (PluginWindow* win = getWindowFor (node))
-        return win;
-    return createWindowFor (node);
+    return gui.getContentComponent();
 }
 
 Toolbar* PluginWindow::getToolbar() const
@@ -239,20 +189,6 @@ void PluginWindow::resized()
     DocumentWindow::resized();
 }
 
-PluginWindow* PluginWindow::getWindowFor (GraphNode* node)
-{
-    for (int i = activePluginWindows.size(); --i >= 0;)
-        if (activePluginWindows.getUnchecked(i)->owner == node)
-            return activePluginWindows.getUnchecked(i);
-
-    return nullptr;
-}
-
-PluginWindow* PluginWindow::getFirstWindow()
-{
-    return activePluginWindows.getFirst();
-}
-    
 void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
 {
     jassert(nullptr != newNode && nullptr != newEditor);
@@ -260,47 +196,6 @@ void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
     setContentOwned (newEditor, true);
 }
     
-PluginWindow* PluginWindow::createWindowFor (GraphNode* node)
-{
-    jassertfalse;
-    return nullptr;
-}
-
-PluginWindow* PluginWindow::createWindowFor (GraphNode* node, Component* ed)
-{
-    jassertfalse;
-    return nullptr;
-}
-
-PluginWindow* PluginWindow::getWindowFor (const Node& node)
-{
-    return getWindowFor (node.getGraphNode());
-}
-
-PluginWindow* PluginWindow::createWindowFor (const Node& node)
-{
-    GraphNodePtr object = node.getGraphNode();
-    AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-    if (! proc)
-        return nullptr;
-    if (!proc->hasEditor())
-        return nullptr;
-    
-    auto* editor = proc->createEditorIfNeeded();
-    return (editor != nullptr) ? createWindowFor (node, editor) : nullptr;
-}
-
-PluginWindow* PluginWindow::createWindowFor (const Node& n, Component* e) {
-    return new PluginWindow (e, n);
-}
-
-PluginWindow* PluginWindow::getOrCreateWindowFor (const Node& node)
-{
-    if (auto* w = getWindowFor (node))
-        return w;
-    return createWindowFor (node);
-}
-
 void PluginWindow::moved()
 {
     node.setProperty ("windowX", getX());
@@ -309,16 +204,7 @@ void PluginWindow::moved()
 
 void PluginWindow::closeButtonPressed()
 {
-    const int index = activePluginWindows.indexOf (this);
-    if (index > 0)
-    {
-        deleteWindow (index, false);
-    }
-    else
-    {
-        node.setProperty ("windowVisible", false);
-        delete this;
-    }
+    gui.closePluginWindow (this);
 }
 
 }

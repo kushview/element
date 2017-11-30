@@ -1,4 +1,6 @@
 
+#include "controllers/AppController.h"
+#include "controllers/GuiController.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "gui/ViewHelpers.h"
@@ -106,21 +108,23 @@ void postMessageFor (Component* c, Message* m)
     deleter = nullptr;
 }
 
+void presentPluginWindow (Component* c, const Node& node)
+{
+    if (auto* cc = findContentComponent (c))
+        if (auto* gui = cc->getAppController().findChild<GuiController>())
+            gui->presentPluginWindow (node);
+}
+
+void closePluginWindows (Component* c, const bool visible)
+{
+    if (auto* cc = findContentComponent (c))
+        if (auto* gui = cc->getAppController().findChild<GuiController>())
+            gui->closeAllPluginWindows (visible);
+}
+
 void presentPluginWindow (const Node& node)
 {
-    auto* window = PluginWindow::getWindowFor (node);
-    if (window)
-    {
-        window->setVisible (true);
-        window->toFront (false);
-        return;
-    }
-    
-    window = PluginWindow::createWindowFor (node);
-    if (window)
-    {
-        window->setVisible (true);
-    }
+    jassertfalse;
 }
 
 }

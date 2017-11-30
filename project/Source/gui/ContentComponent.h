@@ -65,7 +65,7 @@ public:
     
     bool isInterestedInFileDrag (const StringArray &files) override;
     void filesDropped (const StringArray &files, int x, int y) override;
-
+    
 private:
     AppController& controller;
     ScopedPointer<NavigationConcertinaPanel> nav;

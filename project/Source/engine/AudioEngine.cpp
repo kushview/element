@@ -242,7 +242,7 @@ public:
         transport.postProcess (numSamples);
         traceMidi (midi);
         
-//        // WIP: correct midi output
+//        // FIXME: correct midi output
 //        if (auto* e = engine.world.getDeviceManager().getDefaultMidiOutput())
 //            e->sendBlockOfMessages (midi, 14.f + Time::getMillisecondCounterHiRes(), sampleRate);
 //

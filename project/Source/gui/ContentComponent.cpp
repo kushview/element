@@ -162,7 +162,7 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
             if (99999 == menu.show())
-                PluginWindow::closeAllCurrentlyOpenWindows (false);
+                ViewHelpers::closePluginWindows (this, false);
         }
     }
 
