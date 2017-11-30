@@ -706,7 +706,6 @@ void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
     }
     
     virtualKeyboardVisible = isVisible;
-    updateLayout();
     resized();
 }
 

@@ -258,15 +258,15 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
     
     if (! isPrepared)
     {
-        instance->setPlayConfigDetails (instance->getTotalNumInputChannels(),
-                                        instance->getTotalNumOutputChannels(),
-                                        sampleRate, blockSize);
-        setParentGraph (parent);
+        isPrepared = true;
+        setParentGraph (parentGraph);
+        
+        instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
         instance->prepareToPlay (sampleRate, blockSize);
         
-        if (nullptr != dynamic_cast<IOProcessor*> (instance)) {
+        // TODO: move model code out of engine code
+        if (nullptr != dynamic_cast<IOProcessor*> (instance))
             resetPorts();
-        }
         
         inRMS.clearQuick (true);
         for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
@@ -286,7 +286,6 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
         
         if (metadata.getProperty (Tags::bypass, false))
             instance->suspendProcessing (true);
-        isPrepared = true;
     }
 }
 
@@ -295,8 +294,8 @@ void GraphNode::unprepare()
     if (isPrepared)
     {
         isPrepared = false;
-        inRMS.clear(true);
-        outRMS.clear(true);
+        inRMS.clear (true);
+        outRMS.clear (true);
         proc->releaseResources();
         parent = nullptr;
     }
@@ -454,4 +453,5 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
         }
     }
 }
+
 }
