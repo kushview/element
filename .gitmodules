@@ -1,4 +1,0 @@
-[submodule "libs/element"]
-	path = libs/element
-	url = https://github.com/kushview/element.git
-	branch = develop
