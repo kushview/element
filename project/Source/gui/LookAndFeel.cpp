@@ -19,10 +19,18 @@ LookAndFeel::LookAndFeel()
     setColour (Slider::textBoxTextColourId, LookAndFeel::textColor);
     setColour (Slider::trackColourId, Colours::red);
     
-    setColour (TextEditor::highlightColourId, Colours::yellow);
-    setColour (TextEditor::outlineColourId, Colours::black);
-    setColour (TextEditor::focusedOutlineColourId, Colours::black);
+    setColour (TextEditor::textColourId,            textColor);
+    setColour (TextEditor::highlightColourId,       Colours::yellow);
+    setColour (TextEditor::highlightedTextColourId, Colours::black);
+    setColour (TextEditor::outlineColourId,         Colours::black);
+    setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
     
+    setColour (Label::textWhenEditingColourId,      findColour(TextEditor::textColourId).darker (0.003));
+
+    setColour (TextPropertyComponent::outlineColourId,      findColour (TextEditor::outlineColourId));
+    setColour (TextPropertyComponent::backgroundColourId,   findColour (TextEditor::backgroundColourId));
+    setColour (TextPropertyComponent::textColourId,         findColour (TextEditor::textColourId));
+
     setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
     setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);
     setColour (SettingButton::textColourId, Colours::black);
