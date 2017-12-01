@@ -16,7 +16,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       20000  // 20 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       31000  // 31 Seconds
 
 namespace Element {
 
@@ -258,6 +258,7 @@ private:
         
         const auto key = String(settings->lastPluginScanPathPrefix) + format.getName();
         FileSearchPath path (settings->getUserSettings()->getValue (key));
+        path.addPath (format.getDefaultLocationsToSearch());
         scanner = new PluginDirectoryScanner (plugins->availablePlugins(), format,
                                               path, true, plugins->getDeadAudioPluginsFile(),
                                               false);
@@ -343,6 +344,7 @@ private:
     int    blockSize    = 512;
     
     ScopedPointer<PluginScanner> scanner;
+    HashMap<String, StringArray> unverifiedAudioPlugins;
     
     void scanAudioPlugins (const StringArray& names)
     {
@@ -525,9 +527,12 @@ void PluginManager::scanInternalPlugins()
 }
 void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins)
 {
+    HashMap<String, StringArray>& plugs (priv->unverifiedAudioPlugins);
+    
     if (auto* format = getAudioPluginFormat (formatName))
     {
         auto& list (availablePlugins());
+        StringArray& files (plugs.getReference (formatName));
         
         FileSearchPath path;
         if (props)
@@ -538,7 +543,9 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
         
         path.addPath (format->getDefaultLocationsToSearch());
         
-        const auto files = format->searchPathsForPlugins (path, true);
+        if (files.isEmpty())
+            files = format->searchPathsForPlugins (path, true);
+        
         for (const auto& file: files)
         {
             if (nullptr != list.getTypeForFile (file))
