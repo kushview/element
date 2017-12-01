@@ -38,6 +38,7 @@ namespace Element {
     {
         setName ("GraphSettings");
         addAndMakeVisible (props = new GraphPropertyPanel());
+        setEscapeTriggersClose (true);
     }
     
     GraphSettingsView::~GraphSettingsView()
@@ -47,6 +48,7 @@ namespace Element {
     
     void GraphSettingsView::didBecomeActive()
     {
+        grabKeyboardFocus();
         stabilizeContent();
     }
     
@@ -63,7 +65,7 @@ namespace Element {
     
     void GraphSettingsView::resized()
     {
-        props->setBounds (getLocalBounds());
+        props->setBounds (getLocalBounds().reduced (2));
     }
 }
 

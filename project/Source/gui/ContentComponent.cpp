@@ -50,8 +50,33 @@
 
 namespace Element {
 
-ContentView::ContentView() { }
-ContentView::~ContentView() { }
+// MARK: Content View
+
+ContentView::ContentView()
+{
+    addKeyListener(this);
+    
+}
+    
+ContentView::~ContentView()
+{
+    removeKeyListener (this);
+}
+
+void ContentView::paint (Graphics& g) { g.fillAll (LookAndFeel::contentBackgroundColor); }
+    
+bool ContentView::keyPressed (const KeyPress& k, Component*)
+{
+    if (escapeTriggersClose && k == KeyPress::escapeKey)
+    {
+        ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
+        return true;
+    }
+    
+    return false;
+}
+
+// MARK: Toolbar
     
 class ContentComponent::Toolbar : public Component,
                                   public ButtonListener

@@ -8,6 +8,9 @@
 #include "ElementApp.h"
 #include "session/Node.h"
 
+#define EL_TEMPO_MIN 20
+#define EL_TEMPO_MAX 999
+
 namespace Element {
     class Session;
     class Globals;

@@ -657,7 +657,10 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
 }
     
     
-PluginManagerContentView::PluginManagerContentView() { }
+PluginManagerContentView::PluginManagerContentView()
+{
+    setEscapeTriggersClose (true);
+}
 
 PluginManagerContentView::~PluginManagerContentView() { }
 
@@ -670,15 +673,18 @@ void PluginManagerContentView::didBecomeActive()
 
     if (pluginList)
         pluginList = nullptr;
+    
     pluginList = new Element::PluginListComponent (plugins, settings.getUserSettings());
     addAndMakeVisible (pluginList);
     resized();
+    
+    grabKeyboardFocus();
 }
 
 void PluginManagerContentView::resized()
 {
     if (pluginList)
-        pluginList->setBounds (getLocalBounds());
+        pluginList->setBounds (getLocalBounds().reduced (2));
 }
     
 void PluginListComponent::scanWithBackgroundScanner()

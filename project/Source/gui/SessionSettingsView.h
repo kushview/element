@@ -5,7 +5,8 @@
 
 namespace Element {
 class SessionPropertyPanel;
-class SessionContentView : public ContentView {
+class SessionContentView : public ContentView
+{
 public:
     SessionContentView();
     ~SessionContentView();

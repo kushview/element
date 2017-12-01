@@ -32,7 +32,7 @@ namespace Element {
             props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::name),
                                                   "Name", 256, false));
             props.add (new SliderPropertyComponent (s->getPropertyAsValue (Tags::tempo),
-                                                    "Tempo", 20, 240, 1));
+                                                    "Tempo", EL_TEMPO_MIN, EL_TEMPO_MAX, 1));
             props.add (new TextPropertyComponent (s->getPropertyAsValue (Tags::notes),
                                                   "Notes", 512, true));
         }
@@ -42,6 +42,7 @@ namespace Element {
     {
         setName ("SessionSettings");
         addAndMakeVisible (props = new SessionPropertyPanel());
+        setEscapeTriggersClose (true);
     }
     
     SessionContentView::~SessionContentView()
@@ -51,17 +52,17 @@ namespace Element {
     
     void SessionContentView::didBecomeActive()
     {
-        if (auto* cc = ViewHelpers::findContentComponent (this))
-            props->setSession (cc->getGlobals().getSession());
+        grabKeyboardFocus();
+        props->setSession (ViewHelpers::getSession (this));
         resized();
     }
     
     void SessionContentView::paint (Graphics& g) {
-        g.fillAll(LookAndFeel::contentBackgroundColor);
+        g.fillAll (LookAndFeel::contentBackgroundColor);
     }
     
     void SessionContentView::resized()
     {
-        props->setBounds (getLocalBounds());
+        props->setBounds (getLocalBounds().reduced(2));
     }
 }

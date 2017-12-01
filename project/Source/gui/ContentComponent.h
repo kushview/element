@@ -21,7 +21,8 @@ class RackView;
 class TransportBar;
 class VirtualKeyboardView;
 
-class ContentView : public Component
+class ContentView : public Component,
+                    public KeyListener
 {
 public:
     ContentView();
@@ -29,6 +30,18 @@ public:
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
+    
+    inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
+    
+    /** @internal */
+    virtual void paint (Graphics& g) override;
+    
+    /** @internal */
+    virtual bool keyPressed (const KeyPress& k, Component*) override;
+
+private:
+    bool escapeTriggersClose = false;
+
 };
 
 class ContentComponent :  public Component,
