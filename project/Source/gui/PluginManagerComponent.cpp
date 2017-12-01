@@ -158,14 +158,13 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     
     setSize (400, 600);
     list.addChangeListener (this);
-    plugins.addChangeListener (this);
+    
     updateList();
     table.getHeader().reSortTable();
     
-    PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (list, deadMansPedalFile);
-    deadMansPedalFile.deleteFile();
-    
-    if (plugins.isScanningAudioPlugins()) {
+    if (plugins.isScanningAudioPlugins())
+    {
+        plugins.addChangeListener (this);
         scanWithBackgroundScanner();
     }
 }
@@ -598,6 +597,7 @@ private:
     void audioPluginScanStarted (const String& pluginName) override
     {
         pluginBeingScanned = pluginName;
+        DBG("[EL] scanning: " << pluginName);
     }
     
     void audioPluginScanProgress (const float reportedProgress) override

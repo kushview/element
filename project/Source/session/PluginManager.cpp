@@ -190,6 +190,7 @@ public:
                 scanFor (format);
             }
             
+            settings->saveIfNeeded();
             sendState ("finished");
         }
     }
@@ -208,7 +209,6 @@ public:
         settings    = nullptr;
         plugins     = nullptr;
         scanner     = nullptr;
-        exit(0);
     }
 
 private:
@@ -236,7 +236,6 @@ private:
         {
             sendString ("progress", String (scanner->getProgress()));
             plugins->saveUserPlugins (*settings);
-            settings->saveIfNeeded();
             return true;
         }
         
@@ -263,7 +262,9 @@ private:
                                               path, true, plugins->getDeadAudioPluginsFile(),
                                               false);
         
-        while (doNextScan()) { }
+        while (doNextScan()) {
+            
+        }
     }
 };
 
@@ -351,6 +352,7 @@ private:
         if (scanner)
         {
             scanner->cancel();
+            scanner->removeListener(this);
             scanner = nullptr;
         }
     
@@ -372,7 +374,7 @@ private:
     
     void audioPluginScanStarted (const String& plugin) override
     {
-        DBG("[EL] plugin scanned in background: " << plugin);
+        DBG("[EL] scanning: " << plugin);
     }
 };
 
