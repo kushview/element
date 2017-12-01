@@ -374,12 +374,12 @@
         <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
         <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
         <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
@@ -422,12 +422,12 @@
         <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
         <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="kv_core" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_engines" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_gui" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_lv2" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_models" path="../../kv-modules/modules"/>
-        <MODULEPATH id="kv_edd" path="../../kv-modules/modules"/>
+        <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
         <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
