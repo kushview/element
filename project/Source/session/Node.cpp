@@ -329,6 +329,9 @@ namespace Element {
     int Node::getCurrentProgram() const
     {
         if (auto* obj = getGraphNode())
+            obj->getAudioProcessor()->getParameters();
+        
+        if (auto* obj = getGraphNode())
             return (const_cast<AudioProcessor*>(obj->getAudioProcessor()))->getCurrentProgram();
         
         return -1;

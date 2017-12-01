@@ -8,12 +8,13 @@ const Colour Colors::elemental      = Colour (0xff4765a0);  // LookAndFeel_KV1::
 const Colour Colors::toggleBlue     = Colour (0xff33aaf9);
 const Colour Colors::toggleGreen    = Colour (0xff92e75e);
 const Colour Colors::toggleOrange   = Colour (0xfffaa63a);
-const Colour Colors::toggleRed      = Colours::red;
+const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
+    
     setColour (Slider::thumbColourId, Colours::black);
     setColour (Slider::textBoxTextColourId, LookAndFeel::textColor);
     setColour (Slider::trackColourId, Colours::red);

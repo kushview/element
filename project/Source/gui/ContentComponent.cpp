@@ -535,14 +535,11 @@ void ContentComponent::setMainView (const String& name)
         setContentView (new GraphSettingsView());
     }
 }
-
-void ContentComponent::setAccessoryView (const String& name)
+void ContentComponent::backMainView()
 {
-    if (name == "PatchBay") {
-        setContentView (new ConnectionGrid());
-    }
+    setMainView (lastMainView.isEmpty() ? "GraphEditor" : lastMainView);
 }
-    
+
 void ContentComponent::nextMainView()
 {
     // only have two rotatable views as of now
@@ -550,6 +547,28 @@ void ContentComponent::nextMainView()
         return;
     const String nextName = getMainViewName() == "GraphEditor" ? "PatchBay" : "GraphEditor";
     setMainView (nextName);
+}
+
+void ContentComponent::setContentView (ContentView* view, const bool accessory)
+{
+    jassert (view && container);
+    ScopedPointer<ContentView> deleter (view);
+    if (accessory)
+    {
+        container->setAccessoryView (deleter.release());
+    }
+    else
+    {
+        lastMainView = getMainViewName();
+        container->setMainView (deleter.release());
+    }
+}
+
+void ContentComponent::setAccessoryView (const String& name)
+{
+    if (name == "PatchBay") {
+        setContentView (new ConnectionGrid());
+    }
 }
 
 void ContentComponent::paint (Graphics &g)
@@ -683,13 +702,6 @@ void ContentComponent::resizerMouseUp()
     resized();
 }
 
-void ContentComponent::setContentView (ContentView* view, const bool accessory)
-{
-    jassert (view && container);
-    ScopedPointer<ContentView> deleter (view);
-    (accessory) ? container->setAccessoryView (deleter.release())
-                : container->setMainView (deleter.release());
-}
 void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 {
     if (isVisible == virtualKeyboardVisible)

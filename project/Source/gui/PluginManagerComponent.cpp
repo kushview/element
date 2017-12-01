@@ -139,6 +139,10 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     optionsButton.addListener (this);
     optionsButton.setTriggeredOnMouseDown (true);
     
+    addAndMakeVisible (closeButton);
+    closeButton.setButtonText ("Close");
+    closeButton.addListener (this);
+    
     for (int i = 0; i < formatManager.getNumFormats(); ++i)
     {
         const auto name = formatManager.getFormat(i)->getName();
@@ -191,7 +195,7 @@ void PluginListComponent::setNumberOfThreadsForScanning (int num)
 void PluginListComponent::resized()
 {
     Rectangle<int> r (getLocalBounds().reduced (2));
-    auto r2 = r.removeFromBottom (24).reduced (0, 2);
+    auto r2 = r.removeFromTop (24).reduced (0, 2);
     
     for (auto* b : formatButtons)
     {
@@ -202,7 +206,10 @@ void PluginListComponent::resized()
     r2.removeFromLeft (4);
     optionsButton.setBounds (r2);
     optionsButton.changeWidthToFitText (r2.getHeight());
-    
+    r2.removeFromRight (2);
+    closeButton.changeWidthToFitText (r2.getHeight());
+    closeButton.setBounds (r2.removeFromRight (closeButton.getWidth()));
+    r.removeFromTop (3);
     r.removeFromBottom (3);
     table.setBounds (r);
 }
@@ -287,7 +294,7 @@ static void removeNonElementPlugins (KnownPluginList& list)
 {
     for (int i = list.getNumTypes(); --i >= 0;) {
         if (list.getType(i)->pluginFormatName != "Element")
-            list.removeType(i);
+            list.removeType (i);
     }
 }
 
@@ -332,6 +339,10 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&optionsButton),
                             ModalCallbackFunction::forComponent (optionsMenuStaticCallback, this));
     }
+    else if (button == &closeButton)
+    {
+        ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
+    }
     else
     {
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
@@ -353,9 +364,10 @@ bool PluginListComponent::isInterestedInFileDrag (const StringArray& /*files*/)
 
 void PluginListComponent::filesDropped (const StringArray& files, int, int)
 {
-// FIXME
-//    OwnedArray<PluginDescription> typesFound;
-//    list.scanAndAddDragAndDroppedFiles (formatManager, files, typesFound);
+    if (currentScanner || plugins.isScanningAudioPlugins())
+        return;
+    OwnedArray<PluginDescription> typesFound;
+    list.scanAndAddDragAndDroppedFiles (formatManager, files, typesFound);
 }
 
 FileSearchPath PluginListComponent::getLastSearchPath (PropertiesFile& properties, AudioPluginFormat& format)
@@ -669,11 +681,12 @@ void PluginManagerContentView::resized()
         pluginList->setBounds (getLocalBounds());
 }
     
-    void PluginListComponent::scanWithBackgroundScanner()
-    {
-        if (currentScanner) {
-            currentScanner = nullptr;
-        }
-        currentScanner = new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins");
+void PluginListComponent::scanWithBackgroundScanner()
+{
+    if (currentScanner) {
+        currentScanner = nullptr;
     }
+    currentScanner = new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins");
+}
+
 }

@@ -221,6 +221,7 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showGraphConfig,
         Commands::showPatchBay,
         Commands::showGraphEditor,
+        Commands::showLastContentView,
         Commands::toggleVirtualKeyboard,
         Commands::rotateContentView
     });
@@ -320,6 +321,9 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
             break;
         
+        case Commands::showLastContentView:
+            result.setInfo ("Last View", "Shows the last content view", "User Interface", 0);
+            break;
         case Commands::showSessionConfig:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -429,6 +433,7 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showAbout:
             toggleAboutScreen();
             break;
+
         case Commands::showPluginManager:
             content->setMainView ("PluginManager");
             break;
@@ -449,6 +454,10 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
+            break;
+            
+        case Commands::showLastContentView:
+            content->backMainView();
             break;
         case Commands::rotateContentView:
             content->nextMainView();

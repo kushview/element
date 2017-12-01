@@ -98,7 +98,7 @@ private:
     KnownPluginList& list;
     File deadMansPedalFile;
     TableListBox table;
-    TextButton optionsButton;
+    TextButton optionsButton, closeButton;
     PropertiesFile* propertiesToUse;
     String dialogTitle, dialogText;
     bool allowAsync;

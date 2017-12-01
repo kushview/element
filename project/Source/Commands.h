@@ -21,6 +21,7 @@ namespace Commands {
         showGraphConfig,
         showPatchBay,
         showGraphEditor,
+        showLastContentView,
         
         toggleVirtualKeyboard,
         rotateContentView,

@@ -48,6 +48,7 @@ public:
     void setAccessoryView (const String& name);
     String getMainViewName() const;
     void nextMainView();
+    void backMainView();
     
     int getNavSize();
     
@@ -90,6 +91,8 @@ private:
     int toolBarSize;
     bool virtualKeyboardVisible = false;
     int virtualKeyboardSize = 80;
+    
+    String lastMainView;
     
     void resizerMouseDown();
     void resizerMouseUp();
