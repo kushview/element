@@ -324,7 +324,7 @@ namespace Element {
         {
             if (value.refersToSameSourceAs (checkForUpdates.getToggleStateValue()))
             {
-                settings.setCheckFormUpdates (checkForUpdates.getToggleState());
+                settings.setCheckForUpdates (checkForUpdates.getToggleState());
                 jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
             }
             

@@ -7,13 +7,13 @@ namespace Element {
     
     const File DataPath::applicationDataDir()
     {
-#if JUCE_MAC
-        return File::getSpecialLocation(File::userApplicationDataDirectory)
+       #if JUCE_MAC
+        return File::getSpecialLocation (File::userApplicationDataDirectory)
             .getChildFile ("Application Support/Element");
-#else
+       #else
         return File::getSpecialLocation(File::userApplicationDataDirectory)
             .getChildFile ("Element");
-#endif
+       #endif
     }
     
     const File DataPath::defaultSettingsFile()
@@ -27,7 +27,7 @@ namespace Element {
     
     const File DataPath::defaultLocation()
     {
-        return File::getSpecialLocation(File::userMusicDirectory)
+        return File::getSpecialLocation (File::userMusicDirectory)
             .getChildFile ("Element");
     }
     

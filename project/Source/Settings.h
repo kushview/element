@@ -17,7 +17,6 @@ public:
     
     static const char* checkForUpdatesKey;
     static const char* pluginListKey;
-    static const char* pluginListKey64;
     static const char* pluginFormatsKey;
     static const char* lastPluginScanPathPrefix;
     static const char* scanForPluginsOnStartKey;
@@ -29,7 +28,7 @@ public:
     bool checkForUpdates() const;
     
     /** Set if should check updates on start */
-    void setCheckFormUpdates (const bool shouldCheck);
+    void setCheckForUpdates (const bool shouldCheck);
     
     /** Returns true if plugins should be scanned on startup */
     bool scanForPluginsOnStartup() const;

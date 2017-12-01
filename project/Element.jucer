@@ -323,6 +323,10 @@
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="Debug32" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="32BitUniversal"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="DebugFree" osxSDK="default" osxCompatibility="10.8 SDK"
                        osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="Element"
                        headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
@@ -342,25 +346,19 @@
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_CI_AUTH=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="ReleaseFree" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="0" optimisation="2" targetName="Element"
-                       codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
+                       osxArchitecture="64BitUniversal" isDebug="0" optimisation="2"
+                       targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/ReleaseFree" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_FREE=1&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugPDV" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="ProDriverVST"
-                       headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1&#10;EL_ICON_PRO_AUDIO=1&#10;"
-                       enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>

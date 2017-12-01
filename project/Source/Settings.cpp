@@ -7,16 +7,30 @@
 
 namespace Element {
 
+
 const char* Settings::checkForUpdatesKey        = "checkForUpdates";
-const char* Settings::pluginListKey             = "plugin-list";
-const char* Settings::pluginListKey64           = "pluginList64";
 const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 
-#if JUCE_MAC || JUCE_32BIT
- const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";
-#else
- const char* Settings::lastPluginScanPathPrefix = "pluginScanPath64_";
+#if JUCE_32BIT
+ #if JUCE_MAC
+  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath32_";
+  const char* Settings::pluginListKey            = "pluginList32";
+ 
+ #else
+  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";   // TODO: migrate this
+  const char* Settings::pluginListKey            = "plugin-list";       // TODO: migrate this
+ #endif
+
+#else // 64bit keys
+ #if JUCE_MAC
+  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath_";   // TODO: migrate this
+  const char* Settings::pluginListKey            = "plugin-list";       // TODO: migrate this
+ 
+ #else
+  const char* Settings::lastPluginScanPathPrefix = "pluginScanPath64_";
+  const char* Settings::pluginListKey            = "pluginList64";
+ #endif
 #endif
     
 Settings::Settings()
@@ -51,7 +65,7 @@ bool Settings::checkForUpdates() const
     return false;
 }
 
-void Settings::setCheckFormUpdates (const bool shouldCheck)
+void Settings::setCheckForUpdates (const bool shouldCheck)
 {
     if (shouldCheck == checkForUpdates())
         return;

@@ -1,6 +1,6 @@
 /*
     PluginManager.cpp - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2018  Kushview, LLC.  All rights reserved.
 */
 
 #include "session/PluginManager.h"
@@ -16,7 +16,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       12000  // 12 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       20000  // 20 Seconds
 
 namespace Element {
 
@@ -455,16 +455,8 @@ AudioPluginFormatManager& PluginManager::formats()
 KnownPluginList& PluginManager::availablePlugins() { return priv->allPlugins; }
 const File& PluginManager::getDeadAudioPluginsFile() const { return priv->deadAudioPlugins; }
 
-static const char* pluginListKey()
-{
-   #if JUCE_MAC
-	return Settings::pluginListKey;
-   #elif JUCE_64BIT
-	return Settings::pluginListKey64;
-   #else
-	return Settings::pluginListKey;
-   #endif
-}
+static const char* pluginListKey()  { return Settings::pluginListKey; }
+
 
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
@@ -558,7 +550,7 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
         }
     }
 }
-    
+
 void PluginManager::scanFinished()
 {
     if (priv->scanner)
