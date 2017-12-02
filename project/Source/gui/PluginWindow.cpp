@@ -78,7 +78,7 @@ public:
     void resized() override
     {
         editor->removeComponentListener (this);
-        auto r (getLocalBounds());
+        auto r (getLocalBounds().reduced (2));
         
         if (toolbar->getThickness())
         {
@@ -139,7 +139,7 @@ private:
 
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
-                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
+                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
       gui (g), owner (n.getGraphNode()), node (n)
 {
     setUsingNativeTitleBar (true);
@@ -153,15 +153,16 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
         node.getValueTree().setProperty ("windowVisible", true, 0);
     }
     
-    setVisible (true);
-    addToDesktop();
-    
-    if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
+	if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
+	{
+		setResizable (true, true);
+	}
+    else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         setResizable (ed->isResizable(), false);
     }
 }
-    
+
 PluginWindow::~PluginWindow()
 {
     clearContentComponent();

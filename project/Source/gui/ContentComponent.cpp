@@ -721,7 +721,7 @@ void ContentComponent::updateLayout()
 void ContentComponent::resizerMouseDown()
 {
     updateLayout();
-    resized();
+    //resized();
 }
 
 void ContentComponent::resizerMouseUp()

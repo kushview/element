@@ -31,6 +31,10 @@ public:
     void closeButtonPressed();
     void resized();
 
+	int getDesktopWindowStyleFlags() const override {
+		return ComponentPeer::windowHasCloseButton |
+			   ComponentPeer::windowHasTitleBar;
+	}
 protected:
     PluginWindow (GuiController&, Component* const uiComp, const Node& node);
 
