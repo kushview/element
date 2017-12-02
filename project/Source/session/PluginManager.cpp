@@ -232,6 +232,7 @@ public:
         settings    = nullptr;
         plugins     = nullptr;
         scanner     = nullptr;
+        exit(0);
     }
 
 private:

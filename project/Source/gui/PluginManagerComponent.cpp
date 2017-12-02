@@ -449,6 +449,12 @@ public:
             pool->removeAllJobs (true, 60000);
             pool = nullptr;
         }
+        
+        if (scanner)
+        {
+            scanner->cancel();
+            scanner.clear();
+        }
     }
     
 private:
@@ -572,8 +578,10 @@ private:
     
     void finishedScan()
     {
-        if (scanner)
+        if (scanner) {
             scanner->removeListener (this);
+        }
+        
         owner.scanFinished (scanner != nullptr ? scanner->getFailedFiles()
                                                : StringArray());
     }
