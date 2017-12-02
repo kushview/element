@@ -171,8 +171,14 @@ private:
 class PluginScannerSlave : public ChildProcessSlave
 {
 public:
-    PluginScannerSlave() { }
-    ~PluginScannerSlave() { }
+    PluginScannerSlave ()
+    {
+        scanFile = PluginScanner::getSlavePluginListFile();
+    }
+    
+    ~PluginScannerSlave()
+    {
+    }
     
     void handleMessageFromMaster (const MemoryBlock& mb) override
     {
@@ -182,13 +188,19 @@ public:
         
         if (type == "scan")
         {
+            if (! scanFile.existsAsFile())
+            {
+                sendState ("scanning");
+                sendState ("finished");
+                return;
+            }
+            
             sendState ("scanning");
             
             const auto formats (StringArray::fromTokens (message.trim(), ",", "'"));
 
-            for (const auto& format : formats) {
+            for (const auto& format : formats)
                 scanFor (format);
-            }
             
             settings->saveIfNeeded();
             sendState ("finished");
@@ -201,6 +213,17 @@ public:
         plugins     = new PluginManager();
         plugins->addDefaultFormats();
         plugins->restoreUserPlugins (*settings);
+        
+        if (! scanFile.existsAsFile())
+            scanFile.create();
+        
+        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (scanFile))
+            pluginList.recreateFromXml (*xml);
+
+        for (int i = 0; i < plugins->availablePlugins().getNumTypes(); ++i)
+            if (auto* type = plugins->availablePlugins().getType (i))
+                pluginList.addType (*type);
+        
         sendState (EL_PLUGIN_SCANNER_READY_ID);
     }
     
@@ -216,6 +239,8 @@ private:
     ScopedPointer<PluginManager> plugins;
     ScopedPointer<PluginDirectoryScanner> scanner;
     String fileOrIdentifier;
+    KnownPluginList pluginList;
+    File scanFile;
     
     bool sendState (const String& state)
     {
@@ -232,10 +257,12 @@ private:
     bool doNextScan()
     {
         sendString ("name", scanner->getNextPluginFileThatWillBeScanned());
+
         if (scanner->scanNextFile (true, fileOrIdentifier))
         {
-            sendString ("progress", String (scanner->getProgress()));
-            plugins->saveUserPlugins (*settings);
+            if (ScopedPointer<XmlElement> xml = pluginList.createXml())
+                xml->writeToFile (scanFile, String());
+
             return true;
         }
         
@@ -258,13 +285,15 @@ private:
         const auto key = String(settings->lastPluginScanPathPrefix) + format.getName();
         FileSearchPath path (settings->getUserSettings()->getValue (key));
         path.addPath (format.getDefaultLocationsToSearch());
-        scanner = new PluginDirectoryScanner (plugins->availablePlugins(), format,
+        scanner = new PluginDirectoryScanner (pluginList, format,
                                               path, true, plugins->getDeadAudioPluginsFile(),
                                               false);
         
-        while (doNextScan()) {
-            
-        }
+        while (doNextScan())
+            sendString ("progress", String (scanner->getProgress()));
+        
+        if (ScopedPointer<XmlElement> xml = pluginList.createXml())
+            xml->writeToFile (scanFile, String());
     }
 };
 
@@ -390,6 +419,7 @@ PluginManager::PluginManager()
 PluginManager::~PluginManager()
 {
     priv = nullptr;
+    PluginScanner::getSlavePluginListFile().deleteFile();
 }
 
 void PluginManager::addDefaultFormats()
@@ -548,7 +578,7 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
         if (files.isEmpty())
             files = format->searchPathsForPlugins (path, true);
         
-        for (const auto& file: files)
+        for (const auto& file : files)
         {
             if (nullptr != list.getTypeForFile (file))
                 continue;
@@ -562,16 +592,32 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 
 void PluginManager::scanFinished()
 {
+    restoreAudioPlugins (PluginScanner::getSlavePluginListFile());
+    PluginScanner::getSlavePluginListFile().deleteFile();
+
     if (priv->scanner)
-        priv->scanner = nullptr;
-
+        priv->scanner->cancel();
+    
     jassert(! isScanningAudioPlugins());
-
-    if (props && props->reload())
-        if (ScopedXml xml = props->getXmlValue (pluginListKey()))
-            restoreUserPlugins (*xml);
-
     sendChangeMessage();
+}
+
+void PluginManager::restoreAudioPlugins (const File& file)
+{
+    if (ScopedPointer<XmlElement> xml = XmlDocument::parse (file))
+        restoreUserPlugins (*xml);
+}
+
+const File& PluginScanner::getSlavePluginListFile() {
+    static File _listTempFile;
+    #if 0
+    if (_listTempFile == File())
+        _listTempFile = File::createTempFile ("el-pm-slave");
+    #else
+    if (_listTempFile == File())
+        _listTempFile = DataPath::applicationDataDir().getChildFile ("Temp/SlavePluginList.xml");
+    #endif
+    return _listTempFile;
 }
 
 }

@@ -82,11 +82,13 @@ class ContentComponent::Toolbar : public Component,
                                   public ButtonListener
 {
 public:
-    Toolbar()
-        : viewBtn ("e")
+    Toolbar (ContentComponent& o)
+        : owner(o), viewBtn ("e")
     {
-       #if EL_USE_ACCESSORY_BUTTONS
         addAndMakeVisible (viewBtn);
+        viewBtn.setButtonText ("view");
+       #if EL_USE_ACCESSORY_BUTTONS
+        
         addAndMakeVisible (panicBtn);
        #endif
        #if EL_RUNNING_AS_PLUGIN
@@ -153,8 +155,8 @@ public:
         
         if (viewBtn.isVisible())
         {
-            viewBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                                .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            viewBtn.setBounds (r.removeFromRight(tempoBarHeight * 2)
+                                .withSizeKeepingCentre(tempoBarHeight * 2, tempoBarHeight));
         }
         
         if (transport.isVisible())
@@ -175,7 +177,9 @@ public:
     {
         if (btn == &viewBtn)
         {
-            ViewHelpers::invokeDirectly (this, Commands::rotateContentView, true);
+            const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
+                              ? Commands::rotateContentView : Commands::showLastContentView;
+            ViewHelpers::invokeDirectly (this, command, true);
         }
         else  if (btn == &panicBtn)
         {
@@ -192,6 +196,7 @@ public:
     }
 
 private:
+    ContentComponent& owner;
     SessionPtr session;
     SettingButton menuBtn;
     SettingButton viewBtn;
@@ -498,7 +503,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, controller));
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
-    addAndMakeVisible (toolBar = new Toolbar());
+    addAndMakeVisible (toolBar = new Toolbar (*this));
     
     container->setMainView (createLastContentView (controller.getGlobals().getSettings()));
     setVirtualKeyboardVisible (virtualKeyboardSetting (controller.getGlobals().getSettings()));

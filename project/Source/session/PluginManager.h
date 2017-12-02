@@ -84,6 +84,9 @@ public:
     /** This will get a possible list of plugins. Trying to load this might fail */
     void getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins);
     
+    /** Restore User Plugins From a file */
+    void restoreAudioPlugins (const File&);
+
 private:
     PropertiesFile* props = nullptr;
     class Private;
@@ -112,6 +115,8 @@ public:
         virtual void audioPluginScanStarted (const String& name) { }
     };
     
+    static const File& getSlavePluginListFile();
+    
     /** scan for plugins of type */
     void scanForAudioPlugins (const String& formatName);
     
@@ -132,7 +137,7 @@ public:
     
     /** Returns a list of plugins that failed to load */
     const StringArray& getFailedFiles() const { return failedIdentifiers; }
-    
+
 private:
     friend class PluginScannerMaster;
     friend class Timer;

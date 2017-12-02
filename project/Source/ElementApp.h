@@ -12,6 +12,8 @@
  #include "JuceHeader.h"
 #endif
 
+#include "DataPath.h"
+
 using namespace kv;
 
 namespace Element {

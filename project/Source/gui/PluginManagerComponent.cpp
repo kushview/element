@@ -297,14 +297,20 @@ static void removeNonElementPlugins (KnownPluginList& list)
     }
 }
 
+static void saveSettings (Component* c)
+{
+    if (auto* g = ViewHelpers::getGlobals (c))
+        g->getPluginManager().saveUserPlugins (g->getSettings());
+}
+
 void PluginListComponent::optionsMenuCallback (int result)
 {
     switch (result)
     {
         case 0:   break;
-        case 1:   removeNonElementPlugins (list); break;
-        case 2:   removeSelectedPlugins(); break;
-        case 3:   showSelectedFolder(); break;
+        case 1:   removeNonElementPlugins (list);  saveSettings(this); break;
+        case 2:   removeSelectedPlugins();         saveSettings(this); break;
+        case 3:   showSelectedFolder();   break;
         case 4:   removeMissingPlugins(); break;
             
         default:
@@ -552,6 +558,8 @@ private:
         }
 
         progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+        
+        
         progressWindow.addProgressBarComponent (progress);
         progress = -1.0;
         progressWindow.enterModalState();
@@ -596,8 +604,8 @@ private:
     
     void audioPluginScanStarted (const String& pluginName) override
     {
-        pluginBeingScanned = pluginName;
-        DBG("[EL] scanning: " << pluginName);
+        pluginBeingScanned = File::createFileWithoutCheckingPath(pluginName).getFileName();
+        DBG("[EL] scanning: " << pluginBeingScanned);
     }
     
     void audioPluginScanProgress (const float reportedProgress) override
@@ -639,8 +647,9 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
     
     if (auto* world = ViewHelpers::getGlobals (this))
     {
-        world->getSettings().getUserSettings()->reload();
-        plugins.restoreUserPlugins (world->getSettings());
+        const auto file = PluginScanner::getSlavePluginListFile();
+        plugins.restoreAudioPlugins (file);
+        file.deleteFile();
     }
     
     for (int i = 0; i < failedFiles.size(); ++i)
