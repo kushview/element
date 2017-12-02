@@ -52,7 +52,8 @@ public:
         
     private:
         class Row : public Component,
-        public Label::Listener
+                            public Label::Listener,
+                        public ButtonListener
         {
         public:
             Row (ElementsNavigationPanel& _owner) : owner (_owner)
@@ -63,6 +64,11 @@ public:
                 text.setColour (Label::textWhenEditingColourId, LookAndFeel::textColor.darker());
                 text.setColour (Label::backgroundWhenEditingColourId, Colours::black);
                 text.addListener (this);
+                
+                // TODO: conf button
+                // addAndMakeVisible (conf);
+                conf.setButtonText ("=");
+                conf.addListener (this);
             }
             
             ~Row() {
@@ -108,7 +114,17 @@ public:
             
             void resized() override
             {
-                text.setBounds (10, 0, getWidth() - 10, getHeight());
+                auto r (getLocalBounds());
+                r.removeFromRight (4);
+                
+                if (conf.isVisible())
+                {
+                    conf.setBounds (r.removeFromRight (20).withSizeKeepingCentre (16, 16));
+                    r.removeFromRight (4);
+                }
+                
+                r.removeFromLeft (10);
+                text.setBounds (r);
             }
             
             void labelTextChanged (Label*) override {}
@@ -127,11 +143,18 @@ public:
                 repaint (0, 0, 20, getHeight());
             }
             
+            void buttonClicked (Button*) override
+            {
+                owner.selectRow (row);
+                ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, false);
+            }
+            
         private:
             ElementsNavigationPanel& owner;
             Node node;
             Label text;
             String savedText;
+            SettingButton conf;
             int row = 0;
             bool selected = false;
         };
