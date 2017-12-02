@@ -17,8 +17,12 @@ namespace Element {
         static const File defaultLocation();
         static const File defaultSessionDir();
         static const File defaultGraphDir();
+        
+        const File& getUserLibrary() const { return userLibrary; }
+        
+    private:
+        File userLibrary;
     };
 }
-
 
 #endif  // EL_DATAPATH_H

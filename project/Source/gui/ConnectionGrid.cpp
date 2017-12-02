@@ -173,8 +173,8 @@ namespace Element
         void showMenuForNode (const Node& node)
         {
             NodePopupMenu menu (node);
-            PopupMenu programs; menu.getProgramsMenu (programs);
-            menu.addSubMenu ("Programs", programs);
+            menu.addProgramsMenu();
+            menu.addPresetsMenu();
             
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
@@ -188,8 +188,8 @@ namespace Element
         void showMenuForNodeAndPort (const Node& n, const Port& p)
         {
             NodePopupMenu menu (n, p);
-            PopupMenu programs; menu.getProgramsMenu(programs);
-            menu.addSubMenu ("Programs", programs);
+            menu.addProgramsMenu();
+            menu.addPresetsMenu();
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
             {

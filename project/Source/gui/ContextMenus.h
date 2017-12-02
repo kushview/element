@@ -3,6 +3,9 @@
 
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
+
+#define EL_USE_PRESETS 0
+
 namespace Element {
 
 class PluginsPopupMenu : public PopupMenu
@@ -151,6 +154,23 @@ public:
     {
         PopupMenu programs; getProgramsMenu (programs);
         addSubMenu (subMenuName, programs);
+    }
+    
+    inline void addPresetsMenu (const String& subMenuName = "Presets")
+    {
+        PopupMenu presets; getPresetsMenu (presets);
+        addSubMenu (subMenuName, presets);
+    }
+    
+    inline void getPresetsMenu (PopupMenu& menu)
+    {
+        #if EL_USE_PRESETS
+        if (node.isAudioIONode() || node.isMidiIONode())
+            return;
+        menu.addItem (20000, "Add Preset");
+        menu.addSeparator();
+        menu.addItem (20001, "(none)", false, false);
+        #endif
     }
     
     inline void getProgramsMenu (PopupMenu& menu)

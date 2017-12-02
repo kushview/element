@@ -112,7 +112,9 @@ public:
         else if (button == &nodeButton)
         {
             NodePopupMenu menu (node);
+            menu.addSeparator();
             menu.addProgramsMenu();
+            menu.addPresetsMenu();
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
         }

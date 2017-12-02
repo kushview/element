@@ -148,7 +148,9 @@ public:
         if (e.mods.isPopupMenu())
         {
             NodePopupMenu menu (node);
+            menu.addSeparator();
             menu.addProgramsMenu();
+            menu.addPresetsMenu();
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
         }

@@ -2,7 +2,18 @@
 #include "DataPath.h"
 
 namespace Element {
-    DataPath::DataPath() { }
+    namespace DataPathHelpers {
+        void initializeUserLibrary (const File& path) {
+            
+        }
+    }
+    
+    DataPath::DataPath()
+    {
+        userLibrary = defaultLocation();
+        DataPathHelpers::initializeUserLibrary (userLibrary);
+    }
+    
     DataPath::~DataPath() { }
     
     const File DataPath::applicationDataDir()
