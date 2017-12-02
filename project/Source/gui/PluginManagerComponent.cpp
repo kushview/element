@@ -6,7 +6,8 @@
 #include "Settings.h"
 
 namespace Element {
-
+static void removeNonElementPlugins (KnownPluginList& list);
+    
 class PluginListComponent::TableModel  : public TableListBoxModel
 {
 public:
@@ -19,6 +20,7 @@ public:
     
     void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
+        
         ViewHelpers::drawBasicTextRow (String(), g, width, height, rowIsSelected);
     }
     
@@ -65,6 +67,30 @@ public:
                         : Colours::grey);
             g.setFont (Font (height * 0.7f));
             g.drawFittedText (text, 4, 0, width - 6, height, Justification::centredLeft, 1, 0.9f);
+        }
+    }
+    
+    void cellPopup (const int result)
+    {
+        switch (result)
+        {
+            case 0: break;
+            case 1: removeNonElementPlugins (owner.list); break;
+            case 2: owner.removeSelectedPlugins(); break;
+            default: {
+                
+            } break;
+        }
+    }
+    
+    void cellClicked (int row, int col, const MouseEvent& ev) override
+    {
+        if (ev.mods.isPopupMenu())
+        {
+            PopupMenu menu;
+            menu.addItem (1, "Clear list");
+            menu.addItem (2, "Remove selected");
+            cellPopup (menu.show());
         }
     }
     
