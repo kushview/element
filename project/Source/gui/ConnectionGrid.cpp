@@ -49,8 +49,7 @@ namespace Element
         const Port getPort (const int index, const bool isSource) const
         {
             const PortArray& ports = isSource ? outs : ins;
-            jassert (isPositiveAndBelow (index, ports.size()));
-            return ports.getUnchecked (index);
+			return ports [index];
         }
         
         const int getAudioChannelForIndex (const int index, const bool isSource) const
