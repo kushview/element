@@ -319,10 +319,11 @@
                vst3Folder="" extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                documentExtensions="elc,elg,els">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"
+                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES"/>
         <CONFIGURATION name="Debug32" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="32BitUniversal"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
