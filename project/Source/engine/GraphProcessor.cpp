@@ -221,13 +221,13 @@ public:
             buffer.applyGain(0, numSamples, node->getInputGain());
         }
 
-        if (! processor->isSuspended())
+        if (! processor->isSuspended ())
         {
             processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
         }
         else
         {
-            processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked(midiBufferToUse));
+            processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
         }
         
         if (node->getGain() != node->getLastGain()) {
@@ -275,7 +275,7 @@ public:
 
         for (int i = 0; i < orderedNodes.size(); ++i)
         {
-            createRenderingOpsForNode ((GraphNode*) orderedNodes.getUnchecked(i),
+            createRenderingOpsForNode ((GraphNode*) orderedNodes.getUnchecked (i),
                                        renderingOps, i);
             markUnusedBuffersFree (i);
         }
@@ -332,8 +332,7 @@ private:
         return maxLatency;
     }
 
-    void createRenderingOpsForNode (GraphNode* const node,
-                                    Array<void*>& renderingOps,
+    void createRenderingOpsForNode (GraphNode* const node, Array<void*>& renderingOps,
                                     const int ourRenderingIndex)
     {
         AudioProcessor* const proc (node->getAudioProcessor());
@@ -357,10 +356,8 @@ private:
         for (uint32 port = 0; port < numPorts; ++port)
         {
             const PortType portType (node->getPortType (port));
-
-            if (portType != PortType::Audio && portType != PortType::Midi) {
+            if (portType != PortType::Audio && portType != PortType::Midi)
                 continue;
-            }
 
             const uint32 numIns    = node->getNumPorts (portType, true);
             const uint32 numOuts   = node->getNumPorts (portType, false);
@@ -442,10 +439,9 @@ private:
                     bufIndex = getReadOnlyEmptyBuffer();
                     jassert (bufIndex >= 0);
                 }
-
-                if (inputChan < (int)numOuts
-                     && isBufferNeededLater (ourRenderingIndex,
-                                             port, srcNode, srcPort))
+                
+                const bool bufNeededLater = isBufferNeededLater (ourRenderingIndex, port, srcNode, srcPort);
+                if (bufNeededLater && (inputChan < (int) numOuts || portType == PortType::Midi))
                 {
                     // can't mess up this channel because it's needed later by another node, so we
                     // need to use a copy of it..
@@ -582,12 +578,11 @@ private:
             jassert (bufIndex >= 0);
             channelsToUse[portType.id()].add (bufIndex);
 
-            if (inputChan < (int)numOuts)
+            if (inputChan < (int) numOuts)
             {
                 const int outputPort = node->getNthPort (portType, inputChan, false, false);
                 markBufferAsContaining (bufIndex, portType, node->nodeId, outputPort);
             }
-
         } /* foreach port */
 
         setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
@@ -655,21 +650,22 @@ private:
         }
     }
 
-    bool isBufferNeededLater (int stepIndexToSearchFrom,
-                              uint32 inputChannelOfIndexToIgnore,
-                              const uint32 sourceNode,
-                              const uint32 outputPortIndex) const
+    bool isBufferNeededLater (int stepIndexToSearchFrom, uint32 inputChannelOfIndexToIgnore,
+                              const uint32 sourceNode, const uint32 outputPortIndex) const
     {
         while (stepIndexToSearchFrom < orderedNodes.size())
         {
             const GraphNode* const node = (const GraphNode*) orderedNodes.getUnchecked (stepIndexToSearchFrom);
 
             {
-                for (uint32 i = 0; i < node->getNumPorts(); ++i)
-                    if (i != inputChannelOfIndexToIgnore
-                         && graph.getConnectionBetween (sourceNode, outputPortIndex,
-                                                        node->nodeId, i) != nullptr)
+                for (uint32 port = 0; port < node->getNumPorts(); ++port)
+                {
+                    if (port != inputChannelOfIndexToIgnore &&
+                          graph.getConnectionBetween (sourceNode, outputPortIndex, node->nodeId, port) != nullptr)
+                    {
                         return true;
+                    }
+                }
             }
 
             inputChannelOfIndexToIgnore = KV_INVALID_PORT;
@@ -703,14 +699,6 @@ GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 s
        .setProperty (Tags::sourcePort, (int) sourcePort, nullptr)
        .setProperty (Tags::destNode, (int) destNode, nullptr)
        .setProperty (Tags::destPort, (int) destPort, nullptr);
-}
-
-static ValueTree createGraphModel()
-{
-    ValueTree graphModel (Tags::node);
-    graphModel.setProperty (Slugs::type, Tags::graph.toString(), nullptr);
-    graphModel.setProperty (Slugs::name, "Processing Graph", nullptr);
-    return graphModel;
 }
     
 GraphProcessor::GraphProcessor()
