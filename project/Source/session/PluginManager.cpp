@@ -25,7 +25,11 @@ class PluginScannerMaster : public ChildProcessMaster,
 {
 public:
     explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
-    ~PluginScannerMaster() { }
+    ~PluginScannerMaster()
+    {
+        String m ("quit");
+        sendMessageToSlave (MemoryBlock (m.toRawUTF8(), m.length()));
+    }
     
     bool startScanning (const StringArray& names = StringArray())
     {
@@ -190,6 +194,12 @@ public:
         const auto data (mb.toString());
         const auto type (data.upToFirstOccurrenceOf (":", false, false));
         const auto message (data.fromFirstOccurrenceOf (":", false, false));
+        
+        if (type == "quit")
+        {
+            exit(0);
+            return;
+        }
         
         if (type == "scan")
         {

@@ -606,12 +606,25 @@ private:
         progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         progressWindow.addProgressBarComponent (progress);
         progress = -1.0;
-        progressWindow.enterModalState();
+        
 //        progressWindow.enterModalState (true, ModalCallbackFunction::create (scannerStaticCallback, this), false);
         scanner->addListener (this);
+        
         if (! useBackgroundScanner)
             scanner->scanForAudioPlugins (formatToScan.getName());
         startTimer (20);
+        const int result = progressWindow.runModalLoop();
+        if (result == 0)
+        {
+            scanner->cancel();
+        }
+        else if (result == 1)
+        {
+            
+        }
+        
+        progressWindow.setVisible (false);
+        finishedScan();
     }
     
     void finishedScan()
@@ -629,13 +642,14 @@ private:
         if (doNextScan())
             startTimer (20);
         
-        if (! progressWindow.isCurrentlyModal())
-            finished = true;
-        
         if (finished)
-            finishedScan();
+        {
+            progressWindow.exitModalState (1);
+        }
         else
+        {
             progressWindow.setMessage (pluginBeingScanned);
+        }
     }
     
     bool doNextScan()
