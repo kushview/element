@@ -546,14 +546,14 @@ private:
             return true;
         
         File::SpecialLocationType pathsThatWouldBeStupidToScan[]
-        = { File::globalApplicationsDirectory,
-            File::userHomeDirectory,
-            File::userDocumentsDirectory,
-            File::userDesktopDirectory,
-            File::tempDirectory,
-            File::userMusicDirectory,
-            File::userMoviesDirectory,
-            File::userPicturesDirectory };
+            = { File::globalApplicationsDirectory,
+                File::userHomeDirectory,
+                File::userDocumentsDirectory,
+                File::userDesktopDirectory,
+                File::tempDirectory,
+                File::userMusicDirectory,
+                File::userMoviesDirectory,
+                File::userPicturesDirectory };
         
         for (int i = 0; i < numElementsInArray (pathsThatWouldBeStupidToScan); ++i)
         {
@@ -574,6 +574,20 @@ private:
             scanner->finishedScan();
     }
     
+    static void scannerStaticCallback (const int result, Scanner* scanner) {
+        if (scanner)
+            scanner->handleScanModalResult (result);
+    }
+    
+    void handleScanModalResult (const int result)
+    {
+        if (result == 0)
+        {
+            if (scanner)
+                scanner->cancel();
+        }
+    }
+    
     void startScan()
     {
         pathChooserWindow.setVisible (false);
@@ -590,12 +604,10 @@ private:
         }
 
         progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
-        
-        
         progressWindow.addProgressBarComponent (progress);
         progress = -1.0;
         progressWindow.enterModalState();
-        
+//        progressWindow.enterModalState (true, ModalCallbackFunction::create (scannerStaticCallback, this), false);
         scanner->addListener (this);
         if (! useBackgroundScanner)
             scanner->scanForAudioPlugins (formatToScan.getName());
@@ -683,7 +695,6 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
     {
         const auto file = PluginScanner::getSlavePluginListFile();
         plugins.restoreAudioPlugins (file);
-        file.deleteFile();
     }
     
     for (int i = 0; i < failedFiles.size(); ++i)

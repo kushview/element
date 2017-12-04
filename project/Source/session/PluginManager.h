@@ -101,13 +101,13 @@ private:
 class PluginScanner : private Timer
 {
 public:
-    PluginScanner();
+    PluginScanner (KnownPluginList&);
     ~PluginScanner();
     
     class Listener
     {
     public:
-        Listener() { }
+        Listener () { }
         virtual ~Listener() { }
         
         virtual void audioPluginScanFinished() { }
@@ -144,6 +144,7 @@ private:
     ScopedPointer<PluginScannerMaster> master;
     ListenerList<Listener> listeners;
     StringArray failedIdentifiers;
+    KnownPluginList& list;
     void timerCallback() override;
 };
     

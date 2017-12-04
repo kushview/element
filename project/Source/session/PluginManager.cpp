@@ -16,7 +16,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       31000  // 31 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       60000  // 60 Seconds
 
 namespace Element {
 
@@ -60,7 +60,8 @@ public:
             ScopedLock sl (lock);
             const String lastState = slaveState;
             slaveState = message;
-            if (lastState != slaveState) {
+            if (lastState != slaveState)
+            {
                 ScopedUnlock sul (lock);
                 triggerAsyncUpdate();
             }
@@ -73,7 +74,7 @@ public:
         }
         else if (type == "progress")
         {
-            float newProgress = (float) var(message);
+            float newProgress = (float) var (message);
             owner.listeners.call (&PluginScanner::Listener::audioPluginScanProgress, newProgress);
             ScopedLock sl (lock);
             progress = newProgress;
@@ -104,6 +105,9 @@ public:
             if (! isRunning())
             {
                 DBG("[EL] a plugin crashed or timed out during scan");
+                if (ScopedPointer<XmlElement> xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
+                    owner.list.recreateFromXml (*xml);
+
                 const bool res = launchScanner();
                 ScopedLock sl (lock);
                 running = res;
@@ -153,7 +157,7 @@ private:
     StringArray faileFiles;
     
     String pluginBeingScanned;
-    
+
     void resetScannerVariables()
     {
         ScopedLock sl (lock);
@@ -163,12 +167,13 @@ private:
     
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
+        resetScannerVariables();
         return launchSlaveProcess (File::getSpecialLocation (File::currentExecutableFile),
                                    EL_PLUGIN_SCANNER_PROCESS_ID, timeout, flags);
     }
 };
 
-class PluginScannerSlave : public ChildProcessSlave
+class PluginScannerSlave : public ChildProcessSlave, public AsyncUpdater
 {
 public:
     PluginScannerSlave ()
@@ -188,41 +193,65 @@ public:
         
         if (type == "scan")
         {
-            if (! scanFile.existsAsFile())
-            {
-                sendState ("scanning");
-                sendState ("finished");
-                return;
-            }
-            
-            sendState ("scanning");
-            
             const auto formats (StringArray::fromTokens (message.trim(), ",", "'"));
-
-            for (const auto& format : formats)
-                scanFor (format);
-            
-            settings->saveIfNeeded();
-            sendState ("finished");
+            formatsToScan = formats;
+            triggerAsyncUpdate();
         }
+    }
+    
+    void handleAsyncUpdate() override
+    {
+        if (! scanFile.existsAsFile())
+        {
+            sendState ("scanning");
+            sendState ("finished");
+            return;
+        }
+        
+        updateScanFileWithSettings();
+        
+        sendState ("scanning");
+        
+        for (const auto& format : formatsToScan)
+            scanFor (format);
+        
+        settings->saveIfNeeded();
+        sendState ("finished");
+    }
+    
+    void updateScanFileWithSettings()
+    {
+        if (! plugins)
+            return;
+        
+        for (int i = 0; i < plugins->availablePlugins().getNumTypes(); ++i)
+            if (auto* type = plugins->availablePlugins().getType (i))
+                pluginList.addType (*type);
+        
+        for (const auto& file : plugins->availablePlugins().getBlacklistedFiles())
+            pluginList.addToBlacklist (file);
+        
+        writePluginListNow();
     }
     
     void handleConnectionMade() override
     {
         settings    = new Settings();
         plugins     = new PluginManager();
-        plugins->addDefaultFormats();
-        plugins->restoreUserPlugins (*settings);
         
         if (! scanFile.existsAsFile())
             scanFile.create();
         
         if (ScopedPointer<XmlElement> xml = XmlDocument::parse (scanFile))
             pluginList.recreateFromXml (*xml);
-
-        for (int i = 0; i < plugins->availablePlugins().getNumTypes(); ++i)
-            if (auto* type = plugins->availablePlugins().getType (i))
-                pluginList.addType (*type);
+        
+        // This must happen before user settings, PluginManager will delete the deadman file
+        // when restoring user plugins
+        PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
+            pluginList, plugins->getDeadAudioPluginsFile());
+        
+        plugins->addDefaultFormats();
+        plugins->restoreUserPlugins (*settings);
         
         sendState (EL_PLUGIN_SCANNER_READY_ID);
     }
@@ -241,7 +270,23 @@ private:
     ScopedPointer<PluginDirectoryScanner> scanner;
     String fileOrIdentifier;
     KnownPluginList pluginList;
+    StringArray filesToSkip;
     File scanFile;
+    StringArray formatsToScan;
+    
+    void applyDeadPlugins()
+    {
+        PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
+            pluginList, plugins->getDeadAudioPluginsFile());
+    }
+    
+    bool writePluginListNow()
+    {
+        applyDeadPlugins();
+        if (ScopedPointer<XmlElement> xml = pluginList.createXml())
+            return xml->writeToFile (scanFile, String());
+        return false;
+    }
     
     bool sendState (const String& state)
     {
@@ -257,13 +302,14 @@ private:
     
     bool doNextScan()
     {
-        sendString ("name", scanner->getNextPluginFileThatWillBeScanned());
+        const auto nextFile = scanner->getNextPluginFileThatWillBeScanned();
+        sendString ("name", nextFile);
+        for (const auto& file : scanner->getFailedFiles())
+            pluginList.addToBlacklist (file);
 
         if (scanner->scanNextFile (true, fileOrIdentifier))
         {
-            if (ScopedPointer<XmlElement> xml = pluginList.createXml())
-                xml->writeToFile (scanFile, String());
-
+            writePluginListNow();
             return true;
         }
         
@@ -293,21 +339,26 @@ private:
         while (doNextScan())
             sendString ("progress", String (scanner->getProgress()));
         
-        if (ScopedPointer<XmlElement> xml = pluginList.createXml())
-            xml->writeToFile (scanFile, String());
+        writePluginListNow();
     }
 };
 
 // MARK: Plugin Scanner
 
-PluginScanner::PluginScanner() { }
+PluginScanner::PluginScanner (KnownPluginList& listToManage) : list(listToManage) { }
 PluginScanner::~PluginScanner()
 {
     listeners.clear();
     master = nullptr;
 }
 
-void PluginScanner::cancel() { master = nullptr; }
+void PluginScanner::cancel()
+{
+    if (master)
+    {
+        master = nullptr;
+    }
+}
 
 bool PluginScanner::isScanning() const { return master && master->isRunning(); }
 
@@ -318,11 +369,9 @@ void PluginScanner::scanForAudioPlugins (const juce::String &formatName)
 
 void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
-    if (master)
-    {
-        master = nullptr;
-    }
-    
+    cancel();
+    getSlavePluginListFile().deleteFile();
+    jassert (master == nullptr);
     master = new PluginScannerMaster (*this);
     master->startScanning (formats);
 }
@@ -392,7 +441,7 @@ private:
                 if (formats.getFormat(i)->getName() != "Element" && formats.getFormat(i)->canScanForPlugins())
                     formatsToScan.add (formats.getFormat(i)->getName());
    
-        scanner = new PluginScanner();
+        scanner = new PluginScanner (allPlugins);
         scanner->addListener (this);
         scanner->scanForAudioPlugins (formatsToScan);
     }
@@ -420,7 +469,6 @@ PluginManager::PluginManager()
 PluginManager::~PluginManager()
 {
     priv = nullptr;
-    PluginScanner::getSlavePluginListFile().deleteFile();
 }
 
 void PluginManager::addDefaultFormats()
@@ -443,7 +491,7 @@ ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
 
 PluginScanner* PluginManager::createAudioPluginScanner()
 {
-    auto* scanner = new PluginScanner();
+    auto* scanner = new PluginScanner (availablePlugins());
     return scanner;
 }
 
@@ -594,8 +642,7 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 void PluginManager::scanFinished()
 {
     restoreAudioPlugins (PluginScanner::getSlavePluginListFile());
-    PluginScanner::getSlavePluginListFile().deleteFile();
-
+    
     if (priv->scanner)
         priv->scanner->cancel();
     
