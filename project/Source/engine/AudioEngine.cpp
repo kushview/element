@@ -103,6 +103,10 @@ public:
         
         while (iter.getNextEvent (msg, frame))
         {
+            if (msg.isMidiClock())
+            {
+                DBG("clock:");
+            }
             if (msg.isNoteOn())
             {
                 DBG("NOTE ON");
@@ -213,7 +217,7 @@ public:
         const bool shouldProcess = graph != nullptr;
         
         transport.preProcess (numSamples);
-        
+
         if (shouldProcess)
         {
             const ScopedLock sl2 (graph->getCallbackLock());
@@ -240,7 +244,7 @@ public:
         }
         
         transport.postProcess (numSamples);
-        traceMidi (midi);
+        
         
 //        // FIXME: correct midi output
 //        if (auto* e = engine.world.getDeviceManager().getDefaultMidiOutput())
