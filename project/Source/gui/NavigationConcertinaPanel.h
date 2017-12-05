@@ -178,8 +178,8 @@ public:
         addAndMakeVisible (tree = new FileTreeComponent (*list));
         tree->addListener (this);
         
-        renameWindow.addButton (TRANS ("Save"), 1);
-        renameWindow.addButton (TRANS ("Cancel"), 0);
+        renameWindow.addButton (TRANS ("Save"),   1, KeyPress (KeyPress::returnKey));
+        renameWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         renameWindow.addTextEditor ("filename", "", "Filename");
         
         setSize (300, 800);
@@ -230,6 +230,9 @@ private:
     {
         const auto file (getSelectedFile());
         renameWindow.getTextEditor("filename")->setText(getSelectedFile().getFileNameWithoutExtension());
+        renameWindow.setAlwaysOnTop (true);
+        renameWindow.centreAroundComponent (ViewHelpers::findContentComponent(this),
+                                            renameWindow.getWidth(), renameWindow.getHeight());
         renameWindow.enterModalState (true, ModalCallbackFunction::forComponent (renameFileCallback, this),
                                       false);
     }
@@ -239,6 +242,8 @@ private:
     }
     void handleRenameFile (const int result)
     {
+        const String newBaseName = renameWindow.getTextEditorContents ("filename");
+        
         if (result == 0)
         {
         
@@ -246,11 +251,15 @@ private:
         else
         {
             auto file = getSelectedFile();
-            auto newFile = file.getParentDirectory().getChildFile(renameWindow.getTextEditorContents("filename")).withFileExtension (file.getFileExtension());
+            auto newFile = file.getParentDirectory().getChildFile(newBaseName).withFileExtension(file.getFileExtension());
             if (file.moveFileTo (newFile))
             {
                 refresh();
                 tree->setSelectedFile (newFile);
+            }
+            else
+            {
+                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "File rename", "Could not rename this file.");
             }
         }
         
