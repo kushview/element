@@ -10,6 +10,11 @@ plugins/Element/JuceLibraryCode/ReadMe.txt
 plugins/Element/JuceLibraryCode/include_*.*
 plugins/Element/JuceLIbraryCode/include_*.*
 
+plugins/ElementFX/Builds
+plugins/ElementFX/JuceLibraryCode/ReadMe.txt
+plugins/ElementFX/JuceLibraryCode/include_*.*
+plugins/ElementFX/JuceLIbraryCode/include_*.*
+
 data/*.ai
 
 dst
