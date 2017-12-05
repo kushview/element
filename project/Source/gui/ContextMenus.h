@@ -4,8 +4,6 @@
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
 
-#define EL_USE_PRESETS 0
-
 namespace Element {
 
 class PluginsPopupMenu : public PopupMenu
@@ -158,19 +156,19 @@ public:
     
     inline void addPresetsMenu (const String& subMenuName = "Presets")
     {
-        PopupMenu presets; getPresetsMenu (presets);
+        PopupMenu presets;
+        getPresetsMenu (presets);
         addSubMenu (subMenuName, presets);
     }
     
     inline void getPresetsMenu (PopupMenu& menu)
     {
-        #if EL_USE_PRESETS
+       #if EL_USE_PRESETS
+        const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
-        menu.addItem (20000, "Add Preset");
-        menu.addSeparator();
-        menu.addItem (20001, "(none)", false, false);
-        #endif
+        addItemInternal (menu, "Add Preset", new AddPresetOp (node));
+       #endif
     }
     
     inline void getProgramsMenu (PopupMenu& menu)
@@ -188,20 +186,23 @@ public:
         deleter.clearQuick (true);
     }
     
-    
     Message* createMessageForResultCode (const int result)
     {
         if (result == RemoveNode)
             return new RemoveNodeMessage (node);
-        if (result == Duplicate)
+        else if (result == Duplicate)
             return new DuplicateNodeMessage (node);
-        if (result == Disconnect)
+        else if (result == Disconnect)
             return new DisconnectNodeMessage (node);
-        if (auto* op = resultMap [result])
+        else if (auto* op = resultMap [result])
             return op->createMessage();
-        if (result >= 10000)
+        else if (result >= 10000 && result < 20000)
         {
             Node(node).setCurrentProgram (result - 10000);
+        }
+        else if (result >= 20000 && result < 30000)
+        {
+            
         }
         
         return nullptr;
@@ -251,6 +252,18 @@ private:
         }
     };
     
+    struct AddPresetOp : public ResultOp
+    {
+        AddPresetOp (const Node& n)
+            : node(n)
+        { }
+        
+        const Node node;
+        Message* createMessage()
+        {
+            return new AddPresetMessage (node);
+        }
+    };
     HashMap<int, ResultOp*> resultMap;
     OwnedArray<ResultOp> deleter;
     

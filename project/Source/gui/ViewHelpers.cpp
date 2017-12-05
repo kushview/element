@@ -29,7 +29,7 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 
     g.setColour ((selected) ? LF::textColor.brighter(0.2f) : LF::textColor);
     if (text.isNotEmpty())
-        g.drawText (text, padding, 0, w - padding, h, Justification::centredLeft);
+        g.drawText (text, padding, 0, w - padding - 2, h, Justification::centredLeft);
 
     g.restoreState();
 }
@@ -93,10 +93,14 @@ bool invokeDirectly (Component* c, const int commandID, bool async) {
 
 GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
 {
-    auto* cc = findContentComponent (c);
-    if (! cc)
-        return nullptr;
-    return nullptr;
+    GraphNodePtr obj = node.getGraphNode();
+    
+    if (nullptr == obj)
+    {
+         // noop
+    }
+    
+    return obj;
 }
 
 void postMessageFor (Component* c, Message* m)

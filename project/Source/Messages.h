@@ -6,6 +6,16 @@
 
 namespace Element {
 
+/** Send this to add a preset for a node */
+class AddPresetMessage : public Message
+{
+public:
+    AddPresetMessage (const Node& n) : node(n) { }
+    ~AddPresetMessage() { }
+    
+    const Node node;
+};
+
 /** Send this to remove a node from the current graph */
 class RemoveNodeMessage : public Message
 {

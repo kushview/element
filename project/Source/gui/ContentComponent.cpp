@@ -4,9 +4,9 @@
 */
 
 #include "controllers/AppController.h"
+#include "controllers/SessionController.h"
+
 #include "engine/GraphProcessor.h"
-
-
 
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
@@ -50,6 +50,14 @@
 
 namespace Element {
 
+static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
+{
+    String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature.\nGet a copy @ https://kushview.net"
+        : msg;
+    if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
+        URL("https://kushview.net/products/element/").launchInDefaultBrowser();
+}
+    
 // MARK: Content View
 
 ContentView::ContentView()
@@ -285,8 +293,6 @@ public:
        #else
         if (auto* dev = devices.getCurrentAudioDevice())
         {
-            devices.getCpuUsage();
-            
             String text = "Sample Rate: ";
             text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
             text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
@@ -617,12 +623,27 @@ void ContentComponent::resized()
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
     
-    Component* comps[3] = { nav.get(), bar1.get(), container.get() };
+    Component* comps [3] = { nav.get(), bar1.get(), container.get() };
     layout.layOutComponents (comps, 3, r.getX(), r.getY(),
                              r.getWidth(), r.getHeight(),
                              false, true);
 }
 
+bool ContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
+{
+    return true;
+}
+    
+void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
+{
+    
+    if (dragSourceDetails.description.toString() == "ccNavConcertinaPanel")
+        if (auto* panel = nav->findPanel<DataPathTreeComponent>())
+            filesDropped (StringArray ({ panel->getSelectedFile().getFullPathName() }),
+                          dragSourceDetails.localPosition.getX(),
+                          dragSourceDetails.localPosition.getY());
+}
+    
 bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
 {
     for (const auto& path : files)
@@ -652,6 +673,18 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
             {
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
                     "Apply License File", "Your software could not be unlocked.");
+            }
+        }
+        else if (file.hasFileExtension ("elg"))
+        {
+            if (getGlobals().getUnlockStatus().isFullVersion())
+            {
+                if (auto* sess = controller.findChild<SessionController>())
+                    sess->importGraph (file);
+            }
+            else
+            {
+                showProductLockedAlert();
             }
         }
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&

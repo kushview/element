@@ -4,7 +4,8 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace Element
+{
     class DataPath
     {
     public:
@@ -18,11 +19,13 @@ namespace Element {
         static const File defaultSessionDir();
         static const File defaultGraphDir();
         
-        const File& getUserLibrary() const { return userLibrary; }
+        const File& getRootDir() const { return root; }
         
     private:
-        File userLibrary;
+        File root;
     };
+    
+    class DataSearchPath { };
 }
 
 #endif  // EL_DATAPATH_H

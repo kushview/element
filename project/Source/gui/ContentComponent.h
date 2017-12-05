@@ -46,7 +46,8 @@ private:
 
 class ContentComponent :  public Component,
                           public DragAndDropContainer,
-                          public FileDragAndDropTarget
+                          public FileDragAndDropTarget,
+                          public DragAndDropTarget
 {
 public:
     ContentComponent (AppController& app);
@@ -80,6 +81,8 @@ public:
     bool isInterestedInFileDrag (const StringArray &files) override;
     void filesDropped (const StringArray &files, int x, int y) override;
     
+    bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
+    void itemDropped (const SourceDetails& dragSourceDetails) override;
 private:
     AppController& controller;
     ScopedPointer<NavigationConcertinaPanel> nav;

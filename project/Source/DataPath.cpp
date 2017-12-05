@@ -1,17 +1,31 @@
 
 #include "DataPath.h"
 
-namespace Element {
-    namespace DataPathHelpers {
-        void initializeUserLibrary (const File& path) {
-            
+namespace Element
+{
+    namespace DataPathHelpers
+    {
+        StringArray getSubDirs()
+        {
+            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates" });
+        }
+        
+        void initializeUserLibrary (const File& path)
+        {
+            for (const auto& d : getSubDirs())
+            {
+                const auto subdir = path.getChildFile (d);
+                if (subdir.existsAsFile())
+                    subdir.deleteFile();
+                subdir.createDirectory();
+            }
         }
     }
     
     DataPath::DataPath()
     {
-        userLibrary = defaultLocation();
-        DataPathHelpers::initializeUserLibrary (userLibrary);
+        root = defaultLocation();
+        DataPathHelpers::initializeUserLibrary (root);
     }
     
     DataPath::~DataPath() { }

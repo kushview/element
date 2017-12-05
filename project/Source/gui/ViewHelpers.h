@@ -40,14 +40,17 @@ bool invokeDirectly (Component* c, const int commandID, bool async);
  */
 void postMessageFor (Component*, Message*);
 
+/** Get a graph node for a given node.  If the node doesn't have an
+    object property, then controllers are used to find the object
+ */
 GraphNodePtr findGraphNodeFor (Component*, const Node&);
 
+/** This will present a plugin window */
 void presentPluginWindow (Component*, const Node&);
+
 void closePluginWindows (Component*, const bool visible = true);
 
 }
 }
-
-
 
 #endif  // EL_VIEW_HELPERS_H

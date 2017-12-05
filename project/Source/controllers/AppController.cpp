@@ -23,13 +23,13 @@ static void showProductLockedAlert (const String& msg = String(), const String& 
         URL("https://kushview.net/products/element/").launchInDefaultBrowser();
 }
 
-    Globals& AppController::Child::getWorld()
-    {
-        auto* app = dynamic_cast<AppController*> (getRoot());
-        jassert(app);
-        return app->getWorld();
-    }
-    
+Globals& AppController::Child::getWorld()
+{
+    auto* app = dynamic_cast<AppController*> (getRoot());
+    jassert(app);
+    return app->getWorld();
+}
+
 AppController::AppController (Globals& g)
     : world (g)
 {
@@ -135,6 +135,16 @@ void AppController::handleMessage (const Message& msg)
     {
         ec->disconnectNode (dnm2->node);
     }
+    else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
+    {
+        String path = "Presets/";
+        path << String (aps->node.getName().isNotEmpty() ? aps->node.getName() : "New Preset");
+        path << ".elpreset";
+        DataPath dataPath;
+        File file = dataPath.getRootDir().getChildFile(path);
+        if (! aps->node.writeToFile (file.getNonexistentSibling()))
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
+    }
     else
     {
         handled = false;
@@ -145,7 +155,6 @@ void AppController::handleMessage (const Message& msg)
         DBG("[EL] AppController: unhandled Message received");
     }
 }
-
 
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
