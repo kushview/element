@@ -87,6 +87,7 @@ void AppController::run()
 void AppController::handleMessage (const Message& msg)
 {
 	auto* ec = findChild<EngineController>();
+    auto* gui = findChild<GuiController>();
 	jassert(ec);
 
     bool handled = true;
@@ -137,13 +138,18 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
-        String path = "Presets/";
-        path << String (aps->node.getName().isNotEmpty() ? aps->node.getName() : "New Preset");
-        path << ".elpreset";
-        DataPath dataPath;
-        File file = dataPath.getRootDir().getChildFile(path);
-        if (! aps->node.writeToFile (file.getNonexistentSibling()))
+        const DataPath path;
+        auto file = path.createNewPresetFile (aps->node, aps->name);
+        if (! aps->node.writeToFile (file))
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
+        
+        if (gui)
+            if (auto* cc = gui->getContentComponent())
+                cc->stabilize (true);
+    }
+    else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
+    {
+        ec->addNode (anm->node);
     }
     else
     {
@@ -259,6 +265,9 @@ bool AppController::perform (const InvocationInfo& info)
                 if (chooser.browseForFileToSave (true))
                     findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
                                                                  chooser.getResult());
+                if (auto* gui = findChild<GuiController>())
+                        if (auto* cc = gui->getContentComponent())
+                            cc->stabilize (true);
             }
             else
             {

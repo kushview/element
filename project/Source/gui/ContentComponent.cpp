@@ -687,6 +687,18 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
                 showProductLockedAlert();
             }
         }
+        else if (file.hasFileExtension ("elpreset"))
+        {
+            const Node node (Node::parse (file));
+            if (node.hasNodeType ("plugin"))
+            {
+                this->post (new AddNodeMessage (node));
+            }
+            else
+            {
+                
+            }
+        }
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&
                  (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
@@ -703,7 +715,7 @@ void ContentComponent::post (Message* message)
     controller.postMessage (message);
 }
 
-void ContentComponent::stabilize()
+void ContentComponent::stabilize (const bool refreshDataPathTrees)
 {
     auto session = getGlobals().getSession();
     if (session->getNumGraphs() > 0)
@@ -729,6 +741,10 @@ void ContentComponent::stabilize()
     
     if (auto* main = findParentComponentOfClass<MainWindow>())
         main->refreshMenu();
+    
+    if (refreshDataPathTrees)
+        if (auto* data = nav->findPanel<DataPathTreeComponent>())
+            data->refresh();
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

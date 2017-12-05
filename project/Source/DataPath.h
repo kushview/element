@@ -4,8 +4,12 @@
 
 #include "ElementApp.h"
 
+#define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset"
+
 namespace Element
 {
+    class Node;
+    
     class DataPath
     {
     public:
@@ -20,6 +24,7 @@ namespace Element
         static const File defaultGraphDir();
         
         const File& getRootDir() const { return root; }
+        File createNewPresetFile (const Node& node, const String& name = String()) const;
         
     private:
         File root;

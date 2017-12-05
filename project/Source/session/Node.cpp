@@ -62,6 +62,7 @@ namespace Element {
     
     bool Node::writeToFile (const File& targetFile) const
     {
+        
         ValueTree data = objectData.createCopy();
         sanitizeProperties (data, true);
         

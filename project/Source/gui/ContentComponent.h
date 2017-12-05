@@ -71,7 +71,7 @@ public:
     void toggleVirtualKeyboard();
     
     void setCurrentNode (const Node& node);
-    void stabilize();
+    void stabilize (const bool refreshDataPathTrees = false);
     
     void post (Message*);
     AppController& getAppController() { return controller; }

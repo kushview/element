@@ -21,7 +21,7 @@ public:
         if (kp.getKeyCode() == KeyPress::backspaceKey)
             return Component::keyPressed (kp);
             return ListBox::keyPressed (kp);
-            }
+    }
     
     void paintListBoxItem (int, Graphics&, int, int, bool) override { }
     
@@ -51,7 +51,7 @@ public:
         jassert(r);
         r->updateContent (getGraph(row), row, isSelected);
         return r;
-        }
+    }
         
     private:
         class Row : public Component,
@@ -161,21 +161,33 @@ public:
             int row = 0;
             bool selected = false;
         };
-    };
+};
 
 class DataPathTreeComponent : public Component,
+                              public FileBrowserListener,
                               private Timer
 {
 public:
     DataPathTreeComponent()
-        : thread ("EL_DataPath")
+        : thread ("EL_DataPath"),
+          renameWindow ("Rename","Enter a new file name.", AlertWindow::NoIcon)
     {
         thread.startThread();
         list = new DirectoryContentsList (0, thread);
         list->setDirectory (DataPath::defaultLocation(), true, true);
         addAndMakeVisible (tree = new FileTreeComponent (*list));
-
+        tree->addListener (this);
+        
+        renameWindow.addButton (TRANS ("Save"), 1);
+        renameWindow.addButton (TRANS ("Cancel"), 0);
+        renameWindow.addTextEditor ("filename", "", "Filename");
+        
         setSize (300, 800);
+    }
+    
+    ~DataPathTreeComponent()
+    {
+        tree->removeListener (this);
     }
     
     void resized() override
@@ -194,14 +206,82 @@ public:
             tree->restoreOpennessState (*state, true);
     }
 
+    virtual void selectionChanged() override { }
+    virtual void fileClicked (const File& file, const MouseEvent& e) override
+    {
+        if (e.mods.isPopupMenu() && ! file.isDirectory())
+            runFileMenu (file);
+    }
+    
+    virtual void fileDoubleClicked (const File& file) override { }
+    virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
+    
 private:
     ScopedPointer<FileTreeComponent> tree;
     ScopedPointer<DirectoryContentsList> list;
     TimeSliceThread thread;
     
+    AlertWindow renameWindow;
+    
     friend class Timer;
-    void timerCallback() override
+    void timerCallback() override { }
+    
+    void renameFile()
     {
+        const auto file (getSelectedFile());
+        renameWindow.getTextEditor("filename")->setText(getSelectedFile().getFileNameWithoutExtension());
+        renameWindow.enterModalState (true, ModalCallbackFunction::forComponent (renameFileCallback, this),
+                                      false);
+    }
+    
+    void closeRenameWindow() {
+        
+    }
+    void handleRenameFile (const int result)
+    {
+        if (result == 0)
+        {
+        
+        }
+        else
+        {
+            auto file = getSelectedFile();
+            auto newFile = file.getParentDirectory().getChildFile(renameWindow.getTextEditorContents("filename")).withFileExtension (file.getFileExtension());
+            if (file.moveFileTo (newFile))
+            {
+                refresh();
+                tree->setSelectedFile (newFile);
+            }
+        }
+        
+        renameWindow.setVisible (false);
+    }
+    
+    static void renameFileCallback (const int res, DataPathTreeComponent* t)
+    {
+        if (t) t->handleRenameFile (res);
+    }
+    
+    static void fileMenuCallback (const int res, DataPathTreeComponent* t) {
+        if (t) t->handleFileMenu (res);
+    }
+    
+    void handleFileMenu (const int res)
+    {
+        switch (res)
+        {
+            case 0: break;
+            case 1: renameFile(); break;
+        }
+    }
+    
+    void runFileMenu (const File& file)
+    {
+        PopupMenu menu;
+        menu.addItem (1, "Rename");
+
+        auto* callback = ModalCallbackFunction::forComponent (fileMenuCallback, this);
+        menu.showMenuAsync (PopupMenu::Options(), callback);
     }
 };
 

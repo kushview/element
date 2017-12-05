@@ -1,5 +1,6 @@
 
 #include "DataPath.h"
+#include "session/Node.h"
 
 namespace Element
 {
@@ -58,4 +59,15 @@ namespace Element
     
     const File DataPath::defaultSessionDir()    { return defaultLocation().getChildFile ("Sessions"); }
     const File DataPath::defaultGraphDir()      { return defaultLocation().getChildFile ("Graphs"); }
+    
+    File DataPath::createNewPresetFile (const Node& node, const String& name) const
+    {
+        String path = "Presets/";
+        if (name.isNotEmpty())
+            path << name;
+        else
+            path << String (node.getName().isNotEmpty() ? node.getName() : "New Preset");
+        path << ".elpreset";
+        return getRootDir().getChildFile(path).getNonexistentSibling();
+    }
 }

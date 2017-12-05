@@ -22,7 +22,6 @@ namespace Element {
         
         int getChannel() const;
         
-        
         const bool isInput() const
         {
             jassert (objectData.hasProperty ("flow"));
