@@ -9,6 +9,7 @@
 namespace Element
 {
     class Node;
+    class NodeArray;
     
     class DataPath
     {
@@ -25,6 +26,7 @@ namespace Element
         
         const File& getRootDir() const { return root; }
         File createNewPresetFile (const Node& node, const String& name = String()) const;
+        void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
         
     private:
         File root;

@@ -70,4 +70,20 @@ namespace Element
         path << ".elpreset";
         return getRootDir().getChildFile(path).getNonexistentSibling();
     }
+    
+    void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
+    {
+        DBG("[EL] seraching for presets: " << format << "-" << identifier);
+        DirectoryIterator iter (root.getChildFile("Presets"), true, "*.elpreset");
+        while (iter.next())
+        {
+            Node node (Node::parse (iter.getFile()));
+            if (node.isValid() &&
+                (node.getProperty(Tags::identifier) == identifier || node.getProperty(Tags::file) == identifier) &&
+                node.getProperty(Tags::format) == format)
+            {
+                nodes.add (node);
+            }
+        }
+    }
 }

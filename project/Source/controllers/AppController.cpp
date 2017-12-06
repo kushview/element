@@ -88,7 +88,7 @@ void AppController::handleMessage (const Message& msg)
 {
 	auto* ec = findChild<EngineController>();
     auto* gui = findChild<GuiController>();
-	jassert(ec);
+	jassert(ec && gui);
 
     bool handled = true;
 
@@ -139,13 +139,15 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
         const DataPath path;
-        auto file = path.createNewPresetFile (aps->node, aps->name);
-        if (! aps->node.writeToFile (file))
+        if (! aps->node.savePresetTo (path, aps->name))
+        {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
-        
-        if (gui)
+        }
+        else
+        {
             if (auto* cc = gui->getContentComponent())
                 cc->stabilize (true);
+        }
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {

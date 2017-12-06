@@ -191,6 +191,8 @@ namespace Element {
         /** Write the contents of this node to file */
         bool writeToFile (const File& file) const;
     
+        bool savePresetTo (const DataPath& path, const String& name) const;
+        
         ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
         ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
@@ -212,7 +214,11 @@ namespace Element {
         bool canConnect (const uint32 sourceNode, const uint32 sourcePort,
                          const uint32 destNode, const uint32 destPort) const;
         
+        /** Saves the node state from GraphNode to state property */
         void savePluginState();
+        
+        /** Reads state property and applies to GraphNode */
+        void restorePluginState();
         
         int getNumPrograms() const;
         String getProgramName (const int index) const;

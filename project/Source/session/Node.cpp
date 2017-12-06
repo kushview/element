@@ -38,12 +38,11 @@ namespace Element {
     ValueTree Node::parse (const File& file)
     {
         ValueTree data;
+        ValueTree nodeData;
         
         if (ScopedPointer<XmlElement> e = XmlDocument::parse(file))
         {
-            ValueTree xml = ValueTree::fromXml (*e);
-            if (xml.hasType (Tags::node))
-                data = xml;
+            data = ValueTree::fromXml (*e);
         }
         else
         {
@@ -51,10 +50,27 @@ namespace Element {
             data = ValueTree::readFromStream (input);
         }
         
-        if (data.isValid() && data.hasType (Tags::node))
+        if (data.hasType (Tags::node))
         {
-            Node::sanitizeProperties (data);
-            return data;
+            nodeData = data;
+        }
+        else
+        {
+            nodeData = data.getChildWithName (Tags::node);
+            // Rename the node appropriately
+            if (data.hasProperty (Tags::name))
+                nodeData.setProperty (Tags::name, data.getProperty(Tags::name), 0);
+            else
+                nodeData.setProperty (Tags::name, file.getFileNameWithoutExtension(), 0);
+        }
+        
+        if (nodeData.isValid() && nodeData.hasType (Tags::node))
+        {
+            if (data.indexOf (nodeData) >= 0)
+                data.removeChild (nodeData, 0);
+            
+            Node::sanitizeProperties (nodeData);
+            return nodeData;
         }
         
         return ValueTree();
@@ -72,6 +88,33 @@ namespace Element {
         return true;
        #else
         if (ScopedPointer<XmlElement> e = data.createXml())
+            return e->writeToFile (targetFile, String());
+       #endif
+        return false;
+    }
+    
+    bool Node::savePresetTo (const DataPath& path, const String& name) const
+    {
+        {
+            // hack: ensure the plugin's state info is up-to-date
+            Node(*this).savePluginState();
+        }
+        
+        ValueTree preset ("preset");
+        ValueTree data = objectData.createCopy();
+        sanitizeProperties (data, true);
+        preset.addChild (data, -1, 0);
+        
+        const auto targetFile = path.createNewPresetFile (*this, name);
+        data.setProperty (Tags::name, targetFile.getFileNameWithoutExtension(), 0);
+        data.setProperty (Tags::type, Tags::node.toString(), 0);
+        
+       #if EL_SAVE_BINARY_FORMAT
+        FileOutputStream stream (targetFile);
+        preset.writeToStream (stream);
+        return true;
+       #else
+        if (ScopedPointer<XmlElement> e = preset.createXml())
             return e->writeToFile (targetFile, String());
        #endif
         return false;
@@ -306,6 +349,21 @@ namespace Element {
         
         return isProbablyGraphNode (parent) ? Node (parent, false)
                                             : Node();
+    }
+    
+    void Node::restorePluginState()
+    {
+        if (! isValid())
+            return;
+        
+        MemoryBlock state;
+        state.fromBase64Encoding (getProperty(Tags::state).toString());
+        if (state.getSize() > 0)
+        {
+            if (GraphNodePtr obj = getGraphNode())
+                if (auto* proc = obj->getAudioProcessor())
+                    proc->setStateInformation (state.getData(), (int)state.getSize());
+        }
     }
     
     void Node::savePluginState()

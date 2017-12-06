@@ -649,7 +649,7 @@ bool ContentComponent::isInterestedInFileDrag (const StringArray &files)
     for (const auto& path : files)
     {
         const File file (path);
-        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst"))
+        if (file.hasFileExtension ("elc;elg;els;dll;vst3;vst;elpreset"))
             return true;
     }
     return false;
@@ -689,14 +689,16 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         }
         else if (file.hasFileExtension ("elpreset"))
         {
-            const Node node (Node::parse (file));
-            if (node.hasNodeType ("plugin"))
+            const auto data = Node::parse (file);
+            
+            if (data.hasType (Tags::node))
             {
+                const Node node (data, false);
                 this->post (new AddNodeMessage (node));
             }
             else
             {
-                
+                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Presets", "Error adding preset");
             }
         }
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&

@@ -226,7 +226,30 @@ private:
     friend class Timer;
     void timerCallback() override { }
     
-    void renameFile()
+    void deleteSelectedFile()
+    {
+        const auto file (getSelectedFile());
+        if (! file.existsAsFile())
+            return;
+        
+        #if JUCE_WINDOWS
+        String message ("Would you like to move this file to the Recycle Bin?\n");
+        #else
+        String message ("Would you like to move this file to the trash?\n\n");
+        #endif
+        
+        message << file.getFullPathName();
+        if (! AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon, "Delete file", message))
+            return;
+        
+        if (! file.deleteFile()) {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Delete file", "Could not delete");
+        } else {
+            refresh();
+        }
+    }
+    
+    void renameSelectedFile()
     {
         const auto file (getSelectedFile());
         renameWindow.getTextEditor("filename")->setText(getSelectedFile().getFileNameWithoutExtension());
@@ -237,9 +260,14 @@ private:
                                       false);
     }
     
-    void closeRenameWindow() {
-        
+    void closeRenameWindow()
+    {
+        if (renameWindow.isCurrentlyModal())
+            renameWindow.exitModalState (0);
+        renameWindow.setVisible (false);
     }
+    
+    static void renameFileCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleRenameFile (res); }
     void handleRenameFile (const int result)
     {
         const String newBaseName = renameWindow.getTextEditorContents ("filename");
@@ -263,31 +291,26 @@ private:
             }
         }
         
-        renameWindow.setVisible (false);
+        closeRenameWindow();
     }
     
-    static void renameFileCallback (const int res, DataPathTreeComponent* t)
-    {
-        if (t) t->handleRenameFile (res);
-    }
-    
-    static void fileMenuCallback (const int res, DataPathTreeComponent* t) {
-        if (t) t->handleFileMenu (res);
-    }
-    
+    static void fileMenuCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleFileMenu (res); }
     void handleFileMenu (const int res)
     {
         switch (res)
         {
             case 0: break;
-            case 1: renameFile(); break;
+            case 1: renameSelectedFile(); break;
+            case 2: deleteSelectedFile(); break;
         }
     }
+    
     
     void runFileMenu (const File& file)
     {
         PopupMenu menu;
         menu.addItem (1, "Rename");
+        menu.addItem (2, "Delete");
 
         auto* callback = ModalCallbackFunction::forComponent (fileMenuCallback, this);
         menu.showMenuAsync (PopupMenu::Options(), callback);

@@ -27,9 +27,9 @@ public:
     Toolbar* getToolbar() const;
     void updateGraphNode (GraphNode* newNode, Component* newEditor);
     
-    void moved();
-    void closeButtonPressed();
-    void resized();
+    void moved() override;
+    void closeButtonPressed() override;
+    void resized() override;
 
 	int getDesktopWindowStyleFlags() const override {
 		return ComponentPeer::windowHasCloseButton |

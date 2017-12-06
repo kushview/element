@@ -168,6 +168,24 @@ public:
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
+        DataPath path;
+        
+        auto identifier = node.getProperty (Tags::identifier).toString();
+        if (identifier.isEmpty())
+            identifier = node.getProperty (Tags::file);
+        
+        presetNodes.clearQuick();
+        path.findPresetsFor (node.getProperty (Tags::format), identifier, presetNodes);
+        
+        menu.addSeparator();
+        
+        if (presetNodes.size() <= 0)
+        {
+            addItem (offset, "(none)", false);
+        }
+        
+        for (int i = 0; i < presetNodes.size(); ++i)
+            menu.addItem (offset + i, presetNodes[i].getName());
        #endif
     }
     
@@ -202,7 +220,13 @@ public:
         }
         else if (result >= 20000 && result < 30000)
         {
-            
+            Node n (node);
+            if (presetNodes[result - 20000].isValid())
+            {
+                const String state = presetNodes[result - 20000].getProperty (Tags::state).toString();
+                n.getValueTree().setProperty (Tags::state, state, 0);
+                n.restorePluginState ();
+            }
         }
         
         return nullptr;
@@ -214,6 +238,7 @@ public:
     
 private:
     const Node node;
+    NodeArray presetNodes;
     const Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;
