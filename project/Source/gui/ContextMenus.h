@@ -180,9 +180,7 @@ public:
         menu.addSeparator();
         
         if (presetNodes.size() <= 0)
-        {
-            addItem (offset, "(none)", false);
-        }
+            menu.addItem (offset, "(none)", false);
         
         for (int i = 0; i < presetNodes.size(); ++i)
             menu.addItem (offset + i, presetNodes[i].getName());

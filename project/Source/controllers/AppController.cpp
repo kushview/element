@@ -139,13 +139,24 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
         const DataPath path;
-        if (! aps->node.savePresetTo (path, aps->name))
+        String name = aps->name;
+        bool canceled = false;
+        
+        if (name.isEmpty ())
         {
-            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
+            AlertWindow alert ("Add Preset", "Enter preset name", AlertWindow::NoIcon, 0);
+            alert.addTextEditor ("name", aps->node.getName());
+            alert.addButton ("Save", 1, KeyPress (KeyPress::returnKey));
+            alert.addButton ("Cancel", 0, KeyPress (KeyPress::escapeKey));
+            canceled = 0 == alert.runModalLoop();
+            name = alert.getTextEditorContents ("name");
         }
-        else
+        
+        if (! canceled)
         {
-            if (auto* cc = gui->getContentComponent())
+             if (! aps->node.savePresetTo (path, name))
+                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
+             if (auto* cc = gui->getContentComponent())
                 cc->stabilize (true);
         }
     }

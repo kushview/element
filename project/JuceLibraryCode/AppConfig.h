@@ -28,6 +28,11 @@
  #define EL_USE_SUBGRAPHS 0
 #endif
 
+
+#ifndef EL_ROOT_MIDI_CHANNEL
+ #define EL_ROOT_MIDI_CHANNEL 1
+#endif
+
 #if _MSC_VER
  #pragma warning(disable: 4100) // unreferenced formal param
  #pragma warning(disable: 4244) // convert possible data loss

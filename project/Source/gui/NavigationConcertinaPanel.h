@@ -333,6 +333,10 @@ public:
         setLookAndFeel (nullptr);
     }
     
+    void saveState (PropertiesFile* props) { }
+    
+    void restoreState (PropertiesFile* props) { }
+    
     int getIndexOfPanel (Component* panel)
     {
         if (nullptr == panel)
@@ -364,11 +368,13 @@ public:
         clearPanels();
         Component* c = nullptr;
         c = new ElementsNavigationPanel();
+        c->setName ("Elements");
         auto *h = new ElementsHeader (*this, *c);
         addPanelInternal (-1, c, "Elements", h);
         
        #if EL_USE_DATA_PATH_TREE
         auto * dp = new DataPathTreeComponent();
+        dp->setName ("UserDataPath");
         dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
        #endif

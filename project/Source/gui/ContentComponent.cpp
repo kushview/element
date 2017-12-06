@@ -531,7 +531,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     }
     
     toolBar->setSession (getGlobals().getSession());
-    nav->expandPanelFully (nav->getSessionPanel(), false);
+    nav->setPanelSize (nav->findPanel<ElementsNavigationPanel>(), 160, false);
 }
 
 ContentComponent::~ContentComponent()

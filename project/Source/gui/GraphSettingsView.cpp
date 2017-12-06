@@ -2,8 +2,6 @@
 #include "gui/GuiCommon.h"
 #include "gui/GraphSettingsView.h"
 
-#define EL_ROOT_MIDI_CHANNEL 0
-
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;
     
