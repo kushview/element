@@ -37,6 +37,11 @@ GuiController::~GuiController()
         windowManager = nullptr;
     }
     
+    if (content)
+    {
+        content = nullptr;
+    }
+    
     LookAndFeel::setDefaultLookAndFeel (nullptr);
 }
 

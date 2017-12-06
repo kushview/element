@@ -153,6 +153,42 @@ namespace Element {
         } layout;
     };
     
+    class MidiChannelPropertyComponent : public ChoicePropertyComponent
+    {
+    public:
+        MidiChannelPropertyComponent (const String& name = "MIDI Channel")
+            : ChoicePropertyComponent (name)
+        {
+            choices.add ("Omni");
+            choices.add ("");
+            for (int i = 1; i <= 16; ++i)
+            {
+                choices.add (String (i));
+            }
+        }
+        
+        /** midi channel.  0 means omni */
+        inline int getMidiChannel() const { return midiChannel; }
+        
+        inline int getIndex() const override
+        {
+            const int index = midiChannel == 0 ? 0 : midiChannel + 1;
+            return index;
+        }
+        
+        inline void setIndex (const int index) override
+        {
+            midiChannel = (index <= 1) ? 0 : index - 1;
+            jassert (isPositiveAndBelow (midiChannel, 17));
+            midiChannelChanged();
+        }
+        
+        virtual void midiChannelChanged() { }
+        
+    private:
+        int midiChannel = 0;
+    };
+    
     class GraphPropertyPanel : public PropertyPanel {
     public:
         GraphPropertyPanel() { }
@@ -180,7 +216,8 @@ namespace Element {
             props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
                                                   "Name", 256, false));
             #if EL_ROOT_MIDI_CHANNEL
-            props.add (new GraphMidiChannels());
+            // props.add (new GraphMidiChannels());
+            props.add (new MidiChannelPropertyComponent ());
             #endif
         }
     };
