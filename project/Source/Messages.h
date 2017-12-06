@@ -6,6 +6,18 @@
 
 namespace Element {
 
+/** Send this to add a preset for a node */
+class AddPresetMessage : public Message
+{
+public:
+    AddPresetMessage (const Node& n, const String& name_ = String())
+        : node (n), name (name_) { }
+    ~AddPresetMessage() { }
+    
+    const Node node;
+    const String name;
+};
+
 /** Send this to remove a node from the current graph */
 class RemoveNodeMessage : public Message
 {
@@ -66,6 +78,16 @@ public:
     inline bool usePorts() const { return !useChannels(); }
 };
 
+    class AddNodeMessage : public Message {
+    public:
+        AddNodeMessage (const Node& n)
+            : node (n.getValueTree().createCopy())
+        {
+            
+        }
+        
+        const Node node;
+    };
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:

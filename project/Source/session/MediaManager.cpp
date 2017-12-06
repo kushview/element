@@ -7,7 +7,7 @@
 #include "session/Session.h"
 
 namespace Element {
-    MediaManager::MediaManager() { }
+    MediaManager::MediaManager()  { }
     MediaManager::~MediaManager() { }
 
     bool MediaManager::anyFilesNeedSaving() const
@@ -343,10 +343,8 @@ namespace Element {
     {
         for (int i = 0; i < list.size(); ++i)
         {
-            const MediaManager::Document& doc = *list.getUnchecked(i);
-
+            const MediaManager::Document& doc = *list.getUnchecked (i);
             XmlElement* e = xml.createNewChildElement ("DOC");
-
             e->setAttribute ("file", doc.getFile().getFullPathName());
             e->setAttribute ("state", doc.getState());
         }
@@ -361,5 +359,4 @@ namespace Element {
 
         return xml;
     }
-
 }

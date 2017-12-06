@@ -26,7 +26,6 @@ public:
     JUCE_LEAK_DETECTOR (Task);
 };
 
-
 class ClearChannelOp : public Task
 {
 public:
@@ -590,13 +589,11 @@ private:
         if (proc->getTotalNumOutputChannels() == 0)
             totalLatency = maxLatency;
 
-#if 1
         int totalChans = jmax (node->getNumPorts (PortType::Audio, true),
                                node->getNumPorts (PortType::Audio, false));
 
         renderingOps.add (new ProcessBufferOp (node, channelsToUse [PortType::Audio],
                                                totalChans, 0, channelsToUse));
-#endif
     }
 
     int getFreeBuffer (PortType type)

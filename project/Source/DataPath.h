@@ -4,7 +4,13 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+#define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset"
+
+namespace Element
+{
+    class Node;
+    class NodeArray;
+    
     class DataPath
     {
     public:
@@ -18,11 +24,15 @@ namespace Element {
         static const File defaultSessionDir();
         static const File defaultGraphDir();
         
-        const File& getUserLibrary() const { return userLibrary; }
+        const File& getRootDir() const { return root; }
+        File createNewPresetFile (const Node& node, const String& name = String()) const;
+        void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
         
     private:
-        File userLibrary;
+        File root;
     };
+    
+    class DataSearchPath { };
 }
 
 #endif  // EL_DATAPATH_H

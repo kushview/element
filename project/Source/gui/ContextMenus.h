@@ -4,8 +4,6 @@
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
 
-#define EL_USE_PRESETS 0
-
 namespace Element {
 
 class PluginsPopupMenu : public PopupMenu
@@ -158,19 +156,37 @@ public:
     
     inline void addPresetsMenu (const String& subMenuName = "Presets")
     {
-        PopupMenu presets; getPresetsMenu (presets);
+        PopupMenu presets;
+        getPresetsMenu (presets);
         addSubMenu (subMenuName, presets);
     }
     
     inline void getPresetsMenu (PopupMenu& menu)
     {
-        #if EL_USE_PRESETS
+       #if EL_USE_PRESETS
+        const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
-        menu.addItem (20000, "Add Preset");
+        addItemInternal (menu, "Add Preset", new AddPresetOp (node));
+        DataPath path;
+        
+        auto identifier = node.getProperty (Tags::identifier).toString();
+        if (identifier.isEmpty())
+            identifier = node.getProperty (Tags::file);
+        
+        presetNodes.clearQuick();
+        path.findPresetsFor (node.getProperty (Tags::format), identifier, presetNodes);
+        
         menu.addSeparator();
-        menu.addItem (20001, "(none)", false, false);
-        #endif
+        
+        if (presetNodes.size() <= 0)
+        {
+            addItem (offset, "(none)", false);
+        }
+        
+        for (int i = 0; i < presetNodes.size(); ++i)
+            menu.addItem (offset + i, presetNodes[i].getName());
+       #endif
     }
     
     inline void getProgramsMenu (PopupMenu& menu)
@@ -188,20 +204,29 @@ public:
         deleter.clearQuick (true);
     }
     
-    
     Message* createMessageForResultCode (const int result)
     {
         if (result == RemoveNode)
             return new RemoveNodeMessage (node);
-        if (result == Duplicate)
+        else if (result == Duplicate)
             return new DuplicateNodeMessage (node);
-        if (result == Disconnect)
+        else if (result == Disconnect)
             return new DisconnectNodeMessage (node);
-        if (auto* op = resultMap [result])
+        else if (auto* op = resultMap [result])
             return op->createMessage();
-        if (result >= 10000)
+        else if (result >= 10000 && result < 20000)
         {
             Node(node).setCurrentProgram (result - 10000);
+        }
+        else if (result >= 20000 && result < 30000)
+        {
+            Node n (node);
+            if (presetNodes[result - 20000].isValid())
+            {
+                const String state = presetNodes[result - 20000].getProperty (Tags::state).toString();
+                n.getValueTree().setProperty (Tags::state, state, 0);
+                n.restorePluginState ();
+            }
         }
         
         return nullptr;
@@ -213,6 +238,7 @@ public:
     
 private:
     const Node node;
+    NodeArray presetNodes;
     const Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;
@@ -251,6 +277,18 @@ private:
         }
     };
     
+    struct AddPresetOp : public ResultOp
+    {
+        AddPresetOp (const Node& n)
+            : node(n)
+        { }
+        
+        const Node node;
+        Message* createMessage()
+        {
+            return new AddPresetMessage (node);
+        }
+    };
     HashMap<int, ResultOp*> resultMap;
     OwnedArray<ResultOp> deleter;
     

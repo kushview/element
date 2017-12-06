@@ -23,13 +23,13 @@ static void showProductLockedAlert (const String& msg = String(), const String& 
         URL("https://kushview.net/products/element/").launchInDefaultBrowser();
 }
 
-    Globals& AppController::Child::getWorld()
-    {
-        auto* app = dynamic_cast<AppController*> (getRoot());
-        jassert(app);
-        return app->getWorld();
-    }
-    
+Globals& AppController::Child::getWorld()
+{
+    auto* app = dynamic_cast<AppController*> (getRoot());
+    jassert(app);
+    return app->getWorld();
+}
+
 AppController::AppController (Globals& g)
     : world (g)
 {
@@ -87,7 +87,8 @@ void AppController::run()
 void AppController::handleMessage (const Message& msg)
 {
 	auto* ec = findChild<EngineController>();
-	jassert(ec);
+    auto* gui = findChild<GuiController>();
+	jassert(ec && gui);
 
     bool handled = true;
 
@@ -135,6 +136,23 @@ void AppController::handleMessage (const Message& msg)
     {
         ec->disconnectNode (dnm2->node);
     }
+    else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
+    {
+        const DataPath path;
+        if (! aps->node.savePresetTo (path, aps->name))
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
+        }
+        else
+        {
+            if (auto* cc = gui->getContentComponent())
+                cc->stabilize (true);
+        }
+    }
+    else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
+    {
+        ec->addNode (anm->node);
+    }
     else
     {
         handled = false;
@@ -145,7 +163,6 @@ void AppController::handleMessage (const Message& msg)
         DBG("[EL] AppController: unhandled Message received");
     }
 }
-
 
 ApplicationCommandTarget* AppController::getNextCommandTarget()
 {
@@ -250,6 +267,9 @@ bool AppController::perform (const InvocationInfo& info)
                 if (chooser.browseForFileToSave (true))
                     findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
                                                                  chooser.getResult());
+                if (auto* gui = findChild<GuiController>())
+                        if (auto* cc = gui->getContentComponent())
+                            cc->stabilize (true);
             }
             else
             {

@@ -2,6 +2,9 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
+#include "DataPath.h"
+
+
 
 namespace Element {
     
@@ -18,7 +21,7 @@ public:
         if (kp.getKeyCode() == KeyPress::backspaceKey)
             return Component::keyPressed (kp);
             return ListBox::keyPressed (kp);
-            }
+    }
     
     void paintListBoxItem (int, Graphics&, int, int, bool) override { }
     
@@ -48,7 +51,7 @@ public:
         jassert(r);
         r->updateContent (getGraph(row), row, isSelected);
         return r;
-        }
+    }
         
     private:
         class Row : public Component,
@@ -158,14 +161,167 @@ public:
             int row = 0;
             bool selected = false;
         };
-    };
+};
 
+class DataPathTreeComponent : public Component,
+                              public FileBrowserListener,
+                              private Timer
+{
+public:
+    DataPathTreeComponent()
+        : thread ("EL_DataPath"),
+          renameWindow ("Rename","Enter a new file name.", AlertWindow::NoIcon)
+    {
+        thread.startThread();
+        list = new DirectoryContentsList (0, thread);
+        list->setDirectory (DataPath::defaultLocation(), true, true);
+        addAndMakeVisible (tree = new FileTreeComponent (*list));
+        tree->addListener (this);
+        
+        renameWindow.addButton (TRANS ("Save"),   1, KeyPress (KeyPress::returnKey));
+        renameWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+        renameWindow.addTextEditor ("filename", "", "Filename");
+        
+        setSize (300, 800);
+    }
+    
+    ~DataPathTreeComponent()
+    {
+        tree->removeListener (this);
+    }
+    
+    void resized() override
+    {
+        tree->setBounds (getLocalBounds().reduced(2));
+    }
+    
+    FileTreeComponent& getFileTreeComponent() {  jassert(tree != nullptr); return *tree; }
+    File getSelectedFile() { return getFileTreeComponent().getSelectedFile(); }
+    File getDirectory() { return (list) ? list->getDirectory() : File(); }
+    void refresh()
+    {
+        ScopedPointer<XmlElement> state = tree->getOpennessState (true);
+        getFileTreeComponent().refresh();
+        if (state)
+            tree->restoreOpennessState (*state, true);
+    }
+
+    virtual void selectionChanged() override { }
+    virtual void fileClicked (const File& file, const MouseEvent& e) override
+    {
+        if (e.mods.isPopupMenu() && ! file.isDirectory())
+            runFileMenu (file);
+    }
+    
+    virtual void fileDoubleClicked (const File& file) override { }
+    virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
+    
+private:
+    ScopedPointer<FileTreeComponent> tree;
+    ScopedPointer<DirectoryContentsList> list;
+    TimeSliceThread thread;
+    
+    AlertWindow renameWindow;
+    
+    friend class Timer;
+    void timerCallback() override { }
+    
+    void deleteSelectedFile()
+    {
+        const auto file (getSelectedFile());
+        if (! file.existsAsFile())
+            return;
+        
+        #if JUCE_WINDOWS
+        String message ("Would you like to move this file to the Recycle Bin?\n");
+        #else
+        String message ("Would you like to move this file to the trash?\n\n");
+        #endif
+        
+        message << file.getFullPathName();
+        if (! AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon, "Delete file", message))
+            return;
+        
+        if (! file.deleteFile()) {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Delete file", "Could not delete");
+        } else {
+            refresh();
+        }
+    }
+    
+    void renameSelectedFile()
+    {
+        const auto file (getSelectedFile());
+        renameWindow.getTextEditor("filename")->setText(getSelectedFile().getFileNameWithoutExtension());
+        renameWindow.setAlwaysOnTop (true);
+        renameWindow.centreAroundComponent (ViewHelpers::findContentComponent(this),
+                                            renameWindow.getWidth(), renameWindow.getHeight());
+        renameWindow.enterModalState (true, ModalCallbackFunction::forComponent (renameFileCallback, this),
+                                      false);
+    }
+    
+    void closeRenameWindow()
+    {
+        if (renameWindow.isCurrentlyModal())
+            renameWindow.exitModalState (0);
+        renameWindow.setVisible (false);
+    }
+    
+    static void renameFileCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleRenameFile (res); }
+    void handleRenameFile (const int result)
+    {
+        const String newBaseName = renameWindow.getTextEditorContents ("filename");
+        
+        if (result == 0)
+        {
+        
+        }
+        else
+        {
+            auto file = getSelectedFile();
+            auto newFile = file.getParentDirectory().getChildFile(newBaseName).withFileExtension(file.getFileExtension());
+            if (file.moveFileTo (newFile))
+            {
+                refresh();
+                tree->setSelectedFile (newFile);
+            }
+            else
+            {
+                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "File rename", "Could not rename this file.");
+            }
+        }
+        
+        closeRenameWindow();
+    }
+    
+    static void fileMenuCallback (const int res, DataPathTreeComponent* t) { if (t) t->handleFileMenu (res); }
+    void handleFileMenu (const int res)
+    {
+        switch (res)
+        {
+            case 0: break;
+            case 1: renameSelectedFile(); break;
+            case 2: deleteSelectedFile(); break;
+        }
+    }
+    
+    
+    void runFileMenu (const File& file)
+    {
+        PopupMenu menu;
+        menu.addItem (1, "Rename");
+        menu.addItem (2, "Delete");
+
+        auto* callback = ModalCallbackFunction::forComponent (fileMenuCallback, this);
+        menu.showMenuAsync (PopupMenu::Options(), callback);
+    }
+};
 
 class NavigationConcertinaPanel : public ConcertinaPanel
 {
 public:
     NavigationConcertinaPanel (Globals& g)
-    : globals (g), headerHeight (30),
+        : globals (g), headerHeight (30),
     defaultPanelHeight (80)
     {
         setLookAndFeel (&lookAndFeel);
@@ -191,7 +347,7 @@ public:
     template<class T> T* findPanel()
     {
         for (int i = getNumPanels(); --i >= 0;)
-            if (auto* panel = dynamic_cast<T*> (getPanel (i)))
+            if (T* panel = dynamic_cast<T*> (getPanel (i)))
                 return panel;
         return nullptr;
     }
@@ -210,6 +366,12 @@ public:
         c = new ElementsNavigationPanel();
         auto *h = new ElementsHeader (*this, *c);
         addPanelInternal (-1, c, "Elements", h);
+        
+       #if EL_USE_DATA_PATH_TREE
+        auto * dp = new DataPathTreeComponent();
+        dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
+        addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
+       #endif
     }
     
     AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
@@ -241,7 +403,8 @@ private:
             comp->setName (name);
         addPanel (index, comps.insert(index, comp), false);
         setPanelHeaderSize (comp, headerHeight);
-        if (!header)
+        
+        if (nullptr == header)
             header = new Header (*this, *comp);
         setCustomPanelHeader (comp, header, true);
     }
@@ -252,8 +415,10 @@ private:
         Header (NavigationConcertinaPanel& _parent, Component& _panel)
         : parent(_parent), panel(_panel)
         {
+            setInterceptsMouseClicks (false, true);
             addAndMakeVisible (text);
             text.setColour (Label::textColourId, ELF::textColor);
+            text.setInterceptsMouseClicks (false, true);
         }
         
         virtual ~Header() { }
@@ -304,6 +469,55 @@ private:
                 }
         
     private:
+        TextButton addButton;
+    };
+    
+    class UserDataPathHeader : public Header,
+                               public ButtonListener
+    {
+    public:
+        UserDataPathHeader (NavigationConcertinaPanel& _parent, DataPathTreeComponent& _panel)
+            : Header (_parent, _panel), tree (_panel)
+        {
+            addAndMakeVisible (addButton);
+            addButton.setButtonText ("+");
+            addButton.addListener (this);
+            addButton.setTriggeredOnMouseDown (true);
+            setInterceptsMouseClicks (false, true);
+        }
+        
+        void resized() override
+        {
+            const int padding = 4;
+            const int buttonSize = getHeight() - (padding * 2);
+            addButton.setBounds (getWidth() - padding - buttonSize,
+                                 padding, buttonSize, buttonSize);
+        }
+        
+        void buttonClicked (Button*) override
+        {
+            PopupMenu menu;
+            menu.addItem (1, "Refresh...");
+            menu.addSeparator();
+            #if JUCE_MAC
+            String name = "Show in Finder";
+            #else
+            String name = "Show in Exlorer"
+            #endif
+            menu.addItem (2, name);
+            const int res = menu.show();
+            if (res == 1)
+            {
+                tree.refresh();
+            }
+            else if (res == 2)
+            {
+                tree.getDirectory().revealToUser();
+            }
+        }
+        
+    private:
+        DataPathTreeComponent& tree;
         TextButton addButton;
     };
     

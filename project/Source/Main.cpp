@@ -38,6 +38,9 @@ public:
     {
         Settings& settings (world.getSettings());
         isFirstRun = !settings.getUserSettings()->getFile().existsAsFile();
+        DataPath path;
+        ignoreUnused (path);
+        
         updateSettingsIfNeeded();
         setupAnalytics();
 

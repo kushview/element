@@ -12,13 +12,16 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
+    // Property Component
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
     
-    setColour (Slider::thumbColourId, Colours::black);
-    setColour (Slider::textBoxTextColourId, LookAndFeel::textColor);
-    setColour (Slider::trackColourId, Colours::red);
+    // Slider
+    setColour (Slider::thumbColourId,               Colours::black);
+    setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
+    setColour (Slider::trackColourId,               Colours::red);
     
+    // Text Editor
     setColour (TextEditor::textColourId,            textColor);
     setColour (TextEditor::highlightColourId,       Colours::yellow);
     setColour (TextEditor::highlightedTextColourId, Colours::black);
@@ -31,10 +34,23 @@ LookAndFeel::LookAndFeel()
     setColour (TextPropertyComponent::backgroundColourId,   findColour (TextEditor::backgroundColourId));
     setColour (TextPropertyComponent::textColourId,         findColour (TextEditor::textColourId));
 
+    // Setting Button
     setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
     setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);
     setColour (SettingButton::textColourId, Colours::black);
     setColour (SettingButton::textDisabledColourId, Colours::darkgrey);
+    
+    // Tree View
+    setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
+    setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
+    
+    // Directory Contents Display
+    setColour (DirectoryContentsDisplayComponent::textColourId, textColor);
+    setColour (DirectoryContentsDisplayComponent::highlightColourId, Colors::elemental.darker (0.6000006f));
+
+    // List Box
+    setColour (ListBox::textColourId, textColor);
+    
 }
 
 
@@ -95,6 +111,13 @@ Rectangle<int> LookAndFeel::getPropertyComponentContentPosition (PropertyCompone
 {
     const auto textW = jmin (200, component.getWidth() / 2);
     return { textW, 0, component.getWidth() - textW, component.getHeight() - 1 };
+}
+
+// MARK: Treeview
+void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float> &area,
+                                            Colour backgroundColour, bool isOpen, bool isMouseOver)
+{
+    LookAndFeel_KV1::drawTreeviewPlusMinusBox (g, area, backgroundColour, isOpen, isMouseOver);
 }
 
 }

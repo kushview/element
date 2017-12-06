@@ -9,7 +9,6 @@ static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 {
     p.setProperty (Tags::format,        pd.pluginFormatName, nullptr);
     p.setProperty (Tags::identifier,    pd.fileOrIdentifier, nullptr);
-    
 #if 0
     p.setProperty (Slugs::name, pd.name, nullptr);
     if (pd.descriptiveName != pd.name)
@@ -35,11 +34,14 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
       metadata (Tags::node)
 {
     parent = nullptr;
-    gain.set(1.0f); lastGain.set(1.0f);
-    inputGain.set(1.0f); lastInputGain.set(1.0f);
+    gain.set(1.0f); lastGain.set (1.0f);
+    inputGain.set(1.0f); lastInputGain.set (1.0f);
     jassert (proc != nullptr);
+    
     PluginDescription desc;
     getPluginDescription (desc);
+    desc.createIdentifierString();
+    
     setNodePropertiesFrom (desc, metadata);
     const String type = (nullptr == dynamic_cast<GraphProcessor*> (processor_)) ? "plugin" : "graph";
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
