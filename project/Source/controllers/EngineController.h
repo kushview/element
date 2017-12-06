@@ -57,6 +57,8 @@ public:
     /** Change root node */
     void setRootNode (const Node&);
     
+    void updateRootGraphMidiChannel (const int index, const int midiChannel);
+    
 private:
     ScopedPointer<RootGraphController> root;
     OwnedArray<RootGraphController> rootGraphs;

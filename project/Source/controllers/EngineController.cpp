@@ -261,6 +261,7 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     if (auto* proc = engine->getGraph (index))
     {
+        proc->setMidiChannel ((int) newRootNode.getProperty (Tags::midiChannel, 0));
         root = new RootGraphController (*proc, getWorld().getPluginManager());
     }
     else
@@ -296,6 +297,13 @@ void EngineController::setRootNode (const Node& newRootNode)
     }
     
     engine->refreshSession();
+}
+void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)
+{
+    auto engine   = getWorld().getAudioEngine();
+    if (auto* g = engine->getGraph (index)) {
+        g->setMidiChannel (midiChannel);
+    }
 }
 
 void EngineController::addMissingIONodes()

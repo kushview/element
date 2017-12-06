@@ -40,7 +40,7 @@ private:
     String graphName = "Device";
     StringArray audioInputNames;
     StringArray audioOutputNames;
-    
+    int midiChannel;
     void updateChannelNames (AudioIODevice* device);
 };
 

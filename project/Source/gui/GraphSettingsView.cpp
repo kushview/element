@@ -1,4 +1,6 @@
 
+#include "controllers/AppController.h"
+#include "controllers/EngineController.h"
 #include "gui/GuiCommon.h"
 #include "gui/GraphSettingsView.h"
 
@@ -185,8 +187,36 @@ namespace Element {
         
         virtual void midiChannelChanged() { }
         
-    private:
+    protected:
         int midiChannel = 0;
+    };
+    
+    class RootGraphMidiChanel : public MidiChannelPropertyComponent
+    {
+    public:
+        RootGraphMidiChanel (const Node& n)
+            : MidiChannelPropertyComponent(),
+              node (n)
+        {
+            jassert (node.isRootGraph());
+            midiChannel = node.getProperty (Tags::midiChannel, 0);
+        }
+        
+        void midiChannelChanged() override
+        {
+            auto session = ViewHelpers::getSession (this);
+            const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
+            node.getValueTree().setProperty (Tags::midiChannel, getMidiChannel(), 0);
+            if (node.isRootGraph())
+            {
+                if (isPositiveAndBelow (index, session->getNumGraphs()))
+                    if (auto* cc = ViewHelpers::findContentComponent (this))
+                        if (auto* ec = cc->getAppController().findChild<EngineController> ())
+                            ec->updateRootGraphMidiChannel (index, getMidiChannel());
+            }
+        }
+        
+        Node node;
     };
     
     class GraphPropertyPanel : public PropertyPanel {
@@ -217,7 +247,8 @@ namespace Element {
                                                   "Name", 256, false));
             #if EL_ROOT_MIDI_CHANNEL
             // props.add (new GraphMidiChannels());
-            props.add (new MidiChannelPropertyComponent ());
+            if (g.isRootGraph())
+                props.add (new RootGraphMidiChanel (g));
             #endif
         }
     };

@@ -154,6 +154,9 @@ public:
     */
     bool removeIllegalConnections();
 
+    /** Set the allowed MIDI channel of this Graph */
+    void setMidiChannel (const int channel) noexcept;
+    
     /** A special number that represents the midi channel of a node.
 
         This is used as a channel index value if you want to refer to the midi input
@@ -319,7 +322,10 @@ private:
     AudioSampleBuffer currentAudioOutputBuffer;
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
-
+    
+    int midiChannel = 0;
+    MidiBuffer filteredMidi;
+    
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();

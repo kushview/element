@@ -966,10 +966,21 @@ bool GraphProcessor::removeIllegalConnections()
     return doneAnything;
 }
 
+void GraphProcessor::setMidiChannel (const int channel) noexcept
+{
+    int newChannel = channel;
+    if (newChannel < 0)     newChannel = 0;
+    if (newChannel > 16)    newChannel = 16;
+    ScopedLock sl (getCallbackLock());
+    if (midiChannel != newChannel)
+        midiChannel = newChannel;
+}
+
 static void deleteRenderOpArray (Array<void*>& ops)
 {
     for (int i = ops.size(); --i >= 0;)
-        delete static_cast<GraphRender::Task*> (ops.getUnchecked(i));
+        delete static_cast<GraphRender::Task*> (ops.getUnchecked (i));
+    ops.clearQuick();
 }
 
 void GraphProcessor::clearRenderingSequence()
@@ -1116,6 +1127,7 @@ void GraphProcessor::reset()
 }
 
 // MARK: Process Graph
+
 void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
     const int32 numSamples = buffer.getNumSamples();
@@ -1123,14 +1135,41 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     currentAudioInputBuffer = &buffer;
     currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
-    currentMidiInputBuffer = &midiMessages;
+    
+    if (midiChannel <= 0)
+    {
+        currentMidiInputBuffer = &midiMessages;
+    }
+    else
+    {
+        filteredMidi.clear();
+        MidiBuffer::Iterator iter (midiMessages);
+        MidiMessage msg; int frame = 0, chan = 0;
+        
+        while (iter.getNextEvent (msg, frame))
+        {
+            chan = msg.getChannel();
+            if (chan == 0 || chan == midiChannel)
+                filteredMidi.addEvent (msg, frame);
+        }
+        
+        currentMidiInputBuffer = &filteredMidi;
+    }
+    
     currentMidiOutputBuffer.clear();
 
+    MidiBuffer::Iterator iter (*currentMidiInputBuffer);
+    MidiMessage msg; int frame = 0, chan = 0;
+    while (iter.getNextEvent (msg, frame))
+        {
+            DBG("filtered chan: " << msg.getChannel());
+        }
+    
     preRenderNodes();
 
     for (int i = 0; i < renderingOps.size(); ++i)
     {
-        GraphRender::Task* const op = static_cast<GraphRender::Task*> (renderingOps.getUnchecked(i));
+        GraphRender::Task* const op = static_cast<GraphRender::Task*> (renderingOps.getUnchecked (i));
         op->perform (renderingBuffers, midiBuffers, numSamples);
     }
 
