@@ -1,4 +1,5 @@
 #include "ElementApp.h"
+#include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "session/Node.h"
@@ -27,12 +28,12 @@ static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 #endif
 }
 
-GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) noexcept
+GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_, const bool takeOwnership) noexcept
     : nodeId (nodeId_),
-      proc (processor_),
       isPrepared (false),
       metadata (Tags::node)
 {
+    proc.set (processor_, takeOwnership);
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
@@ -40,7 +41,6 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
     
     PluginDescription desc;
     getPluginDescription (desc);
-    desc.createIdentifierString();
     
     setNodePropertiesFrom (desc, metadata);
     const String type = (nullptr == dynamic_cast<GraphProcessor*> (processor_)) ? "plugin" : "graph";
@@ -52,6 +52,17 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
     resetPorts();
 }
 
+GraphNode::~GraphNode()
+{
+    proc.clear();
+}
+
+GraphNode* GraphNode::createForRootGraphProcessor (RootGraph* g)
+{
+    auto* node = new GraphNode (0, g, false);
+    return node;
+}
+    
 void GraphNode::setInputGain (const float f) {
     inputGain.set(f);
 }

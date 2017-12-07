@@ -4,9 +4,10 @@
 #include "ElementApp.h"
 
 namespace Element {
-    
+
 class GraphProcessor;
-    
+class RootGraph;
+
 /** Represents one of the nodes, or processors, in an AudioProcessorGraph.
 
     To create a node, call ProcessorGraph::addNode().
@@ -18,6 +19,8 @@ public:
         This is assigned by the graph that owns it, and can't be changed. */
     const uint32 nodeId;
 
+    virtual ~GraphNode();
+    
     /** A set of user-definable properties that are associated with this node.
 
         This can be used to attach values to the node for whatever purpose seems
@@ -26,6 +29,8 @@ public:
     */
     NamedValueSet properties;
 
+    static GraphNode* createForRootGraphProcessor (RootGraph*);
+    
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept { return proc; }
     
@@ -93,10 +98,6 @@ public:
     }
 
     ValueTree getMetadata() const { return metadata; }
-    void setMetadata (const ValueTree& meta, bool copy = false)
-    {
-        metadata = (copy) ? meta.createCopy() : meta;
-    }
 
     bool isAudioIONode() const;
     bool isMidiIONode() const;
@@ -117,9 +118,9 @@ private:
     friend class EngineController;
     friend class Node;
 
-    const ScopedPointer<AudioProcessor> proc;
+    OptionalScopedPointer<AudioProcessor> proc;
     bool isPrepared;
-    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
+    GraphNode (uint32 nodeId, AudioProcessor*, const bool takeOwnership = true) noexcept;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*);
