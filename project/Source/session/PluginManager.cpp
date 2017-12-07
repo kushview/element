@@ -177,17 +177,18 @@ private:
     }
 };
 
+static void pluginScannerSlaveCrashHandler (void*) { /* noop. prevent OS error dialogs from child process */ }
+    
 class PluginScannerSlave : public ChildProcessSlave, public AsyncUpdater
 {
 public:
-    PluginScannerSlave ()
+    PluginScannerSlave()
     {
         scanFile = PluginScanner::getSlavePluginListFile();
+        SystemStats::setApplicationCrashHandler (pluginScannerSlaveCrashHandler);
     }
     
-    ~PluginScannerSlave()
-    {
-    }
+    ~PluginScannerSlave() { }
     
     void handleMessageFromMaster (const MemoryBlock& mb) override
     {

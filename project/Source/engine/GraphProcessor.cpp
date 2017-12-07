@@ -1157,13 +1157,6 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     }
     
     currentMidiOutputBuffer.clear();
-
-    MidiBuffer::Iterator iter (*currentMidiInputBuffer);
-    MidiMessage msg; int frame = 0, chan = 0;
-    while (iter.getNextEvent (msg, frame))
-        {
-            DBG("filtered chan: " << msg.getChannel());
-        }
     
     preRenderNodes();
 
