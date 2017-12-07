@@ -25,8 +25,6 @@ public:
 
     GraphProcessor& getGraph() noexcept { return processor; }
 
-    PluginManager& plugins() { return pluginManager; }
-
     int getNumFilters() const noexcept;
 
     const NodePtr getNode (const int index) const noexcept;

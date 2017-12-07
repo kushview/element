@@ -74,6 +74,7 @@ public:
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
+        graphs.ensureStorageAllocated (32);
     }
 
     ~Private()
@@ -322,13 +323,21 @@ public:
         if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
             midiClock.process (message);
     }
-
+    
+    void updateGraphIndexes()
+    {
+        for (int i = 0 ; i < graphs.size(); ++i)
+            graphs.getUnchecked(i)->engineIndex = i;
+    }
+    
     void addGraph (RootGraph* graph)
     {
+        jassert (graph);
         if (isPrepared)
             prepareGraph (graph, sampleRate, blockSize);
         ScopedLock sl (lock);
         graphs.add (graph);
+        graph->engineIndex = graphs.size() - 1;
     }
     
     void removeGraph (RootGraph* graph)
@@ -336,13 +345,14 @@ public:
         {
             ScopedLock sl (lock);
             jassert (graphs.contains (graph));
-            graphs.removeObject (graph, false);
+            graphs.removeFirstMatchingValue (graph);
+            updateGraphIndexes();
+            if (currentGraph.get() >= graphs.size())
+                engine.setCurrentGraph (graphs.size() - 1);
         }
         
         if (isPrepared)
             graph->releaseResources();
-        
-        deleteAndZero (graph);
     }
     
     void connectSessionValues()
@@ -373,27 +383,25 @@ public:
         if (oldSession == session)
             return;
         
-        OwnedArray<RootGraph> newGraphs;
-        
-        if (session)
-        {
-            const int numGraphs = session->getNumGraphs();
-            while (newGraphs.size() < numGraphs)
-            {
-                auto* graph = newGraphs.add (new RootGraph());
-                if (isPrepared)
-                    prepareGraph (graph, sampleRate, blockSize);
-            }
-            
-            
-        }
-        else
-        {
-            //noop
-        }
-        
-        ScopedLock sl (lock);
-        graphs.swapWith (newGraphs);
+//        OwnedArray<RootGraph> newGraphs;
+//
+//        if (session)
+//        {
+//            const int numGraphs = session->getNumGraphs();
+//            while (newGraphs.size() < numGraphs)
+//            {
+//                auto* graph = newGraphs.add (new RootGraph());
+//                if (isPrepared)
+//                    prepareGraph (graph, sampleRate, blockSize);
+//            }
+//        }
+//        else
+//        {
+//            //noop
+//        }
+//
+//        ScopedLock sl (lock);
+//        graphs.swapWith (newGraphs);
     }
     
     void valueChanged (Value& value) override
@@ -445,15 +453,15 @@ public:
     
 private:
     friend class AudioEngine;
-    AudioEngine&    engine;
-    Transport       transport;
-    OwnedArray<RootGraph> graphs;
-    SessionPtr session;
+    AudioEngine&        engine;
+    Transport           transport;
+    Array<RootGraph*>   graphs;
+    SessionPtr          session;
     
     Value tempoValue;
     Atomic<float> nextTempo;
     
-    CriticalSection lock;
+    CriticalSection     lock;
     double sampleRate   = 0.0;
     int blockSize       = 0;
     bool isPrepared     = false;
@@ -547,7 +555,7 @@ bool AudioEngine::removeGraph (RootGraph* graph)
     priv->removeGraph (graph);
     return true;
 }
-    
+
 RootGraph* AudioEngine::getGraph (const int index)
 {
     ScopedLock sl (priv->lock);

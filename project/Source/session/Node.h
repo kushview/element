@@ -225,6 +225,7 @@ namespace Element {
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
         
+        const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
     private:
         void setMissingProperties();
     };

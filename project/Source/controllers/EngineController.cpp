@@ -12,8 +12,118 @@
 #include "controllers/EngineController.h"
 
 namespace Element {
+    
+struct RootGraphHolder
+{
+    RootGraphHolder (const Node& n, Globals& world)
+        : plugins(world.getPluginManager()), model (n)
+    {
+        jassert (model.isRootGraph());
+    }
+    
+    ~RootGraphHolder()
+    {
+        jassert(! attached());
+        controller = nullptr;
+        model.getValueTree().removeProperty (Tags::object, 0);
+        node = nullptr;
+        model = Node();
+    }
+    
+    bool attached() const { return node && controller; }
+    bool attach (AudioEnginePtr engine)
+    {
+        jassert (engine);
+        if (! engine)
+            return false;
+        
+        if (attached())
+            return true;
+        
+        node = GraphNode::createForRoot (new RootGraph ());
+        
+        if (auto* root = getRootGraph())
+        {
+            if (engine->addGraph (root))
+            {
+                controller = new RootGraphController (*root, plugins);
+                model.getValueTree().setProperty (Tags::object, node.get(), 0);
+            }
+        }
+        
+        return attached();
+    }
+    
+    bool detach (AudioEnginePtr engine)
+    {
+        if (! engine)
+            return false;
+        
+        if (! attached())
+            return true;
+        
+        bool wasRemoved = false;
+        if (auto* g = getRootGraph())
+            wasRemoved = engine->removeGraph (g);
+        
+        if (wasRemoved)
+        {
+            controller = nullptr;
+            model.getValueTree().removeProperty (Tags::object, 0);
+            node = nullptr;
+        }
+        
+        return wasRemoved;
+    }
+    
+    RootGraphController* getController() const { return controller; }
+    RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node->getAudioProcessor() : nullptr); }
+    
+    bool hasController()    const { return nullptr != controller; }
+    
+private:
+    friend class EngineController::RootGraphs;
+    PluginManager&                      plugins;
+    ScopedPointer<RootGraphController>  controller;
+    Node                                model;
+    GraphNodePtr                        node;
+};
 
-EngineController::EngineController() { }
+class EngineController::RootGraphs
+{
+public:
+    RootGraphs (EngineController& e) : owner (e) { }
+    
+    RootGraphHolder* add (RootGraphHolder* item)
+    {
+        jassert (! graphs.contains (item));
+        return graphs.add (item);
+    }
+    
+    void clear()
+    {
+        graphs.clear();
+    }
+    
+    RootGraphHolder* findFor (const Node& node)
+    {
+        for (auto* const n : graphs)
+            if (n->model == node)
+                return n;
+        return 0;
+    }
+    
+    const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
+    
+private:
+    EngineController& owner;
+    OwnedArray<RootGraphHolder> graphs;
+};
+
+EngineController::EngineController()
+{
+    graphs = new RootGraphs (*this);
+}
 
 EngineController::~EngineController()
 {
@@ -22,6 +132,8 @@ EngineController::~EngineController()
         root->removeChangeListener (this);
         root = nullptr;
     }
+    
+    graphs = nullptr;
 }
 
 void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
@@ -163,7 +275,8 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     if (plugs.size() > 0)
         root->addFilter (plugs.getFirst(), rx, ry);
     else
-        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add Plugin", String("Could not add ") + desc.name + " for an unknown reason");
+        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add Plugin",
+                                          String("Could not add ") + desc.name + " for an unknown reason");
 }
 
 void EngineController::removeNode (const uint32 nodeId)
@@ -179,15 +292,13 @@ void EngineController::disconnectNode (const Node& node)
 {
     if (! root)
         return;
-    root->disconnectFilter (node.getNodeId());
+    root->disconnectFilter (node.getNodeId ());
 }
 
 void EngineController::activate()
 {
-    if (root != nullptr)
-        return;
-    
     Controller::activate();
+    root = nullptr;
     
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
@@ -196,11 +307,13 @@ void EngineController::activate()
     auto session (globals.getSession());
     engine->setSession (session);
 
+    graphs->clear();
+    
     if (session->getNumGraphs() > 0)
     {
-        // WIP: better graph node management
-        // GraphNodePtr node = GraphNode::createForRoot (new RootGraph());
-        DBG ("[EL] loading current graph in engine activate");
+        for (int i = 0; i < session->getNumGraphs(); ++i)
+            graphs->add (new RootGraphHolder (session->getGraph (i), globals));
+        
         setRootNode (session->getCurrentGraph());
     }
     
@@ -232,7 +345,8 @@ void EngineController::clear()
 
 void EngineController::setRootNode (const Node& newRootNode)
 {
-    if (! newRootNode.isRootGraph())
+    auto* holder = graphs->findFor (newRootNode);
+    if (! newRootNode.isRootGraph() || holder == nullptr)
     {
         jassertfalse; // needs to be a graph
         return;
@@ -242,47 +356,39 @@ void EngineController::setRootNode (const Node& newRootNode)
     auto session  = getWorld().getSession();
     auto& devices = getWorld().getDeviceManager();
     
-    const int index = session->getValueTree().getChildWithName(Tags::graphs).indexOf (newRootNode.getValueTree ());
+    const int index = holder->getRootGraph()->getEngineIndex();
+    if (! holder->attached())
+        holder->attach (engine);
     
     /* Unload the existing graph if necessary */
-    if (root)
+    if (auto* r = holder->getController())
     {
         if (auto* gui = findSibling<GuiController>())
             gui->closeAllPluginWindows();
-        root->savePluginStates();
-        root->unloadGraph();
-    }
-    
-    /* Ensure enough processors allocated for number of graphs on the session */
-    for (int i = 0; i < session->getNumGraphs(); ++i)
-    {
-        if (nullptr != engine->getGraph (i))
-            continue;
-        engine->addGraph (new RootGraph());
+        r->savePluginStates();
+        r->unloadGraph();
     }
 
-    if (auto* proc = engine->getGraph (index))
+    if (auto* proc = holder->getRootGraph())
     {
         proc->setMidiChannel ((int) newRootNode.getProperty (Tags::midiChannel, 0));
-        root = new RootGraphController (*proc, getWorld().getPluginManager());
     }
     else
     {
         DBG("[EL] couldn't find graph processor for node.");
-        root = nullptr;
     }
     
-    if (root)
+    if (auto* r = holder->getController())
     {
         DBG("[EL] setting root: " << newRootNode.getName());
-        root->setNodeModel (newRootNode);
+        r->setNodeModel (newRootNode);
         if (auto* device = devices.getCurrentAudioDevice())
-            root->getRootGraph().setPlayConfigFor (device);
+            r->getRootGraph().setPlayConfigFor (device);
         
         ValueTree nodes = newRootNode.getNodesValueTree();
         for (int i = nodes.getNumChildren(); --i >= 0;)
         {
-            Node model (nodes.getChild(i), false);
+            Node model (nodes.getChild (i), false);
             GraphNodePtr node = model.getGraphNode();
             if (node && node->isAudioIONode())
                 model.resetPorts();
@@ -300,6 +406,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     engine->refreshSession();
 }
+
 void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)
 {
     auto engine   = getWorld().getAudioEngine();

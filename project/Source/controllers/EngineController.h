@@ -61,8 +61,12 @@ public:
     void updateRootGraphMidiChannel (const int index, const int midiChannel);
     
 private:
+    friend class RootGraphHolder;
+    
     ScopedPointer<RootGraphController> root;
-    OwnedArray<RootGraphController> graphs;
+    
+    class RootGraphs; friend class RootGraphs;
+    ScopedPointer<RootGraphs> graphs;
     
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;

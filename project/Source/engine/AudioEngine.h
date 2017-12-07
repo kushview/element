@@ -34,13 +34,20 @@ public:
     const String getName() const override;
     const String getInputChannelName (int channelIndex) const override;
     const String getOutputChannelName (int channelIndex) const override;
+    
+    /** the index in the audio engine.  if less than 0 then the graph
+        is not attached */
+    int getEngineIndex()    const { return engineIndex; }
 
 private:
+    friend class AudioEngine;
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
     StringArray audioInputNames;
     StringArray audioOutputNames;
     int midiChannel;
+    int engineIndex = -1;
+    
     void updateChannelNames (AudioIODevice* device);
 };
 
