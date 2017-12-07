@@ -28,12 +28,12 @@ static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 #endif
 }
 
-GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_, const bool takeOwnership) noexcept
+GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) noexcept
     : nodeId (nodeId_),
       isPrepared (false),
       metadata (Tags::node)
 {
-    proc.set (processor_, takeOwnership);
+    proc = processor_;
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
@@ -54,12 +54,12 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_, co
 
 GraphNode::~GraphNode()
 {
-    proc.clear();
+    proc = nullptr;
 }
 
-GraphNode* GraphNode::createForRootGraphProcessor (RootGraph* g)
+GraphNode* GraphNode::createForRoot (GraphProcessor* g)
 {
-    auto* node = new GraphNode (0, g, false);
+    auto* node = new GraphNode (0, g);
     return node;
 }
     

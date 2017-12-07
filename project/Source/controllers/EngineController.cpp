@@ -57,7 +57,7 @@ void EngineController::addGraph()
 
 void EngineController::duplicateGraph()
 {
-    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto& world  = getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
@@ -81,7 +81,7 @@ void EngineController::duplicateGraph()
 
 void EngineController::removeGraph (int index)
 {
-    auto& world  = (dynamic_cast<AppController*>(getRoot()))->getWorld();
+    auto& world  = getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
@@ -198,6 +198,8 @@ void EngineController::activate()
 
     if (session->getNumGraphs() > 0)
     {
+        // WIP: better graph node management
+        // GraphNodePtr node = GraphNode::createForRoot (new RootGraph());
         DBG ("[EL] loading current graph in engine activate");
         setRootNode (session->getCurrentGraph());
     }

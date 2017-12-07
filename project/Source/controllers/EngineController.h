@@ -57,11 +57,13 @@ public:
     /** Change root node */
     void setRootNode (const Node&);
     
+    /** Updates the MIDI channel of a root graph by index */
     void updateRootGraphMidiChannel (const int index, const int midiChannel);
     
 private:
     ScopedPointer<RootGraphController> root;
-    OwnedArray<RootGraphController> rootGraphs;
+    OwnedArray<RootGraphController> graphs;
+    
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
     void addMissingIONodes();

@@ -6,7 +6,6 @@
 namespace Element {
 
 class GraphProcessor;
-class RootGraph;
 
 /** Represents one of the nodes, or processors, in an AudioProcessorGraph.
 
@@ -29,7 +28,7 @@ public:
     */
     NamedValueSet properties;
 
-    static GraphNode* createForRootGraphProcessor (RootGraph*);
+    static GraphNode* createForRoot (GraphProcessor*);
     
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept { return proc; }
@@ -118,9 +117,9 @@ private:
     friend class EngineController;
     friend class Node;
 
-    OptionalScopedPointer<AudioProcessor> proc;
+    ScopedPointer<AudioProcessor> proc;
     bool isPrepared;
-    GraphNode (uint32 nodeId, AudioProcessor*, const bool takeOwnership = true) noexcept;
+    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*);
