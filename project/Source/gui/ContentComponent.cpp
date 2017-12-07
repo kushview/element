@@ -473,9 +473,7 @@ public:
 private:
     ContentComponent& owner;
 };
-    
-    
-    
+
 static ContentView* createLastContentView (Settings& settings)
 {
     auto* props = settings.getUserSettings();

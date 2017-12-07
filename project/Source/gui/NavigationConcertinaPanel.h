@@ -11,24 +11,21 @@ namespace Element {
 class ElementsNavigationPanel : public SessionGraphsListBox
 {
 public:
-    ElementsNavigationPanel() {
-        
-    }
+    ElementsNavigationPanel() { }
+    
     bool keyPressed(const KeyPress& kp) override
     {
         // Allows menu command to pass through, maybe a better way
         // to do this.
         if (kp.getKeyCode() == KeyPress::backspaceKey)
             return Component::keyPressed (kp);
-            return ListBox::keyPressed (kp);
+        return ListBox::keyPressed (kp);
     }
     
     void paintListBoxItem (int, Graphics&, int, int, bool) override { }
     
     void listBoxItemClicked (int row, const MouseEvent& ev) override
     {
-        if (ev.mods.isPopupMenu())
-            return;
         const Node graph (getSelectedGraph());
         
         if (auto* cc = ViewHelpers::findContentComponent (this))
@@ -40,8 +37,8 @@ public:
                 graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
                 if (auto* ec = cc->getAppController().findChild<EngineController>())
                     ec->setRootNode (graph);
-                    cc->stabilize();
-                    }
+                cc->stabilize();
+            }
         }
     }
     
@@ -91,7 +88,29 @@ public:
             {
                 owner.selectRow (row);
                 
-                if (ev.getNumberOfClicks() == 2)
+                if (ev.mods.isPopupMenu() && !text.isBeingEdited())
+                {
+                    owner.listBoxItemClicked (row, ev);
+
+                    PopupMenu menu;
+                    menu.addItem (2, "Rename");
+                    menu.addItem (3, "Delete");
+                    menu.addSeparator();
+                    menu.addItem (4, "Edit...");
+                    menu.addItem (5, "Settings...");
+                    
+                    const auto res = menu.show();
+                    
+                    switch (res)
+                    {
+                        case 0: break;
+                        case 2: text.showEditor(); break;
+                        case 3: ViewHelpers::invokeDirectly (this, Commands::sessionDeleteGraph, true); break;
+                        case 4: ViewHelpers::invokeDirectly (this, Commands::showGraphEditor, true); break;
+                        case 5: ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, true); break;
+                    }
+                }
+                else if (ev.getNumberOfClicks() == 2)
                 {
                     if (! text.isBeingEdited())
                     {
@@ -322,7 +341,7 @@ class NavigationConcertinaPanel : public ConcertinaPanel
 public:
     NavigationConcertinaPanel (Globals& g)
         : globals (g), headerHeight (30),
-    defaultPanelHeight (80)
+          defaultPanelHeight (80)
     {
         setLookAndFeel (&lookAndFeel);
         updateContent();
