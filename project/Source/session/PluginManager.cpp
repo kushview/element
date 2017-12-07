@@ -16,7 +16,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       60000  // 60 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       12000  // 60 Seconds
 
 namespace Element {
 
@@ -27,8 +27,8 @@ public:
     explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
     ~PluginScannerMaster()
     {
-        String m ("quit");
-        sendMessageToSlave (MemoryBlock (m.toRawUTF8(), m.length()));
+        const char* quitMessage = "quit";
+        sendMessageToSlave (MemoryBlock (quitMessage, 4));
     }
     
     bool startScanning (const StringArray& names = StringArray())
@@ -38,7 +38,7 @@ public:
         
         {
             ScopedLock sl (lock);
-            slaveState  = String();
+            slaveState  = "waiting";
             running     = false;
             formatNames = names;
         }
@@ -98,37 +98,41 @@ public:
     
     void handleAsyncUpdate() override
     {
-        if (slaveState == "ready" && isRunning())
+        const auto state = getSlaveState();
+        if (state == "ready" && isRunning())
         {
             String msg = "scan:"; msg << formatNames.joinIntoString(",");
             MemoryBlock mb (msg.toRawUTF8(), msg.length());
             sendMessageToSlave (mb);
         }
-        else if (slaveState == "scanning")
+        else if (state == "scanning")
         {
             if (! isRunning())
             {
                 DBG("[EL] a plugin crashed or timed out during scan");
-                if (ScopedPointer<XmlElement> xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
-                    owner.list.recreateFromXml (*xml);
-
-                const bool res = launchScanner();
-                ScopedLock sl (lock);
-                running = res;
+                updateListAndLaunchSlave();
             }
             else
             {
                 DBG("[EL] scanning... and running....");
             }
         }
-        else if (slaveState == "finished")
+        else if (state == "finished")
         {
             DBG("[EL] slave finished scanning");
             owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
         }
+        else if (state == "waiting")
+        {
+            if (! isRunning())
+            {
+                DBG("[EL] waiting for plugin scanner");
+                updateListAndLaunchSlave();
+            }
+        }
         else
         {
-            DBG("[EL] invalid slave state: " << slaveState);
+            DBG("[EL] invalid slave state: " << state);
         }
     }
     
@@ -162,6 +166,16 @@ private:
     
     String pluginBeingScanned;
 
+    void updateListAndLaunchSlave()
+    {
+        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
+            owner.list.recreateFromXml (*xml);
+        
+        const bool res = launchScanner();
+        ScopedLock sl (lock);
+        running = res;
+    }
+    
     void resetScannerVariables()
     {
         ScopedLock sl (lock);
