@@ -103,6 +103,8 @@ namespace Element {
           */
         void closePluginWindow (PluginWindow*);
         
+        Element::LookAndFeel& getLookAndFeel() { return lookAndFeel; }
+        
     private:
         AppController& controller;
         Globals& world;

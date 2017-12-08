@@ -489,8 +489,6 @@ void EngineController::setRootNode (const Node& newRootNode)
     {
         jassertfalse; // you should have a root graph registered before calling this.
         holder = graphs->add (new RootGraphHolder (newRootNode, getWorld()));
-        if (holder != nullptr)
-            holder->attach(getWorld().getAudioEngine());
     }
     
     if (! holder)
@@ -503,10 +501,10 @@ void EngineController::setRootNode (const Node& newRootNode)
     auto session  = getWorld().getSession();
     auto& devices = getWorld().getDeviceManager();
     
-    const int index = holder->getRootGraph()->getEngineIndex();
     if (! holder->attached())
         holder->attach (engine);
-    
+    const int index = holder->getRootGraph()->getEngineIndex();
+
     /* Unload the existing graph if necessary */
     if (auto* r = holder->getController())
     {

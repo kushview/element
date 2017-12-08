@@ -281,6 +281,7 @@
       </GROUP>
       <FILE id="lFdHY3" name="Commands.cpp" compile="1" resource="0" file="Source/Commands.cpp"/>
       <FILE id="aH8YyX" name="Commands.h" compile="0" resource="0" file="Source/Commands.h"/>
+      <FILE id="Kkwkaz" name="CommonConfig.h" compile="0" resource="0" file="Source/CommonConfig.h"/>
       <FILE id="K6661n" name="DataPath.cpp" compile="1" resource="0" file="Source/DataPath.cpp"/>
       <FILE id="AAnMXa" name="DataPath.h" compile="0" resource="0" file="Source/DataPath.h"/>
       <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="Source/ElementApp.h"/>

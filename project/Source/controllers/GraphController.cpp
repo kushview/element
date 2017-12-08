@@ -278,6 +278,7 @@ void GraphController::savePluginStates()
 void GraphController::clear()
 {
     processor.clear();
+    
     if (graph.isValid())
     {
         graph.removeChild (arcs, nullptr);
@@ -287,6 +288,7 @@ void GraphController::clear()
         graph.addChild (nodes, -1, nullptr);
         graph.addChild (arcs, -1, nullptr);
     }
+    
     changed();
 }
 

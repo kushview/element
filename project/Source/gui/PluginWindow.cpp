@@ -144,6 +144,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
       gui (g), owner (n.getGraphNode()), node (n)
 {
+    setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);
     setSize (400, 300);
     setContentOwned (new PluginWindowContent (ui, node), true);
