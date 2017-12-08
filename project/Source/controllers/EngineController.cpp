@@ -17,9 +17,7 @@ struct RootGraphHolder
 {
     RootGraphHolder (const Node& n, Globals& world)
         : plugins(world.getPluginManager()), model (n)
-    {
-        jassert (model.isRootGraph());
-    }
+    { }
     
     ~RootGraphHolder()
     {
@@ -156,6 +154,7 @@ public:
     
     void clear()
     {
+        detachAll();
         graphs.clear();
     }
     
@@ -203,6 +202,12 @@ public:
     void remove (RootGraphHolder* g)
     {
         graphs.removeObject (g, true);
+    }
+    
+    void savePluginStates()
+    {
+        for (auto* h : graphs)
+            h->model.savePluginState();
     }
     
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
@@ -259,10 +264,10 @@ void EngineController::addGraph()
     {
         err = "Could not create new graph.";
     }
-        
+    
     if (err.isNotEmpty())
     {
-        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Elements", err);
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Audio Engine", err);
     }
     
     findSibling<GuiController>()->stabilizeContent();
@@ -274,19 +279,28 @@ void EngineController::duplicateGraph()
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
-    ScopedPointer<RootGraph> newGraph = new RootGraph();
-    if (engine->addGraph (newGraph.get()))
+    String err;
+    const Node current (session->getCurrentGraph());
+    Node node (current.getValueTree().createCopy());
+    node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
+    if (auto* holder = graphs->add (new RootGraphHolder (node, getWorld())))
     {
-        newGraph.release();
-        Node node (session->getCurrentGraph().getValueTree().createCopy());
-        node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
-        session->addGraph (node, true);
-        setRootNode (node);
+        if (holder->attach (engine))
+        {
+            session->addGraph (node, true);
+            setRootNode (node);
+            holder->addMissingIONodes();
+        }
+        else
+        {
+            err = "Could not attach new graph to engine.";
+        }
     }
-    else
+    
+    if (err.isNotEmpty())
     {
         AlertWindow::showMessageBoxAsync (
-            AlertWindow::InfoIcon, "Elements", "Could not duplicate graph.");
+            AlertWindow::InfoIcon, "Audio Engine", "Could not duplicate graph: " + current.getName());
     }
     
     findSibling<GuiController>()->stabilizeContent();
@@ -297,6 +311,9 @@ void EngineController::removeGraph (int index)
     auto& world  = getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
+    
+    if (index < 0)
+        index = session->getActiveGraphIndex();
     
     if (auto* holder = graphs->findByEngineIndex (index))
     {
@@ -316,6 +333,22 @@ void EngineController::removeGraph (int index)
         {
             graphs->remove (holder);
             DBG("[EL] graph removed");
+            ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
+            
+            if (index < 0 || index >= session->getNumGraphs())
+                index = session->getNumGraphs() - 1;
+            
+            if (isPositiveAndBelow (index, session->getNumGraphs()))
+            {
+                sgraphs.setProperty (Tags::active, index, 0);
+                setRootNode (session->getActiveGraph ());
+            }
+            else if (session->getNumGraphs() > 0)
+            {
+                DBG("[EL] failed to find appropriate index.");
+                sgraphs.setProperty (Tags::active, 0, 0);
+                setRootNode (session->getActiveGraph ());
+            }
         }
     }
     else
@@ -412,16 +445,7 @@ void EngineController::activate()
     auto session (globals.getSession());
     engine->setSession (session);
 
-    graphs->clear();
-    
-    if (session->getNumGraphs() > 0)
-    {
-        for (int i = 0; i < session->getNumGraphs(); ++i)
-            if (auto* holder = graphs->add (new RootGraphHolder (session->getGraph (i), globals)))
-                holder->attach (engine);
-        
-        setRootNode (session->getCurrentGraph());
-    }
+    sessionReloaded();
     
     engine->activate();
     devices.addChangeListener (this);
@@ -433,10 +457,10 @@ void EngineController::deactivate()
     auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
+    graphs->savePluginStates();
+    graphs->detachAll();
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
-    // TODO: save plugin states here
-    jassertfalse;
 }
 
 void EngineController::clear()
@@ -447,13 +471,27 @@ void EngineController::clear()
 
 void EngineController::setRootNode (const Node& newRootNode)
 {
-    auto* holder = graphs->findFor (newRootNode);
-    if (! newRootNode.isRootGraph() || holder == nullptr)
+    if (! newRootNode.isRootGraph())
     {
         jassertfalse; // needs to be a graph
         return;
     }
-
+    
+    auto* holder = graphs->findFor (newRootNode);
+    if (! holder)
+    {
+        jassertfalse; // you should have a root graph registered before calling this.
+        holder = graphs->add (new RootGraphHolder (newRootNode, getWorld()));
+        if (holder != nullptr)
+            holder->attach(getWorld().getAudioEngine());
+    }
+    
+    if (! holder)
+    {
+        DBG("[EL] failed to find root graph for node: " << newRootNode.getName());
+        return;
+    }
+    
     auto engine   = getWorld().getAudioEngine();
     auto session  = getWorld().getSession();
     auto& devices = getWorld().getDeviceManager();
@@ -562,4 +600,19 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     }
 }
 
+void EngineController::sessionReloaded()
+{
+    graphs->clear();
+    auto session = getWorld().getSession();
+    auto engine  = getWorld().getAudioEngine();
+    if (session->getNumGraphs() > 0)
+    {
+        for (int i = 0; i < session->getNumGraphs(); ++i)
+            if (auto* holder = graphs->add (new RootGraphHolder (session->getGraph (i), getWorld())))
+                holder->attach (engine);
+        
+        setRootNode (session->getCurrentGraph());
+    }
+}
+    
 }

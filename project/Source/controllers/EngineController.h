@@ -60,6 +60,9 @@ public:
     /** Updates the MIDI channel of a root graph by index */
     void updateRootGraphMidiChannel (const int index, const int midiChannel);
     
+    /** called when the session loads or re-loads */
+    void sessionReloaded();
+    
 private:
     friend class RootGraphHolder;
     class RootGraphs; friend class RootGraphs;

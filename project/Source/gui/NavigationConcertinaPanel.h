@@ -13,7 +13,7 @@ class ElementsNavigationPanel : public SessionGraphsListBox
 public:
     ElementsNavigationPanel() { }
     
-    bool keyPressed(const KeyPress& kp) override
+    bool keyPressed (const KeyPress& kp) override
     {
         // Allows menu command to pass through, maybe a better way
         // to do this.
@@ -34,7 +34,7 @@ public:
             if (row != session->getActiveGraphIndex())
             {
                 auto graphs = graph.getValueTree().getParent();
-                graphs.setProperty ("active", graphs.indexOf(graph.node()), nullptr);
+                graphs.setProperty (Tags::active, graphs.indexOf(graph.node()), nullptr);
                 if (auto* ec = cc->getAppController().findChild<EngineController>())
                     ec->setRootNode (graph);
                 cc->stabilize();
@@ -52,8 +52,8 @@ public:
         
     private:
         class Row : public Component,
-                            public Label::Listener,
-                        public ButtonListener
+                    public Label::Listener,
+                    public ButtonListener
         {
         public:
             Row (ElementsNavigationPanel& _owner) : owner (_owner)
@@ -94,6 +94,7 @@ public:
 
                     PopupMenu menu;
                     menu.addItem (2, "Rename");
+                    menu.addItem (6, "Duplicate");
                     menu.addItem (3, "Delete");
                     menu.addSeparator();
                     menu.addItem (4, "Edit...");
@@ -108,6 +109,7 @@ public:
                         case 3: ViewHelpers::invokeDirectly (this, Commands::sessionDeleteGraph, true); break;
                         case 4: ViewHelpers::invokeDirectly (this, Commands::showGraphEditor, true); break;
                         case 5: ViewHelpers::invokeDirectly (this, Commands::showGraphConfig, true); break;
+                        case 6: ViewHelpers::invokeDirectly (this, Commands::sessionDuplicateGraph, true); break;
                     }
                 }
                 else if (ev.getNumberOfClicks() == 2)
@@ -537,7 +539,13 @@ private:
             }
             else if (res == 2)
             {
-                tree.getDirectory().revealToUser();
+                File file = tree.getSelectedFile();
+                if (! file.exists())
+                    file = file.getParentDirectory();
+                if (! file.exists())
+                    file = tree.getDirectory();
+                if (file.exists())
+                    file.revealToUser();
             }
         }
         

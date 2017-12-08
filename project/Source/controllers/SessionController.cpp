@@ -46,7 +46,7 @@ void SessionController::openFile (const File& file)
             DBG("[EL] add graph to session: " << model.getName());
             if (currentSession->addGraph (node, true))
                 if (auto* ec = findSibling<EngineController>())
-                    ec->setRootNode (model);
+                    ec->sessionReloaded();
         }
     }
     else if (file.hasFileExtension ("els"))
@@ -57,10 +57,7 @@ void SessionController::openFile (const File& file)
         {
             currentSession->freezeChangeNotification = true;
             if (auto* ec = findSibling<EngineController>())
-            {
-                ec->setRootNode (currentSession->getCurrentGraph());
-                getWorld().getAudioEngine()->refreshSession();
-            }
+                ec->sessionReloaded();
             currentSession->freezeChangeNotification = false;
         }
     }

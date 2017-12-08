@@ -374,34 +374,8 @@ public:
     
     void setSession (SessionPtr s)
     {
-        auto oldSession = session;
         session = s;
         connectSessionValues();
-        
-        // If it's the same object, then don't replace graphs
-        // FIXME: need better management of root graphs
-        if (oldSession == session)
-            return;
-        
-//        OwnedArray<RootGraph> newGraphs;
-//
-//        if (session)
-//        {
-//            const int numGraphs = session->getNumGraphs();
-//            while (newGraphs.size() < numGraphs)
-//            {
-//                auto* graph = newGraphs.add (new RootGraph());
-//                if (isPrepared)
-//                    prepareGraph (graph, sampleRate, blockSize);
-//            }
-//        }
-//        else
-//        {
-//            //noop
-//        }
-//
-//        ScopedLock sl (lock);
-//        graphs.swapWith (newGraphs);
     }
     
     void valueChanged (Value& value) override
@@ -428,7 +402,7 @@ public:
         }
     }
     
-    void resetMidiClock ()
+    void resetMidiClock()
     {
         midiClock.reset (sampleRate, blockSize);
     }

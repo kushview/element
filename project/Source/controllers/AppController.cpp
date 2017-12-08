@@ -57,7 +57,6 @@ void AppController::run()
     activate();
     auto session = getWorld().getSession();
 
-    
     if (auto* gui = findChild<GuiController>())
         gui->run();
     
@@ -68,16 +67,17 @@ void AppController::run()
             sc->openFile (File (lastSession));
     }
     
+    if (auto* ec = findChild<EngineController> ())
+    {
+        ec->sessionReloaded();
+    }
+    
     if (auto* gui = findChild<GuiController>())
     {
         const Node graph (session->getCurrentGraph());
         gui->stabilizeContent();
         if (graph.isValid())
-        {
-            for (int i = graph.getNumNodes(); --i >= 0;)
-                if ((bool) graph.getNode(i).getProperty ("windowVisible", false))
-                    gui->presentPluginWindow (graph.getNode (i));
-        }
+            gui->showPluginWindowsFor (graph);
     }
     
     if (auto* sc = findChild<SessionController>())
