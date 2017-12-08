@@ -62,9 +62,6 @@ public:
     
 private:
     friend class RootGraphHolder;
-    
-    ScopedPointer<RootGraphController> root;
-    
     class RootGraphs; friend class RootGraphs;
     ScopedPointer<RootGraphs> graphs;
     

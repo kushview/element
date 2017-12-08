@@ -81,7 +81,60 @@ struct RootGraphHolder
     
     bool hasController()    const { return nullptr != controller; }
     
+    void addMissingIONodes()
+    {
+        auto* root = getController();
+        if (! root) return;
+        GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+        for (int i = 0; i < root->getNumFilters(); ++i)
+        {
+            GraphNodePtr node = root->getNode (i);
+            if (node->isMidiIONode() || node->isAudioIONode())
+            {
+                auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
+                ioNodes [proc->getType()] = node;
+            }
+        }
+        
+        for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
+        {
+            if (nullptr != ioNodes [t])
+                continue;
+            
+            PluginDescription desc;
+            desc.pluginFormatName = "Internal";
+            double rx = 0.5f, ry = 0.5f;
+            switch (t)
+            {
+                case IOProcessor::audioInputNode:
+                    desc.fileOrIdentifier = "audio.input";
+                    rx = .25;
+                    ry = .25;
+                    break;
+                case IOProcessor::audioOutputNode:
+                    desc.fileOrIdentifier = "audio.output";
+                    rx = .25;
+                    ry = .75;
+                    break;
+                case IOProcessor::midiInputNode:
+                    desc.fileOrIdentifier = "midi.input";
+                    rx = .75;
+                    ry = .25;
+                    break;
+                case IOProcessor::midiOutputNode:
+                    desc.fileOrIdentifier = "midi.output";
+                    rx = .75;
+                    ry = .75;
+                    break;
+            }
+            
+            auto nodeId = root->addFilter (&desc, rx, ry);
+            ioNodes[t] = root->getNodeForId (nodeId);
+            jassert(ioNodes[t] != nullptr);
+        }
+    }
 private:
+    friend class EngineController;
     friend class EngineController::RootGraphs;
     PluginManager&                      plugins;
     ScopedPointer<RootGraphController>  controller;
@@ -93,6 +146,7 @@ class EngineController::RootGraphs
 {
 public:
     RootGraphs (EngineController& e) : owner (e) { }
+    ~RootGraphs() { }
     
     RootGraphHolder* add (RootGraphHolder* item)
     {
@@ -105,7 +159,17 @@ public:
         graphs.clear();
     }
     
-    RootGraphHolder* findFor (const Node& node)
+    RootGraphHolder* findByEngineIndex (const int index) const
+    {
+        if (index >= 0)
+            for (auto* const n : graphs)
+                if (auto* p = n->getRootGraph())
+                    if (p->getEngineIndex() == index)
+                        return n;
+        return 0;
+    }
+    
+    RootGraphHolder* findFor (const Node& node) const
     {
         for (auto* const n : graphs)
             if (n->model == node)
@@ -113,33 +177,60 @@ public:
         return 0;
     }
     
+    RootGraphController* findActiveRootGraphController() const
+    {
+        if (auto session = owner.getWorld().getSession())
+            if (auto* h = findFor (session->getActiveGraph()))
+                return h->controller.get();
+        return 0;
+    }
+    
+    void attachAll()
+    {
+        engine = owner.getWorld().getAudioEngine();
+        for (auto* g : graphs)
+            g->attach (engine);
+    }
+    
+    void detachAll()
+    {
+        engine = owner.getWorld().getAudioEngine();
+        for (auto* g : graphs)
+            g->detach (engine);
+    }
+    
+    // remove the holder, this will also delete it!
+    void remove (RootGraphHolder* g)
+    {
+        graphs.removeObject (g, true);
+    }
+    
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
     
 private:
     EngineController& owner;
+    SessionPtr session;
+    EnginePtr  engine;
     OwnedArray<RootGraphHolder> graphs;
 };
 
 EngineController::EngineController()
+    : AppController::Child()
 {
     graphs = new RootGraphs (*this);
 }
 
 EngineController::~EngineController()
 {
-    if (root)
-    {
-        root->removeChangeListener (this);
-        root = nullptr;
-    }
-    
     graphs = nullptr;
 }
 
 void EngineController::addConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    if (root)
-        root->addConnection (s, sp, d, dp);
+    if (auto session = getWorld().getSession())
+        if (auto *h = graphs->findFor (session->getCurrentGraph()))
+            if (auto* c = h->getController())
+                c->addConnection (s, sp, d, dp);
 }
 
 void EngineController::addGraph()
@@ -148,20 +239,30 @@ void EngineController::addGraph()
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
-    ScopedPointer<RootGraph> newGraph = new RootGraph();
-    if (engine->addGraph (newGraph.get()))
+    String err;
+    Node node (Tags::graph);
+    node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
+    if (auto* holder = graphs->add (new RootGraphHolder (node, getWorld())))
     {
-        Node node (Tags::graph);
-        node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
-        session->addGraph (node, true);
-        setRootNode (node);
-        addMissingIONodes();
-        newGraph.release();
+        if (holder->attach (engine))
+        {
+            session->addGraph (node, true);
+            setRootNode (node);
+            holder->addMissingIONodes();
+        }
+        else
+        {
+            err = "Could not attach new graph to engine.";
+        }
     }
     else
     {
-        AlertWindow::showMessageBoxAsync (
-            AlertWindow::InfoIcon, "Elements", "Could not add new graph to session.");
+        err = "Could not create new graph.";
+    }
+        
+    if (err.isNotEmpty())
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Elements", err);
     }
     
     findSibling<GuiController>()->stabilizeContent();
@@ -197,54 +298,56 @@ void EngineController::removeGraph (int index)
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
-    Node node;
-    if (isPositiveAndBelow (index, session->getNumGraphs()))
-        node = session->getGraph (index);
-    else
-        node = session->getCurrentGraph();
-    
-    ValueTree graphs = session->getValueTree().getChildWithName (Tags::graphs);
-    index = graphs.indexOf (node.getValueTree());
-    graphs.removeChild (index, nullptr);
-    
-    if (auto* g = engine->getGraph (index))
+    if (auto* holder = graphs->findByEngineIndex (index))
     {
-        jassert (g == &root->getGraph());
-        root = nullptr;
-        engine->removeGraph (g);
+        bool removeIt = false;
+        if (holder->detach (engine))
+        {
+            ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
+            sgraphs.removeChild (holder->model.getValueTree(), nullptr);
+            removeIt = true;
+        }
+        else
+        {
+            DBG("[EL] could not detach root graph");
+        }
+        
+        if (removeIt)
+        {
+            graphs->remove (holder);
+            DBG("[EL] graph removed");
+        }
     }
-    
-    index = jmin (index, graphs.getNumChildren() - 1);
-    graphs.setProperty (Tags::active, index, nullptr);
-    node = session->getCurrentGraph();
-    if (node.isValid())
-        setRootNode (node);
-    else if (root && session->getNumGraphs() <= 0)
-        root->clear();
+    else
+    {
+        DBG("[EL] could not find root graph index: " << index);
+    }
     
     findSibling<GuiController>()->stabilizeContent();
 }
 
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
 {
-    jassert (root);
-    auto src = root->getNodeForId (s);
-    auto dst = root->getNodeForId (d);
-    if (!src || !dst)
-        return;
-    addConnection (src->nodeId, src->getPortForChannel (PortType::Audio, sc, false),
-                   dst->nodeId, dst->getPortForChannel (PortType::Audio, dc, true));
+    if (auto* root = graphs->findActiveRootGraphController ())
+    {
+        auto src = root->getNodeForId (s);
+        auto dst = root->getNodeForId (d);
+        if (!src || !dst)
+            return;
+        addConnection (src->nodeId, src->getPortForChannel (PortType::Audio, sc, false),
+                       dst->nodeId, dst->getPortForChannel (PortType::Audio, dc, true));
+    }
 }
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    if (! root)
-        return;
-    root->removeConnection (s, sp, d, dp);
+    if (auto* root = graphs->findActiveRootGraphController())
+        root->removeConnection (s, sp, d, dp);
 }
 
 void EngineController::addNode (const Node& node)
 {
+    auto* root = graphs->findActiveRootGraphController();
     if (root && KV_INVALID_NODE == root->addNode (node))
     {
         AlertWindow::showMessageBox (AlertWindow::InfoIcon,
@@ -254,6 +357,7 @@ void EngineController::addNode (const Node& node)
 
 void EngineController::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
 {
+    auto* root = graphs->findActiveRootGraphController();
     if (! root)
         return;
     
@@ -281,6 +385,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
 
 void EngineController::removeNode (const uint32 nodeId)
 {
+    auto* root = graphs->findActiveRootGraphController();
     if (! root)
         return;
     if (auto* gui = findSibling<GuiController>())
@@ -290,6 +395,7 @@ void EngineController::removeNode (const uint32 nodeId)
 
 void EngineController::disconnectNode (const Node& node)
 {
+    auto* root = graphs->findActiveRootGraphController();
     if (! root)
         return;
     root->disconnectFilter (node.getNodeId ());
@@ -298,7 +404,6 @@ void EngineController::disconnectNode (const Node& node)
 void EngineController::activate()
 {
     Controller::activate();
-    root = nullptr;
     
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& globals (app->getWorld());
@@ -312,7 +417,8 @@ void EngineController::activate()
     if (session->getNumGraphs() > 0)
     {
         for (int i = 0; i < session->getNumGraphs(); ++i)
-            graphs->add (new RootGraphHolder (session->getGraph (i), globals));
+            if (auto* holder = graphs->add (new RootGraphHolder (session->getGraph (i), globals)))
+                holder->attach (engine);
         
         setRootNode (session->getCurrentGraph());
     }
@@ -329,17 +435,13 @@ void EngineController::deactivate()
     auto engine   (globals.getAudioEngine());
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
-    if (root)
-    {
-        root->removeChangeListener (this);
-        root->savePluginStates();
-        root = nullptr;
-    }
+    // TODO: save plugin states here
+    jassertfalse;
 }
 
 void EngineController::clear()
 {
-    if (root)
+    if (auto* root = graphs->findActiveRootGraphController())
         root->clear();
 }
 
@@ -417,53 +519,9 @@ void EngineController::updateRootGraphMidiChannel (const int index, const int mi
 
 void EngineController::addMissingIONodes()
 {
-    GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
-    for (int i = 0; i < root->getNumFilters(); ++i)
-    {
-        GraphNodePtr node = root->getNode (i);
-        if (node->isMidiIONode() || node->isAudioIONode())
-        {
-            auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
-            ioNodes [proc->getType()] = node;
-        }
-    }
-    
-    for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
-    {
-        if (nullptr != ioNodes [t])
-            continue;
-        
-        PluginDescription desc;
-        desc.pluginFormatName = "Internal";
-        double rx = 0.5f, ry = 0.5f;
-        switch (t)
-        {
-            case IOProcessor::audioInputNode:
-                desc.fileOrIdentifier = "audio.input";
-                rx = .25;
-                ry = .25;
-                break;
-            case IOProcessor::audioOutputNode:
-                desc.fileOrIdentifier = "audio.output";
-                rx = .25;
-                ry = .75;
-                break;
-            case IOProcessor::midiInputNode:
-                desc.fileOrIdentifier = "midi.input";
-                rx = .75;
-                ry = .25;
-                break;
-            case IOProcessor::midiOutputNode:
-                desc.fileOrIdentifier = "midi.output";
-                rx = .75;
-                ry = .75;
-                break;
-        }
-        
-        auto nodeId = root->addFilter (&desc, rx, ry);
-        ioNodes[t] = root->getNodeForId (nodeId);
-        jassert(ioNodes[t] != nullptr);
-    }
+    if (auto session = getWorld().getSession())
+        if (auto* h = graphs->findFor (session->getActiveGraph()))
+            h->addMissingIONodes();
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
@@ -472,7 +530,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     auto* app = dynamic_cast<AppController*> (getRoot());
     auto& devices (app->getWorld().getDeviceManager());
    
-    
+    auto* root = graphs->findActiveRootGraphController();
     if (cb == (ChangeBroadcaster*) &devices && root != nullptr)
     {
         auto& processor (root->getRootGraph());
