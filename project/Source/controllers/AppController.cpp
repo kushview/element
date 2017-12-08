@@ -33,6 +33,8 @@ Globals& AppController::Child::getWorld()
 AppController::AppController (Globals& g)
     : world (g)
 {
+    lastExportedGraph = DataPath::defaultGraphDir();
+    
     addChild (new GuiController (g, *this));
     addChild (new EngineController ());
     addChild (new SessionController ());
@@ -259,7 +261,7 @@ bool AppController::perform (const InvocationInfo& info)
         {
             if (world.getUnlockStatus().isFullVersion())
             {
-                FileChooser chooser ("Import Graph", lastSavedFile, "*.elg");
+                FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToOpen())
                     findChild<SessionController>()->importGraph (chooser.getResult());
             }
@@ -272,15 +274,23 @@ bool AppController::perform (const InvocationInfo& info)
             
         case Commands::exportGraph:
         {
+            auto session = getWorld().getSession();
+            const auto node = session->getCurrentGraph();
+            if (!lastExportedGraph.isDirectory())
+                lastExportedGraph = lastExportedGraph.getParentDirectory();
+            if (lastExportedGraph.isDirectory())
+            {
+                lastExportedGraph = lastExportedGraph.getChildFile(node.getName()).withFileExtension ("elg");
+                lastExportedGraph = lastExportedGraph.getNonexistentSibling();
+            }
             if (world.getUnlockStatus().isFullVersion())
             {
-                FileChooser chooser ("Export Graph", lastSavedFile, "*.elg");
+                FileChooser chooser ("Export Graph", lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToSave (true))
                     findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
                                                                  chooser.getResult());
                 if (auto* gui = findChild<GuiController>())
-                        if (auto* cc = gui->getContentComponent())
-                            cc->stabilize (true);
+                    gui->stabilizeContent();
             }
             else
             {

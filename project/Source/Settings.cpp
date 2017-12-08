@@ -7,10 +7,10 @@
 
 namespace Element {
 
-
 const char* Settings::checkForUpdatesKey        = "checkForUpdates";
 const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
+const char* Settings::showPluginWindowsKey      = "showPluginWindows";
 
 #if JUCE_32BIT
  #if JUCE_MAC
@@ -110,6 +110,21 @@ void Settings::setScanForPluginsOnStartup (const bool shouldScan)
         return;
     if (auto* p = getProps())
         p->setValue (scanForPluginsOnStartKey, shouldScan);
+}
+
+bool Settings::showPluginWindowsWhenAdded() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (showPluginWindowsKey, true);
+    return true;
+}
+
+void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)
+{
+    if (shouldShow == showPluginWindowsWhenAdded())
+        return;
+    if (auto* p = getProps())
+        p->setValue (showPluginWindowsKey, shouldShow);
 }
 
 }

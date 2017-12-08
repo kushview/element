@@ -177,11 +177,34 @@ public:
         return 0;
     }
     
-    RootGraphController* findActiveRootGraphController() const
+    /** Returns the active graph according to the engine */
+    RootGraphHolder* findActiveInEngine() const
+    {
+        auto engine = owner.getWorld().getAudioEngine();
+        if (! engine)
+            return 0;
+        const int currentIndex = engine->getActiveGraph();
+        if (currentIndex >= 0)
+            for (auto* h : graphs)
+                if (auto* root = h->getRootGraph())
+                    if (currentIndex == root->getEngineIndex())
+                        return h;
+        return 0;
+    }
+    
+    /** Returns the active graph according to the session */
+    RootGraphHolder* findActive() const
     {
         if (auto session = owner.getWorld().getSession())
             if (auto* h = findFor (session->getActiveGraph()))
-                return h->controller.get();
+                return h;
+        return 0;
+    }
+    
+    RootGraphController* findActiveRootGraphController() const
+    {
+        if (auto* h = findActive())
+            return h->controller.get();
         return 0;
     }
     
@@ -386,12 +409,13 @@ void EngineController::addNode (const Node& node)
     if (KV_INVALID_NODE != nodeId)
     {
         const Node actual (root->getNodeModelForId (nodeId));
-        findSibling<GuiController>()->presentPluginWindow (actual);
+        if (getWorld().getSettings().showPluginWindowsWhenAdded())
+            findSibling<GuiController>()->presentPluginWindow (actual);
     }
     else
     {
         AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-            "Duplicate Node", String("Could not duplicate node: ") + node.getName());
+            "Audio Engine", String("Could not add node: ") + node.getName());
     }
 }
 
@@ -400,13 +424,14 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     auto* root = graphs->findActiveRootGraphController();
     if (! root)
         return;
-    
+
     OwnedArray<PluginDescription> plugs;
     if (! verified)
     {
         auto* format = getWorld().getPluginManager().getAudioPluginFormat (desc.pluginFormatName);
         jassert(format != nullptr);
         auto& list (getWorld().getPluginManager().availablePlugins());
+        list.removeFromBlacklist (desc.fileOrIdentifier);
         if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format)) {
             getWorld().getPluginManager().saveUserPlugins (getWorld().getSettings());
         }
@@ -417,10 +442,20 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     }
     
     if (plugs.size() > 0)
-        root->addFilter (plugs.getFirst(), rx, ry);
+    {
+        const auto nodeId = root->addFilter (plugs.getFirst(), rx, ry);
+        if (KV_INVALID_NODE != nodeId)
+        {
+            const Node node (root->getNodeModelForId (nodeId));
+            if (getWorld().getSettings().showPluginWindowsWhenAdded())
+                findSibling<GuiController>()->presentPluginWindow (node);
+        }
+    }
     else
+    {
         AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add Plugin",
                                           String("Could not add ") + desc.name + " for an unknown reason");
+    }
 }
 
 void EngineController::removeNode (const uint32 nodeId)
@@ -505,13 +540,19 @@ void EngineController::setRootNode (const Node& newRootNode)
         holder->attach (engine);
     const int index = holder->getRootGraph()->getEngineIndex();
 
-    /* Unload the existing graph if necessary */
-    if (auto* r = holder->getController())
+    /* Unload the active graph if necessary */
+    auto* active = graphs->findActiveInEngine();
+    if (active && active != holder)
     {
         if (auto* gui = findSibling<GuiController>())
             gui->closeAllPluginWindows();
-        r->savePluginStates();
-        r->unloadGraph();
+        
+        if (! (bool) active->model.getProperty(Tags::persistent) && active->attached())
+        {
+            active->controller->savePluginStates();
+            active->controller->unloadGraph();
+            DBG("[EL] graph unloaded: " << active->model.getName());
+        }
     }
 
     if (auto* proc = holder->getRootGraph())
@@ -525,18 +566,23 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     if (auto* r = holder->getController())
     {
-        DBG("[EL] setting root: " << newRootNode.getName());
-        r->setNodeModel (newRootNode);
-        if (auto* device = devices.getCurrentAudioDevice())
-            r->getRootGraph().setPlayConfigFor (device);
+        DBG("[EL] setting root: " << holder->model.getName());
         
-        ValueTree nodes = newRootNode.getNodesValueTree();
-        for (int i = nodes.getNumChildren(); --i >= 0;)
+        if (! (bool) newRootNode.getProperty (Tags::persistent, false) || !r->isLoaded())
         {
-            Node model (nodes.getChild (i), false);
-            GraphNodePtr node = model.getGraphNode();
-            if (node && node->isAudioIONode())
-                model.resetPorts();
+            DBG("[EL] loading...");
+            r->setNodeModel (newRootNode);
+            if (auto* device = devices.getCurrentAudioDevice())
+                r->getRootGraph().setPlayConfigFor (device);
+            
+            ValueTree nodes = newRootNode.getNodesValueTree();
+            for (int i = nodes.getNumChildren(); --i >= 0;)
+            {
+                Node model (nodes.getChild (i), false);
+                GraphNodePtr node = model.getGraphNode();
+                if (node && node->isAudioIONode())
+                    model.resetPorts();
+            }
         }
         
         engine->setCurrentGraph (index);

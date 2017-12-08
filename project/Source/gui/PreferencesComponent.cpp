@@ -268,6 +268,15 @@ namespace Element {
             scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
             scanForPlugins.getToggleStateValue().addListener (this);
             
+            addAndMakeVisible ( showPluginWindowsLabel);
+            showPluginWindowsLabel.setText ("Automatically show plugin windows", dontSendNotification);
+            showPluginWindowsLabel.setFont (Font (12.0, Font::bold));
+            
+            addAndMakeVisible (showPluginWindows);
+            showPluginWindows.setClickingTogglesState (true);
+            showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
+            showPluginWindows.getToggleStateValue().addListener (this);
+            
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -289,6 +298,20 @@ namespace Element {
             clockSource.removeListener (this);
         }
 
+        void layoutSetting (Rectangle<int>& r, Label& label, SettingButton& setting)
+        {
+            const int spacingBetweenSections = 6;
+            const int settingHeight = 22;
+            const int toggleWidth = 40;
+            const int toggleHeight = 18;
+            
+            r.removeFromTop (spacingBetweenSections);
+            auto r2 = r.removeFromTop (settingHeight);
+            label.setBounds (r2.removeFromLeft (getWidth() / 2));
+            setting.setBounds (r2.removeFromLeft (toggleWidth)
+                                 .withSizeKeepingCentre (toggleWidth, toggleHeight));
+        }
+        
         void resized() override
         {
             const int spacingBetweenSections = 6;
@@ -312,6 +335,8 @@ namespace Element {
             scanForPlugsLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
+            
+            layoutSetting(r, showPluginWindowsLabel, showPluginWindows);
             
             if (pluginSettings.isVisible())
             {
@@ -343,6 +368,10 @@ namespace Element {
             {
                 settings.setScanForPluginsOnStartup (scanForPlugins.getToggleState());
             }
+            else if (value.refersToSameSourceAs (showPluginWindows.getToggleStateValue()))
+            {
+                settings.setShowPluginWindowsWhenAdded (showPluginWindows.getToggleState());
+            }
             
             settings.saveIfNeeded();
             gui.stabilizeContent();
@@ -360,6 +389,9 @@ namespace Element {
         SettingButton scanForPlugins;
         
         PluginSettingsComponent pluginSettings;
+        
+        Label showPluginWindowsLabel;
+        SettingButton showPluginWindows;
         
         Settings& settings;
         AudioEnginePtr engine;

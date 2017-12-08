@@ -34,6 +34,12 @@ LookAndFeel::LookAndFeel()
     setColour (TextPropertyComponent::backgroundColourId,   findColour (TextEditor::backgroundColourId));
     setColour (TextPropertyComponent::textColourId,         findColour (TextEditor::textColourId));
 
+    setColour (ToggleButton::textColourId, textColor);
+    
+    // Boolean property comp
+    setColour (BooleanPropertyComponent::backgroundColourId,    findColour (TextEditor::backgroundColourId));
+    setColour (BooleanPropertyComponent::outlineColourId,       Colours::black);
+               
     // Setting Button
     setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
     setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);

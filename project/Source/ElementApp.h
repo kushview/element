@@ -29,6 +29,7 @@ namespace Tags
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
     const Identifier notes              = "notes";
+    const Identifier persistent         = "persistent";
     const Identifier port               = "port";
     const Identifier ports              = "ports";
     

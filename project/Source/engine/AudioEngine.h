@@ -75,7 +75,10 @@ public:
     bool addGraph (RootGraph* graph);
     bool removeGraph (RootGraph* graph);
     
-    void setCurrentGraph (const int index);
+    void setCurrentGraph (const int index) { setActiveGraph (index); }
+    void setActiveGraph (const int index);
+    int getActiveGraph() const;
+    
     RootGraph* getGraph (const int index);
     
     void setPlaying (const bool shouldBePlaying);

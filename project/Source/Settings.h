@@ -20,6 +20,7 @@ public:
     static const char* pluginFormatsKey;
     static const char* lastPluginScanPathPrefix;
     static const char* scanForPluginsOnStartKey;
+    static const char* showPluginWindowsKey;
     
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -35,6 +36,9 @@ public:
     
     /** Set if plugins should be scanned during startup */
     void setScanForPluginsOnStartup (const bool shouldScan);
+    
+    bool showPluginWindowsWhenAdded() const;
+    void setShowPluginWindowsWhenAdded (const bool);
     
 private:
     PropertiesFile* getProps() const;

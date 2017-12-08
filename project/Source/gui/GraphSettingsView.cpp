@@ -205,15 +205,10 @@ namespace Element {
         void midiChannelChanged() override
         {
             auto session = ViewHelpers::getSession (this);
-            const int index = node.getValueTree().getParent().indexOf (node.getValueTree());
             node.getValueTree().setProperty (Tags::midiChannel, getMidiChannel(), 0);
-            if (node.isRootGraph())
-            {
-                if (isPositiveAndBelow (index, session->getNumGraphs()))
-                    if (auto* cc = ViewHelpers::findContentComponent (this))
-                        if (auto* ec = cc->getAppController().findChild<EngineController> ())
-                            ec->updateRootGraphMidiChannel (index, getMidiChannel());
-            }
+            if (GraphNodePtr ptr = node.getGraphNode())
+                if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
+                    root->setMidiChannel (getMidiChannel());
         }
         
         Node node;
@@ -244,12 +239,15 @@ namespace Element {
         static void getSessionProperties (PropertyArray& props, Node g)
         {
             props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
-                                                  "Name", 256, false));
+                                                  TRANS("Name"), 256, false));
             #if EL_ROOT_MIDI_CHANNEL
             // props.add (new GraphMidiChannels());
-            if (g.isRootGraph())
+            if (g.isRootGraph ())
                 props.add (new RootGraphMidiChanel (g));
             #endif
+            props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
+                                                     TRANS("Persistent"),
+                                                     TRANS("Don't unload when deactivated")));
         }
     };
     

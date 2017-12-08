@@ -544,11 +544,13 @@ void AudioEngine::addMidiMessage (const MidiMessage msg)
         priv->messageCollector.addMessageToQueue (msg);
 }
     
-void AudioEngine::setCurrentGraph (const int index)
+void AudioEngine::setActiveGraph (const int index)
 {
     if (priv)
         priv->currentGraph.set (index);
 }
+
+int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }
 
 void AudioEngine::setSession (SessionPtr session)
 {

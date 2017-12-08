@@ -74,11 +74,13 @@ public:
         processorArcsChanged();
     }
     
+    inline bool isLoaded() const { return loaded; }
 private:
     PluginManager& pluginManager;
     GraphProcessor& processor;
     ValueTree graph, arcs, nodes;
-
+    bool loaded = false;
+    
     uint32 lastUID;
     uint32 getNextUID() noexcept;
     inline void changed() { sendChangeMessage(); }

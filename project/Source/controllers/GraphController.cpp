@@ -213,6 +213,7 @@ void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
 
 void GraphController::setNodeModel (const Node& node)
 {
+    loaded = false;
     processor.clear();
     graph   = node.getValueTree();
     arcs    = node.getArcsValueTree();
@@ -263,6 +264,7 @@ void GraphController::setNodeModel (const Node& node)
     }
     
     jassert (arcs.getNumChildren() == processor.getNumConnections());
+    loaded = true;
     processorArcsChanged();
 }
 
@@ -277,6 +279,8 @@ void GraphController::savePluginStates()
 
 void GraphController::clear()
 {
+    loaded = false;
+
     processor.clear();
     
     if (graph.isValid())

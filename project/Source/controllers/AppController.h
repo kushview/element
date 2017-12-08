@@ -42,6 +42,7 @@ protected:
 private:
     friend class Application;
     File lastSavedFile;
+    File lastExportedGraph;
     Globals& world;
     CommandManager commands;
     void run();
