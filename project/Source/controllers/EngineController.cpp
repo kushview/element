@@ -131,6 +131,7 @@ struct RootGraphHolder
             jassert(ioNodes[t] != nullptr);
         }
     }
+    
 private:
     friend class EngineController;
     friend class EngineController::RootGraphs;
@@ -381,7 +382,13 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
 void EngineController::addNode (const Node& node)
 {
     auto* root = graphs->findActiveRootGraphController();
-    if (root && KV_INVALID_NODE == root->addNode (node))
+    const uint32 nodeId = (root != nullptr) ? root->addNode (node) : KV_INVALID_NODE;
+    if (KV_INVALID_NODE != nodeId)
+    {
+        const Node actual (root->getNodeModelForId (nodeId));
+        findSibling<GuiController>()->presentPluginWindow (actual);
+    }
+    else
     {
         AlertWindow::showMessageBox (AlertWindow::InfoIcon,
             "Duplicate Node", String("Could not duplicate node: ") + node.getName());

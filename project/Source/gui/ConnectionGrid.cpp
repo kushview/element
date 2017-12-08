@@ -12,6 +12,8 @@
 
 #include "gui/ConnectionGrid.h"
 
+#define EL_MATRIX_SIZE 30
+
 namespace Element
 {
     // Spacing between each patch point
@@ -27,7 +29,7 @@ namespace Element
               matrix()
         {
             setSize (300, 200);
-            setMatrixCellSize (36);
+            setMatrixCellSize (EL_MATRIX_SIZE);
             nodeModels = ValueTree (Tags::nodes);
             nodes.clear();
             nodeModels.addListener (this);

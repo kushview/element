@@ -176,6 +176,7 @@ void GuiController::presentPluginWindow (const Node& node)
 void GuiController::run()
 {
     mainWindow = new MainWindow (world);
+    mainWindow->setLookAndFeel (&lookAndFeel);
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     PropertiesFile* pf = globals().getSettings().getUserSettings();

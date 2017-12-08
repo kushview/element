@@ -783,6 +783,7 @@ void ContentComponent::resizerMouseUp()
 
 void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 {
+    
     if (isVisible == virtualKeyboardVisible)
         return;
     
@@ -792,6 +793,8 @@ void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
         keyboard->willBecomeActive();
         addAndMakeVisible (keyboard);
         keyboard->didBecomeActive();
+        if (keyboard->isShowing() || keyboard->isOnDesktop())
+            keyboard->grabKeyboardFocus();
     }
     else
     {

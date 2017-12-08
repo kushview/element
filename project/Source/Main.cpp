@@ -155,6 +155,7 @@ private:
     
     void setupAnalytics()
     {
+       #if 0
         auto* analytics (Analytics::getInstance());
         StringPairArray userData;
         userData.set ("group", "beta");
@@ -162,6 +163,7 @@ private:
         analytics->setUserProperties (userData);
         analytics->addDestination (new GoogleAnalyticsDestination());
         analytics->logEvent ("startup", {});
+       #endif
     }
 };
 
@@ -210,7 +212,7 @@ public:
 
         slaves.clearQuick (true);
         
-        Analytics::getInstance()->logEvent ("shutdown", {});
+        // Analytics::getInstance()->logEvent ("shutdown", {});
         
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
@@ -232,7 +234,7 @@ public:
         world->unloadModules();
         world = nullptr;
         
-        Analytics::getInstance()->deleteInstance();
+        // Analytics::getInstance()->deleteInstance();
     }
 
     void systemRequestedQuit() override
