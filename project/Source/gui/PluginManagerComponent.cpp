@@ -20,7 +20,6 @@ public:
     
     void paintRowBackground (Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
     {
-        
         ViewHelpers::drawBasicTextRow (String(), g, width, height, rowIsSelected);
     }
     
@@ -428,7 +427,7 @@ public:
       progressWindow (title, text, AlertWindow::NoIcon),
       progress (0.0), numThreads (threads),
       allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-      finished (false), useBackgroundScanner (false)
+      finished (false), useBackgroundScanner (true)
     {
         FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
         
@@ -592,11 +591,8 @@ private:
     {
         pathChooserWindow.setVisible (false);
         
-        if (useBackgroundScanner)
-            scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
-        else
-            scanner.setOwned (owner.plugins.createAudioPluginScanner());
-        
+        scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+      
         if (propertiesToUse != nullptr)
         {
             setLastSearchPath (*propertiesToUse, formatToScan, pathList.getPath());
@@ -610,7 +606,7 @@ private:
 //        progressWindow.enterModalState (true, ModalCallbackFunction::create (scannerStaticCallback, this), false);
         scanner->addListener (this);
         
-        if (! useBackgroundScanner)
+        if (! scanner->isScanning())
             scanner->scanForAudioPlugins (formatToScan.getName());
         startTimer (20);
         const int result = progressWindow.runModalLoop();
@@ -630,6 +626,7 @@ private:
     void finishedScan()
     {
         if (scanner) {
+			// just in case
             scanner->removeListener (this);
         }
         
@@ -645,6 +642,7 @@ private:
         if (finished)
         {
             progressWindow.exitModalState (1);
+			scanner->removeListener (this);
         }
         else
         {

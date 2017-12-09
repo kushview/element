@@ -16,7 +16,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       12000  // 60 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       10000  // 60 Seconds
 
 namespace Element {
 
@@ -25,12 +25,18 @@ class PluginScannerMaster : public ChildProcessMaster,
 {
 public:
     explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
-    ~PluginScannerMaster()
-    {
-        const char* quitMessage = "quit";
-        sendMessageToSlave (MemoryBlock (quitMessage, 4));
-    }
+    ~PluginScannerMaster() { }
     
+	bool sendQuitMessage()
+	{
+		const char* quitMessage = "quit";
+		const bool didQuit = sendMessageToSlave (MemoryBlock (quitMessage, 4));
+		ScopedLock sl (lock);
+		slaveState = "quitting";
+		running = false;
+		return didQuit;
+	}
+
     bool startScanning (const StringArray& names = StringArray())
     {
         if (isRunning())
@@ -117,10 +123,16 @@ public:
                 DBG("[EL] scanning... and running....");
             }
         }
-        else if (state == "finished")
-        {
-            DBG("[EL] slave finished scanning");
+		else if (state == "finished")
+		{
+			DBG("[EL] slave finished scanning");
+			{
+				ScopedLock sl(lock);
+				running = false;
+				slaveState = "idle";
+			}
             owner.listeners.call (&PluginScanner::Listener::audioPluginScanFinished);
+			
         }
         else if (state == "waiting")
         {
@@ -130,6 +142,11 @@ public:
                 updateListAndLaunchSlave();
             }
         }
+		else if (slaveState == "quitting")
+		{
+			owner.master = nullptr;
+			return;
+		}
         else
         {
             DBG("[EL] invalid slave state: " << state);
@@ -320,8 +337,8 @@ private:
     
     bool sendString (const String& type, const String& message)
     {
-        String data = type; data << ":" << message.trim();
-        MemoryBlock mb (data.toRawUTF8(), data.length());
+		String data = type; data << ":" << message.trim();
+		MemoryBlock mb (data.toRawUTF8(), data.getNumBytesAsUTF8());
         return sendMessageToMaster (mb);
     }
     
@@ -381,7 +398,7 @@ void PluginScanner::cancel()
 {
     if (master)
     {
-        master = nullptr;
+		master->sendQuitMessage();
     }
 }
 
@@ -396,8 +413,10 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 {
     cancel();
     getSlavePluginListFile().deleteFile();
-    jassert (master == nullptr);
-    master = new PluginScannerMaster (*this);
+	if (master == nullptr)
+		master = new PluginScannerMaster (*this);
+	if (master->isRunning())
+		return;
     master->startScanning (formats);
 }
 
@@ -522,7 +541,10 @@ PluginScanner* PluginManager::createAudioPluginScanner()
 
 PluginScanner* PluginManager::getBackgroundAudioPluginScanner()
 {
-    return (priv != nullptr) ? priv->scanner.get() : nullptr;
+	if (!priv) return 0;
+	if (!priv->scanner)
+		priv->scanner = new PluginScanner (availablePlugins());
+	return priv->scanner.get();
 }
 
 bool PluginManager::isScanningAudioPlugins()

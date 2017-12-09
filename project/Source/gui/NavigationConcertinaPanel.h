@@ -209,6 +209,9 @@ public:
     ~DataPathTreeComponent()
     {
         tree->removeListener (this);
+		renameWindow.setVisible(false);
+		tree = nullptr;
+		list = nullptr;
     }
     
     void resized() override
@@ -351,6 +354,7 @@ public:
     
     ~NavigationConcertinaPanel()
     {
+		clearPanels();
         setLookAndFeel (nullptr);
     }
     
@@ -529,7 +533,7 @@ private:
             #if JUCE_MAC
             String name = "Show in Finder";
             #else
-            String name = "Show in Exlorer"
+			String name = "Show in Exlorer";
             #endif
             menu.addItem (2, name);
             const int res = menu.show();

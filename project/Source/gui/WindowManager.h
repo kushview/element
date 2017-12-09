@@ -73,9 +73,9 @@ public:
     {
         for (int i = 0; i < proc.getNumNodes(); ++i)
             if (auto node = proc.getNode (i))
-                for (int i = activePluginWindows.size(); --i >= 0;)
-                    if (activePluginWindows.getUnchecked(i)->owner == node)
-                        { deletePluginWindow (i, windowVisible); break; }
+                for (int j = activePluginWindows.size(); --j >= 0;)
+                    if (activePluginWindows.getUnchecked(j)->owner == node)
+                        { deletePluginWindow (j, windowVisible); break; }
     }
     
     inline void closeOpenPluginWindowsFor (GraphNode* const node, const bool windowVisible)
