@@ -13,7 +13,7 @@
 #endif
 
 #include "DataPath.h"
-
+namespace kv { }
 using namespace kv;
 
 namespace Element {

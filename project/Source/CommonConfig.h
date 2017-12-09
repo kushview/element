@@ -17,7 +17,7 @@
  #define EL_ROOT_MIDI_CHANNEL 1
 #endif
 
-#if _MSC_VER
+#ifdef _MSC_VER
  #pragma warning(disable: 4100) // unreferenced formal param
  #pragma warning(disable: 4244) // convert possible data loss
  #pragma warning(disable: 4245) // signed/unsigned mismatch
@@ -28,6 +28,3 @@
  #pragma warning(disable: 4458) // declaration of 'xxx' hides class member
  #pragma warning(disable: 4389) // signed/unsigned mismatch
 #endif
-
-namespace kv { }
-using namespace kv;
