@@ -652,7 +652,6 @@ private:
     void audioPluginScanStarted (const String& pluginName) override
     {
         pluginBeingScanned = File::createFileWithoutCheckingPath(pluginName).getFileName();
-        DBG("[EL] scanning: " << pluginBeingScanned);
     }
     
     void audioPluginScanProgress (const float reportedProgress) override

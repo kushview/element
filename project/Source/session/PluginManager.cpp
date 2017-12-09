@@ -162,6 +162,13 @@ public:
         return running;
     }
     
+    bool sendQuitMessage()
+    {
+        if (isRunning())
+            return sendMessageToSlave (MemoryBlock ("quit", 4));
+        return false;
+    }
+    
 private:
     PluginScanner& owner;
 
@@ -220,7 +227,7 @@ public:
         
         if (type == "quit")
         {
-            exit(0);
+            handleConnectionLost();
             return;
         }
         
@@ -294,7 +301,7 @@ public:
         settings    = nullptr;
         plugins     = nullptr;
         scanner     = nullptr;
-        exit(0);
+        exit (0);
     }
 
 private:
@@ -389,6 +396,8 @@ void PluginScanner::cancel()
 {
     if (master)
     {
+        master->cancelPendingUpdate();
+        master->sendQuitMessage();
 		master = nullptr;
     }
 }
