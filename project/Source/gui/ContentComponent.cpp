@@ -579,7 +579,22 @@ void ContentComponent::setMainView (const String& name)
     } else if (name == "GraphSettings") {
         setContentView (new GraphSettingsView());
     }
+    else
+    {
+        if (auto s = controller.getWorld().getSession())
+        {
+            if (s->getNumGraphs() > 0)
+                setContentView (new GraphEditorView());
+            else
+                setContentView (new EmptyContentView());
+        }
+        else
+        {
+            setContentView (new EmptyContentView());
+        }
+    }
 }
+
 void ContentComponent::backMainView()
 {
     setMainView (lastMainView.isEmpty() ? "GraphEditor" : lastMainView);
@@ -762,10 +777,7 @@ void ContentComponent::setCurrentNode (const Node& node)
 {
     if (nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()))
         if (getSession()->getNumGraphs() > 0)
-            setContentView (new ConnectionGrid());
-    
-    if (auto* audioPanel = nav->getAudioIOPanel())
-        audioPanel->setNode (node);
+            setMainView ("GraphEditor");
     
     if (node.hasNodeType (Tags::graph))
         container->setNode (node);
@@ -781,7 +793,6 @@ void ContentComponent::updateLayout()
 void ContentComponent::resizerMouseDown()
 {
     updateLayout();
-    //resized();
 }
 
 void ContentComponent::resizerMouseUp()
