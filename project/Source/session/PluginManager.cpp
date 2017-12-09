@@ -27,15 +27,7 @@ public:
     explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
     ~PluginScannerMaster() { }
     
-	bool sendQuitMessage()
-	{
-		const char* quitMessage = "quit";
-		const bool didQuit = sendMessageToSlave (MemoryBlock (quitMessage, 4));
-		ScopedLock sl (lock);
-		slaveState = "quitting";
-		running = false;
-		return didQuit;
-	}
+	
 
     bool startScanning (const StringArray& names = StringArray())
     {
@@ -144,7 +136,6 @@ public:
         }
 		else if (slaveState == "quitting")
 		{
-			owner.master = nullptr;
 			return;
 		}
         else
@@ -398,7 +389,7 @@ void PluginScanner::cancel()
 {
     if (master)
     {
-		master->sendQuitMessage();
+		master = nullptr;
     }
 }
 
@@ -429,76 +420,100 @@ void PluginScanner::timerCallback()
 class PluginManager::Private : public PluginScanner::Listener
 {
 public:
-    Private (PluginManager& o) : owner (o)
-    {
-        deadAudioPlugins = DataPath::applicationDataDir().getChildFile (EL_DEAD_AUDIO_PLUGINS_FILENAME);
-    }
+	Private(PluginManager& o) : owner(o)
+	{
+		deadAudioPlugins = DataPath::applicationDataDir().getChildFile(EL_DEAD_AUDIO_PLUGINS_FILENAME);
+	}
 
-    ~Private() {  }
+	~Private() {  }
 
-    /** returns true if anything changed in the plugin list */
-    bool updateBlacklistedAudioPlugins()
-    {
-        bool didSomething = false;
-        
-        if (deadAudioPlugins.existsAsFile())
-        {
-            PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal (
-                allPlugins, deadAudioPlugins);
-            deadAudioPlugins.deleteFile();
-            didSomething = true;
-        }
-        
-        return didSomething;
-    }
-    
+	/** returns true if anything changed in the plugin list */
+	bool updateBlacklistedAudioPlugins()
+	{
+		bool didSomething = false;
+
+		if (deadAudioPlugins.existsAsFile())
+		{
+			PluginDirectoryScanner::applyBlacklistingsFromDeadMansPedal(
+				allPlugins, deadAudioPlugins);
+			deadAudioPlugins.deleteFile();
+			didSomething = true;
+		}
+
+		return didSomething;
+	}
+
 private:
-    friend class PluginManager;
-    PluginManager& owner;
-    AudioPluginFormatManager formats;
-    KnownPluginList allPlugins;
-    File deadAudioPlugins;
-    
-   #if ELEMENT_LV2_PLUGIN_HOST
-    OptionalPtr<LV2World> lv2;
-    OptionalPtr<SymbolMap> symbols;
-   #endif
+	friend class PluginManager;
+	PluginManager& owner;
+	AudioPluginFormatManager formats;
+	KnownPluginList allPlugins;
+	File deadAudioPlugins;
 
-    double sampleRate   = 44100.0;
-    int    blockSize    = 512;
-    
-    ScopedPointer<PluginScanner> scanner;
-    HashMap<String, StringArray> unverifiedAudioPlugins;
-    
-    void scanAudioPlugins (const StringArray& names)
-    {
-        if (scanner)
-        {
-            scanner->cancel();
-            scanner->removeListener(this);
-            scanner = nullptr;
-        }
-    
-        StringArray formatsToScan = names;
-        if (formatsToScan.isEmpty())
-            for (int i = 0; i < formats.getNumFormats(); ++i)
-                if (formats.getFormat(i)->getName() != "Element" && formats.getFormat(i)->canScanForPlugins())
-                    formatsToScan.add (formats.getFormat(i)->getName());
-   
-        scanner = new PluginScanner (allPlugins);
-        scanner->addListener (this);
-        scanner->scanForAudioPlugins (formatsToScan);
-    }
-    
-    void audioPluginScanFinished() override
-    {
-        owner.scanFinished();
-    }
-    
-    void audioPluginScanStarted (const String& plugin) override
-    {
-        DBG("[EL] scanning: " << plugin);
-    }
+#if ELEMENT_LV2_PLUGIN_HOST
+	OptionalPtr<LV2World> lv2;
+	OptionalPtr<SymbolMap> symbols;
+#endif
+
+	double sampleRate = 44100.0;
+	int    blockSize = 512;
+
+	ScopedPointer<PluginScanner> scanner;
+	HashMap<String, StringArray> unverifiedAudioPlugins;
+
+	void scanAudioPlugins (const StringArray& names)
+	{
+		if (scanner)
+		{
+			scanner->removeListener (this);
+			scanner->cancel();
+			scanner = nullptr;
+		}
+
+		StringArray formatsToScan = names;
+		if (formatsToScan.isEmpty())
+			for (int i = 0; i < formats.getNumFormats(); ++i)
+				if (formats.getFormat(i)->getName() != "Element" && formats.getFormat(i)->canScanForPlugins())
+					formatsToScan.add(formats.getFormat(i)->getName());
+
+		scanner = new PluginScanner (allPlugins);
+		scanner->addListener (this);
+		scanner->scanForAudioPlugins (formatsToScan);
+	}
+
+	void audioPluginScanFinished() override
+	{
+		{
+			ScopedLock sl(lock);
+			scannedPlugin = String();
+			progress = -1.0;
+		}
+
+		owner.scanFinished();
+	}
+
+	void audioPluginScanStarted(const String& plugin) override
+	{
+		DBG("[EL] scanning: " << plugin);
+		ScopedLock sl(lock);
+		scannedPlugin = plugin;
+	}
+
+	void audioPluginScanProgress(const float p) override
+	{
+		ScopedLock sl(lock);
+		progress = p;
+	}
+
+	String getScannedPluginName() const
+	{
+		ScopedLock sl (lock);
+		return scannedPlugin;
+	}
+private:
+	CriticalSection lock;
+	String scannedPlugin;
+	float progress = -1.0;
 };
 
 PluginManager::PluginManager()
@@ -542,8 +557,10 @@ PluginScanner* PluginManager::createAudioPluginScanner()
 PluginScanner* PluginManager::getBackgroundAudioPluginScanner()
 {
 	if (!priv) return 0;
-	if (!priv->scanner)
-		priv->scanner = new PluginScanner (availablePlugins());
+	if (!priv->scanner) {
+		priv->scanner = createAudioPluginScanner();
+		priv->scanner->addListener (priv.get());
+	}
 	return priv->scanner.get();
 }
 
@@ -628,6 +645,11 @@ void PluginManager::scanAudioPlugins (const StringArray& names)
         return;
     
     priv->scanAudioPlugins (names);
+}
+
+String PluginManager::getCurrentlyScannedPluginName() const
+{
+	return (priv) ? priv->getScannedPluginName() : String();
 }
 
 void PluginManager::scanInternalPlugins()

@@ -430,7 +430,7 @@ public:
       finished (false), useBackgroundScanner (true)
     {
         FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
-        
+		scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
         // You need to use at least one thread when scanning plug-ins asynchronously
         jassert (! allowAsync || (numThreads > 0));
         
@@ -464,22 +464,26 @@ public:
             progress (0.0), numThreads (0), allowAsync (false), finished (false),
       useBackgroundScanner (true)
     {
+		scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
         startScan();
     }
     
     ~Scanner()
     {
+		if (progressWindow.isCurrentlyModal ())
+			progressWindow.exitModalState (2);
+		stopTimer();
+
+		if (scanner)
+			scanner->removeListener (this);
+
         if (pool != nullptr)
         {
             pool->removeAllJobs (true, 60000);
             pool = nullptr;
         }
         
-        if (scanner)
-        {
-            scanner->cancel();
-            scanner.clear();
-        }
+		scanner.clear();
     }
     
 private:
@@ -573,81 +577,66 @@ private:
             scanner->finishedScan();
     }
     
-    static void scannerStaticCallback (const int result, Scanner* scanner) {
-        if (scanner)
-            scanner->handleScanModalResult (result);
-    }
-    
-    void handleScanModalResult (const int result)
-    {
-        if (result == 0)
-        {
-            if (scanner)
-                scanner->cancel();
-        }
-    }
-    
-    void startScan()
-    {
-        pathChooserWindow.setVisible (false);
-        
-        scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
-      
-        if (propertiesToUse != nullptr)
-        {
-            setLastSearchPath (*propertiesToUse, formatToScan, pathList.getPath());
-            propertiesToUse->saveIfNeeded();
-        }
+	void startScan()
+	{
+		pathChooserWindow.setVisible(false);
+		if (propertiesToUse != nullptr)
+		{
+			setLastSearchPath(*propertiesToUse, formatToScan, pathList.getPath());
+			propertiesToUse->saveIfNeeded();
+		}
 
-        progressWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
-        progressWindow.addProgressBarComponent (progress);
-        progress = -1.0;
-        
-//        progressWindow.enterModalState (true, ModalCallbackFunction::create (scannerStaticCallback, this), false);
-        scanner->addListener (this);
-        
-        if (! scanner->isScanning())
-            scanner->scanForAudioPlugins (formatToScan.getName());
-        startTimer (20);
-        const int result = progressWindow.runModalLoop();
-        if (result == 0)
-        {
-            scanner->cancel();
-        }
-        else if (result == 1)
-        {
-            
-        }
+		progressWindow.addButton(TRANS("Cancel"), 0, KeyPress(KeyPress::escapeKey));
+		progressWindow.addProgressBarComponent(progress);
+		progress = -1.0;
+
+		scanner->addListener(this);
+		finished = false;
+		if (!scanner->isScanning())
+			scanner->scanForAudioPlugins(formatToScan.getName());
+		startTimer(20);
+		const int result = progressWindow.runModalLoop();
+		if (result == 0)
+		{
+			scanner->cancel();
+		}
+		else if (result == 1)
+		{
+
+		}
+		else if (result == 2)
+		{
+			// 2 is when exited in dtor
+			return;
+		}
         
         progressWindow.setVisible (false);
         finishedScan();
+		stopTimer();
     }
     
     void finishedScan()
     {
+		StringArray failedFiles;
         if (scanner) {
 			// just in case
             scanner->removeListener (this);
+			failedFiles = scanner->getFailedFiles();
         }
         
-        owner.scanFinished (scanner != nullptr ? scanner->getFailedFiles()
-                                               : StringArray());
+        owner.scanFinished (failedFiles);
     }
     
     void timerCallback() override
-    {
-        if (doNextScan())
-            startTimer (20);
-        
-        if (finished)
-        {
-            progressWindow.exitModalState (1);
-			scanner->removeListener (this);
-        }
-        else
+    {    
+        if (! finished)
         {
             progressWindow.setMessage (pluginBeingScanned);
         }
+		else
+		{
+			progressWindow.exitModalState (1);
+		}
     }
     
     bool doNextScan()

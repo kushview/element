@@ -243,7 +243,7 @@ public:
             }
         }
         
-        startTimer (5000);
+        startTimer (2000);
         updateLabels();
     }
     
@@ -313,6 +313,17 @@ public:
             streamingStatusLabel.setText ("", dontSendNotification);
             statusLabel.setText ("No Device", dontSendNotification);
         }
+
+		if (plugins.isScanningAudioPlugins())
+		{
+			auto text = streamingStatusLabel.getText();
+			auto name = plugins.getCurrentlyScannedPluginName();
+			name = File::createFileWithoutCheckingPath(name).getFileName();
+
+			text << " - Scanning: " << name;
+			if (name.isNotEmpty())
+				streamingStatusLabel.setText(text, dontSendNotification);
+		}
        #endif
     }
     

@@ -57,6 +57,9 @@ public:
     /** true if a scan is in progress using the child process */
     bool isScanningAudioPlugins();
     
+	/** returns the name of the currently scanned plugin. This value
+	    is not suitable for use in loading plugins */
+	String getCurrentlyScannedPluginName() const;
     /** Looks for new or updated internal/element plugins */
     void scanInternalPlugins();
     
