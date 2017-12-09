@@ -7,6 +7,14 @@
 
 namespace Element {
 static void removeNonElementPlugins (KnownPluginList& list);
+static bool isPluginVersion()
+{
+    #if EL_RUNNING_AS_PLUGIN
+    return true;
+    #else
+    return false;
+    #endif;
+}
     
 class PluginListComponent::TableModel  : public TableListBoxModel
 {
@@ -74,7 +82,10 @@ public:
         switch (result)
         {
             case 0: break;
-            case 1: removeNonElementPlugins (owner.list); break;
+            case 1:
+                removeNonElementPlugins (owner.list);
+                owner.saveListToSettings();
+                break;
             case 2: owner.removeSelectedPlugins(); break;
             default: {
                 
@@ -84,11 +95,12 @@ public:
     
     void cellClicked (int row, int col, const MouseEvent& ev) override
     {
+        
         if (ev.mods.isPopupMenu())
         {
             PopupMenu menu;
-            menu.addItem (1, "Clear list");
-            menu.addItem (2, "Remove selected");
+            menu.addItem (1, "Clear list", ! isPluginVersion());
+            menu.addItem (2, "Remove selected", ! isPluginVersion());
             cellPopup (menu.show());
         }
     }
@@ -169,7 +181,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     closeButton.addListener (this);
     
     addAndMakeVisible (scanButton);
-    scanButton.setButtonText ("Scan");
+    scanButton.setButtonText (isPluginVersion() ? "Reload" : "Scan");
     scanButton.addListener (this);
     
     setSize (400, 600);
@@ -320,10 +332,10 @@ void PluginListComponent::optionsMenuCallback (int result)
     switch (result)
     {
         case 0:   break;
-        case 1:   removeNonElementPlugins (list);  saveSettings(this); break;
-        case 2:   removeSelectedPlugins();         saveSettings(this); break;
+        case 1:   removeNonElementPlugins (list);  saveSettings (this); break;
+        case 2:   removeSelectedPlugins();         saveSettings (this); break;
         case 3:   showSelectedFolder();   break;
-        case 4:   removeMissingPlugins(); break;
+        case 4:   removeMissingPlugins();          saveSettings (this); break;
             
         default:
             if (AudioPluginFormat* format = formatManager.getFormat (result - 10))
@@ -339,10 +351,10 @@ void PluginListComponent::buttonClicked (Button* button)
     {
         PopupMenu menu;
         
-        menu.addItem (1, TRANS("Clear list"));
-        menu.addItem (2, TRANS("Remove selected plug-in from list"), table.getNumSelectedRows() > 0);
-        menu.addItem (3, TRANS("Show folder containing selected plug-in"), canShowSelectedFolder());
-        menu.addItem (4, TRANS("Remove any plug-ins whose files no longer exist"));
+        menu.addItem (1, TRANS("Clear list"), !isPluginVersion());
+        menu.addItem (2, TRANS("Remove selected plug-in from list"), !isPluginVersion() && table.getNumSelectedRows() > 0);
+        menu.addItem (3, TRANS("Show folder containing selected plug-in"), !isPluginVersion() && canShowSelectedFolder());
+        menu.addItem (4, TRANS("Remove any plug-ins whose files no longer exist"), !isPluginVersion());
         menu.addSeparator();
         
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
@@ -350,7 +362,7 @@ void PluginListComponent::buttonClicked (Button* button)
             AudioPluginFormat* const format = formatManager.getFormat (i);
                 
             if (format->canScanForPlugins())
-                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plugins");
+                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plugins", !isPluginVersion());
         }
         
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&optionsButton),
@@ -359,10 +371,19 @@ void PluginListComponent::buttonClicked (Button* button)
     else if (button == &closeButton)
     {
         ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
+        saveListToSettings();
     }
     else if (button == &scanButton)
     {
-        scanAll();
+        if (! isPluginVersion())
+        {
+            scanAll();
+        }
+        else
+        {
+            if (auto* world = ViewHelpers::getGlobals (this))
+                plugins.restoreUserPlugins (world->getSettings());
+        }
     }
 }
 
@@ -683,7 +704,7 @@ void PluginListComponent::scanAll()
     plugins.scanInternalPlugins();
     
    #if EL_RUNNING_AS_PLUGIN
-    AlertWindow::showMessageBoxAsync(AlertWindow::NoIcon, "Plugin Scanner",
+    AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Plugin Scanner",
                                      "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
    #else
     if (auto* world = ViewHelpers::getGlobals (this))
@@ -718,6 +739,12 @@ bool PluginListComponent::isScanning() const noexcept
     return (currentScanner != nullptr || plugins.isScanningAudioPlugins());
 }
 
+void PluginListComponent::saveListToSettings()
+{
+    if (auto* world = ViewHelpers::getGlobals (this))
+        plugins.saveUserPlugins (world->getSettings());
+}
+    
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
 {
     StringArray shortNames;

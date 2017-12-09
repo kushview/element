@@ -8,7 +8,7 @@
 #include "Settings.h"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME          "DeadAudioPlugins.txt"
-
+#define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH       "Temp/SlavePluginList.xml"
 #define EL_PLUGIN_SCANNER_WAITING_STATE         "waiting"
 #define EL_PLUGIN_SCANNER_READY_STATE           "ready"
 
@@ -616,27 +616,36 @@ static const char* pluginListKey()  { return Settings::pluginListKey; }
 
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
-    ScopedXml elm (priv->allPlugins.createXml());
-	settings.getUserSettings()->setValue (pluginListKey(), elm.get());
-    settings.saveIfNeeded();
+    setPropertiesFile (settings.getUserSettings());
+    if (ScopedXml elm = priv->allPlugins.createXml())
+    {
+        props->setValue (pluginListKey(), elm.get());
+        props->saveIfNeeded();
+    }
 }
 
 void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
 {
-	if (ScopedXml xml = settings.getUserSettings()->getXmlValue (pluginListKey()))
-    {
+    setPropertiesFile (settings.getUserSettings());
+    if (props == nullptr) return;
+    if (ScopedXml xml = props->getXmlValue (pluginListKey()))
 		restoreUserPlugins (*xml);
-        if (priv->updateBlacklistedAudioPlugins())
-            saveUserPlugins (settings);
-    }
-    
     settings.saveIfNeeded();
 }
 
 void PluginManager::restoreUserPlugins (const XmlElement& xml)
 {
 	priv->allPlugins.recreateFromXml (xml);
-	scanInternalPlugins();
+    scanInternalPlugins();
+    priv->updateBlacklistedAudioPlugins();
+    if (props == nullptr)
+        return;
+
+    if (ScopedXml e = priv->allPlugins.createXml())
+    {
+        props->setValue (pluginListKey(), e.get());
+        props->saveIfNeeded();
+    }
 }
 
 void PluginManager::setPlayConfig (double sampleRate, int blockSize)
@@ -720,10 +729,8 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
 void PluginManager::scanFinished()
 {
     restoreAudioPlugins (PluginScanner::getSlavePluginListFile());
-    
-    if (priv->scanner)
-        priv->scanner->cancel();
-    
+    if (auto* scanner = getBackgroundAudioPluginScanner())
+        scanner->cancel();
     jassert(! isScanningAudioPlugins());
     sendChangeMessage();
 }
@@ -734,15 +741,16 @@ void PluginManager::restoreAudioPlugins (const File& file)
         restoreUserPlugins (*xml);
 }
 
-const File& PluginScanner::getSlavePluginListFile() {
+const File& PluginScanner::getSlavePluginListFile()
+{
     static File _listTempFile;
-    #if 0
+   #if 0
     if (_listTempFile == File())
         _listTempFile = File::createTempFile ("el-pm-slave");
-    #else
+   #else
     if (_listTempFile == File())
-        _listTempFile = DataPath::applicationDataDir().getChildFile ("Temp/SlavePluginList.xml");
-    #endif
+        _listTempFile = DataPath::applicationDataDir().getChildFile (EL_PLUGIN_SCANNER_SLAVE_LIST_PATH);
+   #endif
     return _listTempFile;
 }
 

@@ -134,6 +134,8 @@ private:
     
     void scanWithBackgroundScanner();
     
+    void saveListToSettings();
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListComponent)
 };
 
