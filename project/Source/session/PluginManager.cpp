@@ -20,7 +20,7 @@
 
 namespace Element {
 
-class PluginScannerMaster : public ChildProcessMaster,
+class PluginScannerMaster : public kv::ChildProcessMaster,
                             public AsyncUpdater
 {
 public:
@@ -208,7 +208,7 @@ private:
 
 static void pluginScannerSlaveCrashHandler (void*) { /* noop. prevent OS error dialogs from child process */ }
     
-class PluginScannerSlave : public ChildProcessSlave, public AsyncUpdater
+class PluginScannerSlave : public kv::ChildProcessSlave, public AsyncUpdater
 {
 public:
     PluginScannerSlave()
@@ -552,7 +552,7 @@ void PluginManager::addFormat (AudioPluginFormat* fmt)
     getAudioPluginFormats().addFormat (fmt);
 }
 
-ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
+kv::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
 {
     return new PluginScannerSlave();
 }

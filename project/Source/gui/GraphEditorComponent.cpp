@@ -743,9 +743,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             }
             else if (hasRequestedType)
             {
-                const ValueTree node = graph.getNodesValueTree()
+                const ValueTree requestedNode = graph.getNodesValueTree()
                   .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
-                const Node model (node, false);
+                const Node model (requestedNode, false);
                 ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
             }
             else

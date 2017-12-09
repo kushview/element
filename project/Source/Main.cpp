@@ -314,7 +314,7 @@ private:
     ScopedPointer<Globals>          world;
     ScopedPointer<AppController>    controller;
     ScopedPointer<Startup>          startup;
-    OwnedArray<ChildProcessSlave>   slaves;
+    OwnedArray<kv::ChildProcessSlave>   slaves;
     
     bool maybeLaunchSlave (const String& commandLine)
     {

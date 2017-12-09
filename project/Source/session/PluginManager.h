@@ -43,7 +43,7 @@ public:
     }
     
     /** creates a child process slave used in start up */
-    ChildProcessSlave* createAudioPluginScannerSlave();
+    kv::ChildProcessSlave* createAudioPluginScannerSlave();
     
     /** creates a new plugin scanner for use by a third party, e.g. plugin manager UI */
     PluginScanner* createAudioPluginScanner();
