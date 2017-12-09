@@ -168,18 +168,9 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     closeButton.setButtonText ("Close");
     closeButton.addListener (this);
     
-    for (int i = 0; i < formatManager.getNumFormats(); ++i)
-    {
-        const auto name = formatManager.getFormat(i)->getName();
-        const bool canScan = formatManager.getFormat(i)->canScanForPlugins();
-        if (name == "Element" || name == "Internal" || !canScan)
-            continue;
-        
-        auto* button = formatButtons.add (new TextButton (name));
-        button->setButtonText ("Scan " + name);
-        button->addListener (this);
-        addAndMakeVisible (button);
-    }
+    addAndMakeVisible (scanButton);
+    scanButton.setButtonText ("Scan");
+    scanButton.addListener (this);
     
     setSize (400, 600);
     list.addChangeListener (this);
@@ -221,12 +212,8 @@ void PluginListComponent::resized()
     Rectangle<int> r (getLocalBounds().reduced (2));
     auto r2 = r.removeFromTop (24).reduced (0, 2);
     
-    for (auto* b : formatButtons)
-    {
-        b->changeWidthToFitText (r2.getHeight());
-        b->setBounds (r2.removeFromLeft (b->getWidth()));
-        r2.removeFromLeft (4);
-    }
+    scanButton.changeWidthToFitText (r2.getHeight());
+    scanButton.setBounds (r2.removeFromLeft (scanButton.getWidth()));
     r2.removeFromLeft (4);
     optionsButton.setBounds (r2);
     optionsButton.changeWidthToFitText (r2.getHeight());
@@ -373,17 +360,9 @@ void PluginListComponent::buttonClicked (Button* button)
     {
         ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
     }
-    else
+    else if (button == &scanButton)
     {
-        for (int i = 0; i < formatManager.getNumFormats(); ++i)
-        {
-            AudioPluginFormat* const format = formatManager.getFormat (i);
-            if (format->getName() == button->getName())
-            {
-                scanFor (*format);
-                break;
-            }
-        }
+        scanAll();
     }
 }
 
@@ -422,49 +401,65 @@ public:
     Scanner (PluginListComponent& plc, AudioPluginFormat& format, PropertiesFile* properties,
              bool allowPluginsWhichRequireAsynchronousInstantiation, int threads,
              const String& title, const String& text)
-    : owner (plc), formatToScan (format), propertiesToUse (properties),
-      pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
-      progressWindow (title, text, AlertWindow::NoIcon),
-      progress (0.0), numThreads (threads),
-      allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
-      finished (false), useBackgroundScanner (true)
-    {
-        FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
-		scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
-        // You need to use at least one thread when scanning plug-ins asynchronously
-        jassert (! allowAsync || (numThreads > 0));
-        
-        if (path.getNumPaths() > 0 )
+        : owner (plc), formatToScan (format), propertiesToUse (properties),
+          pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
+          progressWindow (title, text, AlertWindow::NoIcon),
+          progress (0.0), numThreads (threads),
+          allowAsync (allowPluginsWhichRequireAsynchronousInstantiation),
+          finished (false), useBackgroundScanner (true)
         {
-           #if ! JUCE_IOS
-            if (propertiesToUse != nullptr)
-                path = getLastSearchPath (*propertiesToUse, formatToScan);
-           #endif
-            pathList.setSize (500, 300);
-            pathList.setPath (path);
+            FileSearchPath path (formatToScan.getDefaultLocationsToSearch());
+            scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+            // You need to use at least one thread when scanning plug-ins asynchronously
+            jassert (! allowAsync || (numThreads > 0));
             
-            pathChooserWindow.addCustomComponent (&pathList);
-            pathChooserWindow.addButton (TRANS("Scan"),   1, KeyPress (KeyPress::returnKey));
-            pathChooserWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
-            
-            pathChooserWindow.enterModalState (true,
-                ModalCallbackFunction::forComponent (startScanCallback, &pathChooserWindow, this),
-                false);
+            if (path.getNumPaths() > 0 )
+            {
+               #if ! JUCE_IOS
+                if (propertiesToUse != nullptr)
+                    path = getLastSearchPath (*propertiesToUse, formatToScan);
+               #endif
+                pathList.setSize (500, 300);
+                pathList.setPath (path);
+                
+                pathChooserWindow.addCustomComponent (&pathList);
+                pathChooserWindow.addButton (TRANS("Scan"),   1, KeyPress (KeyPress::returnKey));
+                pathChooserWindow.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+                
+                pathChooserWindow.enterModalState (true,
+                    ModalCallbackFunction::forComponent (startScanCallback, &pathChooserWindow, this),
+                    false);
+            }
+            else
+            {
+                startScan();
+            }
         }
-        else
-        {
-            startScan();
-        }
-    }
-        
+    
     Scanner (PluginListComponent& plc, PluginManager& plugins, const String& title, const String& text)
         : owner (plc), formatToScan (*plugins.getAudioPluginFormat("Element")), propertiesToUse (nullptr),
           pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
           progressWindow (title, text, AlertWindow::NoIcon),
-            progress (0.0), numThreads (0), allowAsync (false), finished (false),
-      useBackgroundScanner (true)
+          progress (0.0), numThreads (0), allowAsync (false), finished (false),
+          useBackgroundScanner (true)
     {
 		scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+        startScan();
+    }
+    
+    Scanner (PluginListComponent& plc, PluginManager& plugins,
+             const StringArray& formats,
+             const String& title, const String& text)
+        : owner (plc),
+          formatToScan (*plugins.getAudioPluginFormat("Element")),
+          propertiesToUse (nullptr),
+          pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
+          progressWindow (title, text, AlertWindow::NoIcon),
+          progress (0.0), numThreads (0), allowAsync (false), finished (false),
+          useBackgroundScanner (true)
+    {
+        scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+        formatsToScan = formats;
         startScan();
     }
     
@@ -500,6 +495,7 @@ private:
     bool allowAsync, finished;
     ScopedPointer<ThreadPool> pool;
     bool useBackgroundScanner = false;
+    StringArray formatsToScan;
     
     static void startScanCallback (int result, AlertWindow* alert, Scanner* scanner)
     {
@@ -592,9 +588,15 @@ private:
 
 		scanner->addListener(this);
 		finished = false;
-		if (!scanner->isScanning())
-			scanner->scanForAudioPlugins(formatToScan.getName());
-		startTimer(20);
+		if (! scanner->isScanning())
+        {
+            if (formatsToScan.size() > 0)
+                scanner->scanForAudioPlugins (formatsToScan);
+            else
+                scanner->scanForAudioPlugins (formatToScan.getName());
+        }
+        
+		startTimer (20);
 		const int result = progressWindow.runModalLoop();
 		if (result == 0)
 		{
@@ -662,11 +664,40 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Scanner)
 };
 
+static StringArray scanAllFormats (PluginManager& p)
+{
+    const StringArray supported ({ "AudioUnit", "VST", "VST3" });
+    StringArray filtered;
+    for (int i = 0; i < p.getAudioPluginFormats().getNumFormats (); ++i)
+    {
+        auto* f = p.getAudioPluginFormats().getFormat (i);
+        if (supported.contains (f->getName()))
+            filtered.add (f->getName());
+    }
+    
+    return filtered;
+}
+
+void PluginListComponent::scanAll()
+{
+    plugins.scanInternalPlugins();
+    
+   #if EL_RUNNING_AS_PLUGIN
+    AlertWindow::showMessageBoxAsync(AlertWindow::NoIcon, "Plugin Scanner",
+                                     "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
+   #else
+    if (auto* world = ViewHelpers::getGlobals (this))
+        plugins.saveUserPlugins (world->getSettings());
+    currentScanner = new Scanner (*this, plugins, scanAllFormats (plugins),
+                                  TRANS("Scanning for plug-ins..."),
+                                  TRANS("Searching for all possible plug-in files..."));
+   #endif
+}
+
 void PluginListComponent::scanFor (AudioPluginFormat& format)
 {
     if (format.getName() == "Element")
     {
-        plugins.scanInternalPlugins();
         return;
     }
     

@@ -78,6 +78,9 @@ public:
     /** Triggers an asynchronous scan for the given format. */
     void scanFor (AudioPluginFormat&);
     
+    /** Scan for all third party types */
+    void scanAll();
+    
     /** Returns true if there's currently a scan in progress. */
     bool isScanning() const noexcept;
     
@@ -98,7 +101,7 @@ private:
     KnownPluginList& list;
     File deadMansPedalFile;
     TableListBox table;
-    TextButton optionsButton, closeButton;
+    TextButton optionsButton, closeButton, scanButton;
     PropertiesFile* propertiesToUse;
     String dialogTitle, dialogText;
     bool allowAsync;
