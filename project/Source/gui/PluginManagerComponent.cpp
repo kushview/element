@@ -359,10 +359,9 @@ void PluginListComponent::buttonClicked (Button* button)
         
         for (int i = 0; i < formatManager.getNumFormats(); ++i)
         {
-            AudioPluginFormat* const format = formatManager.getFormat (i);
-                
+            auto* const format = formatManager.getFormat (i);
             if (format->canScanForPlugins())
-                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plugins", !isPluginVersion());
+                menu.addItem (10 + i, "Scan for new or updated " + format->getName() + " plugins");
         }
         
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&optionsButton),
@@ -382,7 +381,10 @@ void PluginListComponent::buttonClicked (Button* button)
         else
         {
             if (auto* world = ViewHelpers::getGlobals (this))
+            {
+                world->getSettings().getUserSettings()->reload();
                 plugins.restoreUserPlugins (world->getSettings());
+            }
         }
     }
 }
