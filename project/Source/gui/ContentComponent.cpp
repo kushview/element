@@ -515,6 +515,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     setOpaque (true);
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
+    nav->updateContent();
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
     addAndMakeVisible (container = new ContentContainer (*this, controller));
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
