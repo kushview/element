@@ -13,9 +13,9 @@ static bool isPluginVersion()
     return true;
     #else
     return false;
-    #endif;
+    #endif
 }
-    
+
 class PluginListComponent::TableModel  : public TableListBoxModel
 {
 public:

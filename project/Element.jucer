@@ -363,26 +363,26 @@
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_gui_extra" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_core" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="/opt/kushview/JUCE/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="/opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
-        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
@@ -411,26 +411,26 @@
                        enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_product_unlocking" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_extra" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_gui_basics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_graphics" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_events" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_data_structures" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_cryptography" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_core" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_utils" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_processors" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_formats" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_devices" path="C:\SDKs\JUCE\modules"/>
-        <MODULEPATH id="juce_audio_basics" path="C:\SDKs\JUCE\modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/JUCE/modules"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
-        <MODULEPATH id="juce_analytics" path="../../../../../../opt/kushview/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>

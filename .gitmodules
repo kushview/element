@@ -1,3 +1,7 @@
 [submodule "libs/kv"]
 	path = libs/kv
 	url = https://github.com/kushview/kv-modules
+[submodule "libs/JUCE"]
+	path = libs/JUCE
+	url = https://github.com/WeAreRoli/JUCE.git
+	branch = master
