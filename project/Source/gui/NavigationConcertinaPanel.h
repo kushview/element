@@ -348,8 +348,7 @@ public:
         : globals (g), headerHeight (30),
           defaultPanelHeight (80)
     {
-        setLookAndFeel (&lookAndFeel);
-        updateContent();
+
     }
     
     ~NavigationConcertinaPanel()
@@ -396,6 +395,10 @@ public:
         c->setName ("Elements");
         auto *h = new ElementsHeader (*this, *c);
         addPanelInternal (-1, c, "Elements", h);
+        
+        auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
+        pv->setName("Plugins");
+        addPanelInternal (-1, pv, "Plugins", 0);
         
        #if EL_USE_DATA_PATH_TREE
         auto * dp = new DataPathTreeComponent();
@@ -476,7 +479,7 @@ private:
     {
     public:
         ElementsHeader (NavigationConcertinaPanel& _parent, Component& _panel)
-        : Header (_parent, _panel)
+            : Header (_parent, _panel)
         {
             addAndMakeVisible (addButton);
             addButton.setButtonText ("+");
