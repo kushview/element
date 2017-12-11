@@ -6,7 +6,6 @@
 
 namespace Element {
     class PluginManager;
-    class PluginTreeView;
     
     class PluginsPanelView : public Component,
                              public ChangeListener
@@ -21,7 +20,8 @@ namespace Element {
         void changeListenerCallback (ChangeBroadcaster*) override;
         
     private:
-        ScopedPointer<PluginTreeView> pluginTree;
+        PluginManager& plugins;
+        TreeView tree;
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginsPanelView);
     };
 }

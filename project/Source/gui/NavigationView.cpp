@@ -306,8 +306,6 @@ void PluginTreeView::rootItemChanged (int item)
     rootItem = item;
 }
 
-
-
 NavigationView::NavigationView()
 {
     addAndMakeVisible (navList = new NavigationList (this));

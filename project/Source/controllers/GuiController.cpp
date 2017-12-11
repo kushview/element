@@ -49,7 +49,24 @@ void GuiController::timerCallback()
 {
     
 }
+
+void GuiController::saveProperties (PropertiesFile* props)
+{
+    jassert(props);
     
+    if (content)
+    {
+        props->setValue ("lastContentView", content->getMainViewName());
+        props->setValue ("navSize",         content->getNavSize());
+        props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
+    }
+    
+    if (mainWindow)
+    {
+        props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+    }
+}
+
 void GuiController::activate()
 {
     LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
@@ -60,16 +77,8 @@ void GuiController::activate()
 void GuiController::deactivate()
 {
     stopTimer();
-    
-    auto* const props (getWorld().getSettings().getUserSettings());
-    if (props && content)
-    {
-        if (mainWindow)
-            props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
-        props->setValue ("lastContentView", content->getMainViewName());
-        props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
-        props->setValue ("navSize",         content->getNavSize());
-    }
+
+    saveProperties (getWorld().getSettings().getUserSettings());
     
     Controller::deactivate();
 }
