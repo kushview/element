@@ -458,8 +458,6 @@ private:
     }
 };
 
-    
-    
 class ContentComponent::Resizer : public StretchableLayoutResizerBar
 {
 public:
@@ -521,8 +519,9 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar (*this));
     
-    container->setMainView (createLastContentView (controller.getGlobals().getSettings()));
-    setVirtualKeyboardVisible (virtualKeyboardSetting (controller.getGlobals().getSettings()));
+    auto& settings (controller.getGlobals().getSettings());
+    container->setMainView (createLastContentView (settings));
+    setVirtualKeyboardVisible (virtualKeyboardSetting (settings));
     
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
@@ -541,7 +540,9 @@ ContentComponent::ContentComponent (AppController& ctl_)
     }
     
     toolBar->setSession (getGlobals().getSession());
-    nav->setPanelSize (nav->findPanel<ElementsNavigationPanel>(), 160, false);
+    nav->setPanelSize (nav->getGraphsPanel(), 20 * 6, false);
+    nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
+//    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
 }
 
 ContentComponent::~ContentComponent()
@@ -768,7 +769,7 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
     
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
-    if (auto* sp = nav->getSessionPanel())
+    if (auto* sp = nav->getGraphsPanel())
         sp->setSession (session);
     toolBar->setSession (session);
     

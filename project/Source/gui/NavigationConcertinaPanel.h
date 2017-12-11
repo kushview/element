@@ -348,7 +348,7 @@ public:
         : globals (g), headerHeight (30),
           defaultPanelHeight (80)
     {
-
+        setLookAndFeel (&lookAndFeel);
     }
     
     ~NavigationConcertinaPanel()
@@ -390,27 +390,24 @@ public:
     void updateContent()
     {
         clearPanels();
-        Component* c = nullptr;
-        c = new ElementsNavigationPanel();
+        auto* c = new ElementsNavigationPanel();
         c->setName ("Elements");
-        auto *h = new ElementsHeader (*this, *c);
-        addPanelInternal (-1, c, "Elements", h);
+        addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
         
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
-        pv->setName("Plugins");
+        pv->setName ("Plugins");
         addPanelInternal (-1, pv, "Plugins", 0);
         
-       #if EL_USE_DATA_PATH_TREE
         auto * dp = new DataPathTreeComponent();
         dp->setName ("UserDataPath");
         dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
-       #endif
     }
     
-    AudioIOPanelView* getAudioIOPanel() { return findPanel<AudioIOPanelView>(); }
-    PluginsPanelView* getPluginsPanel() { return findPanel<PluginsPanelView>(); }
-    SessionGraphsListBox* getSessionPanel() { return findPanel<SessionGraphsListBox>(); }
+    ElementsNavigationPanel* getGraphsPanel()       { return findPanel<ElementsNavigationPanel>(); }
+    AudioIOPanelView* getAudioIOPanel()             { return findPanel<AudioIOPanelView>(); }
+    PluginsPanelView* getPluginsPanel()             { return findPanel<PluginsPanelView>(); }
+    DataPathTreeComponent* getUserDataPathPanel()   { return findPanel<DataPathTreeComponent>(); }
     
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
