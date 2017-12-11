@@ -56,6 +56,8 @@ void SessionController::openFile (const File& file)
         if (result.wasOk())
         {
             currentSession->freezeChangeNotification = true;
+            if (auto* gc = findSibling<GuiController>())
+                gc->closeAllPluginWindows();
             if (auto* ec = findSibling<EngineController>())
                 ec->sessionReloaded();
             currentSession->freezeChangeNotification = false;
@@ -120,15 +122,13 @@ void SessionController::newSession()
     
     if (res == 1 || res == 2)
     {
+        if (auto* gc = findSibling<GuiController>())
+            gc->closeAllPluginWindows();
+        
         currentSession->freezeChangeNotification = true;
         currentSession->clear();
         if (auto* ec = findSibling<EngineController>())
-        {
-            if (currentSession->getNumGraphs() > 0)
-                ec->setRootNode (currentSession->getCurrentGraph());
-            else
-                ec->clear();
-        }
+            ec->sessionReloaded();
         
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
