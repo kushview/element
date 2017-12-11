@@ -52,7 +52,7 @@ namespace Element
             }
             else
             {
-                
+                clearSubItems();
             }
         }
     };
@@ -77,7 +77,7 @@ namespace Element
             }
             else
             {
-                
+                clearSubItems();
             }
         }
         
