@@ -67,7 +67,7 @@ bool CurrentVersion::isNewerVersionAvailable()
     if (res.failed() || !data.isObject())
         return false;
     
-    permalink   = data["homepage"].toString();
+    permalink   = "https://kushview.net/element/download/"; // data["homepage"].toString();
     version     = data["stable_version"].toString();
     
     return Version::asHexInteger(version) > ProjectInfo::versionNumber;

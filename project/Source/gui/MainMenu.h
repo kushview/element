@@ -96,7 +96,7 @@ public:
         
         if (index == 6000 && menu == Help)
         {
-            URL ("https://kushview.net/products/element/").launchInDefaultBrowser();
+            URL ("http://help.kushview.net/collection/10-element").launchInDefaultBrowser();
         }
         else if (index == 7000 && menu == Help)
         {
