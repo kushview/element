@@ -23,13 +23,15 @@
  #define EL_PUBKEY "5,7bc48fe0cef16975604686123c4b8c9f597b8d62b839e14f6300e632f993d613c406c068ecccd912c845ab314574ae727d55ef1ce8257e6d6dfd239a1cf5831753632a8eb9615d1033264e132edfcf537bc1e643288f45138e364fb2e2afe91c43ceaf929209d3d26428f6f276242b8505e63a923702f3990000fa043a324473"
 
 #else
+ #define EL_PUBKEY_ENCODED 1
  #define EL_PRODUCT_ID "20"
  #define EL_BASE_URL "https://kushview.net"
  #define EL_AUTH_URL EL_BASE_URL "/products/authorize"
- #define EL_PUBKEY "5,c72ce63fbe64d394711f0623ee2efa749f59e192cc87ed440bab12d9f2c8cc67e0464ad18b483c171e8e9762e1a14106348f633e7acde5ec9271e9927582df02816b65d3f836d5a7a46baa3af530adec166fdc0c68320ba68d5e21ca493772753c834388fbf7d21f3e38bc3b8b7ac917cb396c1579ce9e347215fc1b1e837d099f46d9a8c422369f64d93c3f18d85e20895f244192abc1919da275eb3cebc15655f2be9e9ee97298fb8fd21c33b01d9f1849ac6ba2e1d91852847a675c6f4e2c7f00d6f4f29db9357c8fdf4af9484da07018ab986ee6ad9c88ba5a724cb98751c6c0ccbbd94c9d70a90d3cec7f8f9a42463f1df6c342c5f2dd272cf112c204f5"
 #endif
 
 namespace Element {
+    #include "./PublicKey.cpp"
+
     const char* UnlockStatus::propsKey = "props";
     const char* UnlockStatus::fullKey = "f";
     const char* UnlockStatus::priceIdKey = "price_id";
@@ -41,7 +43,16 @@ namespace Element {
         return getProductID() == returnedIDFromServer;
     }
     
-    RSAKey UnlockStatus::getPublicKey() { return RSAKey (EL_PUBKEY); }
+    RSAKey UnlockStatus::getPublicKey()
+    {
+       #if EL_PUBKEY_ENCODED
+        return RSAKey (Element::getPublicKey());
+       #elif defined(EL_PUBKEY)
+        return RSAKey (EL_PUBKEY);
+       #else
+        jassertfalse; // you need a public key for unlocking features
+       #endif
+    }
     
     void UnlockStatus::saveState (const String& data)
     {
