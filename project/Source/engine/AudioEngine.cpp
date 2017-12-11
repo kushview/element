@@ -170,42 +170,18 @@ public:
                 ++totalNumChans;
             }
         }
-#if 0
-        const ScopedLock sl (lock);
-        auto* const graph = getCurrentGraph();
-        const bool shouldProcess = graph != nullptr;
-        
-        if (shouldProcess)
-        {
-            const int64 remainingFrames = transport.getRemainingFrames();
-            ignoreUnused (remainingFrames);
-            const ScopedLock sl2 (graph->getCallbackLock());
-            
-            if (graph->isSuspended())
-            {
-                for (int i = 0; i < numOutputChannels; ++i)
-                    zeromem (outputChannelData[i], sizeof (float) * (size_t) numSamples);
-            }
-            else
-            {
-                AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
-                graph->processBlock (buffer, incomingMidi);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < numOutputChannels; ++i)
-                zeromem (outputChannelData[i], sizeof (float) * (size_t)numSamples);
-        }
-        
-        if (transport.isPlaying())
-            transport.advance (numSamples);
-        transport.postProcess (numSamples);
-        incomingMidi.clear();
-#else
+
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
-#endif
+        
+        if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
+        {
+            const double delayMs = 6.0;
+            if (! incomingMidi.isEmpty())
+                midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
+        }
+        
+        incomingMidi.clear();
     }
     
     void processCurrentGraph (AudioBuffer<float>& buffer, MidiBuffer& midi)
@@ -245,14 +221,6 @@ public:
         }
         
         transport.postProcess (numSamples);
-        
-        
-//        // FIXME: correct midi output
-//        if (auto* e = engine.world.getDeviceManager().getDefaultMidiOutput())
-//            e->sendBlockOfMessages (midi, 14.f + Time::getMillisecondCounterHiRes(), sampleRate);
-//
-        
-        midi.clear();
     }
     
     bool isTimeMaster() const {

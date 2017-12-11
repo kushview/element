@@ -1298,9 +1298,11 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
 
         case midiOutputNode:
             graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, buffer.getNumSamples(), 0);
+            midiMessages.clear();
             break;
 
         case midiInputNode:
+            midiMessages.clear();
             midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
             break;
 

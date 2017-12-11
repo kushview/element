@@ -69,11 +69,6 @@ void AppController::run()
             sc->openFile (File (lastSession));
     }
     
-    if (auto* ec = findChild<EngineController> ())
-    {
-        ec->sessionReloaded();
-    }
-    
     if (auto* gui = findChild<GuiController>())
     {
         const Node graph (session->getCurrentGraph());
