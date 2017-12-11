@@ -68,13 +68,6 @@ namespace Element {
     void UnlockStatus::launchProUpgradeUrl()
     {
         elGetProUpgradeUrl().launchInDefaultBrowser();
-
-//        // http://kushview.dev/checkout/?edd_action=sl_license_upgrade&license_id=129&upgrade_id=3
-//        URL url (EL_BASE_URL "/checkout/");
-//        url.withParameter("edd_action", "sl_license_upgrade")
-//           .withParameter("license_id", "129")
-//           .withParameter("upgrade_id", "3")
-//           .launchInDefaultBrowser();
     }
     
     String UnlockStatus::getState()
