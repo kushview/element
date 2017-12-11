@@ -661,12 +661,23 @@ bool ContentComponent::isInterestedInDragSource (const SourceDetails& dragSource
     
 void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
 {
-    
+    const auto& desc (dragSourceDetails.description);
     if (dragSourceDetails.description.toString() == "ccNavConcertinaPanel")
+    {
         if (auto* panel = nav->findPanel<DataPathTreeComponent>())
             filesDropped (StringArray ({ panel->getSelectedFile().getFullPathName() }),
                           dragSourceDetails.localPosition.getX(),
                           dragSourceDetails.localPosition.getY());
+    }
+    else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
+    {
+        auto& list (getGlobals().getPluginManager().availablePlugins());
+        if (auto* plugin = list.getTypeForIdentifierString (desc[1].toString()))
+            this->post (new LoadPluginMessage (*plugin, true));
+        else
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin",
+                                              "The plugin you dropped could not be loaded for an unknown reason.");
+    }
 }
     
 bool ContentComponent::isInterestedInFileDrag (const StringArray &files)

@@ -11,7 +11,7 @@ namespace Element {
 class ElementsNavigationPanel : public SessionGraphsListBox
 {
 public:
-    ElementsNavigationPanel() { }
+    ElementsNavigationPanel() { setRowHeight (20); }
     
     bool keyPressed (const KeyPress& kp) override
     {
@@ -198,7 +198,7 @@ public:
         list->setDirectory (DataPath::defaultLocation(), true, true);
         addAndMakeVisible (tree = new FileTreeComponent (*list));
         tree->addListener (this);
-        
+        tree->setItemHeight (20);
         renameWindow.addButton (TRANS ("Save"),   1, KeyPress (KeyPress::returnKey));
         renameWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         renameWindow.addTextEditor ("filename", "", "Filename");

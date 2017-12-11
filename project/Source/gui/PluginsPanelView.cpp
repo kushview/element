@@ -11,12 +11,19 @@ namespace Element
         PluginTreeViewItem (const PluginDescription& d) : desc (new  PluginDescription(d)) { }
         bool mightContainSubItems() override { return false; }
         const ScopedPointer<const PluginDescription> desc;
+
+        var getDragSourceDescription() override
+        {
+            var result;
+            result.append ("plugin");
+            result.append (desc->createIdentifierString());
+            return result;
+        }
         
         void paintItem (Graphics& g, int width, int height) override
         {
             g.setColour (Element::LookAndFeel::textColor);
             String text = desc->name;
-            text << " (" << desc->pluginFormatName << ")";
             g.drawText (text, 6, 0, width - 6, height, Justification::centredLeft);
         }
     };
@@ -31,7 +38,7 @@ namespace Element
         void paintItem (Graphics& g, int width, int height) override
         {
             g.setColour (Element::LookAndFeel::textColor);
-            g.drawText (tree.folder, 10, 0, width - 10, height, Justification::centredLeft);
+            g.drawText (tree.folder, 6, 0, width - 6, height, Justification::centredLeft);
         }
         
         void itemOpennessChanged (bool isNowOpen) override
