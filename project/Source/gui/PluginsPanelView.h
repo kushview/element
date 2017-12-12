@@ -4,11 +4,14 @@
 
 #include "ElementApp.h"
 
-namespace Element {
+namespace Element
+{
     class PluginManager;
     
     class PluginsPanelView : public Component,
-                             public ChangeListener
+                             public ChangeListener,
+                             public TextEditor::Listener,
+                             public Timer
     {
     public:
         PluginsPanelView (PluginManager& pm);
@@ -17,11 +20,21 @@ namespace Element {
         void resized() override;
         void paint (Graphics&) override;
         
+        /** Returns the text in the search box */
+        String getSearchText() { return search.getText(); }
+
+        /** @internal */
+        void textEditorTextChanged (TextEditor&) override;
+        void textEditorReturnKeyPressed (TextEditor&) override;
         void changeListenerCallback (ChangeBroadcaster*) override;
-        
+        void timerCallback() override;
     private:
         PluginManager& plugins;
         TreeView tree;
+        TextEditor search;
+
+        void updateTreeView();
+
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PluginsPanelView);
     };
 }

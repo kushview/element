@@ -4,9 +4,8 @@
 #include "gui/GuiCommon.h"
 #include "DataPath.h"
 
-
-
-namespace Element {
+namespace Element
+{
     
 class ElementsNavigationPanel : public SessionGraphsListBox
 {
@@ -199,6 +198,8 @@ public:
         addAndMakeVisible (tree = new FileTreeComponent (*list));
         tree->addListener (this);
         tree->setItemHeight (20);
+        tree->setIndentSize (10);
+
         renameWindow.addButton (TRANS ("Save"),   1, KeyPress (KeyPress::returnKey));
         renameWindow.addButton (TRANS ("Cancel"), 0, KeyPress (KeyPress::escapeKey));
         renameWindow.addTextEditor ("filename", "", "Filename");
