@@ -16,17 +16,29 @@ namespace Element {
 
 RootGraph::RootGraph() { }
 
+void RootGraph::setPlayConfigFor (DeviceManager& devices)
+{
+    if (auto* device = devices.getCurrentAudioDevice())
+        setPlayConfigFor (device);
+    DeviceManager::AudioSettings setup;
+    devices.getAudioDeviceSetup (setup);
+    audioInName     = setup.inputDeviceName;
+    audioOutName    = setup.outputDeviceName;
+}
+
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
     jassert (device);
+    
     const int numIns        = device->getActiveInputChannels().countNumberOfSetBits();
     const int numOuts       = device->getActiveOutputChannels().countNumberOfSetBits();
     const int bufferSize    = device->getCurrentBufferSizeSamples();
     const double sampleRate = device->getCurrentSampleRate();
-    
     setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
+
     updateChannelNames (device);
-    graphName = "Device";
+    graphName = device->getName();
+    if (graphName.isEmpty()) graphName = "Device";
 }
 
 void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)

@@ -19,22 +19,23 @@ class PinComponent   : public Component,
                        public SettableTooltipClient
 {
 public:
-    PinComponent (const Node& graph_, const uint32 filterID_,
+    PinComponent (const Node& graph_, const Node& node_,
+                  const uint32 filterID_,
                   const uint32 index_, const bool isInput_,
                   const PortType type_, const bool verticle_)
         : filterID (filterID_),
           port (index_),
           type (type_),
           isInput (isInput_),
-          graph (graph_),
+          graph (graph_), node (node_),
           verticle (verticle_)
     {
-        if (const GraphNodePtr node = graph.getGraphNodeForId (filterID_))
+        if (const GraphNodePtr obj = node.getGraphNode())
         {
-            String tip;
+            const Port p (node.getPort ((int) port));
+            String tip = p.getName();
             
-            if (tip.isEmpty())
-            {
+            if (tip.isEmpty()) {
                 tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
             }
 
@@ -103,13 +104,13 @@ public:
         getGraphPanel()->endDraggingConnector (e);
     }
 
-    const uint32 filterID;
-    const uint32 port;
-    const PortType type;
-    const bool   isInput;
+    const uint32    filterID;
+    const uint32    port;
+    const PortType  type;
+    const bool      isInput;
 
 private:
-    Node graph;
+    Node graph, node;
     bool verticle;
     GraphEditorComponent* getGraphPanel() const noexcept
     {
@@ -124,7 +125,7 @@ class FilterComponent    : public Component
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
         : filterID (node_.getNodeId()),
-          graph (graph_), node(node_),
+          graph (graph_), node (node_),
           numInputs (0), numOutputs (0),
           pinSize (16), font (13.0f, Font::bold),
           numIns (0), numOuts (0), vertical(vertical_)
@@ -338,7 +339,7 @@ public:
         
         setSize (w, h);
 
-        setName (f->getAudioProcessor()->getName());
+        setName (node.getName());
         updatePosition();
 
         if (numIns != numInputs || numOuts != numOutputs)
@@ -355,7 +356,7 @@ public:
                     continue;
                 
                 const bool isInput (f->isPortInput (i));
-                addAndMakeVisible (new PinComponent (graph, filterID, i, isInput, t, vertical));
+                addAndMakeVisible (new PinComponent (graph, node, filterID, i, isInput, t, vertical));
             }
 
             resized();

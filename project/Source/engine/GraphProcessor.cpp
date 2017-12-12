@@ -3,6 +3,7 @@
    Copyright (c) 2014-2017 Kushview, LLC.  All rights reserved.
 */
 
+#include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "session/Node.h"
 
@@ -1220,16 +1221,28 @@ GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
 
 const String GraphProcessor::AudioGraphIOProcessor::getName() const
 {
+    if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
+    {
+        switch (type)
+        {
+            case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
+            case audioInputNode:    return root->getAudioInputDeviceName();     break;
+            case midiOutputNode:    return "MIDI Out"; break;
+            case midiInputNode:     return "MIDI In"; break;
+            default:                break;
+        }
+    }
+    
     switch (type)
     {
-        case audioOutputNode:   return "Audio Output";
-        case audioInputNode:    return "Audio Input";
-        case midiOutputNode:    return "Midi Output";
-        case midiInputNode:     return "Midi Input";
+        case audioOutputNode:   return "Audio Output"; break;
+        case audioInputNode:    return "Audio Input"; break;
+        case midiOutputNode:    return "Midi Output"; break;
+        case midiInputNode:     return "Midi Input"; break;
         default:                break;
     }
 
-    return String::empty;
+    return String();
 }
 
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const

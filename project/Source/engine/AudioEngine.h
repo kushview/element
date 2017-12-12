@@ -30,10 +30,13 @@ public:
     void setValueTree (const ValueTree& tree);
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
+    void setPlayConfigFor (DeviceManager&);
     
     const String getName() const override;
     const String getInputChannelName (int channelIndex) const override;
     const String getOutputChannelName (int channelIndex) const override;
+    const String getAudioInputDeviceName() const        { return audioInName; }
+    const String getAudioOutputDeviceName() const       { return audioOutName; }
     
     /** the index in the audio engine.  if less than 0 then the graph
         is not attached */
@@ -43,6 +46,7 @@ private:
     friend class AudioEngine;
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
+    String audioInName, audioOutName;
     StringArray audioInputNames;
     StringArray audioOutputNames;
     int midiChannel;

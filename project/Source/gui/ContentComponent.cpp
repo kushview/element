@@ -506,6 +506,12 @@ static bool virtualKeyboardSetting (Settings& settings)
     auto* props = settings.getUserSettings();
     return props == nullptr ? false : props->getBoolValue ("virtualKeyboard");
 }
+
+struct ContentComponent::Tooltips
+{
+    Tooltips() { tooltipWindow = new TooltipWindow(); }
+    ScopedPointer<TooltipWindow> tooltipWindow;
+};
     
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)

@@ -222,7 +222,16 @@ namespace Element {
     {
         if (GraphNodePtr ptr = getGraphNode())
         {
+            // workaround to keep IO node names correct. note that
+            // setParentGraph may or may not call reset ports
+            if (auto* parent = ptr->getParentGraph()) {
+                ptr->setParentGraph (parent);
+                if (ptr->isMidiIONode() || ptr->isAudioIONode())
+                    setProperty (Tags::name, ptr->getAudioProcessor()->getName());
+            }
+            
             ptr->resetPorts();
+            
             ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
             ValueTree ports = getPortsValueTree();
             objectData.removeChild (ports, nullptr);

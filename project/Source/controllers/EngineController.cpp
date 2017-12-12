@@ -130,6 +130,20 @@ struct RootGraphHolder
             ioNodes[t] = root->getNodeForId (nodeId);
             jassert(ioNodes[t] != nullptr);
         }
+        
+        
+    }
+    
+    void resetIONodePorts()
+    {
+        const ValueTree nodes = model.getNodesValueTree();
+        for (int i = nodes.getNumChildren(); --i >= 0;)
+        {
+            Node model (nodes.getChild (i), false);
+            GraphNodePtr node = model.getGraphNode();
+            if (node && (node->isAudioIONode() || node->isMidiIONode()))
+                model.resetPorts();
+        }
     }
     
 private:
@@ -571,18 +585,17 @@ void EngineController::setRootNode (const Node& newRootNode)
         if (! (bool) newRootNode.getProperty (Tags::persistent, false) || !r->isLoaded())
         {
             DBG("[EL] loading...");
+            r->getRootGraph().setPlayConfigFor (devices);
             r->setNodeModel (newRootNode);
-            if (auto* device = devices.getCurrentAudioDevice())
-                r->getRootGraph().setPlayConfigFor (device);
-            
-            ValueTree nodes = newRootNode.getNodesValueTree();
-            for (int i = nodes.getNumChildren(); --i >= 0;)
-            {
-                Node model (nodes.getChild (i), false);
-                GraphNodePtr node = model.getGraphNode();
-                if (node && node->isAudioIONode())
-                    model.resetPorts();
-            }
+            holder->resetIONodePorts();
+//            ValueTree nodes = newRootNode.getNodesValueTree();
+//            for (int i = nodes.getNumChildren(); --i >= 0;)
+//            {
+//                Node model (nodes.getChild (i), false);
+//                GraphNodePtr node = model.getGraphNode();
+//                if (node && (node->isAudioIONode() || node->isMidiIONode()))
+//                    model.resetPorts();
+//            }
         }
         
         engine->setCurrentGraph (index);
@@ -616,33 +629,25 @@ void EngineController::addMissingIONodes()
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
-    auto* app = dynamic_cast<AppController*> (getRoot());
-    auto& devices (app->getWorld().getDeviceManager());
-   
+    auto& devices (getWorld().getDeviceManager());
+    auto session = getWorld().getSession();
     auto* root = graphs->findActiveRootGraphController();
-    if (cb == (ChangeBroadcaster*) &devices && root != nullptr)
+    
+    if (cb == &devices && root != nullptr)
     {
         auto& processor (root->getRootGraph());
         if (auto* device = devices.getCurrentAudioDevice())
         {
-            auto session = app->getWorld().getSession();
-            auto nodes = session->getActiveGraph().getValueTree().getChildWithName(Tags::nodes);
+            auto nodes = session->getActiveGraph().getValueTree().getChildWithName (Tags::nodes);
             processor.suspendProcessing (true);
-            processor.setPlayConfigFor (device);
+            processor.setPlayConfigFor (devices);
             
             for (int i = nodes.getNumChildren(); --i >= 0;)
             {
-                Node model (nodes.getChild(i), false);
-                GraphNodePtr node = model.getGraphNode();
-                if (node && node->isAudioIONode())
-                {
-                    (dynamic_cast<IOP*>(node->getProcessor()))->releaseResources();
-                    (dynamic_cast<IOP*>(node->getProcessor()))->setParentGraph (&processor);
-                    (dynamic_cast<IOP*>(node->getProcessor()))->prepareToPlay (device->getCurrentSampleRate(),
-                                                                               device->getCurrentBufferSizeSamples());
-
-                    model.resetPorts();
-                }
+                Node model (nodes.getChild (i), false);
+                if (GraphNodePtr node = model.getGraphNode())
+                    if (node && (node->isAudioIONode() || node->isMidiIONode()))
+                        model.resetPorts();
             }
             
             root->syncArcsModel();

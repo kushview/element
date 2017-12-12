@@ -318,7 +318,9 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
 {
     int index = 0;
     auto* graph = proc->getParentGraph();
-    jassert(graph && proc);
+    if (graph == nullptr || proc == nullptr)
+        return;
+    
     for (int channel = 0; channel < node->getNumAudioInputs(); ++channel)
     {
         ValueTree port (Tags::port);
@@ -459,11 +461,8 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
     if (IOP* const iop = dynamic_cast<IOP*> (proc.get()))
     {
         iop->setParentGraph (parent);
-        if (parent != nullptr)
-        {
-            metadata.setProperty (Slugs::name, parent->getName(), nullptr);
-            resetPorts();
-        }
+        metadata.setProperty (Slugs::name, iop->getName(), nullptr);
+        resetPorts();
     }
 }
 

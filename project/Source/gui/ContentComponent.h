@@ -85,6 +85,10 @@ public:
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 private:
     AppController& controller;
+    
+    struct Tooltips;
+    SharedResourcePointer<Tooltips> tips;
+    
     ScopedPointer<NavigationConcertinaPanel> nav;
     ScopedPointer<ContentContainer> container;
     ScopedPointer<TooltipWindow> toolTips;
