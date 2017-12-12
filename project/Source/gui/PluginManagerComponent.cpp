@@ -332,7 +332,8 @@ void PluginListComponent::editPluginPath (const String& f)
     if (auto* const fmt = plugins.getAudioPluginFormat (f))
     {
         jassert(propertiesToUse);
-        AlertWindow window (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon);
+        String message (f); message << TRANS(" plugin path");
+        AlertWindow window (message, String(), AlertWindow::NoIcon);
         FileSearchPathListComponent pathList;
         pathList.setSize (400, 260);
         pathList.setPath (getLastSearchPath (*propertiesToUse, *fmt));
@@ -378,8 +379,8 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addSeparator();
         
         PopupMenu paths;
-        paths.addItem (100, TRANS("Configure VST path"));
-        paths.addItem (101, TRANS("Configure VST3 path"));
+        paths.addItem (100, TRANS("VST Path"));
+        paths.addItem (101, TRANS("VST3 Path"));
         menu.addSubMenu ("Search Paths", paths);
         menu.addSeparator();
         
