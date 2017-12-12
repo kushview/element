@@ -371,9 +371,8 @@ private:
         
         const auto key = String(settings->lastPluginScanPathPrefix) + format.getName();
         FileSearchPath path (settings->getUserSettings()->getValue (key));
-        path.addPath (format.getDefaultLocationsToSearch());
-        scanner = new PluginDirectoryScanner (pluginList, format,
-                                              path, true, plugins->getDeadAudioPluginsFile(),
+        scanner = new PluginDirectoryScanner (pluginList, format, path, true,
+                                              plugins->getDeadAudioPluginsFile(),
                                               false);
         
         while (doNextScan())
