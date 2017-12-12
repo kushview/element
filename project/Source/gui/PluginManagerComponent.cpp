@@ -327,6 +327,27 @@ static void saveSettings (Component* c)
         g->getPluginManager().saveUserPlugins (g->getSettings());
 }
 
+void PluginListComponent::editPluginPath (const String& f)
+{
+    if (auto* const fmt = plugins.getAudioPluginFormat (f))
+    {
+        jassert(propertiesToUse);
+        AlertWindow window (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon);
+        FileSearchPathListComponent pathList;
+        pathList.setSize (400, 260);
+        pathList.setPath (getLastSearchPath (*propertiesToUse, *fmt));
+        window.addCustomComponent (&pathList);
+        window.addButton (TRANS("Save"),   1, KeyPress (KeyPress::returnKey));
+        window.addButton (TRANS("Cancel"), 0, KeyPress (KeyPress::escapeKey));
+        
+        const int result = window.runModalLoop();
+        if (1 == result)
+        {
+            setLastSearchPath (*propertiesToUse, *fmt, pathList.getPath());
+        }
+    }
+}
+    
 void PluginListComponent::optionsMenuCallback (int result)
 {
     switch (result)
@@ -336,7 +357,9 @@ void PluginListComponent::optionsMenuCallback (int result)
         case 2:   removeSelectedPlugins();         saveSettings (this); break;
         case 3:   showSelectedFolder();   break;
         case 4:   removeMissingPlugins();          saveSettings (this); break;
-            
+        
+        case 100: editPluginPath ("VST");  break;
+        case 101: editPluginPath ("VST3"); break;
         default:
             if (AudioPluginFormat* format = formatManager.getFormat (result - 10))
                 scanFor (*format);
@@ -352,6 +375,14 @@ void PluginListComponent::buttonClicked (Button* button)
         PopupMenu menu;
         
         menu.addItem (1, TRANS("Clear list"), !isPluginVersion());
+        menu.addSeparator();
+        
+        PopupMenu paths;
+        paths.addItem (100, TRANS("Configure VST path"));
+        paths.addItem (101, TRANS("Configure VST3 path"));
+        menu.addSubMenu ("Search Paths", paths);
+        menu.addSeparator();
+        
         menu.addItem (2, TRANS("Remove selected plug-in from list"), !isPluginVersion() && table.getNumSelectedRows() > 0);
         menu.addItem (3, TRANS("Show folder containing selected plug-in"), !isPluginVersion() && canShowSelectedFolder());
         menu.addItem (4, TRANS("Remove any plug-ins whose files no longer exist"), !isPluginVersion());
