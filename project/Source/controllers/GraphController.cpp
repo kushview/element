@@ -38,7 +38,29 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     GraphNode* node = nullptr;
     
     if (instance != nullptr)
+    {
+        instance->enableAllBuses();
+        
+        // try to find the greatest supported discrete layout
+        for (int ins = 9; --ins >= 1;)
+        {
+            bool success = false;
+            for (int outs = 9; --outs >= 1;)
+            {
+                AudioProcessor::BusesLayout layout;
+                layout.inputBuses.add (AudioChannelSet::discreteChannels (ins));
+                layout.outputBuses.add (AudioChannelSet::discreteChannels (outs));
+                if (instance->checkBusesLayoutSupported (layout))
+                    success = instance->setBusesLayoutWithoutEnabling (layout);
+                if (success) 
+                    break;
+            }
+            if (success) 
+                break;
+        }
+        
         node = processor.addNode (instance, nodeId);
+    }
     
     return node;
 }
@@ -104,7 +126,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
     {
         AlertWindow::showMessageBox (AlertWindow::WarningIcon,
                                      TRANS ("Couldn't create filter"),
-                                     "Cannot instantiate plugin without a description");
+                                     TRANS ("Cannot instantiate plugin without a description"));
         return KV_INVALID_NODE;
     }
 
