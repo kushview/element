@@ -5,11 +5,11 @@
 #include "session/Node.h"
 
 namespace Element {
+struct AppMessage : public Message { };
 
 /** Send this to add a preset for a node */
-class AddPresetMessage : public Message
+struct AddPresetMessage : public AppMessage
 {
-public:
     AddPresetMessage (const Node& n, const String& name_ = String())
         : node (n), name (name_) { }
     ~AddPresetMessage() { }
@@ -60,7 +60,7 @@ public:
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
-        jassert(useChannels());
+        jassert (useChannels());
     }
     
     RemoveConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp)
@@ -78,16 +78,15 @@ public:
     inline bool usePorts() const { return !useChannels(); }
 };
 
-    class AddNodeMessage : public Message {
-    public:
-        AddNodeMessage (const Node& n)
-            : node (n.getValueTree().createCopy())
-        {
-            
-        }
-        
-        const Node node;
-    };
+class AddNodeMessage : public Message {
+public:
+    AddNodeMessage (const Node& n)
+        : node (n.getValueTree().createCopy())
+    { }
+    
+    const Node node;
+};
+
 /** Send this when a plugin needs loaded into the graph */
 class LoadPluginMessage : public Message {
 public:
@@ -108,6 +107,15 @@ public:
     
     /** Whether or not this plugin has been vetted yet */
     const bool verified;
+};
+
+struct AddPluginMessage : public AppMessage {
+    AddPluginMessage (const Node& g, const PluginDescription& d)
+        : graph (g), description (d)
+    { }
+
+    const Node graph;
+    const PluginDescription description;
 };
 
 class DuplicateNodeMessage : public Message {

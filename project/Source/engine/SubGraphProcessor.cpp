@@ -1,5 +1,7 @@
 
+#include "controllers/GraphController.h"
 #include "engine/SubGraphProcessor.h"
+#include "Globals.h"
 
 namespace Element
 {
@@ -7,10 +9,15 @@ namespace Element
 SubGraphProcessor::SubGraphProcessor ()
 {
     setPlayConfigDetails (2, 2, 44100.f, 512);
-    
 }
 
 SubGraphProcessor::~SubGraphProcessor() { }
+
+GraphController* SubGraphProcessor::createGraphController (PluginManager& plugins)
+{
+    return new GraphController (*this, plugins);
+    createAllIONodes();
+}
 
 void SubGraphProcessor::createAllIONodes()
 {

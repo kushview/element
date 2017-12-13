@@ -191,6 +191,10 @@ public:
 
     void makeEditorActive()
     {
+        if (node.isGraph())
+            if (auto* cc = ViewHelpers::findContentComponent(this))
+                cc->setCurrentNode (node);
+            
         if (node.isValid())
             ViewHelpers::presentPluginWindow (this, node);
     }

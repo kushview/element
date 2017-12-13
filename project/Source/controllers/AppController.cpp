@@ -2,8 +2,10 @@
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
+#include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
 #include "engine/GraphProcessor.h"
+#include "engine/SubGraphProcessor.h"
 #include "gui/UnlockForm.h"
 #include "gui/GuiCommon.h"
 #include "session/UnlockStatus.h"
@@ -160,6 +162,21 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
         ec->addNode (anm->node);
+    }
+    else if (const auto* apm = dynamic_cast<const AddPluginMessage*> (&msg))
+    {
+        const auto& graph (apm->graph);
+        const auto& desc (apm->description);
+        
+        if (graph.isRootGraph())
+        {
+            ec->addPlugin (desc, true);
+        }
+        else if (graph.isGraph ())
+        {
+            DBG("handle subgraph node");
+            ec->addPlugin (graph, desc);
+        }
     }
     else
     {

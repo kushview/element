@@ -279,7 +279,8 @@ namespace Element
         
         void emptyAreaClicked (const MouseEvent& ev)
         {
-            if (! ev.mods.isPopupMenu()) {
+            if (! ev.mods.isPopupMenu())
+            {
                 DBG("GRAPH");
                 auto printme = graphModel.createCopy();
                 Node::sanitizeProperties(printme, true);
@@ -309,8 +310,9 @@ namespace Element
             if (menu.isPluginResultCode (result))
             {
                 bool verified = false;
-                if (const auto* desc = menu.getPluginDescription (result, verified))
-                    ViewHelpers::postMessageFor (this, new LoadPluginMessage (*desc, verified));
+                const auto* desc = menu.getPluginDescription (result, verified);
+                if (desc)
+                    ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc));
             }
             else
             {

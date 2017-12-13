@@ -50,7 +50,7 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
         
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
         {
-            DBG ("[EL] setup subgraph");
+            DBG ("[EL] initializing subgraph");
             sub->createAllIONodes();
         }
 
@@ -101,6 +101,15 @@ uint32 GraphController::addNode (const Node& newNode)
                 node->getAudioProcessor()->setStateInformation (state.getData(), (int) state.getSize());
         }
         
+        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+        {
+            if (auto* gc = sub->createGraphController (pluginManager))
+            {
+                gc->setNodeModel (n);
+                addChild (gc);
+            }
+        }
+        
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (data, -1, nullptr);
         changed();
@@ -128,19 +137,23 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
     if (auto* node = createFilter (desc, rx, ry, nodeId))
     {
         nodeId = node->nodeId;
-        
         ValueTree model = node->getMetadata().createCopy();
         model.setProperty (Tags::object, node, nullptr)
              .setProperty ("relativeX", rx, 0)
              .setProperty ("relativeY", ry, 0);
         
-
         Node n (model, false);
-        if (n.isGraph())
+
+        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
         {
-            n.resetPorts();
-            DBG(n.getValueTree().toXmlString());
+            if (auto* gc = sub->createGraphController (pluginManager))
+            {
+                gc->setNodeModel (n);
+                addChild (gc);
+            }
         }
+        
+        n.resetPorts();
 
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);
@@ -256,6 +269,15 @@ void GraphController::setNodeModel (const Node& node)
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
             if (node.getValueTree().getProperty (Tags::bypass, false))
                 obj->getAudioProcessor()->suspendProcessing (true);
+            
+            if (auto* sub = dynamic_cast<SubGraphProcessor*> (obj->getAudioProcessor()))
+            {
+                if (auto* gc = sub->createGraphController (pluginManager))
+                {
+                    gc->setNodeModel (node);
+                    addChild (gc);
+                }
+            }
         }
         else if (GraphNodePtr obj = createPlaceholder (node))
         {

@@ -1,7 +1,8 @@
 #include "controllers/AppController.h"
 
 namespace Element {
-    
+
+class GraphController;
 class RootGraphController;
 class Node;
     
@@ -24,6 +25,8 @@ public:
     /** Adds a plugin by description to the current graph */
     void addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f);
     
+    void addPlugin (const Node& graph, const PluginDescription& desc);
+
     /** Removes a node from the current graph */
     void removeNode (const uint32);
     
@@ -71,6 +74,7 @@ private:
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
     void addMissingIONodes();
+    void addPlugin (GraphController& controller, const PluginDescription& desc);
 };
     
 }

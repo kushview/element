@@ -25,6 +25,8 @@ public:
 
     GraphProcessor& getGraph() noexcept { return processor; }
 
+    bool isControlling (const Node& g) const { return graph == g.getValueTree(); }
+
     int getNumFilters() const noexcept;
 
     const NodePtr getNode (const int index) const noexcept;

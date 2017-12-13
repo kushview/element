@@ -173,6 +173,17 @@ public:
         graphs.clear();
     }
     
+    GraphController* findSubGraphController (const Node& node)
+    {
+        for (auto* const h : graphs)
+            if (auto* rc = h->getController()) // TODO: make this recursive
+                for (int i = 0; i < rc->getNumChildren(); ++i)
+                    if (auto* gc = dynamic_cast<GraphController*> (rc->getChild (i)))
+                        if (gc->isControlling (node))
+                            return gc;
+        return nullptr;
+    }
+
     RootGraphHolder* findByEngineIndex (const int index) const
     {
         if (index >= 0)
@@ -656,9 +667,19 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     }
 }
 
+void EngineController::addPlugin (const Node& graph, const PluginDescription& desc)
+{
+    if (! graph.isGraph())
+        return;
+    
+    if (auto* controller = graphs->findSubGraphController (graph))
+        addPlugin (*controller, desc);
+}
+
 void EngineController::sessionReloaded()
 {
     graphs->clear();
+    
     auto session = getWorld().getSession();
     auto engine  = getWorld().getAudioEngine();
     if (session->getNumGraphs() > 0)
@@ -670,5 +691,16 @@ void EngineController::sessionReloaded()
         setRootNode (session->getCurrentGraph());
     }
 }
-    
+
+void EngineController::addPlugin (GraphController& controller, const PluginDescription& desc)
+{
+    const auto nodeId = controller.addFilter (&desc);
+    if (KV_INVALID_NODE != nodeId)
+    {
+        const Node node (controller.getNodeModelForId (nodeId));
+        if (getWorld().getSettings().showPluginWindowsWhenAdded())
+            findSibling<GuiController>()->presentPluginWindow (node);
+    }
+}
+
 }
