@@ -275,7 +275,10 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
         isPrepared = true;
         setParentGraph (parentGraph);
         
-        instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
+        DBG("INNNN: " << instance->getTotalNumInputChannels());
+        DBG("OUTTT: " << instance->getTotalNumInputChannels());
+        
+        // instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
         instance->prepareToPlay (sampleRate, blockSize);
         
         // TODO: move model code out of engine code
