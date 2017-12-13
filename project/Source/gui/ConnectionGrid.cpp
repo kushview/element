@@ -279,9 +279,18 @@ namespace Element
         
         void emptyAreaClicked (const MouseEvent& ev)
         {
-            if (! ev.mods.isPopupMenu())
+            if (! ev.mods.isPopupMenu()) {
+                DBG("GRAPH");
+                auto printme = graphModel.createCopy();
+                Node::sanitizeProperties(printme, true);
+                DBG(printme.toXmlString());
+
+                DBG("NODES");
+                printme = nodeModels.createCopy();
+                Node::sanitizeProperties(printme, true);
+                DBG(printme.toXmlString());
                 return;
-            
+            }
             const Node graph (graphModel);
             
             PluginsPopupMenu menu (this);
@@ -368,7 +377,7 @@ namespace Element
             const Node node (getNode (row, isSource));
             if (node.isGraph())
             {
-                auto* cc = ViewHelpers::findContentComponent(this);
+                auto* cc = ViewHelpers::findContentComponent (this);
                 cc->setCurrentNode (node);
             }
             else
@@ -501,8 +510,10 @@ namespace Element
         
         virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged) override
         {
-//            if (nodeModels != treeWhichHasBeenChanged)
-//                return;
+            if (nodeModels != treeWhichHasBeenChanged)
+            {
+                
+            }
             graphModel = nodeModels.getParent();
             buildNodeArray();
             resetMatrix();

@@ -114,6 +114,7 @@ public:
 
 private:
     friend class GraphProcessor;
+    friend class GraphController;
     friend class EngineController;
     friend class Node;
 

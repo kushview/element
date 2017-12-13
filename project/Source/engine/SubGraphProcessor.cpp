@@ -4,18 +4,25 @@
 namespace Element
 {
 
-SubGraphProcessor::SubGraphProcessor()
+SubGraphProcessor::SubGraphProcessor ()
 {
     setPlayConfigDetails (2, 2, 44100.f, 512);
-    disableNonMainBuses();
+    
 }
 
 SubGraphProcessor::~SubGraphProcessor() { }
 
+void SubGraphProcessor::createAllIONodes()
+{
+    for (int i = 0; i < IOProcessor::numDeviceTypes; ++i)
+        if (nullptr == ioNodes [i])
+            ioNodes[i] = addNode (new IOProcessor ((IOProcessor::IODeviceType) i));
+}
+
 void SubGraphProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name                = "Graph";
-    d.descriptiveName     = "Embedded graph within a root graph.";
+    d.descriptiveName     = "A nested graph";
     d.pluginFormatName    = "Element";
     d.category            = "Utility";
     d.manufacturerName    = "Element";

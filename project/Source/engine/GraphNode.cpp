@@ -2,6 +2,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -373,10 +374,21 @@ void GraphNode::resetPorts()
     jassert(proc);
     
     ValueTree ports (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
+    ValueTree nodes (metadata.getOrCreateChildWithName (Tags::nodes, nullptr));
     metadata.removeChild (ports, nullptr);
+    metadata.removeChild (nodes, nullptr);
     ports.removeAllChildren (nullptr);
     
-    if (isAudioIONode() || isMidiIONode())
+    if (nullptr != dynamic_cast<SubGraphProcessor*> (proc.get()))
+    {
+        auto* sub = dynamic_cast<SubGraphProcessor*> (proc.get());
+        for (int i = 0; i < sub->getNumNodes(); ++i)
+        {
+            sub->getNode(i)->resetPorts();
+            nodes.addChild (sub->getNode(i)->getMetadata().createCopy(), i, 0);
+        }
+    }
+    else if (isAudioIONode() || isMidiIONode())
     {
         addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*>(proc.get()), ports);
         metadata.addChild (ports, 0, nullptr);
@@ -441,7 +453,8 @@ void GraphNode::resetPorts()
         index++;
     }
     
-    metadata.addChild (ports, 0, nullptr);
+    metadata.addChild (nodes, 0, nullptr);
+    metadata.addChild (ports, 1, nullptr);
 }
 
 AudioPluginInstance* GraphNode::getAudioPluginInstance() const

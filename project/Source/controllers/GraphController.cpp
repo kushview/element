@@ -1,6 +1,7 @@
 
 #include "controllers/GraphController.h"
 #include "engine/PlaceholderProcessor.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
 
 namespace Element {
@@ -44,9 +45,15 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
         AudioProcessor::BusesLayout stereoLayout;
         stereoLayout.inputBuses.add (AudioChannelSet::stereo());
         stereoLayout.outputBuses.add (AudioChannelSet::stereo());
-        if (instance->checkBusesLayoutSupported(stereoLayout))
+        if (instance->checkBusesLayoutSupported (stereoLayout))
             instance->setBusesLayout (stereoLayout);
         
+        if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
+        {
+            DBG ("[EL] setup subgraph");
+            sub->createAllIONodes();
+        }
+
         node = processor.addNode (instance, nodeId);
     }
     
@@ -57,7 +64,7 @@ GraphNode* GraphController::createPlaceholder (const Node& node)
 {
     PluginDescription desc; node.getPluginDescription (desc);
     auto* ph = new PlaceholderProcessor ();
-    ph->setupFor (node, 44100.0, 1024);
+    ph->setupFor (node, processor.getSampleRate(), processor.getBlockSize());
     return processor.addNode (ph, node.getNodeId());
 }
     
@@ -127,7 +134,14 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
              .setProperty ("relativeX", rx, 0)
              .setProperty ("relativeY", ry, 0);
         
-        const Node n (model, false);
+
+        Node n (model, false);
+        if (n.isGraph())
+        {
+            n.resetPorts();
+            DBG(n.getValueTree().toXmlString());
+        }
+
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);
         changed();
