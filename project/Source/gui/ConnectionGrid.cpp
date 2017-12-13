@@ -70,6 +70,13 @@ namespace Element
             repaint();
         }
         
+        void mouseExit(const juce::MouseEvent &ev) override
+        {
+            PatchMatrixComponent::mouseExit (ev);
+            if (auto* grid = findParentComponentOfClass<ConnectionGrid>())
+                grid->repaint();
+        }
+        
         void mouseMove (const MouseEvent& ev) override
         {
             PatchMatrixComponent::mouseMove (ev);
@@ -215,6 +222,23 @@ namespace Element
         Array<int> audioInIndexes, audioOutIndexes, audioInChannels, audioOutChannels,
                    midiInIndexes, midiOutIndexes, midiInChannels, midiOutChannels;
         
+        void matrixHoveredCellChanged (const int prevRow, const int prevCol,
+                                       const int newRow,  const int newCol) override
+        {
+            auto* quads = findParentComponentOfClass<QuadrantLayout>();
+            if (auto* sources = dynamic_cast<ListBox*> (quads->getQauadrantComponent (QuadrantLayout::Q2)))
+            {
+                sources->repaintRow (prevRow);
+                sources->repaintRow (newRow);
+            }
+            
+            if (auto* dests = dynamic_cast<HorizontalListBox*> (quads->getQauadrantComponent (QuadrantLayout::Q4)))
+            {
+                dests->repaintRow (prevCol);
+                dests->repaintRow (newCol);
+            }
+        }
+        
         void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
                                bool rowIsSelected, bool isSource)
         {
@@ -231,12 +255,16 @@ namespace Element
                 text << " - " << portName;
             }
             
-            g.setColour (rowIsSelected ? LookAndFeel_KV1::widgetBackgroundColor.brighter()
-                                       : LookAndFeel_KV1::widgetBackgroundColor);
+            
+            const bool hover = (isSource) ? mouseIsOverRow (rowNumber) 
+                                          : mouseIsOverColumn (rowNumber); 
+            g.setColour (hover ? Colors::elemental.withAlpha(0.4f) : LookAndFeel::widgetBackgroundColor);
+            
             if (isSource)
                 g.fillRect (0, 0, width - 1, height - 1);
             else
                 g.fillRect (0, 1, width - 1, height - 1);
+            
             g.setColour (Colours::white);
             
             if (isSource)
