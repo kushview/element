@@ -12,6 +12,8 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
+    setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
+
     // Property Component
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
@@ -23,8 +25,8 @@ LookAndFeel::LookAndFeel()
     
     // Text Editor
     setColour (TextEditor::textColourId,            textColor);
-    setColour (TextEditor::highlightColourId,       Colours::yellow);
-    setColour (TextEditor::highlightedTextColourId, Colours::black);
+    setColour (TextEditor::highlightColourId,       Colors::elemental.brighter (0.31f));
+    setColour (TextEditor::highlightedTextColourId, Colours::black.brighter(0.22f));
     setColour (TextEditor::outlineColourId,         Colours::black);
     setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
     

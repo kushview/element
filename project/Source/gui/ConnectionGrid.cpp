@@ -19,7 +19,6 @@ namespace Element
     // Spacing between each patch point
     static const int gridPadding = 1;
     
-    
     class ConnectionGrid::PatchMatrix :  public PatchMatrixComponent,
                                          private ValueTree::Listener
     {

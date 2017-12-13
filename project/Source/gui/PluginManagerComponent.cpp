@@ -321,10 +321,14 @@ static void removeNonElementPlugins (KnownPluginList& list)
     }
 }
 
-static void saveSettings (Component* c)
+static void saveSettings (Component* c, const bool saveUserPlugins = true)
 {
     if (auto* g = ViewHelpers::getGlobals (c))
-        g->getPluginManager().saveUserPlugins (g->getSettings());
+    {
+        if (saveUserPlugins)
+            g->getPluginManager().saveUserPlugins (g->getSettings());
+        g->getSettings().saveIfNeeded();
+    }
 }
 
 void PluginListComponent::editPluginPath (const String& f)
@@ -359,13 +363,13 @@ void PluginListComponent::optionsMenuCallback (int result)
         case 3:   showSelectedFolder();   break;
         case 4:   removeMissingPlugins();          saveSettings (this); break;
         
-        case 100: editPluginPath ("VST");  break;
-        case 101: editPluginPath ("VST3"); break;
+        case 100: editPluginPath ("VST");          saveSettings (this, false); break;
+        case 101: editPluginPath ("VST3");         saveSettings (this, false); break;
         default:
+        {
             if (AudioPluginFormat* format = formatManager.getFormat (result - 10))
                 scanFor (*format);
-            
-            break;
+        } break;
     }
 }
 
