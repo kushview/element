@@ -6,6 +6,7 @@
 #include "Settings.h"
 
 namespace Element {
+
 static void removeNonElementPlugins (KnownPluginList& list);
 static bool isPluginVersion()
 {

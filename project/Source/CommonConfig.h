@@ -10,7 +10,7 @@
 #endif
 
 #ifndef EL_USE_SUBGRAPHS
- #define EL_USE_SUBGRAPHS 0
+ #define EL_USE_SUBGRAPHS 1
 #endif
 
 #ifndef EL_ROOT_MIDI_CHANNEL
