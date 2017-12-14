@@ -38,9 +38,17 @@ public:
         typeCol = 2,
         categoryCol = 3,
         manufacturerCol = 4,
-        descCol = 5
+        descCol = 5,
+        ioCol = 6
     };
     
+    String getPluginIO (const PluginDescription& desc)
+    {
+        String result (desc.numInputChannels);
+        result << " / " << desc.numOutputChannels;
+        return result;
+    }
+
     void paintCell (Graphics& g, int row, int columnId,
                     int width, int height, bool rowIsSelected) override
     {
@@ -63,7 +71,7 @@ public:
                 case categoryCol:     text = desc->category.isNotEmpty() ? desc->category : "-"; break;
                 case manufacturerCol: text = desc->manufacturerName; break;
                 case descCol:         text = getPluginDescription (*desc); break;
-                    
+                case ioCol:           text = getPluginIO (*desc); break;
                 default: jassertfalse; break;
             }
         }
@@ -119,6 +127,8 @@ public:
             case typeCol:         list.sort (KnownPluginList::sortByFormat, isForwards); break;
             case categoryCol:     list.sort (KnownPluginList::sortByCategory, isForwards); break;
             case manufacturerCol: list.sort (KnownPluginList::sortByManufacturer, isForwards); break;
+            
+            case ioCol:
             case descCol:         break;
                 
             default: jassertfalse; break;
@@ -166,8 +176,8 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
     header.addColumn (TRANS("Category"),     TableModel::categoryCol,     100, 100, 200);
     header.addColumn (TRANS("Manufacturer"), TableModel::manufacturerCol, 200, 100, 300);
     header.addColumn (TRANS("Description"),  TableModel::descCol,         300, 100, 500, TableHeaderComponent::notSortable);
-    
-    table.setHeaderHeight (22);
+    header.addColumn (TRANS("IO"),           TableModel::ioCol,           80, 80, 80,    TableHeaderComponent::notSortable);
+    table.setHeaderHeight (22);         
     table.setRowHeight (20);
     table.setModel (tableModel);
     table.setMultipleSelectionEnabled (true);

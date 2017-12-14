@@ -41,57 +41,6 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     if (instance != nullptr)
     {
         instance->enableAllBuses();
-//        instance->dis
-        
-        AudioProcessor::BusesLayout currentLayout (instance->getBusesLayout());
-
-        for (int ins = 9; --ins >= 1;)
-        {
-            bool supported = false;
-            for (int outs = 9; --outs >= 1;)
-            {
-                AudioProcessor::BusesLayout layout;
-                layout.inputBuses.add (AudioChannelSet::discreteChannels (ins));
-                layout.outputBuses.add (AudioChannelSet::discreteChannels (outs));
-                if (instance->checkBusesLayoutSupported (layout))
-                    supported = instance->setBusesLayout (layout);
-
-                if (supported)
-                    break;
-            }
-
-            if (supported)
-                break;
-        }
-
-        // layout.inputBuses.add (AudioChannelSet::discreteChannels (desc->numInputChannels));
-        // layout.outputBuses.add (AudioChannelSet::discreteChannels (desc->numOutputChannels));
-
-        // layout = instance->getNextBestLayoutInLayoutList<10> (layout, {
-        //     { 1, 1 }, { 1, 2 }, { 1, 3 }, { 1, 4 }, { 1, 8 },
-        //     { 2, 2 }, { 2, 4 }, { 2, 2 }, { 2, 4 }, { 2, 8 }
-        // });
-        
-        DBG("in:  " << instance->getTotalNumInputChannels());
-        DBG("out: " << instance->getTotalNumOutputChannels());
-        
-//        if (currentLayout.getMainInputChannels() == 1 &&
-//            currentLayout.getMainOutputChannels() == 1)
-//        {
-//            AudioProcessor::BusesLayout stereoLayout;
-//            stereoLayout.inputBuses.add (AudioChannelSet::stereo());
-//            stereoLayout.outputBuses.add (AudioChannelSet::stereo());
-//            if (instance->checkBusesLayoutSupported (stereoLayout))
-//                instance->setBusesLayout (stereoLayout);
-//                    currentLayout = instance->getBusesLayout();
-//        }
-        
-        if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
-        {
-            DBG ("[EL] initializing subgraph");
-            sub->createAllIONodes();
-        }
-
         node = processor.addNode (instance, nodeId);
     }
     

@@ -120,25 +120,60 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
 };
 
-class FilterComponent    : public Component
+class FilterComponent    : public Component,
+                           public ButtonListener
 {
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
         : filterID (node_.getNodeId()),
-          graph (graph_), node (node_),
-          numInputs (0), numOutputs (0),
-          pinSize (16), font (13.0f, Font::bold),
-          numIns (0), numOuts (0), vertical(vertical_)
+          graph (graph_), 
+          node (node_),
+          numInputs (0), 
+          numOutputs (0),
+          pinSize (16), 
+          font (13.0f, Font::bold),
+          numIns (0), 
+          numOuts (0), 
+          vertical (vertical_)
     {
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
         
+        addAndMakeVisible (ioButton);
+        ioButton.setButtonText ("IO");
+        ioButton.addListener (this);
+
         setSize (vertical ? 150 : 170, 60);
+    }
+
+    void buttonClicked (Button*) override 
+    {
+        if (ioButton.getToggleState())
+        {
+            ioButton.setToggleState (false, dontSendNotification);
+            ioBox.clear();
+        }
+        else if (! ioButton.getToggleState())
+        {
+            auto* component = new Component();
+            component->setSize (200, 100);
+
+            auto& box = CallOutBox::launchAsynchronously (
+                component, ioButton.getScreenBounds(), 0);
+            ioBox.setNonOwned (&box);
+        }
+    }
+
+    void deleteAllPins()
+    {
+        for (int i = getNumChildComponents(); --i >= 0;)
+            if (auto * c = dynamic_cast<PinComponent*> (getChildComponent(i)))
+                delete c;
     }
 
     ~FilterComponent()
     {
-        deleteAllChildren();
+        deleteAllPins();
     }
 
     void mouseDown (const MouseEvent& e)
@@ -259,6 +294,8 @@ public:
 
     void resized()
     {
+        auto r (getBoxRectangle());
+        ioButton.setBounds (r.removeFromTop(20).removeFromRight (16));
         int indexIn = 0, indexOut = 0;
         if (vertical)
         {
@@ -351,7 +388,7 @@ public:
             numInputs = numIns;
             numOutputs = numOuts;
 
-            deleteAllChildren();
+            deleteAllPins();
 
             for (uint32 i = 0; i < f->getNumPorts(); ++i)
             {
@@ -381,7 +418,9 @@ private:
     int numIns, numOuts;
     bool vertical = true;
     
-    
+    SettingButton ioButton;
+    OptionalScopedPointer<CallOutBox> ioBox;
+
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
 
