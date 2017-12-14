@@ -44,6 +44,7 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
         // try to find the greatest supported discrete layout
         for (int ins = 9; --ins >= 1;)
         {
+            instance->getTotalNumInputChannels();
             bool success = false;
             for (int outs = 9; --outs >= 1;)
             {
@@ -52,7 +53,7 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
                 layout.outputBuses.add (AudioChannelSet::discreteChannels (outs));
                 if (instance->checkBusesLayoutSupported (layout))
                     success = instance->setBusesLayoutWithoutEnabling (layout);
-                if (success) 
+                if (success)
                     break;
             }
             if (success) 
