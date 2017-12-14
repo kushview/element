@@ -20,11 +20,31 @@ namespace Element
             return result;
         }
         
+        static String shortFormatName (const String& name)
+        {
+            if (name == "VST") 
+                return "vst";
+            else if (name == "AudioUnit")
+                return "au";
+            else if (name == "VST3")
+                return "vst3";
+            return String();
+        }
         void paintItem (Graphics& g, int width, int height) override
         {
-            g.setColour (Element::LookAndFeel::textColor);
+            g.setColour (Element::LookAndFeel::textColor.darker (0.22f));
             String text = desc->name;
-            g.drawText (text, 6, 0, width - 6, height, Justification::centredLeft);
+            String extra = shortFormatName (desc->pluginFormatName);
+            
+            const int leftSide = (width * 4) / 5;
+            g.drawText (text, 0, 0, leftSide, height, Justification::centredLeft);
+            if (extra.isNotEmpty())
+            {
+                g.setColour (Element::LookAndFeel::textColor.withAlpha(0.8f));
+                extra = String("(") + extra + String(")");
+                g.setFont (Font (12.f));
+                g.drawText (extra, leftSide, 0, width - leftSide - 3, height, Justification::centredRight);
+            }
         }
     };
     
