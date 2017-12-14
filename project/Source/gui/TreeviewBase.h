@@ -1,5 +1,4 @@
-#ifndef EL_TREEVIEW_BASE_H
-#define EL_TREEVIEW_BASE_H
+#pragma once
 
 #include "gui/Icons.h"
 
@@ -11,15 +10,7 @@ public:
     TreeItemBase();
     ~TreeItemBase();
 
-    int getItemWidth() const override                   { return -1; }
-    int getItemHeight() const override                  { return 20; }
-
-    Component* createItemComponent() override;
-    void itemClicked (const MouseEvent& e) override;
-    void itemSelectionChanged (bool isNowSelected) override;
-    void itemDoubleClicked (const MouseEvent&) override;
-    void paintItem (Graphics& g, int width, int height) override;
-    void paintOpenCloseButton (Graphics&, const Rectangle<float>& area, Colour backgroundColour, bool isMouseOver) override;
+    
 
     void cancelDelayedSelectionTimer();
 
@@ -45,6 +36,19 @@ public:
     void launchPopupMenu (PopupMenu&); // runs asynchronously, and produces a callback to handlePopupMenuResult().
     virtual void showPopupMenu();
     virtual void handlePopupMenuResult (int resultCode);
+
+
+    int getItemWidth() const override                   { return -1; }
+    int getItemHeight() const override                  { return 20; }
+
+    Component* createItemComponent() override;
+
+    void itemClicked (const MouseEvent& e) override;
+    void itemSelectionChanged (bool isNowSelected) override;
+    void itemDoubleClicked (const MouseEvent&) override;
+    void paintItem (Graphics& g, int width, int height) override;
+    void paintOpenCloseButton (Graphics&, const Rectangle<float>& area, 
+                              Colour backgroundColour, bool isMouseOver) override;
 
     struct WholeTreeOpennessRestorer   : public OpennessRestorer
     {
@@ -83,14 +87,13 @@ private:
     class ItemSelectionTimer;
     friend class ItemSelectionTimer;
     ScopedPointer<Timer> delayedSelectionTimer;
-
     WeakReference<TreeItemBase>::Master masterReference;
     friend class WeakReference<TreeItemBase>;
 
     void invokeShowDocument();
 };
 
-class TreePanelBase   : public Component
+class TreePanelBase : public Component
 {
 public:
     explicit TreePanelBase (const String& treeviewID = "treePanelBase");
@@ -184,4 +187,3 @@ public:
 };
 
 }
-#endif // EL_TREEVIEW_BASE_H

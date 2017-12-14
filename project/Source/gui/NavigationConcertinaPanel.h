@@ -395,6 +395,10 @@ public:
         c->setName ("Elements");
         addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
         
+        auto* sess = new SessionTreePanel();
+        sess->setName ("Session");
+        addPanelInternal (-1, sess, "Session", 0);
+
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");
         addPanelInternal (-1, pv, "Plugins", 0);
@@ -412,11 +416,15 @@ public:
     
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
+    
     void setHeaderHeight (const int newHeight)
     {
+        if (newHeight == headerHeight)
+            return;
         jassert (newHeight > 0);
         headerHeight = newHeight;
-        updateContent();
+        for (auto* c : comps)
+            setPanelHeaderSize (c, headerHeight);
     }
     
 private:

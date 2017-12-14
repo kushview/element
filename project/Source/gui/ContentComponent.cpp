@@ -777,6 +777,9 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
         window->setName ("Element - " + session->getName());
     if (auto* sp = nav->getGraphsPanel())
         sp->setSession (session);
+    if (auto* ss = nav->findPanel<SessionTreePanel>())
+        ss->setSession (session);
+        
     toolBar->setSession (session);
     
     if (container->content1)

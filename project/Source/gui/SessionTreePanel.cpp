@@ -38,11 +38,77 @@ void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int wid
     ViewHelpers::drawBasicTextRow ("  " + node.getName(), g, width, height, rowIsSelected);
 }
 
+class SessionNodeTreeItem : public TreeItemBase
+{
+public:
+    SessionNodeTreeItem (const Node& n) : node (n) { }
+    
+    void itemOpennessChanged (const bool isOpen) override
+    {
+        if (isOpen)
+            refreshSubItems();
+        else
+            clearSubItems();
+    }
+
+    void addSubItems() override
+    {
+        const auto nodes (node.getNodesValueTree());
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+            addSubItem (new SessionNodeTreeItem (Node (nodes.getChild(i), false)));
+    }
+
+    bool mightContainSubItems() override            { return node.isGraph(); }
+    String getRenamingName() const override         { return getDisplayName(); }
+    String getDisplayName() const override          { return node.getName(); }
+    void setName (const String& newName) override   { ignoreUnused (newName); }
+    bool isMissing() { return false; }
+    Icon getIcon() const override { 
+        return node.isGraph() ? Icon (getIcons().folder, Colours::orange)
+                              : Icon (getIcons().jigsaw, Colors::elemental); 
+    }
+
+    Node node;
+};
+
+class SessionRootTreeItem : public TreeItemBase
+{
+public:
+    SessionRootTreeItem (SessionTreePanel& o) : panel (o)
+    {
+
+    }
+
+    void itemOpennessChanged (const bool isOpen) override
+    {
+        refreshSubItems();
+    }
+
+    void addSubItems() override
+    {
+        if (auto session = panel.getSession())
+        {
+            for (int i = 0; i < session->getNumGraphs(); ++i)
+                addSubItem (new SessionNodeTreeItem (session->getGraph (i)));
+        }
+    }
+
+    virtual bool mightContainSubItems() override { return true; }
+    virtual String getRenamingName() const override { return getDisplayName(); }
+    virtual String getDisplayName() const override { return "Session"; }
+    virtual void setName (const String& newName) override { }
+    virtual bool isMissing() override { return false; }
+    virtual Icon getIcon() const override { return Icon (getIcons().folder, Colours::red); }
+
+    SessionTreePanel& panel;
+};
 
 SessionTreePanel::SessionTreePanel()
     : TreePanelBase ("session")
 {
-    tree.setInterceptsMouseClicks (false, true);
+    tree.setRootItemVisible (false);
+    tree.setInterceptsMouseClicks (true, true);
+    setRoot (new SessionRootTreeItem (*this));
 }
 
 SessionTreePanel::~SessionTreePanel()
@@ -52,6 +118,14 @@ SessionTreePanel::~SessionTreePanel()
 
 void SessionTreePanel::mouseDown (const MouseEvent &ev)
 {
+
+}
+
+void SessionTreePanel::setSession (SessionPtr s)
+{
+    session = s;
+    setRoot (nullptr);
+    setRoot (new SessionRootTreeItem (*this));
 }
 
 SessionPtr SessionTreePanel::getSession() const

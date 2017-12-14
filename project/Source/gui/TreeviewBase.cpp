@@ -42,10 +42,10 @@ void TreePanelBase::setRoot (TreeItemBase* root)
 {
     tree.setRootItem (nullptr);
     rootItem = root;
-    if (root != nullptr)
+    if (rootItem != nullptr)
     {
-        tree.setRootItem (root);
-        tree.getRootItem()->setOpen (true);
+        tree.setRootItem (rootItem.get());
+        rootItem->setOpen (true);
     }
 }
 
@@ -76,7 +76,8 @@ TreeItemBase::~TreeItemBase()
 
 void TreeItemBase::refreshSubItems()
 {
-    WholeTreeOpennessRestorer wtor (*this);
+    // FIXME: sub classes MUST provide the unique name
+    // WholeTreeOpennessRestorer wtor (*this);
     clearSubItems();
     addSubItems();
 }
@@ -103,7 +104,7 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& ar
 {
     Path p;
 
-    const float width = area.getWidth();
+    const float width  = area.getWidth();
     const float height = area.getHeight();
 
     if (isOpen())
