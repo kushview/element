@@ -80,18 +80,27 @@ public:
     
     inline void closeOpenPluginWindowsFor (GraphNode* const node, const bool windowVisible)
     {
+        if (! node)
+            return;
         for (int i = activePluginWindows.size(); --i >= 0;)
             if (activePluginWindows.getUnchecked(i)->owner == node)
                 { deletePluginWindow (i, windowVisible); break; }
     }
     
-    void closeOpenPluginWindowsFor (const uint32 nodeId, const bool windowVisible)
+    inline void closeOpenPluginWindowsFor (const uint32 nodeId, const bool windowVisible)
     {
         for (int i = activePluginWindows.size(); --i >= 0;)
             if (activePluginWindows.getUnchecked(i)->owner->nodeId == nodeId)
                 { deletePluginWindow (i, windowVisible); break; }
     }
     
+    inline void closeOpenPluginWindowsFor (const Node& node, const bool windowVisible)
+    {
+        for (int i = activePluginWindows.size(); --i >= 0;)
+            if (activePluginWindows.getUnchecked(i)->node == node)
+                { deletePluginWindow (i, windowVisible); break; }
+    }
+
     inline void closeAllPluginWindows (const bool windowVisible)
     {
         if (activePluginWindows.size() > 0)

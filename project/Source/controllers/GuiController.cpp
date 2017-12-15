@@ -131,6 +131,9 @@ void GuiController::runDialog (const String& uri)
 void GuiController::closePluginWindow (PluginWindow* w) { windowManager->closePluginWindow (w); }
 void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
 void GuiController::closeAllPluginWindows (const bool visible) { windowManager->closeAllPluginWindows (visible); }
+void GuiController::closePluginWindowsFor (const Node& node, const bool visible) { 
+    windowManager->closeOpenPluginWindowsFor (node.getGraphNode(), visible);
+}
 
 void GuiController::runDialog (Component* c, const String& title)
 {

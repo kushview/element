@@ -89,15 +89,17 @@ namespace Element {
         ContentComponent* getContentComponent();
         
         /** Close all plugin windows housed by this controller */
-        void closeAllPluginWindows (const bool visible = true);
+        void closeAllPluginWindows (const bool windowVisible = true);
         
         /** Close plugin windows for a Node ID
          
             @param nodeId   The Node to close windows for
             @param visible  The visibility state flag, true indicates the window should be open when loaded
         */
-        void closePluginWindowsFor (uint32 nodeId, const bool visible);
+        void closePluginWindowsFor (uint32 nodeId, const bool windowVisible);
         
+        void closePluginWindowsFor (const Node& node, const bool windowVisible);
+
         /** @internal close a specific plugin window
             PluginWindows call this when they need deleted
           */

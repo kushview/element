@@ -9,6 +9,7 @@
 #include "gui/ContentComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/PluginWindow.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
 
@@ -200,7 +201,7 @@ public:
         getGraphPanel()->updateConnectorComponents();
     }
     
-    void mouseDrag (const MouseEvent& e)
+    void mouseDrag (const MouseEvent& e) override
     {
         if (e.mods.isPopupMenu())
             return;
@@ -234,7 +235,7 @@ public:
             ViewHelpers::presentPluginWindow (this, node);
     }
     
-    void mouseUp (const MouseEvent& e)
+    void mouseUp (const MouseEvent& e) override
     {
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
@@ -247,7 +248,7 @@ public:
         }
     }
 
-    bool hitTest (int x, int y)
+    bool hitTest (int x, int y) override
     {
         for (int i = getNumChildComponents(); --i >= 0;)
             if (getChildComponent(i)->getBounds().contains (x, y))
@@ -561,19 +562,46 @@ public:
         if ((! dragging) && ! e.mouseWasClicked())
         {
             dragging = true;
-
-            ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                sourceFilterID, (uint32)sourceFilterChannel, destFilterID, (uint32)destFilterChannel));
-
+            
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
             const bool isNearerSource = (distanceFromStart < distanceFromEnd);
-
-            getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID,
-                                                 sourceFilterChannel,
-                                                 isNearerSource ? destFilterID : 0,
-                                                 destFilterChannel,
-                                                 e);
+            
+            if (graph.isRootGraph())
+            {
+                ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                    sourceFilterID, (uint32)sourceFilterChannel,
+                    destFilterID, (uint32)destFilterChannel));
+                
+                // start draging before removing connection so
+                // the wire doesn't get deleted before hand
+                getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel,
+                                                     isNearerSource ? destFilterID : 0,
+                                                     destFilterChannel,
+                                                     e);
+            }
+            else if (graph.isGraph())
+            {
+                const Node node (graph.getNodeById (isNearerSource ? sourceFilterID : destFilterID));
+                getGraphPanel()->data.removeListener (getGraphPanel());
+                
+                if (GraphNodePtr ptr = graph.getGraphNode())
+                    if (auto* proc = dynamic_cast<SubGraphProcessor*> (ptr->getAudioProcessor()))
+                        proc->getController().removeConnection (sourceFilterID, (uint32)sourceFilterChannel,
+                                                                destFilterID, (uint32)destFilterChannel);
+                
+                getGraphPanel()->data.addListener (getGraphPanel());
+                
+                // start draging before removing connection so
+                // the wire doesn't get deleted before hand
+                getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID,
+                                                     sourceFilterChannel,
+                                                     isNearerSource ? destFilterID : 0,
+                                                     destFilterChannel,
+                                                     e);
+                
+                getGraphPanel()->updateConnectorComponents();
+            }
         }
         else if (dragging)
         {
@@ -732,10 +760,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        const bool isRootGraph = graph.isRootGraph();
-        
         PluginsPopupMenu menu (this);
-        if (isRootGraph)
+        if (graph.isGraph())
         {
             menu.addSectionHeader ("Graph I/O");
             menu.addItem (1, "Audio Inputs",    true, graph.hasAudioInputNode());
@@ -808,7 +834,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             {
                 DBG("X: " << e.position.getX() / (float)getWidth() <<
                    " Y: " << e.position.getY() / (float)getHeight());
-                ViewHelpers::postMessageFor (this, new LoadPluginMessage (desc, true));
+                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, desc));
             }
         }
     }
@@ -1050,7 +1076,7 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             if (pin->isInput)
                 return;
 
-            srcFilter = pin->filterID;
+            srcFilter  = pin->filterID;
             srcChannel = pin->port;
         }
         else
@@ -1058,12 +1084,22 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             if (! pin->isInput)
                 return;
 
-            dstFilter = pin->filterID;
-            dstChannel = pin->port;
+            dstFilter   = pin->filterID;
+            dstChannel  = pin->port;
         }
         
-        ViewHelpers::postMessageFor (this, new AddConnectionMessage (srcFilter, (uint32)srcChannel,
-                                                                     dstFilter, (uint32)dstChannel));
+        if (graph.isRootGraph())
+        {
+            ViewHelpers::postMessageFor (this, new AddConnectionMessage (srcFilter, (uint32)srcChannel,
+                                                                         dstFilter, (uint32)dstChannel));
+        }
+        else
+        {
+            if (GraphNodePtr ptr = graph.getGraphNode())
+                if (auto* proc = dynamic_cast<SubGraphProcessor*> (ptr->getAudioProcessor()))
+                    proc->getController().addConnection (srcFilter, (uint32)srcChannel,
+                                                         dstFilter, (uint32)dstChannel);
+        }
     }
 }
 

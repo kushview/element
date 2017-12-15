@@ -30,6 +30,9 @@ public:
     /** Removes a node from the current graph */
     void removeNode (const uint32);
     
+    /** remove a node by object */
+    void removeNode (const Node& node);
+
     /** Adds a new root graph */
     void addGraph();
     

@@ -498,6 +498,22 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     }
 }
 
+void EngineController::removeNode (const Node& node)
+{
+    const Node graph (node.getParentGraph ());
+    if (! graph.isGraph())
+        return;
+    if (graph.isRootGraph())
+        return removeNode (node.getNodeId());
+    
+    if (auto* controller = graphs->findSubGraphController (graph))
+    {
+        if (auto* gui = findSibling<GuiController>())
+            gui->closePluginWindowsFor (node, true);
+        controller->removeFilter (node.getNodeId());
+    }
+}
+
 void EngineController::removeNode (const uint32 nodeId)
 {
     auto* root = graphs->findActiveRootGraphController();

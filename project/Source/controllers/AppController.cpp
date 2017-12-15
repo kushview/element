@@ -97,7 +97,12 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
     {
-        ec->removeNode (rnm->nodeId);
+        if (rnm->node.isValid())
+            ec->removeNode (rnm->node);
+        else if (rnm->node.getParentGraph().isGraph())
+            ec->removeNode (rnm->nodeId);
+        else
+            handled = false;
     }
     else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
     {
@@ -172,10 +177,13 @@ void AppController::handleMessage (const Message& msg)
         {
             ec->addPlugin (desc, true);
         }
-        else if (graph.isGraph ())
+        else if (graph.isGraph())
         {
-            DBG("handle subgraph node");
             ec->addPlugin (graph, desc);
+        }
+        else
+        {
+            handled = false;
         }
     }
     else

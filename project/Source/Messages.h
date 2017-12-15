@@ -22,16 +22,17 @@ struct AddPresetMessage : public AppMessage
 class RemoveNodeMessage : public Message
 {
 public:
-    RemoveNodeMessage (const Node& node) : nodeId (node.getNodeId()) { }
+    RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) { }
     RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) { }
     const uint32 nodeId;
+    const Node node;
 };
 
 /** Send this to add a new connection */
 class AddConnectionMessage : public Message
 {
 public:
-    AddConnectionMessage (uint32 s, int sc, uint32 d, int dc)
+    AddConnectionMessage (const Node& target, uint32 s, int sc, uint32 d, int dc)
     {
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
@@ -49,6 +50,9 @@ public:
     
     uint32 sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
+
+    const Node targetGraph;
+
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }
 };
