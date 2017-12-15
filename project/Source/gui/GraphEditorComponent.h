@@ -57,6 +57,9 @@ private:
     Node graph;
     ValueTree data;
     
+    float lastDropX = 0.5f;
+    float lastDropY = 0.5f;
+
     ScopedPointer<ConnectorComponent> draggingConnector;
     
     bool verticalLayout = true;

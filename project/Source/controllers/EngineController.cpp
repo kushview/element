@@ -172,6 +172,18 @@ public:
         graphs.clear();
     }
     
+    GraphController* findSubGraphController (GraphController* parent, const Node& n)
+    {
+        for (int i = parent->getNumFilters(); --i >= 0;)
+        {
+            if (GraphNodePtr node = parent->getNode (i))
+                if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+                    if (sub->getController().isControlling (n))
+                        return &sub->getController();
+        }
+        return nullptr;
+    }
+
     GraphController* findSubGraphController (const Node& n)
     {
         if (n.isRootGraph() || !n.isGraph())
@@ -235,7 +247,22 @@ public:
                 return h;
         return 0;
     }
-    
+
+    GraphController* findGraphControllerFor (const Node& node)
+    {
+        for (const auto* h : graphs)
+        {
+            if (auto* controller = h->controller.get())
+            {
+                if (controller->isControlling (node))
+                    return controller;
+                else if (auto* subController = findSubGraphController (controller, node))
+                    return subController;
+            }
+        }
+        return nullptr;
+    }
+
     RootGraphController* findActiveRootGraphController() const
     {
         if (auto* h = findActive())
@@ -537,10 +564,9 @@ void EngineController::removeNode (const uint32 nodeId)
 
 void EngineController::disconnectNode (const Node& node)
 {
-    auto* root = graphs->findActiveRootGraphController();
-    if (! root)
-        return;
-    root->disconnectFilter (node.getNodeId ());
+    const auto graph (node.getParentGraph());
+    if (auto* controller = graphs->findGraphControllerFor (graph))
+        controller->disconnectFilter (node.getNodeId());
 }
 
 void EngineController::activate()

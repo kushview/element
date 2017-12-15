@@ -1112,33 +1112,6 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
     }
 }
 
-PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric)
-{
-    // FIXME:
-    jassertfalse;
-    return 0;
-#if 0
-    if (PluginWindow* window = PluginWindow::getWindowFor (f))
-        return window;
-    
-    PluginWindow* w = PluginWindow::getFirstWindow();
-    ScopedPointer<Component> c (createContainerForNode (f, useGeneric));
-    
-    if (! w && c) {
-            w = PluginWindow::createWindowFor (f, c.get());
-            if (w)
-                c.release();
-    }
-    else if (w && c)
-    {
-        w->updateGraphNode (f, c.release());
-    }
-
-    return w;
-#endif
-}
-
-
 bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& details)
 {
     if (details.description.toString() == "ccNavConcertinaPanel")
@@ -1155,9 +1128,6 @@ bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& detail
     
     return false;
 }
-
-static float lastDropX = 0.5f;
-static float lastDropY = 0.5f;
 
 void GraphEditorComponent::itemDropped (const SourceDetails& details)
 {
@@ -1208,44 +1178,5 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
         updateComponents();
     }
 }
-
-class TooltipBar   : public Component,
-                     private Timer
-{
-public:
-    TooltipBar()
-    {
-        startTimer (100);
-    }
-
-    void paint (Graphics& g)
-    {
-        g.setFont (Font (getHeight() * 0.7f, Font::bold));
-        g.setColour (Colours::black);
-        g.drawFittedText (tip, 10, 0, getWidth() - 12, getHeight(), Justification::centredLeft, 1);
-    }
-
-    void timerCallback()
-    {
-        Component* const underMouse = Desktop::getInstance().getMainMouseSource().getComponentUnderMouse();
-        TooltipClient* const ttc = dynamic_cast <TooltipClient*> (underMouse);
-
-        String newTip;
-
-        if (ttc != nullptr && ! (underMouse->isMouseButtonDown() || underMouse->isCurrentlyBlockedByAnotherModalComponent()))
-            newTip = ttc->getTooltip();
-
-        if (newTip != tip)
-        {
-            tip = newTip;
-            repaint();
-        }
-    }
-
-private:
-    String tip;
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TooltipBar)
-};
 
 }
