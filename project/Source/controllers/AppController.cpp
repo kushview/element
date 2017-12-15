@@ -133,7 +133,7 @@ void AppController::handleMessage (const Message& msg)
         if (newNode.isValid() && graph.isValid())
         {
             newNode.getValueTree().removeProperty (Tags::id, 0);
-            ec->addNode (newNode);
+            ec->addNode (newNode, graph);
         }
     }
     else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))

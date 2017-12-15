@@ -471,12 +471,7 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
 
 void EngineController::addNode (const Node& node, const Node& target)
 {
-    GraphController* controller = nullptr;
-    if (auto* holder = graphs->findFor (target))
-        controller = holder->getController();
-    if (! controller)
-        controller = graphs->findSubGraphController (target);
-    if (controller != nullptr)
+    if (auto* controller = graphs->findGraphControllerFor (target))
         controller->addNode (node);
 }
 
