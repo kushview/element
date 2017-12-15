@@ -16,12 +16,15 @@ public:
     GraphEditorView();
     ~GraphEditorView();
     
+    void setNode (const Node& g);
+
     void didBecomeActive() override;
     void stabilizeContent() override;
     void paint (Graphics& g) override;
     void resized() override;
     
 private:
+    Node node;
     GraphEditorComponent graph;
 };
 

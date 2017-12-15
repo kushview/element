@@ -176,7 +176,7 @@ public:
         deleteAllPins();
     }
 
-    void mouseDown (const MouseEvent& e)
+    void mouseDown (const MouseEvent& e) override
     {
         originalPos = localPointToGlobal (Point<int>());
         toFront (true);
@@ -346,21 +346,22 @@ public:
     void update()
     {
         vertical = getGraphPanel()->isLayoutVertical();
-        const GraphNodePtr f (graph.getGraphNodeForId (filterID));
-
-        if (f == nullptr)
+        
+        if (! node.getValueTree().getParent().hasType (Tags::nodes))
         {
             delete this;
             return;
         }
 
         numIns = numOuts = 0;
-        for (uint32 i = 0; i < f->getNumPorts(); ++i)
+        const auto numPorts = node.getPortsValueTree().getNumChildren();
+        for (int i = 0; i < numPorts; ++i)
         {
-            if (PortType::Control == f->getPortType(i))
+            const Port port (node.getPort (i));
+            if (PortType::Control == port.getType())
                 continue;
             
-            if (f->isPortInput (i))
+            if (port.isInput())
                 ++numIns;
             else
                 ++numOuts;
@@ -390,13 +391,14 @@ public:
 
             deleteAllPins();
 
-            for (uint32 i = 0; i < f->getNumPorts(); ++i)
+            for (uint32 i = 0; i < numPorts; ++i)
             {
-                const PortType t (f->getPortType (i));
+                const Port port (node.getPort (i));
+                const PortType t (port.getType());
                 if (t == PortType::Control)
                     continue;
                 
-                const bool isInput (f->isPortInput (i));
+                const bool isInput (port.isInput());
                 addAndMakeVisible (new PinComponent (graph, node, filterID, i, isInput, t, vertical));
             }
 
@@ -423,7 +425,6 @@ private:
 
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
-
 
     GraphEditorComponent* getGraphPanel() const noexcept
     {
@@ -687,12 +688,25 @@ GraphEditorComponent::~GraphEditorComponent()
 
 void GraphEditorComponent::setNode (const Node& n)
 {
-    graph = n.isValid() && n.isGraph() ? n : Node (Tags::graph);
+    bool isGraph = n.isGraph();
+    bool isValid = n.isValid();
+    graph = isValid && isGraph ? n : Node(Tags::graph);
+    
+    data.removeListener (this);
     data = graph.getValueTree();
+    
+    #if 0
+    auto d2 = data.createCopy();
+    Node::sanitizeProperties(d2, true);
+    DBG(d2.toXmlString());
+    #endif
+    
     verticalLayout = graph.getProperty ("vertical", true);
     draggingConnector = nullptr;
     deleteAllChildren();
     updateComponents();
+
+    data.addListener (this);
 }
 
 void GraphEditorComponent::setVerticalLayout (const bool isVertical)
@@ -718,8 +732,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (e.mods.isPopupMenu())
     {
-        const bool isRootGraph = data.getParent().hasType(Tags::graphs) &&
-                                 data.getParent().getParent().hasType(Tags::session);
+        const bool isRootGraph = graph.isRootGraph();
         
         PluginsPopupMenu menu (this);
         if (isRootGraph)
@@ -738,13 +751,12 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
         const int result = menu.show();
+        
         if (menu.isPluginResultCode (result))
         {
             bool verified = false;
             if (const auto* desc = menu.getPluginDescription (result, verified))
-                ViewHelpers::postMessageFor (this, new LoadPluginMessage (
-                    *desc, verified, e.position.getX() / getWidth(),
-                                     e.position.getY() / getHeight()));
+                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc));
         }
         else
         {
@@ -851,7 +863,8 @@ PinComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 
 void GraphEditorComponent::resized()
 {
-    updateComponents();
+    updateFilterComponents();
+    updateConnectorComponents();
 }
 
 void GraphEditorComponent::changeListenerCallback (ChangeBroadcaster*)
@@ -921,8 +934,7 @@ void GraphEditorComponent::updateComponents()
         }
     }
 
-    updateFilterComponents();
-    updateConnectorComponents();
+    resized();
 }
 
 void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,

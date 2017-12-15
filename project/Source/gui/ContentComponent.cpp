@@ -390,6 +390,10 @@ public:
     {
         if (auto* grid = dynamic_cast<ConnectionGrid*> (content1.get()))
             grid->setNode (node);
+        else if (auto* ed = dynamic_cast<GraphEditorView*> (content1.get()))
+            ed->setNode (node);
+        else if (nullptr != content1)
+            content1->stabilizeContent();
     }
     
     void setMainView (ContentView* view)
@@ -546,7 +550,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     }
     
     toolBar->setSession (getGlobals().getSession());
-    nav->setPanelSize (nav->getGraphsPanel(), 20 * 6, false);
+    nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 //    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
 }

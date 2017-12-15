@@ -57,17 +57,30 @@ private:
     SessionPtr session;
 };
 
-class SessionTreePanel : public TreePanelBase
+class SessionTreePanel : public TreePanelBase,
+                         private ValueTree::Listener
 {
 public:
     explicit SessionTreePanel();
     virtual ~SessionTreePanel();
+
+    void refresh();
+
     void mouseDown (const MouseEvent &event) override;
     void setSession (SessionPtr);
     SessionPtr getSession() const;
 
 private:
     SessionPtr session;
+    ValueTree data;
+
+    friend class ValueTree;
+    void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override;
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int indexRomovedAt) override;
+    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override;
+    void valueTreeParentChanged (ValueTree& tree) override;
+    void valueTreeRedirected (ValueTree& tree) override;
 };
 
 }

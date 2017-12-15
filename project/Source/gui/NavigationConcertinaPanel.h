@@ -391,13 +391,14 @@ public:
     void updateContent()
     {
         clearPanels();
-        auto* c = new ElementsNavigationPanel();
-        c->setName ("Elements");
-        addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
-        
+
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
-        addPanelInternal (-1, sess, "Session", 0);
+        addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
+
+        // auto* c = new ElementsNavigationPanel();
+        // c->setName ("Elements");
+        // addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");
@@ -413,6 +414,7 @@ public:
     AudioIOPanelView* getAudioIOPanel()             { return findPanel<AudioIOPanelView>(); }
     PluginsPanelView* getPluginsPanel()             { return findPanel<PluginsPanelView>(); }
     DataPathTreeComponent* getUserDataPathPanel()   { return findPanel<DataPathTreeComponent>(); }
+    SessionTreePanel* getSessionPanel()             { return findPanel<SessionTreePanel>(); }
     
     const StringArray& getNames() const { return names; }
     const int getHeaderHeight() const { return headerHeight; }
@@ -481,7 +483,7 @@ private:
     };
     
     class ElementsHeader : public Header,
-    public ButtonListener
+                           public ButtonListener
     {
     public:
         ElementsHeader (NavigationConcertinaPanel& _parent, Component& _panel)
@@ -503,10 +505,12 @@ private:
         
         void buttonClicked (Button*) override
         {
-            if (auto* cc = findParentComponentOfClass<ContentComponent>())
-                cc->getGlobals().getCommandManager().invokeDirectly (
-                                                                     (int)Commands::sessionAddGraph, true);
-                }
+            ViewHelpers::invokeDirectly (this, Commands::sessionAddGraph, false);
+            if (auto* p = dynamic_cast<SessionTreePanel*> (&panel))
+            {
+                p->refresh();
+            }
+        }
         
     private:
         TextButton addButton;

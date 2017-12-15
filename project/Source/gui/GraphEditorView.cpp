@@ -16,16 +16,25 @@ namespace Element {
     
     GraphEditorView::~GraphEditorView() { }
 
+    void GraphEditorView::setNode (const Node& g)
+    {
+        if (g == node)
+            return;
+
+        node = g;
+        stabilizeContent();
+    }
+
     void GraphEditorView::stabilizeContent()
     {
-        graph.deleteAllChildren();
-        if (auto session = ViewHelpers::getSession (this))
-            graph.setNode (session->getCurrentGraph());
-        graph.updateComponents();
+        graph.setNode (node);
     }
     
     void GraphEditorView::didBecomeActive()
     {
+        if (!node.isValid() || !node.isGraph())
+            if (auto session = ViewHelpers::getSession (this))
+                node = session->getCurrentGraph();
         stabilizeContent();
     }
     
@@ -36,6 +45,6 @@ namespace Element {
     
     void GraphEditorView::resized()
     {
-        graph.setBounds (getLocalBounds());
+        graph.setBounds (getLocalBounds().reduced (2));
     }
 }

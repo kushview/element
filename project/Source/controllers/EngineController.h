@@ -33,12 +33,18 @@ public:
     /** Adds a new root graph */
     void addGraph();
     
+    /** adds a specific graph */
+    void addGraph (const Node& n);
+
     /** Remove a root graph by index */
     void removeGraph (int index = -1);
 
     /** Duplicates the currently active root graph */
     void duplicateGraph();
-    
+
+    /** Ads a specific new graph */
+    void duplicateGraph (const Node& graph);
+
     /** Add a subgraph to the currently active root graph */
     void addSubGraph();
     

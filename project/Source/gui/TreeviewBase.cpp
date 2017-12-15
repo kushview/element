@@ -29,8 +29,9 @@ TreePanelBase::TreePanelBase (const String& treeviewID)
     tree.setRootItemVisible (false);
     tree.setDefaultOpenness (true);
     tree.setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
-    tree.setIndentSize (14);
-    tree.getViewport()->setScrollBarThickness (14);
+    tree.setIndentSize (16);
+    tree.setOpenCloseButtonsVisible (false);
+    tree.getViewport()->setScrollBarThickness (12);
 }
 
 TreePanelBase::~TreePanelBase()
@@ -77,7 +78,7 @@ TreeItemBase::~TreeItemBase()
 void TreeItemBase::refreshSubItems()
 {
     // FIXME: sub classes MUST provide the unique name
-    // WholeTreeOpennessRestorer wtor (*this);
+    WholeTreeOpennessRestorer wtor (*this);
     clearSubItems();
     addSubItems();
 }
@@ -99,11 +100,13 @@ float TreeItemBase::getIconSize() const
     return jmin (getItemHeight() - 4.0f, 18.0f);
 }
 
-void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& area,
-                                         Colour /* backgroundColour */, bool /* isMouseOver */)
+void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& r, Colour c, bool o)
 {
-    Path p;
+    getOwnerView()->getLookAndFeel().drawTreeviewPlusMinusBox (g, r, c, o, false);
+    return;
 
+    Path p;
+#if 0
     const float width  = area.getWidth();
     const float height = area.getHeight();
 
@@ -114,6 +117,7 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& ar
 
     g.setColour (Colours::white);
     g.fillPath (p);
+#endif
 }
 
 Colour TreeItemBase::getBackgroundColour() const
@@ -240,9 +244,8 @@ void TreeItemBase::handlePopupMenuResult (int)
 class TreeItemBase::ItemSelectionTimer  : public Timer
 {
 public:
-    ItemSelectionTimer (TreeItemBase& tvb)  : owner (tvb) {}
-
-    void timerCallback() override    { owner.invokeShowDocument(); }
+    ItemSelectionTimer (TreeItemBase& tvb)  : owner (tvb) { }
+    void timerCallback() override { owner.invokeShowDocument(); }
 
 private:
     TreeItemBase& owner;

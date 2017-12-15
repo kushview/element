@@ -10,7 +10,10 @@ GraphController::GraphController (GraphProcessor& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
 { }
 
-GraphController::~GraphController() { }
+GraphController::~GraphController()
+{ 
+    DBG("GraphController::~GraphController()");
+}
 
 uint32 GraphController::getNextUID() noexcept
 {

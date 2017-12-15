@@ -293,9 +293,29 @@ void EngineController::addGraph()
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
-    String err;
     Node node (Tags::graph);
     node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
+    addGraph (node);    
+    
+    findSibling<GuiController>()->stabilizeContent();
+}
+
+void EngineController::addGraph (const Node& newGraph)
+{
+    jassert(newGraph.isGraph());
+
+    Node node       = newGraph.getValueTree().getParent().isValid() ? newGraph
+                    : Node (newGraph.getValueTree().createCopy(), false);
+    auto engine     = getWorld().getAudioEngine();
+    auto session    = getWorld().getSession();
+    String err      = node.isGraph() ? String() : "Not a graph";   
+
+    if (err.isNotEmpty())
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Audio Engine", err);
+        return;
+    }
+
     if (auto* holder = graphs->add (new RootGraphHolder (node, getWorld())))
     {
         if (holder->attach (engine))
@@ -318,8 +338,15 @@ void EngineController::addGraph()
     {
         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Audio Engine", err);
     }
-    
+
     findSibling<GuiController>()->stabilizeContent();
+}
+
+void EngineController::duplicateGraph (const Node& graph)
+{
+    Node duplicate (graph.getValueTree().createCopy());
+    duplicate.setProperty (Tags::name, duplicate.getName().replace("(copy)","").trim() + String(" (copy)"));
+    addGraph (duplicate);
 }
 
 void EngineController::duplicateGraph()
@@ -330,29 +357,7 @@ void EngineController::duplicateGraph()
     
     String err;
     const Node current (session->getCurrentGraph());
-    Node node (current.getValueTree().createCopy());
-    node.setProperty (Tags::name, node.getName().replace("(copy)","").trim() + String(" (copy)"));
-    if (auto* holder = graphs->add (new RootGraphHolder (node, getWorld())))
-    {
-        if (holder->attach (engine))
-        {
-            session->addGraph (node, true);
-            setRootNode (node);
-            holder->addMissingIONodes();
-        }
-        else
-        {
-            err = "Could not attach new graph to engine.";
-        }
-    }
-    
-    if (err.isNotEmpty())
-    {
-        AlertWindow::showMessageBoxAsync (
-            AlertWindow::InfoIcon, "Audio Engine", "Could not duplicate graph: " + current.getName());
-    }
-    
-    findSibling<GuiController>()->stabilizeContent();
+    duplicateGraph (current);
 }
 
 void EngineController::removeGraph (int index)
@@ -599,14 +604,6 @@ void EngineController::setRootNode (const Node& newRootNode)
             r->getRootGraph().setPlayConfigFor (devices);
             r->setNodeModel (newRootNode);
             holder->resetIONodePorts();
-//            ValueTree nodes = newRootNode.getNodesValueTree();
-//            for (int i = nodes.getNumChildren(); --i >= 0;)
-//            {
-//                Node model (nodes.getChild (i), false);
-//                GraphNodePtr node = model.getGraphNode();
-//                if (node && (node->isAudioIONode() || node->isMidiIONode()))
-//                    model.resetPorts();
-//            }
         }
         
         engine->setCurrentGraph (index);
@@ -692,12 +689,12 @@ void EngineController::sessionReloaded()
     }
 }
 
-void EngineController::addPlugin (GraphController& controller, const PluginDescription& desc)
+void EngineController::addPlugin (GraphController& c, const PluginDescription& desc)
 {
-    const auto nodeId = controller.addFilter (&desc);
+    const auto nodeId = c.addFilter (&desc, 0.5f, 0.5f, 0);
     if (KV_INVALID_NODE != nodeId)
     {
-        const Node node (controller.getNodeModelForId (nodeId));
+        const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
             findSibling<GuiController>()->presentPluginWindow (node);
     }

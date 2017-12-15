@@ -312,8 +312,8 @@ void MidiEditorBody::paintTrackLane (Graphics &g, int track, const Rectangle<int
     track = (127 - track);
 
     g.resetToDefaultState();
-
-    if (true) //Midi::noteIsWhiteKey (track))
+    
+    if (! MidiMessage::isMidiNoteBlack (track))
         g.setColour (Colour (0xff999999));
     else
         g.setColour (Colour (0xff888888));
@@ -321,7 +321,6 @@ void MidiEditorBody::paintTrackLane (Graphics &g, int track, const Rectangle<int
     g.fillRect (area);
 #endif
 }
-
 
 void MidiEditorBody::selectNotesOnKey (int key, bool deselectOthers)
 {

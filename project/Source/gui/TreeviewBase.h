@@ -10,10 +10,8 @@ public:
     TreeItemBase();
     ~TreeItemBase();
 
+    void refreshSubItems();
     
-
-    void cancelDelayedSelectionTimer();
-
     virtual Font getFont() const;
     virtual String getRenamingName() const = 0;
     virtual String getDisplayName() const = 0;
@@ -26,7 +24,6 @@ public:
     virtual int getMillisecsAllowedForDragGesture()     { return 120; }
     virtual File getDraggableFile() const { return File::nonexistent; }
 
-    void refreshSubItems();
     virtual void deleteItem();
     virtual void deleteAllSelectedItems();
     virtual void showDocument();
@@ -44,16 +41,16 @@ public:
     Component* createItemComponent() override;
 
     void itemClicked (const MouseEvent& e) override;
-    void itemSelectionChanged (bool isNowSelected) override;
     void itemDoubleClicked (const MouseEvent&) override;
+
+    void itemSelectionChanged (bool isNowSelected) override;
     void paintItem (Graphics& g, int width, int height) override;
     void paintOpenCloseButton (Graphics&, const Rectangle<float>& area, 
-                              Colour backgroundColour, bool isMouseOver) override;
+                               Colour backgroundColour, bool isMouseOver) override;
 
-    struct WholeTreeOpennessRestorer   : public OpennessRestorer
+    struct WholeTreeOpennessRestorer : public OpennessRestorer
     {
-        WholeTreeOpennessRestorer (TreeViewItem& item)  : OpennessRestorer (getTopLevelItem (item))
-        {}
+    WholeTreeOpennessRestorer (TreeViewItem& item)  : OpennessRestorer (getTopLevelItem (item)) { }
 
     private:
         static TreeViewItem& getTopLevelItem (TreeViewItem& item)
@@ -68,6 +65,8 @@ public:
     int textX;
 
 protected:
+    void cancelDelayedSelectionTimer();
+
     template<class ParentType>
     inline ParentType* findParent() const
     {

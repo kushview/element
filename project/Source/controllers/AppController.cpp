@@ -165,8 +165,8 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* apm = dynamic_cast<const AddPluginMessage*> (&msg))
     {
-        const auto& graph (apm->graph);
-        const auto& desc (apm->description);
+        const auto graph (apm->graph);
+        const auto desc (apm->description);
         
         if (graph.isRootGraph())
         {

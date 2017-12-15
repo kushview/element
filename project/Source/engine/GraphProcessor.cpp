@@ -773,7 +773,7 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     if (auto* iop = dynamic_cast<AudioGraphIOProcessor*> (newProcessor))
         iop->setParentGraph (this);
     
-    if (GraphNodePtr node = createNode (nodeId, newProcessor))
+    if (GraphNode* node = createNode (nodeId, newProcessor))
     {
         node->setParentGraph (this);
         node->prepare (getSampleRate(), getBlockSize(), this);

@@ -104,7 +104,7 @@ public:
     }
     
     NodePopupMenu (const Node& n, const Port& p)
-        : node (n), port(p)
+        : node (n), port (p)
     {
         addMainItems (true);
         NodeArray siblings;
@@ -198,8 +198,7 @@ public:
     
     ~NodePopupMenu()
     {
-        resultMap.clear();
-        deleter.clearQuick (true);
+        reset();
     }
     
     Message* createMessageForResultCode (const int result)
@@ -234,10 +233,27 @@ public:
         return createMessageForResultCode (this->show());
     }
     
+    void reset()
+    {
+        resultMap.clear();
+        deleter.clearQuick (true);
+        presetNodes.clearQuick();
+        currentResultOpId = firstResultOpId;
+        this->clear();
+    }
+
+    void setNode (const Node& n, const bool header = true)
+    {
+        reset();
+        node = n;
+        if (node.isValid())
+            addMainItems (header);
+    }
+
 private:
-    const Node node;
+    Node node;
     NodeArray presetNodes;
-    const Port port;
+    Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;
     
