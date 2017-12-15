@@ -541,6 +541,7 @@ void EngineController::deactivate()
     auto engine   (globals.getAudioEngine());
     graphs->savePluginStates();
     graphs->detachAll();
+    graphs->clear();
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
 }

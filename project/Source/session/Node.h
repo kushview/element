@@ -98,6 +98,11 @@ namespace Element {
                     sanitizeProperties (node.getChild(i), recursive);
         }
         
+        /** this is just an alias right now */
+        static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false) {
+            sanitizeProperties (node, recursive);
+        }
+
         /** Create a value tree version of an arc */
         static ValueTree makeArc (const kv::Arc& arc);
         static Arc arcFromValueTree (const ValueTree& data);

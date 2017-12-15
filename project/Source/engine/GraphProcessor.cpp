@@ -5,6 +5,7 @@
 
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -785,7 +786,6 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     
     return nullptr;
 }
-
 bool GraphProcessor::removeNode (const uint32 nodeId)
 {
     disconnectNode (nodeId);
@@ -795,12 +795,18 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
         GraphNodePtr n = nodes.getUnchecked (i);
         if (nodes.getUnchecked(i)->nodeId == nodeId)
         {
-            nodes.remove(i);
+            nodes.remove (i);
          
             // triggerAsyncUpdate();
             // do this syncronoously so it wont try processing with a null graph
             handleAsyncUpdate();
             n->setParentGraph (nullptr);
+
+            if (auto* sub = dynamic_cast<SubGraphProcessor*> (n->getAudioProcessor()))
+            {
+                DBG("sub removed");
+            }
+
             return true;
         }
     }

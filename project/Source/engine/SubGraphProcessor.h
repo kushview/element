@@ -25,6 +25,8 @@ private:
     ScopedPointer<GraphController> controller;
     void createAllIONodes();
     void initController (PluginManager& plugins);
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SubGraphProcessor);
 };
 
 }

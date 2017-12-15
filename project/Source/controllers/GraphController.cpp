@@ -11,8 +11,13 @@ GraphController::GraphController (GraphProcessor& pg, PluginManager& pm)
 { }
 
 GraphController::~GraphController()
-{ 
-    DBG("GraphController::~GraphController()");
+{
+    // Make sure to dereference GraphNode's so we don't leak memory
+    // If you get warnings by juce's leak detector about graph related
+    // objects, then there's probably "object" properties lingering that
+    // are referenced in the model;
+    Node::sanitizeRuntimeProperties (graph, true);
+    graph = arcs = nodes = ValueTree();
 }
 
 uint32 GraphController::getNextUID() noexcept
@@ -161,7 +166,14 @@ void GraphController::removeFilter (const uint32 uid)
         const Node node (nodes.getChild(i), false);
         if (node.getNodeId() == uid)
         {
-            nodes.removeChild (node.getValueTree(), nullptr);
+            // the model was probably referencing the node ptr
+            GraphNodePtr obj = node.getGraphNode();
+            auto data = node.getValueTree();
+            nodes.removeChild (data, nullptr);
+            // clear all referecnce counted objects
+            Node::sanitizeProperties (data, true);
+            // finally delete the node + plugin instance.
+            obj = nullptr;
         }
     }
     
@@ -307,6 +319,7 @@ void GraphController::clear()
     
     if (graph.isValid())
     {
+        Node::sanitizeRuntimeProperties (graph);
         graph.removeChild (arcs, nullptr);
         graph.removeChild (nodes, nullptr);
         nodes.removeAllChildren (nullptr);

@@ -12,7 +12,8 @@ SubGraphProcessor::SubGraphProcessor ()
 }
 
 SubGraphProcessor::~SubGraphProcessor()
-{ 
+{
+    clear();
     controller = nullptr;
 }
 
