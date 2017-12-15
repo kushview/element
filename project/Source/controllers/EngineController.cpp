@@ -597,6 +597,11 @@ void EngineController::setRootNode (const Node& newRootNode)
         holder->attach (engine);
     const int index = holder->getRootGraph()->getEngineIndex();
 
+#if 0
+    // saving this for reference. graphs will need to be
+    // explicitly de-activated by users to unload them
+    // moving forward - MRF
+    
     /* Unload the active graph if necessary */
     auto* active = graphs->findActiveInEngine();
     if (active && active != holder)
@@ -611,6 +616,7 @@ void EngineController::setRootNode (const Node& newRootNode)
             DBG("[EL] graph unloaded: " << active->model.getName());
         }
     }
+#endif
 
     if (auto* proc = holder->getRootGraph())
     {

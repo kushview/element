@@ -148,6 +148,30 @@ public:
             .findChild<EngineController>()->duplicateGraph (node);
     }
 
+   
+    void showSettings()
+    {
+        updateIndexInParent();
+        ViewHelpers::invokeDirectly (getOwnerView(), Commands::showGraphConfig, false);
+    }
+
+    void editGraph()
+    {
+        updateIndexInParent();
+        ViewHelpers::invokeDirectly (getOwnerView(), Commands::showGraphEditor, false);
+    }
+
+    int getIndexInParent() const
+    {
+        return node.getValueTree().getParent().indexOf (node.getValueTree());
+    }
+
+    void updateIndexInParent()
+    {
+        const int index = getIndexInParent();
+        node.getValueTree().getParent().setProperty (Tags::active, index, 0);
+    }
+
     void handlePopupMenuResult (int result) override
     {
         switch (result)
@@ -155,6 +179,8 @@ public:
             case 0: break;
             case 1: deleteItem(); break;
             case 2: duplicateItem(); break;
+            case 3: showSettings(); break;
+            case 4: editGraph(); break;
             {
                 
             } break;
@@ -165,10 +191,12 @@ public:
 
     void showPopupMenu() override
     {   
-        
         PopupMenu menu;
         menu.addItem (1, "Remove");
         menu.addItem (2, "Duplicate");
+        menu.addSeparator();
+        menu.addItem (4, "Edit");
+        menu.addItem (3, "Settings...");
         
         launchPopupMenu (menu);
     }

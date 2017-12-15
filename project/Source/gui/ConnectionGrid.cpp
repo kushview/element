@@ -281,17 +281,9 @@ namespace Element
         {
             if (! ev.mods.isPopupMenu())
             {
-                DBG("GRAPH");
-                auto printme = graphModel.createCopy();
-                Node::sanitizeProperties(printme, true);
-                DBG(printme.toXmlString());
-
-                DBG("NODES");
-                printme = nodeModels.createCopy();
-                Node::sanitizeProperties(printme, true);
-                DBG(printme.toXmlString());
                 return;
             }
+            
             const Node graph (graphModel);
             
             PluginsPopupMenu menu (this);

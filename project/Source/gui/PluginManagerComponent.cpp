@@ -821,6 +821,7 @@ void PluginListComponent::scanFinished (const StringArray& failedFiles)
     
 PluginManagerContentView::PluginManagerContentView()
 {
+    setName ("PluginManager");
     setEscapeTriggersClose (true);
 }
 

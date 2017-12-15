@@ -805,8 +805,17 @@ void ContentComponent::setCurrentNode (const Node& node)
         if (getSession()->getNumGraphs() > 0)
             setMainView ("GraphEditor");
     
+    if (getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager")
+        setMainView ("GraphEditor");
+
     if (node.hasNodeType (Tags::graph))
+    {
         container->setNode (node);
+    }
+    else
+    {
+        DBG("don't know how to show: " << node.getProperty(Tags::type).toString() << ": " << node.getName());
+    }
 }
 
 void ContentComponent::updateLayout()

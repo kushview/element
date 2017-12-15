@@ -228,11 +228,15 @@ public:
     void makeEditorActive()
     {
         if (node.isGraph())
-            if (auto* cc = ViewHelpers::findContentComponent(this))
+        {
+            // TODO: this can cause a crash, do it async
+            if (auto* cc = ViewHelpers::findContentComponent (this))
                 cc->setCurrentNode (node);
-            
-        if (node.isValid())
+        }
+        else if (node.isValid())
+        {
             ViewHelpers::presentPluginWindow (this, node);
+        }
     }
     
     void mouseUp (const MouseEvent& e) override
