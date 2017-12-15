@@ -14,10 +14,20 @@ namespace Element {
     
     static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescription& pd)
     {
-        pd.pluginFormatName = p.getProperty (Tags::format);
-        pd.fileOrIdentifier = p.getProperty (Tags::identifier);
-        if (pd.fileOrIdentifier.isEmpty())
-            pd.fileOrIdentifier = p.getProperty (Slugs::file);
+        if (p.getProperty(Tags::type) == "graph")
+        {
+            pd.name = p.getProperty (Tags::name);
+            pd.fileOrIdentifier = "element.graph";
+            pd.pluginFormatName = "Element";
+        }
+        else
+        {
+            // plugins and io nodes
+            pd.pluginFormatName = p.getProperty (Tags::format);
+            pd.fileOrIdentifier = p.getProperty (Tags::identifier);
+            if (pd.fileOrIdentifier.isEmpty())
+                pd.fileOrIdentifier = p.getProperty (Slugs::file);
+        }
     }
     
     

@@ -9,10 +9,15 @@
 #include "gui/ContentComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/PluginWindow.h"
+
+#include "gui/AudioIOPanelView.h"
+#include "gui/SessionTreePanel.h"
+#include "gui/PluginsPanelView.h"
+#include "gui/NavigationConcertinaPanel.h"
+
 #include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
-
 #include "gui/GraphEditorComponent.h"
 
 namespace Element {
@@ -1136,26 +1141,49 @@ PluginWindow* GraphEditorComponent::getOrCreateWindowForNode (GraphNodePtr f, bo
 
 bool GraphEditorComponent::isInterestedInDragSource (const SourceDetails& details)
 {
+    if (details.description.toString() == "ccNavConcertinaPanel")
+        return true;
+    
     if (! details.description.isArray())
         return false;
     
     if (auto* a = details.description.getArray())
     {
         const var type (a->getFirst());
-        return type == var ("element://dnd/plugin");
+        return type == var ("plugin");
     }
     
     return false;
 }
 
+static float lastDropX = 0.5f;
+static float lastDropY = 0.5f;
+
 void GraphEditorComponent::itemDropped (const SourceDetails& details)
 {
+    lastDropX = (float)details.localPosition.x / (float)getWidth();
+    lastDropY = (float)details.localPosition.y / (float)getHeight();
+    
     if (const auto* a = details.description.getArray())
     {
-        PluginDescription desc;
-        desc.pluginFormatName = a->getUnchecked (1);
-        desc.fileOrIdentifier = a->getUnchecked (2);
-        createNewPlugin (&desc, details.localPosition.x, details.localPosition.y);
+        auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
+        if (const auto* t = plugs.availablePlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
+            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));        
+    }
+    else if (details.description.toString() == "ccNavConcertinaPanel")
+    {
+        auto* nav = ViewHelpers::getNavigationConcertinaPanel (this);
+        if (auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : nullptr)
+        {
+            File file = panel->getSelectedFile();
+            if (file.hasFileExtension ("elg") ||
+                file.hasFileExtension ("elpreset"))
+            {
+                const Node node (Node::parse (file));
+                if (node.isValid())
+                    ViewHelpers::postMessageFor (this, new AddNodeMessage (node, graph));
+            }
+        }
     }
 }
 
@@ -1164,12 +1192,18 @@ bool shouldDrawDragImageWhenOver()
     return true;
 }
 
-void GraphEditorComponent::valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded)
+void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
-    if (childWhichHasBeenAdded.hasType (Tags::node) ||
-        childWhichHasBeenAdded.hasType (Tags::arc) ||
-        childWhichHasBeenAdded.hasType (Tags::nodes) ||
-        childWhichHasBeenAdded.hasType (Tags::arcs))
+    if (child.hasType (Tags::node))
+    {
+        child.setProperty ("relativeX", verticalLayout ? lastDropX : lastDropY, 0);
+        child.setProperty ("relativeY", verticalLayout ? lastDropY : lastDropX, 0);
+        auto* comp = new FilterComponent (graph, Node (child, false), verticalLayout);
+        addAndMakeVisible (comp);
+        comp->update();
+    }
+    else if (child.hasType (Tags::arc) || child.hasType (Tags::nodes) ||
+             child.hasType (Tags::arcs))
     {
         updateComponents();
     }

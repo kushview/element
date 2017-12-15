@@ -11,6 +11,7 @@ namespace Element {
 class ContentComponent;
 class Globals;
 class Node;
+class NavigationConcertinaPanel;
 
 namespace ViewHelpers {
 
@@ -28,6 +29,8 @@ Globals* getGlobals (Component* c);
 
 /** Get Session */
 SessionPtr getSession (Component* c);
+
+NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c);
 
 /** Invoke a command directly */
 bool invokeDirectly (Component* c, const int commandID, bool async);

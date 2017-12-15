@@ -53,6 +53,8 @@ public:
     ContentComponent (AppController& app);
     ~ContentComponent();
 
+    NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
+
     void childBoundsChanged (Component* child) override;
     void mouseDown (const MouseEvent&) override;
     void paint (Graphics &g) override;
@@ -83,6 +85,7 @@ public:
     
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
+
 private:
     AppController& controller;
     

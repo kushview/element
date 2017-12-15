@@ -84,11 +84,13 @@ public:
 
 class AddNodeMessage : public Message {
 public:
-    AddNodeMessage (const Node& n)
-        : node (n.getValueTree().createCopy())
+    AddNodeMessage (const Node& n, const Node& t = Node())
+        : node (n.getValueTree().createCopy()),
+          target(t)
     { }
     
     const Node node;
+    const Node target;
 };
 
 /** Send this when a plugin needs loaded into the graph */
@@ -113,9 +115,11 @@ public:
     const bool verified;
 };
 
-struct AddPluginMessage : public AppMessage {
+struct AddPluginMessage : public AppMessage
+{
     AddPluginMessage (const Node& g, const PluginDescription& d)
-        : graph (g), description (d)
+        : graph (g),
+          description (d)
     { }
 
     const Node graph;

@@ -131,6 +131,12 @@ void presentPluginWindow (const Node& node)
     jassertfalse;
 }
 
+NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c)
+{
+    if (auto* cc = findContentComponent (c))
+        return cc->getNavigationConcertinaPanel();
+    return nullptr;
+}
 }
 }
 

@@ -801,21 +801,15 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
 
 void ContentComponent::setCurrentNode (const Node& node)
 {
-    if (nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()))
-        if (getSession()->getNumGraphs() > 0)
-            setMainView ("GraphEditor");
-    
-    if (getMainViewName() == "SessionSettings" || getMainViewName() == "PluginManager")
+    if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) ||
+        getMainViewName() == "SessionSettings" || 
+        getMainViewName() == "PluginManager") && 
+        getSession()->getNumGraphs() > 0)
+    {
         setMainView ("GraphEditor");
+    }
 
-    if (node.hasNodeType (Tags::graph))
-    {
-        container->setNode (node);
-    }
-    else
-    {
-        DBG("don't know how to show: " << node.getProperty(Tags::type).toString() << ": " << node.getName());
-    }
+    container->setNode (node);
 }
 
 void ContentComponent::updateLayout()

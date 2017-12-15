@@ -166,7 +166,10 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
-        ec->addNode (anm->node);
+        if (anm->target.isValid ())
+            ec->addNode (anm->node, anm->target);
+        else
+            ec->addNode (anm->node);
     }
     else if (const auto* apm = dynamic_cast<const AddPluginMessage*> (&msg))
     {

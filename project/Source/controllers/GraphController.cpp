@@ -56,6 +56,11 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
         node = processor.addNode (instance, nodeId);
     }
     
+    if (errorMessage.isNotEmpty())
+    {
+        DBG("[EL] error creating audio plugin: " << errorMessage);
+    }
+    
     return node;
 }
 
@@ -77,8 +82,13 @@ uint32 GraphController::addNode (const Node& newNode)
     }
     
     uint32 nodeId = KV_INVALID_NODE;
-    PluginDescription desc; newNode.getPluginDescription (desc);
+    PluginDescription desc; 
+    newNode.getPluginDescription (desc);
     
+    DBG("desc: " << desc.name);
+    DBG("desc: " << desc.pluginFormatName);
+    DBG("desc: " << desc.fileOrIdentifier);
+
     if (auto* node = createFilter (&desc, 0, 0))
     {
         nodeId = node->nodeId;
@@ -92,7 +102,7 @@ uint32 GraphController::addNode (const Node& newNode)
         data.removeProperty ("windowY", nullptr);
         data.removeProperty ("windowVisible", nullptr);
 
-        const Node n (data, false);
+        Node n (data, false);
         
         {
             MemoryBlock state;
@@ -101,7 +111,11 @@ uint32 GraphController::addNode (const Node& newNode)
         }
         
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+        {
+            DBG("total in: "<< sub->getTotalNumInputChannels());
             sub->getController().setNodeModel (n);
+            n.resetPorts();
+        }
         
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (data, -1, nullptr);
