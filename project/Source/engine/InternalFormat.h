@@ -106,7 +106,6 @@ namespace Element {
         PluginDescription reverbDesc;
         PluginDescription combFilterDesc;
         PluginDescription allPassFilterDesc;
-        
         AudioPluginInstance* instantiatePlugin (const PluginDescription& desc, double rate, int block);
     };
 }

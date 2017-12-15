@@ -11,20 +11,19 @@ SubGraphProcessor::SubGraphProcessor ()
     setPlayConfigDetails (2, 2, 44100.f, 512);
 }
 
-SubGraphProcessor::~SubGraphProcessor() { }
-
-GraphController* SubGraphProcessor::createGraphController (PluginManager& plugins)
-{
-    return new GraphController (*this, plugins);
-    createAllIONodes();
+SubGraphProcessor::~SubGraphProcessor()
+{ 
+    controller = nullptr;
 }
 
-void SubGraphProcessor::createAllIONodes()
+void SubGraphProcessor::initController (PluginManager& plugins)
 {
-    for (int i = 0; i < IOProcessor::numDeviceTypes; ++i)
-        if (nullptr == ioNodes [i])
-            ioNodes[i] = addNode (new IOProcessor ((IOProcessor::IODeviceType) i));
+    if (controller != nullptr)
+        return;
+    controller = new GraphController (*this, plugins);
 }
+
+void SubGraphProcessor::createAllIONodes() { }
 
 void SubGraphProcessor::fillInPluginDescription (PluginDescription& d) const
 {

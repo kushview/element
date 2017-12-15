@@ -3,6 +3,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
@@ -130,8 +131,6 @@ struct RootGraphHolder
             ioNodes[t] = root->getNodeForId (nodeId);
             jassert(ioNodes[t] != nullptr);
         }
-        
-        
     }
     
     void resetIONodePorts()
@@ -173,14 +172,25 @@ public:
         graphs.clear();
     }
     
-    GraphController* findSubGraphController (const Node& node)
+    GraphController* findSubGraphController (const Node& n)
     {
+        if (n.isRootGraph() || !n.isGraph())
+            return nullptr;
+        
         for (auto* const h : graphs)
-            if (auto* rc = h->getController()) // TODO: make this recursive
-                for (int i = 0; i < rc->getNumChildren(); ++i)
-                    if (auto* gc = dynamic_cast<GraphController*> (rc->getChild (i)))
-                        if (gc->isControlling (node))
-                            return gc;
+        {
+            if (auto* controller = h->getController())
+            {
+                for (int i = controller->getNumFilters(); --i >= 0;)
+                {
+                    if (GraphNodePtr node = controller->getNode (i))
+                        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+                            if (sub->getController().isControlling (n))
+                                return &sub->getController();
+                }
+            }
+        }
+        
         return nullptr;
     }
 

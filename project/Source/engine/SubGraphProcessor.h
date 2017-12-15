@@ -16,13 +16,15 @@ public:
     SubGraphProcessor();
     virtual ~SubGraphProcessor();
     void fillInPluginDescription (PluginDescription& d) const override;
-    GraphController* createGraphController (PluginManager&);
-
+    GraphController& getController() const { jassert(controller); return* controller; }
+    
 private:
     typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
     GraphNodePtr ioNodes [PortType::Unknown];
     friend class GraphController;
+    ScopedPointer<GraphController> controller;
     void createAllIONodes();
+    void initController (PluginManager& plugins);
 };
 
 }

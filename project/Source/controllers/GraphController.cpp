@@ -43,7 +43,11 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     
     if (instance != nullptr)
     {
+        if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
+            sub->initController (pluginManager);
+        
         instance->enableAllBuses();
+        
         node = processor.addNode (instance, nodeId);
     }
     
@@ -92,13 +96,7 @@ uint32 GraphController::addNode (const Node& newNode)
         }
         
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
-        {
-            if (auto* gc = sub->createGraphController (pluginManager))
-            {
-                gc->setNodeModel (n);
-                addChild (gc);
-            }
-        }
+            sub->getController().setNodeModel (n);
         
         node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (data, -1, nullptr);
@@ -135,13 +133,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
         Node n (model, false);
 
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
-        {
-            if (auto* gc = sub->createGraphController (pluginManager))
-            {
-                gc->setNodeModel (n);
-                addChild (gc);
-            }
-        }
+            sub->getController().setNodeModel (n);
         
         n.resetPorts();
 
@@ -261,13 +253,7 @@ void GraphController::setNodeModel (const Node& node)
                 obj->getAudioProcessor()->suspendProcessing (true);
             
             if (auto* sub = dynamic_cast<SubGraphProcessor*> (obj->getAudioProcessor()))
-            {
-                if (auto* gc = sub->createGraphController (pluginManager))
-                {
-                    gc->setNodeModel (node);
-                    addChild (gc);
-                }
-            }
+                sub->getController().setNodeModel (node);
         }
         else if (GraphNodePtr obj = createPlaceholder (node))
         {
