@@ -85,6 +85,8 @@ public:
     /** called when the session loads or re-loads */
     void sessionReloaded();
     
+    void changeBusesLayout (const Node& node, const AudioProcessor::BusesLayout& layout);
+    
 private:
     friend class RootGraphHolder;
     class RootGraphs; friend class RootGraphs;

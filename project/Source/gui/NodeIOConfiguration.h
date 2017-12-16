@@ -10,7 +10,8 @@ class GraphEditorComponent;
 class GraphProcessor;
 class MainWindow;
 
-class NodeAudioBusesComponent : public  AudioProcessorEditor
+class NodeAudioBusesComponent : public AudioProcessorEditor,
+                                public ButtonListener
 {
 public:
     class InputOutputConfig;
@@ -24,6 +25,8 @@ public:
     InputOutputConfig* getConfig (bool isInput) noexcept { return isInput ? inConfig : outConfig; }
     void update();
 
+    void buttonClicked (Button*) override;
+    
 private:
     MainWindow* getMainWindow() const;
     GraphEditorComponent* getGraphEditor() const;
@@ -32,10 +35,12 @@ private:
 
     friend class InputOutputConfig;
     Node node;
-    
+
     AudioProcessor::BusesLayout currentLayout;
+
     Label title;
     ScopedPointer<InputOutputConfig> inConfig, outConfig;
+    TextButton saveButton, cancelButton;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeAudioBusesComponent)
 };

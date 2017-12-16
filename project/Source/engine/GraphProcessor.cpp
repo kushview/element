@@ -952,6 +952,7 @@ bool GraphProcessor::isConnectionLegal (const Connection* const c) const
     const GraphNode* const dest   = getNodeForId (c->destNode);
 
     return source != nullptr && dest != nullptr
+            && source->isPortOutput (c->sourcePort) && dest->isPortInput (c->destPort)
             && source->getPortType (c->sourcePort).canConnect (dest->getPortType (c->destPort))
             && c->sourcePort < source->getNumPorts()
             && c->destPort < dest->getNumPorts();

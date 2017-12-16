@@ -256,19 +256,29 @@ private:
                     }
                 }
 
-                layouts.setSelectedId (bus->getLastEnabledLayout().size());
-
+                const auto& channelSet = isInput ? owner.currentLayout.inputBuses.getReference(currentBus)
+                                                 : owner.currentLayout.outputBuses.getReference(currentBus);
+                
+                layouts.setSelectedId (channelSet.size());
+                
                 const bool canBeDisabled = bus->isNumberOfChannelsSupported (0);
 
                 if (canBeDisabled != enabledToggle.isEnabled())
                     enabledToggle.setEnabled (canBeDisabled);
 
-                DBG("update layout");
                 enabledToggle.setToggleState (bus->isEnabled(), NotificationType::dontSendNotification);
-            }
-
-            
+            }            
         }
+    }
+
+    void updateOthers()
+    {
+        updateBusLayout();
+
+        if (InputOutputConfig* config = owner.getConfig (! isInput))
+            config->updateBusLayout();
+
+        owner.update();
     }
 
     //==============================================================================
@@ -284,6 +294,14 @@ private:
 
                     if (selectedNumChannels != bus->getLastEnabledLayout().size())
                     {
+                        if (isPositiveAndBelow (selectedNumChannels, AudioChannelSet::maxChannelsOfNamedLayout))
+                        {
+                            auto& currentSet = isInput ? owner.currentLayout.inputBuses 
+                                                       : owner.currentLayout.outputBuses;
+                            currentSet.getReference (currentBus) = bus->supportedLayoutWithChannels (selectedNumChannels);
+                            updateOthers();
+                        }
+#if 0
                         if (isPositiveAndBelow (selectedNumChannels, AudioChannelSet::maxChannelsOfNamedLayout)
                              && bus->setCurrentLayoutWithoutEnabling (bus->supportedLayoutWithChannels (selectedNumChannels)))
                         {
@@ -292,6 +310,7 @@ private:
 
                             owner.update();
                         }
+                        #endif
                     }
                 }
             }
@@ -310,21 +329,16 @@ private:
                 {
                     if (bus->isEnabled() != enabledToggle.getToggleState())
                     {
-                        bool success;
-
+                        bool success = false;
+#if 0
                         if (enabledToggle.getToggleState())
                             success = bus->enable();
                         else
                             success = bus->setCurrentLayout (AudioChannelSet::disabled());
-
+#endif
                         if (success)
                         {
-                            updateBusLayout();
-
-                            if (InputOutputConfig* config = owner.getConfig (! isInput))
-                                config->updateBusLayout();
-
-                            owner.update();
+                            updateOthers();
                         }
                         else
                         {
@@ -419,52 +433,56 @@ NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor*
     jassert (p != nullptr);
     jassert (nullptr != n.getGraphNode());
     jassert (p == n.getGraphNode()->getAudioProcessor());
-
+    currentLayout = p->getBusesLayout();
+    
     setOpaque (true);
 
     title.setFont (title.getFont().withStyle (Font::bold));
     addAndMakeVisible (title);
 
-    {
-        ScopedLock renderLock (p->getCallbackLock());
-        p->suspendProcessing (true);
-        p->releaseResources();
-    }
-
-    if (p->getBusCount (true)  > 0 || p->canAddBus (true))
+    if (p->getBusCount (true)  > 0)// || p->canAddBus (true))
         addAndMakeVisible (inConfig = new InputOutputConfig (*this, true));
 
-    if (p->getBusCount (false) > 0 || p->canAddBus (false))
+    if (p->getBusCount (false) > 0)// || p->canAddBus (false))
         addAndMakeVisible (outConfig = new InputOutputConfig (*this, false));
 
-    currentLayout = p->getBusesLayout();
-    setSize (400, (inConfig != nullptr && outConfig != nullptr ? 160 : 0) + 200);
+    
+    addAndMakeVisible(saveButton);
+    saveButton.setButtonText ("Save");
+    saveButton.addListener (this);
+
+    addAndMakeVisible(cancelButton);
+    cancelButton.setButtonText ("Cancel");
+    cancelButton.addListener (this);
+
+    setSize (400, (inConfig != nullptr && outConfig != nullptr ? 160 : 0) + 226);
 }
 
-NodeAudioBusesComponent::~NodeAudioBusesComponent()
+NodeAudioBusesComponent::~NodeAudioBusesComponent() { }
+
+void NodeAudioBusesComponent::buttonClicked (Button* b)
 {
-    if (auto* graph = getGraph())
+    if (b == &saveButton)
     {
-        if (auto* p = getAudioProcessor())
+        bool posted = false;
+
+        if (auto* window = getMainWindow())
         {
-            ScopedLock renderLock (graph->getCallbackLock());
+            if (auto * cc = dynamic_cast<ContentComponent*> (window->getContentComponent()))
+            {
+                cc->post (new ChangeBusesLayout (node, currentLayout));
+                posted = true;
+            }
+        }
 
-            graph->suspendProcessing (true);
-            graph->releaseResources();
-
-            p->prepareToPlay (p->getSampleRate(), p->getBlockSize());
-            p->suspendProcessing (false);
-
-            graph->prepareToPlay (graph->getSampleRate(), graph->getBlockSize());
-            graph->suspendProcessing (false);
+        if (! posted)
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, node.getName(), "Could request update of audio buses.");
         }
     }
-    else if (auto* p = getAudioProcessor())
-    {
-        ScopedLock procLock (p->getCallbackLock());
-        p->prepareToPlay (p->getSampleRate(), p->getBlockSize());
-        p->suspendProcessing (false);
-    }
+
+    if (auto* co = findParentComponentOfClass<CallOutBox> ())
+        co->dismiss();
 }
 
 void NodeAudioBusesComponent::paint (Graphics& g)
@@ -475,6 +493,7 @@ void NodeAudioBusesComponent::paint (Graphics& g)
 void NodeAudioBusesComponent::resized()
 {
     auto r = getLocalBounds().reduced (10);
+    auto r2 = r.removeFromBottom (22);
 
     title.setBounds (r.removeFromTop (14));
     r.reduce (10, 0);
@@ -484,12 +503,18 @@ void NodeAudioBusesComponent::resized()
 
     if (outConfig != nullptr)
         outConfig->setBounds (r.removeFromTop (160));
+    
+    cancelButton.changeWidthToFitText (22);
+    cancelButton.setBounds (r2.removeFromRight (cancelButton.getWidth()));
+
+    r2.removeFromRight (4);
+    saveButton.changeWidthToFitText (22);
+    saveButton.setBounds (r2.removeFromRight (saveButton.getWidth()));
 }
 
 void NodeAudioBusesComponent::update()
 {
-    auto nodeId = getNodeId();
-    node.resetPorts();
+    DBG("NodeAudioBusesComponent::update()");
 }
 
 int32 NodeAudioBusesComponent::getNodeId() const

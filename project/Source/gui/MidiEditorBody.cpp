@@ -297,10 +297,10 @@ void MidiEditorBody::paintTrackHeader (Graphics &g, int track, const Rectangle<i
         g.drawHorizontalLine (area.getBottom(), area.getX(), area.getRight());
     }
 
-    if (true) // Midi::noteIsWhiteKey (track))
-        g.setColour (Colours::white);
-    else
-        g.setColour (Colours::black);
+//    if (true) // Midi::noteIsWhiteKey (track))
+//        g.setColour (Colours::white);
+//    else
+//        g.setColour (Colours::black);
 
     Rectangle<int> r (area);
     g.fillRect (r.removeFromRight (area.getWidth() / 2));

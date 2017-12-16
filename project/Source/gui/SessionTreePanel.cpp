@@ -39,13 +39,6 @@ void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int wid
     ViewHelpers::drawBasicTextRow ("  " + node.getName(), g, width, height, rowIsSelected);
 }
 
-static String nextUniqueName()
-{
-    static int next = 0;
-    String name ("ID:"); name << next++;
-    return name;
-}
-
 class SessionNodeTreeItem : public TreeItemBase
 {
     

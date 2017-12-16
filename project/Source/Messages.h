@@ -151,9 +151,18 @@ public:
     const Node node;
 };
 
-class FinishedLaunchingMessage : public Message {
-public:
+struct FinishedLaunchingMessage : public AppMessage
+{
     FinishedLaunchingMessage() { }
     ~FinishedLaunchingMessage() { }
 };
+
+struct ChangeBusesLayout : public AppMessage
+{
+    ChangeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& l)
+        : node (n), layout (l) { }
+    const Node node;
+    const AudioProcessor::BusesLayout layout;
+};
+
 }

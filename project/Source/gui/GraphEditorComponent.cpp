@@ -149,6 +149,7 @@ public:
         addAndMakeVisible (ioButton);
         ioButton.setButtonText ("IO");
         ioButton.addListener (this);
+        ioButton.setVisible (!node.isIONode() && !node.isGraph());
 
         setSize (vertical ? 150 : 170, 60);
     }
@@ -305,7 +306,7 @@ public:
         g.drawRect (box);
     }
 
-    void resized()
+    void resized() override
     {
         auto r (getBoxRectangle());
         ioButton.setBounds (r.removeFromTop(20).removeFromRight (16));

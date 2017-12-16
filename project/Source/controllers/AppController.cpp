@@ -204,6 +204,10 @@ void AppController::handleMessage (const Message& msg)
             handled = false;
         }
     }
+    else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
+    {
+        ec->changeBusesLayout (cbm->node, cbm->layout);
+    }
     else
     {
         handled = false;

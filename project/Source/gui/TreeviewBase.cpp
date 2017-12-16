@@ -104,9 +104,9 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& r,
 {
     getOwnerView()->getLookAndFeel().drawTreeviewPlusMinusBox (g, r, c, o, false);
     return;
-
-    Path p;
 #if 0
+    Path p;
+
     const float width  = area.getWidth();
     const float height = area.getHeight();
 

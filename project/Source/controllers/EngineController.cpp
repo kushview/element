@@ -780,4 +780,48 @@ void EngineController::addPlugin (GraphController& c, const PluginDescription& d
     }
 }
 
+void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)
+{
+    Node node  = n;
+    Node graph = node.getParentGraph();
+    GraphNodePtr ptr = node.getGraphNode();
+    auto* controller = graphs->findGraphControllerFor (graph);
+    if (! controller)
+        return;
+    
+    if (AudioProcessor* proc = ptr ? ptr->getAudioProcessor () : nullptr)
+    {
+        GraphNodePtr ptr2 = graph.getGraphNode();
+        if (auto* gp = dynamic_cast<GraphProcessor*> (ptr2->getAudioProcessor()))
+        {
+            if (proc->checkBusesLayoutSupported (layout))
+            {   
+                gp->suspendProcessing (true);
+                gp->releaseResources();
+                
+                const bool wasNotSuspended = ! proc->isSuspended();
+                proc->suspendProcessing (true);
+                proc->releaseResources();
+                const bool success = proc->setBusesLayoutWithoutEnabling (layout);
+                if (wasNotSuspended)
+                    proc->suspendProcessing (false);
+                
+        
+                gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
+                gp->suspendProcessing (false);
+
+                DBG(graph.getValueTree().toXmlString());
+
+                controller->removeIllegalConnections();
+                controller->syncArcsModel();
+                node.resetPorts();
+
+                DBG(graph.getValueTree().toXmlString());
+
+                bool b = false;
+            }
+        }
+    }
+}
+
 }
