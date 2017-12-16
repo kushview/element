@@ -95,7 +95,7 @@ private:
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
     void addMissingIONodes();
-    void addPlugin (GraphController& controller, const PluginDescription& desc);
+    Node addPlugin (GraphController& controller, const PluginDescription& desc);
 };
     
 }

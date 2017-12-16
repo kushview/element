@@ -132,6 +132,8 @@ struct AddPluginMessage : public AppMessage
 
     const Node graph;
     const PluginDescription description;
+
+    const bool autoConnectToAudioInput = true;
 };
 
 class DuplicateNodeMessage : public Message {

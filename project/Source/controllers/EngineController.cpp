@@ -750,7 +750,16 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
         return;
     
     if (auto* controller = graphs->findSubGraphController (graph))
-        addPlugin (*controller, desc);
+    {
+        const Node node (addPlugin (*controller, desc));
+        if (node.isValid())
+        {
+            ConnectionBuilder builder;
+            builder.connectStereo (graph.getIONode (PortType::Audio, true), node);
+            builder.connectStereo (node, graph.getIONode (PortType::Audio, false));
+            DBG(builder.getConnections().toXmlString());
+        }
+    }
 }
 
 void EngineController::sessionReloaded()
@@ -769,7 +778,7 @@ void EngineController::sessionReloaded()
     }
 }
 
-void EngineController::addPlugin (GraphController& c, const PluginDescription& desc)
+Node EngineController::addPlugin (GraphController& c, const PluginDescription& desc)
 {
     const auto nodeId = c.addFilter (&desc, 0.5f, 0.5f, 0);
     if (KV_INVALID_NODE != nodeId)
@@ -777,7 +786,10 @@ void EngineController::addPlugin (GraphController& c, const PluginDescription& d
         const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
             findSibling<GuiController>()->presentPluginWindow (node);
+        return node;
     }
+
+    return Node();
 }
 
 void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)

@@ -183,6 +183,31 @@ namespace Element {
         
         inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
         
+        /** returns the first node by format and identifier */
+        inline Node getNodeByFormat (const var& format, const var& identifier) const
+        {
+            auto nodes = getNodesValueTree();
+
+            for (int i = 0; i < nodes.getNumChildren(); ++i)
+            {
+                auto child = nodes.getChild (i);
+                if (child[Tags::format] == format && child[Tags::identifier] == identifier)
+                    return Node (child, false);
+            }
+
+            return Node();
+        }
+
+        Node getIONode (PortType portType, const bool isInput) const
+        {
+            if (!portType.isAudio() && !portType.isMidi())
+                return Node();
+            
+            String identifier = portType.getSlug();
+            identifier << "." << String((isInput) ? "input" : "output");
+            return getNodeByFormat ("Internal", identifier);
+        }
+
         bool hasChildNode (const var& format, const var& identifier) const
         {
             auto nodes = getNodesValueTree();
@@ -261,4 +286,30 @@ namespace Element {
         void sortByName();
     };
     
+    struct ConnectionBuilder
+    {
+        ConnectionBuilder () : arcs (Tags::arcs) { }
+
+        void connectStereo (const Node& src, const Node& dst,
+                            int srcOffset = 0, int dstOffset = 0)
+        {
+            if (srcOffset < 0) srcOffset = 0;
+            if (dstOffset < 0) dstOffset = 0;
+
+            for (int i = 0; i < 2; ++i)
+            {
+                ValueTree connection (Tags::arc);
+                connection.setProperty (Tags::sourceNode, (int64) src.getNodeId(), 0)
+                          .setProperty (Tags::destNode, (int64) dst.getNodeId(), 0)
+                          .setProperty (Tags::sourceChannel, i + srcOffset, 0)
+                          .setProperty (Tags::destChannel, i + dstOffset, 0);
+                arcs.addChild (connection, -1, 0);
+            }
+        }
+
+        ValueTree getConnections() const { return arcs; }
+
+    private:
+        ValueTree arcs;
+    };
 }

@@ -1100,8 +1100,11 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
     if (const auto* a = details.description.getArray())
     {
         auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
+        
         if (const auto* t = plugs.availablePlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
-            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));
+        {
+            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));   
+        }
     }
     else if (details.description.toString() == "ccNavConcertinaPanel")
     {
