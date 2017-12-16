@@ -381,14 +381,14 @@ public:
                 ++numOuts;
         }
 
-        int w = 100;
-        int h = 60;
+        int w = getWidth();
+        int h = getHeight();
 
         w = vertical ? jmax (w, (jmax (numIns, numOuts) + 1) * 20) : 120;
         h = vertical ? h : jmax (h, (jmax (numIns, numOuts) + 1) * 20);
         
         const int textWidth = font.getStringWidth (node.getName());
-        w = jmax (w, 16 + jmin (textWidth, 300));
+        w = jmax (w, (vertical ? 16 : 48) + jmin (textWidth, 300));
         
         if (vertical && textWidth > 300)
             h = 100;
