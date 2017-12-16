@@ -248,15 +248,17 @@ public:
         return 0;
     }
 
-    GraphController* findGraphControllerFor (const Node& node)
+    /** This returns a GraphController for the provided node. The
+        passed in node is expected to have type="graph" */
+    GraphController* findGraphControllerFor (const Node& graph)
     {
         for (const auto* h : graphs)
         {
             if (auto* controller = h->controller.get())
             {
-                if (controller->isControlling (node))
+                if (controller->isControlling (graph))
                     return controller;
-                else if (auto* subController = findSubGraphController (controller, node))
+                else if (auto* subController = findSubGraphController (controller, graph))
                     return subController;
             }
         }
@@ -467,6 +469,12 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
 {
     if (auto* root = graphs->findActiveRootGraphController())
         root->removeConnection (s, sp, d, dp);
+}
+
+void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& target)
+{
+    if (auto* controller = graphs->findGraphControllerFor (target))
+        controller->removeConnection (s, sp, d, dp);
 }
 
 void EngineController::addNode (const Node& node, const Node& target)

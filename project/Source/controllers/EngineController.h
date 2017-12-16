@@ -63,6 +63,9 @@ public:
     /** Remove a connection on the active root graph */
     void removeConnection (const uint32, const uint32, const uint32, const uint32);
 
+    /** Remove a connection on the specified graph */
+    void removeConnection (const uint32, const uint32, const uint32, const uint32, const Node& target);
+
     /** Disconnect the provided node */
     void disconnectNode (const Node& node);
 

@@ -119,7 +119,10 @@ void AppController::handleMessage (const Message& msg)
         }
         else
         {
-            ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
+            if (! rcm->target.isValid())
+                ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
+            else
+                ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort, rcm->target);
         }
     }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))

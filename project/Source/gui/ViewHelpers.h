@@ -54,6 +54,31 @@ void presentPluginWindow (Component*, const Node&);
 void closePluginWindows (Component*, const bool visible = true);
 
 }
+
+
+class ViewHelperMixin
+{
+public:
+    virtual ~ViewHelperMixin() { }
+
+    ContentComponent* getContentComponent() const   { return ViewHelpers::findContentComponent (componentCast()); }
+    SessionPtr getSession() const                   { return ViewHelpers::getSession (componentCast()); }
+    void postMessage (Message* message)             { return ViewHelpers::postMessageFor (componentCast(), message); }
+    
+    void connectPorts (const Port& src, const Port& dst);
+    void disconnectPorts (const Port& src, const Port& dst);
+
+protected:
+    ViewHelperMixin() { }
+
+private:
+    Component* componentCast() const { 
+        return reinterpret_cast<Component*> (const_cast<ViewHelperMixin*> (this));
+    }
+};
+
+
+
 }
 
 #endif  // EL_VIEW_HELPERS_H

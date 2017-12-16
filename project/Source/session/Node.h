@@ -20,6 +20,15 @@ namespace Element {
         Port (const ValueTree& p) : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
         ~Port() { }
         
+        /** Returns the ValueTree of the Node containing this port
+            will not always be valid 
+         */
+        inline ValueTree getNode() const { return objectData.getParent().getParent(); }
+
+        /** Returns true if this port probably lives on a Node */
+        inline bool hasParentNode() const { return getNode().hasType (Tags::node); }
+
+        /** Returns the coresponding channel for this port's index */
         int getChannel() const;
         
         const bool isInput() const
@@ -49,7 +58,7 @@ namespace Element {
             const int index = getProperty (Slugs::index, -1);
             return index >= 0 ? static_cast<uint32> (index) : KV_INVALID_PORT;
         }
-    
+
         operator uint32() const { return getIndex(); }
     };
 
@@ -198,11 +207,6 @@ namespace Element {
     
         bool savePresetTo (const DataPath& path, const String& name) const;
         
-        ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
-        ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
-        ValueTree getParentArcsNode() const;
-        ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-
         /** Returns true if this is a root graph on the session */
         bool isRootGraph() const
         {
@@ -230,6 +234,11 @@ namespace Element {
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
         
+        ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
+        ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
+        ValueTree getParentArcsNode() const;
+        ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
+
         const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
     private:
         void setMissingProperties();

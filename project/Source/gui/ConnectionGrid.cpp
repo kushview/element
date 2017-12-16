@@ -20,7 +20,8 @@ namespace Element
     static const int gridPadding = 1;
     
     class ConnectionGrid::PatchMatrix :  public PatchMatrixComponent,
-                                         private ValueTree::Listener
+                                         private ValueTree::Listener,
+                                         ViewHelperMixin
     {
     public:
         PatchMatrix ()
@@ -113,6 +114,7 @@ namespace Element
         
         void matrixCellClicked (const int row, const int col, const MouseEvent& ev) override
         {
+            const Node graph (graphModel, false);
             const Node srcNode (getNode (row, true));
             const Port srcPort (getPort (row, true));
             const Node dstNode (getNode (col, false));
@@ -137,14 +139,20 @@ namespace Element
                                               dstNode.getNodeId(), dstPort.getIndex()))
             {
                 matrix.disconnect (row, col);
-                ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                    srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()));
+                disconnectPorts (srcPort, dstPort);
+                // ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                //     srcNode.getNodeId(), srcPort.getIndex(), 
+                //     dstNode.getNodeId(), dstPort.getIndex()));
             }
             else
             {
                 matrix.connect (row, col);
-                ViewHelpers::postMessageFor (this, new AddConnectionMessage (
-                    srcNode.getNodeId(), srcPort.getIndex(), dstNode.getNodeId(), dstPort.getIndex()));
+                connectPorts (srcPort, dstPort);
+                
+                // ViewHelpers::postMessageFor (this, new AddConnectionMessage (
+                //     srcNode.getNodeId(), srcPort.getIndex(), 
+                //     dstNode.getNodeId(), dstPort.getIndex(),
+                //     graph));
             }
             
             repaint();
@@ -361,9 +369,6 @@ namespace Element
             const Port port (getPort (row, isSource));
             if (ev.mods.isPopupMenu())
                 showMenuForNodeAndPort (node, port);
-            if (auto* cc = ViewHelpers::findContentComponent (this))
-                if (! node.isGraph())
-                    cc->setCurrentNode (node);
         }
         
         void listBoxItemDoubleClicked (int row, const MouseEvent& ev, bool isSource)

@@ -29,18 +29,22 @@ public:
 };
 
 /** Send this to add a new connection */
-class AddConnectionMessage : public Message
+struct AddConnectionMessage : public AppMessage
 {
 public:
-    AddConnectionMessage (const Node& target, uint32 s, int sc, uint32 d, int dc)
+    AddConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& tgt = Node())
+        : target (tgt)
     {
-        sourceNode = s; destNode = d;
-        sourceChannel = sc; destChannel = dc;
+        sourceNode = s; 
+        destNode = d;
+        sourceChannel = sc; 
+        destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
         jassert (useChannels());
     }
     
-    AddConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp)
+    AddConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& tgt = Node())
+        : target (tgt)
     {
         sourceNode = s; destNode = d;
         sourcePort = sp; destPort = dp;
@@ -51,7 +55,7 @@ public:
     uint32 sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
 
-    const Node targetGraph;
+    const Node target;
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }
@@ -60,14 +64,14 @@ public:
 /** Send this to remove a connection from the graph */
 class RemoveConnectionMessage : public Message {
 public:
-    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc) {
+    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node()) {
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
         jassert (useChannels());
     }
     
-    RemoveConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp)
+    RemoveConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& t = Node())
     {
         sourceNode = s; destNode = d;
         sourcePort = sp; destPort = dp;
@@ -77,6 +81,7 @@ public:
     
     uint32 sourceNode, sourcePort, destNode, destPort;
     int sourceChannel, destChannel;
+    const Node target;
     
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }

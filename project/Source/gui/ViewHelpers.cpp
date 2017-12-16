@@ -1,7 +1,11 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "controllers/GraphController.h"
+
 #include "engine/AudioEngine.h"
+#include "engine/SubGraphProcessor.h"
+
 #include "engine/GraphProcessor.h"
 #include "gui/ViewHelpers.h"
 #include "gui/ContentComponent.h"
@@ -10,6 +14,7 @@
 #include "session/Node.h"
 #include "session/CommandManager.h"
 #include "Globals.h"
+#include "Messages.h"
 
 namespace Element {
 namespace ViewHelpers {
@@ -138,5 +143,28 @@ NavigationConcertinaPanel* getNavigationConcertinaPanel (Component* c)
     return nullptr;
 }
 }
+
+void ViewHelperMixin::connectPorts (const Port& src, const Port& dst)
+{
+    const Node srcNode (src.getNode(), false);
+    const Node dstNode (dst.getNode(), false);
+    const Node graph   (srcNode.getParentGraph());
+
+    DBG("[EL] sending connect message: " << srcNode.getName() << " <-> " << dstNode.getName());
+    postMessage (new AddConnectionMessage (srcNode.getNodeId(), src.getIndex(), 
+                                           dstNode.getNodeId(), dst.getIndex(), graph));
+}
+
+void ViewHelperMixin::disconnectPorts (const Port& src, const Port& dst)
+{
+    const Node srcNode (src.getNode(), false);
+    const Node dstNode (dst.getNode(), false);
+    const Node graph   (srcNode.getParentGraph());
+
+    DBG("[EL] sending disconnect ports message: " << srcNode.getName() << " <-> " << dstNode.getName());
+    postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.getIndex(),
+                                              dstNode.getNodeId(), dst.getIndex(), graph));
+}
+
 }
 
