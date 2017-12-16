@@ -512,10 +512,7 @@ void NodeAudioBusesComponent::resized()
     saveButton.setBounds (r2.removeFromRight (saveButton.getWidth()));
 }
 
-void NodeAudioBusesComponent::update()
-{
-    DBG("NodeAudioBusesComponent::update()");
-}
+void NodeAudioBusesComponent::update() { }
 
 int32 NodeAudioBusesComponent::getNodeId() const
 {

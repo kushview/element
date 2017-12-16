@@ -810,13 +810,9 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
                 gp->suspendProcessing (false);
 
-                DBG(graph.getValueTree().toXmlString());
-
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();
                 node.resetPorts();
-
-                DBG(graph.getValueTree().toXmlString());
 
                 bool b = false;
             }

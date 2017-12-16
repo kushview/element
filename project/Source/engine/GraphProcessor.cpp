@@ -804,7 +804,7 @@ bool GraphProcessor::removeNode (const uint32 nodeId)
 
             if (auto* sub = dynamic_cast<SubGraphProcessor*> (n->getAudioProcessor()))
             {
-                DBG("sub removed");
+                DBG("[EL] sub graph removed");
             }
 
             return true;

@@ -709,12 +709,6 @@ void GraphEditorComponent::setNode (const Node& n)
     data.removeListener (this);
     data = graph.getValueTree();
     
-    #if 0
-    auto d2 = data.createCopy();
-    Node::sanitizeProperties(d2, true);
-    DBG(d2.toXmlString());
-    #endif
-    
     verticalLayout = graph.getProperty ("vertical", true);
     draggingConnector = nullptr;
     deleteAllChildren();
