@@ -14,6 +14,7 @@
 #include "gui/SessionTreePanel.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
+#include "gui/NodeIOConfiguration.h"
 
 #include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
@@ -161,12 +162,14 @@ public:
         }
         else if (! ioButton.getToggleState())
         {
-            auto* component = new Component();
-            component->setSize (200, 100);
-
-            auto& box = CallOutBox::launchAsynchronously (
-                component, ioButton.getScreenBounds(), 0);
-            ioBox.setNonOwned (&box);
+            GraphNodePtr obj = node.getGraphNode();
+            if (auto* proc = (obj) ? obj->getAudioProcessor() : 0)
+            {
+                auto* component = new NodeAudioBusesComponent (node, proc);
+                auto& box = CallOutBox::launchAsynchronously (
+                    component, ioButton.getScreenBounds(), 0);
+                ioBox.setNonOwned (&box);
+            }
         }
     }
 
@@ -287,7 +290,7 @@ public:
         return { x, y, w, h };
     }
     
-    void paint (Graphics& g)
+    void paint (Graphics& g) override
     {
         g.setColour (Colours::lightgrey);
         
@@ -576,7 +579,6 @@ public:
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
             const bool isNearerSource = (distanceFromStart < distanceFromEnd);
-            DBG("sending connect on: " << graph.getName());
             ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
                     sourceFilterID, (uint32)sourceFilterChannel,
                     destFilterID, (uint32)destFilterChannel, graph));
@@ -585,41 +587,6 @@ public:
                                                     isNearerSource ? destFilterID : 0,
                                                     destFilterChannel,
                                                     e);
-#if 0
-            if (graph.isRootGraph())
-            {
-                ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                    sourceFilterID, (uint32)sourceFilterChannel,
-                    destFilterID, (uint32)destFilterChannel));
-                
-                getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel,
-                                                     isNearerSource ? destFilterID : 0,
-                                                     destFilterChannel,
-                                                     e);
-            }
-            else if (graph.isGraph())
-            {
-                const Node node (graph.getNodeById (isNearerSource ? sourceFilterID : destFilterID));
-                getGraphPanel()->data.removeListener (getGraphPanel());
-                
-                if (GraphNodePtr ptr = graph.getGraphNode())
-                    if (auto* proc = dynamic_cast<SubGraphProcessor*> (ptr->getAudioProcessor()))
-                        proc->getController().removeConnection (sourceFilterID, (uint32)sourceFilterChannel,
-                                                                destFilterID, (uint32)destFilterChannel);
-                
-                getGraphPanel()->data.addListener (getGraphPanel());
-                
-                // start draging before removing connection so
-                // the wire doesn't get deleted before hand
-                getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID,
-                                                     sourceFilterChannel,
-                                                     isNearerSource ? destFilterID : 0,
-                                                     destFilterChannel,
-                                                     e);
-                
-                getGraphPanel()->updateConnectorComponents();
-            }
-#endif
         }
         else if (dragging)
         {
@@ -1139,7 +1106,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
     {
         auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
         if (const auto* t = plugs.availablePlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
-            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));        
+            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));
     }
     else if (details.description.toString() == "ccNavConcertinaPanel")
     {
@@ -1177,6 +1144,14 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
              child.hasType (Tags::arcs))
     {
         updateComponents();
+    }
+    else if (child.hasType (Tags::ports))
+    {
+        const Node node (parent, false);
+        for (int i = 0; i < getNumChildComponents(); ++i)
+            if (auto* const filter = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+                filter->update();
+        updateConnectorComponents();
     }
 }
 

@@ -168,6 +168,10 @@
               file="Source/gui/NavigationView.cpp"/>
         <FILE id="nbrl8E" name="NavigationView.h" compile="0" resource="0"
               file="Source/gui/NavigationView.h"/>
+        <FILE id="vcZQ4S" name="NodeIOConfiguration.cpp" compile="1" resource="0"
+              file="Source/gui/NodeIOConfiguration.cpp"/>
+        <FILE id="O0M4gV" name="NodeIOConfiguration.h" compile="0" resource="0"
+              file="Source/gui/NodeIOConfiguration.h"/>
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="Source/gui/NoteClipItem.h"/>
         <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="Source/gui/PluginManagerComponent.cpp"/>

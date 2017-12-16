@@ -12,6 +12,7 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
+    setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
     setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
     // Property Component

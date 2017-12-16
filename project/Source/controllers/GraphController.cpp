@@ -252,10 +252,8 @@ void GraphController::removeConnection (const int index)
 void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
                                         uint32 destNode, uint32 destPort)
 {
-    DBG("GraphDontroller: trying connection removal");
     if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
     {
-        DBG("GraphDontroller: connection removed");
         processorArcsChanged();
     }
 }
