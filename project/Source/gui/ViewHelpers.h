@@ -61,18 +61,21 @@ class ViewHelperMixin
 public:
     virtual ~ViewHelperMixin() { }
 
-    ContentComponent* getContentComponent() const   { return ViewHelpers::findContentComponent (componentCast()); }
-    SessionPtr getSession() const                   { return ViewHelpers::getSession (componentCast()); }
-    void postMessage (Message* message)             { return ViewHelpers::postMessageFor (componentCast(), message); }
+    inline ContentComponent* getContentComponent() const   { return ViewHelpers::findContentComponent (componentCast()); }
+    inline SessionPtr getSession() const                   { return ViewHelpers::getSession (componentCast()); }
+    inline void postMessage (Message* message)             { return ViewHelpers::postMessageFor (componentCast(), message); }
     
     void connectPorts (const Port& src, const Port& dst);
+    void connectPorts (const Node& graph, const uint32 srcNode, const uint32 srcPort, 
+                                          const uint32 dstNode, const uint32 dstPort);
+    
     void disconnectPorts (const Port& src, const Port& dst);
 
 protected:
     ViewHelperMixin() { }
 
 private:
-    Component* componentCast() const { 
+    Component* componentCast() const {
         return reinterpret_cast<Component*> (const_cast<ViewHelperMixin*> (this));
     }
 };

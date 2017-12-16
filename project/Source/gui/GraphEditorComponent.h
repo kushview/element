@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "engine/GraphProcessor.h"
+#include "gui/ViewHelpers.h"
 
 namespace Element {
 
@@ -19,7 +20,8 @@ class PluginWindow;
 class GraphEditorComponent   : public Component,
                                public ChangeListener,
                                public DragAndDropTarget,
-                               private ValueTree::Listener
+                               private ValueTree::Listener,
+                               public ViewHelperMixin
 {
 public:
     GraphEditorComponent();

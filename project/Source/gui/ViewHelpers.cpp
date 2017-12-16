@@ -155,16 +155,20 @@ void ViewHelperMixin::connectPorts (const Port& src, const Port& dst)
                                            dstNode.getNodeId(), dst.getIndex(), graph));
 }
 
+void ViewHelperMixin::connectPorts (const Node& graph, const uint32 srcNode, const uint32 srcPort, 
+                                                       const uint32 dstNode, const uint32 dstPort)
+{
+    ViewHelpers::postMessageFor (componentCast(),
+        new AddConnectionMessage (srcNode, srcPort, dstNode, dstPort, graph));
+}
+
 void ViewHelperMixin::disconnectPorts (const Port& src, const Port& dst)
 {
     const Node srcNode (src.getNode(), false);
     const Node dstNode (dst.getNode(), false);
     const Node graph   (srcNode.getParentGraph());
-
-    DBG("[EL] sending disconnect ports message: " << srcNode.getName() << " <-> " << dstNode.getName());
     postMessage (new RemoveConnectionMessage (srcNode.getNodeId(), src.getIndex(),
                                               dstNode.getNodeId(), dst.getIndex(), graph));
 }
 
 }
-

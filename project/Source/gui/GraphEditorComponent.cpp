@@ -461,6 +461,7 @@ public:
     ~ConnectorComponent() { }
 
     bool isDragging() const { return dragging; }
+    void setGraph (const Node& g) { graph = g; }
 
     void setInput (const uint32 sourceFilterID_, const int sourceFilterChannel_)
     {
@@ -575,15 +576,22 @@ public:
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
             const bool isNearerSource = (distanceFromStart < distanceFromEnd);
-            
+            DBG("sending connect on: " << graph.getName());
+            ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
+                    sourceFilterID, (uint32)sourceFilterChannel,
+                    destFilterID, (uint32)destFilterChannel, graph));
+                
+            getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel,
+                                                    isNearerSource ? destFilterID : 0,
+                                                    destFilterChannel,
+                                                    e);
+#if 0
             if (graph.isRootGraph())
             {
                 ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
                     sourceFilterID, (uint32)sourceFilterChannel,
                     destFilterID, (uint32)destFilterChannel));
                 
-                // start draging before removing connection so
-                // the wire doesn't get deleted before hand
                 getGraphPanel()->beginConnectorDrag (isNearerSource ? 0 : sourceFilterID, sourceFilterChannel,
                                                      isNearerSource ? destFilterID : 0,
                                                      destFilterChannel,
@@ -611,6 +619,7 @@ public:
                 
                 getGraphPanel()->updateConnectorComponents();
             }
+#endif
         }
         else if (dragging)
         {
@@ -954,6 +963,7 @@ void GraphEditorComponent::updateComponents()
             addAndMakeVisible (connector);
         }
         
+        connector->setGraph (this->graph);
         connector->setInput (arc.sourceNode, arc.sourcePort);
         connector->setOutput (arc.destNode, arc.destPort);
     }
@@ -980,6 +990,7 @@ void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const in
     if (draggingConnector == nullptr)
         draggingConnector = new ConnectorComponent (graph);
 
+    draggingConnector->setGraph (this->graph);
     draggingConnector->setInput (sourceNode, sourceFilterChannel);
     draggingConnector->setOutput (destNode, destFilterChannel);
 
@@ -1097,18 +1108,8 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
             dstChannel  = pin->port;
         }
         
-        if (graph.isRootGraph())
-        {
-            ViewHelpers::postMessageFor (this, new AddConnectionMessage (srcFilter, (uint32)srcChannel,
-                                                                         dstFilter, (uint32)dstChannel));
-        }
-        else
-        {
-            if (GraphNodePtr ptr = graph.getGraphNode())
-                if (auto* proc = dynamic_cast<SubGraphProcessor*> (ptr->getAudioProcessor()))
-                    proc->getController().addConnection (srcFilter, (uint32)srcChannel,
-                                                         dstFilter, (uint32)dstChannel);
-        }
+        connectPorts (graph, srcFilter, (uint32)srcChannel,
+                             dstFilter, (uint32)dstChannel);
     }
 }
 

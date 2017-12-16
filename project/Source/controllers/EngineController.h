@@ -57,6 +57,10 @@ public:
     /** Add a connection on the active root graph */
     void addConnection (const uint32, const uint32, const uint32, const uint32);
 
+    /** Add a connection on a specific graph */
+    void addConnection (const uint32 s, const uint32 sp, 
+                        const uint32 d, const uint32 dp, const Node& graph);
+
     /** Connect by channel on the root graph */
     void connectChannels (const uint32, const int, const uint32, const int);
 

@@ -107,9 +107,19 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
     {
         if (acm->useChannels())
-            ec->connectChannels (acm->sourceNode, acm->sourceChannel, acm->destNode, acm->destChannel);
+        {
+            jassertfalse;
+            // ec->connectChannels (acm->sourceNode, acm->sourceChannel, acm->destNode, acm->destChannel);
+        }
         else
-            ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort);
+        {
+            if (!acm->target.isValid() || acm->target.isRootGraph())
+                ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort);
+            else if (acm->target.isGraph())
+                ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort, acm->target);
+            else
+                handled = false;
+        }
     }
     else if (const auto* rcm = dynamic_cast<const RemoveConnectionMessage*> (&msg))
     {
@@ -119,10 +129,12 @@ void AppController::handleMessage (const Message& msg)
         }
         else
         {
-            if (! rcm->target.isValid())
+            if (! rcm->target.isValid() || rcm->target.isRootGraph())
                 ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
-            else
+            else if (rcm->target.isGraph())
                 ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort, rcm->target);
+            else
+                handled = false;
         }
     }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))

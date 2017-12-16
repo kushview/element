@@ -64,7 +64,9 @@ public:
 /** Send this to remove a connection from the graph */
 class RemoveConnectionMessage : public Message {
 public:
-    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node()) {
+    RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node()) 
+        : target (t)
+    {
         sourceNode = s; destNode = d;
         sourceChannel = sc; destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
@@ -72,6 +74,7 @@ public:
     }
     
     RemoveConnectionMessage (uint32 s, uint32 sp, uint32 d, uint32 dp, const Node& t = Node())
+        : target (t)
     {
         sourceNode = s; destNode = d;
         sourcePort = sp; destPort = dp;

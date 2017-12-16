@@ -140,19 +140,11 @@ namespace Element
             {
                 matrix.disconnect (row, col);
                 disconnectPorts (srcPort, dstPort);
-                // ViewHelpers::postMessageFor (this, new RemoveConnectionMessage (
-                //     srcNode.getNodeId(), srcPort.getIndex(), 
-                //     dstNode.getNodeId(), dstPort.getIndex()));
             }
             else
             {
                 matrix.connect (row, col);
                 connectPorts (srcPort, dstPort);
-                
-                // ViewHelpers::postMessageFor (this, new AddConnectionMessage (
-                //     srcNode.getNodeId(), srcPort.getIndex(), 
-                //     dstNode.getNodeId(), dstPort.getIndex(),
-                //     graph));
             }
             
             repaint();
