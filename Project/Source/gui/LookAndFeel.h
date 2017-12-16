@@ -20,6 +20,8 @@ public:
     LookAndFeel();
     ~LookAndFeel() { }
     
+    int getDefaultScrollbarWidth() override;
+
     // MARK: Concertina Panel
     void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,

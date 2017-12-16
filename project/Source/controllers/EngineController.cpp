@@ -772,8 +772,7 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     {
         const Node node (addPlugin (*controller, desc));
         builder.addConnections (*controller, node.getNodeId());
-        DBG("lastError: " << builder.getError());
-        controller->syncArcsModel();
+        
     }
 }
 

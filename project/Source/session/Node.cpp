@@ -410,9 +410,6 @@ namespace Element {
     int Node::getCurrentProgram() const
     {
         if (auto* obj = getGraphNode())
-            obj->getAudioProcessor()->getParameters();
-        
-        if (auto* obj = getGraphNode())
             return (const_cast<AudioProcessor*>(obj->getAudioProcessor()))->getCurrentProgram();
         
         return -1;
@@ -439,26 +436,31 @@ namespace Element {
         GraphNodePtr tgt = controller.getNodeForId (targetNodeId);
         if (tgt)
         {
+            bool anythingAdded = false;
             for (const auto* pc : portChannelMap)
             {
                 GraphNodePtr ptr = controller.getNodeForId (pc->nodeId);
                 if (! ptr)
                     continue;
+
                 if (pc->isInput)
                 {
-                    controller.addConnection (
+                    anythingAdded |= controller.addConnection (
                         tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput),
                         ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput)
                     );
                 }
                 else
                 {
-                    controller.addConnection (
+                    anythingAdded |= controller.addConnection (
                         ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput),
                         tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput)
                     );
                 }
             }
+
+            if (anythingAdded)
+                controller.syncArcsModel();
         }
         else
         {
