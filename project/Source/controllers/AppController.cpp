@@ -148,7 +148,8 @@ void AppController::handleMessage (const Message& msg)
         if (newNode.isValid() && graph.isValid())
         {
             newNode.getValueTree().removeProperty (Tags::id, 0);
-            ec->addNode (newNode, graph);
+            ConnectionBuilder dummy;
+            ec->addNode (newNode, graph, dummy);
         }
     }
     else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))
@@ -182,7 +183,7 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
         if (anm->target.isValid ())
-            ec->addNode (anm->node, anm->target);
+            ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
     }
@@ -191,13 +192,9 @@ void AppController::handleMessage (const Message& msg)
         const auto graph (apm->graph);
         const auto desc (apm->description);
         
-        if (graph.isRootGraph())
+        if (graph.isGraph())
         {
-            ec->addPlugin (desc, true);
-        }
-        else if (graph.isGraph())
-        {
-            ec->addPlugin (graph, desc);
+            ec->addPlugin (graph, desc, apm->builder);
         }
         else
         {

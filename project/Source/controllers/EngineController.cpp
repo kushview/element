@@ -484,10 +484,17 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
         controller->removeConnection (s, sp, d, dp);
 }
 
-void EngineController::addNode (const Node& node, const Node& target)
+void EngineController::addNode (const Node& node, const Node& target,
+                                const ConnectionBuilder& builder)
 {
     if (auto* controller = graphs->findGraphControllerFor (target))
-        controller->addNode (node);
+    {
+        const uint32 nodeId = controller->addNode (node);
+        if (GraphNodePtr ptr = controller->getNodeForId (nodeId))
+        {
+            builder.addConnections (*controller, nodeId);
+        }
+    }    
 }
 
 void EngineController::addNode (const Node& node)
@@ -749,16 +756,24 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     if (! graph.isGraph())
         return;
     
-    if (auto* controller = graphs->findSubGraphController (graph))
+    if (auto* controller = graphs->findGraphControllerFor (graph))
     {
         const Node node (addPlugin (*controller, desc));
-        if (node.isValid())
-        {
-            ConnectionBuilder builder;
-            builder.connectStereo (graph.getIONode (PortType::Audio, true), node);
-            builder.connectStereo (node, graph.getIONode (PortType::Audio, false));
-            DBG(builder.getConnections().toXmlString());
-        }
+    }
+}
+
+void EngineController::addPlugin (const Node& graph, const PluginDescription& desc,
+                                  const ConnectionBuilder& builder)
+{
+    if (! graph.isGraph())
+        return;
+    
+    if (auto* controller = graphs->findGraphControllerFor (graph))
+    {
+        const Node node (addPlugin (*controller, desc));
+        builder.addConnections (*controller, node.getNodeId());
+        DBG("lastError: " << builder.getError());
+        controller->syncArcsModel();
     }
 }
 

@@ -812,8 +812,6 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             }
             else
             {
-                DBG("X: " << e.position.getX() / (float)getWidth() <<
-                   " Y: " << e.position.getY() / (float)getHeight());
                 ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, desc));
             }
         }
@@ -1103,7 +1101,28 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
         
         if (const auto* t = plugs.availablePlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
         {
-            ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *t));   
+            ScopedPointer<AddPluginMessage> message = new AddPluginMessage (graph, *t);
+            auto& builder (message->builder);
+            
+            if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
+            {
+                const auto audioInputNode = graph.getIONode (PortType::Audio, true);
+                const auto midiInputNode  = graph.getIONode (PortType::Midi, true);
+                builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
+                builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
+                builder.addChannel (midiInputNode,  PortType::Midi,  0, 0, false);
+            }
+            
+            if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
+            {
+                const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
+                const auto midiOutNode     = graph.getIONode (PortType::Midi, false);
+                builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
+                builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
+                builder.addChannel (midiOutNode,     PortType::Midi,  0, 0, true);
+            }
+
+            postMessage (message.release());
         }
     }
     else if (details.description.toString() == "ccNavConcertinaPanel")
@@ -1117,7 +1136,28 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
             {
                 const Node node (Node::parse (file));
                 if (node.isValid())
-                    ViewHelpers::postMessageFor (this, new AddNodeMessage (node, graph));
+                {
+                    ScopedPointer<AddNodeMessage> message (new AddNodeMessage (node, graph));
+                    auto& builder (message->builder);
+                    if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
+                    {
+                        const auto audioInputNode = graph.getIONode (PortType::Audio, true);
+                        const auto midiInputNode  = graph.getIONode (PortType::Midi, true);
+                        builder.addChannel (audioInputNode, PortType::Audio, 0, 0, false);
+                        builder.addChannel (audioInputNode, PortType::Audio, 1, 1, false);
+                        builder.addChannel (midiInputNode,  PortType::Midi,  0, 0, false);
+                    }
+                    
+                    if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
+                    {
+                        const auto audioOutputNode = graph.getIONode (PortType::Audio, false);
+                        const auto midiOutNode     = graph.getIONode (PortType::Midi, false);
+                        builder.addChannel (audioOutputNode, PortType::Audio, 0, 0, true);
+                        builder.addChannel (audioOutputNode, PortType::Audio, 1, 1, true);
+                        builder.addChannel (midiOutNode,     PortType::Midi,  0, 0, true);
+                    }
+                    postMessage (message.release());
+                }
             }
         }
     }

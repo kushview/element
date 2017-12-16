@@ -19,9 +19,8 @@ struct AddPresetMessage : public AppMessage
 };
 
 /** Send this to remove a node from the current graph */
-class RemoveNodeMessage : public Message
+struct RemoveNodeMessage : public AppMessage
 {
-public:
     RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) { }
     RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) { }
     const uint32 nodeId;
@@ -31,7 +30,6 @@ public:
 /** Send this to add a new connection */
 struct AddConnectionMessage : public AppMessage
 {
-public:
     AddConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& tgt = Node())
         : target (tgt)
     {
@@ -99,6 +97,7 @@ public:
     
     const Node node;
     const Node target;
+    ConnectionBuilder builder;
 };
 
 /** Send this when a plugin needs loaded into the graph */
@@ -126,14 +125,12 @@ public:
 struct AddPluginMessage : public AppMessage
 {
     AddPluginMessage (const Node& g, const PluginDescription& d)
-        : graph (g),
-          description (d)
+        : graph (g), description (d)
     { }
 
     const Node graph;
     const PluginDescription description;
-
-    const bool autoConnectToAudioInput = true;
+    ConnectionBuilder builder;
 };
 
 class DuplicateNodeMessage : public Message {

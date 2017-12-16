@@ -142,7 +142,7 @@ public:
     {
         menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
         menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
-        menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete selected graph");
+        menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::copy, "Copy");
         menu.addCommandItem (&cmd, Commands::paste, "Paste");

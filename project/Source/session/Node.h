@@ -10,6 +10,7 @@
 
 namespace Element {
     
+    class GraphController;
     class NodeArray;
     class PortArray;
     
@@ -87,6 +88,8 @@ namespace Element {
         
         static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
                                       const uint32 destNode, const uint32 destPort);
+        
+        
         /** Creates an empty graph model */
         static Node createGraph();
         
@@ -288,7 +291,24 @@ namespace Element {
     
     struct ConnectionBuilder
     {
-        ConnectionBuilder () : arcs (Tags::arcs) { }
+        ConnectionBuilder() : arcs (Tags::arcs) { }
+        ConnectionBuilder (const Node& tgt)
+            : arcs (Tags::arcs),  target (tgt)
+        { }
+
+        void setTarget (const Node& newTarget)
+        {
+            target = newTarget;
+        }
+
+        /** add a port that will be connected to the target's channel
+            of the corresponding port type
+         */
+        ConnectionBuilder& addChannel (const Node& node, PortType t, const int sc, const int tc, bool input)
+        {
+            portChannelMap.add (new ConnectionMap (node, t, sc, tc, input));
+            return *this;
+        }
 
         void connectStereo (const Node& src, const Node& dst,
                             int srcOffset = 0, int dstOffset = 0)
@@ -307,9 +327,32 @@ namespace Element {
             }
         }
 
-        ValueTree getConnections() const { return arcs; }
+        void addConnections (GraphController& controller, const uint32 targetNodeId) const;
+
+        String getError() const { return lastError; }
 
     private:
         ValueTree arcs;
+        Node target;
+        mutable String lastError;
+
+        struct ConnectionMap
+        {
+            ConnectionMap (const Node& node, PortType t, 
+                           const int nc, const int tc, 
+                           const bool input)
+                : nodeId (node.getNodeId()),
+                  type (t), isInput (input),
+                  nodeChannel (nc), targetChannel (tc)
+            { }
+
+            const uint32 nodeId;
+            const PortType type;
+            const bool isInput;
+            const int nodeChannel;
+            const int targetChannel;
+        };
+
+        OwnedArray<ConnectionMap> portChannelMap;
     };
 }

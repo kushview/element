@@ -1,5 +1,6 @@
 
 #include "session/Node.h"
+#include "controllers/GraphController.h"
 
 namespace Element {
     struct NameSorter
@@ -180,9 +181,11 @@ namespace Element {
     void Node::setMissingProperties()
     {
         stabilizePropertyString (Tags::type, "default");
-        stabilizePropertyString (Tags::name, "Default Node");
+        stabilizePropertyString (Tags::name, "Node");
         stabilizeProperty (Tags::bypass, false);
+        stabilizeProperty (Tags::persistent, true);
         objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
+        objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     }
 
     GraphNode* Node::getGraphNode() const
@@ -429,5 +432,37 @@ namespace Element {
             return obj->getAudioProcessor()->getNumPrograms();
         
         return 0;
+    }
+
+    void ConnectionBuilder::addConnections (GraphController& controller, const uint32 targetNodeId) const
+    {
+        GraphNodePtr tgt = controller.getNodeForId (targetNodeId);
+        if (tgt)
+        {
+            for (const auto* pc : portChannelMap)
+            {
+                GraphNodePtr ptr = controller.getNodeForId (pc->nodeId);
+                if (! ptr)
+                    continue;
+                if (pc->isInput)
+                {
+                    controller.addConnection (
+                        tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput),
+                        ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput)
+                    );
+                }
+                else
+                {
+                    controller.addConnection (
+                        ptr->nodeId, ptr->getPortForChannel (pc->type, pc->nodeChannel, pc->isInput),
+                        tgt->nodeId, tgt->getPortForChannel (pc->type, pc->targetChannel, ! pc->isInput)
+                    );
+                }
+            }
+        }
+        else
+        {
+            lastError = "Could not find target node";
+        }
     }
 }

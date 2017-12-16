@@ -3,7 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
-#include "Transport.h"
+#include "engine/Transport.h"
 
 namespace Element
 {
@@ -15,7 +15,7 @@ Transport::Transport()
     monitor = new Monitor();
     monitor->tempo.set (getTempo());
     
-    seekWanted.set(false);
+    seekWanted.set (false);
     seekFrame.set (0);
     
     nextBeatsPerBar.set (getBeatsPerBar());

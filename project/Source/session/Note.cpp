@@ -118,4 +118,5 @@ Note::Note (int note, double start, double length, int channel, float velocity)
     node().setProperty ("eventId", 0, nullptr);
 }
 
+
 }
