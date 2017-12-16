@@ -84,13 +84,11 @@ uint32 GraphController::addNode (const Node& newNode)
     uint32 nodeId = KV_INVALID_NODE;
     PluginDescription desc; 
     newNode.getPluginDescription (desc);
-    
-    DBG("desc: " << desc.name);
-    DBG("desc: " << desc.pluginFormatName);
-    DBG("desc: " << desc.fileOrIdentifier);
 
     if (auto* node = createFilter (&desc, 0, 0))
     {
+        auto* const proc = node->getAudioProcessor();
+
         nodeId = node->nodeId;
         ValueTree data = newNode.getValueTree().createCopy();
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
@@ -110,9 +108,31 @@ uint32 GraphController::addNode (const Node& newNode)
                 node->getAudioProcessor()->setStateInformation (state.getData(), (int) state.getSize());
         }
         
+        PortArray ins, outs;
+        n.getPorts (ins, outs, PortType::Audio);
+
+        // try to match ports
+        if (proc->getTotalNumInputChannels() != ins.size() ||
+            proc->getTotalNumOutputChannels() != outs.size())
+        {
+            AudioProcessor::BusesLayout layout;
+            layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
+            layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
+            
+            if (proc->checkBusesLayoutSupported (layout))
+            {
+                proc->suspendProcessing (true);
+                proc->releaseResources ();
+                proc->setBusesLayoutWithoutEnabling (layout);
+                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->suspendProcessing (false);
+            }
+            
+            n.resetPorts();
+        }
+
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
         {
-            DBG("total in: "<< sub->getTotalNumInputChannels());
             sub->getController().setNodeModel (n);
             n.resetPorts();
         }
@@ -273,15 +293,43 @@ void GraphController::setNodeModel (const Node& node)
         PluginDescription desc; node.getPluginDescription (desc);
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
+            auto* const proc = obj->getAudioProcessor();
+
             MemoryBlock state;
             if (state.fromBase64Encoding (node.node().getProperty(Tags::state).toString()))
                 obj->getAudioProcessor()->setStateInformation (state.getData(), (int)state.getSize());
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+            
+            PortArray ins, outs;
+            node.getPorts (ins, outs, PortType::Audio);
+
+            // try to match ports
+            if (proc->getTotalNumInputChannels() != ins.size() ||
+                proc->getTotalNumOutputChannels() != outs.size())
+            {
+                AudioProcessor::BusesLayout layout;
+                layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
+                layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
+                
+                if (proc->checkBusesLayoutSupported (layout))
+                {
+                    proc->suspendProcessing (true);
+                    proc->releaseResources ();
+                    proc->setBusesLayoutWithoutEnabling (layout);
+                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                    proc->suspendProcessing (false);
+                }
+                
+                node.resetPorts();
+            }
+            
+            if (auto* sub = dynamic_cast<SubGraphProcessor*> (obj->getAudioProcessor())) {
+                sub->getController().setNodeModel (node);
+                node.resetPorts();
+            }
+            
             if (node.getValueTree().getProperty (Tags::bypass, false))
                 obj->getAudioProcessor()->suspendProcessing (true);
-            
-            if (auto* sub = dynamic_cast<SubGraphProcessor*> (obj->getAudioProcessor()))
-                sub->getController().setNodeModel (node);
         }
         else if (GraphNodePtr obj = createPlaceholder (node))
         {
@@ -295,6 +343,7 @@ void GraphController::setNodeModel (const Node& node)
             failed.add (node.getValueTree());
         }
     }
+
     for (const auto& n : failed)
         nodes.removeChild (n, nullptr);
     
