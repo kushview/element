@@ -78,6 +78,7 @@ public:
     }
     
     inline bool isLoaded() const { return loaded; }
+
 private:
     PluginManager& pluginManager;
     GraphProcessor& processor;

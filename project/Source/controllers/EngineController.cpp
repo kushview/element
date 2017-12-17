@@ -566,7 +566,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
 
 void EngineController::removeNode (const Node& node)
 {
-    const Node graph (node.getParentGraph ());
+    const Node graph (node.getParentGraph());
     if (! graph.isGraph())
         return;
     

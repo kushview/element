@@ -6,6 +6,95 @@
 
 namespace Element {
 
+/** this enforces correct IO nodes based on the graph processor's settings
+    in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
+    It updates the model as well
+  */
+struct IONodeEnforcer
+{
+    GraphController& controller;
+    IONodeEnforcer (GraphController& c) : controller (c) { addMissingIONodes(); controller.syncArcsModel(); }
+    GraphController* getController() const { return &controller; }
+
+private:
+    void addMissingIONodes()
+    {
+        auto* root = getController();
+        if (! root) return;
+        auto& proc (root->getGraph());
+
+        const bool wantsAudioIn   = proc.getTotalNumInputChannels() > 0;
+        const bool wantsAudioOut  = proc.getTotalNumInputChannels() > 0;
+        const bool wantsMidiIn    = proc.acceptsMidi();
+        const bool wantsMidiOut   = proc.producesMidi();
+        
+        GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+        for (int i = 0; i < root->getNumFilters(); ++i)
+        {
+            GraphNodePtr node = root->getNode (i);
+            if (node->isMidiIONode() || node->isAudioIONode())
+            {
+                auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
+                ioNodes [proc->getType()] = node;
+            }
+        }
+        
+        Array<uint32> nodesToRemove;
+
+        for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
+        {
+            if (nullptr != ioNodes [t])
+            {
+                if (t == IOProcessor::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
+                if (t == IOProcessor::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IOProcessor::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IOProcessor::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
+                continue;
+            }
+
+            if (t == IOProcessor::audioInputNode    && !wantsAudioIn)   continue;
+            if (t == IOProcessor::audioOutputNode   && !wantsAudioOut)  continue;
+            if (t == IOProcessor::midiInputNode     && !wantsMidiIn)    continue;
+            if (t == IOProcessor::midiOutputNode    && !wantsMidiOut)   continue;
+
+            PluginDescription desc;
+            desc.pluginFormatName = "Internal";
+            double rx = 0.5f, ry = 0.5f;
+            switch (t)
+            {
+                case IOProcessor::audioInputNode:
+                    desc.fileOrIdentifier = "audio.input";
+                    rx = .25;
+                    ry = .25;
+                    break;
+                case IOProcessor::audioOutputNode:
+                    desc.fileOrIdentifier = "audio.output";
+                    rx = .25;
+                    ry = .75;
+                    break;
+                case IOProcessor::midiInputNode:
+                    desc.fileOrIdentifier = "midi.input";
+                    rx = .75;
+                    ry = .25;
+                    break;
+                case IOProcessor::midiOutputNode:
+                    desc.fileOrIdentifier = "midi.output";
+                    rx = .75;
+                    ry = .75;
+                    break;
+            }
+            
+            auto nodeId = root->addFilter (&desc, rx, ry);
+            ioNodes[t] = root->getNodeForId (nodeId);
+            jassert(ioNodes[t] != nullptr);
+        }
+
+        for (const auto& nodeId : nodesToRemove)
+            root->removeFilter (nodeId);
+    }
+};
+
+
 GraphController::GraphController (GraphProcessor& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
 { }
@@ -134,6 +223,7 @@ uint32 GraphController::addNode (const Node& newNode)
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
         {
             sub->getController().setNodeModel (n);
+            IONodeEnforcer enforceIONodes (sub->getController());
             n.resetPorts();
         }
         
@@ -172,7 +262,10 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
         Node n (model, false);
 
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+        {
             sub->getController().setNodeModel (n);
+            IONodeEnforcer enforceIONodes (sub->getController());
+        }
         
         n.resetPorts();
 
