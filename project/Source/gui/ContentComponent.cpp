@@ -84,6 +84,21 @@ bool ContentView::keyPressed (const KeyPress& k, Component*)
     return false;
 }
 
+void ContentView::disableIfNotUnlocked()
+{
+    if (auto* w = ViewHelpers::getGlobals (this))
+    {
+        setEnabled (w->getUnlockStatus().isFullVersion());
+    }
+    else
+    {
+        jassertfalse;
+        setEnabled (false);
+    }
+
+    setInterceptsMouseClicks (isEnabled(), isEnabled());
+}
+
 // MARK: Toolbar
     
 class ContentComponent::Toolbar : public Component,

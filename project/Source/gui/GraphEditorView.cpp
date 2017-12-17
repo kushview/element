@@ -5,6 +5,8 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/GraphEditorView.h"
+#include "Globals.h"
+#include "session/UnlockStatus.h"
 
 namespace Element {
     
@@ -27,6 +29,16 @@ namespace Element {
 
     void GraphEditorView::stabilizeContent()
     {
+        if (node.isGraph() && !node.isRootGraph())
+        {
+            disableIfNotUnlocked();
+        }
+        else 
+        {
+            setEnabled (true); 
+            setInterceptsMouseClicks (true, true);
+        }
+
         graph.setNode (node);
     }
     

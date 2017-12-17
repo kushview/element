@@ -766,6 +766,16 @@ namespace Element
     
     void ConnectionGrid::setNode (const Node& newNode)
     {
+        if (newNode.isGraph() && !newNode.isRootGraph())
+        {
+            disableIfNotUnlocked();
+        }
+        else 
+        {
+            setEnabled (true); 
+            setInterceptsMouseClicks (true, true);
+        }
+
         ValueTree newNodes = newNode.hasNodeType(Tags::graph) ? newNode.getNodesValueTree()
                                                               : ValueTree (Tags::nodes);
         jassert (this->matrix != nullptr);

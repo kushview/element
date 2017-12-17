@@ -18,6 +18,8 @@
 #include "engine/WetDryProcessor.h"
 
 #include "session/Session.h"
+#include "session/UnlockStatus.h"
+
 #include "Globals.h"
 
 namespace Element {
@@ -137,10 +139,9 @@ namespace Element {
     
     // MARK: Element Format
     
-    ElementAudioPluginFormat::ElementAudioPluginFormat()
-    {
-
-    }
+    ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
+        : world (g)
+    {  }
     
     void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
     {
@@ -269,7 +270,7 @@ namespace Element {
             base = new ReverbProcessor();
         
         else if (desc.fileOrIdentifier == "element.graph")
-            base = new SubGraphProcessor();
+            base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
         
         return base != nullptr ? base.release() : nullptr;
     }

@@ -182,7 +182,12 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
-        if (anm->target.isValid ())
+        if (anm->node.isGraph() && !getWorld().getUnlockStatus().isFullVersion())
+        {
+            showProductLockedAlert ("Sub graphs are not supported in the free version");
+        }
+
+        else if (anm->target.isValid ())
             ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
@@ -192,7 +197,11 @@ void AppController::handleMessage (const Message& msg)
         const auto graph (apm->graph);
         const auto desc (apm->description);
         
-        if (graph.isGraph())
+        if (desc.fileOrIdentifier == "element.graph" && !getWorld().getUnlockStatus().isFullVersion())
+        {
+            showProductLockedAlert ("Sub graphs are not supported in the free version");
+        }
+        else if (graph.isGraph())
         {
             ec->addPlugin (graph, desc, apm->builder);
         }

@@ -528,12 +528,6 @@ namespace Element {
                 midiInputs.clearQuick (true);
                 inputs  = MidiInput::getDevices();
 
-                for (int i = 0; i < 20; ++i)
-                {
-                    String s ("Fake Device "); s << int (i + 1);
-                    inputs.add (s);
-                }
-                
                 for (const auto& name : inputs)
                 {
                     auto* label = midiInputLabels.add (new Label());

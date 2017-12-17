@@ -147,7 +147,7 @@ private:
         
         plugins.addDefaultFormats();
         plugins.addFormat (new InternalFormat (*engine));
-        plugins.addFormat (new ElementAudioPluginFormat());
+        plugins.addFormat (new ElementAudioPluginFormat (world));
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();

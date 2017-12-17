@@ -83,7 +83,7 @@ namespace Element {
     class ElementAudioPluginFormat   : public AudioPluginFormat
     {
     public:
-        ElementAudioPluginFormat();
+        ElementAudioPluginFormat (Globals&);
         ~ElementAudioPluginFormat() { }
         
         // AudioPluginFormat
@@ -103,6 +103,7 @@ namespace Element {
         bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
         
     private:
+        Globals& world;
         PluginDescription reverbDesc;
         PluginDescription combFilterDesc;
         PluginDescription allPassFilterDesc;

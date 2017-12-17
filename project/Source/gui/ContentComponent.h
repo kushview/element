@@ -27,10 +27,15 @@ class ContentView : public Component,
 public:
     ContentView();
     virtual ~ContentView();
+
+
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
-    
+
+    /** Call this to disable the entire view if the app isn't unlocked */
+    void disableIfNotUnlocked();
+
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
     
     /** @internal */
