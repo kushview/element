@@ -386,6 +386,8 @@ namespace Element {
                 if (auto* proc = obj->getAudioProcessor())
                     proc->setStateInformation (state.getData(), (int)state.getSize());
         }
+
+        objectData.removeProperty (Tags::state, 0);
     }
     
     void Node::savePluginState()

@@ -168,7 +168,7 @@ public:
             item.setName (ed.getText());
     }
 
-    void textEditorTextChanged (TextEditor&) override               {}
+    void textEditorTextChanged (TextEditor&) override                { }
     void textEditorReturnKeyPressed (TextEditor& editor) override    { editor.exitModalState (1); }
     void textEditorEscapeKeyPressed (TextEditor& editor) override    { editor.exitModalState (0); }
     void textEditorFocusLost (TextEditor& editor) override           { editor.exitModalState (0); }

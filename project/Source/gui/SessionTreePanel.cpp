@@ -91,7 +91,14 @@ public:
 
     virtual void itemDoubleClicked (const MouseEvent& ev) override
     {
-        
+        if (ev.x < roundFloatToInt (1.f + getIconSize()))
+        {
+            // icon double clicked
+        }
+        else if (! ev.mods.isPopupMenu())
+        {
+            showRenameBox();
+        }
     }
 
     void showDocument() override
@@ -107,13 +114,23 @@ public:
         }
 
         if (auto* cc = ViewHelpers::findContentComponent (getOwnerView()))
-            cc->setCurrentNode (node);
+        {
+            auto graph = (node.isGraph()) ? node : node.getParentGraph();
+            cc->setCurrentNode (graph);
+        }
     }
 
     bool mightContainSubItems() override            { return node.isGraph(); }
-    String getRenamingName() const override         { return getDisplayName() + "(copy)"; }
+    String getRenamingName() const override         { return getDisplayName(); }
     String getDisplayName() const override          { return node.getName(); }
-    void setName (const String& newName) override   { ignoreUnused (newName); }
+
+    void setName (const String& newName) override   
+    {
+        if (newName.isNotEmpty()) 
+            node.setProperty (Tags::name, newName); 
+    }
+    
+    
     bool isMissing() override { return false; }
     
     Icon getIcon() const override

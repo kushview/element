@@ -57,7 +57,9 @@ public:
     /** Returns true if an output port */
     bool isPortOutput (const uint32 port) const;
     
-    bool isGraph() const;
+    bool isGraph() const noexcept;
+    bool isRootGraph() const noexcept;
+    bool isSubGraph() const noexcept;
     
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
@@ -68,9 +70,6 @@ public:
     /** The actual processor object dynamic_cast'd to ProcType */
     template<class ProcType>
     inline ProcType* processor() const { return dynamic_cast<ProcType*> (proc.get()); }
-
-    /** Returns true if the process is a graph */
-    bool isSubgraph() const noexcept;
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;

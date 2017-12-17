@@ -146,11 +146,10 @@ void GraphNode::suspendProcessing (const bool shouldBeSuspended)
         proc->suspendProcessing (shouldBeSuspended);
 }
 
-bool GraphNode::isGraph() const
-{
-    return (nullptr != dynamic_cast<GraphProcessor*> (proc.get()));
-}
-    
+bool GraphNode::isGraph() const noexcept { return (nullptr != dynamic_cast<GraphProcessor*> (proc.get())); }
+bool GraphNode::isSubGraph() const noexcept { return (nullptr != dynamic_cast<SubGraphProcessor*> (proc.get())); }
+bool GraphNode::isRootGraph() const noexcept { return (nullptr != dynamic_cast<RootGraph*> (proc.get())); }
+
 PortType GraphNode::getPortType (const uint32 port) const
 {
     return Processor::getPortType (proc.get(), port);
@@ -257,11 +256,6 @@ uint32 GraphNode::getMidiInputPort() const
 uint32 GraphNode::getMidiOutputPort() const
 {
     return getPortForChannel (PortType::Midi, 0, false);;
-}
-
-bool GraphNode::isSubgraph() const noexcept
-{
-    return (dynamic_cast<GraphProcessor*> (proc.get()) != nullptr);
 }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,

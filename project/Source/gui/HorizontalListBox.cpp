@@ -653,8 +653,7 @@ Rectangle<int> HorizontalListBox::getRowPosition (const int rowNumber,
     if (relativeToComponentTopLeft)
         x -= viewport->getViewPositionX();
         
-    return Rectangle<int> (x, viewport->getY(),
-                          rowHeight, viewport->getViewedComponent()->getHeight());
+    return { x, viewport->getY(), rowHeight, viewport->getViewedComponent()->getHeight() };
 }
 
 void HorizontalListBox::setVerticalPosition (const double proportion)
