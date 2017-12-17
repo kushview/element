@@ -268,6 +268,8 @@ namespace Element {
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
 
         const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
+        const bool operator!=(const Node& o) const { return this->objectData != o.objectData; }
+
     private:
         void setMissingProperties();
     };

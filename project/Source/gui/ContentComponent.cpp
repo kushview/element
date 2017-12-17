@@ -403,7 +403,9 @@ public:
     
     void setNode (const Node& node)
     {
-        if (auto* grid = dynamic_cast<ConnectionGrid*> (content1.get()))
+        if (auto* gdv = dynamic_cast<GraphDisplayView*> (content1.get()))
+            gdv->setNode (node);
+        else if (auto* grid = dynamic_cast<ConnectionGrid*> (content1.get()))
             grid->setNode (node);
         else if (auto* ed = dynamic_cast<GraphEditorView*> (content1.get()))
             ed->setNode (node);

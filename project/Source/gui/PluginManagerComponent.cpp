@@ -481,10 +481,12 @@ public:
             jassert (properties != nullptr);
             FileSearchPath path (getLastSearchPath (*properties, formatToScan));
             scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
+
             // You need to use at least one thread when scanning plug-ins asynchronously
             jassert (! allowAsync || (numThreads > 0));
-            
-            if (path.getNumPaths() <= 0)
+
+            const bool wantsPath = formatToScan.getName() == "VST" || formatToScan.getName() == "VST3";
+            if (path.getNumPaths() <= 0 && wantsPath)
             {
                #if ! JUCE_IOS
                 if (propertiesToUse != nullptr)

@@ -18,18 +18,11 @@ namespace Element {
     
     GraphEditorView::~GraphEditorView() { }
 
-    void GraphEditorView::setNode (const Node& g)
-    {
-        if (g == node)
-            return;
-
-        node = g;
-        stabilizeContent();
-    }
-
     void GraphEditorView::stabilizeContent()
     {
-        if (node.isGraph() && !node.isRootGraph())
+        const auto g = getGraph();
+        
+        if (g.isGraph() && !g.isRootGraph())
         {
             disableIfNotUnlocked();
         }
@@ -39,15 +32,20 @@ namespace Element {
             setInterceptsMouseClicks (true, true);
         }
 
-        graph.setNode (node);
+        graph.setNode (g);
     }
     
     void GraphEditorView::didBecomeActive()
     {
-        if (!node.isValid() || !node.isGraph())
+        if (!getGraph().isValid() || !getGraph().isGraph())
+        {
             if (auto session = ViewHelpers::getSession (this))
-                node = session->getCurrentGraph();
-        stabilizeContent();
+                setNode (session->getCurrentGraph());
+        }
+        else
+        {
+            stabilizeContent();
+        }
     }
     
     void GraphEditorView::paint (Graphics& g)
@@ -55,8 +53,13 @@ namespace Element {
         g.fillAll (LookAndFeel::contentBackgroundColor);
     }
     
-    void GraphEditorView::resized()
+    void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
     {
-        graph.setBounds (getLocalBounds().reduced (2));
+        graph.setBounds (area);
+    }
+
+    void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
+    {
+        stabilizeContent();
     }
 }

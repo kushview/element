@@ -462,7 +462,7 @@ void GraphController::setNodeModel (const Node& node)
 
     for (const auto& n : failed)
     {
-        nodes.removeChild (n, nullptr);
+        arcs.removeChild (n, nullptr);
         Node::sanitizeRuntimeProperties (n);
     }
     failed.clearQuick();

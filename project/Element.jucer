@@ -130,6 +130,8 @@
         <FILE id="sKIHTU" name="ContextMenus.cpp" compile="1" resource="0"
               file="Source/gui/ContextMenus.cpp"/>
         <FILE id="UeLvAw" name="ContextMenus.h" compile="0" resource="0" file="Source/gui/ContextMenus.h"/>
+        <FILE id="IlpPf7" name="GraphDisplayView.h" compile="0" resource="0"
+              file="Source/gui/GraphDisplayView.h"/>
         <FILE id="N6IdK1" name="GraphEditorComponent.cpp" compile="1" resource="0"
               file="Source/gui/GraphEditorComponent.cpp"/>
         <FILE id="RZD4Q9" name="GraphEditorComponent.h" compile="0" resource="0"

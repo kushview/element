@@ -293,7 +293,7 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour (Colours::lightgrey);
+        g.setColour (isEnabled() ? Colours::lightgrey : Colours::lightgrey.darker());
         
         const auto box (getBoxRectangle());
         g.fillRect (box);

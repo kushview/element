@@ -5,24 +5,25 @@
 
 #pragma once
 
-#include "gui/ContentComponent.h"
+#include "gui/GraphDisplayView.h"
 #include "gui/GraphEditorComponent.h"
 
 namespace Element {
 
-class GraphEditorView : public ContentView
+class GraphEditorView : public GraphDisplayView
 {
 public:
     GraphEditorView();
     ~GraphEditorView();
-    
-    void setNode (const Node& g);
 
     void didBecomeActive() override;
     void stabilizeContent() override;
     void paint (Graphics& g) override;
-    void resized() override;
-    
+
+protected:
+    void graphDisplayResized (const Rectangle<int>& area) override;
+    void graphNodeChanged (const Node& g, const Node&) override;
+
 private:
     Node node;
     GraphEditorComponent graph;
