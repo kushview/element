@@ -82,12 +82,16 @@ public:
 
     void itemClicked (const MouseEvent& ev) override
     {
+        if (ev.x < roundFloatToInt (1.f + getIconSize())) {
+            setOpen (! isOpen());
+        }
+
         TreeItemBase::itemClicked (ev);
     }
 
-    void itemDoubleClicked (const MouseEvent& ev) override
+    virtual void itemDoubleClicked (const MouseEvent& ev) override
     {
-        setOpen (! isOpen());
+        
     }
 
     void showDocument() override
@@ -123,6 +127,13 @@ public:
     NodePopupMenu menu;
 };
 
+class SessionPluginTreeItem : public SessionNodeTreeItem
+{
+public:
+    SessionPluginTreeItem (const Node& n) 
+        : SessionNodeTreeItem (n) { }
+};
+
 class SessionRootGraphTreeItem : public SessionNodeTreeItem
 {
 public:
@@ -141,7 +152,6 @@ public:
             .findChild<EngineController>()->duplicateGraph (node);
     }
 
-   
     void showSettings()
     {
         updateIndexInParent();
@@ -198,10 +208,7 @@ public:
 class SessionRootTreeItem : public TreeItemBase
 {
 public:
-    SessionRootTreeItem (SessionTreePanel& o) : panel (o)
-    {
-
-    }
+    SessionRootTreeItem (SessionTreePanel& o) : panel (o) { }
 
     String getUniqueName() const override { return "SESSION"; }
 
