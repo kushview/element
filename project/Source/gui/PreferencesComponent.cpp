@@ -453,7 +453,12 @@ namespace Element {
             midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
             midiInputHeader.setFont (Font (12, Font::bold));
             
+            midiInputs = new MidiInputs (*this);
+            midiInputView.setViewedComponent (midiInputs.get(), false);
+            addAndMakeVisible (midiInputView);
+
             setSize (300, 400);
+
             devices.addChangeListener (this);
             updateDevices();
         }
@@ -461,7 +466,7 @@ namespace Element {
         ~MidiSettingsPage()
         {
             devices.removeChangeListener (this);
-            midiInputs.clearQuick (true);
+            midiInputs = nullptr;
             midiOutput.removeListener (this);
         }
         
@@ -480,33 +485,18 @@ namespace Element {
             r.removeFromTop (roundDoubleToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
             
-            jassert (midiInputLabels.size() == midiInputs.size());
-            
-            for (int i = 0; i < midiInputs.size(); ++i)
-            {
-                r.removeFromTop (spacingBetweenSections);
-                auto r2 = r.removeFromTop (settingHeight);
-                midiInputLabels.getUnchecked(i)->setBounds (r2.removeFromLeft (getWidth() / 2));
-                midiInputs.getUnchecked(i)->setBounds (
-                    r2.removeFromLeft(toggleWidth).withSizeKeepingCentre (toggleWidth, toggleHeight));
-            }
+            midiInputView.setBounds (r);
+            midiInputs->updateSize();
         }
         
-        void buttonClicked (Button* btn) override
+        void buttonClicked (Button*) override
         {
-            if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
-            {
-                devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
-            }
-            else
-            {
-                jassertfalse; // unhandled button press
-            }
+            
         }
         
         void comboBoxChanged (ComboBox* box) override
         {
-            const auto name = inputs [midiOutput.getSelectedId() - 10];
+            const auto name = outputs [midiOutput.getSelectedId() - 10];
             if (box == &midiOutput)
                 devices.setDefaultMidiOutput (name);
         }
@@ -523,21 +513,125 @@ namespace Element {
         Label midiOutputLabel;
         ComboBox midiOutput;
         Label midiInputHeader;
-        OwnedArray<Label> midiInputLabels;
-        OwnedArray<SettingButton> midiInputs;
-        
-        StringArray inputs;
         StringArray outputs;
         
+        class MidiInputs : public Component,
+                           public ButtonListener
+        {
+        public:
+            MidiInputs (MidiSettingsPage& o)
+                : owner (o) { }
+            
+            void updateDevices()
+            {
+                midiInputLabels.clearQuick (true);
+                midiInputs.clearQuick (true);
+                inputs  = MidiInput::getDevices();
+
+                for (int i = 0; i < 20; ++i)
+                {
+                    String s ("Fake Device "); s << int (i + 1);
+                    inputs.add (s);
+                }
+                
+                for (const auto& name : inputs)
+                {
+                    auto* label = midiInputLabels.add (new Label());
+                    label->setFont (Font (12));
+                    label->setText (name, dontSendNotification);
+                    addAndMakeVisible (label);
+                    
+                    auto* btn = midiInputs.add (new SettingButton());
+                    btn->setName (name);
+                    btn->setClickingTogglesState (true);
+                    btn->setYesNoText ("On", "Off");
+                    btn->addListener (this);
+                    addAndMakeVisible (btn);
+                }
+
+                updateSize();
+            }
+            
+            void updateSize()
+            {
+                const int widthOfView = owner.midiInputView.getWidth() - owner.midiInputView.getScrollBarThickness();
+                setSize (jmax (200, widthOfView), computeHeight());
+            }
+
+            int computeHeight()
+            {
+                static int tick = 0;
+                
+                const int spacingBetweenSections = 6;
+                const int settingHeight = 22;
+
+                int h = 1;
+                for (int i = 0; i < midiInputs.size(); ++i)
+                {
+                    h += spacingBetweenSections;
+                    h += settingHeight;
+                }
+                
+                // this makes sure the height is always
+                // different and the viewport will refresh
+                if (tick == 0)
+                    tick = 1;
+                else
+                    tick = 0;
+                
+                return h + tick;
+            }
+
+            void resized() override
+            {
+                const int spacingBetweenSections = 6;
+                const int settingHeight = 22;
+                const int toggleWidth = 40;
+                const int toggleHeight = 18;
+
+                jassert (midiInputLabels.size() == midiInputs.size());
+                auto r = getLocalBounds();
+                for (int i = 0; i < midiInputs.size(); ++i)
+                {
+                    r.removeFromTop (spacingBetweenSections);
+                    auto r2 = r.removeFromTop (settingHeight);
+                    midiInputLabels.getUnchecked(i)->setBounds (r2.removeFromLeft (getWidth() / 2));
+                    midiInputs.getUnchecked(i)->setBounds (
+                        r2.removeFromLeft(toggleWidth).withSizeKeepingCentre (toggleWidth, toggleHeight));
+                }
+            }
+
+            void buttonClicked (Button* btn) override
+            {
+                 if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
+                 {
+                     owner.devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
+                 }
+            }
+
+            void updateSelection()
+            {
+                for (auto* input : midiInputs)
+                    input->setToggleState (owner.devices.isMidiInputEnabled(input->getName()), dontSendNotification);
+            }
+
+        private:
+            friend class MidiSettingsPage;
+            MidiSettingsPage& owner;
+            StringArray inputs;
+            OwnedArray<Label> midiInputLabels;
+            OwnedArray<SettingButton> midiInputs;
+        };
+
+        friend class MidiInputs;
+        ScopedPointer<MidiInputs> midiInputs;
+        Viewport midiInputView;
+
         void updateDevices()
         {
-            inputs  = MidiInput::getDevices();
-            outputs = MidiOutput::getDevices();
-            
+            outputs = MidiOutput::getDevices();            
             midiOutput.clear (dontSendNotification);
             midiOutput.setTextWhenNoChoicesAvailable ("<none>");
-            midiInputLabels.clearQuick (true);
-            midiInputs.clearQuick (true);
             
             int i = 0;
             midiOutput.addItem ("<< none >>", 1);
@@ -547,21 +641,8 @@ namespace Element {
                 midiOutput.addItem (name, 10 + i);
                 ++i;
             }
-
-            for (const auto& name : inputs)
-            {
-                auto* label = midiInputLabels.add (new Label());
-                label->setFont (Font (12));
-                label->setText (name, dontSendNotification);
-                addAndMakeVisible (label);
-                
-                auto* btn = midiInputs.add (new SettingButton());
-                btn->setName (name);
-                btn->setClickingTogglesState (true);
-                btn->setYesNoText ("On", "Off");
-                btn->addListener (this);
-                addAndMakeVisible (btn);
-            }
+            
+            midiInputs->updateDevices();
             
             updateInputSelection();
             updateOutputSelection();
@@ -579,8 +660,8 @@ namespace Element {
         
         void updateInputSelection()
         {
-            for (auto* input : midiInputs)
-                input->setToggleState (devices.isMidiInputEnabled(input->getName()), dontSendNotification);
+            if (midiInputs)
+                midiInputs->updateSelection();
         }
     };
     
