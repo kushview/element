@@ -99,7 +99,7 @@ void AppController::handleMessage (const Message& msg)
     {
         if (rnm->node.isValid())
             ec->removeNode (rnm->node);
-        else if (rnm->node.getParentGraph().isGraph())
+        else if (rnm->node.getParentGraph().isRootGraph())
             ec->removeNode (rnm->nodeId);
         else
             handled = false;

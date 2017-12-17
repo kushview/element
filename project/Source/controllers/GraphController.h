@@ -66,6 +66,7 @@ public:
     void clear();
 
     void setNodeModel (const Node& node);
+    inline Node getGraphModel() const { return Node (graph, false); }
     
     void savePluginStates();
     

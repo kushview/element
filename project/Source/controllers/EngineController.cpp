@@ -172,14 +172,21 @@ public:
         graphs.clear();
     }
     
+    /** This is recursive! */
     GraphController* findSubGraphController (GraphController* parent, const Node& n)
     {
         for (int i = parent->getNumFilters(); --i >= 0;)
         {
             if (GraphNodePtr node = parent->getNode (i))
+            {
                 if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+                {
                     if (sub->getController().isControlling (n))
                         return &sub->getController();
+                    else if (auto* sub2 = findSubGraphController (&sub->getController(), n))
+                        return sub2;
+                }
+            }
         }
         return nullptr;
     }
@@ -249,7 +256,10 @@ public:
     }
 
     /** This returns a GraphController for the provided node. The
-        passed in node is expected to have type="graph" */
+        passed in node is expected to have type="graph" 
+        
+        NOTE: this is a recursive operation
+     */
     GraphController* findGraphControllerFor (const Node& graph)
     {
         for (const auto* h : graphs)
@@ -262,6 +272,7 @@ public:
                     return subController;
             }
         }
+
         return nullptr;
     }
 
@@ -558,10 +569,8 @@ void EngineController::removeNode (const Node& node)
     const Node graph (node.getParentGraph ());
     if (! graph.isGraph())
         return;
-    if (graph.isRootGraph())
-        return removeNode (node.getNodeId());
     
-    if (auto* controller = graphs->findSubGraphController (graph))
+    if (auto* controller = graphs->findGraphControllerFor (graph))
     {
         if (auto* gui = findSibling<GuiController>())
             gui->closePluginWindowsFor (node, true);
