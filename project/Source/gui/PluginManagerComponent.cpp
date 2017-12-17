@@ -479,7 +479,7 @@ public:
           finished (false), useBackgroundScanner (true)
         {
             jassert (properties != nullptr);
-            FileSearchPath path (getLastSearchPath(*properties, formatToScan));
+            FileSearchPath path (getLastSearchPath (*properties, formatToScan));
             scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
             // You need to use at least one thread when scanning plug-ins asynchronously
             jassert (! allowAsync || (numThreads > 0));
@@ -604,6 +604,7 @@ private:
             }
         }
         
+        owner.setLastSearchPath (*propertiesToUse, formatToScan, pathList.getPath());
         startScan();
     }
     
