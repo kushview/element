@@ -283,7 +283,10 @@ void SessionTreePanel::mouseDown (const MouseEvent &ev)
 void SessionTreePanel::setSession (SessionPtr s)
 {
     if (session == s)
+    {
+        refresh();
         return;
+    }
     
     if (auto old = session)
     {
@@ -323,7 +326,7 @@ static void refreshSubItems (TreeItemBase* item)
 
     if (auto* root = dynamic_cast<SessionRootTreeItem*> (item))
     {
-            root->refreshSubItems();
+        root->refreshSubItems();
     }
     else
     {

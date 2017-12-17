@@ -469,6 +469,8 @@ void GraphController::setNodeModel (const Node& node)
 
     loaded = true;
     jassert (arcs.getNumChildren() == processor.getNumConnections());
+
+    IONodeEnforcer enforceIONodes (*this);
     processorArcsChanged();
 }
 

@@ -200,6 +200,7 @@ public:
     {
         const int numSamples = buffer.getNumSamples();
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
+        traceMidi (midi);
         
         const ScopedLock sl (lock);
         auto* const graph = getCurrentGraph();

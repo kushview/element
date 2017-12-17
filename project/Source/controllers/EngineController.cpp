@@ -699,7 +699,6 @@ void EngineController::setRootNode (const Node& newRootNode)
             DBG("[EL] loading...");
             r->getRootGraph().setPlayConfigFor (devices);
             r->setNodeModel (newRootNode);
-            holder->resetIONodePorts();
         }
         
         engine->setCurrentGraph (index);
@@ -794,9 +793,17 @@ void EngineController::sessionReloaded()
     if (session->getNumGraphs() > 0)
     {
         for (int i = 0; i < session->getNumGraphs(); ++i)
+        {
             if (auto* holder = graphs->add (new RootGraphHolder (session->getGraph (i), getWorld())))
+            {
                 holder->attach (engine);
-        
+                if (auto* const controller = holder->getController())
+                {
+                    // noop: saving this logical block
+                }
+            }
+        }
+
         setRootNode (session->getCurrentGraph());
     }
 }
