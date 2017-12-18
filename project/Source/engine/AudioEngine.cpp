@@ -111,6 +111,16 @@ struct RootGraphRender
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
+        if (program.wasRequested())
+        {
+            DBG("[EL] program was requested: " << program.program << " channel: " << program.channel);
+            const int nextGraph = findGraphForProgram (program);
+            DBG("[EL] current graph: " << currentGraph);
+            DBG("[EL] selected graph: " << nextGraph);
+            setCurrentGraph (nextGraph);
+            program.reset();
+        }
+        
         const int numSamples = buffer.getNumSamples();
         const int numChans   = buffer.getNumChannels();
         auto* const current  = getCurrentGraph();
@@ -122,7 +132,7 @@ struct RootGraphRender
             midi.clear();
             return;
         }
-        
+
         const bool graphChanged = lastGraph != currentGraph;
         const bool shouldProcess = true;
         const RootGraph::RenderMode mode = current->getRenderMode();
@@ -204,7 +214,20 @@ struct RootGraphRender
 
             for (int i = 0; i < numChans; ++i)
                 buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
-        
+
+            MidiBuffer::Iterator iter (midi);
+            MidiMessage msg; int frame = 0;
+            
+            // setup a program change if present
+            while (iter.getNextEvent(msg, frame) || frame >= numSamples)
+            {
+                if (! msg.isProgramChange())
+                    continue;
+                program.program = msg.getProgramChangeNumber();
+                program.channel = msg.getChannel();
+            }
+
+            // done with input, swap it with the rendered output
             midi.swapWith (midiOut);
         }
         else
@@ -244,12 +267,24 @@ struct RootGraphRender
 
     int size() const { return graphs.size(); }
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked(i); }
-    Array<RootGraph*> getGraphs() const { return graphs; }
+    const Array<RootGraph*>& getGraphs() const { return graphs; }
     
 private:
     Array<RootGraph*> graphs;
     int currentGraph        = -1;
     int lastGraph           = -1;
+
+    struct ProgramRequest {
+        int program      = -1;
+        int channel      = -1;
+
+        const bool wasRequested() const { return program >= 0; }
+        void reset()
+        {
+            program = channel = -1;
+        }
+
+    } program;
 
     int numInputChans       = -1;
     int numOutputChans      = -1;
@@ -261,6 +296,32 @@ private:
     {
         for (int i = 0 ; i < graphs.size(); ++i)
             graphs.getUnchecked(i)->engineIndex = i;
+    }
+
+    bool searchProgramChange (int program, MidiBuffer& buf)
+    {
+        MidiBuffer::Iterator iter (buf);
+        MidiMessage msg; int frame = 0;
+        
+        while (iter.getNextEvent (msg, frame))
+        {
+            if (!msg.isProgramChange())
+                continue;
+            msg.getProgramChangeNumber();
+        }
+
+        return program;
+    }
+
+    int findGraphForProgram (const ProgramRequest& r) const
+    {
+        if (isPositiveAndBelow (program.program, 127))
+            for (const auto* g : graphs)
+                if (g->midiChannel == 0 || g->midiChannel == r.channel)
+                    if (g->midiProgram == r.program)
+                        return g->engineIndex;
+                
+        return currentGraph;
     }
 };
 
@@ -325,7 +386,7 @@ public:
             }
         }
     }
-    
+
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
@@ -396,9 +457,10 @@ public:
 
         if (shouldProcess)
         {
-            graphs.renderGraphs (buffer, midi);
             if (currentGraph.get() != graphs.getCurrentGraphIndex())
-                currentGraph.set (graphs.setCurrentGraph (currentGraph.get()));
+                graphs.setCurrentGraph (currentGraph.get());
+            graphs.renderGraphs (buffer, midi);  // user requested index can be cancelled by program changed
+            currentGraph.set (graphs.getCurrentGraphIndex());
         }
         else
         {

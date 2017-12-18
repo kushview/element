@@ -10,33 +10,35 @@
 #include "Globals.h"
 
 namespace Element {
-    MainWindow::MainWindow (Globals& g)
-        : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
-          world (g)
-    {
-        setUsingNativeTitleBar (true);
-        setResizable (true, false);
-        
-        mainMenu = new MainMenu (*this, g.getCommandManager());
-        mainMenu->setupMenu();
-        
-        addKeyListener (g.getCommandManager().getKeyMappings());
-    }
 
-    MainWindow::~MainWindow()
-    {
-        mainMenu = nullptr;
-    }
+MainWindow::MainWindow (Globals& g)
+    : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
+        world (g)
+{
+    setUsingNativeTitleBar (true);
+    setResizable (true, false);
+    
+    mainMenu = new MainMenu (*this, g.getCommandManager());
+    mainMenu->setupMenu();
+    
+    addKeyListener (g.getCommandManager().getKeyMappings());
+}
 
-    void MainWindow::closeButtonPressed()
-    {
-        JUCEApplication* app (JUCEApplication::getInstance());
-        app->systemRequestedQuit();
-    }
+MainWindow::~MainWindow()
+{
+    mainMenu = nullptr;
+}
 
-    void MainWindow::refreshMenu()
-    {
-        if (mainMenu)
-            mainMenu->menuItemsChanged();
-    }
+void MainWindow::closeButtonPressed()
+{
+    JUCEApplication* app (JUCEApplication::getInstance());
+    app->systemRequestedQuit();
+}
+
+void MainWindow::refreshMenu()
+{
+    if (mainMenu)
+        mainMenu->menuItemsChanged();
+}
+
 }

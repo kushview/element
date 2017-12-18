@@ -235,7 +235,7 @@ namespace Element {
         void midiChannelChanged() override
         {
             auto session = ViewHelpers::getSession (this);
-            node.getValueTree().setProperty (Tags::midiChannel, getMidiChannel(), 0);
+            node.setProperty (Tags::midiChannel, getMidiChannel());
             if (GraphNodePtr ptr = node.getGraphNode())
                 if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                     root->setMidiChannel (getMidiChannel());
@@ -244,6 +244,29 @@ namespace Element {
         Node node;
     };
     
+    class MidiProgramPropertyComponent : public SliderPropertyComponent
+
+    {
+    public:
+        MidiProgramPropertyComponent (const Node& n)
+            : SliderPropertyComponent ("MIDI Program", 0.0, 128.0, 1.0, 1.0,false),
+              node (n)
+        {
+        }
+
+        void setValue (double v) override
+        {
+            node.setProperty ("midiProgram", roundDoubleToInt(v) - 1);
+            if (GraphNodePtr ptr = node.getGraphNode())
+                if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
+                    root->setMidiProgram ((int) node.getProperty ("midiProgram"));
+        }
+        
+        double getValue() const override { return 1.0 + (double)node.getProperty("midiProgram", -1); }
+        
+        Node node;
+    };
+
     class GraphPropertyPanel : public PropertyPanel {
     public:
         GraphPropertyPanel() { }
@@ -272,10 +295,10 @@ namespace Element {
                                                   TRANS("Name"), 256, false));
             props.add (new RenderModePropertyComponent (g));
             props.add (new RootGraphMidiChanel (g));
+            props.add (new MidiProgramPropertyComponent (g));
             props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
                                                      TRANS("Persistent"),
                                                      TRANS("Don't unload when deactivated")));
-            
         }
     };
     

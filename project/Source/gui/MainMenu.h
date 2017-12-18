@@ -8,6 +8,9 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
+
+#include "engine/AudioEngine.h"
+
 #include "session/Session.h"
 #include "session/CommandManager.h"
 #include "session/Node.h"
@@ -93,7 +96,8 @@ public:
     void menuItemSelected (int index, int menu) override
     {
         auto session = world.getSession();
-        
+        auto engine  = world.getAudioEngine();
+
         if (index == 6000 && menu == Help)
         {
             URL ("http://help.kushview.net/collection/10-element").launchInDefaultBrowser();
@@ -114,6 +118,12 @@ public:
             auto data = session->getValueTree().createCopy();
             Node::sanitizeProperties (data, true);
             DBG(data.toXmlString());
+        }
+        else if (index == 1111)
+        {
+            auto msg = MidiMessage::programChange (1, 10);
+            msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
+            engine->addMidiMessage (msg);
         }
        #endif
     }
@@ -217,6 +227,7 @@ private:
     {
         menu.addItem (1000, "Dump session to console");
         menu.addItem (1001, "Report bug");
+        menu.addItem (1111, "Report bug");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     

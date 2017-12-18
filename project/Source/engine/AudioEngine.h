@@ -58,9 +58,20 @@ public:
     
     inline void setRenderMode (const RenderMode mode)
     {
+        // TODO: don't use a lock
+        ScopedLock sl (getCallbackLock());
         if (renderMode == static_cast<int> (mode))
             return;
         renderMode = mode;
+    }
+
+    inline void setMidiProgram (const int program)
+    {
+        if (program == midiProgram)
+            return;
+        DBG("program: " << program);
+        ScopedLock sl (getCallbackLock());
+        midiProgram = program;
     }
 
     const String getName() const override;
@@ -82,7 +93,8 @@ private:
     String audioInName, audioOutName;
     StringArray audioInputNames;
     StringArray audioOutputNames;
-    int midiChannel;
+    int midiChannel = 0;
+    int midiProgram = -1;
     int engineIndex = -1;
     RenderMode renderMode = Parallel;
     

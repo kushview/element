@@ -51,9 +51,13 @@ struct RootGraphHolder
         {
             const auto modeStr = model.getProperty (Tags::renderMode, "single").toString().trim().toLowerCase();
             const auto mode = modeStr == "single" ? RootGraph::SingleGraph : RootGraph::Parallel;
+            const auto channel = (int) model.getProperty (Tags::midiChannel, 0);
+            const auto program = (int) model.getProperty ("midiProgram", -1);
 
             root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
+            root->setMidiChannel (channel);
+            root->setMidiProgram (program);
 
             if (engine->addGraph (root))
             {
