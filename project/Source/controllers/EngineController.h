@@ -2,7 +2,7 @@
 
 namespace Element {
 
-class ConnectionBuilder;
+struct ConnectionBuilder;
 class GraphController;
 class RootGraphController;
 class Node;
@@ -34,8 +34,7 @@ public:
     
     /** Adds a plugin to a specific graph and adds connections from
         a ConnectionBuilder */
-    void addPlugin (const Node& graph, const PluginDescription& desc,
-                    const ConnectionBuilder& builder);
+    void addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder);
 
     /** Removes a node from the current graph */
     void removeNode (const uint32);
@@ -57,9 +56,6 @@ public:
 
     /** Ads a specific new graph */
     void duplicateGraph (const Node& graph);
-
-    /** Add a subgraph to the currently active root graph */
-    void addSubGraph();
     
     /** Add a connection on the active root graph */
     void addConnection (const uint32, const uint32, const uint32, const uint32);
@@ -95,7 +91,7 @@ public:
     void changeBusesLayout (const Node& node, const AudioProcessor::BusesLayout& layout);
     
 private:
-    friend class RootGraphHolder;
+    friend struct RootGraphHolder;
     class RootGraphs; friend class RootGraphs;
     ScopedPointer<RootGraphs> graphs;
     

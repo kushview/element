@@ -117,15 +117,15 @@ public:
                 graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), 0);
                 auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
                 app.findChild<EngineController>()->setRootNode (node);
-                if (auto* gui = app.findChild<GuiController>())
-                    gui->showPluginWindowsFor (node, true);
+                if (auto* g = app.findChild<GuiController>())
+                    g->showPluginWindowsFor (node, true);
             }
         }
         
-        if (auto* cc = ViewHelpers::findContentComponent (getOwnerView()))
+        if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
-            cc->setCurrentNode (graph);
+            c->setCurrentNode (graph);
         }
     }
 
