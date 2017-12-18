@@ -30,7 +30,12 @@
 #endif
 
 namespace Element {
+
     #include "./PublicKey.cpp"
+
+    void UnlockStatus::LockableObject::showLockedAlert() {
+        Alert::showProductLockedAlert();
+    }
 
     const char* UnlockStatus::propsKey = "props";
     const char* UnlockStatus::fullKey = "f";

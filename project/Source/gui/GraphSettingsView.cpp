@@ -3,10 +3,13 @@
 #include "controllers/EngineController.h"
 #include "gui/GuiCommon.h"
 #include "gui/GraphSettingsView.h"
+#include "session/UnlockStatus.h"
 
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;
     
+
+
     class GraphMidiChannels : public PropertyComponent
     {
     public:
@@ -25,7 +28,8 @@ namespace Element {
             layout.updateMatrix();
         }
         
-        void resized() override {
+        void resized() override
+        {
             PropertyComponent::resized();
             layout.updateMatrix();
         }
@@ -103,7 +107,7 @@ namespace Element {
             Matrix_1x16 (GraphMidiChannels& o) : MatrixBase (o, 1, 16) { }
         } matrix_1x16;
         
-        class Layout : public Component{
+        class Layout : public Component {
         public:
             Layout (GraphMidiChannels& o)
                 : owner(o), matrix116(o), matrix28(o)
@@ -190,7 +194,8 @@ namespace Element {
         int midiChannel = 0;
     };
     
-    class RenderModePropertyComponent : public ChoicePropertyComponent
+    class RenderModePropertyComponent : public ChoicePropertyComponent,
+                                        public UnlockStatus::LockableObject
     {
     public:
         RenderModePropertyComponent (const Node& g, const String& name = "Rendering Mode")
@@ -209,15 +214,30 @@ namespace Element {
         
         inline void setIndex (const int index) override
         {
-            RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
-            graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
-            if (auto* node = graph.getGraphNode ())
-                if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
-                    root->setRenderMode (mode);
+            if (! locked)
+            {
+                RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
+                graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
+                if (auto* node = graph.getGraphNode ())
+                    if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
+                        root->setRenderMode (mode);
+            }
+            else
+            {
+                showLockedAlert();
+                refresh();
+            }
+        }
+        
+        void setLocked (const var& isLocked) override
+        {
+            locked = isLocked;
+            refresh();
         }
         
     protected:
         Node graph;
+        bool locked;
     };
 
     class RootGraphMidiChanel : public MidiChannelPropertyComponent
@@ -243,7 +263,8 @@ namespace Element {
         Node node;
     };
     
-    class MidiProgramPropertyComponent : public SliderPropertyComponent
+    class MidiProgramPropertyComponent : public SliderPropertyComponent,
+                                         public UnlockStatus::LockableObject
 
     {
     public:
@@ -253,27 +274,47 @@ namespace Element {
         {
         }
 
+        void setLocked (const var& isLocked) override
+        {
+            locked = isLocked;
+            refresh();
+        }
+
         void setValue (double v) override
         {
-            node.setProperty ("midiProgram", roundDoubleToInt(v) - 1);
-            if (GraphNodePtr ptr = node.getGraphNode())
-                if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
-                    root->setMidiProgram ((int) node.getProperty ("midiProgram"));
+            if (! locked)
+            {
+                node.setProperty ("midiProgram", roundDoubleToInt(v) - 1);
+                if (GraphNodePtr ptr = node.getGraphNode())
+                    if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
+                        root->setMidiProgram ((int) node.getProperty ("midiProgram"));
+            }
+            else
+            {
+                showLockedAlert();
+                refresh();
+            }
         }
         
         double getValue() const override { return 1.0 + (double)node.getProperty("midiProgram", -1); }
         
         Node node;
+        bool locked;
     };
 
     class GraphPropertyPanel : public PropertyPanel {
     public:
-        GraphPropertyPanel() { }
+        GraphPropertyPanel() : locked (var (true)) { }
         ~GraphPropertyPanel()
         {
             clear();
         }
         
+        void setLocked (const bool isLocked)
+        {
+            locked = isLocked;
+        }
+
         void setNode (const Node& newNode)
         {
             clear();
@@ -288,13 +329,26 @@ namespace Element {
         
     private:
         Node graph;
-        static void getSessionProperties (PropertyArray& props, Node g)
+        var locked;
+
+        static void maybeLockObject (PropertyComponent* p, const var& locked)
+        {
+            if (auto* lc = dynamic_cast<UnlockStatus::LockableObject*> (p))
+                lc->setLocked (locked);
+        }
+
+        void getSessionProperties (PropertyArray& props, Node g)
         {
             props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
                                                   TRANS("Name"), 256, false));
+
             props.add (new RenderModePropertyComponent (g));
             props.add (new RootGraphMidiChanel (g));
             props.add (new MidiProgramPropertyComponent (g));
+
+            for (auto* const p : props)
+                maybeLockObject (p, locked);
+            
             // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
             //                                          TRANS("Persistent"),
             //                                          TRANS("Don't unload when deactivated")));
@@ -321,8 +375,12 @@ namespace Element {
     
     void GraphSettingsView::stabilizeContent()
     {
-        if (auto* cc = ViewHelpers::findContentComponent (this))
-            props->setNode (cc->getGlobals().getSession()->getCurrentGraph());
+        if (auto* const world = ViewHelpers::getGlobals (this))
+        {
+            const auto notFull (!(bool) world->getUnlockStatus().isFullVersion());
+            props->setLocked (notFull);
+            props->setNode (world->getSession()->getCurrentGraph());
+        }
     }
     
     void GraphSettingsView::paint (Graphics& g)

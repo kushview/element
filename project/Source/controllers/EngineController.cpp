@@ -7,6 +7,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
+#include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Settings.h"
 
@@ -19,6 +20,7 @@ struct RootGraphHolder
     RootGraphHolder (const Node& n, Globals& world)
         : plugins (world.getPluginManager()), 
           devices (world.getDeviceManager()),
+          status  (world.getUnlockStatus()),
           model (n)
     { }
     
@@ -54,6 +56,7 @@ struct RootGraphHolder
             const auto channel = (int) model.getProperty (Tags::midiChannel, 0);
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
+            root->setLocked (!(bool) status.isFullVersion());
             root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
             root->setMidiChannel (channel);
@@ -115,6 +118,7 @@ private:
     friend class EngineController::RootGraphs;
     PluginManager&                      plugins;
     DeviceManager&                      devices;
+    UnlockStatus&                       status;
     ScopedPointer<RootGraphController>  controller;
     Node                                model;
     GraphNodePtr                        node;

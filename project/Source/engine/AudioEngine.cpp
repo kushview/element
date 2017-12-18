@@ -9,6 +9,7 @@
 #include "engine/MidiClipSource.h"
 #include "engine/MidiClock.h"
 #include "engine/Transport.h"
+#include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Settings.h"
 
@@ -114,12 +115,19 @@ struct RootGraphRender
         if (program.wasRequested())
         {
             DBG("[EL] program was requested: " << program.program << " channel: " << program.channel);
-            const int nextGraph = findGraphForProgram (program);
-            
-            if (nextGraph != currentGraph)
+            if (! locked)
             {
-                DBG("[EL] changing graph: " << currentGraph << " > " << nextGraph);
-                setCurrentGraph (nextGraph);
+                const int nextGraph = findGraphForProgram (program);
+                
+                if (nextGraph != currentGraph)
+                {
+                    DBG("[EL] changing graph: " << currentGraph << " > " << nextGraph);
+                    setCurrentGraph (nextGraph);
+                }
+            }
+            else
+            {
+                DBG("[EL] program changed not handled: product locked");
             }
 
             program.reset();
@@ -244,8 +252,10 @@ struct RootGraphRender
     }
     
     /** not realtime safe! */
+
     bool addGraph (RootGraph* graph)
     {
+        graph->setLocked (locked);
         graphs.add (graph);
         graph->engineIndex = graphs.size() - 1;
         
@@ -273,8 +283,16 @@ struct RootGraphRender
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked(i); }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
     
+    void setLocked (const bool l)
+    {
+        locked = l;
+        for (auto* g : graphs)
+            g->setLocked (locked);
+    }
+
 private:
     Array<RootGraph*> graphs;
+    bool locked             = true;
     int currentGraph        = -1;
     int lastGraph           = -1;
 
@@ -501,6 +519,7 @@ public:
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
         
+        graphs.setLocked (!(bool) engine.getWorld().getUnlockStatus().isFullVersion());
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
 
         if (isPrepared)
@@ -853,5 +872,6 @@ void AudioEngine::releaseExternalResources()
     if (priv)
         priv->audioStopped();
 }
-    
+
+Globals& AudioEngine::getWorld() const { return world; }
 }

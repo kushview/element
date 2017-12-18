@@ -16,9 +16,17 @@ namespace Element {
 class Globals;
 class Settings;
 
+
+
 class UnlockStatus :  public kv::EDDOnlineUnlockStatus
 {
 public:
+    struct LockableObject 
+    {
+        virtual void setLocked (const var& locked) =0;
+        virtual void showLockedAlert();
+    };
+
     UnlockStatus (Globals&);
     ~UnlockStatus() { }
 

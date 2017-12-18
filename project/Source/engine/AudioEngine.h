@@ -11,6 +11,7 @@
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
+#include "session/UnlockStatus.h"
 
 namespace Element {
 
@@ -21,7 +22,8 @@ class Settings;
 
 typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
 
-class RootGraph : public GraphProcessor
+class RootGraph : public GraphProcessor,
+                  public UnlockStatus::LockableObject
 {
 public:
     RootGraph();
@@ -32,6 +34,13 @@ public:
         SingleGraph     = 0,
         Parallel        = (1 << 0)
     };
+
+    inline void setLocked (const var& l) override
+    {
+        const bool isNowLocked = (bool) l;
+        ScopedLock sl (getCallbackLock());
+        locked = isNowLocked;
+    }
 
     inline static bool renderModeValid (const int mode) {
         return mode == SingleGraph || mode == Parallel;
@@ -59,21 +68,20 @@ public:
     inline void setRenderMode (const RenderMode mode)
     {
         // TODO: don't use a lock
-        ScopedLock sl (getCallbackLock());
-        if (renderMode == static_cast<int> (mode))
+        if (! locked && renderMode == static_cast<int> (mode))
             return;
-        renderMode = mode;
+        ScopedLock sl (getCallbackLock());
+        renderMode = locked ? SingleGraph : mode;
     }
 
     inline void setMidiProgram (const int program)
     {
         if (program == midiProgram)
             return;
-        DBG("program: " << program);
         ScopedLock sl (getCallbackLock());
         midiProgram = program;
     }
-
+    
     const String getName() const override;
     const String getInputChannelName (int channelIndex) const override;
     const String getOutputChannelName (int channelIndex) const override;
@@ -98,6 +106,8 @@ private:
     int engineIndex = -1;
     RenderMode renderMode = Parallel;
     
+    bool locked = true;
+
     void updateChannelNames (AudioIODevice* device);
 };
 
@@ -152,6 +162,8 @@ public:
     void processExternalPlayhead (AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
     
+    Globals& getWorld() const;
+
 private:
     class Private;
     ScopedPointer<Private> priv;

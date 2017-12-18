@@ -17,14 +17,6 @@
 
 namespace Element {
 
-static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
-{
-    String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature.\nGet a copy @ https://kushview.net"
-                                     : msg;
-    if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
-        URL("https://kushview.net/products/element/").launchInDefaultBrowser();
-}
-
 Globals& AppController::Child::getWorld()
 {
     auto* app = dynamic_cast<AppController*> (getRoot());
@@ -185,7 +177,7 @@ void AppController::handleMessage (const Message& msg)
     {
         if (anm->node.isGraph() && !getWorld().getUnlockStatus().isFullVersion())
         {
-            showProductLockedAlert ("Nested graphs are not supported without a license");
+            Alert::showProductLockedAlert ("Nested graphs are not supported without a license");
         }
 
         else if (anm->target.isValid ())
@@ -200,7 +192,7 @@ void AppController::handleMessage (const Message& msg)
         
         if (desc.fileOrIdentifier == "element.graph" && !getWorld().getUnlockStatus().isFullVersion())
         {
-            showProductLockedAlert ("Nested graphs are not supported without a license");
+            Alert::showProductLockedAlert ("Nested graphs are not supported without a license");
         }
         else if (graph.isGraph())
         {
@@ -316,7 +308,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
-                Element::showProductLockedAlert();
+                Alert::showProductLockedAlert();
             }
             
         } break;
@@ -343,7 +335,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
             else
             {
-                Element::showProductLockedAlert();
+                Alert::showProductLockedAlert();
             }
         } break;
 
