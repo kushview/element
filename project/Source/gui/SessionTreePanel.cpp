@@ -294,11 +294,9 @@ void SessionTreePanel::setSession (SessionPtr s)
     }
 
     session = s;
-
-    setRoot (nullptr);
-    setRoot (new SessionRootTreeItem (*this));
-
+    
     data = (session != nullptr) ? session->getValueTree() : ValueTree();
+    refresh();
 }
 
 SessionPtr SessionTreePanel::getSession() const

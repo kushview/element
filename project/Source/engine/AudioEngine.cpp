@@ -69,6 +69,201 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
             audioOutputNames.add(namesOut[i]);
 }
 
+struct RootGraphRender
+{
+    RootGraphRender()
+    {
+        graphs.ensureStorageAllocated (32);
+    }
+
+    const int setCurrentGraph (const int index)
+    {
+        if (index == currentGraph)
+            return currentGraph;
+        currentGraph = index;
+        return currentGraph;
+    }
+
+    const int getCurrentGraphIndex() const { return currentGraph; }
+
+    RootGraph* getCurrentGraph() const
+    { 
+        return isPositiveAndBelow (currentGraph, graphs.size()) ? graphs.getUnchecked(currentGraph) 
+                                                                : nullptr; 
+    }
+
+    void prepareBuffers (const int numIns, const int numOuts, const int numSamples)
+    {
+        numInputChans   = numIns;
+        numOutputChans  = numOuts;
+        audioTemp.setSize (jmax (numIns, numOuts), numSamples);
+        audioOut.setSize (audioTemp.getNumChannels(), audioTemp.getNumSamples());
+    }
+
+    void releaseBuffers()
+    {
+        numInputChans = numOutputChans = 0;
+        midiOut.clear();
+        midiTemp.clear();
+        audioTemp.setSize (1, 1);
+        audioOut.setSize (1, 1);
+    }
+
+    void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
+    {
+        const int numSamples = buffer.getNumSamples();
+        const int numChans   = buffer.getNumChannels();
+        auto* const current  = getCurrentGraph();
+        auto* const last     = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph(lastGraph) : nullptr;
+        
+        if (current == nullptr || last == nullptr)
+        {
+            buffer.clear();
+            midi.clear();
+            return;
+        }
+        
+        const bool graphChanged = lastGraph != currentGraph;
+        const bool shouldProcess = true;
+        const RootGraph::RenderMode mode = current->getRenderMode();
+        const bool modeChanged = graphChanged && mode != last->getRenderMode();
+
+        if (shouldProcess)
+        {
+            // clear the mixing area
+            for (int i = numChans; --i >= 0;)
+                audioOut.clear (i, 0, numSamples);
+            midiOut.clear();
+            
+            for (auto* const graph : graphs)
+            {
+                // copy inputs, clear outs if more than input count
+                for (int i = 0; i < numInputChans; ++i)
+                    audioTemp.copyFrom (i, 0, buffer, i, 0, numSamples);
+                for (int i = numInputChans; i < numChans; ++i)
+                    audioTemp.clear (i, 0, numSamples);
+                
+                if ((last == graph && graphChanged && last->isSingle())
+                    || (graphChanged && current != nullptr && current->isSingle() && graph != current))
+                {
+                    // send all notes off to the last graph if it is single
+                    // it to parellel graphs as well
+                    for (int i = 0; i < 16; ++i)
+                        midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
+                }
+                else if ((current == graph && graph->isSingle()) 
+                            || (current != nullptr && !current->isSingle() && !graph->isSingle()))
+                {
+                    // current single graph or parallel graphs get MIDI always
+                    midiTemp.addEvents (midi, 0, numSamples, 0);
+                }
+
+                {
+                    const ScopedLock sl (graph->getCallbackLock());
+                    if (graph->isSuspended())
+                    {
+                        graph->processBlockBypassed (audioTemp, midiTemp);
+                    }
+                    else
+                    {
+                        graph->processBlock (audioTemp, midiTemp);
+                    }
+                }
+                
+                if (graphChanged && ((current->isSingle() && current != graph) ||
+                                     (modeChanged && !current->isSingle() && graph->isSingle())))
+                                     
+                {
+                    DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
+                    for (int i = 0; i < numOutputChans; ++i)
+                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
+                                                      numSamples, 1.f, 0.f);
+                }
+                else if ((graph == current && graph->isSingle()) ||
+                         (!graph->isSingle() && (current != nullptr) && !current->isSingle()))
+                {
+                    // if it's the current single graph or both are parallel...
+                    
+                    if (graphChanged && (graph->isSingle() || 
+                                        (modeChanged && !graph->isSingle() && !current->isSingle())))
+                    {
+                        DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
+                        for (int i = 0; i < numOutputChans; ++i)
+                            audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
+                                                      numSamples, 0.f, 1.f);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < numOutputChans; ++i)
+                            audioOut.addFrom (i, 0, audioTemp, i, 0, numSamples);
+                    }
+                    
+                    midiOut.addEvents (midiTemp, 0, numSamples, 0);
+                }
+            }
+
+            for (int i = 0; i < numChans; ++i)
+                buffer.copyFrom (i, 0, audioOut, i, 0, numSamples);
+        
+            midi.swapWith (midiOut);
+        }
+        else
+        {
+            for (int i = 0; i < buffer.getNumChannels(); ++i)
+                zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
+        }
+
+        lastGraph = currentGraph;
+    }
+    
+    /** not realtime safe! */
+    bool addGraph (RootGraph* graph)
+    {
+        graphs.add (graph);
+        graph->engineIndex = graphs.size() - 1;
+        
+        if (graph->engineIndex == 0)
+        {
+            setCurrentGraph (0);
+            lastGraph = 0;
+        }
+        
+        return true;
+    }
+
+    /** not realtime safe! */
+    void removeGraph (RootGraph* graph)
+    {
+        jassert (graphs.contains (graph));
+        graphs.removeFirstMatchingValue (graph);
+        graph->engineIndex = -1;
+        updateIndexes();
+        if (currentGraph >= graphs.size())
+            currentGraph = graphs.size() - 1;
+    }
+
+    int size() const { return graphs.size(); }
+    RootGraph* getGraph (const int i) const { return graphs.getUnchecked(i); }
+    Array<RootGraph*> getGraphs() const { return graphs; }
+    
+private:
+    Array<RootGraph*> graphs;
+    int currentGraph        = -1;
+    int lastGraph           = -1;
+
+    int numInputChans       = -1;
+    int numOutputChans      = -1;
+    AudioSampleBuffer   audioOut, audioTemp;
+
+    MidiBuffer midiOut, midiTemp;
+
+    void updateIndexes()
+    {
+        for (int i = 0 ; i < graphs.size(); ++i)
+            graphs.getUnchecked(i)->engineIndex = i;
+    }
+};
+
 class AudioEngine::Private : public AudioIODeviceCallback,
                              public MidiInputCallback,
                              public ValueListener,
@@ -86,7 +281,6 @@ public:
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
-        graphs.ensureStorageAllocated (32);
     }
 
     ~Private()
@@ -103,11 +297,7 @@ public:
         }
     }
     
-    RootGraph* getCurrentGraph() const
-    {
-        return isPositiveAndBelow (currentGraph.get(), graphs.size()) ? graphs.getUnchecked(currentGraph.get())
-                                                                      : nullptr;
-    }
+    RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
     
     void traceMidi (MidiBuffer& buf)
     {
@@ -141,7 +331,6 @@ public:
                                 const int numSamples) override
     {
         jassert (sampleRate > 0 && blockSize > 0);
-        
         int totalNumChans = 0;
         ScopedNoDenormals denormals;
         if (numInputChannels > numOutputChannels)
@@ -202,29 +391,21 @@ public:
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
         
         const ScopedLock sl (lock);
-        auto* const graph = getCurrentGraph();
-        const bool shouldProcess = graph != nullptr;
-        
+        const bool shouldProcess = true;
         transport.preProcess (numSamples);
 
         if (shouldProcess)
         {
-            const ScopedLock sl2 (graph->getCallbackLock());
-            if (graph->isSuspended())
-            {
-                graph->processBlockBypassed (buffer, midi);
-            }
-            else
-            {
-                graph->processBlock (buffer, midi);
-            }
+            graphs.renderGraphs (buffer, midi);
+            if (currentGraph.get() != graphs.getCurrentGraphIndex())
+                currentGraph.set (graphs.setCurrentGraph (currentGraph.get()));
         }
         else
         {
             for (int i = 0; i < buffer.getNumChannels(); ++i)
                 zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
         }
-        
+
         if (isTimeMaster() && transport.isPlaying())
             transport.advance (numSamples);
         
@@ -268,6 +449,8 @@ public:
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
         
+        graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
+
         if (isPrepared)
         {
             isPrepared = false;
@@ -295,6 +478,7 @@ public:
         sampleRate  = 0.0;
         blockSize   = 0;
         tempBuffer.setSize (1, 1);
+        graphs.releaseBuffers();
     }
     
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
@@ -304,31 +488,20 @@ public:
             midiClock.process (message);
     }
     
-    void updateGraphIndexes()
-    {
-        for (int i = 0 ; i < graphs.size(); ++i)
-            graphs.getUnchecked(i)->engineIndex = i;
-    }
-    
     void addGraph (RootGraph* graph)
     {
         jassert (graph);
         if (isPrepared)
             prepareGraph (graph, sampleRate, blockSize);
         ScopedLock sl (lock);
-        graphs.add (graph);
-        graph->engineIndex = graphs.size() - 1;
+        graphs.addGraph (graph);
     }
     
     void removeGraph (RootGraph* graph)
     {
         {
             ScopedLock sl (lock);
-            jassert (graphs.contains (graph));
-            graphs.removeFirstMatchingValue (graph);
-            updateGraphIndexes();
-            if (currentGraph.get() >= graphs.size())
-                engine.setCurrentGraph (graphs.size() - 1);
+            graphs.removeGraph (graph);
         }
         
         if (isPrepared)
@@ -409,7 +582,7 @@ private:
     friend class AudioEngine;
     AudioEngine&        engine;
     Transport           transport;
-    Array<RootGraph*>   graphs;
+    RootGraphRender     graphs;
     SessionPtr          session;
     
     Value tempoValue;
@@ -420,13 +593,17 @@ private:
     int blockSize       = 0;
     bool isPrepared     = false;
     Atomic<int> currentGraph;
+
     int numInputChans, numOutputChans;
     HeapBlock<float*> channels;
     AudioSampleBuffer tempBuffer;
     MidiBuffer incomingMidi;
     MidiMessageCollector messageCollector;
     MidiKeyboardState keyboardState;
-    
+
+    AudioSampleBuffer graphBuffer;
+    AudioSampleBuffer graphMixBuffer;
+
     Value externalClockValue;
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
@@ -444,14 +621,14 @@ private:
     
     void prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
-        for (auto* graph : graphs)
-            prepareGraph (graph, sampleRate, estimatedBlockSize);
+        for (int i = 0; i < graphs.size(); ++i)
+            prepareGraph (graphs.getGraph(i), sampleRate, estimatedBlockSize);
     }
     
     void releaseResources()
     {
-        for (auto* graph : graphs)
-            graph->releaseResources();
+        for (int i = 0; i < graphs.size(); ++i)
+            graphs.getGraph(i)->releaseResources();
     }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
@@ -514,7 +691,7 @@ RootGraph* AudioEngine::getGraph (const int index)
 {
     ScopedLock sl (priv->lock);
     if (isPositiveAndBelow (index, priv->graphs.size()))
-        return priv->graphs.getUnchecked (index);
+        return priv->graphs.getGraph (index);
     return nullptr;
 }
 

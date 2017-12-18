@@ -27,11 +27,42 @@ public:
     RootGraph();
     ~RootGraph() { }
     
+    enum RenderMode
+    {
+        SingleGraph     = 0,
+        Parallel        = (1 << 0)
+    };
+
+    inline static bool renderModeValid (const int mode) {
+        return mode == SingleGraph || mode == Parallel;
+    }
+
+    inline static String getSlugForRenderMode (const RenderMode mode)
+    {
+        switch (mode)
+        {
+            case SingleGraph: return "single"; break;
+            case Parallel:    return "parallel"; break;
+        }
+        return String();
+    }
+
     void setValueTree (const ValueTree& tree);
     void setPlayConfigFor (AudioIODevice* device);
     void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
     void setPlayConfigFor (DeviceManager&);
     
+    inline RenderMode getRenderMode() const { return renderMode; }
+    inline String getRenderModeSlug() const { return getSlugForRenderMode (renderMode); }
+    inline bool isSingle() const { return getRenderMode() == SingleGraph; }
+    
+    inline void setRenderMode (const RenderMode mode)
+    {
+        if (renderMode == static_cast<int> (mode))
+            return;
+        renderMode = mode;
+    }
+
     const String getName() const override;
     const String getInputChannelName (int channelIndex) const override;
     const String getOutputChannelName (int channelIndex) const override;
@@ -44,6 +75,8 @@ public:
 
 private:
     friend class AudioEngine;
+    friend class RootGraphRender;
+
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
     String audioInName, audioOutName;
@@ -51,6 +84,7 @@ private:
     StringArray audioOutputNames;
     int midiChannel;
     int engineIndex = -1;
+    RenderMode renderMode = Parallel;
     
     void updateChannelNames (AudioIODevice* device);
 };

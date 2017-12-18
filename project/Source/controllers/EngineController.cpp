@@ -17,7 +17,9 @@ namespace Element {
 struct RootGraphHolder
 {
     RootGraphHolder (const Node& n, Globals& world)
-        : plugins(world.getPluginManager()), model (n)
+        : plugins (world.getPluginManager()), 
+          devices (world.getDeviceManager()),
+          model (n)
     { }
     
     ~RootGraphHolder()
@@ -30,6 +32,10 @@ struct RootGraphHolder
     }
     
     bool attached() const { return node && controller; }
+
+    /** This will create a root graph processor/controller and load it if not
+        done already. Properties are set from the model, so make sure they are
+        correct before calling this */
     bool attach (AudioEnginePtr engine)
     {
         jassert (engine);
@@ -43,9 +49,17 @@ struct RootGraphHolder
         
         if (auto* root = getRootGraph())
         {
+            const auto modeStr = model.getProperty ("renderMode").toString().trim().toLowerCase();
+            const auto mode = modeStr == "single" ? RootGraph::SingleGraph : RootGraph::Parallel;
+
+            root->setPlayConfigFor (devices);
+            root->setRenderMode (mode);
+
             if (engine->addGraph (root))
             {
                 controller = new RootGraphController (*root, plugins);
+                controller->setNodeModel (model);
+                resetIONodePorts();
                 model.getValueTree().setProperty (Tags::object, node.get(), 0);
             }
         }
@@ -79,60 +93,7 @@ struct RootGraphHolder
     RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node->getAudioProcessor() : nullptr); }
     
     bool hasController()    const { return nullptr != controller; }
-    
-    void addMissingIONodes()
-    {
-        auto* root = getController();
-        if (! root) return;
-        GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
-        for (int i = 0; i < root->getNumFilters(); ++i)
-        {
-            GraphNodePtr node = root->getNode (i);
-            if (node->isMidiIONode() || node->isAudioIONode())
-            {
-                auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
-                ioNodes [proc->getType()] = node;
-            }
-        }
-        
-        for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
-        {
-            if (nullptr != ioNodes [t])
-                continue;
-            
-            PluginDescription desc;
-            desc.pluginFormatName = "Internal";
-            double rx = 0.5f, ry = 0.5f;
-            switch (t)
-            {
-                case IOProcessor::audioInputNode:
-                    desc.fileOrIdentifier = "audio.input";
-                    rx = .25;
-                    ry = .25;
-                    break;
-                case IOProcessor::audioOutputNode:
-                    desc.fileOrIdentifier = "audio.output";
-                    rx = .25;
-                    ry = .75;
-                    break;
-                case IOProcessor::midiInputNode:
-                    desc.fileOrIdentifier = "midi.input";
-                    rx = .75;
-                    ry = .25;
-                    break;
-                case IOProcessor::midiOutputNode:
-                    desc.fileOrIdentifier = "midi.output";
-                    rx = .75;
-                    ry = .75;
-                    break;
-            }
-            
-            auto nodeId = root->addFilter (&desc, rx, ry);
-            ioNodes[t] = root->getNodeForId (nodeId);
-            jassert(ioNodes[t] != nullptr);
-        }
-    }
-    
+
     void resetIONodePorts()
     {
         const ValueTree nodes = model.getNodesValueTree();
@@ -149,6 +110,7 @@ private:
     friend class EngineController;
     friend class EngineController::RootGraphs;
     PluginManager&                      plugins;
+    DeviceManager&                      devices;
     ScopedPointer<RootGraphController>  controller;
     Node                                model;
     GraphNodePtr                        node;
@@ -379,7 +341,6 @@ void EngineController::addGraph (const Node& newGraph)
         {
             session->addGraph (node, true);
             setRootNode (node);
-            holder->addMissingIONodes();
         }
         else
         {
@@ -722,13 +683,6 @@ void EngineController::updateRootGraphMidiChannel (const int index, const int mi
     }
 }
 
-void EngineController::addMissingIONodes()
-{
-    if (auto session = getWorld().getSession())
-        if (auto* h = graphs->findFor (session->getActiveGraph()))
-            h->addMissingIONodes();
-}
-
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
@@ -780,7 +734,6 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     {
         const Node node (addPlugin (*controller, desc));
         builder.addConnections (*controller, node.getNodeId());
-        
     }
 }
 
@@ -855,8 +808,6 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();
                 node.resetPorts();
-
-                bool b = false;
             }
         }
     }

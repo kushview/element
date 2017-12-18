@@ -191,6 +191,36 @@ namespace Element {
         int midiChannel = 0;
     };
     
+    class RenderModePropertyComponent : public ChoicePropertyComponent
+    {
+    public:
+        RenderModePropertyComponent (const Node& g, const String& name = "Rendering Mode")
+            : ChoicePropertyComponent (name), graph(g)
+        {
+            jassert(graph.isRootGraph());
+            choices.add ("Single");
+            choices.add ("Parallel");
+        }
+        
+        inline int getIndex() const override
+        {
+            const String slug = graph.getProperty ("renderMode", "single").toString();
+            return (slug == "single") ? 0 : 1;
+        }
+        
+        inline void setIndex (const int index) override
+        {
+            RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
+            graph.setProperty ("renderMode", RootGraph::getSlugForRenderMode (mode));
+            if (auto* node = graph.getGraphNode ())
+                if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
+                    root->setRenderMode (mode);
+        }
+        
+    protected:
+        Node graph;
+    };
+
     class RootGraphMidiChanel : public MidiChannelPropertyComponent
     {
     public:
@@ -240,14 +270,12 @@ namespace Element {
         {
             props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
                                                   TRANS("Name"), 256, false));
-            #if EL_ROOT_MIDI_CHANNEL
-            // props.add (new GraphMidiChannels());
-            if (g.isRootGraph ())
-                props.add (new RootGraphMidiChanel (g));
-            #endif
+            props.add (new RenderModePropertyComponent (g));
+            props.add (new RootGraphMidiChanel (g));
             props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
                                                      TRANS("Persistent"),
                                                      TRANS("Don't unload when deactivated")));
+            
         }
     };
     
