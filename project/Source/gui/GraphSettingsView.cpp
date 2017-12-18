@@ -296,9 +296,9 @@ namespace Element {
             props.add (new RenderModePropertyComponent (g));
             props.add (new RootGraphMidiChanel (g));
             props.add (new MidiProgramPropertyComponent (g));
-            props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
-                                                     TRANS("Persistent"),
-                                                     TRANS("Don't unload when deactivated")));
+            // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
+            //                                          TRANS("Persistent"),
+            //                                          TRANS("Don't unload when deactivated")));
         }
     };
     

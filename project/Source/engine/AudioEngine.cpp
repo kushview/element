@@ -184,7 +184,7 @@ struct RootGraphRender
                                      (modeChanged && !current->isSingle() && graph->isSingle())))
                                      
                 {
-                    DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
+                    // DBG("  FADE OUT LAST GRAPH: " << graph->engineIndex);
                     for (int i = 0; i < numOutputChans; ++i)
                             audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
                                                       numSamples, 1.f, 0.f);
@@ -197,7 +197,7 @@ struct RootGraphRender
                     if (graphChanged && (graph->isSingle() || 
                                         (modeChanged && !graph->isSingle() && !current->isSingle())))
                     {
-                        DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
+                        // DBG("  FADE IN NEW GRAPH: " << graph->engineIndex);
                         for (int i = 0; i < numOutputChans; ++i)
                             audioOut.addFromWithRamp (i, 0, audioTemp.getReadPointer (i), 
                                                       numSamples, 0.f, 1.f);
@@ -219,7 +219,7 @@ struct RootGraphRender
             MidiMessage msg; int frame = 0;
             
             // setup a program change if present
-            while (iter.getNextEvent(msg, frame) || frame >= numSamples)
+            while (iter.getNextEvent (msg, frame) || frame >= numSamples)
             {
                 if (! msg.isProgramChange())
                     continue;
@@ -296,21 +296,6 @@ private:
     {
         for (int i = 0 ; i < graphs.size(); ++i)
             graphs.getUnchecked(i)->engineIndex = i;
-    }
-
-    bool searchProgramChange (int program, MidiBuffer& buf)
-    {
-        MidiBuffer::Iterator iter (buf);
-        MidiMessage msg; int frame = 0;
-        
-        while (iter.getNextEvent (msg, frame))
-        {
-            if (!msg.isProgramChange())
-                continue;
-            msg.getProgramChangeNumber();
-        }
-
-        return program;
     }
 
     int findGraphForProgram (const ProgramRequest& r) const
