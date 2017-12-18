@@ -115,9 +115,13 @@ struct RootGraphRender
         {
             DBG("[EL] program was requested: " << program.program << " channel: " << program.channel);
             const int nextGraph = findGraphForProgram (program);
-            DBG("[EL] current graph: " << currentGraph);
-            DBG("[EL] selected graph: " << nextGraph);
-            setCurrentGraph (nextGraph);
+            
+            if (nextGraph != currentGraph)
+            {
+                DBG("[EL] changing graph: " << currentGraph << " > " nextGraph);
+                setCurrentGraph (nextGraph);
+            }
+
             program.reset();
         }
         
@@ -274,7 +278,8 @@ private:
     int currentGraph        = -1;
     int lastGraph           = -1;
 
-    struct ProgramRequest {
+    struct ProgramRequest
+    {
         int program      = -1;
         int channel      = -1;
 
