@@ -358,9 +358,49 @@ public:
         setLookAndFeel (nullptr);
     }
     
-    void saveState (PropertiesFile* props) { }
+    void saveState (PropertiesFile* props)
+    {
+        ValueTree state (Tags::state);
+
+        for (int i = 0; i < getNumPanels(); ++i)
+        {
+            ValueTree item ("item");
+            auto* const panel = getPanel (i);
+            item.setProperty ("index", i, 0)
+                .setProperty ("name", panel->getName(), 0)
+                .setProperty ("h",  panel->getHeight(), 0);
+            state.addChild (item, -1, 0);
+        }
+
+        DBG(state.toXmlString());
+
+        if (ScopedPointer<XmlElement> xml = state.createXml())
+            props->setValue ("ccNavPanel", xml);
+    }
     
-    void restoreState (PropertiesFile* props) { }
+    Component* findPanelByName (const String& name)
+    {
+        for (int i = 0; i < getNumPanels(); ++i)
+            if (getPanel(i)->getName() == name)
+                return getPanel(i);
+        return 0;
+    }
+
+    void restoreState (PropertiesFile* props)
+    {
+        if (auto* xml = props->getXmlValue ("ccNavPanel"))
+        {
+            ValueTree state = ValueTree::fromXml (*xml);
+            for (int i = 0; i < state.getNumChildren(); ++i)
+            {
+                auto item (state.getChild (i));
+                if (auto* c = findPanelByName (item["name"].toString().trim()))
+                    setPanelSize (c, jmax (10, (int)item["h"]), false);
+            }
+
+            deleteAndZero (xml);
+        }
+    }
     
     int getIndexOfPanel (Component* panel)
     {
@@ -394,6 +434,7 @@ public:
 
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
+        sess->setComponentID ("Session");
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
 
         // auto* c = new ElementsNavigationPanel();
@@ -402,10 +443,12 @@ public:
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");
+        pv->setComponentID ("Plugins");
         addPanelInternal (-1, pv, "Plugins", 0);
         
         auto * dp = new DataPathTreeComponent();
         dp->setName ("UserDataPath");
+        dp->setComponentID ("UserDataPath");
         dp->getFileTreeComponent().setDragAndDropDescription ("ccNavConcertinaPanel");
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
     }

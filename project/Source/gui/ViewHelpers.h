@@ -53,6 +53,8 @@ void presentPluginWindow (Component*, const Node&);
 
 void closePluginWindows (Component*, const bool visible = true);
 
+void closePluginWindowsFor (Component*, Node& node, const bool visible = true);
+
 }
 
 

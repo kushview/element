@@ -104,13 +104,21 @@ public:
     void showDocument() override
     {
         auto session = ViewHelpers::getSession (getOwnerView());
-        
+        auto* cc = ViewHelpers::findContentComponent (getOwnerView());
+        auto* gui = cc->getAppController().findChild<GuiController>();
+
         if (node.isRootGraph())
         {
-            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
-            graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), 0);
-            auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
-            app.findChild<EngineController>()->setRootNode (node);
+            if (node != session->getCurrentGraph())
+            {
+                gui->closeAllPluginWindows (true);
+                auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
+
+                graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), 0);
+                auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
+                app.findChild<EngineController>()->setRootNode (node);
+                
+            }
         }
 
         if (auto* cc = ViewHelpers::findContentComponent (getOwnerView()))

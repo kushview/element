@@ -59,6 +59,7 @@ void AppController::deactivate()
 void AppController::run()
 {
     activate();
+    
     auto session = getWorld().getSession();
 
     if (auto* gui = findChild<GuiController>())

@@ -71,6 +71,9 @@ public:
     void nextMainView();
     void backMainView();
     
+    void saveState (PropertiesFile*);
+    void restoreState (PropertiesFile*);
+    
     int getNavSize();
     
     bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }

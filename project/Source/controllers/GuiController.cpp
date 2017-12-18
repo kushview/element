@@ -54,16 +54,17 @@ void GuiController::saveProperties (PropertiesFile* props)
 {
     jassert(props);
     
+    if (mainWindow)
+    {
+        props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+    }
+
     if (content)
     {
         props->setValue ("lastContentView", content->getMainViewName());
         props->setValue ("navSize",         content->getNavSize());
         props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
-    }
-    
-    if (mainWindow)
-    {
-        props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+        content->saveState (props);
     }
 }
 
@@ -131,8 +132,11 @@ void GuiController::runDialog (const String& uri)
 void GuiController::closePluginWindow (PluginWindow* w) { windowManager->closePluginWindow (w); }
 void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
 void GuiController::closeAllPluginWindows (const bool visible) { windowManager->closeAllPluginWindows (visible); }
-void GuiController::closePluginWindowsFor (const Node& node, const bool visible) { 
-    windowManager->closeOpenPluginWindowsFor (node.getGraphNode(), visible);
+
+void GuiController::closePluginWindowsFor (const Node& node, const bool visible)
+{
+    if (! node.isGraph())
+        windowManager->closeOpenPluginWindowsFor (node, visible);
 }
 
 void GuiController::runDialog (Component* c, const String& title)
@@ -194,6 +198,7 @@ void GuiController::run()
     PropertiesFile* pf = globals().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (commander().getKeyMappings());
+    getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
     mainWindow->setVisible (true);
     findSibling<SessionController>()->resetChanges();

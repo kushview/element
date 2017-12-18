@@ -41,10 +41,6 @@
  #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
-#ifndef EL_USE_AUDIO_PANEL
- #define EL_USE_AUDIO_PANEL 1
-#endif
-
 #define EL_NAV_MIN_WIDTH 100
 #define EL_NAV_MAX_WIDTH 360
 
@@ -814,6 +810,20 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
     if (refreshDataPathTrees)
         if (auto* data = nav->findPanel<DataPathTreeComponent>())
             data->refresh();
+}
+
+void ContentComponent::saveState (PropertiesFile* props)
+{
+    jassert (props);
+    if (nav)
+        nav->saveState (props);
+}
+
+void ContentComponent::restoreState (PropertiesFile* props)
+{
+    jassert (props);
+    if (nav)
+        nav->restoreState (props);
 }
 
 void ContentComponent::setCurrentNode (const Node& node)

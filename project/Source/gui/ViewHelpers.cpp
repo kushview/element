@@ -131,6 +131,13 @@ void closePluginWindows (Component* c, const bool visible)
             gui->closeAllPluginWindows (visible);
 }
 
+void closePluginWindowsFor (Component* c, Node& node, const bool visible)
+{
+    if (auto* cc = findContentComponent (c))
+        if (auto* gui = cc->getAppController().findChild<GuiController>())
+            gui->closePluginWindowsFor (node, visible);
+}
+
 void presentPluginWindow (const Node& node)
 {
     jassertfalse;
