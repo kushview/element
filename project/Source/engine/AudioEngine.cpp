@@ -125,8 +125,6 @@ struct RootGraphRender
             program.reset();
         }
         
-        const int numSamples = buffer.getNumSamples();
-        const int numChans   = buffer.getNumChannels();
         auto* const current  = getCurrentGraph();
         auto* const last     = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph(lastGraph) : nullptr;
         
@@ -137,6 +135,8 @@ struct RootGraphRender
             return;
         }
 
+        const int numSamples = buffer.getNumSamples();
+        const int numChans   = buffer.getNumChannels();
         const bool graphChanged = lastGraph != currentGraph;
         const bool shouldProcess = true;
         const RootGraph::RenderMode mode = current->getRenderMode();
