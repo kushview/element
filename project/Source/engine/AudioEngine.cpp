@@ -118,7 +118,7 @@ struct RootGraphRender
             
             if (nextGraph != currentGraph)
             {
-                DBG("[EL] changing graph: " << currentGraph << " > " nextGraph);
+                DBG("[EL] changing graph: " << currentGraph << " > " << nextGraph);
                 setCurrentGraph (nextGraph);
             }
 
