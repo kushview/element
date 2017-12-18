@@ -105,7 +105,7 @@ class AudioEngine : public Engine
 {
 public:
     AudioEngine (Globals&);
-    ~AudioEngine();
+    virtual ~AudioEngine() noexcept;
 
     void activate();
     void deactivate();

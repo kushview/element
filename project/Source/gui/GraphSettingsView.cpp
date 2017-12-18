@@ -18,12 +18,11 @@ namespace Element {
             preferredHeight = 25 * 3;
         }
         
-        virtual ~GraphMidiChannels() { }
+        virtual ~GraphMidiChannels() noexcept { }
         
         virtual void refresh() override
         {
             layout.updateMatrix();
-            DBG("width: "<< getWidth());
         }
         
         void resized() override {
@@ -57,7 +56,7 @@ namespace Element {
             {
                 setMatrixCellSize (25);
             }
-            virtual ~MatrixBase() { }
+            virtual ~MatrixBase() noexcept { }
             
             int getNumRows() override { return state.getNumRows(); }
             int getNumColumns() override { return state.getNumColumns(); }
