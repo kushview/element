@@ -184,6 +184,7 @@ namespace Element {
         stabilizePropertyString (Tags::name, "Node");
         stabilizeProperty (Tags::bypass, false);
         stabilizeProperty (Tags::persistent, true);
+        stabilizePropertyString (Tags::renderMode, "single");
         objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
         objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     }

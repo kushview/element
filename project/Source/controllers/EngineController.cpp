@@ -49,7 +49,7 @@ struct RootGraphHolder
         
         if (auto* root = getRootGraph())
         {
-            const auto modeStr = model.getProperty ("renderMode").toString().trim().toLowerCase();
+            const auto modeStr = model.getProperty (Tags::renderMode, "single").toString().trim().toLowerCase();
             const auto mode = modeStr == "single" ? RootGraph::SingleGraph : RootGraph::Parallel;
 
             root->setPlayConfigFor (devices);
@@ -663,9 +663,6 @@ void EngineController::setRootNode (const Node& newRootNode)
         }
         
         engine->setCurrentGraph (index);
-        
-        if (auto* gui = findSibling<GuiController>())
-            gui->showPluginWindowsFor (newRootNode);
     }
     else
     {

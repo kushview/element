@@ -71,8 +71,8 @@ namespace Element {
         /** Get a reference to Sesison data */
         SessionRef session();
         
-        /** show plugin windows of child nodes */
-        void showPluginWindowsFor (const Node& node);
+        /** show plugin windows of this node or child nodes */
+        void showPluginWindowsFor (const Node& node, const bool recursive = true);
         
         /** present a plugin window */
         void presentPluginWindow (const Node& node);

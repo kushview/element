@@ -117,10 +117,11 @@ public:
                 graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), 0);
                 auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
                 app.findChild<EngineController>()->setRootNode (node);
-                
+                if (auto* gui = app.findChild<GuiController>())
+                    gui->showPluginWindowsFor (node, true);
             }
         }
-
+        
         if (auto* cc = ViewHelpers::findContentComponent (getOwnerView()))
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
@@ -138,7 +139,6 @@ public:
             node.setProperty (Tags::name, newName); 
     }
     
-    
     bool isMissing() override { return false; }
     
     Icon getIcon() const override
@@ -146,7 +146,67 @@ public:
         return Icon (node.isGraph() ? getIcons().graph : getIcons().document,
                      Colors::elemental.withAlpha (0.9f));
     }
+    
+    virtual void deleteItem() override
+    {
+        if (! node.isRootGraph())
+        {
+            ViewHelpers::postMessageFor(getOwnerView(), new RemoveNodeMessage (node));
+        }
+    }
+    
+    virtual void duplicateItem()
+    {
+        if (! node.isRootGraph())
+        {
+            ViewHelpers::postMessageFor(getOwnerView(), new DuplicateNodeMessage (node));
+        }
+    }
 
+    void addNewGraph()
+    {
+        if (! node.isGraph())
+            return;
+
+        PluginDescription desc;
+        desc.fileOrIdentifier = "element.graph";
+        desc.pluginFormatName = "Element";
+        desc.name = "Graph";
+        ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
+    }
+    
+    virtual void handlePopupMenuResult (int result) override
+    {
+        switch (result)
+        {
+            case 0: break;
+            case 1: deleteItem(); break;
+            case 2: duplicateItem(); break;
+            case 5: addNewGraph(); break;
+            {
+                
+            } break;
+                
+            default: break;
+        }
+    }
+    
+    virtual void showPopupMenu() override
+    {
+        PopupMenu menu;
+        if (node.isGraph())
+        {
+            menu.addItem (5, "Add New Graph");
+            menu.addSeparator();
+        }
+        
+        menu.addItem (2, "Duplicate");
+        menu.addSeparator();
+        menu.addItem (1, "Delete");
+        
+        launchPopupMenu (menu);
+    }
+    
     String uniqueName;
     Node node;
     NodePopupMenu menu;
@@ -183,6 +243,15 @@ public:
         ViewHelpers::invokeDirectly (getOwnerView(), Commands::showGraphConfig, false);
     }
 
+    void addGraph()
+    {
+        PluginDescription desc;
+        desc.fileOrIdentifier = "element.graph";
+        desc.pluginFormatName = "Element";
+        desc.name = "Graph";
+        ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
+    }
+
     void editGraph()
     {
         updateIndexInParent();
@@ -209,6 +278,7 @@ public:
             case 2: duplicateItem(); break;
             case 3: showSettings(); break;
             case 4: editGraph(); break;
+            case 5: addGraph(); break;
             {
                 
             } break;
@@ -220,12 +290,16 @@ public:
     void showPopupMenu() override
     {   
         PopupMenu menu;
-        menu.addItem (1, "Remove");
+        menu.addItem (5, "Add New Graph");
+        menu.addItem (4, "Edit Graph...");
+        menu.addItem (3, "View Settings...");
+        menu.addSeparator();
+
         menu.addItem (2, "Duplicate");
         menu.addSeparator();
-        menu.addItem (4, "Edit");
-        menu.addItem (3, "Settings...");
+        menu.addItem (1, "Delete");
         
+ 
         launchPopupMenu (menu);
     }
 };

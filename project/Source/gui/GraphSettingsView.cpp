@@ -204,14 +204,14 @@ namespace Element {
         
         inline int getIndex() const override
         {
-            const String slug = graph.getProperty ("renderMode", "single").toString();
+            const String slug = graph.getProperty (Tags::renderMode, "single").toString();
             return (slug == "single") ? 0 : 1;
         }
         
         inline void setIndex (const int index) override
         {
             RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
-            graph.setProperty ("renderMode", RootGraph::getSlugForRenderMode (mode));
+            graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
             if (auto* node = graph.getGraphNode ())
                 if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
                     root->setRenderMode (mode);

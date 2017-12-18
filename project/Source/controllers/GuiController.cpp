@@ -162,11 +162,18 @@ ContentComponent* GuiController::getContentComponent()
     return content.get();
 }
 
-void GuiController::showPluginWindowsFor (const Node& node)
+void GuiController::showPluginWindowsFor (const Node& node, const bool recursive)
 {
-    for (int i = 0; i < node.getNumNodes(); ++i)
-        if ((bool) node.getNode(i).getProperty ("windowVisible", false))
-            presentPluginWindow (node.getNode (i));
+    if (! node.isGraph())
+    {
+        if ((bool) node.getProperty ("windowVisible", false))
+            presentPluginWindow (node);
+        return;
+    }
+
+    if (node.isGraph() && recursive)
+        for (int i = 0; i < node.getNumNodes(); ++i)
+            showPluginWindowsFor (node.getNode(i), recursive);
 }
 
 void GuiController::presentPluginWindow (const Node& node)
