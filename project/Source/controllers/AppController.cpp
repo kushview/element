@@ -185,7 +185,7 @@ void AppController::handleMessage (const Message& msg)
     {
         if (anm->node.isGraph() && !getWorld().getUnlockStatus().isFullVersion())
         {
-            showProductLockedAlert ("Sub graphs are not supported in the free version");
+            showProductLockedAlert ("Nested graphs are not supported without a license");
         }
 
         else if (anm->target.isValid ())
@@ -200,7 +200,7 @@ void AppController::handleMessage (const Message& msg)
         
         if (desc.fileOrIdentifier == "element.graph" && !getWorld().getUnlockStatus().isFullVersion())
         {
-            showProductLockedAlert ("Sub graphs are not supported in the free version");
+            showProductLockedAlert ("Nested graphs are not supported without a license");
         }
         else if (graph.isGraph())
         {
