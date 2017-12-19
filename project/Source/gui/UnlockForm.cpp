@@ -1,6 +1,8 @@
 
 #include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
+#include "session/DeviceManager.h"
+#include "Globals.h"
 
 struct Spinner  : public Component, private Timer
 {
@@ -21,8 +23,8 @@ struct UnlockForm::OverlayComp  : public Component,
         Activate, Deactivate, Check
     };
     
-    OverlayComp (UnlockForm& f, Action a)
-        : Thread (String()), action(a), form (f)
+    OverlayComp (UnlockForm& f, Element::Globals& w, Action a)
+        : Thread (String()), action(a), form (f), world(w)
     {
         result.succeeded = false;
         email       = form.emailBox.getText();
@@ -112,15 +114,18 @@ struct UnlockForm::OverlayComp  : public Component,
         
         // (local copies because we're about to delete this)
         const bool worked = result.succeeded;
+        auto& g = world;
+        const auto a = action;
         UnlockForm& f = form;
         
         delete this;
         
-        if (worked && action != Check)
+        if (worked && a != Check)
         {
             f.dismiss();
+            g.getDeviceManager().restartLastAudioDevice();
         }
-        else if (!worked && action == Deactivate)
+        else if (!worked && a == Deactivate)
         {
             f.setMode (Activate);
         }
@@ -128,6 +133,7 @@ struct UnlockForm::OverlayComp  : public Component,
     
     const Action action;
     UnlockForm& form;
+    Element::Globals& world;
     Spinner spinner;
     OnlineUnlockStatus::UnlockResult result;
     String email, password, license;
@@ -196,7 +202,7 @@ private:
     {
         if (overlay)
             return;
-        addAndMakeVisible (overlay = new Overlay (form, Overlay::Deactivate));
+        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Deactivate));
         resized();
     }
     
@@ -204,7 +210,7 @@ private:
     {
         if (overlay)
             return;
-        addAndMakeVisible (overlay = new Overlay (form, Overlay::Check));
+        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Check));
         resized();
     }
     
@@ -222,7 +228,7 @@ static juce_wchar getDefaultPasswordChar() noexcept
 #endif
 }
 
-UnlockForm::UnlockForm (Element::UnlockStatus& s,
+UnlockForm::UnlockForm (Element::Globals& s,
                         const String& userInstructions,
                         bool hasEmailBox,
                         bool hasPasswordBox,
@@ -232,7 +238,8 @@ UnlockForm::UnlockForm (Element::UnlockStatus& s,
       passwordBox (String(), getDefaultPasswordChar()),
       activateButton (TRANS ("Activate")),
       cancelButton (TRANS ("Cancel")),
-      status (s),
+      world (s),
+      status (s.getUnlockStatus()),
       useLicense (hasLicenseBox),
       useEmail (hasEmailBox),
       usePassword (hasPasswordBox)
@@ -423,7 +430,7 @@ void UnlockForm::attemptRegistration()
         if (useLicense)
             status.setLicenseKey (licenseBox.getText().trim());
 
-        addAndMakeVisible (unlockingOverlay = new OverlayComp (*this, OverlayComp::Activate));
+        addAndMakeVisible (unlockingOverlay = new OverlayComp (*this, world, OverlayComp::Activate));
         resized();
         unlockingOverlay->enterModalState();
     }

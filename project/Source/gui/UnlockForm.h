@@ -6,6 +6,7 @@
 namespace Element {
 	class UnlockStatus;
 	struct LicenseInfo;
+    class Globals;
 }
 
 class UnlockForm  : public Component,
@@ -15,7 +16,7 @@ public:
     /** Creates an unlock form that will work with the given status object.
         The userInstructions will be displayed above the email and password boxes.
      */
-    UnlockForm (Element::UnlockStatus&,
+    UnlockForm (Element::Globals&,
                 const String& userInstructions,
                 bool hasEmailBox = true,
                 bool hasPasswordBox = true,
@@ -45,6 +46,7 @@ public:
     TextButton activateButton, cancelButton, deactivateButton, refreshButton;
    
 private:
+    Element::Globals& world;
     Element::UnlockStatus& status;
     bool useLicense, useEmail, usePassword;
     
