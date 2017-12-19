@@ -166,7 +166,8 @@ public:
             GraphNodePtr obj = node.getGraphNode();
             if (auto* proc = (obj) ? obj->getAudioProcessor() : 0)
             {
-                auto* component = new NodeAudioBusesComponent (node, proc);
+                auto* const component = new NodeAudioBusesComponent (node, proc,
+                        ViewHelpers::findContentComponent (this));
                 auto& box = CallOutBox::launchAsynchronously (
                     component, ioButton.getScreenBounds(), 0);
                 ioBox.setNonOwned (&box);

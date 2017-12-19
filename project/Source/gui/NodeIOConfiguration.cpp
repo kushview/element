@@ -425,8 +425,10 @@ private:
 };
 
 
-NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p)
+NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor* const p,
+                                                  ContentComponent* cc)
     : AudioProcessorEditor (p),
+      content (cc),
       node (n),
       title ("title", p->getName())
 {
@@ -466,13 +468,10 @@ void NodeAudioBusesComponent::buttonClicked (Button* b)
     {
         bool posted = false;
 
-        if (auto* window = getMainWindow())
+        if (auto* cc = getContentComponent())
         {
-            if (auto * cc = dynamic_cast<ContentComponent*> (window->getContentComponent()))
-            {
-                cc->post (new ChangeBusesLayout (node, currentLayout));
-                posted = true;
-            }
+            cc->post (new ChangeBusesLayout (node, currentLayout));
+            posted = true;
         }
 
         if (! posted)
@@ -529,15 +528,20 @@ int32 NodeAudioBusesComponent::getNodeId() const
     return -1;
 }
 
-MainWindow* NodeAudioBusesComponent::getMainWindow() const
+ContentComponent* NodeAudioBusesComponent::getContentComponent()
 {
-   Component* comp;
-
-   for (int idx = 0; (comp = Desktop::getInstance().getComponent(idx)) != nullptr; ++idx)
-       if (auto* window = dynamic_cast<MainWindow*> (comp))
-           return window;
-
-    return nullptr;
+   if (! content)
+   {
+       Component* comp;
+       for (int idx = 0; (comp = Desktop::getInstance().getComponent (idx)) != nullptr; ++idx)
+       {
+           if (auto* window = dynamic_cast<MainWindow*> (comp))
+               content = dynamic_cast<ContentComponent*> (window->getContentComponent());
+           if (content != nullptr)
+               break;
+        }
+   }
+   return content;
 }
 
 GraphEditorComponent* NodeAudioBusesComponent::getGraphEditor() const

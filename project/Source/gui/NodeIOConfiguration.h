@@ -6,9 +6,9 @@
 
 namespace Element {
 
+class ContentComponent;
 class GraphEditorComponent;
 class GraphProcessor;
-class MainWindow;
 
 class NodeAudioBusesComponent : public AudioProcessorEditor,
                                 public ButtonListener
@@ -16,7 +16,7 @@ class NodeAudioBusesComponent : public AudioProcessorEditor,
 public:
     class InputOutputConfig;
 
-    NodeAudioBusesComponent (const Node& n, AudioProcessor* const p);
+    NodeAudioBusesComponent (const Node& n, AudioProcessor* const p, ContentComponent* cc = nullptr);
     ~NodeAudioBusesComponent();
 
     void paint (Graphics& g) override;
@@ -28,7 +28,8 @@ public:
     void buttonClicked (Button*) override;
     
 private:
-    MainWindow* getMainWindow() const;
+    ContentComponent* content = nullptr;
+    ContentComponent* getContentComponent();
     GraphEditorComponent* getGraphEditor() const;
     GraphProcessor* getGraph() const;
     int32 getNodeId() const;
