@@ -23,6 +23,7 @@ class UnlockStatus :  public kv::EDDOnlineUnlockStatus
 public:
     struct LockableObject 
     {
+        virtual ~LockableObject() noexcept { }
         virtual void setLocked (const var& locked) =0;
         virtual void showLockedAlert();
     };

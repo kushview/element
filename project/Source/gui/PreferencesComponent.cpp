@@ -474,8 +474,6 @@ namespace Element {
         {
             const int spacingBetweenSections = 6;
             const int settingHeight = 22;
-            const int toggleWidth = 40;
-            const int toggleHeight = 18;
             
             Rectangle<int> r (getLocalBounds());
             auto r2 = r.removeFromTop (settingHeight);

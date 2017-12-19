@@ -231,7 +231,7 @@ public:
             .findChild<EngineController>()->removeGraph (index);
     }
 
-    void duplicateItem()
+    void duplicateItem() override
     {
         ViewHelpers::findContentComponent (getOwnerView())->getAppController()
             .findChild<EngineController>()->duplicateGraph (node);

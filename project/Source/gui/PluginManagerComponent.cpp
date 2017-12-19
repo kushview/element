@@ -757,6 +757,7 @@ void PluginListComponent::scanAll()
     plugins.scanInternalPlugins();
     
    #if EL_RUNNING_AS_PLUGIN
+    ignoreUnused (scanAllFormats);
     AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Plugin Scanner",
                                      "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
    #else

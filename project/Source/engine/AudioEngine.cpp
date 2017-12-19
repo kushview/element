@@ -19,16 +19,24 @@ RootGraph::RootGraph() { }
 
 void RootGraph::setPlayConfigFor (DeviceManager& devices)
 {
+#if EL_RUNNING_AS_PLUGIN
+    ignoreUnused (devices);
+    graphName = "Device";
+#else
     if (auto* device = devices.getCurrentAudioDevice())
         setPlayConfigFor (device);
     DeviceManager::AudioSettings setup;
     devices.getAudioDeviceSetup (setup);
     audioInName     = setup.inputDeviceName;
     audioOutName    = setup.outputDeviceName;
+#endif
 }
 
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
+#if EL_RUNNING_AS_PLUGIN
+    ignoreUnused (device);
+#else
     jassert (device);
     
     const int numIns        = device->getActiveInputChannels().countNumberOfSetBits();
@@ -40,6 +48,7 @@ void RootGraph::setPlayConfigFor (AudioIODevice *device)
     updateChannelNames (device);
     graphName = device->getName();
     if (graphName.isEmpty()) graphName = "Device";
+#endif
 }
 
 void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
@@ -711,7 +720,7 @@ AudioEngine::AudioEngine (Globals& g)
     priv = new Private (*this);
 }
 
-AudioEngine::~AudioEngine()
+AudioEngine::~AudioEngine() noexcept
 {
     deactivate();
     priv = nullptr;

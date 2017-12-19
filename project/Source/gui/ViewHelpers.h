@@ -74,12 +74,16 @@ public:
     void disconnectPorts (const Port& src, const Port& dst);
 
 protected:
-    ViewHelperMixin() { }
-
+    explicit ViewHelperMixin (void* p) : superClass (*(Component*)p) { }
+    
 private:
-    Component* componentCast() const {
-        return reinterpret_cast<Component*> (const_cast<ViewHelperMixin*> (this));
+    Component& superClass;
+    Component* componentCast() const
+    {
+        return &superClass;
     }
+    
+    JUCE_DECLARE_NON_COPYABLE(ViewHelperMixin);
 };
 
 

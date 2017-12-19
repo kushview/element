@@ -802,7 +802,7 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 const bool wasNotSuspended = ! proc->isSuspended();
                 proc->suspendProcessing (true);
                 proc->releaseResources();
-                const bool success = proc->setBusesLayoutWithoutEnabling (layout);
+                proc->setBusesLayoutWithoutEnabling (layout);
                 if (wasNotSuspended)
                     proc->suspendProcessing (false);
                 

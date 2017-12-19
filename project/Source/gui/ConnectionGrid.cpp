@@ -25,7 +25,8 @@ namespace Element
     {
     public:
         PatchMatrix ()
-            : useHighlighting (true),
+            : ViewHelperMixin (this),
+              useHighlighting (true),
               matrix()
         {
             setSize (300, 200);
@@ -144,6 +145,8 @@ namespace Element
             else
             {
                 matrix.connect (row, col);
+                jassert (nullptr != ViewHelpers::findContentComponent(this));
+                
                 connectPorts (srcPort, dstPort);
             }
             

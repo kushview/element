@@ -16,6 +16,10 @@
 #include "Globals.h"
 #include "Messages.h"
 
+#if EL_RUNNING_AS_PLUGIN
+ #include "../../plugins/Element/Source/PluginEditor.h"
+#endif
+
 namespace Element {
 namespace ViewHelpers {
 
@@ -69,6 +73,9 @@ ContentComponent* findContentComponent (Component* c)
     if (auto* pw = c->findParentComponentOfClass<PluginWindow>())
         return pw->getElementContentComponent();
 
+    if (auto* ed = c->findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+        return ed->getContentComponent();
+    
     for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
         if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
             return dynamic_cast<ContentComponent*> (main->getContentComponent());

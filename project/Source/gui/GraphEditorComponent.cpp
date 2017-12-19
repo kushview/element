@@ -688,6 +688,7 @@ private:
 };
 
 GraphEditorComponent::GraphEditorComponent()
+    : ViewHelperMixin (this)
 {
     setOpaque (true);
     data.addListener (this);

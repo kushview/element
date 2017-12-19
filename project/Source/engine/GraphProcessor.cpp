@@ -1228,18 +1228,20 @@ GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
 
 const String GraphProcessor::AudioGraphIOProcessor::getName() const
 {
+   #if ! EL_RUNNING_AS_PLUGIN
     if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
     {
         switch (type)
         {
             case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
-            case audioInputNode:    return root->getAudioInputDeviceName();     break;
+            case audioInputNode:    return root->getAudioInputDeviceName();  break;
             case midiOutputNode:    return "MIDI Out"; break;
             case midiInputNode:     return "MIDI In"; break;
             default:                break;
         }
     }
-    
+   #endif
+
     switch (type)
     {
         case audioOutputNode:   return "Audio Output"; break;
