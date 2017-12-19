@@ -20,7 +20,7 @@ public:
     void closeButtonPressed();
     void refreshMenu();
     Globals& getWorld() { return world; }
-
+    
 private:
     Globals& world;
     ScopedPointer<MainMenu> mainMenu;
