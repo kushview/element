@@ -73,8 +73,10 @@ ContentComponent* findContentComponent (Component* c)
     if (auto* pw = c->findParentComponentOfClass<PluginWindow>())
         return pw->getElementContentComponent();
 
+#if EL_RUNNING_AS_PLUGIN
     if (auto* ed = c->findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
         return ed->getContentComponent();
+#endif
     
     for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
         if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
