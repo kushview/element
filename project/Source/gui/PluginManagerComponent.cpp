@@ -374,8 +374,8 @@ void PluginListComponent::optionsMenuCallback (int result)
         case 3:   showSelectedFolder();   break;
         case 4:   removeMissingPlugins();          saveSettings (this); break;
         
-        case 100: editPluginPath ("VST");          saveSettings (this, false); break;
-        case 101: editPluginPath ("VST3");         saveSettings (this, false); break;
+        case 100: editPluginPath ("VST");          saveSettings (this, true); break;
+        case 101: editPluginPath ("VST3");         saveSettings (this, true); break;
         default:
         {
             if (AudioPluginFormat* format = formatManager.getFormat (result - 10))
@@ -460,6 +460,7 @@ void PluginListComponent::setLastSearchPath (PropertiesFile& properties, AudioPl
 {
     properties.setValue (Settings::lastPluginScanPathPrefix + format.getName(),
                          newPath.toString());
+	properties.saveIfNeeded();
 }
 
 // MARK: Scanner
