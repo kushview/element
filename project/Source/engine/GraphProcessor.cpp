@@ -719,7 +719,7 @@ GraphProcessor::~GraphProcessor()
 
 const String GraphProcessor::getName() const
 {
-    return "Processing Graph";
+    return "Graph";
 }
 
 void GraphProcessor::clear()
