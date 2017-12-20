@@ -480,7 +480,10 @@ public:
           finished (false), useBackgroundScanner (true)
         {
             jassert (properties != nullptr);
+            
             FileSearchPath path (getLastSearchPath (*properties, formatToScan));
+            pathList.setPath (path); // set this so it is ALWAYS up-to-date in ::startScan()
+            
             scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
 
             // You need to use at least one thread when scanning plug-ins asynchronously
@@ -489,10 +492,6 @@ public:
             const bool wantsPath = formatToScan.getName() == "VST" || formatToScan.getName() == "VST3";
             if (path.getNumPaths() <= 0 && wantsPath)
             {
-               #if ! JUCE_IOS
-                if (propertiesToUse != nullptr)
-                    path = getLastSearchPath (*propertiesToUse, formatToScan);
-               #endif
                 pathList.setSize (500, 300);
                 pathList.setPath (path);
                 
@@ -650,10 +649,11 @@ private:
     
 	void startScan()
 	{
-		pathChooserWindow.setVisible(false);
+		pathChooserWindow.setVisible (false);
+        
 		if (propertiesToUse != nullptr)
 		{
-			setLastSearchPath(*propertiesToUse, formatToScan, pathList.getPath());
+			setLastSearchPath (*propertiesToUse, formatToScan, pathList.getPath());
 			propertiesToUse->saveIfNeeded();
 		}
 
