@@ -483,11 +483,7 @@ public:
             
             FileSearchPath path (getLastSearchPath (*properties, formatToScan));
             pathList.setPath (path); // set this so it is ALWAYS up-to-date in ::startScan()
-            
             scanner.setNonOwned (owner.plugins.getBackgroundAudioPluginScanner());
-
-            // You need to use at least one thread when scanning plug-ins asynchronously
-            jassert (! allowAsync || (numThreads > 0));
 
             const bool wantsPath = formatToScan.getName() == "VST" || formatToScan.getName() == "VST3";
             if (path.getNumPaths() <= 0 && wantsPath)
