@@ -286,6 +286,8 @@ struct RootGraphRender
         updateIndexes();
         if (currentGraph >= graphs.size())
             currentGraph = graphs.size() - 1;
+        if (lastGraph >= graphs.size())
+            lastGraph = graphs.size() - 1;
     }
 
     int size() const { return graphs.size(); }

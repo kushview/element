@@ -402,6 +402,8 @@ namespace Element {
                 proc->getStateInformation (state);
         if (state.getSize() > 0)
             objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+        else 
+            objectData.removeProperty (Tags::state, 0);
     }
     
     void Node::setCurrentProgram (const int index)

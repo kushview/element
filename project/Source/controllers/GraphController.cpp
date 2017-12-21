@@ -190,12 +190,7 @@ uint32 GraphController::addNode (const Node& newNode)
         data.removeProperty ("windowVisible", nullptr);
 
         Node n (data, false);
-        
-        {
-            MemoryBlock state;
-            if (state.fromBase64Encoding (data.getProperty(Tags::state).toString()))
-                node->getAudioProcessor()->setStateInformation (state.getData(), (int) state.getSize());
-        }
+        n.restorePluginState();
         
         PortArray ins, outs;
         n.getPorts (ins, outs, PortType::Audio);
@@ -389,7 +384,6 @@ void GraphController::setNodeModel (const Node& node)
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
             auto* const proc = obj->getAudioProcessor();
 
-            node.restorePluginState();
             
             PortArray ins, outs;
             node.getPorts (ins, outs, PortType::Audio);
@@ -420,6 +414,8 @@ void GraphController::setNodeModel (const Node& node)
                 node.resetPorts();
             }
             
+            node.restorePluginState();
+
             if (node.getValueTree().getProperty (Tags::bypass, false))
                 proc->suspendProcessing (true);
         }

@@ -65,9 +65,9 @@ struct RootGraphHolder
             if (engine->addGraph (root))
             {
                 controller = new RootGraphController (*root, plugins);
+                model.setProperty (Tags::object, node.get());
                 controller->setNodeModel (model);
                 resetIONodePorts();
-                model.getValueTree().setProperty (Tags::object, node.get(), 0);
             }
         }
         
@@ -81,7 +81,7 @@ struct RootGraphHolder
         
         if (! attached())
             return true;
-        
+
         bool wasRemoved = false;
         if (auto* g = getRootGraph())
             wasRemoved = engine->removeGraph (g);
@@ -122,6 +122,8 @@ private:
     ScopedPointer<RootGraphController>  controller;
     Node                                model;
     GraphNodePtr                        node;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootGraphHolder);
 };
 
 class EngineController::RootGraphs
@@ -412,16 +414,19 @@ void EngineController::removeGraph (int index)
         if (removeIt)
         {
             graphs->remove (holder);
-            DBG("[EL] graph removed");
+            DBG("[EL] graph removed: index: " << index);
             ValueTree sgraphs = session->getValueTree().getChildWithName (Tags::graphs);
             
             if (index < 0 || index >= session->getNumGraphs())
                 index = session->getNumGraphs() - 1;
             
-            if (isPositiveAndBelow (index, session->getNumGraphs()))
+            sgraphs.setProperty (Tags::active, index, 0);
+            const Node nextGraph = session->getCurrentGraph();
+
+            if (nextGraph.isRootGraph())
             {
-                sgraphs.setProperty (Tags::active, index, 0);
-                setRootNode (session->getActiveGraph ());
+                DBG("[EL] setting new graph: " << nextGraph.getName());
+                setRootNode (nextGraph);
             }
             else if (session->getNumGraphs() > 0)
             {
@@ -663,7 +668,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     {
         DBG("[EL] setting root: " << holder->model.getName());
         
-        if (! (bool) newRootNode.getProperty (Tags::persistent, false) || !r->isLoaded())
+        if (!r->isLoaded())
         {
             DBG("[EL] loading...");
             r->getRootGraph().setPlayConfigFor (devices);
@@ -745,14 +750,18 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
 void EngineController::sessionReloaded()
 {
     graphs->clear();
-    
+
     auto session = getWorld().getSession();
     auto engine  = getWorld().getAudioEngine();
+
     if (session->getNumGraphs() > 0)
     {
         for (int i = 0; i < session->getNumGraphs(); ++i)
         {
-            if (auto* holder = graphs->add (new RootGraphHolder (session->getGraph (i), getWorld())))
+            Node rootGraph (session->getGraph (i));
+
+            DBG("[EL] adding holder: " << rootGraph.getName());
+            if (auto* holder = graphs->add (new RootGraphHolder (rootGraph, getWorld())))
             {
                 holder->attach (engine);
                 if (auto* const controller = holder->getController())
