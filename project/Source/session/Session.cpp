@@ -151,25 +151,25 @@ namespace Element {
     void Session::valueTreeParentChanged (ValueTree& tree) { }
     void Session::valueTreeRedirected (ValueTree& tree) { }
     
+
+    static void saveGraphStateRecursive (Node& node)
+    {
+        node.savePluginState();
+        const auto nodes = node.getValueTree().getChildWithName (Tags::nodes);
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        {
+            Node child (nodes.getChild (i), false);
+            saveGraphStateRecursive (child);
+        }
+    }
+
     void Session::saveGraphState()
     {
         auto graphs = getGraphsValueTree();
-        for (int i = 0; i < graphs.getNumChildren(); ++i)
+        for (int i = 0; i < getNumGraphs(); ++i)
         {
-            auto graph = graphs.getChild (i);
-            auto nodes = graph.getChildWithName(Tags::nodes);
-            for (int j = 0; j < nodes.getNumChildren(); ++j)
-            {
-                Node node (nodes.getChild (j), false);
-                if (GraphNodePtr ptr = node.getGraphNode())
-                {
-                    MemoryBlock state;
-                    if (auto* proc = ptr->getAudioProcessor())
-                        proc->getStateInformation (state);
-                    if (state.getSize() > 0)
-                        node.setProperty (Tags::state, state.toBase64Encoding());
-                }
-            }
+            auto graph = getGraph (i);
+            saveGraphStateRecursive (graph);
         }
     }
 }

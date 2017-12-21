@@ -372,8 +372,6 @@ public:
             state.addChild (item, -1, 0);
         }
 
-        DBG(state.toXmlString());
-
         if (ScopedPointer<XmlElement> xml = state.createXml())
             props->setValue ("ccNavPanel", xml);
     }

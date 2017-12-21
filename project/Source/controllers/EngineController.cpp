@@ -278,7 +278,9 @@ public:
     void savePluginStates()
     {
         for (auto* h : graphs)
+        {
             h->model.savePluginState();
+        }
     }
     
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
@@ -593,7 +595,6 @@ void EngineController::deactivate()
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
     graphs->savePluginStates();
-    graphs->detachAll();
     graphs->clear();
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
