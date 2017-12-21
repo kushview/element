@@ -277,7 +277,7 @@ struct RootGraphRender
         return true;
     }
 
-    /** not realtime safe! */
+    /** not realtime safe! AudioEngine's callback should be locked when you call this */
     void removeGraph (RootGraph* graph)
     {
         jassert (graphs.contains (graph));
@@ -291,9 +291,11 @@ struct RootGraphRender
     }
 
     int size() const { return graphs.size(); }
-    RootGraph* getGraph (const int i) const { return graphs.getUnchecked(i); }
+
+    RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
     
+    /** passing in true turns off all rendering features in the pro version */
     void setLocked (const bool l)
     {
         locked = l;
