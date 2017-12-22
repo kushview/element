@@ -16,8 +16,7 @@
 
     GraphPort::~GraphPort() { }
 
-    uint32
-    GraphPort::getNumPorts()
+    uint32 GraphPort::getNumPorts()
     {
         return uint32 (1);
     }

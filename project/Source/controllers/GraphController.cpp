@@ -6,17 +6,18 @@
 
 namespace Element {
 
-/** this enforces correct IO nodes based on the graph processor's settings
+/** This enforces correct IO nodes based on the graph processor's settings
     in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
-    It updates the model as well
+    It uses the controller for all node operations so the model will
+    stay in sync.
   */
 struct IONodeEnforcer
 {
-    GraphController& controller;
     IONodeEnforcer (GraphController& c) : controller (c) { addMissingIONodes(); controller.syncArcsModel(); }
     GraphController* getController() const { return &controller; }
 
 private:
+    GraphController& controller;
     void addMissingIONodes()
     {
         auto* root = getController();
@@ -24,7 +25,7 @@ private:
         auto& proc (root->getGraph());
 
         const bool wantsAudioIn   = proc.getTotalNumInputChannels() > 0;
-        const bool wantsAudioOut  = proc.getTotalNumInputChannels() > 0;
+        const bool wantsAudioOut  = proc.getTotalNumOutputChannels() > 0;
         const bool wantsMidiIn    = proc.acceptsMidi();
         const bool wantsMidiOut   = proc.producesMidi();
         

@@ -701,6 +701,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
     auto session = getWorld().getSession();
     auto* root = graphs->findActiveRootGraphController();
     
+   #if ! EL_RUNNING_AS_PLUGIN
     if (cb == &devices && root != nullptr)
     {
         auto& processor (root->getRootGraph());
@@ -722,6 +723,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
             processor.suspendProcessing (false);
         }
     }
+   #endif
 }
 
 void EngineController::addPlugin (const Node& graph, const PluginDescription& desc)

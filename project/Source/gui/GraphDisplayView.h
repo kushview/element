@@ -25,7 +25,7 @@ public:
             resized();
         }
     }
-    
+
     inline void setNode (const Node& n)
     {
         Node oldGraph = graph;
