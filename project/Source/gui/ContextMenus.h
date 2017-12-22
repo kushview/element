@@ -100,13 +100,13 @@ public:
     NodePopupMenu (const Node& n)
         : node (n)
     {
-        addMainItems (true);
+        addMainItems (false);
     }
     
     NodePopupMenu (const Node& n, const Port& p)
         : node (n), port (p)
     {
-        addMainItems (true);
+        addMainItems (false);
         NodeArray siblings;
         addSeparator();
         

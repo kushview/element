@@ -192,30 +192,43 @@ public:
         originalPos = localPointToGlobal (Point<int>());
         toFront (true);
 
+        selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
+        dragging = false;
+
+        getGraphPanel()->repaint();
+
         if (e.mods.isPopupMenu())
         {
             NodePopupMenu menu (node);
             menu.addSeparator();
             menu.addProgramsMenu();
             menu.addPresetsMenu();
-            if (auto* message = menu.showAndCreateMessage())
+            
+            if (auto* message = menu.showAndCreateMessage ())
+            {
                 ViewHelpers::postMessageFor (this, message);
+                for (const auto& nodeId : getGraphPanel()->selectedNodes)
+                {
+                    if (nodeId == node.getNodeId ())
+                        continue;
+                    const Node selectedNode = graph.getNodeById (nodeId);
+                    if (selectedNode.isValid())
+                    {
+                        if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
+                        {
+                            ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
+                        }
+                    }
+                }
+            }
         }
     }
 
-    void updatePosition()
-    {
-        node.getRelativePosition (relativeX, relativeY);
-        vertical ? setCentreRelative (relativeX, relativeY)
-                 : setCentreRelative (relativeY, relativeX);
-        getGraphPanel()->updateConnectorComponents();
-    }
-    
     void mouseDrag (const MouseEvent& e) override
     {
         if (e.mods.isPopupMenu())
             return;
-        
+        dragging = true;
         Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
         
         if (getParentComponent() != nullptr)
@@ -235,6 +248,29 @@ public:
         updatePosition();
     }
 
+    void mouseUp (const MouseEvent& e) override
+    {
+        getGraphPanel()->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods, 
+            dragging, selectionMouseDownResult);
+
+        dragging = selectionMouseDownResult = false;
+
+        if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
+        {
+            makeEditorActive();
+        }
+
+        getGraphPanel()->repaint();
+    }
+
+    void updatePosition()
+    {
+        node.getRelativePosition (relativeX, relativeY);
+        vertical ? setCentreRelative (relativeX, relativeY)
+                 : setCentreRelative (relativeY, relativeX);
+        getGraphPanel()->updateConnectorComponents();
+    }
+
     void makeEditorActive()
     {
         if (node.isGraph())
@@ -249,19 +285,6 @@ public:
         }
     }
     
-    void mouseUp (const MouseEvent& e) override
-    {
-        if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
-        {
-            makeEditorActive();
-        }
-        else if (! e.mouseWasClicked())
-        {
-            // FIXME:
-            // graph.sendChangeMessage();
-        }
-    }
-
     bool hitTest (int x, int y) override
     {
         for (int i = getNumChildComponents(); --i >= 0;)
@@ -303,8 +326,9 @@ public:
         g.setFont (font);
         g.drawFittedText (getName(), getLocalBounds().reduced (4, 2), Justification::centred, 2);
 
-        g.setColour (Colours::grey);
-        g.drawRect (box);
+        bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
+        g.setColour (selected ? Colors::toggleBlue.withAlpha(.95f) : Colours::grey);
+        g.drawRect (box, selected ? 2 : 1);
     }
 
     void resized() override
@@ -434,7 +458,11 @@ private:
     Font font;
     int numIns, numOuts;
     bool vertical = true;
-    
+
+    bool selectionMouseDownResult = false;
+    bool dragging = false;
+
+
     SettingButton ioButton;
     OptionalScopedPointer<CallOutBox> ioBox;
 
@@ -740,6 +768,11 @@ void GraphEditorComponent::paint (Graphics& g)
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
+    if (selectedNodes.getNumSelected() > 0) {
+        selectedNodes.deselectAll();
+        repaint();
+    }
+
     if (e.mods.isPopupMenu())
     {
         PluginsPopupMenu menu (this);
@@ -1193,6 +1226,17 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
                 filter->update();
         updateConnectorComponents();
     }
+}
+
+void GraphEditorComponent::deleteSelectedNodes()
+{
+    for (const auto& nodeId : selectedNodes)
+    {
+        const auto node = graph.getNodeById (nodeId);
+        ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
+    }
+
+    selectedNodes.deselectAll();
 }
 
 }

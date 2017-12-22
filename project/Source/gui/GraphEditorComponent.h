@@ -29,6 +29,8 @@ public:
 
     void setNode (const Node& n);
     
+    void deleteSelectedNodes();
+    
     bool isLayoutVertical() const { return verticalLayout; }
     void setVerticalLayout (const bool isVertical);
     
@@ -40,7 +42,7 @@ public:
     void onGraphChanged();
     void updateComponents();
 
-    bool isInterestedInDragSource (const SourceDetails& /*details*/) override;
+    bool isInterestedInDragSource (const SourceDetails&) override;
     // void itemDragEnter (const SourceDetails& dragSourceDetails) override;
     // void itemDragMove (const SourceDetails& dragSourceDetails) override;
     // void itemDragExit (const SourceDetails& dragSourceDetails) override;
@@ -66,6 +68,10 @@ private:
     
     bool verticalLayout = true;
     
+    SelectedItemSet<uint32> selectedNodes;
+
+    void selectNode (const Node& node, ModifierKeys mods);
+
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);

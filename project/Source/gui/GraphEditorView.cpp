@@ -8,58 +8,73 @@
 #include "Globals.h"
 #include "session/UnlockStatus.h"
 
-namespace Element {
-    
-    GraphEditorView::GraphEditorView()
-    {
-        setName ("GraphEditor");
-        addAndMakeVisible (graph);
-    }
-    
-    GraphEditorView::~GraphEditorView() { }
+namespace Element
+{
 
-    void GraphEditorView::stabilizeContent()
-    {
-        const auto g = getGraph();
-        
-        if (g.isGraph() && !g.isRootGraph())
-        {
-            disableIfNotUnlocked();
-        }
-        else 
-        {
-            setEnabled (true); 
-            setInterceptsMouseClicks (true, true);
-        }
+GraphEditorView::GraphEditorView()
+{
+    setName ("GraphEditor");
+    addAndMakeVisible (graph);
+    setWantsKeyboardFocus (true);
+}
 
-        graph.setNode (g);
-    }
-    
-    void GraphEditorView::didBecomeActive()
+GraphEditorView::~GraphEditorView() { }
+
+bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
+{
+    if (key.getKeyCode() == KeyPress::backspaceKey ||
+        key.getKeyCode() == KeyPress::deleteKey)
     {
-        if (!getGraph().isValid() || !getGraph().isGraph())
-        {
-            if (auto session = ViewHelpers::getSession (this))
-                setNode (session->getCurrentGraph());
-        }
-        else
-        {
-            stabilizeContent();
-        }
-    }
-    
-    void GraphEditorView::paint (Graphics& g)
-    {
-        g.fillAll (LookAndFeel::contentBackgroundColor);
-    }
-    
-    void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
-    {
-        graph.setBounds (area);
+        graph.deleteSelectedNodes();
+        return true;
     }
 
-    void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
+    return ContentView::keyPressed (key, c);
+}
+
+void GraphEditorView::stabilizeContent()
+{
+    const auto g = getGraph();
+    
+    if (g.isGraph() && !g.isRootGraph())
+    {
+        disableIfNotUnlocked();
+    }
+    else 
+    {
+        setEnabled (true); 
+        setInterceptsMouseClicks (true, true);
+    }
+
+    graph.setNode (g);
+}
+
+void GraphEditorView::didBecomeActive()
+{
+    if (!getGraph().isValid() || !getGraph().isGraph())
+    {
+        if (auto session = ViewHelpers::getSession (this))
+            setNode (session->getCurrentGraph());
+    }
+    else
     {
         stabilizeContent();
     }
 }
+
+void GraphEditorView::paint (Graphics& g)
+{
+    g.fillAll (LookAndFeel::contentBackgroundColor);
+}
+
+void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
+{
+    graph.setBounds (area);
+}
+
+void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
+{
+    stabilizeContent();
+}
+
+} /* namespace Element */

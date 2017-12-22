@@ -20,6 +20,8 @@ public:
     void stabilizeContent() override;
     void paint (Graphics& g) override;
 
+    bool keyPressed (const KeyPress& key, Component* c) override;
+
 protected:
     void graphDisplayResized (const Rectangle<int>& area) override;
     void graphNodeChanged (const Node& g, const Node&) override;

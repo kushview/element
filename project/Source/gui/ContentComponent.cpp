@@ -414,6 +414,7 @@ public:
         if (content1)
             removeChildComponent (content1);
         content1 = view;
+        
         if (content1)
         {
             content1->willBecomeActive();
@@ -888,6 +889,11 @@ void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 void ContentComponent::toggleVirtualKeyboard()
 {
     setVirtualKeyboardVisible (! virtualKeyboardVisible);
+}
+
+ApplicationCommandTarget* ContentComponent::getNextCommandTarget()
+{
+    return (container) ? container->content1.get() : nullptr;
 }
 
 }

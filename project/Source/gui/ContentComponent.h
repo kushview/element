@@ -22,6 +22,7 @@ class TransportBar;
 class VirtualKeyboardView;
 
 class ContentView : public Component,
+                    public ApplicationCommandTarget,
                     public KeyListener
 {
 public:
@@ -38,21 +39,28 @@ public:
 
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
     
+    virtual void getAllCommands (Array<CommandID>&) override { }
+    virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    virtual bool perform (const InvocationInfo&) override { return false; }
+
+    /** @internal */
+    ApplicationCommandTarget* getNextCommandTarget() override { return nextCommandTarget; }
+
     /** @internal */
     virtual void paint (Graphics& g) override;
-    
     /** @internal */
     virtual bool keyPressed (const KeyPress& k, Component*) override;
 
 private:
     bool escapeTriggersClose = false;
-
+    ApplicationCommandTarget* nextCommandTarget = nullptr;
 };
 
-class ContentComponent :  public Component,
+class ContentComponent :  public Component, 
                           public DragAndDropContainer,
                           public FileDragAndDropTarget,
-                          public DragAndDropTarget
+                          public DragAndDropTarget,
+                          public ApplicationCommandTarget
 {
 public:
     ContentComponent (AppController& app);
@@ -93,6 +101,11 @@ public:
     
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
+
+    void getAllCommands (Array<CommandID>&) override { }
+    void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    bool perform (const InvocationInfo&) override { return false; }
+    ApplicationCommandTarget* getNextCommandTarget() override;
 
 private:
     AppController& controller;

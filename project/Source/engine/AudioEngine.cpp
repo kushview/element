@@ -540,7 +540,7 @@ public:
             isPrepared = false;
             releaseResources();
         }
-        
+
         prepareToPlay (sampleRate, blockSize);
         isPrepared = true;
     }

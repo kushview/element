@@ -238,7 +238,7 @@ void GuiController::saveSession (bool saveAs)
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()
 {
-    return nullptr;
+    return content.get();
 }
 
 void GuiController::getAllCommands (Array <CommandID>& commands)
@@ -496,6 +496,7 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
+        
         default:
             result = false;
     }
