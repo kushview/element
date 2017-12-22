@@ -680,13 +680,15 @@ void ContentComponent::resized()
 
 bool ContentComponent::isInterestedInDragSource (const SourceDetails& dragSourceDetails)
 {
-    return true;
+    const auto& desc (dragSourceDetails.description);
+    return desc.toString() == "ccNavConcertinaPanel" || 
+        (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
 }
-    
+
 void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
 {
     const auto& desc (dragSourceDetails.description);
-    if (dragSourceDetails.description.toString() == "ccNavConcertinaPanel")
+    if (desc.toString() == "ccNavConcertinaPanel")
     {
         if (auto* panel = nav->findPanel<DataPathTreeComponent>())
             filesDropped (StringArray ({ panel->getSelectedFile().getFullPathName() }),

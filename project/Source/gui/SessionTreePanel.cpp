@@ -3,10 +3,17 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/SessionController.h"
+
 #include "gui/GuiCommon.h"
 #include "gui/ContextMenus.h"
 #include "gui/ContentComponent.h"
+
+#include "gui/AudioIOPanelView.h"
+#include "gui/PluginsPanelView.h"
 #include "gui/SessionTreePanel.h"
+#include "gui/NavigationConcertinaPanel.h"
+
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
 
@@ -207,6 +214,63 @@ public:
         launchPopupMenu (menu);
     }
     
+       bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
+    {
+        const auto& desc (details.description);
+        if (! node.isGraph())
+            return false;
+        
+        return desc.toString() == "ccNavConcertinaPanel"
+            || (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
+    } 
+
+    void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
+    {
+        ignoreUnused (index);
+
+        auto* world = ViewHelpers::getGlobals (getOwnerView());
+        auto session = world->getSession();
+        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
+        const auto& desc (details.description);
+
+        const auto graph = node.isGraph() ? node : node.getParentGraph();
+
+        if (desc.toString() == "ccNavConcertinaPanel")
+        {
+            auto* nav = ViewHelpers::getNavigationConcertinaPanel (getOwnerView());
+            auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : 0;
+            const auto file ((panel) ? panel->getSelectedFile() : File());
+            if (file.hasFileExtension ("elg"))
+            {
+                if (world->getUnlockStatus().isFullVersion())
+                {
+                    const Node newGraph (Node::parse (file));
+                    ViewHelpers::postMessageFor (getOwnerView(),
+                        new AddNodeMessage (newGraph, graph));
+                }
+                else
+                {
+                    Alert::showProductLockedAlert();
+                }
+            }
+        }
+        else if (desc.isArray() && desc[0] == "plugin")
+        {
+            if (auto* p = world->getPluginManager().availablePlugins().getTypeForIdentifierString(desc[1].toString()))
+            {
+                if (p->fileOrIdentifier == "element.graph" && !(bool) world->getUnlockStatus().isFullVersion())
+                {
+                    Alert::showProductLockedAlert ("Nested graphs are only available in the pro version.");
+                }
+                else
+                {
+                    ViewHelpers::postMessageFor (getOwnerView(),
+                        new AddPluginMessage (graph, *p));
+                }
+            }
+        }
+    }
+
     String uniqueName;
     Node node;
     NodePopupMenu menu;
@@ -323,6 +387,7 @@ public:
             for (int i = 0; i < session->getNumGraphs(); ++i)
                 addSubItem (new SessionRootGraphTreeItem (session->getGraph (i)));
         }
+
     }
 
     virtual bool mightContainSubItems() override { return true; }
@@ -331,6 +396,52 @@ public:
     virtual void setName (const String& newName) override { }
     virtual bool isMissing() override { return false; }
     virtual Icon getIcon() const override { return Icon (getIcons().folder, Colours::red); }
+
+    bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
+    {
+        const auto& desc (details.description);
+        return desc.toString() == "ccNavConcertinaPanel";
+        // ||    (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin");
+    } 
+
+    void itemDropped (const DragAndDropTarget::SourceDetails& details, int index) override
+    {
+        // TODO: need to not directly bind index of graph in model from the actual
+        // index used in the engine.  After this, it will be less complicated to
+        // insert graphs anywhere from a visual standpoint.
+        ignoreUnused (index);
+
+        auto* world = ViewHelpers::getGlobals (getOwnerView());
+        auto session = world->getSession();
+        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
+        const auto& desc (details.description);
+
+        if (desc.toString() == "ccNavConcertinaPanel")
+        {
+            auto* nav = ViewHelpers::getNavigationConcertinaPanel (getOwnerView());
+            auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : 0;
+            const auto file ((panel) ? panel->getSelectedFile() : File());
+            if (file.hasFileExtension ("elg"))
+            {
+                if (world->getUnlockStatus().isFullVersion())
+                {
+                    if (auto* sess = app.findChild<SessionController>())
+                        sess->importGraph (file);
+                }
+                else
+                {
+                    Alert::showProductLockedAlert();
+                }
+            }
+        }
+    }
+
+    #if 0
+    void itemDragMove (const SourceDetails& dragSourceDetails) override;
+    bool shouldDrawDragImageWhenOver() override { return true; }
+    void itemDragExit (const SourceDetails& details) override;
+    virtual void itemDragEnter (const SourceDetails& details) override;
+    #endif
 
     SessionTreePanel& panel;
 };
