@@ -248,6 +248,8 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
 
     if (auto* node = createFilter (desc, rx, ry, nodeId))
     {
+        auto* const proc = node->getAudioProcessor();
+
         nodeId = node->nodeId;
         ValueTree model = node->getMetadata().createCopy();
         model.setProperty (Tags::object, node, nullptr)
@@ -262,9 +264,43 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
             IONodeEnforcer enforceIONodes (sub->getController());
         }
         
+        {
+            // try to use stereo by default on newly added plugins
+            AudioProcessor::BusesLayout stereoInOut;
+            stereoInOut.inputBuses.add (AudioChannelSet::stereo());
+            stereoInOut.outputBuses.add (AudioChannelSet::stereo());
+            AudioProcessor::BusesLayout stereoOut;
+            stereoOut.outputBuses.add (AudioChannelSet::stereo());
+            AudioProcessor::BusesLayout* tryStereo = nullptr;
+
+            if (proc->getTotalNumInputChannels() == 1 &&
+                proc->getTotalNumOutputChannels() == 1 &&
+                proc->checkBusesLayoutSupported (stereoInOut))
+            {
+                tryStereo = &stereoInOut;
+            }
+            else if (proc->getTotalNumInputChannels() == 0 &&
+                proc->getTotalNumOutputChannels() == 1 &&
+                proc->checkBusesLayoutSupported (stereoOut))
+            {
+                tryStereo = &stereoOut;
+            }
+
+            if (tryStereo != nullptr)
+            {
+                proc->suspendProcessing (true);
+                proc->releaseResources();
+                const bool success = proc->setBusesLayout (*tryStereo);
+                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->suspendProcessing (false);
+                DBG("[EL] attempting stereo preference: " << String (success ? "success" : "failed"));
+            }
+        }
+
+        // make sure the model ports are correct with the actual processor
         n.resetPorts();
 
-        node->getAudioProcessor()->suspendProcessing (n.isBypassed());
+        proc->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);
         changed();
     }
