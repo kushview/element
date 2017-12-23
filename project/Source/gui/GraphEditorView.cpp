@@ -25,7 +25,12 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
     if (key.getKeyCode() == KeyPress::backspaceKey ||
         key.getKeyCode() == KeyPress::deleteKey)
     {
-        graph.deleteSelectedNodes();
+        if (AlertWindow::showOkCancelBox (AlertWindow::QuestionIcon, "Delete ALL selected nodes?",
+            "This operation cannot be undone (yet)"))
+        {
+            graph.deleteSelectedNodes();
+        }
+
         return true;
     }
 
