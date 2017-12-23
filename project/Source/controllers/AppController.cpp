@@ -40,11 +40,24 @@ AppController::~AppController() { }
 
 void AppController::activate()
 {
+    const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+    if (recentList.existsAsFile())
+    {
+        FileInputStream stream (recentList);
+        recentFiles.restoreFromString (stream.readEntireStreamAsString());
+    }
+
     Controller::activate();
 }
 
 void AppController::deactivate()
 {
+    const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
+    if (! recentList.existsAsFile())
+        recentList.create();
+    if (recentList.exists())
+        recentList.replaceWithText (recentFiles.toString(), false, false);
+    
     Controller::deactivate();
 }
 
@@ -270,7 +283,11 @@ bool AppController::perform (const InvocationInfo& info)
         {
             FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
             if (chooser.browseForFileToOpen())
+            {
                 findChild<SessionController>()->openFile (chooser.getResult());
+                recentFiles.addFile (chooser.getResult());
+            }
+
         } break;
         case Commands::sessionNew:
             findChild<SessionController>()->newSession();

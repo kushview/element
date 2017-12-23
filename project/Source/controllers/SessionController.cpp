@@ -52,6 +52,7 @@ void SessionController::openFile (const File& file)
     else if (file.hasFileExtension ("els"))
     {
         DBG("[El] opening session " << file.getFullPathName());
+        document->saveIfNeededAndUserAgrees();
         Result result = document->loadFrom (file, true);
         if (result.wasOk())
         {

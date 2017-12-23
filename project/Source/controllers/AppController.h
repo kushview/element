@@ -30,6 +30,8 @@ public:
         Globals& getWorld();
     };
     
+    RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
+
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;
@@ -45,6 +47,8 @@ private:
     File lastExportedGraph;
     Globals& world;
     CommandManager commands;
+    RecentlyOpenedFilesList recentFiles;
+
     void run();
 };
 

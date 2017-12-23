@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "controllers/SessionController.h"
+
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
@@ -125,7 +127,14 @@ public:
             msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
             engine->addMidiMessage (msg);
         }
-       #endif
+        #endif
+        
+        if (menu == File && index >= recentMenuOffset)
+        {
+            const int fileIdx = index - recentMenuOffset;
+            class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
+            owner.getAppController().findChild<SessionController>()->openFile (f);
+        }
     }
     
     // Command Target
@@ -192,6 +201,7 @@ public:
 private:
     MainWindow& owner;
     ScopedPointer<PopupMenu> macMenu;
+    const int recentMenuOffset = 20000;
     
     void buildFileMenu (PopupMenu& menu)
     {
@@ -199,6 +209,17 @@ private:
         menu.addSeparator();
 
         menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
+  
+        if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
+        {
+            PopupMenu recents;
+            auto& app (cc->getAppController());
+            auto& list (app.getRecentlyOpenedFilesList());
+            list.createPopupMenuItems (recents, recentMenuOffset, true, true);
+            menu.addSubMenu ("Open Recent", recents);
+            menu.addSeparator();
+        }
+        
         menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
         menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
 

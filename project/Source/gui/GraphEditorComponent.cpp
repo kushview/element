@@ -250,17 +250,20 @@ public:
 
     void mouseUp (const MouseEvent& e) override
     {
-        getGraphPanel()->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods, 
-            dragging, selectionMouseDownResult);
-
+        auto* panel = getGraphPanel();
+        
+        if (panel)
+            panel->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods,
+                                                          dragging, selectionMouseDownResult);
         dragging = selectionMouseDownResult = false;
 
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
             makeEditorActive();
         }
-
-        getGraphPanel()->repaint();
+        
+        if (panel)
+            panel->repaint();
     }
 
     void updatePosition()

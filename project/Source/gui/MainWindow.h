@@ -20,7 +20,8 @@ public:
     void closeButtonPressed();
     void refreshMenu();
     Globals& getWorld() { return world; }
-    
+    AppController& getAppController();
+
 private:
     Globals& world;
     ScopedPointer<MainMenu> mainMenu;

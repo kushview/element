@@ -3,6 +3,7 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/AppController.h"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
@@ -39,6 +40,13 @@ void MainWindow::refreshMenu()
 {
     if (mainMenu)
         mainMenu->menuItemsChanged();
+}
+
+AppController& MainWindow::getAppController()
+{
+    jassert(nullptr != dynamic_cast<ContentComponent*> (getContentComponent()));
+    return (dynamic_cast<ContentComponent*> (getContentComponent()))
+        ->getAppController();
 }
 
 }
