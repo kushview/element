@@ -16,6 +16,10 @@
 namespace kv { }
 using namespace kv;
 
+#if EL_RUNNING_AS_PLUGIN
+ #include "../JuceLibraryCode/BinaryData.h"
+#endif
+
 namespace Element {
 namespace Tags
 {
