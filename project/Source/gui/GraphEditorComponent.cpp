@@ -128,7 +128,8 @@ private:
 };
 
 class FilterComponent    : public Component,
-                           public ButtonListener
+                           public ButtonListener,
+                           public AsyncUpdater
 {
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
@@ -143,6 +144,9 @@ public:
           numOuts (0), 
           vertical (vertical_)
     {
+        // setCachedComponentImage (0);
+        setBufferedToImage (true);
+
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
         
@@ -158,11 +162,16 @@ public:
                                 findColour (SettingButton::backgroundColourId));
             powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
             powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
-            powerButton.addListener (this);
             powerButton.setClickingTogglesState (true);
+            powerButton.addListener (this);
         }
 
-        setSize (vertical ? 150 : 170, 60);
+        setSize (170, 60);
+    }
+
+    void handleAsyncUpdate() override
+    {
+        repaint();
     }
 
     void buttonClicked (Button* b) override 
@@ -198,7 +207,7 @@ public:
                 delete c;
     }
 
-    ~FilterComponent()
+    ~FilterComponent() noexcept
     {
         deleteAllPins();
     }
@@ -207,12 +216,9 @@ public:
     {
         originalPos = localPointToGlobal (Point<int>());
         toFront (true);
-
-        selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
         dragging = false;
-
-        getGraphPanel()->repaint();
-
+        selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
+        
         if (e.mods.isPopupMenu())
         {
             NodePopupMenu menu (node);
@@ -238,6 +244,9 @@ public:
                 }
             }
         }
+
+        repaint();
+        getGraphPanel()->updateSelection();
     }
 
     void mouseDrag (const MouseEvent& e) override
@@ -276,10 +285,7 @@ public:
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
             makeEditorActive();
-        }
-        
-        if (panel)
-            panel->repaint();
+        }        
     }
 
     void updatePosition()
@@ -343,7 +349,9 @@ public:
 
         g.setColour (Colours::black);
         g.setFont (font);
-        g.drawFittedText (getName(), getLocalBounds().reduced (4, 2), Justification::centred, 2);
+        g.drawFittedText (getName(), powerButton.getRight() + 4, box.getY() + 2,
+                                     ioButton.getX() - powerButton.getRight(),
+                                     20, Justification::centred, 2);
 
         bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
         g.setColour (selected ? Colors::toggleBlue.withAlpha(.95f) : Colours::grey);
@@ -352,11 +360,11 @@ public:
 
     void resized() override
     {
-        auto r (getBoxRectangle());
-        r = r.removeFromTop (20);
+        auto r (getBoxRectangle().reduced (5, 4));
+        r = r.removeFromTop (16);
 
-        ioButton.setBounds (r.removeFromRight (16));
-        powerButton.setBounds (r.removeFromLeft (16));
+        ioButton.setBounds (r.removeFromRight (18));
+        powerButton.setBounds (r.removeFromLeft (18));
 
         int indexIn = 0, indexOut = 0;
         if (vertical)
@@ -429,26 +437,25 @@ public:
                 ++numOuts;
         }
 
-        int w = getWidth();
-        int h = getHeight();
+        int w = vertical ? 160 : 170;
+        int h = 68;
 
-        w = vertical ? jmax (w, (jmax (numIns, numOuts) + 1) * 20) : 120;
-        h = vertical ? h : jmax (h, (jmax (numIns, numOuts) + 1) * 20);
-        
-        const int textWidth = font.getStringWidth (node.getName());
-        w = jmax (w, (vertical ? 16 : 48) + jmin (textWidth, 300));
-        
-        if (vertical && textWidth > 300)
-            h = 100;
-        
+        if (vertical)
+        {
+            w = jmax (w, (jmax (numIns, numOuts) + 1) * pinSize);
+        }
+        else
+        {
+            h = jmax (h, (jmax (numIns, numOuts) + 1) * pinSize);
+        }
+
         setSize (w, h);
-
         setName (node.getName());
         updatePosition();
 
         if (numIns != numInputs || numOuts != numOutputs)
         {
-            numInputs = numIns;
+            numInputs  = numIns;
             numOutputs = numOuts;
 
             deleteAllPins();
@@ -484,7 +491,6 @@ private:
 
     bool selectionMouseDownResult = false;
     bool dragging = false;
-
 
     SettingButton ioButton;
     OptionalScopedPointer<CallOutBox> ioBox;
@@ -795,7 +801,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
     if (selectedNodes.getNumSelected() > 0) {
         selectedNodes.deselectAll();
-        repaint();
+        updateSelection();
     }
 
     if (e.mods.isPopupMenu())
@@ -1262,6 +1268,17 @@ void GraphEditorComponent::deleteSelectedNodes()
     }
 
     selectedNodes.deselectAll();
+}
+
+void GraphEditorComponent::updateSelection()
+{
+    for (int i = getNumChildComponents(); --i >= 0;) {
+        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        { 
+            fc->repaint(); 
+            MessageManager::getInstance()->runDispatchLoopUntil (20);
+        }
+    }
 }
 
 }

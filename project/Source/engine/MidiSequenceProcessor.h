@@ -1,5 +1,4 @@
-#ifndef EL_MIDI_SEQUENCE_PROCESSOR_H
-#define EL_MIDI_SEQUENCE_PROCESSOR_H
+#pragma once
 
 #include "ElementApp.h"
 #include "session/MidiClip.h"
@@ -9,9 +8,10 @@ namespace Element {
 class AudioEngine;
 class ClipSource;
 
-class MidiSequenceProcessor : public Processor {
+class MidiSequenceProcessor : public Processor
+{
 public:
-    explicit MidiSequenceProcessor (AudioEngine&);
+    explicit MidiSequenceProcessor();
     ~MidiSequenceProcessor() { }
     
     const String getName() const override { return "MIDI Sequencer"; }
@@ -19,18 +19,14 @@ public:
     void prepareToPlay (double sampleRate, int estimatedBlockSize) override;
     void releaseResources() override;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-    
-    const String getInputChannelName (int) const override { return String::empty; }
-    const String getOutputChannelName (int) const override { return String::empty; }
-    bool isInputChannelStereoPair (int) const override { return false; }
-    bool isOutputChannelStereoPair (int) const override { return false; }
-    bool silenceInProducesSilenceOut() const override { return false; }
+
     double getTailLengthSeconds() const override { return 0.0f; }
     
-    bool acceptsMidi() const override { return false; }
+    bool isMidiEffect() const { return true; }
+    bool acceptsMidi()  const override { return true; }
     bool producesMidi() const override { return true; }
-    
-    bool hasEditor() const override                 { return true; }
+
+    bool hasEditor() const override { return true; }
     AudioProcessorEditor* createEditor() override;
     
     int getNumParameters() override                       { return 0; }
@@ -50,15 +46,20 @@ public:
     
     void fillInPluginDescription (PluginDescription& d) const override
     {
-        d.fileOrIdentifier = "element.midiSequence";
+        d.fileOrIdentifier = "element.midiSequencer";
         d.name = getName();
-        d.pluginFormatName = "Internal";
-        d.manufacturerName = "Element";
-        d.version = "1.0";
+        d.pluginFormatName = "Element";
+        d.manufacturerName = "Kushview";
+        d.version = "1.0.0";
     }
     
+    const String getInputChannelName (int) const override { return String::empty; }
+    const String getOutputChannelName (int) const override { return String::empty; }
+    bool isInputChannelStereoPair (int) const override { return false; }
+    bool isOutputChannelStereoPair (int) const override { return false; }
+    bool silenceInProducesSilenceOut() const override { return false; }
+
 private:
-    AudioEngine& engine;
     MidiSequencePlayer player;
     MidiMessageSequence seq;
     MidiClip clip;
@@ -66,5 +67,3 @@ private:
 };
     
 }
-
-#endif  // EL_MIDI_SEQUENCE_PROCESSOR_H

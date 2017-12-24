@@ -49,14 +49,8 @@ namespace Element {
         }
         
         {
-//            MidiSequenceProcessor p (engine);
-//            p.fillInPluginDescription (metroDesc);
-        }
-        
-        {
             PlaceholderProcessor p;
             p.fillInPluginDescription (placeholderDesc);
-            
         }
     }
 
@@ -84,7 +78,7 @@ namespace Element {
         }
         else if (desc.fileOrIdentifier == metroDesc.fileOrIdentifier)
         {
-            return new MidiSequenceProcessor (engine);
+            return new MidiSequenceProcessor();
         }
         else if (desc.fileOrIdentifier == "element.placeholder")
         {
@@ -224,6 +218,11 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             SubGraphProcessor().fillInPluginDescription (*desc);
         }
+        else if (fileOrId == "element.midiSequencer")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            MidiSequenceProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -235,6 +234,9 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
+       #if EL_USE_MIDI_SEQUENCER
+        results.add ("element.midiSequencer");
+       #endif
        #if EL_USE_SUBGRAPHS
         results.add ("element.graph");
        #endif
@@ -271,6 +273,9 @@ namespace Element {
         
         else if (desc.fileOrIdentifier == "element.graph")
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
+        
+        else if (desc.fileOrIdentifier == "element.midiSequencer")
+            base = new MidiSequenceProcessor();
         
         return base != nullptr ? base.release() : nullptr;
     }

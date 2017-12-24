@@ -89,6 +89,7 @@ private:
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
     PinComponent* findPinAt (const int x, const int y) const;
     
+    void updateSelection();
     
     void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property) override { }
     void valueTreeChildAdded (ValueTree& parentTree, ValueTree& childWhichHasBeenAdded) override;
