@@ -324,8 +324,8 @@ void EngineController::addGraph()
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
     
-    Node node (Tags::graph);
-    node.setProperty (Tags::name, "Graph " + String(session->getNumGraphs() + 1));
+    Node node (Node::createDefaultGraph ("Graph " + String(session->getNumGraphs() + 1)));
+    // Node node (Node::parse (File ("/Users/mfisher/Desktop/DefaultGraph.elg")));
     addGraph (node);    
     
     findSibling<GuiController>()->stabilizeContent();

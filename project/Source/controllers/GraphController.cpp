@@ -13,7 +13,13 @@ namespace Element {
   */
 struct IONodeEnforcer
 {
-    IONodeEnforcer (GraphController& c) : controller (c) { addMissingIONodes(); controller.syncArcsModel(); }
+    IONodeEnforcer (GraphController& c)
+        : controller (c)
+    {
+        addMissingIONodes(); 
+        controller.syncArcsModel();
+    }
+    
     GraphController* getController() const { return &controller; }
 
 private:
@@ -23,11 +29,12 @@ private:
         auto* root = getController();
         if (! root) return;
         auto& proc (root->getGraph());
+        const Node graph (root->getGraphModel());
 
-        const bool wantsAudioIn   = proc.getTotalNumInputChannels() > 0;
-        const bool wantsAudioOut  = proc.getTotalNumOutputChannels() > 0;
-        const bool wantsMidiIn    = proc.acceptsMidi();
-        const bool wantsMidiOut   = proc.producesMidi();
+        const bool wantsAudioIn   = graph.hasAudioInputNode()  && proc.getTotalNumInputChannels() > 0;
+        const bool wantsAudioOut  = graph.hasAudioOutputNode() && proc.getTotalNumOutputChannels() > 0;
+        const bool wantsMidiIn    = graph.hasMidiInputNode()   && proc.acceptsMidi();
+        const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.producesMidi();
         
         GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
         for (int i = 0; i < root->getNumFilters(); ++i)

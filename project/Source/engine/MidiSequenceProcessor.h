@@ -22,7 +22,7 @@ public:
 
     double getTailLengthSeconds() const override { return 0.0f; }
     
-    bool isMidiEffect() const { return true; }
+    bool isMidiEffect() const override { return true; }
     bool acceptsMidi()  const override { return true; }
     bool producesMidi() const override { return true; }
 

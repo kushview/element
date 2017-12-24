@@ -40,6 +40,111 @@ namespace Element {
         return -1;
     }
     
+    Node Node::createDefaultGraph (const String& name)
+    {
+        Node graph (Tags::graph);
+        graph.setProperty (Tags::name, name.isNotEmpty() ? name : "Graph");
+        ValueTree nodes = graph.getNodesValueTree();
+        
+       #if 1
+        // TODO: work in progress to create default IO node models
+        // this creates them, but when added to a graph controller, doesn't bind
+        // correctly to actual IO processors (see IONodeEnforcer)
+
+        const auto types = StringArray ({ "audio.input", "audio.output", "midi.input", "midi.output" });
+        const auto names = StringArray ({ "Audio In", "Audio Out", "MIDI In", "MIDI Out" });
+        uint32 nodeId = 1;
+
+        for (const auto& t : types)
+        {
+            ValueTree ioNode (Tags::node);
+            ValueTree ports = ioNode.getOrCreateChildWithName (Tags::ports, 0);
+            int portIdx = 0;
+
+            ioNode.setProperty (Tags::id, static_cast<int64> (nodeId++), 0)
+                  .setProperty (Tags::type, "plugin", 0)
+                  .setProperty (Tags::format, "Internal", 0)
+                  .setProperty (Tags::identifier, t, 0)
+                  .setProperty (Tags::name, names [types.indexOf (t)], 0);
+
+            if (t == "audio.input")
+            {
+                ioNode.setProperty ("relativeX", 0.25f, 0)
+                      .setProperty ("relativeY", 0.25f, 0)
+                      .setProperty ("numAudioIns", 0, 0)
+                      .setProperty ("numAudioOuts", 2, 0);
+
+                ValueTree port (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty("index", portIdx++, 0)
+                    .setProperty ("type", "audio", 0)
+                    .setProperty ("flow", "output", 0);
+                ports.addChild (port, -1, 0);
+
+                port = ValueTree (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty ("index", portIdx++, 0)
+                    .setProperty ("type", "audio", 0)
+                    .setProperty ("flow", "output", 0);
+                ports.addChild (port, -1, 0);   
+            }
+            else if (t == "audio.output")
+            {
+                ioNode.setProperty ("relativeX", 0.25f, 0)
+                      .setProperty ("relativeY", 0.75f, 0)
+                      .setProperty ("numAudioIns", 2, 0)
+                      .setProperty ("numAudioOuts", 0, 0);
+                
+                ValueTree port (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty ("index", portIdx++, 0)
+                    .setProperty ("type", "audio", 0)
+                    .setProperty ("flow", "input", 0);
+                ports.addChild (port, -1, 0);
+
+                port = ValueTree (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty ("index", portIdx++, 0)
+                    .setProperty ("type", "audio", 0)
+                    .setProperty ("flow", "input", 0);
+                ports.addChild (port, -1, 0);                
+            }
+            else if (t == "midi.input")
+            {
+                ioNode.setProperty ("relativeX", 0.75f, 0)
+                      .setProperty ("relativeY", 0.25f, 0)
+                      .setProperty ("numAudioIns", 0, 0)
+                      .setProperty ("numAudioOuts", 0, 0);
+                ValueTree port (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty ("index", portIdx++, 0)
+                    .setProperty ("type", "midi", 0)
+                    .setProperty ("flow", "output", 0);
+                ports.addChild (port, -1, 0);
+            }
+            else if (t == "midi.output")
+            {
+                ioNode.setProperty ("relativeX", 0.75f, 0)
+                      .setProperty ("relativeY", 0.75f, 0)
+                      .setProperty ("numAudioIns", 0, 0)
+                      .setProperty ("numAudioOuts", 0, 0);
+                ValueTree port (Tags::port);
+                port.setProperty ("name", "Port", 0)
+                    .setProperty ("index", portIdx++, 0)
+                    .setProperty ("type", "midi", 0)
+                    .setProperty ("flow", "input", 0);
+                ports.addChild (port, -1, 0);
+            }
+
+            nodes.addChild (ioNode, -1, 0);
+        }
+
+        // DBG(graph.getValueTree().toXmlString());
+       #endif
+        
+        return graph;
+    }
+
     bool Node::isProbablyGraphNode (const ValueTree& data)
     {
         return data.hasType (Tags::node) &&
