@@ -389,6 +389,9 @@ namespace Element {
         }
 
         objectData.removeProperty (Tags::state, 0);
+
+        for (int i = 0; i < getNumNodes(); ++i)
+            getNode(i).restorePluginState();
     }
     
     void Node::savePluginState()
@@ -404,6 +407,9 @@ namespace Element {
             objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
         else 
             objectData.removeProperty (Tags::state, 0);
+
+        for (int i = 0; i < getNumNodes(); ++i)
+            getNode(i).savePluginState();
     }
     
     void Node::setCurrentProgram (const int index)

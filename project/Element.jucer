@@ -8,6 +8,10 @@
               defines="EL_RUNNING_AS_PLUGIN=0&#10;&#10;" userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
+      <GROUP id="{FEE5D81F-0B84-B663-4EA4-E221B76C4F5D}" name="Assets">
+        <FILE id="xMy9dk" name="PowerButton_48x48.png" compile="0" resource="1"
+              file="../data/Assets/PowerButton_48x48.png"/>
+      </GROUP>
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
       <FILE id="xX315d" name="test_icon.png" compile="0" resource="0" file="../data/test_icon.png"/>
     </GROUP>

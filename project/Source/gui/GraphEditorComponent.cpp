@@ -151,27 +151,43 @@ public:
         ioButton.addListener (this);
         ioButton.setVisible (!node.isIONode() && !node.isGraph());
 
+        if (!node.isIONode() && !node.isGraph())
+        {
+            addAndMakeVisible (powerButton);        
+            powerButton.setColour (SettingButton::backgroundOnColourId,
+                                findColour (SettingButton::backgroundColourId));
+            powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
+            powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
+            powerButton.addListener (this);
+            powerButton.setClickingTogglesState (true);
+        }
+
         setSize (vertical ? 150 : 170, 60);
     }
 
-    void buttonClicked (Button*) override 
+    void buttonClicked (Button* b) override 
     {
-        if (ioButton.getToggleState())
+        GraphNodePtr obj = node.getGraphNode();
+        auto* proc = (obj) ? obj->getAudioProcessor() : 0;
+        if (! proc) return;
+
+        if (b == &ioButton && ioButton.getToggleState())
         {
             ioButton.setToggleState (false, dontSendNotification);
             ioBox.clear();
         }
-        else if (! ioButton.getToggleState())
+        else if (b == &ioButton && !ioButton.getToggleState())
         {
-            GraphNodePtr obj = node.getGraphNode();
-            if (auto* proc = (obj) ? obj->getAudioProcessor() : 0)
-            {
-                auto* const component = new NodeAudioBusesComponent (node, proc,
-                        ViewHelpers::findContentComponent (this));
-                auto& box = CallOutBox::launchAsynchronously (
-                    component, ioButton.getScreenBounds(), 0);
-                ioBox.setNonOwned (&box);
-            }
+            auto* const component = new NodeAudioBusesComponent (node, proc,
+                    ViewHelpers::findContentComponent (this));
+            auto& box = CallOutBox::launchAsynchronously (
+                component, ioButton.getScreenBounds(), 0);
+            ioBox.setNonOwned (&box);
+        }
+        else if (b == &powerButton)
+        {
+            if (proc->isSuspended() != node.isBypassed())
+                proc->suspendProcessing (node.isBypassed());
         }
     }
 
@@ -337,7 +353,11 @@ public:
     void resized() override
     {
         auto r (getBoxRectangle());
-        ioButton.setBounds (r.removeFromTop(20).removeFromRight (16));
+        r = r.removeFromTop (20);
+
+        ioButton.setBounds (r.removeFromRight (16));
+        powerButton.setBounds (r.removeFromLeft (16));
+
         int indexIn = 0, indexOut = 0;
         if (vertical)
         {
@@ -468,6 +488,8 @@ private:
 
     SettingButton ioButton;
     OptionalScopedPointer<CallOutBox> ioBox;
+
+    PowerButton powerButton;
 
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;

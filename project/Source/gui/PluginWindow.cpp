@@ -42,18 +42,20 @@ public:
         nodeButton.setColour (TextButton::buttonOnColourId, Colours::red);
         nodeButton.addListener (this);
         
-        addAndMakeVisible (bypassButton);
-        bypassButton.setButtonText ("b");
-        bypassButton.setToggleState (object->getAudioProcessor()->isSuspended(), dontSendNotification);
-        bypassButton.setColour (TextButton::buttonOnColourId, Colours::red);
-        bypassButton.addListener (this);
-        
+        addAndMakeVisible (powerButton);
+        powerButton.setColour (SettingButton::backgroundOnColourId,
+                               findColour (SettingButton::backgroundColourId));
+        powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
+        powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
+        powerButton.setClickingTogglesState (true);
+        powerButton.addListener (this);
+
         updateSize();
     }
     
-    ~PluginWindowContent()
+    ~PluginWindowContent() noexcept
     {
-        bypassButton.removeListener (this);
+        powerButton.removeListener (this);
         
         if (object && editor)
         {
@@ -91,23 +93,21 @@ public:
             nodeButton.setBounds (r3.removeFromRight (16));
             r3.removeFromRight (4);
             
-            bypassButton.setBounds (r3.removeFromRight (16));
+            powerButton.setBounds (r3.removeFromLeft (16));
             r3.removeFromRight (4);
         }
         
         editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
         editor->addComponentListener (this);
     }
-    
+
     void buttonClicked (Button* button) override
     {
-        if (button == &bypassButton)
+        auto* const proc = getProcessor();
+        if (button == &powerButton)
         {
-            const bool desiredBypassState = !object->getAudioProcessor()->isSuspended();
-            object->getAudioProcessor()->suspendProcessing (desiredBypassState);
-            const bool isNowSuspended = object->getAudioProcessor()->isSuspended();
-            bypassButton.setToggleState (isNowSuspended, dontSendNotification);
-            node.setProperty (Tags::bypass, isNowSuspended);
+            if (proc && proc->isSuspended() != node.isBypassed())
+                proc->suspendProcessing (node.isBypassed());
         }
         else if (button == &nodeButton)
         {
@@ -126,17 +126,25 @@ public:
             return;
         if (wasResized)
             updateSize();
-        ignoreUnused(wasMoved);
+        ignoreUnused (wasMoved);
     }
     
     Toolbar* getToolbar() const { return toolbar.get(); }
     
 private:
     ScopedPointer<PluginWindowToolbar> toolbar;
-    SettingButton bypassButton, nodeButton;
+    SettingButton nodeButton;
+    
+    PowerButton powerButton;
+    Value bypassValue;
+
     ScopedPointer<Component> editor, leftPanel, rightPanel;
     GraphNodePtr object;
     Node node;
+
+    AudioProcessor* getProcessor() {
+        return (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    }
 };
 
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)

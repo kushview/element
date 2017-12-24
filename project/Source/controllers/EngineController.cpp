@@ -375,6 +375,8 @@ void EngineController::addGraph (const Node& newGraph)
 void EngineController::duplicateGraph (const Node& graph)
 {
     Node duplicate (graph.getValueTree().createCopy());
+    duplicate.savePluginState(); // need objects present to update processor states
+    Node::sanitizeRuntimeProperties (duplicate.getValueTree());
     duplicate.setProperty (Tags::name, duplicate.getName().replace("(copy)","").trim() + String(" (copy)"));
     addGraph (duplicate);
 }
@@ -477,7 +479,8 @@ void EngineController::addNode (const Node& node, const Node& target,
     if (auto* controller = graphs->findGraphControllerFor (target))
     {
         const uint32 nodeId = controller->addNode (node);
-        if (GraphNodePtr ptr = controller->getNodeForId (nodeId))
+        Node referencedNode (controller->getNodeModelForId (nodeId));
+        if (referencedNode.isValid())
         {
             builder.addConnections (*controller, nodeId);
         }

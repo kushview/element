@@ -3,17 +3,20 @@
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
 project/JuceLibraryCode/include_*.*
-project/JuceLIbraryCode/include_*.*
+project/JuceLibraryCode/include_*.*
+project/JuceLibraryCode/BinaryData*.*
 
 plugins/Element/Builds
 plugins/Element/JuceLibraryCode/ReadMe.txt
 plugins/Element/JuceLibraryCode/include_*.*
-plugins/Element/JuceLIbraryCode/include_*.*
+plugins/Element/JuceLibraryCode/include_*.*
+plugins/Element/JuceLibraryCode/BinaryData*.*
 
 plugins/ElementFX/Builds
 plugins/ElementFX/JuceLibraryCode/ReadMe.txt
 plugins/ElementFX/JuceLibraryCode/include_*.*
-plugins/ElementFX/JuceLIbraryCode/include_*.*
+plugins/ElementFX/JuceLibraryCode/include_*.*
+plugins/ElementFX/JuceLibraryCode/BinaryData*.*
 
 data/*.ai
 

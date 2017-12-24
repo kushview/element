@@ -24,14 +24,22 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     
     g.fillAll (fill);
     
-    String text = getButtonText();
-    
-    if (text.isEmpty() && getClickingTogglesState())
-        text = (getToggleState()) ? yes : no;
-    
-    g.setFont (12.f);
-    g.setColour (getTextColour());
-    g.drawText (text, getLocalBounds(), Justification::centred);
+    if (icon.isNull() || !icon.isValid())
+    {
+        String text = getButtonText();
+        
+        if (text.isEmpty() && getClickingTogglesState())
+            text = (getToggleState()) ? yes : no;
+        g.setFont (12.f);
+        g.setColour (getTextColour());
+        g.drawText (text, getLocalBounds(), Justification::centred);
+    }
+    else
+    {
+        const Rectangle<float> area (0.f, 0.f, getWidth(), getHeight());
+        g.drawImage (icon, area, RectanglePlacement::onlyReduceInSize);
+    }
+
     g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
     g.drawRect (0, 0, getWidth(), getHeight());
 }

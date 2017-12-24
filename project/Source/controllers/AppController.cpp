@@ -145,12 +145,16 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
     {
-        ValueTree parent (dnm->node.getValueTree().getParent());
+        Node node = dnm->node;
+        ValueTree parent (node.getValueTree().getParent());
         if (parent.hasType (Tags::nodes))
             parent = parent.getParent();
-        jassert (parent.hasType(Tags::node));
+        jassert (parent.hasType (Tags::node));
+
         const Node graph (parent, false);
-        Node newNode (dnm->node.getValueTree().createCopy(), false);
+        node.savePluginState();
+        Node newNode (node.getValueTree().createCopy(), false);
+        
         if (newNode.isValid() && graph.isValid())
         {
             newNode.getValueTree().removeProperty (Tags::id, 0);

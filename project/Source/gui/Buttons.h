@@ -3,6 +3,7 @@
 
 #include "ElementApp.h"
 #include "gui/LookAndFeel.h"
+#include "session/Node.h"
 
 namespace Element {
 
@@ -26,6 +27,8 @@ public:
         repaint();
     }
     
+    inline void setIcon (const Image& image) { icon = image; }
+
 protected:
     virtual Colour getTextColour()
     {
@@ -38,11 +41,24 @@ protected:
 private:
     String yes = "Yes";
     String no  = "No";
+    Image icon;
 };
 
 class PanicButton : public SettingButton {
 public:
     PanicButton() { setButtonText ("!"); }
+};
+
+class PowerButton : public SettingButton
+{
+public:
+    PowerButton()
+    {
+        setIcon (ImageCache::getFromMemory (BinaryData::PowerButton_48x48_png,
+                                            BinaryData::PowerButton_48x48_pngSize));
+    }
+
+    ~PowerButton() { }
 };
 
 class DragableIntLabel : public Component

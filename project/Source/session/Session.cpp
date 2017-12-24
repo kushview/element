@@ -150,26 +150,11 @@ namespace Element {
 
     void Session::valueTreeParentChanged (ValueTree& tree) { }
     void Session::valueTreeRedirected (ValueTree& tree) { }
-    
-
-    static void saveGraphStateRecursive (Node& node)
-    {
-        node.savePluginState();
-        const auto nodes = node.getValueTree().getChildWithName (Tags::nodes);
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
-            Node child (nodes.getChild (i), false);
-            saveGraphStateRecursive (child);
-        }
-    }
 
     void Session::saveGraphState()
     {
         auto graphs = getGraphsValueTree();
         for (int i = 0; i < getNumGraphs(); ++i)
-        {
-            auto graph = getGraph (i);
-            saveGraphStateRecursive (graph);
-        }
+            getGraph(i).savePluginState();
     }
 }
