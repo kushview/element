@@ -492,15 +492,16 @@ public:
         if (isTimeMaster() && transport.isPlaying())
             transport.advance (numSamples);
         
-        if (transport.isPlaying()) {
-            
-        }
-        
         transport.postProcess (numSamples);
     }
     
-    bool isTimeMaster() const {
-        return true;
+    bool isTimeMaster() const
+    {
+       #if EL_RUNNING_AS_PLUGIN
+        return sessionWantsExternalClock.get() == 0;
+       #else
+        return processMidiClock.get() == 0 && sessionWantsExternalClock.get() == 0;
+       #endif
     }
     
     void audioDeviceAboutToStart (AudioIODevice* const device) override
