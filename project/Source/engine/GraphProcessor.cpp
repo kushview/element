@@ -1165,8 +1165,6 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     }
     
     currentMidiOutputBuffer.clear();
-    
-    preRenderNodes();
 
     for (int i = 0; i < renderingOps.size(); ++i)
     {
@@ -1174,13 +1172,11 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
         op->perform (renderingBuffers, midiBuffers, numSamples);
     }
 
-    postRenderNodes();
-
     for (int i = 0; i < buffer.getNumChannels(); ++i)
         buffer.copyFrom (i, 0, currentAudioOutputBuffer, i, 0, numSamples);
-
+    
     midiMessages.clear();
-    midiMessages.addEvents (currentMidiOutputBuffer, 0, buffer.getNumSamples(), 0);
+    midiMessages.addEvents (currentMidiOutputBuffer, 0, numSamples, 0);
 }
 
 const String GraphProcessor::getInputChannelName (int channelIndex) const
@@ -1319,6 +1315,7 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
         }
 
         case midiOutputNode:
+            graph->currentMidiOutputBuffer.clear();
             graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, buffer.getNumSamples(), 0);
             midiMessages.clear();
             break;
@@ -1326,6 +1323,7 @@ void GraphProcessor::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buf
         case midiInputNode:
             midiMessages.clear();
             midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
+            graph->currentMidiInputBuffer->clear();
             break;
 
         default:

@@ -174,6 +174,10 @@ struct RootGraphRender
                 for (int i = numInputChans; i < numChans; ++i)
                     audioTemp.clear (i, 0, numSamples);
                 
+                // clear so messages don't accumulate and create a feedback loop
+                // in the IO nodes.
+                midiTemp.clear (0, numSamples);
+                
                 if ((last == graph && graphChanged && last->isSingle())
                     || (graphChanged && current != nullptr && current->isSingle() && graph != current))
                 {
@@ -240,7 +244,7 @@ struct RootGraphRender
             MidiMessage msg; int frame = 0;
             
             // setup a program change if present
-            while (iter.getNextEvent (msg, frame) || frame >= numSamples)
+            while (iter.getNextEvent (msg, frame) && frame < numSamples)
             {
                 if (! msg.isProgramChange())
                     continue;
@@ -253,6 +257,7 @@ struct RootGraphRender
         }
         else
         {
+            midi.clear();
             for (int i = 0; i < buffer.getNumChannels(); ++i)
                 zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
         }
@@ -381,32 +386,7 @@ public:
     
     RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
     
-    void traceMidi (MidiBuffer& buf)
-    {
-        MidiBuffer::Iterator iter (buf);
-        MidiMessage msg; int frame = 0;
-        
-        while (iter.getNextEvent (msg, frame))
-        {
-            if (msg.isMidiClock())
-            {
-                DBG("clock:");
-            }
-            if (msg.isNoteOn())
-            {
-                DBG("NOTE ON");
-                
-            }
-            if (msg.isNoteOff())
-            {
-                DBG("NOTE OFF");
-            }
-            
-            if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
-                DBG("got it: " << frame);
-            }
-        }
-    }
+    
 
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
@@ -456,7 +436,7 @@ public:
 
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
-        
+                
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
             const double delayMs = 6.0;
@@ -599,7 +579,6 @@ public:
         {
             tempoValue.referTo (session->getPropertyAsValue (Tags::tempo));
             externalClockValue.referTo (session->getPropertyAsValue ("externalSync"));
-            
             transport.requestMeter (session->getProperty (Tags::beatsPerBar, 4),
                                     session->getProperty (Tags::beatDivisor, 2));
         }

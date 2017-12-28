@@ -71,4 +71,31 @@ struct Alert
     }
 };
 
+inline static void traceMidi (MidiBuffer& buf)
+{
+    MidiBuffer::Iterator iter (buf);
+    MidiMessage msg; int frame = 0;
+    
+    while (iter.getNextEvent (msg, frame))
+    {
+        if (msg.isMidiClock())
+        {
+            DBG("clock:");
+        }
+        if (msg.isNoteOn())
+        {
+            DBG("NOTE ON");
+            
+        }
+        if (msg.isNoteOff())
+        {
+            DBG("NOTE OFF");
+        }
+        
+        if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
+            DBG("got it: " << frame);
+        }
+    }
+}
+
 }
