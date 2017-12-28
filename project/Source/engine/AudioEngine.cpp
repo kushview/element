@@ -847,7 +847,6 @@ void AudioEngine::processExternalPlayhead (AudioPlayHead* playhead, const int nf
 {
     auto& pos (priv->hostPos);
     playhead->getCurrentPosition (pos);
-
     auto& transport (priv->transport);
     transport.requestTempo (pos.bpm);
     transport.requestMeter (pos.timeSigNumerator, BeatType::fromPosition (pos));
