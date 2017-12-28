@@ -211,9 +211,7 @@ public:
             return;
 
         slaves.clearQuick (true);
-        
-        // Analytics::getInstance()->logEvent ("shutdown", {});
-        
+                
         UnlockStatus& status (world->getUnlockStatus());
         status.save();
         

@@ -597,8 +597,14 @@ void EngineController::deactivate()
     auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
+    if (auto* gui = findSibling<GuiController>()) {
+        // gui might not deactivate before the engine, so
+        // close the windows here
+        gui->closeAllPluginWindows();
+    }
     graphs->savePluginStates();
     graphs->clear();
+    engine->deactivate();
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
 }
