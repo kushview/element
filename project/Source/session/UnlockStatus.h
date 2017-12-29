@@ -74,7 +74,7 @@ private:
     
     inline void dump()
     {
-       #if JUCE_DEBUG
+       #if EL_DEBUG_LICENSE
         DBG("[EL] unlocked: " << ((bool) isUnlocked() ? "yes" : "no"));
         DBG("[EL] license:  " << getLicenseKey());
         DBG("[EL] full:     " << ((bool) isFullVersion() ? "yes" : "no"));

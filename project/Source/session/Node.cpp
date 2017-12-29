@@ -481,19 +481,27 @@ namespace Element {
     
     void Node::restorePluginState()
     {
-        if (! isValid())
+        if (! isValid() || !objectData.hasProperty (Tags::state))
             return;
         
-        MemoryBlock state;
-        state.fromBase64Encoding (getProperty(Tags::state).toString());
-        if (state.getSize() > 0)
+        
+        const auto data = getProperty(Tags::state).toString().trim();
+
+        if (data.isNotEmpty())
         {
-            if (GraphNodePtr obj = getGraphNode())
-                if (auto* proc = obj->getAudioProcessor())
-                    proc->setStateInformation (state.getData(), (int)state.getSize());
+            MemoryBlock state; state.fromBase64Encoding (data);
+            if (state.getSize() > 0)
+            {
+                DBG("[EL] restoring plugin state: " << getName());
+                if (GraphNodePtr obj = getGraphNode())
+                    if (auto* proc = obj->getAudioProcessor())
+                        proc->setStateInformation (state.getData(), (int)state.getSize());
+            }
         }
 
-        objectData.removeProperty (Tags::state, 0);
+        const bool clearStateProperty = false;
+        if (clearStateProperty)
+            objectData.removeProperty (Tags::state, 0);
 
         for (int i = 0; i < getNumNodes(); ++i)
             getNode(i).restorePluginState();
@@ -504,14 +512,23 @@ namespace Element {
         if (! isValid())
             return;
         
-        MemoryBlock state;
         if (GraphNodePtr obj = getGraphNode())
+        {
+            MemoryBlock state;
             if (auto* proc = obj->getAudioProcessor())
+            {
                 proc->getStateInformation (state);
-        if (state.getSize() > 0)
-            objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
-        else 
-            objectData.removeProperty (Tags::state, 0);
+                if (state.getSize() > 0)
+                {
+                    DBG("[EL] state saved to node: " << getName());
+                    objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+                }
+                else
+                { 
+                    objectData.removeProperty (Tags::state, 0);
+                }
+            }
+        }
 
         for (int i = 0; i < getNumNodes(); ++i)
             getNode(i).savePluginState();
