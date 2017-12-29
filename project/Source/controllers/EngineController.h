@@ -14,6 +14,9 @@ public:
     EngineController();
     ~EngineController();
     
+    /** sync models with engine */
+    void syncModels();
+    
     /** activate the controller */
     void activate() override;
     

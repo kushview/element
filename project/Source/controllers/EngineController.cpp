@@ -735,6 +735,13 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
    #endif
 }
 
+void EngineController::syncModels()
+{
+    for (auto* holder : graphs->getGraphs())
+        if (auto* controller = holder->getController())
+            controller->syncArcsModel();
+}
+
 void EngineController::addPlugin (const Node& graph, const PluginDescription& desc)
 {
     if (! graph.isGraph())
