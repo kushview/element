@@ -94,7 +94,7 @@ public:
 
 private:
     friend class AudioEngine;
-    friend class RootGraphRender;
+    friend struct RootGraphRender;
 
     GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";

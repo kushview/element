@@ -161,6 +161,11 @@ struct RootGraphRender
 
         if (shouldProcess)
         {
+			audioOut.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
+							  false, false, true);
+			audioTemp.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
+							   false, false, true);
+
             // clear the mixing area
             for (int i = numChans; --i >= 0;)
                 audioOut.clear (i, 0, numSamples);
