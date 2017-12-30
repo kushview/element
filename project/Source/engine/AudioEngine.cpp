@@ -773,7 +773,10 @@ void AudioEngine::addMidiMessage (const MidiMessage msg)
 void AudioEngine::setActiveGraph (const int index)
 {
     if (priv)
+    {
+        DBG("setting graph index audio engine");
         priv->currentGraph.set (index);
+    }
 }
 
 int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }

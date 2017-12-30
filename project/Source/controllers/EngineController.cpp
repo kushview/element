@@ -693,6 +693,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     }
     
     engine->refreshSession();
+        DBG("[EL] end set root node");
 }
 
 void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)
@@ -785,12 +786,14 @@ void EngineController::sessionReloaded()
                 holder->attach (engine);
                 if (auto* const controller = holder->getController())
                 {
+                    DBG("[EL] plugin was attached: " << i);
                     // noop: saving this logical block
                 }
             }
         }
 
         setRootNode (session->getCurrentGraph());
+        DBG("[EL] session was reloaded in EC");
     }
 }
 
