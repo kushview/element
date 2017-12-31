@@ -153,8 +153,13 @@ namespace Element {
 
     void Session::saveGraphState()
     {
-        auto graphs = getGraphsValueTree();
         for (int i = 0; i < getNumGraphs(); ++i)
             getGraph(i).savePluginState();
+    }
+
+    void Session::restoreGraphState()
+    {
+        for (int i = 0; i < getNumGraphs(); ++i)
+            getGraph(i).restorePluginState();
     }
 }

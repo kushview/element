@@ -349,12 +349,18 @@ namespace Element {
                     setProperty (Tags::name, ptr->getAudioProcessor()->getName());
             }
             
-            ptr->resetPorts();
-            
-            ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
-            ValueTree ports = getPortsValueTree();
-            objectData.removeChild (ports, nullptr);
-            objectData.addChild (newPorts, -1, nullptr);
+            // if (isAudioIONode() || isMidiIONode())
+            // {
+            //     // need to keep IONode ports
+            // }
+            // else
+            {
+                ptr->resetPorts();
+                ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
+                ValueTree ports = getPortsValueTree();
+                objectData.removeChild (ports, nullptr);
+                objectData.addChild (newPorts, -1, nullptr);
+            }
         }
     }
     
@@ -484,7 +490,6 @@ namespace Element {
         if (! isValid() || !objectData.hasProperty (Tags::state))
             return;
         
-        
         const auto data = getProperty(Tags::state).toString().trim();
 
         if (data.isNotEmpty())
@@ -524,8 +529,10 @@ namespace Element {
                     objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
                 }
                 else
-                { 
-                    objectData.removeProperty (Tags::state, 0);
+                {
+                    const bool clearStateProperty = false;
+                    if (clearStateProperty)
+                        objectData.removeProperty (Tags::state, 0);
                 }
             }
         }

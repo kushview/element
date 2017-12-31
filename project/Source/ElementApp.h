@@ -30,10 +30,12 @@ namespace Tags
     const Identifier bypass             = "bypass";
     const Identifier graph              = "graph";
     const Identifier graphs             = "graphs";
+    const Identifier missing            = "missing";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
     const Identifier notes              = "notes";
     const Identifier persistent         = "persistent";
+    const Identifier placeholder        = "placeholder";
     const Identifier port               = "port";
     const Identifier ports              = "ports";
     

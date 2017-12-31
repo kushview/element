@@ -739,8 +739,21 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 void EngineController::syncModels()
 {
     for (auto* holder : graphs->getGraphs())
+    {
+        Node graph (holder->model);
+        for (int i = 0; i < graph.getNumNodes(); ++i)
+        {
+            Node node (graph.getNode (i));
+            if (! node.isIONode())
+                continue;
+            node.resetPorts();
+        }
+
         if (auto* controller = holder->getController())
-            controller->syncArcsModel();
+        {
+            controller->syncArcsModel();   
+        }
+    }
 }
 
 void EngineController::addPlugin (const Node& graph, const PluginDescription& desc)

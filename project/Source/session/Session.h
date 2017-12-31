@@ -43,7 +43,9 @@ namespace Element {
         inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
         
         XmlElement* createXml();
+        
         void saveGraphState();
+        void restoreGraphState();
         
     protected:
         Session();

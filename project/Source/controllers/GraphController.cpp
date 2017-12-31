@@ -413,6 +413,7 @@ void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
 void GraphController::setNodeModel (const Node& node)
 {
     loaded = false;
+
     processor.clear();
     graph   = node.getValueTree();
     arcs    = node.getArcsValueTree();
@@ -427,8 +428,17 @@ void GraphController::setNodeModel (const Node& node)
         {
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
             auto* const proc = obj->getAudioProcessor();
+            // const int numPorts = node.getPortsValueTree().getNumChildren();
+            // const bool isIONode = obj->isAudioIONode() || obj->isMidiIONode();
+            // if (isIONode)
+            // {
+            //     for (int i = 0; i < numPorts; ++i)
+            //     {
+            //         Port port (node.getPort (i));
+            //         DBG (port.getValueTree().toXmlString());
+            //     }
+            // }
 
-            
             PortArray ins, outs;
             node.getPorts (ins, outs, PortType::Audio);
 
@@ -467,7 +477,7 @@ void GraphController::setNodeModel (const Node& node)
         {
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating placeholder");
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
-            node.getValueTree().setProperty ("placeholder", true, nullptr);
+            node.getValueTree().setProperty (Tags::placeholder, true, nullptr);
         }
         else
         {
@@ -488,27 +498,36 @@ void GraphController::setNodeModel (const Node& node)
     
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
-        const ValueTree arc (arcs.getChild (i));
+        ValueTree arc (arcs.getChild (i));
         bool worked = processor.addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
                                                (uint32)(int) arc.getProperty (Tags::sourcePort),
                                                (uint32)(int) arc.getProperty (Tags::destNode),
                                                (uint32)(int) arc.getProperty (Tags::destPort));
-        if (! worked)
+        if (worked)
+        {
+            arc.removeProperty (Tags::missing, 0);
+        }
+        else
         {
             DBG("[EL] failed creating connection");
+            arc.setProperty (Tags::missing, true, 0);
             failed.add (arc);
         }
     }
 
-    for (const auto& n : failed)
+    const bool discardFailedConnections = false;
+    if (discardFailedConnections)
     {
-        arcs.removeChild (n, nullptr);
-        Node::sanitizeRuntimeProperties (n);
+        for (const auto& n : failed)
+        {
+            arcs.removeChild (n, nullptr);
+            Node::sanitizeRuntimeProperties (n);
+        }
     }
-    failed.clearQuick();
 
     loaded = true;
-    jassert (arcs.getNumChildren() == processor.getNumConnections());
+    jassert (arcs.getNumChildren() - failed.size() == processor.getNumConnections());
+    failed.clearQuick();
 
     IONodeEnforcer enforceIONodes (*this);
     processorArcsChanged();
@@ -543,11 +562,36 @@ void GraphController::clear()
     changed();
 }
 
+static bool containsConnection (const ValueTree& arcs, const ValueTree& arc)
+{
+
+}
+
 void GraphController::processorArcsChanged()
 {
     ValueTree newArcs = ValueTree (Tags::arcs);
     for (int i = 0; i < processor.getNumConnections(); ++i)
-        newArcs.addChild (Node::makeArc (*processor.getConnection(i)), -1, nullptr);
+        newArcs.addChild (Node::makeArc (*processor.getConnection (i)), -1, nullptr);
+
+    for (int i = 0; i < arcs.getNumChildren(); ++i)
+    {
+        const ValueTree arc (arcs.getChild (i));
+        if (true == (bool) arc [Tags::missing])
+        {   
+            ValueTree missingArc = arc.createCopy();
+            if (processor.addConnection (
+                (uint32)(int) missingArc[Tags::sourceNode],
+                (uint32)(int) missingArc[Tags::sourcePort],
+                (uint32)(int) missingArc[Tags::destNode],
+                (uint32)(int) missingArc[Tags::destPort]))
+            {
+                missingArc.removeProperty (Tags::missing, 0);
+            }
+
+            newArcs.addChild (missingArc, -1, 0);
+        }
+    }
+
     const auto index = graph.indexOf (arcs);
     graph.removeChild (arcs, nullptr);
     graph.addChild (newArcs, index, nullptr);
