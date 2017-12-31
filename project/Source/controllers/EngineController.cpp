@@ -89,7 +89,6 @@ struct RootGraphHolder
         if (wasRemoved)
         {
             controller = nullptr;
-            model.getValueTree().removeProperty (Tags::object, 0);
             node = nullptr;
         }
         
@@ -273,14 +272,6 @@ public:
     void remove (RootGraphHolder* g)
     {
         graphs.removeObject (g, true);
-    }
-    
-    void savePluginStates()
-    {
-        for (auto* h : graphs)
-        {
-            h->model.savePluginState();
-        }
     }
     
     const OwnedArray<RootGraphHolder>& getGraphs() const { return graphs; }
@@ -584,10 +575,9 @@ void EngineController::activate()
     auto engine (globals.getAudioEngine());
     auto session (globals.getSession());
     engine->setSession (session);
+    engine->activate();
 
     sessionReloaded();
-    
-    engine->activate();
     devices.addChangeListener (this);
 }
 
@@ -597,13 +587,18 @@ void EngineController::deactivate()
     auto& globals (getWorld());
     auto& devices (globals.getDeviceManager());
     auto engine   (globals.getAudioEngine());
-    if (auto* gui = findSibling<GuiController>()) {
+    auto session  (globals.getSession());
+    
+    if (auto* gui = findSibling<GuiController>())
+    {
         // gui might not deactivate before the engine, so
         // close the windows here
         gui->closeAllPluginWindows();
     }
-    graphs->savePluginStates();
+    
+    session->saveGraphState();
     graphs->clear();
+    
     engine->deactivate();
     engine->setSession (nullptr);
     devices.removeChangeListener (this);
@@ -611,8 +606,7 @@ void EngineController::deactivate()
 
 void EngineController::clear()
 {
-    if (auto* root = graphs->findActiveRootGraphController())
-        root->clear();
+    graphs->clear();
 }
 
 void EngineController::setRootNode (const Node& newRootNode)
