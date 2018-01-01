@@ -105,7 +105,7 @@ namespace Element {
           */
         void closePluginWindow (PluginWindow*);
         
-        Element::LookAndFeel& getLookAndFeel() { return lookAndFeel; }
+        Element::LookAndFeel& getLookAndFeel();
         
     private:
         AppController& controller;
@@ -117,8 +117,6 @@ namespace Element {
         ScopedPointer<MainWindow>        mainWindow;
         ScopedPointer<ContentComponent>  content;
         ScopedPointer<AboutComponent>    about;
-        
-        Element::LookAndFeel             lookAndFeel;
         
         void showSplash();
         void toggleAboutScreen();

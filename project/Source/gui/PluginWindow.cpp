@@ -177,6 +177,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
 PluginWindow::~PluginWindow()
 {
     clearContentComponent();
+    setLookAndFeel (nullptr);
 }
 
 ContentComponent* PluginWindow::getElementContentComponent() const

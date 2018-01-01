@@ -12,18 +12,35 @@
 
 namespace Element {
 
+struct GlobalLookAndFeel
+{
+    GlobalLookAndFeel()     { LookAndFeel::setDefaultLookAndFeel (&look); }
+    ~GlobalLookAndFeel()    { LookAndFeel::setDefaultLookAndFeel (nullptr); }
+    Element::LookAndFeel look;
+};
+
+static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
+static Array<GuiController*> guiInstances;
+
 GuiController::GuiController (Globals& w, AppController& a)
     : AppController::Child(),
       controller(a), world(w),
       windowManager (nullptr),
       mainWindow (nullptr)
 {
+    if (guiInstances.size() <= 0)
+        sGlobalLookAndFeel = new GlobalLookAndFeel();
+    guiInstances.add (this);
     windowManager = new WindowManager (*this);
     commander().registerAllCommandsForTarget (this);
+
+   
 }
 
 GuiController::~GuiController()
 {
+    closeAllPluginWindows (true);
+
     if (mainWindow)
     {
         closeAllWindows();
@@ -42,7 +59,15 @@ GuiController::~GuiController()
         content = nullptr;
     }
     
-    LookAndFeel::setDefaultLookAndFeel (nullptr);
+    guiInstances.removeFirstMatchingValue (this);
+    if (guiInstances.size() <= 0)
+        sGlobalLookAndFeel = nullptr;
+}
+
+Element::LookAndFeel& GuiController::getLookAndFeel()
+{ 
+    jassert(sGlobalLookAndFeel);
+    return sGlobalLookAndFeel->look; 
 }
 
 void GuiController::timerCallback()
@@ -70,7 +95,6 @@ void GuiController::saveProperties (PropertiesFile* props)
 
 void GuiController::activate()
 {
-    LookAndFeel::setDefaultLookAndFeel (&lookAndFeel);
     Controller::activate();
     startTimer (1000);
 }
@@ -201,7 +225,6 @@ void GuiController::presentPluginWindow (const Node& node)
 void GuiController::run()
 {
     mainWindow = new MainWindow (world);
-    mainWindow->setLookAndFeel (&lookAndFeel);
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     PropertiesFile* pf = globals().getSettings().getUserSettings();
