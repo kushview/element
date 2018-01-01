@@ -490,20 +490,28 @@ namespace Element {
         if (! isValid() || !objectData.hasProperty (Tags::state))
             return;
         
-        const auto data = getProperty(Tags::state).toString().trim();
-
-        if (data.isNotEmpty())
+        if (GraphNodePtr obj = getGraphNode())
         {
-            MemoryBlock state; state.fromBase64Encoding (data);
-            if (state.getSize() > 0)
+            if (auto* proc = obj->getAudioProcessor())
             {
-                DBG("[EL] restoring plugin state: " << getName());
-                if (GraphNodePtr obj = getGraphNode())
-                    if (auto* proc = obj->getAudioProcessor())
+                const auto data = getProperty(Tags::state).toString().trim();
+                if (data.isNotEmpty())
+                {
+                    MemoryBlock state; state.fromBase64Encoding (data);
+                    if (state.getSize() > 0)
+                    {
+                        DBG("[EL] restoring plugin state: " << getName());
                         proc->setStateInformation (state.getData(), (int)state.getSize());
+                    }
+                }
+
+                proc->suspendProcessing (isBypassed());
             }
         }
 
+        // this was originally here to help reduce memory usage
+        // need another way to free this property without disturbing
+        // the normal flow of the app.
         const bool clearStateProperty = false;
         if (clearStateProperty)
             objectData.removeProperty (Tags::state, 0);
@@ -534,6 +542,8 @@ namespace Element {
                     if (clearStateProperty)
                         objectData.removeProperty (Tags::state, 0);
                 }
+
+                setProperty (Tags::bypass, proc->isSuspended());
             }
         }
 

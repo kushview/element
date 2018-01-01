@@ -230,7 +230,6 @@ uint32 GraphController::addNode (const Node& newNode)
             n.resetPorts();
         }
         
-        node->getAudioProcessor()->suspendProcessing (n.isBypassed());
         nodes.addChild (data, -1, nullptr);
         changed();
     }
@@ -308,7 +307,6 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
         // make sure the model ports are correct with the actual processor
         n.resetPorts();
 
-        proc->suspendProcessing (n.isBypassed());
         nodes.addChild (model, -1, nullptr);
         changed();
     }
@@ -469,9 +467,6 @@ void GraphController::setNodeModel (const Node& node)
             }
             
             node.restorePluginState();
-
-            if (node.getValueTree().getProperty (Tags::bypass, false))
-                proc->suspendProcessing (true);
         }
         else if (GraphNodePtr obj = createPlaceholder (node))
         {
@@ -546,8 +541,6 @@ void GraphController::clear()
 {
     loaded = false;
 
-    processor.clear();
-    
     if (graph.isValid())
     {
         Node::sanitizeRuntimeProperties (graph);
@@ -559,6 +552,7 @@ void GraphController::clear()
         graph.addChild (arcs, -1, nullptr);
     }
     
+    processor.clear();
     changed();
 }
 
