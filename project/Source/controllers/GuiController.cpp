@@ -182,17 +182,15 @@ void GuiController::presentPluginWindow (const Node& node)
         return;
     
     auto* window = windowManager->getPluginWindowFor (node);
-    if (window)
+    if (! window)
+        window = windowManager->createPluginWindowFor (node);
+
+    if (window != nullptr)
     {
+        window->setName (node.getName());
+        window->setAlwaysOnTop (true);
         window->setVisible (true);
         window->toFront (false);
-        return;
-    }
-    
-    window = windowManager->createPluginWindowFor (node);
-    if (window)
-    {
-        window->setVisible (true);
     }
 }
 
