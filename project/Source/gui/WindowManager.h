@@ -136,7 +136,7 @@ public:
         if (! proc)
             return nullptr;
         if (! proc->hasEditor())
-            return nullptr;
+            return createPluginWindowFor (node, new GenericAudioProcessorEditor (proc));
         
         auto* editor = proc->createEditorIfNeeded();
         return (editor != nullptr) ? createPluginWindowFor (node, editor) : nullptr;

@@ -188,7 +188,11 @@ void GuiController::presentPluginWindow (const Node& node)
     if (window != nullptr)
     {
         window->setName (node.getName());
+       #if EL_RUNNING_AS_PLUGIN
+        // This makes plugin window handling more like the standalone
+        // we don't want to modify the existing standalone behavior
         window->setAlwaysOnTop (true);
+       #endif
         window->setVisible (true);
         window->toFront (false);
     }
