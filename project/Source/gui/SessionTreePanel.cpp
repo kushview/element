@@ -47,8 +47,7 @@ void SessionGraphsListBox::paintListBoxItem (int rowNumber, Graphics& g, int wid
 }
 
 class SessionNodeTreeItem : public TreeItemBase
-{
-    
+{  
 public:
     SessionNodeTreeItem (const Node& n)
         : node (n)
@@ -114,19 +113,22 @@ public:
         auto* cc = ViewHelpers::findContentComponent (getOwnerView());
         auto* gui = cc->getAppController().findChild<GuiController>();
 
-        if (node.isRootGraph())
-        {
-            if (node != session->getCurrentGraph())
-            {
-                gui->closeAllPluginWindows (true);
-                auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
+        jassert(session != nullptr && cc != nullptr && gui != nullptr);
+        
+        auto root = node;
+        while (!root.isRootGraph() || !root.isValid())
+            root = root.getParentGraph();
 
-                graphs.setProperty (Tags::active, graphs.indexOf (node.getValueTree()), 0);
-                auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
-                app.findChild<EngineController>()->setRootNode (node);
-                if (auto* g = app.findChild<GuiController>())
-                    g->showPluginWindowsFor (node, true);
-            }
+        if (root.isRootGraph() && root != session->getCurrentGraph())
+        {
+            gui->closeAllPluginWindows (true);
+            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
+
+            graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
+            auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
+            app.findChild<EngineController>()->setRootNode (root);
+            if (auto* g = app.findChild<GuiController>())
+                g->showPluginWindowsFor (root, true);
         }
         
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
