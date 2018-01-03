@@ -136,7 +136,7 @@ struct RootGraphRender
             }
             else
             {
-                DBG("[EL] program changed not handled: product locked");
+                DBG("[EL] program change not handled: product locked");
             }
 
             program.reset();
@@ -179,17 +179,26 @@ struct RootGraphRender
                 for (int i = numInputChans; i < numChans; ++i)
                     audioTemp.clear (i, 0, numSamples);
                 
-                // clear so messages don't accumulate and create a feedback loop
-                // in the IO nodes.
+                // clear so messages: avoids feedback loop when IO node ins are 
+                // connected to IO node outs
                 midiTemp.clear (0, numSamples);
                 
                 if ((last == graph && graphChanged && last->isSingle())
                     || (graphChanged && current != nullptr && current->isSingle() && graph != current))
                 {
-                    // send all notes off to the last graph if it is single
-                    // it to parellel graphs as well
+                    // send kill messages to the last graph(s) when the graph changes
+                    // see http://nickfever.com/music/midi-cc-list
                     for (int i = 0; i < 16; ++i)
+                    {
+                        // sustain pedal off
+                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 64, 0), 0);
+                        // Sostenuto off
+                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 66, 0), 0);
+                        // Hold off
+                        midiTemp.addEvent (MidiMessage::controllerEvent (i + 1, 69, 0), 0);
+
                         midiTemp.addEvent (MidiMessage::allNotesOff (i + 1), 0);
+                    }
                 }
                 else if ((current == graph && graph->isSingle()) 
                             || (current != nullptr && !current->isSingle() && !graph->isSingle()))
@@ -223,7 +232,6 @@ struct RootGraphRender
                          (!graph->isSingle() && (current != nullptr) && !current->isSingle()))
                 {
                     // if it's the current single graph or both are parallel...
-                    
                     if (graphChanged && (graph->isSingle() || 
                                         (modeChanged && !graph->isSingle() && !current->isSingle())))
                     {
