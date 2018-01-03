@@ -44,9 +44,8 @@ void SessionController::openFile (const File& file)
         {
             const Node model (node, true);
             DBG("[EL] add graph to session: " << model.getName());
-            if (currentSession->addGraph (node, true))
-                if (auto* ec = findSibling<EngineController>())
-                    ec->sessionReloaded();
+            if (auto* ec = findSibling<EngineController>())
+                ec->addGraph (model);
         }
     }
     else if (file.hasFileExtension ("els"))

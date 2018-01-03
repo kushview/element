@@ -337,7 +337,9 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::exportGraph:
         {
             auto session = getWorld().getSession();
-            const auto node = session->getCurrentGraph();
+            auto node = session->getCurrentGraph();
+            node.savePluginState();
+            
             if (!lastExportedGraph.isDirectory())
                 lastExportedGraph = lastExportedGraph.getParentDirectory();
             if (lastExportedGraph.isDirectory())
@@ -349,8 +351,7 @@ bool AppController::perform (const InvocationInfo& info)
             {
                 FileChooser chooser ("Export Graph", lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToSave (true))
-                    findChild<SessionController>()->exportGraph (world.getSession()->getCurrentGraph(),
-                                                                 chooser.getResult());
+                    findChild<SessionController>()->exportGraph (node, chooser.getResult());
                 if (auto* gui = findChild<GuiController>())
                     gui->stabilizeContent();
             }
