@@ -42,8 +42,8 @@ private:
             GraphNodePtr node = root->getNode (i);
             if (node->isMidiIONode() || node->isAudioIONode())
             {
-                auto* proc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
-                ioNodes [proc->getType()] = node;
+                auto* ioProc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
+                ioNodes [ioProc->getType()] = node;
             }
         }
         

@@ -38,7 +38,7 @@ namespace Tags
     const Identifier placeholder        = "placeholder";
     const Identifier port               = "port";
     const Identifier ports              = "ports";
-    
+	const Identifier program			= "program";
     const Identifier sourceNode         = "sourceNode";
     const Identifier sourcePort         = "sourcePort";
     const Identifier sourceChannel      = "sourceChannel";
@@ -55,7 +55,7 @@ namespace Tags
     
     const Identifier session            = "session";
     const Identifier state              = "state";
-    
+	const Identifier programState		= "programState";
     const Identifier beatsPerBar        = "beatsPerBar";
     const Identifier beatDivisor        = "beatDivisor";
     const Identifier midiChannel        = "midiChannel";

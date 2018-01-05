@@ -494,7 +494,7 @@ namespace Element {
         {
             if (auto* proc = obj->getAudioProcessor())
             {
-                const auto data = getProperty(Tags::state).toString().trim();
+                auto data = getProperty(Tags::state).toString().trim();
                 if (data.isNotEmpty())
                 {
                     MemoryBlock state; state.fromBase64Encoding (data);
@@ -504,6 +504,19 @@ namespace Element {
                         proc->setStateInformation (state.getData(), (int)state.getSize());
                     }
                 }
+			    
+				proc->setCurrentProgram ((int) objectData.getProperty (Tags::program, 0));
+				data = getProperty(Tags::programState).toString().trim();
+				if (data.isNotEmpty())
+				{
+					MemoryBlock state; state.fromBase64Encoding (data);
+					if (state.getSize() > 0)
+					{
+						DBG("[EL] restoring program state: " << getName());
+						proc->setCurrentProgramStateInformation(state.getData(), 
+							(int)state.getSize());
+					}
+				}
 
                 proc->suspendProcessing (isBypassed());
             }
@@ -543,7 +556,16 @@ namespace Element {
                         objectData.removeProperty (Tags::state, 0);
                 }
 
+				state.reset();
+				proc->getCurrentProgramStateInformation (state);
+				if (state.getSize() > 0)
+				{
+					DBG("[EL] program state saved to node: " << getName());
+					objectData.setProperty(Tags::programState, state.toBase64Encoding(), 0);
+				}
+
                 setProperty (Tags::bypass, proc->isSuspended());
+				setProperty (Tags::program, proc->getCurrentProgram());
             }
         }
 
