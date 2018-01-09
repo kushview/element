@@ -33,8 +33,6 @@ GuiController::GuiController (Globals& w, AppController& a)
     guiInstances.add (this);
     windowManager = new WindowManager (*this);
     commander().registerAllCommandsForTarget (this);
-
-   
 }
 
 GuiController::~GuiController()
@@ -536,10 +534,10 @@ bool GuiController::perform (const InvocationInfo& info)
 
 void GuiController::stabilizeContent()
 {
-    if (auto* cc = getContentComponent())
+    if (auto* cc = content.get())
         cc->stabilize();
 }
-    
+
 void GuiController::toggleAboutScreen()
 {
     if (! about)
@@ -561,4 +559,12 @@ void GuiController::toggleAboutScreen()
     }
 }
     
+#if EL_RUNNING_AS_PLUGIN
+void GuiController::clearContentComponent()
+{
+    jassert(content != nullptr);
+    content = nullptr;
+}
+#endif
+
 }

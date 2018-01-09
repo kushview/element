@@ -32,6 +32,10 @@ namespace Element {
         void activate() override;
         void deactivate() override;
         
+        #if EL_RUNNING_AS_PLUGIN
+        void clearContentComponent();
+        #endif
+        
         void run();
         void timerCallback() override;
         CommandManager& commander();
