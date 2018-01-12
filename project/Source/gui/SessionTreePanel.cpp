@@ -232,7 +232,6 @@ public:
 
         auto* world = ViewHelpers::getGlobals (getOwnerView());
         auto session = world->getSession();
-        auto& app (ViewHelpers::findContentComponent (getOwnerView())->getAppController());
         const auto& desc (details.description);
 
         const auto graph = node.isGraph() ? node : node.getParentGraph();

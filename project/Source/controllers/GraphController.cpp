@@ -468,10 +468,10 @@ void GraphController::setNodeModel (const Node& node)
             
             node.restorePluginState();
         }
-        else if (GraphNodePtr obj = createPlaceholder (node))
+        else if (GraphNodePtr ph = createPlaceholder (node))
         {
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating placeholder");
-            node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+            node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
             node.getValueTree().setProperty (Tags::placeholder, true, nullptr);
         }
         else

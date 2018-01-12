@@ -460,7 +460,7 @@ public:
 
             deleteAllPins();
 
-            for (uint32 i = 0; i < numPorts; ++i)
+            for (uint32 i = 0; i < (uint32) numPorts; ++i)
             {
                 const Port port (node.getPort (i));
                 const PortType t (port.getType());
