@@ -37,7 +37,7 @@
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 namespace Element {
-    
+
     class PreferencesComponent::PageList :  public ListBox,
                                             public ListBoxModel
     {
@@ -114,7 +114,7 @@ namespace Element {
     };
 
     // MARK: Plugin Settings (included in general)
-    
+
     class PluginSettingsComponent : public SettingsPage,
                                     public ButtonListener
     {
@@ -122,7 +122,7 @@ namespace Element {
         PluginSettingsComponent (Globals& w)
             : plugins (w.getPluginManager()),
               settings (w.getSettings())
-        
+
         {
             addAndMakeVisible (activeFormats);
             activeFormats.setText ("Enabled Plugin Formats", dontSendNotification);
@@ -145,22 +145,22 @@ namespace Element {
                 toggle->setColour (ToggleButton::tickColourId, Colours::black);
                 toggle->addListener (this);
             }
-            
+
             updateToggleStates();
         }
-        
+
         void resized() override
         {
             const int spacingBetweenSections = 6;
             const int toggleInset = 4;
-            
+
             Rectangle<int> r (getLocalBounds());
             activeFormats.setFont (Font (15, Font::bold));
             activeFormats.setBounds (r.removeFromTop (18));
             formatNotice.setBounds (r.removeFromTop (14));
-            
+
             r.removeFromTop (spacingBetweenSections);
-            
+
             for (auto* c : formatToggles)
             {
                 auto r2 = r.removeFromTop (18);
@@ -168,41 +168,41 @@ namespace Element {
                 r.removeFromTop (4);
             }
         }
-        
+
         void paint (Graphics&) override { }
-        
+
         void buttonClicked (Button*) override
         {
             writeSetting();
             restoreSetting();
         }
-        
+
     private:
         PluginManager&  plugins;
         Settings&       settings;
-        
+
         Label activeFormats;
-        
+
         OwnedArray<ToggleButton> formatToggles;
         StringArray availableFormats;
-        
+
         Label formatNotice;
-        
+
         const String key = Settings::pluginFormatsKey;
         bool hasChanged = false;
-        
+
         String nameForFormat (const String& name)
         {
             if (name == "AudioUnit")
                 return "Audio Unit";
             return name;
         }
-        
+
         void updateToggleStates()
         {
             restoreSetting();
         }
-        
+
         void restoreSetting()
         {
             StringArray toks;
@@ -210,23 +210,23 @@ namespace Element {
             for (auto* c : formatToggles)
                 c->setToggleState (toks.contains(c->getName()), dontSendNotification);
         }
-        
+
         void writeSetting()
         {
             StringArray toks;
             for (auto* c : formatToggles)
                 if (c->getToggleState())
                     toks.add (c->getName());
-            
+
             toks.trim();
             const auto value = toks.joinIntoString(",");
             settings.getUserSettings()->setValue (key, value);
             settings.saveIfNeeded();
         }
     };
-    
+
     // MARK: General Settings
-    
+
     class GeneralSettingsPage : public SettingsPage,
                                 public ValueListener
     {
@@ -259,7 +259,7 @@ namespace Element {
             checkForUpdates.setClickingTogglesState (true);
             checkForUpdates.setToggleState (settings.checkForUpdates(), dontSendNotification);
             checkForUpdates.getToggleStateValue().addListener (this);
-            
+
             addAndMakeVisible (scanForPlugsLabel);
             scanForPlugsLabel.setText ("Scan plugins on startup", dontSendNotification);
             scanForPlugsLabel.setFont (Font (12.0, Font::bold));
@@ -267,16 +267,16 @@ namespace Element {
             scanForPlugins.setClickingTogglesState (true);
             scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
             scanForPlugins.getToggleStateValue().addListener (this);
-            
+
             addAndMakeVisible ( showPluginWindowsLabel);
             showPluginWindowsLabel.setText ("Automatically show plugin windows", dontSendNotification);
             showPluginWindowsLabel.setFont (Font (12.0, Font::bold));
-            
+
             addAndMakeVisible (showPluginWindows);
             showPluginWindows.setClickingTogglesState (true);
             showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
             showPluginWindows.getToggleStateValue().addListener (this);
-            
+
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -289,11 +289,11 @@ namespace Element {
                 clockSource.setValue ((int) ClockSourceInternal);
                 clockSourceBox.setEnabled (false);
             }
-            
+
             // addAndMakeVisible (pluginSettings);
         }
 
-        virtual ~GeneralSettingsPage()
+        virtual ~GeneralSettingsPage() noexcept
         {
             clockSource.removeListener (this);
         }
@@ -304,40 +304,40 @@ namespace Element {
             const int settingHeight = 22;
             const int toggleWidth = 40;
             const int toggleHeight = 18;
-            
+
             r.removeFromTop (spacingBetweenSections);
             auto r2 = r.removeFromTop (settingHeight);
             label.setBounds (r2.removeFromLeft (getWidth() / 2));
             setting.setBounds (r2.removeFromLeft (toggleWidth)
                                  .withSizeKeepingCentre (toggleWidth, toggleHeight));
         }
-        
+
         void resized() override
         {
             const int spacingBetweenSections = 6;
             const int settingHeight = 22;
             const int toggleWidth = 40;
             const int toggleHeight = 18;
-            
+
             Rectangle<int> r (getLocalBounds());
             auto r2 = r.removeFromTop (settingHeight);
             clockSourceLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             clockSourceBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-            
+
             r.removeFromTop (spacingBetweenSections);
             r2 = r.removeFromTop (settingHeight);
             checkForUpdatesLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             checkForUpdates.setBounds (r2.removeFromLeft (toggleWidth)
                                          .withSizeKeepingCentre (toggleWidth, toggleHeight));
-            
+
             r.removeFromTop (spacingBetweenSections);
             r2 = r.removeFromTop (settingHeight);
             scanForPlugsLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
-            
+
             layoutSetting(r, showPluginWindowsLabel, showPluginWindows);
-            
+
             if (pluginSettings.isVisible())
             {
                 r.removeFromTop (spacingBetweenSections * 2);
@@ -352,7 +352,7 @@ namespace Element {
                 settings.setCheckForUpdates (checkForUpdates.getToggleState());
                 jassert (settings.checkForUpdates() == checkForUpdates.getToggleState());
             }
-            
+
             // clock source
             else if (value.refersToSameSourceAs (clockSource) && status.isFullVersion())
             {
@@ -363,7 +363,7 @@ namespace Element {
                 settings.getUserSettings()->setValue ("clockSource", val);
                 engine->applySettings (settings);
             }
-            
+
             else if (value.refersToSameSourceAs (scanForPlugins.getToggleStateValue()))
             {
                 settings.setScanForPluginsOnStartup (scanForPlugins.getToggleState());
@@ -372,7 +372,7 @@ namespace Element {
             {
                 settings.setShowPluginWindowsWhenAdded (showPluginWindows.getToggleState());
             }
-            
+
             settings.saveIfNeeded();
             gui.stabilizeContent();
         }
@@ -381,18 +381,18 @@ namespace Element {
         Label clockSourceLabel;
         ComboBox clockSourceBox;
         Value clockSource;
-        
+
         Label checkForUpdatesLabel;
         SettingButton checkForUpdates;
-        
+
         Label scanForPlugsLabel;
         SettingButton scanForPlugins;
-        
+
         PluginSettingsComponent pluginSettings;
-        
+
         Label showPluginWindowsLabel;
         SettingButton showPluginWindows;
-        
+
         Settings& settings;
         AudioEnginePtr engine;
         UnlockStatus& status;
@@ -400,7 +400,7 @@ namespace Element {
     };
 
     // MARK: Audio Settings
-    
+
     class AudioSettingsComponent : public SettingsPage
     {
     public:
@@ -410,28 +410,28 @@ namespace Element {
         {
             devices.enableInputLevelMeasurement (true);
             devices.enableOutputLevelMeasurement (true);
-            
+
             addAndMakeVisible (devs);
             devs.setItemHeight (22);
-            
+
             setSize (300, 400);
         }
-        
+
         ~AudioSettingsComponent()
         {
             devices.enableInputLevelMeasurement (false);
             devices.enableOutputLevelMeasurement (false);
         }
-        
+
         void resized() override { devs.setBounds (getLocalBounds()); }
-        
+
     private:
         AudioDeviceSelectorComponent devs;
         DeviceManager& devices;
     };
 
     // MARK: MIDI Settings
-    
+
     class MidiSettingsPage : public SettingsPage,
                              public ComboBoxListener,
                              public ButtonListener,
@@ -445,14 +445,14 @@ namespace Element {
             addAndMakeVisible (midiOutputLabel);
             midiOutputLabel.setFont (Font (12.0, Font::bold));
             midiOutputLabel.setText ("MIDI Output Device", dontSendNotification);
-            
+
             addAndMakeVisible (midiOutput);
             midiOutput.addListener (this);
-            
+
             addAndMakeVisible(midiInputHeader);
             midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
             midiInputHeader.setFont (Font (12, Font::bold));
-            
+
             midiInputs = new MidiInputs (*this);
             midiInputView.setViewedComponent (midiInputs.get(), false);
             addAndMakeVisible (midiInputView);
@@ -462,64 +462,64 @@ namespace Element {
             devices.addChangeListener (this);
             updateDevices();
         }
-        
+
         ~MidiSettingsPage()
         {
             devices.removeChangeListener (this);
             midiInputs = nullptr;
             midiOutput.removeListener (this);
         }
-        
+
         void resized() override
         {
             const int spacingBetweenSections = 6;
             const int settingHeight = 22;
-            
+
             Rectangle<int> r (getLocalBounds());
             auto r2 = r.removeFromTop (settingHeight);
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-            
+
             r.removeFromTop (roundDoubleToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
-            
+
             midiInputView.setBounds (r);
             midiInputs->updateSize();
         }
-        
+
         void buttonClicked (Button*) override
         {
-            
+
         }
-        
+
         void comboBoxChanged (ComboBox* box) override
         {
             const auto name = outputs [midiOutput.getSelectedId() - 10];
             if (box == &midiOutput)
                 devices.setDefaultMidiOutput (name);
         }
-        
+
         void changeListenerCallback (ChangeBroadcaster*) override
         {
             updateDevices();
         }
-        
+
     private:
         DeviceManager& devices;
         Settings& settings;
-        
+
         Label midiOutputLabel;
         ComboBox midiOutput;
         Label midiInputHeader;
         StringArray outputs;
-        
+
         class MidiInputs : public Component,
                            public ButtonListener
         {
         public:
             MidiInputs (MidiSettingsPage& o)
                 : owner (o) { }
-            
+
             void updateDevices()
             {
                 midiInputLabels.clearQuick (true);
@@ -532,7 +532,7 @@ namespace Element {
                     label->setFont (Font (12));
                     label->setText (name, dontSendNotification);
                     addAndMakeVisible (label);
-                    
+
                     auto* btn = midiInputs.add (new SettingButton());
                     btn->setName (name);
                     btn->setClickingTogglesState (true);
@@ -543,7 +543,7 @@ namespace Element {
 
                 updateSize();
             }
-            
+
             void updateSize()
             {
                 const int widthOfView = owner.midiInputView.getWidth() - owner.midiInputView.getScrollBarThickness();
@@ -553,7 +553,7 @@ namespace Element {
             int computeHeight()
             {
                 static int tick = 0;
-                
+
                 const int spacingBetweenSections = 6;
                 const int settingHeight = 22;
 
@@ -563,14 +563,14 @@ namespace Element {
                     h += spacingBetweenSections;
                     h += settingHeight;
                 }
-                
+
                 // this makes sure the height is always
                 // different and the viewport will refresh
                 if (tick == 0)
                     tick = 1;
                 else
                     tick = 0;
-                
+
                 return h + tick;
             }
 
@@ -621,10 +621,10 @@ namespace Element {
 
         void updateDevices()
         {
-            outputs = MidiOutput::getDevices();            
+            outputs = MidiOutput::getDevices();
             midiOutput.clear (dontSendNotification);
             midiOutput.setTextWhenNoChoicesAvailable ("<none>");
-            
+
             int i = 0;
             midiOutput.addItem ("<< none >>", 1);
             midiOutput.addSeparator();
@@ -633,15 +633,15 @@ namespace Element {
                 midiOutput.addItem (name, 10 + i);
                 ++i;
             }
-            
+
             midiInputs->updateDevices();
-            
+
             updateInputSelection();
             updateOutputSelection();
 
             resized();
         }
-        
+
         void updateOutputSelection()
         {
             if (auto* out = devices.getDefaultMidiOutput())
@@ -649,14 +649,14 @@ namespace Element {
             else
                 midiOutput.setSelectedId (1);
         }
-        
+
         void updateInputSelection()
         {
             if (midiInputs)
                 midiInputs->updateSelection();
         }
     };
-    
+
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -689,7 +689,7 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
-    
+
     setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
