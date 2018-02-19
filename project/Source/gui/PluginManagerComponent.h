@@ -39,7 +39,7 @@ class PluginManager;
 class PluginListComponent : public Component,
                             public FileDragAndDropTarget,
                             private ChangeListener,
-                            private ButtonListener
+                            private Button::Listener
 {
 public:
     //==============================================================================

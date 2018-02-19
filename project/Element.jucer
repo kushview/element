@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.15.7"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.2.0" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.2.1" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="14" companyCopyright="Kushview"
               defines="EL_RUNNING_AS_PLUGIN=0&#10;&#10;" userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;">
@@ -330,43 +330,39 @@
                vst3Folder="" extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                documentExtensions="elc,elg,els">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
+        <CONFIGURATION name="Debug" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"
                        customXcodeFlags="ONLY_ACTIVE_ARCH=YES"/>
-        <CONFIGURATION name="Debug32" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="32BitUniversal"
+        <CONFIGURATION name="Debug32" osxCompatibility="10.8 SDK" osxArchitecture="32BitUniversal"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugFree" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="Element"
-                       headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+        <CONFIGURATION name="DebugFree" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_FREE=1&#10;" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugLocal" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="Element"
-                       headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+        <CONFIGURATION name="DebugLocal" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugNoUnlocking" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitIntel" isDebug="1" optimisation="1" targetName="Element"
-                       headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
+        <CONFIGURATION name="DebugNoUnlocking" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugCI" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+        <CONFIGURATION name="DebugCI" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_CI_AUTH=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="Release" osxSDK="default" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
+        <CONFIGURATION name="Release" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="ReleaseFree" osxSDK="default" osxCompatibility="10.8 SDK"
-                       osxArchitecture="64BitUniversal" isDebug="0" optimisation="2"
-                       targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
+        <CONFIGURATION name="ReleaseFree" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
+                       isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/ReleaseFree" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../Source&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_FREE=1&#10;"
@@ -466,16 +462,15 @@
     <MODULE id="kv_lv2" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_models" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
-  <JUCEOPTIONS JUCE_JACK="disabled" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
+  <JUCEOPTIONS JUCE_JACK="0" JUCE_X11="disabled" ELEMENT_PLATFORM_EGL="enabled"
                JUCE_USE_X11="disabled" JUCE_USE_EGL="enabled" JUCE_XEVENTS="enabled"
-               JUCE_ASIO="enabled" JUCE_WASAPI="enabled" JUCE_DIRECTSOUND="disabled"
-               JUCE_ALSA="enabled" JUCE_USE_ANDROID_OPENSLES="disabled" JUCE_USE_CDREADER="disabled"
-               JUCE_USE_CDBURNER="disabled" JUCE_PLUGINHOST_AU="enabled" ELEMENT_LV2_PLUGIN_HOST="disabled"
-               JUCE_WEB_BROWSER="disabled" JUCE_ENABLE_LIVE_CONSTANT_EDITOR="disabled"
-               JUCE_WASAPI_EXCLUSIVE="enabled" JUCE_PLUGINHOST_VST3="enabled"
-               JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled" JUCE_USE_MP3AUDIOFORMAT="disabled"
-               JUCE_USE_LAME_AUDIO_FORMAT="disabled" ELEMENT_DOCKING_WINDOWS="disabled"
-               KV_LV2_PLUGIN_HOST="disabled"/>
+               JUCE_ASIO="1" JUCE_WASAPI="1" JUCE_DIRECTSOUND="0" JUCE_ALSA="1"
+               JUCE_USE_ANDROID_OPENSLES="0" JUCE_USE_CDREADER="0" JUCE_USE_CDBURNER="0"
+               JUCE_PLUGINHOST_AU="1" ELEMENT_LV2_PLUGIN_HOST="disabled" JUCE_WEB_BROWSER="0"
+               JUCE_ENABLE_LIVE_CONSTANT_EDITOR="0" JUCE_WASAPI_EXCLUSIVE="1"
+               JUCE_PLUGINHOST_VST3="1" JUCE_USE_CAMERA="enabled" JUCE_QUICKTIME="enabled"
+               JUCE_USE_MP3AUDIOFORMAT="0" JUCE_USE_LAME_AUDIO_FORMAT="0" ELEMENT_DOCKING_WINDOWS="disabled"
+               KV_LV2_PLUGIN_HOST="0"/>
   <LIVE_SETTINGS>
     <OSX headerPath="Source&#10;" systemHeaderPath="/opt/kushview/include"/>
   </LIVE_SETTINGS>

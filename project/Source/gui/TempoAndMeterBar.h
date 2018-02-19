@@ -9,7 +9,7 @@ namespace Element
 {
 
 class TempoAndMeterBar : public Component,
-                         public ValueListener,
+                         public Value::Listener,
                          public Timer
 {
 public:

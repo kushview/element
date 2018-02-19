@@ -145,7 +145,7 @@ struct UnlockForm::OverlayComp  : public Component,
 
 namespace Element {
 struct LicenseInfo : public Component,
-                     public ButtonListener
+                     public Button::Listener
 {
     LicenseInfo (UnlockForm& f) : form(f)
     {

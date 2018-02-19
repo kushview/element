@@ -144,7 +144,7 @@ Component* TreeItemBase::createItemComponent()
 }
 
 class RenameTreeItemCallback  : public ModalComponentManager::Callback,
-                                public TextEditorListener
+                                public TextEditor::Listener
 {
 public:
     RenameTreeItemCallback (TreeItemBase& ti, Component& parent, const Rectangle<int>& bounds)

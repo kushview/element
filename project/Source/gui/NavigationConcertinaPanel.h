@@ -52,7 +52,7 @@ public:
     private:
         class Row : public Component,
                     public Label::Listener,
-                    public ButtonListener
+                    public Button::Listener
         {
         public:
             Row (ElementsNavigationPanel& _owner) : owner (_owner)
@@ -524,7 +524,7 @@ private:
     };
     
     class ElementsHeader : public Header,
-                           public ButtonListener
+                           public Button::Listener
     {
     public:
         ElementsHeader (NavigationConcertinaPanel& _parent, Component& _panel)
@@ -558,7 +558,7 @@ private:
     };
     
     class UserDataPathHeader : public Header,
-                               public ButtonListener
+                               public Button::Listener
     {
     public:
         UserDataPathHeader (NavigationConcertinaPanel& _parent, DataPathTreeComponent& _panel)

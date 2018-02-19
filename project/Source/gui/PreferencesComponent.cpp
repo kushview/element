@@ -116,7 +116,7 @@ namespace Element {
     // MARK: Plugin Settings (included in general)
 
     class PluginSettingsComponent : public SettingsPage,
-                                    public ButtonListener
+                                    public Button::Listener
     {
     public:
         PluginSettingsComponent (Globals& w)
@@ -228,7 +228,7 @@ namespace Element {
     // MARK: General Settings
 
     class GeneralSettingsPage : public SettingsPage,
-                                public ValueListener
+                                public Value::Listener
     {
     public:
         enum ComboBoxIDs
@@ -433,8 +433,8 @@ namespace Element {
     // MARK: MIDI Settings
 
     class MidiSettingsPage : public SettingsPage,
-                             public ComboBoxListener,
-                             public ButtonListener,
+                             public ComboBox::Listener,
+                             public Button::Listener,
                              public ChangeListener
     {
     public:
@@ -514,7 +514,7 @@ namespace Element {
         StringArray outputs;
 
         class MidiInputs : public Component,
-                           public ButtonListener
+                           public Button::Listener
         {
         public:
             MidiInputs (MidiSettingsPage& o)

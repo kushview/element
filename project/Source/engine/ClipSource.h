@@ -49,7 +49,7 @@ private:
 
 class ClipSource :  public LinkedList<ClipSource>::Link,
                     public PositionableAudioSource,
-                    public ValueListener
+                    public Value::Listener
 {
 public:
     typedef AudioPlayHead::CurrentPositionInfo Position;

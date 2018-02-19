@@ -11,7 +11,7 @@ class GraphEditorComponent;
 class GraphProcessor;
 
 class NodeAudioBusesComponent : public AudioProcessorEditor,
-                                public ButtonListener
+                                public Button::Listener
 {
 public:
     class InputOutputConfig;

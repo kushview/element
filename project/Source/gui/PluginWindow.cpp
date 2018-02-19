@@ -25,7 +25,7 @@ public:
 
 class PluginWindowContent : public Component,
                             public ComponentListener,
-                            public ButtonListener
+                            public Button::Listener
 {
 public:
     PluginWindowContent (Component* const _editor, const Node& _node)

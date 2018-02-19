@@ -98,7 +98,7 @@ void ContentView::disableIfNotUnlocked()
 // MARK: Toolbar
     
 class ContentComponent::Toolbar : public Component,
-                                  public ButtonListener
+                                  public Button::Listener
 {
 public:
     Toolbar (ContentComponent& o)

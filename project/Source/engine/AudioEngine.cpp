@@ -366,7 +366,7 @@ private:
 
 class AudioEngine::Private : public AudioIODeviceCallback,
                              public MidiInputCallback,
-                             public ValueListener,
+                             public Value::Listener,
                              public MidiClock::Listener
 {
 public:
