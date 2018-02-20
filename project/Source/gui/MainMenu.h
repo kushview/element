@@ -190,6 +190,7 @@ public:
         buildEditMenu(cmd, menu);
         menu.addSeparator();
         buildViewMenu(cmd, menu);
+        menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
         menu.addSeparator();
         menu.addItem (99999, "Close all plugin windows...");
        #if 0

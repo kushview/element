@@ -543,7 +543,7 @@ namespace Element
         {
             if (auto *scroll = &getVerticalScrollBar())
             {
-                matrix->setOffsetY (-roundDoubleToInt (scroll->getCurrentRangeStart()));
+                matrix->setOffsetY (-roundToInt (scroll->getCurrentRangeStart()));
                 matrix->repaint();
             }
         }
@@ -625,7 +625,7 @@ namespace Element
         {
             if (auto *scroll = getHorizontalScrollBar())
             {
-                matrix->setOffsetX (-roundDoubleToInt (scroll->getCurrentRangeStart()));
+                matrix->setOffsetX (-roundToInt (scroll->getCurrentRangeStart()));
                 matrix->repaint();
             }
         }

@@ -480,7 +480,7 @@ namespace Element {
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
 
-            r.removeFromTop (roundDoubleToInt ((double) spacingBetweenSections * 1.5));
+            r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
 
             midiInputView.setBounds (r);

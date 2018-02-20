@@ -284,7 +284,7 @@ namespace Element {
         {
             if (! locked)
             {
-                node.setProperty ("midiProgram", roundDoubleToInt(v) - 1);
+                node.setProperty ("midiProgram", roundToInt(v) - 1);
                 if (GraphNodePtr ptr = node.getGraphNode())
                     if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                         root->setMidiProgram ((int) node.getProperty ("midiProgram"));

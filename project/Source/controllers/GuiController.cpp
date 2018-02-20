@@ -543,11 +543,12 @@ void GuiController::toggleAboutScreen()
     if (! about)
     {
         about = new AboutComponent();
-        about->centreWithSize(about->getWidth(), about->getHeight());
-        about->setVisible (true);
-        about->addToDesktop(0);
+        about->centreWithSize (about->getWidth(), about->getHeight());
     }
-    else if (about->isVisible())
+
+    jassert (about);
+
+    if (about->isVisible())
     {
         about->setVisible (false);
         about->removeFromDesktop();
@@ -555,13 +556,23 @@ void GuiController::toggleAboutScreen()
     else
     {
         about->setVisible (true);
-        about->addToDesktop(0);
+        about->addToDesktop (0);
+       #if EL_RUNNING_AS_PLUGIN
+        about->setAlwaysOnTop (true);
+       #endif
     }
 }
     
 #if EL_RUNNING_AS_PLUGIN
 void GuiController::clearContentComponent()
 {
+    if (about)
+    {
+        about->setVisible (false);
+        about->removeFromDesktop();
+        about = nullptr;
+    }
+
     jassert(content != nullptr);
     content = nullptr;
 }

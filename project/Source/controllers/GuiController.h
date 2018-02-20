@@ -124,6 +124,7 @@ namespace Element {
         
         void showSplash();
         void toggleAboutScreen();
+        
         void saveProperties (PropertiesFile* props);
     };
 }
