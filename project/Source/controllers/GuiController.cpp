@@ -562,7 +562,7 @@ void GuiController::toggleAboutScreen()
        #endif
     }
 }
-    
+
 #if EL_RUNNING_AS_PLUGIN
 void GuiController::clearContentComponent()
 {
