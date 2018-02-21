@@ -422,7 +422,97 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
 void PluginScanner::timerCallback()
 {
 }
-    
+
+// MARK: Unverified Plugins
+
+typedef HashMap<String, StringArray> UnverifiedPluginMap;
+typedef HashMap<String, FileSearchPath> UnverifiedPluginPaths;
+
+class UnverifiedPlugins : private Thread
+{
+public:
+    UnverifiedPlugins() : Thread ("euvpl") { }
+
+    ~UnverifiedPlugins()
+    {
+        cancelFlag.set (1);
+        if (isThreadRunning())
+            stopThread (1000);
+    }
+
+    void searchForPlugins (PropertiesFile* props)
+    {
+        if (isThreadRunning())
+            return;
+
+        if (props)
+        {
+            const StringArray formats = { "AU", "VST", "VST3" };
+            for (const auto& f : formats)
+            {
+                const auto key = String(Settings::lastPluginScanPathPrefix) + f;
+                paths.set (f, FileSearchPath (props->getValue (key)));
+            }
+        }
+        else
+        {
+            paths.clear();
+        }
+
+        startThread (4);
+    }
+
+    void getPlugins (OwnedArray<PluginDescription>& plugs, 
+                     const String& format, KnownPluginList& list)
+    {
+        ScopedLock sl (lock);
+        if (plugins.contains (format))
+        {
+            for (const auto& file : plugins.getReference (format))
+            {
+                if (nullptr != list.getTypeForFile (file))
+                    continue;
+                auto* const desc = plugs.add (new PluginDescription());
+                desc->pluginFormatName = format;
+                desc->fileOrIdentifier = file;
+            }
+        }
+    }
+
+private:
+    friend class Thread;
+    CriticalSection lock;
+    UnverifiedPluginMap plugins;
+    UnverifiedPluginPaths paths;
+    Atomic<int> cancelFlag;
+
+    void run() override
+    {
+        cancelFlag.set (0);
+
+        PluginManager pluginManager;
+        pluginManager.addDefaultFormats();
+        auto& manager (pluginManager.getAudioPluginFormats());
+
+        for (int i = 0; i < manager.getNumFormats(); ++i)
+        {
+            if (threadShouldExit() || cancelFlag.get() != 0)
+                break;
+            
+            auto* const format = manager.getFormat (i);
+            FileSearchPath path = paths [format->getName()];
+            path.addPath (format->getDefaultLocationsToSearch());
+            const auto found = format->searchPathsForPlugins (path, true, false);
+
+            ScopedLock sl (lock);
+            plugins.set (format->getName(), found);
+        }
+
+        cancelFlag.set (0);
+        DBG("[EL] unverified plugin scan finished");
+    }
+};
+
 // MARK: Plugin Manager
     
 class PluginManager::Private : public PluginScanner::Listener
@@ -451,12 +541,23 @@ public:
 		return didSomething;
 	}
 
+    void searchUnverifiedPlugins (PropertiesFile* props)
+    {
+        unverified.searchForPlugins (props);
+    }
+
+    void getUnverifiedPlugins (const String& format, OwnedArray<PluginDescription>& plugs)
+    {
+        unverified.getPlugins (plugs, format, allPlugins);
+    }
+
 private:
 	friend class PluginManager;
 	PluginManager& owner;
 	AudioPluginFormatManager formats;
 	KnownPluginList allPlugins;
 	File deadAudioPlugins;
+    UnverifiedPlugins unverified;
 
 #if ELEMENT_LV2_PLUGIN_HOST
 	OptionalPtr<LV2World> lv2;
@@ -561,6 +662,12 @@ void PluginManager::addToKnownPlugins (const PluginDescription& desc)
         list.removeFromBlacklist (desc.fileOrIdentifier);
         list.scanAndAddFile (desc.fileOrIdentifier, true, dummy, *format);
     }
+}
+
+void PluginManager::searchUnverifiedPlugins()
+{
+    if (! priv) return;
+    priv->searchUnverifiedPlugins (this->props);
 }
 
 kv::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
@@ -706,6 +813,7 @@ void PluginManager::scanInternalPlugins()
 }
 void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins)
 {
+    #if 0
     HashMap<String, StringArray>& plugs (priv->unverifiedAudioPlugins);
     
     if (auto* format = getAudioPluginFormat (formatName))
@@ -735,6 +843,11 @@ void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<P
             desc->fileOrIdentifier = file;
         }
     }
+    #else
+        priv->getUnverifiedPlugins (formatName, plugins);
+        if (plugins.isEmpty())
+            priv->searchUnverifiedPlugins (props);
+    #endif
 }
 
 void PluginManager::scanFinished()

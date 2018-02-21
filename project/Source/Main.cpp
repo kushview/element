@@ -151,6 +151,7 @@ private:
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();
+        plugins.searchUnverifiedPlugins();
     }
     
     void setupAnalytics()

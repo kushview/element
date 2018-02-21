@@ -82,11 +82,12 @@ public:
 
     void setPlayConfig (double sampleRate, int blockSize);
 
-    /** Give a properties file to be used when settings aren;t available. FIXME */
-    void setPropertiesFile (PropertiesFile* pf) {
-        props = pf;
-    }
+    /** Give a properties file to be used when settings aren't available. FIXME */
+    void setPropertiesFile (PropertiesFile* pf) { props = pf; }
     
+    /** Search for unverified plugins in background thread */
+    void searchUnverifiedPlugins();
+
     /** This will get a possible list of plugins. Trying to load this might fail */
     void getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins);
     

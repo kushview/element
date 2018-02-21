@@ -849,7 +849,6 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 if (wasNotSuspended)
                     proc->suspendProcessing (false);
                 
-        
                 gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
                 gp->suspendProcessing (false);
 
