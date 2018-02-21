@@ -164,4 +164,11 @@ struct ChangeBusesLayout : public AppMessage
     const AudioProcessor::BusesLayout layout;
 };
 
+struct OpenSessionMessage : public AppMessage
+{
+    OpenSessionMessage (const File& f) : file(f) {}
+    ~OpenSessionMessage() { }
+    const File file;
+};
+
 }

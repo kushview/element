@@ -91,9 +91,10 @@ void AppController::run()
 
 void AppController::handleMessage (const Message& msg)
 {
-	auto* ec = findChild<EngineController>();
-    auto* gui = findChild<GuiController>();
-	jassert(ec && gui);
+	auto* ec   = findChild<EngineController>();
+    auto* gui  = findChild<GuiController>();
+    auto* sess = findChild<SessionController>();
+	jassert(ec && gui && sess);
 
     bool handled = true;
 
@@ -223,6 +224,11 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
         ec->changeBusesLayout (cbm->node, cbm->layout);
+    }
+    else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
+    {
+        sess->openFile (osm->file);
+        recentFiles.addFile (osm->file);
     }
     else
     {

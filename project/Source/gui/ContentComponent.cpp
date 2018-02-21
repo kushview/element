@@ -738,6 +738,10 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
                     "Apply License File", "Your software could not be unlocked.");
             }
         }
+        else if (file.hasFileExtension ("els"))
+        {
+            this->post (new OpenSessionMessage (file));
+        }
         else if (file.hasFileExtension ("elg"))
         {
             if (getGlobals().getUnlockStatus().isFullVersion())

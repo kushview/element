@@ -556,11 +556,6 @@ void GraphController::clear()
     changed();
 }
 
-static bool containsConnection (const ValueTree& arcs, const ValueTree& arc)
-{
-
-}
-
 void GraphController::processorArcsChanged()
 {
     ValueTree newArcs = ValueTree (Tags::arcs);
