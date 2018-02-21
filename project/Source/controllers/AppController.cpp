@@ -72,9 +72,16 @@ void AppController::run()
     
     if (auto* sc = findChild<SessionController>())
     {
-        const auto lastSession = getWorld().getSettings().getUserSettings()->getValue ("lastSession");
-        if (File::isAbsolutePath (lastSession))
-            sc->openFile (File (lastSession));
+        if (world.getSettings().openLastUsedSession())
+        {
+            const auto lastSession = getWorld().getSettings().getUserSettings()->getValue ("lastSession");
+            if (File::isAbsolutePath (lastSession))
+                sc->openFile (File (lastSession));
+        }
+        else
+        {
+            // TODO: open a user specified default session if defined
+        }
     }
     
     if (auto* gui = findChild<GuiController>())

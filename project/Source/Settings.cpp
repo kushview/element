@@ -11,6 +11,7 @@ const char* Settings::checkForUpdatesKey        = "checkForUpdates";
 const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 const char* Settings::showPluginWindowsKey      = "showPluginWindows";
+const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
 
 #if JUCE_32BIT
  #if JUCE_MAC
@@ -125,6 +126,21 @@ void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)
         return;
     if (auto* p = getProps())
         p->setValue (showPluginWindowsKey, shouldShow);
+}
+
+bool Settings::openLastUsedSession() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (openLastUsedSessionKey, true);
+    return true;
+}
+
+void Settings::setOpenLastUsedSession (const bool shouldOpen)
+{
+    if (shouldOpen == openLastUsedSession())
+        return;
+    if (auto* p = getProps())
+        p->setValue (openLastUsedSessionKey, shouldOpen);
 }
 
 }

@@ -277,6 +277,15 @@ namespace Element {
             showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
             showPluginWindows.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible ( openLastSessionLabel);
+            openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
+            openLastSessionLabel.setFont (Font (12.0, Font::bold));
+
+            addAndMakeVisible (openLastSession);
+            openLastSession.setClickingTogglesState (true);
+            openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
+            openLastSession.getToggleStateValue().addListener (this);
+
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -336,7 +345,8 @@ namespace Element {
             scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
 
-            layoutSetting(r, showPluginWindowsLabel, showPluginWindows);
+            layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
+            layoutSetting (r, openLastSessionLabel, openLastSession);
 
             if (pluginSettings.isVisible())
             {
@@ -372,6 +382,10 @@ namespace Element {
             {
                 settings.setShowPluginWindowsWhenAdded (showPluginWindows.getToggleState());
             }
+            else if (value.refersToSameSourceAs (openLastSession.getToggleStateValue()))
+            {
+                settings.setOpenLastUsedSession (openLastSession.getToggleState());
+            }
 
             settings.saveIfNeeded();
             gui.stabilizeContent();
@@ -392,6 +406,9 @@ namespace Element {
 
         Label showPluginWindowsLabel;
         SettingButton showPluginWindows;
+
+        Label openLastSessionLabel;
+        SettingButton openLastSession;
 
         Settings& settings;
         AudioEnginePtr engine;
