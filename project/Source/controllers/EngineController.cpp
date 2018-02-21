@@ -806,12 +806,17 @@ void EngineController::sessionReloaded()
 
 Node EngineController::addPlugin (GraphController& c, const PluginDescription& desc)
 {
+    auto& plugins (getWorld().getPluginManager());
     const auto nodeId = c.addFilter (&desc, 0.5f, 0.5f, 0);
+    
     if (KV_INVALID_NODE != nodeId)
     {
+        plugins.addToKnownPlugins (desc);
+        
         const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
             findSibling<GuiController>()->presentPluginWindow (node);
+
         return node;
     }
 

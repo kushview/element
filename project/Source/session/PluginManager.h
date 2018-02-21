@@ -22,9 +22,11 @@ public:
 
     void addDefaultFormats();
     void addFormat (AudioPluginFormat*);
+    void addToKnownPlugins (const PluginDescription& desc);
 
     const File& getDeadAudioPluginsFile() const;
     KnownPluginList& availablePlugins();
+    KnownPluginList& getKnownPlugins() { return availablePlugins(); }
 
     AudioPluginFormatManager& getAudioPluginFormats() { return formats(); }
     AudioPluginFormatManager& formats();
@@ -60,6 +62,7 @@ public:
 	/** returns the name of the currently scanned plugin. This value
 	    is not suitable for use in loading plugins */
 	String getCurrentlyScannedPluginName() const;
+
     /** Looks for new or updated internal/element plugins */
     void scanInternalPlugins();
     

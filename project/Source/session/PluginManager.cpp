@@ -551,6 +551,18 @@ void PluginManager::addFormat (AudioPluginFormat* fmt)
     getAudioPluginFormats().addFormat (fmt);
 }
 
+void PluginManager::addToKnownPlugins (const PluginDescription& desc)
+{
+    auto* const format = getAudioPluginFormat (desc.pluginFormatName);
+    auto& list = priv->allPlugins;
+    if (format && nullptr == list.getTypeForFile (desc.fileOrIdentifier))
+    {
+        OwnedArray<PluginDescription> dummy;
+        list.removeFromBlacklist (desc.fileOrIdentifier);
+        list.scanAndAddFile (desc.fileOrIdentifier, true, dummy, *format);
+    }
+}
+
 kv::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
 {
     return new PluginScannerSlave();
