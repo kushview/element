@@ -6,6 +6,22 @@
 namespace Element
 {
 
+class VirtualKeyboardComponent : public MidiKeyboardComponent 
+{
+public:
+    VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o)
+        : MidiKeyboardComponent (s, o) { }
+    ~VirtualKeyboardComponent() { }
+
+    void setKeypressOctaveOffset (int offset);
+    int getKeypressOctaveOffset() const { return keypressOctaveOffset; }
+
+    bool keyPressed (const KeyPress&) override;
+
+private:
+    int keypressOctaveOffset = 6;
+};
+
 class VirtualKeyboardView : public ContentView
 {
 public:
@@ -16,12 +32,11 @@ public:
     void resized() override;
     
 private:
-    ScopedPointer<MidiKeyboardComponent> keyboard;
+    ScopedPointer<VirtualKeyboardComponent> keyboard;
     MidiKeyboardState internalState;
+    int keyWidth = 20;
     
-    int keyWidth = 24;
-    
-    void setupKeyboard (MidiKeyboardComponent&);
+    void setupKeyboard (VirtualKeyboardComponent&);
 };
 
 }

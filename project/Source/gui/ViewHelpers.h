@@ -1,8 +1,8 @@
 
-#ifndef EL_VIEW_HELPERS_H
-#define EL_VIEW_HELPERS_H
+#pragma once;
 
 #include "ElementApp.h"
+#include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "session/Session.h"
 
@@ -23,6 +23,9 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 
 /** Finds the content component by traversing parent component(s) */
 ContentComponent* findContentComponent (Component* c);
+
+/** Get the engine */
+AudioEnginePtr getAudioEngine (Component*);
 
 /** Get World */
 Globals* getGlobals (Component* c);
@@ -57,7 +60,6 @@ void closePluginWindowsFor (Component*, Node& node, const bool visible = true);
 
 }
 
-
 class ViewHelperMixin
 {
 public:
@@ -86,8 +88,4 @@ private:
     JUCE_DECLARE_NON_COPYABLE(ViewHelperMixin);
 };
 
-
-
 }
-
-#endif  // EL_VIEW_HELPERS_H

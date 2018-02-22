@@ -85,6 +85,13 @@ ContentComponent* findContentComponent (Component* c)
     return nullptr;
 }
 
+AudioEnginePtr getAudioEngine (Component* c)
+{
+    if (auto* cc = findContentComponent (c))
+        return cc->getGlobals().getAudioEngine();
+    return nullptr;
+}
+
 Globals* getGlobals (Component* c)
 {
     if (auto* cc = findContentComponent(c))
