@@ -50,13 +50,13 @@ bool VirtualKeyboardComponent::keyPressed (const KeyPress& key)
 
     if (key == KeyPress::numberPadSubtract || key == '-')
     {
-        DBG("KeyPress::numberPadSubtract");
+        setKeypressOctaveOffset (keypressOctaveOffset - 1);
     }
     else if (key == KeyPress::numberPadAdd 
         || (isShiftDown && key == KeyPress::numberPadAdd)
         || (isShiftDown && key == '+'))
     {
-        DBG("KeyPress::numberPadAdd");
+        setKeypressOctaveOffset (keypressOctaveOffset + 1);
     }
     else if (key == KeyPress::numberPad0 || key == '0' ||
              key == KeyPress::numberPad1 || key == '1' ||
@@ -101,7 +101,7 @@ void VirtualKeyboardView::resized()
     if (keyboard)
         keyboard->setBounds (getLocalBounds());
 }
-    
+
 void VirtualKeyboardView::didBecomeActive()
 {
     if (auto engine = ViewHelpers::getAudioEngine (this))

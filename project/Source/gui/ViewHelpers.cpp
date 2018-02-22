@@ -55,9 +55,9 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
         g.fillRect (0, 0, h, w);
     }
     
-#if JUCE_MAC
-   // g.setFont (Resources::normalFontSize);
-#endif
+   #if JUCE_MAC
+    // g.setFont (Resources::normalFontSize);
+   #endif
     
     g.setColour((selected) ? LF::textColor.contrasting() : LF::textColor);
     g.drawText (text, 40, 0, h - 40, w, Justification::centredLeft);
@@ -73,10 +73,10 @@ ContentComponent* findContentComponent (Component* c)
     if (auto* pw = c->findParentComponentOfClass<PluginWindow>())
         return pw->getElementContentComponent();
 
-#if EL_RUNNING_AS_PLUGIN
+   #if EL_RUNNING_AS_PLUGIN
     if (auto* ed = c->findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
         return ed->getContentComponent();
-#endif
+   #endif
     
     for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
         if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))

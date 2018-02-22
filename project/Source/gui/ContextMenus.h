@@ -167,10 +167,21 @@ public:
         const int offset = 20000;
         if (node.isAudioIONode() || node.isMidiIONode())
             return;
+        const String format = node.getProperty (Tags::format).toString();
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
+        
+        menu.addSeparator();
+        if (format == "VST")
+        {
+            PopupMenu native;
+            addItemInternal (native, "Save FXB/FXP", new FXBPresetOp (node, false));
+            addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
+            menu.addSubMenu ("Native Presets", native);
+        }
+
         DataPath path;
         
-        auto identifier = node.getProperty (Tags::identifier).toString();
+        auto identifier = node.getProperty(Tags::identifier).toString();
         if (identifier.isEmpty())
             identifier = node.getProperty (Tags::file);
         
@@ -210,7 +221,11 @@ public:
         else if (result == Disconnect)
             return new DisconnectNodeMessage (node);
         else if (auto* op = resultMap [result])
-            return op->createMessage();
+        {
+            if (auto* const msg = op->createMessage())
+                return msg;
+            op->perform();
+        }
         else if (result >= 10000 && result < 20000)
         {
             Node(node).setCurrentProgram (result - 10000);
@@ -263,7 +278,8 @@ private:
         virtual ~ResultOp () { }
         virtual bool isActive() { return true; }
         virtual bool isTicked() { return false; }
-        virtual Message* createMessage() =0;
+        virtual Message* createMessage() { return nullptr; }
+        virtual bool perform() { }
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResultOp);
     };
@@ -294,7 +310,7 @@ private:
     struct AddPresetOp : public ResultOp
     {
         AddPresetOp (const Node& n)
-            : node(n)
+            : node (n)
         { }
         
         const Node node;
@@ -303,6 +319,73 @@ private:
             return new AddPresetMessage (node);
         }
     };
+
+    struct FXBPresetOp : public ResultOp
+    {
+        FXBPresetOp (const Node& n, const bool isLoad)
+            : node (n), load (isLoad) { }
+        const Node node;
+        const bool load;
+        bool perform() override
+        {
+           #if JUCE_PLUGINHOST_VST
+            const auto format = node.getProperty(Tags::format).toString();
+            if (format != "VST" && format != "VST3")
+                return false;
+            
+            auto gn = node.getGraphNode();
+            auto* const proc = (gn) ? gn->getAudioPluginInstance() : nullptr;
+
+            if (! proc)
+                return false;
+
+            if (load)
+            {
+                FileChooser chooser ("Open FXB/FXP Preset", File(), "*.fxb;*.fxp", true);
+                bool wasOk = true;
+                if (chooser.browseForFileToOpen())
+                {
+                    FileInputStream stream (chooser.getResult());
+                    MemoryBlock block;
+                    stream.readIntoMemoryBlock (block);
+                    if (block.getSize() > 0)
+                        wasOk = VSTPluginFormat::loadFromFXBFile (proc, block.getData(), block.getSize());
+                }
+
+                if (! wasOk)
+                {
+                    // TODO: alert
+                }
+            }
+            else
+            {
+                FileChooser chooser ("Save FXB/FXP Preset", File(), "*.fxb;*.fxp", true);
+                if (chooser.browseForFileToSave (true))
+                {
+                    const File f (chooser.getResult());
+                    MemoryBlock block;
+                    if (VSTPluginFormat::saveToFXBFile (proc, block, f.hasFileExtension ("fxb")))
+                    {
+                        FileOutputStream stream (f);
+                        stream.write (block.getData(), block.getSize());
+                        stream.flush();
+                    }
+                    else
+                    {
+                        // TODO: alert
+                    }
+                }
+            }
+
+            return true;
+            
+           #else
+            DBG("[EL] FXB/FXP presets not yet supported on this platform.");
+            return true;
+           #endif
+        }
+    };
+
     HashMap<int, ResultOp*> resultMap;
     OwnedArray<ResultOp> deleter;
     
