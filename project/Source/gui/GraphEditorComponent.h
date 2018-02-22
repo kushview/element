@@ -49,6 +49,16 @@ public:
     void itemDropped (const SourceDetails& details) override;
     bool shouldDrawDragImageWhenOver() override { return true; }
 
+    bool areResizePositionsFrozen() const { return resizePositionsFrozen; }
+    inline void setResizePositionsFrozen (const bool shouldBeFrozen)
+    {
+        if (resizePositionsFrozen == shouldBeFrozen)
+            return;
+        resizePositionsFrozen = shouldBeFrozen;
+        if (graph.isValid ())
+            graph.setProperty ("staticPos", resizePositionsFrozen);
+    }
+
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
     void createNewPlugin (const PluginDescription* desc, int x, int y);
@@ -60,7 +70,8 @@ private:
     
     Node graph;
     ValueTree data;
-    
+    bool resizePositionsFrozen = false;
+
     float lastDropX = 0.5f;
     float lastDropY = 0.5f;
 
@@ -76,7 +87,7 @@ private:
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
     
-    void updateFilterComponents();
+    void updateFilterComponents (const bool doPosition = true);
     void updateConnectorComponents();
     
     void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,

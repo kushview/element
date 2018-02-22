@@ -168,6 +168,11 @@ public:
         setSize (170, 60);
     }
 
+    ~FilterComponent() noexcept
+    {
+        deleteAllPins();
+    }
+
     void handleAsyncUpdate() override
     {
         repaint();
@@ -204,11 +209,6 @@ public:
         for (int i = getNumChildComponents(); --i >= 0;)
             if (auto * c = dynamic_cast<PinComponent*> (getChildComponent(i)))
                 delete c;
-    }
-
-    ~FilterComponent() noexcept
-    {
-        deleteAllPins();
     }
 
     void mouseDown (const MouseEvent& e) override
@@ -248,6 +248,20 @@ public:
         getGraphPanel()->updateSelection();
     }
 
+    void setNodePosition (const int x, const int y)
+    {
+        if (vertical)
+        {
+            node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
+                                      (y + getHeight() / 2) / (double) getParentHeight());
+        }
+        else
+        {
+            node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
+                                      (x + getWidth() / 2) / (double) getParentWidth());
+        }
+    }
+
     void mouseDrag (const MouseEvent& e) override
     {
         if (e.mods.isPopupMenu())
@@ -258,17 +272,17 @@ public:
         if (getParentComponent() != nullptr)
             pos = getParentComponent()->getLocalPoint (nullptr, pos);
         
-        if (vertical)
-        {
-            node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-                                      (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-        }
-        else
-        {
-            node.setRelativePosition ((pos.getY() + getHeight() / 2) / (double) getParentHeight(),
-                                      (pos.getX() + getWidth() / 2) / (double) getParentWidth());
-        }
-        
+        // if (vertical)
+        // {
+        //     node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
+        //                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
+        // }
+        // else
+        // {
+        //     node.setRelativePosition ((pos.getY() + getHeight() / 2) / (double) getParentHeight(),
+        //                               (pos.getX() + getWidth() / 2) / (double) getParentWidth());
+        // }
+        setNodePosition (pos.getX(), pos.getY());
         updatePosition();
     }
 
@@ -412,10 +426,10 @@ public:
         }
     }
 
-    void update()
+    void update (const bool doPosition = true)
     {
         vertical = getGraphPanel()->isLayoutVertical();
-        
+    
         if (! node.getValueTree().getParent().hasType (Tags::nodes))
         {
             delete this;
@@ -450,7 +464,17 @@ public:
 
         setSize (w, h);
         setName (node.getName());
-        updatePosition();
+
+        if (doPosition)
+        {
+            updatePosition();
+        }
+        else
+        {
+            // position is relative and parent might be resizing
+            const auto b = getBoundsInParent();
+            setNodePosition (b.getX(), b.getY());
+        }
 
         if (numIns != numInputs || numOuts != numOutputs)
         {
@@ -583,7 +607,6 @@ public:
                                         (int) jmin (y1, y2) - 4,
                                         (int) fabsf (x1 - x2) + 8,
                                         (int) fabsf (y1 - y2) + 8);
-
         setBounds (newBounds);
         repaint();
     }
@@ -770,6 +793,8 @@ void GraphEditorComponent::setNode (const Node& n)
     data = graph.getValueTree();
     
     verticalLayout = graph.getProperty ("vertical", true);
+    resizePositionsFrozen = (bool) graph.getProperty ("staticPos", resizePositionsFrozen);
+
     draggingConnector = nullptr;
     deleteAllChildren();
     updateComponents();
@@ -817,6 +842,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         
         menu.addSeparator();
         menu.addItem (5, "Change orientation...");
+        menu.addItem (7, "Gather nodes...");
+        menu.addSeparator();
+        menu.addItem (6, "Fixed node positions", true, areResizePositionsFrozen());
         menu.addSeparator();
         
         menu.addSectionHeader ("Plugins");
@@ -859,6 +887,58 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                     setVerticalLayout (! isLayoutVertical());
                     return;
                     break;
+                case 6:
+                    setResizePositionsFrozen (! areResizePositionsFrozen());
+                    return;
+                    break;
+                
+                case 7:
+                {
+                    int numChanges = 0;
+                    for (int i = 0; i < graph.getNumNodes(); ++i)
+                    {
+                        Node node = graph.getNode (i);
+                        double x = 0, y = 0;
+                        node.getRelativePosition (x, y);
+                        bool changed = false;
+                        if (x < 0.0)
+                        {
+                            changed = true;
+                            x = 0.05;
+                        }
+                        else if (x > 1.0)
+                        {
+                            changed = true;
+                            x = 0.95;
+                        }
+
+                        if (y < 0.0)
+                        {
+                            changed = true;
+                            y = 0.05;
+                        }
+                        else if (y > 1.0)
+                        {
+                            changed = true;
+                            y = 0.95;
+                        }
+
+                        if (changed)
+                        {
+                            node.setRelativePosition (x, y);
+                            ++numChanges;
+                        }
+                    }
+
+                    if (numChanges > 0)
+                    {
+                        updateFilterComponents (true);
+                        updateConnectorComponents();
+                    }
+
+                    return;
+                } break;
+
                 default:
                     failure = true;
                     break;
@@ -932,7 +1012,7 @@ PinComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 
 void GraphEditorComponent::resized()
 {
-    updateFilterComponents();
+    updateFilterComponents (! areResizePositionsFrozen());
     updateConnectorComponents();
 }
 
@@ -967,13 +1047,13 @@ void GraphEditorComponent::updateConnectorComponents()
     }
 }
 
-void GraphEditorComponent::updateFilterComponents()
+void GraphEditorComponent::updateFilterComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
         if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
-            fc->update();
+            fc->update (doPosition);
 }
-    
+
 void GraphEditorComponent::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
@@ -1004,7 +1084,8 @@ void GraphEditorComponent::updateComponents()
         }
     }
 
-    resized();
+    updateFilterComponents (true);
+    updateConnectorComponents();
 }
 
 void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,
