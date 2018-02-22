@@ -144,7 +144,6 @@ public:
           numOuts (0), 
           vertical (vertical_)
     {
-        // setCachedComponentImage (0);
         setBufferedToImage (true);
 
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
@@ -1165,7 +1164,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
     {
         auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
         
-        if (const auto* t = plugs.availablePlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
+        if (const auto* t = plugs.getKnownPlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
         {
             ScopedPointer<AddPluginMessage> message = new AddPluginMessage (graph, *t);
             auto& builder (message->builder);

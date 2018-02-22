@@ -19,18 +19,18 @@ public:
     
     bool isPluginResultCode (const int resultCode)
     {
-        return (plugins->availablePlugins().getIndexChosenByMenu (resultCode) >= 0) ||
+        return (plugins->getKnownPlugins().getIndexChosenByMenu (resultCode) >= 0) ||
                (isPositiveAndBelow (int(resultCode - 20000), unverified.size()));
     }
     
     const PluginDescription* getPluginDescription (int resultCode, bool& verified)
     {
         jassert (plugins);
-        int index = plugins->availablePlugins().getIndexChosenByMenu (resultCode);
+        int index = plugins->getKnownPlugins().getIndexChosenByMenu (resultCode);
         if (index >= 0)
         {
             verified = true;
-            return plugins->availablePlugins().getType (index);
+            return plugins->getKnownPlugins().getType (index);
         }
         
         verified = false;
@@ -43,7 +43,7 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
-        plugins->availablePlugins().addToMenu (*this, KnownPluginList::sortByManufacturer);
+        plugins->getKnownPlugins().addToMenu (*this, KnownPluginList::sortByManufacturer);
     
         PopupMenu unvMenu;
        #if JUCE_MAC

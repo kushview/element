@@ -140,7 +140,7 @@ public:
     Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_KV1::elementBlue); }
     void addSubItems() override
     {
-        KnownPluginList& known (plugins.availablePlugins());
+        KnownPluginList& known (plugins.getKnownPlugins());
         for (int i = 0; i < known.getNumTypes(); ++i)
             addSubItem (new PluginTreeItem (*known.getType (i)));
     }

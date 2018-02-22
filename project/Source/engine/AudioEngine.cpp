@@ -774,17 +774,16 @@ RootGraph* AudioEngine::getGraph (const int index)
 
 void AudioEngine::addMidiMessage (const MidiMessage msg)
 {
-    if (priv)
-        priv->messageCollector.addMessageToQueue (msg);
+    if (priv == nullptr)
+        return;
+    priv->messageCollector.addMessageToQueue (msg);
 }
     
 void AudioEngine::setActiveGraph (const int index)
 {
-    if (priv)
-    {
-        DBG("setting graph index audio engine");
-        priv->currentGraph.set (index);
-    }
+    if (priv == nullptr)
+        return;
+    priv->currentGraph.set (index);
 }
 
 int AudioEngine::getActiveGraph() const { return (priv != nullptr) ? priv->currentGraph.get() : -1; }

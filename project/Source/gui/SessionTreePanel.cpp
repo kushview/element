@@ -88,7 +88,7 @@ public:
 
     void itemClicked (const MouseEvent& ev) override
     {
-        if (ev.x < roundFloatToInt (1.f + getIconSize())) {
+        if (ev.x < roundToInt (1.f + getIconSize())) {
             setOpen (! isOpen());
         }
 
@@ -97,7 +97,7 @@ public:
 
     virtual void itemDoubleClicked (const MouseEvent& ev) override
     {
-        if (ev.x < roundFloatToInt (1.f + getIconSize()))
+        if (ev.x < roundToInt (1.f + getIconSize()))
         {
             // icon double clicked
         }
@@ -257,7 +257,7 @@ public:
         }
         else if (desc.isArray() && desc[0] == "plugin")
         {
-            if (auto* p = world->getPluginManager().availablePlugins().getTypeForIdentifierString(desc[1].toString()))
+            if (auto* p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString(desc[1].toString()))
             {
                 if (p->fileOrIdentifier == "element.graph" && !(bool) world->getUnlockStatus().isFullVersion())
                 {

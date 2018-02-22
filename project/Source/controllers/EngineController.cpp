@@ -506,7 +506,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     {
         auto* format = getWorld().getPluginManager().getAudioPluginFormat (desc.pluginFormatName);
         jassert(format != nullptr);
-        auto& list (getWorld().getPluginManager().availablePlugins());
+        auto& list (getWorld().getPluginManager().getKnownPlugins());
         list.removeFromBlacklist (desc.fileOrIdentifier);
         if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format)) {
             getWorld().getPluginManager().saveUserPlugins (getWorld().getSettings());
@@ -638,7 +638,7 @@ void EngineController::setRootNode (const Node& newRootNode)
         holder->attach (engine);
     const int index = holder->getRootGraph()->getEngineIndex();
 
-#if 0
+   #if 0
     // saving this for reference. graphs will need to be
     // explicitly de-activated by users to unload them
     // moving forward - MRF
@@ -657,7 +657,7 @@ void EngineController::setRootNode (const Node& newRootNode)
             DBG("[EL] graph unloaded: " << active->model.getName());
         }
     }
-#endif
+   #endif
 
     if (auto* proc = holder->getRootGraph())
     {
@@ -668,11 +668,10 @@ void EngineController::setRootNode (const Node& newRootNode)
         DBG("[EL] couldn't find graph processor for node.");
     }
     
-    if (auto* r = holder->getController())
+    if (auto* const r = holder->getController())
     {
         DBG("[EL] setting root: " << holder->model.getName());
-        
-        if (!r->isLoaded())
+        if (! r->isLoaded())
         {
             DBG("[EL] loading...");
             r->getRootGraph().setPlayConfigFor (devices);
@@ -687,7 +686,6 @@ void EngineController::setRootNode (const Node& newRootNode)
     }
     
     engine->refreshSession();
-        DBG("[EL] end set root node");
 }
 
 void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)

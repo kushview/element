@@ -92,7 +92,7 @@ namespace Element
               plugins (p)
         {
             
-            data = p.availablePlugins().createTree (KnownPluginList::sortByCategory);
+            data = p.getKnownPlugins().createTree (KnownPluginList::sortByCategory);
     
         }
         
@@ -129,12 +129,12 @@ namespace Element
         tree.setOpenCloseButtonsVisible (true);
         tree.setIndentSize (10);
         tree.setRootItem (new PluginsPanelTreeRootItem (*this, plugins));
-        plugins.availablePlugins().addChangeListener (this);
+        plugins.getKnownPlugins().addChangeListener (this);
     }
     
     PluginsPanelView::~PluginsPanelView()
     {
-        plugins.availablePlugins().removeChangeListener (this);
+        plugins.getKnownPlugins().removeChangeListener (this);
         tree.getRootItem()->clearSubItems();
         tree.deleteRootItem();
     }

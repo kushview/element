@@ -20,6 +20,10 @@
 
 namespace Element {
 
+static const char* pluginListKey() { return Settings::pluginListKey; }
+/* noop. prevent OS error dialogs from child process */ 
+static void pluginScannerSlaveCrashHandler (void*) { }
+
 class PluginScannerMaster : public kv::ChildProcessMaster,
                             public AsyncUpdater
 {
@@ -205,9 +209,7 @@ private:
                                    EL_PLUGIN_SCANNER_PROCESS_ID, timeout, flags);
     }
 };
-
-static void pluginScannerSlaveCrashHandler (void*) { /* noop. prevent OS error dialogs from child process */ }
-    
+  
 class PluginScannerSlave : public kv::ChildProcessSlave, public AsyncUpdater
 {
 public:
@@ -264,11 +266,11 @@ public:
         if (! plugins)
             return;
         
-        for (int i = 0; i < plugins->availablePlugins().getNumTypes(); ++i)
-            if (auto* type = plugins->availablePlugins().getType (i))
+        for (int i = 0; i < plugins->getKnownPlugins().getNumTypes(); ++i)
+            if (auto* type = plugins->getKnownPlugins().getType (i))
                 pluginList.addType (*type);
         
-        for (const auto& file : plugins->availablePlugins().getBlacklistedFiles())
+        for (const auto& file : plugins->getKnownPlugins().getBlacklistedFiles())
             pluginList.addToBlacklist (file);
         
         writePluginListNow();
@@ -518,7 +520,8 @@ private:
 class PluginManager::Private : public PluginScanner::Listener
 {
 public:
-	Private(PluginManager& o) : owner(o)
+	Private (PluginManager& o)
+        : owner(o)
 	{
 		deadAudioPlugins = DataPath::applicationDataDir().getChildFile(EL_DEAD_AUDIO_PLUGINS_FILENAME);
 	}
@@ -558,17 +561,13 @@ private:
 	KnownPluginList allPlugins;
 	File deadAudioPlugins;
     UnverifiedPlugins unverified;
-
-#if ELEMENT_LV2_PLUGIN_HOST
-	OptionalPtr<LV2World> lv2;
-	OptionalPtr<SymbolMap> symbols;
-#endif
-
 	double sampleRate = 44100.0;
 	int    blockSize = 512;
-
 	ScopedPointer<PluginScanner> scanner;
-	HashMap<String, StringArray> unverifiedAudioPlugins;
+   #if ELEMENT_LV2_PLUGIN_HOST
+	OptionalPtr<LV2World> lv2;
+	OptionalPtr<SymbolMap> symbols;
+   #endif
 
 	void scanAudioPlugins (const StringArray& names)
 	{
@@ -641,7 +640,7 @@ PluginManager::~PluginManager()
 
 void PluginManager::addDefaultFormats()
 {
-    formats().addDefaultFormats();
+    getAudioPluginFormats().addDefaultFormats();
    #if ELEMENT_LV2_PLUGIN_HOST
     addFormat (new LV2PluginFormat (*priv->lv2));
    #endif
@@ -677,7 +676,7 @@ kv::ChildProcessSlave* PluginManager::createAudioPluginScannerSlave()
 
 PluginScanner* PluginManager::createAudioPluginScanner()
 {
-    auto* scanner = new PluginScanner (availablePlugins());
+    auto* scanner = new PluginScanner (getKnownPlugins());
     return scanner;
 }
 
@@ -699,7 +698,8 @@ bool PluginManager::isScanningAudioPlugins()
 
 AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& desc, String& errorMsg)
 {
-    return formats().createPluginInstance (desc, priv->sampleRate, priv->blockSize, errorMsg);
+    return getAudioPluginFormats().createPluginInstance (
+        desc, priv->sampleRate, priv->blockSize, errorMsg);
 }
 
 Processor* PluginManager::createPlugin (const PluginDescription &desc, String &errorMsg)
@@ -709,11 +709,17 @@ Processor* PluginManager::createPlugin (const PluginDescription &desc, String &e
     return nullptr;
 }
 
-AudioPluginFormat* PluginManager::format (const String& name)
+AudioPluginFormatManager& PluginManager::getAudioPluginFormats()
 {
-    for (int i = 0; i < formats().getNumFormats(); ++i)
+    return priv->formats;
+}
+
+AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name)
+{
+    auto& manager = getAudioPluginFormats();
+    for (int i = 0; i < manager.getNumFormats(); ++i)
     {
-        AudioPluginFormat* fmt = formats().getFormat (i);
+        AudioPluginFormat* fmt = manager.getFormat (i);
         if (fmt && fmt->getName() == name)
             return fmt;
     }
@@ -721,15 +727,9 @@ AudioPluginFormat* PluginManager::format (const String& name)
     return nullptr;
 }
 
-AudioPluginFormatManager& PluginManager::formats()
-{
-    return priv->formats;
-}
-
-KnownPluginList& PluginManager::availablePlugins() { return priv->allPlugins; }
+KnownPluginList& PluginManager::getKnownPlugins() { return priv->allPlugins; }
 const File& PluginManager::getDeadAudioPluginsFile() const { return priv->deadAudioPlugins; }
 
-static const char* pluginListKey()  { return Settings::pluginListKey; }
 
 
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
@@ -790,9 +790,10 @@ String PluginManager::getCurrentlyScannedPluginName() const
 
 void PluginManager::scanInternalPlugins()
 {
-    for (int i = 0; i < formats().getNumFormats(); ++i)
+    auto& manager = getAudioPluginFormats();
+    for (int i = 0; i < manager.getNumFormats(); ++i)
     {
-        auto* format = formats().getFormat (i);
+        auto* format = manager.getFormat (i);
         
         if (format->getName() != "Element")
             continue;
@@ -801,7 +802,7 @@ void PluginManager::scanInternalPlugins()
             if (priv->allPlugins.getType(j)->pluginFormatName == "Element")
                 priv->allPlugins.removeType (j);
         
-        PluginDirectoryScanner scanner (availablePlugins(), *format,
+        PluginDirectoryScanner scanner (getKnownPlugins(), *format,
                                         format->getDefaultLocationsToSearch(),
                                         true, priv->deadAudioPlugins, false);
         
@@ -811,43 +812,12 @@ void PluginManager::scanInternalPlugins()
         break;
     }
 }
+
 void PluginManager::getUnverifiedPlugins (const String& formatName, OwnedArray<PluginDescription>& plugins)
 {
-    #if 0
-    HashMap<String, StringArray>& plugs (priv->unverifiedAudioPlugins);
-    
-    if (auto* format = getAudioPluginFormat (formatName))
-    {
-        auto& list (availablePlugins());
-        StringArray& files (plugs.getReference (formatName));
-        
-        FileSearchPath path;
-        if (props)
-        {
-            const auto key = String(Settings::lastPluginScanPathPrefix) + format->getName();
-            path = FileSearchPath (props->getValue (key));
-        }
-        
-        path.addPath (format->getDefaultLocationsToSearch());
-        
-        if (files.isEmpty())
-            files = format->searchPathsForPlugins (path, true);
-        
-        for (const auto& file : files)
-        {
-            if (nullptr != list.getTypeForFile (file))
-                continue;
-            
-            auto* desc = plugins.add (new PluginDescription());
-            desc->pluginFormatName = formatName;
-            desc->fileOrIdentifier = file;
-        }
-    }
-    #else
-        priv->getUnverifiedPlugins (formatName, plugins);
-        if (plugins.isEmpty())
-            priv->searchUnverifiedPlugins (props);
-    #endif
+    priv->getUnverifiedPlugins (formatName, plugins);
+    if (plugins.isEmpty())
+        priv->searchUnverifiedPlugins (props);
 }
 
 void PluginManager::scanFinished()

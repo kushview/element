@@ -160,7 +160,7 @@ PluginListComponent::PluginListComponent (PluginManager& p, PropertiesFile* prop
                                           bool allowPluginsWhichRequireAsynchronousInstantiation)
     : plugins(p),
       formatManager (p.getAudioPluginFormats()),
-      list (p.availablePlugins()),
+      list (p.getKnownPlugins()),
       deadMansPedalFile (p.getDeadAudioPluginsFile()),
       optionsButton ("Options..."),
       propertiesToUse (props),

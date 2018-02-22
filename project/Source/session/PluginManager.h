@@ -20,20 +20,28 @@ public:
     PluginManager();
     ~PluginManager();
 
+    /** Add default plugin formats */
     void addDefaultFormats();
+
+    /** Add a plugin format */
     void addFormat (AudioPluginFormat*);
+
+    /** Get the dead mans pedal file */
+    const File& getDeadAudioPluginsFile() const;
+
+    /** Access to the main known plugins list */
+    KnownPluginList& getKnownPlugins();
+
+    /** Scan/Add a description to the known plugins */
     void addToKnownPlugins (const PluginDescription& desc);
 
-    const File& getDeadAudioPluginsFile() const;
-    KnownPluginList& availablePlugins();
-    KnownPluginList& getKnownPlugins() { return availablePlugins(); }
+    /** Returns the audio plugin format manager */
+    AudioPluginFormatManager& getAudioPluginFormats();
 
-    AudioPluginFormatManager& getAudioPluginFormats() { return formats(); }
-    AudioPluginFormatManager& formats();
+    /** Returns an audio plugin format by name */
+    AudioPluginFormat* getAudioPluginFormat (const String& formatName);
     
-    AudioPluginFormat* getAudioPluginFormat (const String& formatName) { return format (formatName); }
-    AudioPluginFormat* format (const String& formatName);
-    
+    /** Returns an audio plugin format by type */
     template<class FormatType>
     inline FormatType* format()
     {
@@ -56,10 +64,10 @@ public:
     /** Scans for all audio plugin types using a child process */
     void scanAudioPlugins (const StringArray& formats = StringArray());
     
-    /** true if a scan is in progress using the child process */
+    /** Returns true if a scan is in progress using the child process */
     bool isScanningAudioPlugins();
     
-	/** returns the name of the currently scanned plugin. This value
+	/** Returns the name of the currently scanned plugin. This value
 	    is not suitable for use in loading plugins */
 	String getCurrentlyScannedPluginName() const;
 
@@ -80,6 +88,7 @@ public:
     AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
     Processor *createPlugin (const PluginDescription& desc, String& errorMsg);
 
+    /** Set the play config used when instantiating plugins */
     void setPlayConfig (double sampleRate, int blockSize);
 
     /** Give a properties file to be used when settings aren't available. FIXME */

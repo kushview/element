@@ -500,7 +500,6 @@ namespace Element {
                     MemoryBlock state; state.fromBase64Encoding (data);
                     if (state.getSize() > 0)
                     {
-                        DBG("[EL] restoring plugin state: " << getName());
                         proc->setStateInformation (state.getData(), (int)state.getSize());
                     }
                 }
@@ -512,7 +511,6 @@ namespace Element {
 					MemoryBlock state; state.fromBase64Encoding (data);
 					if (state.getSize() > 0)
 					{
-						DBG("[EL] restoring program state: " << getName());
 						proc->setCurrentProgramStateInformation(state.getData(), 
 							(int)state.getSize());
 					}

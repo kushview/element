@@ -698,7 +698,7 @@ void ContentComponent::itemDropped (const SourceDetails& dragSourceDetails)
     }
     else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
     {
-        auto& list (getGlobals().getPluginManager().availablePlugins());
+        auto& list (getGlobals().getPluginManager().getKnownPlugins());
         if (auto* plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
