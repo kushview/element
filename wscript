@@ -95,10 +95,6 @@ def build_mingw (bld):
 
     bld.add_post_fun (copy_mingw_libs)
 
-def build_internal_library (bld):
-    libEnv = bld.env.derive()
-    bld.recurse ('libs/element')
-
 def build_plugin (bld, name):
     bundle = '%s.element' % name
     plugin_dir = 'plugins/%s' % bundle
@@ -130,29 +126,7 @@ def build_plugins (bld):
     bld.add_group()
 
 def build_linux (bld):
-    node = bld.path.find_resource ('project/Element.jucer')
-    proj = juce.IntrojucerProject (bld, node.relpath())
-
-    build_desktop (bld, 'element')
-
-    if bld.env.INTERNAL_MODULES:
-        build_internal_library (bld)
-
-    build_plugins(bld)
-
-    appEnv = bld.env.derive()
-    obj = bld.program (
-        source = bld.path.ant_glob ("project/Source/**/*.cpp"),
-        includes = ['project/Source'],
-        use = common_use_flags(),
-        target = 'bin/element',
-        linkflags = '-Wl,-rpath,$ORIGIN'
-    )
-
-    if bld.env.INTERNAL_MODULES:
-        obj.includes += ['libs/element', 'libs/element/element']
-        obj.use += internal_library_use_flags (bld)
-        obj.linkflags += ' -Wl,-rpath,$ORIGIN/../libs/element'
+    return
 
 def build_mac (bld):
     appEnv = bld.env.derive()
