@@ -17,17 +17,13 @@ def configure (conf):
 
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     conf.check_cxx11()
+    
+    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
+    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
 
-    if 'clang' in conf.env.CXX[0]:
-        conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
-        conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
-    if cross.is_mingw(conf):
-        for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
-            conf.env.append_unique ('CFLAGS', [flag])
-            conf.env.append_unique ('CXXFLAGS', [flag])
-
-    if cross.is_mingw(conf):
-        element.check_mingw(conf)
+    if cross.is_mingw(conf): conf.check_mingw()
+    elif juce.is_mac(): conf.check_mac()
+    else: conf.check_linux()
 
     conf.env.DEBUG = conf.options.debug
     conf.env.ELEMENT_VERSION_STRING = '0.15.7'
@@ -89,7 +85,7 @@ def build_mingw (bld):
                          'libs/kv/modules', 'project/JuceLibraryCode', \
                          'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
                          os.path.expanduser('~') + '/SDKs/ASIOSDK/common' ],
-        cxxflags    = '-DJUCE_PLUGINHOST_VST3=0',
+        cxxflags    = '',
         target      = '%s/Element' % (mingwEnv.CROSS),
         name        = 'Element',
         linkflags   = [ '-mwindows', '-static-libgcc', '-static-libstdc++' ],
