@@ -8,15 +8,19 @@ import cross, element, juce
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
+    opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
+        help="Build without license protection [ Default: False ]")
 
 def configure (conf):
+    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
+
     cross.setup_compiler (conf)
     if len(conf.options.cross) <= 0:
         conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx ar cross juce")
+    conf.check_cxx_version()
 
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
-    conf.check_cxx11()
+    
     
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
@@ -26,19 +30,23 @@ def configure (conf):
     else: conf.check_linux()
 
     conf.env.DEBUG = conf.options.debug
-    conf.env.ELEMENT_VERSION_STRING = '0.15.7'
-    conf.define ('ELEMENT_VERSION_STRING', conf.env.ELEMENT_VERSION_STRING)
-    conf.define ('ELEMENT_USE_JACK', len(conf.env.LIB_JACK) > 0)
+    conf.env.EL_VERSION_STRING = '0.15.7'
+    
+    conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
+    conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
+    conf.define ('EL_USE_JACK', 0)
+
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
     print
     juce.display_header ("Element Build Summary")
     juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
     juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
+    juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
+    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
 
     print
     juce.display_header ("Compiler")
-    juce.display_msg (conf, "CPPFLAGS", conf.env.CPPFLAGS)
     juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
     juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)

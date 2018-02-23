@@ -16,8 +16,6 @@ namespace Element {
 class Globals;
 class Settings;
 
-
-
 class UnlockStatus :  public kv::EDDOnlineUnlockStatus
 {
 public:
@@ -87,7 +85,7 @@ private:
         props = ValueTree (propsKey);
        #if EL_LITE_VERSION_DEV
         const var priceId = getProperty (priceIdKey);
-        const var two (2); const var zero(0);
+        const var two (2); const var zero (0);
         if (two == priceId || zero == priceId)
             props.setProperty (fullKey, 1, nullptr);
        #endif
