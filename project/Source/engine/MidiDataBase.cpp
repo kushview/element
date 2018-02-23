@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
 MidiDataBase::MidiDataBase ()
 {
     eventMap.set (0, nullptr);
@@ -166,3 +167,5 @@ bool MidiDataBase::removeNote (const Note& note)
 
     return false;
 }
+
+#endif

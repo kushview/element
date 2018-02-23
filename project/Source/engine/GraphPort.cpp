@@ -1,5 +1,5 @@
 
-
+#if 0
 
     //==============================================================================
     GraphPort::GraphPort (const PortType type_, bool isInputPort)
@@ -185,4 +185,4 @@
         }
     }
 
-
+#endif

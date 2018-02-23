@@ -3,6 +3,8 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
+#if 0
+
 SequencerTrack::SequencerTrack (Sequencer& o, const TrackModel& t)
     : sequencer (o)
 {
@@ -94,3 +96,4 @@ void SequencerTrack::processBlockBypassed (AudioSampleBuffer&, MidiBuffer&)
 {
 
 }
+#endif

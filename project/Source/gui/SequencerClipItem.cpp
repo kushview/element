@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
+
 #include "SequencerClipItem.h"
 #include "SequencerComponent.h"
 
@@ -67,3 +69,4 @@ SequencerClipItem::setModel (const ClipModel& clip)
 }
 
 }
+#endif

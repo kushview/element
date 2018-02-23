@@ -31,7 +31,7 @@
 
 namespace Element {
 
-    #include "./PublicKey.cpp"
+    #include "./PublicKey.h"
 
     void UnlockStatus::LockableObject::showLockedAlert() {
         Alert::showProductLockedAlert();

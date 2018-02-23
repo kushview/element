@@ -79,7 +79,6 @@ private:
     bool hasAddedPlugins = false;
 };
 
-
 // MARK: Node Popup Menu
 
 class NodePopupMenu : public PopupMenu
@@ -279,7 +278,7 @@ private:
         virtual bool isActive() { return true; }
         virtual bool isTicked() { return false; }
         virtual Message* createMessage() { return nullptr; }
-        virtual bool perform() { }
+        virtual bool perform() { return false; }
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResultOp);
     };
@@ -310,9 +309,7 @@ private:
     struct AddPresetOp : public ResultOp
     {
         AddPresetOp (const Node& n)
-            : node (n)
-        { }
-        
+            : node (n) { }
         const Node node;
         Message* createMessage()
         {
@@ -330,7 +327,7 @@ private:
         {
            #if JUCE_PLUGINHOST_VST
             const auto format = node.getProperty(Tags::format).toString();
-            if (format != "VST" && format != "VST3")
+            if (format != "VST")
                 return false;
             
             auto gn = node.getGraphNode();

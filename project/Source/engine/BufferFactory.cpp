@@ -3,6 +3,8 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
+#if 0
+
 #include "engine/BufferFactory.h"
 
 namespace Element {
@@ -167,3 +169,5 @@ void BufferFactory::recycle (Buffer* buffer)
 }
 
 }
+
+#endif

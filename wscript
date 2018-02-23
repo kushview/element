@@ -4,107 +4,44 @@ from subprocess import call, Popen, PIPE
 import os, sys
 
 sys.path.append (os.getcwd() + "/tools/waf")
-import cross, juce
+import cross, element, juce
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
-    if juce.is_mac(): opt.load('framework')
-    opt.add_option ('--internal-modules', default=False, action='store_true', \
-        dest='internal_modules', help='Compile Intrenal Element Modules [ Default: False ]')
-    opt.recurse('libs/element')
-
-def check_modules (conf):
-    if juce.is_linux() and not cross.is_windows(conf) and not conf.options.internal_modules:
-        conf.check_juce_cfg(['audio-processors', 'audio-devices', 'core', 'cryptography', \
-                             'audio-utils', 'gui-basics', 'gui-extra', 'graphics', 'opengl'])
-        conf.check_juce_cfg(['base', 'engines', 'lv2', 'models', 'gui'], 0, 'element_', True)
-    elif juce.is_linux() and not cross.is_windows(conf):
-        conf.recurse('libs/element')
-        conf.define('HAVE_JUCE_CORE', len(conf.env.LIB_JUCE_CORE) > 0)
-        if not conf.is_defined('ELEMENT_USE_LIBJUCE'):
-            conf.define('ELEMENT_USE_LIBJUCE', 1)
-    elif juce.is_linux() and cross.is_windows(conf):
-        conf.check_cfg(package='juce', uselib_store='JUCE', args='--cflags --libs', mandatory=True)
-        conf.recurse('libs/element')
-        conf.define('HAVE_JUCE_CORE', True)
-        if not conf.is_defined('ELEMENT_USE_LIBJUCE'):
-            conf.define('ELEMENT_USE_LIBJUCE', 1)
-    elif juce.is_mac():
-        pass
 
 def configure (conf):
     cross.setup_compiler (conf)
-    if not conf.options.cross:
+    if len(conf.options.cross) <= 0:
         conf.prefer_clang()
-    conf.load ("compiler_c compiler_cxx cross juce")
-    if juce.is_mac(): conf.load('framework')
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share')
+    conf.load ("compiler_c compiler_cxx ar cross juce")
+
+    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
 
     print
     juce.display_header ("Element Configuration")
     conf.check_cxx11()
-
-    # Do pkg-config stuff
-    check_modules (conf)
-
-    conf.check_cfg (package="lv2", uselib_store="LV2", args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package="lilv-0", uselib_store="LILV", args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package="suil-0", uselib_store="SUIL", args='--cflags --libs', mandatory=True)
-    conf.check_cfg (package="jack", uselib_store="JACK", args='--cflags --libs', mandatory=False)
-    pkg_defs = ['HAVE_LILV', 'HAVE_JACK', 'HAVE_SUIL', 'HAVE_LV2']
-
-    if juce.is_linux() and not cross.is_windows (conf):
-        conf.check_cfg (package="alsa", uselib_store="ALSA", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="x11", uselib_store="X11", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="xext", uselib_store="XEXT", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="freetype2", uselib_store="FREETYPE2", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="gl", uselib_store="GL", args='--cflags --libs', mandatory=True)
-        conf.check_cfg (package="glesv2", uselib_store="GLESV2", args='--cflags --libs', mandatory=False)
-        conf.check_cfg (package="egl", uselib_store="EGL", args='--cflags --libs', mandatory=False)
-        pkg_defs += ['HAVE_ALSA', 'HAVE_X11', 'HAVE_XEXT', 'HAVE_FREETYPE2', 'HAVE_GL']
-
-    for d in pkg_defs: conf.env[d] = conf.is_defined (d)
 
     if 'clang' in conf.env.CXX[0]:
         conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
         conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
 
     conf.env.DEBUG = conf.options.debug
-    conf.env.INTERNAL_MODULES = conf.options.internal_modules
-    conf.env.ELEMENT_VERSION_STRING = '0.0.1'
+    conf.env.ELEMENT_VERSION_STRING = '0.15.7'
     conf.define ('ELEMENT_VERSION_STRING', conf.env.ELEMENT_VERSION_STRING)
     conf.define ('ELEMENT_USE_JACK', len(conf.env.LIB_JACK) > 0)
-
-    if juce.is_mac():
-        conf.env.MODULEDIR = "/Library/Application Support/Element/Plug-Ins"
-    else:
-        conf.env.MODULEDIR = conf.env.LIBDIR + "/element/modules"
-
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
-    conf.define ("ELEMENT_DEFAULT_MODULE_PATH", ":".join(conf.env.MODULE_PATH))
 
     print
     juce.display_header ("Element Build Summary")
-    juce.display_msg (conf, "Installation Prefix", conf.env.PREFIX)
-    juce.display_msg (conf, "Installed DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "Jack Audio Support", conf.env.HAVE_JACK)
-    juce.display_msg (conf, "LV2 Plugin Support", conf.env.HAVE_LILV)
-    juce.display_msg (conf, "LV2 Plugin UI Support", conf.env.HAVE_SUIL)
-    juce.display_msg (conf, "Library Version", conf.env.ELEMENT_VERSION_STRING)
-    juce.display_msg (conf, "Module Install Dir", conf.env.MODULEDIR)
-    juce.display_msg (conf, "Module Search Path", conf.env.MODULE_PATH)
-
-    if juce.is_mac():
-        print
-        juce.display_header ("Apple Configuration Summary")
-        juce.display_msg (conf, "Apple Framework Dir", conf.env.FRAMEWORKDIR)
-        juce.display_msg (conf, "Apple Deployment Target", conf.env.APPLE_VERSION_MIN)
+    juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
+    juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
 
     print
-    juce.display_header ("Global Compiler Flags")
-    juce.display_msg (conf, "Compile flags (c)", conf.env.CFLAGS)
-    juce.display_msg (conf, "Compile flags (c++)", conf.env.CXXFLAGS)
-    juce.display_msg (conf, "Linker flags", conf.env.LINKFLAGS)
+    juce.display_header ("Compiler")
+    juce.display_msg (conf, "CPPFLAGS", conf.env.CPPFLAGS)
+    juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
+    juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
+    juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
 def build_desktop (bld, slug):
     if not juce.is_linux():
@@ -132,40 +69,24 @@ def common_use_flags():
     return ['JUCE_AUDIO_UTILS', 'JUCE_GUI_EXTRA', 'JUCE_OPENGL', 'ELEMENT_GUI', \
             'ELEMENT_ENGINES', 'ELEMENT_MODELS', 'ELEMENT_LV2', 'LILV', 'SUIL']
 
-def internal_library_use_flags (bld):
-    debug = bld.env.DEBUG
-    return ['element-base-0', 'element-gui-0', 'element-engines-0', 'element-lv2-0'] if not debug \
-        else ['element-base-debug-0', 'element-gui-debug-0', 'element-engines-debug-0', 'element-lv2-debug-0']
-
 def copy_mingw_libs (bld):
-    call (["bash", "libs/libjuce/tools/copy-cross-mingw32-libs.sh", "build/mingw32"])
-    for dll in 'juce-4 serd-0 sord-0 sratom-0-0 lilv-0 suil-0-0'.split():
-        call (["cp", "-f", '%s/lib/%s.dll' % (bld.env.PREFIX, dll), 'build/mingw32/'])
+    return
 
 def build_mingw (bld):
-    project = juce.IntrojucerProject(bld, 'project/Element.jucer')
-    mingwSrc = project.getLibraryCode() + bld.path.ant_glob('project/Source/**/*.cpp')
-
     mingwEnv = bld.env.derive()
-    # bld.shlib (
-    #     source = ['libs/element/element/modules/element_base/element_base.cpp',
-    #               'libs/element/element/modules/element_engines/element_engines.cpp',
-    #               'libs/element/element/modules/element_lv2/element_lv2.cpp',
-    #               'libs/element/element/modules/element_gui/element_gui.cpp',
-    #               'libs/element/element/modules/element_models/element_models.cpp'],
-    #     includes = ['libs/element', 'src', 'project/Source'],
-    #     target   = 'mingw32/element-0',
-    #     name     = 'libelement',
-    #     use      = ['JUCE', 'LILV', 'SUIL'],
-    #     env      = mingwEnv
-    # )
-
+    mingwSrc = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp")
+    mingwSrc += bld.path.ant_glob('project/Source/**/*.cpp')
+    mingwSrc += bld.path.ant_glob('project/JuceLibraryCode/BinaryData*.cpp')
+    mingwSrc.sort()
+    
     bld.program (
         source      = mingwSrc,
-        includes    = ['libs/element', 'src', 'project/Source', 'project/JuceLibraryCode'],
-        target      = 'mingw32/Element',
+        includes    =  [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                         'libs/kv/modules', 'project/JuceLibraryCode', \
+                         'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = '%s/Element' % (mingwEnv.CROSS),
         name        = 'Element',
-        linkflags   = ['-mwindows'] + project.getLinkFlags(),
+        linkflags   = ['-mwindows'],
         use         = ['LILV', 'SUIL'],
         env         = mingwEnv
     )
@@ -232,33 +153,22 @@ def build_linux (bld):
         obj.linkflags += ' -Wl,-rpath,$ORIGIN/../libs/element'
 
 def build_mac (bld):
-    frameworkEnv = bld.env.derive()
-    frameworkSrc = []
-
-    project = juce.IntrojucerProject(bld, 'project/Element.jucer')
-    frameworkSrc = project.getLibraryCode()
-
-    bld (
-        features = 'cxx cxxshlib',
-        source   = frameworkSrc,
-        includes = ['src', 'project/Source', 'project/JuceLibraryCode'],
-        target   = 'Frameworks/Element',
-        name     = 'ELEMENT',
-        use      = ['LILV', 'SUIL', 'CORE_AUDIO_KIT', 'AUDIO_UNIT'] + project.getUseFlags(),
-        env      = frameworkEnv,
-        mac_framework = True
-    )
-    bld.add_group()
-
     appEnv = bld.env.derive()
     bld.program (
-        source      = bld.path.ant_glob ('project/Source/**/*.cpp'),
-        includes    = ['/opt/kushview/include', 'src', 'project/Source', 'project/JuceLibraryCode'],
+        source      = bld.path.ant_glob ('project/Source/**/*.cpp') + \
+                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp') + \
+                      element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK'],
         target      = 'Applications/Element',
         name        = 'Element',
-        linkflags   = ['-F', './Frameworks', '-framework', 'Element'],
         env         = appEnv,
-        mac_app     = True
+        use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
+                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE',
+        mac_app     = True,
+        mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
+        mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
     )
 
 def build (bld):

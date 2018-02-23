@@ -1,5 +1,5 @@
 
-#pragma once;
+#pragma once
 
 #include "ElementApp.h"
 #include "engine/AudioEngine.h"

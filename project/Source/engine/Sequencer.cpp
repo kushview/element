@@ -5,9 +5,7 @@
       * Michael Fisher <mfisher@kushview.net>
 */
 
-#if JUCE_COMPLETION
-#include "modules/element_engines/element_engines.h"
-#endif
+#if 0
 
 static Sequencer::NodePtr
 trackNode (const TrackModel& t) {
@@ -316,3 +314,4 @@ void Sequencer::valueTreeParentChanged (ValueTree& tree)
 {
 
 }
+#endif
