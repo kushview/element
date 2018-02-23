@@ -16,14 +16,18 @@ def configure (conf):
     conf.load ("compiler_c compiler_cxx ar cross juce")
 
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
-
-    print
-    juce.display_header ("Element Configuration")
     conf.check_cxx11()
 
     if 'clang' in conf.env.CXX[0]:
         conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
         conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
+    if cross.is_mingw(conf):
+        for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
+            conf.env.append_unique ('CFLAGS', [flag])
+            conf.env.append_unique ('CXXFLAGS', [flag])
+
+    if cross.is_mingw(conf):
+        element.check_mingw(conf)
 
     conf.env.DEBUG = conf.options.debug
     conf.env.ELEMENT_VERSION_STRING = '0.15.7'
@@ -83,11 +87,13 @@ def build_mingw (bld):
         source      = mingwSrc,
         includes    =  [ '/opt/kushview/include', 'libs/JUCE/modules', \
                          'libs/kv/modules', 'project/JuceLibraryCode', \
-                         'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+                         'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
+                         os.path.expanduser('~') + '/SDKs/ASIOSDK/common' ],
+        cxxflags    = '-DJUCE_PLUGINHOST_VST3=0',
         target      = '%s/Element' % (mingwEnv.CROSS),
         name        = 'Element',
-        linkflags   = ['-mwindows'],
-        use         = ['LILV', 'SUIL'],
+        linkflags   = [ '-mwindows', '-static-libgcc', '-static-libstdc++' ],
+        use         = element.get_mingw_libs(),
         env         = mingwEnv
     )
 
@@ -160,7 +166,7 @@ def build_mac (bld):
                       element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK'],
+                        'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
