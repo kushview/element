@@ -20,8 +20,6 @@ def configure (conf):
     conf.load ("compiler_c compiler_cxx ar cross juce")
     conf.check_cxx_version()
 
-    
-    
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
 
