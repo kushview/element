@@ -7,7 +7,9 @@ namespace Element {
     class BaseProcessor : public AudioPluginInstance
     {
     public:
-        BaseProcessor() { }
+        BaseProcessor() : AudioPluginInstance() { }
+        BaseProcessor (const BusesProperties& ioLayouts)
+            : AudioPluginInstance (ioLayouts) { }
         virtual ~BaseProcessor() { }
 
 #if 0
