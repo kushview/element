@@ -24,18 +24,18 @@ namespace Element {
     public:
         struct ScopedFrozenLock
         {
-            ScopedFrozenLock(Session& s) : session(s)
+            ScopedFrozenLock(const Session& s) : session(s)
             {
                 wasFrozen = session.freezeChangeNotification;
                 session.freezeChangeNotification = true;
             } 
-            
+
             ~ScopedFrozenLock() {
                 session.freezeChangeNotification = wasFrozen;
             }
 
         private:
-            Session& session;
+            const Session& session;
             bool wasFrozen;
         };
 
@@ -53,12 +53,14 @@ namespace Element {
         bool loadData (const ValueTree& data);
         void clear();
         
-        inline String getName() const   { return objectData.getProperty(Slugs::name, "Invalid Session"); }
-        inline Value getNameValue()     { return getPropertyAsValue (Slugs::name); }
         inline void setName (const String& name) { setProperty (Slugs::name, name); }
-
-        inline bool useExternalClock() const { return (bool) getProperty ("externalSync", false); }
+        inline String getName()            const { return objectData.getProperty(Slugs::name, "Invalid Session"); }
+        inline Value getNameValue()              { return getPropertyAsValue (Slugs::name); }
         
+        inline bool useExternalClock()      const { return (bool) getProperty ("externalSync", false); }
+        
+        inline bool notificationsFrozen()   const { return freezeChangeNotification; }
+
         XmlElement* createXml();
         
         void saveGraphState();
@@ -88,10 +90,8 @@ namespace Element {
         inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
         
         friend class SessionController;
-        friend class SessionDocument;
         friend struct ScopedFrozenLock;
-
-        bool freezeChangeNotification = false;
+        mutable bool freezeChangeNotification = false;
         void notifyChanged();
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);

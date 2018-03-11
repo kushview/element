@@ -71,7 +71,7 @@ namespace Element {
 
     void SessionDocument::onSessionChanged()
     {
-        if (! session->freezeChangeNotification)
+        if (! session->notificationsFrozen())
             changed();
         else
             setChangedFlag (false);
