@@ -59,7 +59,8 @@ namespace Element {
         const int index = getActiveGraphIndex();
         if (isPositiveAndBelow (index, getNumGraphs()))
             return getGraph (index);
-    
+
+        ScopedFrozenLock sfl (*const_cast<Session*> (this));
         ValueTree graphs = getGraphsValueTree();
         graphs.setProperty (Tags::active, graphs.getNumChildren() > 0 ? 0 : -1, nullptr);
         return  graphs.getNumChildren() > 0 ? getGraph(0) : Node();

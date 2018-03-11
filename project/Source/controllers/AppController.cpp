@@ -63,6 +63,10 @@ void AppController::deactivate()
 
 void AppController::run()
 {
+    auto* sessCtl = findChild<SessionController>();
+    assert(sessCtl != nullptr);
+    sessCtl->setChangesFrozen (true);
+
     activate();
     
     auto session = getWorld().getSession();
@@ -92,8 +96,8 @@ void AppController::run()
             gui->showPluginWindowsFor (graph);
     }
     
-    if (auto* sc = findChild<SessionController>())
-        sc->resetChanges();
+    sessCtl->resetChanges();
+    sessCtl->setChangesFrozen (false);
 }
 
 void AppController::handleMessage (const Message& msg)

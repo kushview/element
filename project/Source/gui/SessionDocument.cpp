@@ -71,7 +71,10 @@ namespace Element {
 
     void SessionDocument::onSessionChanged()
     {
-        changed();
+        if (! session->freezeChangeNotification)
+            changed();
+        else
+            setChangedFlag (false);
     }
     
     void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)

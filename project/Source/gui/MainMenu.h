@@ -127,6 +127,11 @@ public:
             msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
             engine->addMidiMessage (msg);
         }
+        else if (index == 2222)
+        {
+            auto&  app = owner.getAppController();
+            DBG("has changed: " << (int) app.findChild<SessionController>()->hasSessionChanged());
+        }
         #endif
         
         if (menu == File && index >= recentMenuOffset)
@@ -184,7 +189,8 @@ public:
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     }
     
-    static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu) {
+    static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
+    {
         buildSessionMenu (cmd, menu);
         menu.addSeparator();
         buildEditMenu(cmd, menu);
@@ -248,8 +254,8 @@ private:
     void buildDebugMenu (PopupMenu& menu)
     {
         menu.addItem (1000, "Dump session to console");
-        menu.addItem (1001, "Report bug");
         menu.addItem (1111, "Report bug");
+        menu.addItem (2222, "Show changed status");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     

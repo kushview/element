@@ -55,12 +55,12 @@ void SessionController::openFile (const File& file)
         Result result = document->loadFrom (file, true);
         if (result.wasOk())
         {
-            currentSession->freezeChangeNotification = true;
+            setChangesFrozen (true);
             if (auto* gc = findSibling<GuiController>())
                 gc->closeAllPluginWindows();
             if (auto* ec = findSibling<EngineController>())
                 ec->sessionReloaded();
-            currentSession->freezeChangeNotification = false;
+            setChangesFrozen (false);
         }
     }
     else
@@ -125,7 +125,7 @@ void SessionController::newSession()
         if (auto* gc = findSibling<GuiController>())
             gc->closeAllPluginWindows();
         
-        currentSession->freezeChangeNotification = true;
+        setChangesFrozen (true);
         currentSession->clear();
         if (auto* ec = findSibling<EngineController>())
             ec->sessionReloaded();
@@ -134,7 +134,7 @@ void SessionController::newSession()
             gc->stabilizeContent();
         
         document = new SessionDocument (currentSession);
-        currentSession->freezeChangeNotification = false;
+        setChangesFrozen (false);
     }
 }
 

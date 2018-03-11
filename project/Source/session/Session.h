@@ -22,6 +22,23 @@ namespace Element {
                     public ValueTree::Listener
     {
     public:
+        struct ScopedFrozenLock
+        {
+            ScopedFrozenLock(Session& s) : session(s)
+            {
+                wasFrozen = session.freezeChangeNotification;
+                session.freezeChangeNotification = true;
+            } 
+            
+            ~ScopedFrozenLock() {
+                session.freezeChangeNotification = wasFrozen;
+            }
+
+        private:
+            Session& session;
+            bool wasFrozen;
+        };
+
         virtual ~Session();
         
         inline int getNumGraphs() const { return objectData.getChildWithName(Tags::graphs).getNumChildren(); }
@@ -71,6 +88,9 @@ namespace Element {
         inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
         
         friend class SessionController;
+        friend class SessionDocument;
+        friend struct ScopedFrozenLock;
+
         bool freezeChangeNotification = false;
         void notifyChanged();
         

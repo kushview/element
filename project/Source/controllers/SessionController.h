@@ -20,6 +20,16 @@ public:
     void saveSession (const bool saveAs = false);
     void newSession();
     bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
+
+    inline void setChangesFrozen (const bool areNowFrozen)
+    {
+        if (! currentSession)
+            return;
+        currentSession->freezeChangeNotification = areNowFrozen;
+        if (document)
+            document->setChangedFlag (false);
+    }
+
     inline void resetChanges()
     {
         if (! document)
