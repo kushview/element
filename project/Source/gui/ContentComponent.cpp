@@ -412,17 +412,23 @@ public:
     void setMainView (ContentView* view)
     {
         if (content1)
+        {
+            content1->willBeRemoved();
             removeChildComponent (content1);
+        }
+
         content1 = view;
         
         if (content1)
         {
             content1->willBecomeActive();
             addAndMakeVisible (content1);
-            content1->didBecomeActive();
         }
+
         updateLayout();
         resized();
+
+        content1->didBecomeActive();
     }
     
     void setAccessoryView (ContentView* view)

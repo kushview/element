@@ -272,16 +272,6 @@ public:
         if (getParentComponent() != nullptr)
             pos = getParentComponent()->getLocalPoint (nullptr, pos);
         
-        // if (vertical)
-        // {
-        //     node.setRelativePosition ((pos.getX() + getWidth() / 2) / (double) getParentWidth(),
-        //                               (pos.getY() + getHeight() / 2) / (double) getParentHeight());
-        // }
-        // else
-        // {
-        //     node.setRelativePosition ((pos.getY() + getHeight() / 2) / (double) getParentHeight(),
-        //                               (pos.getX() + getWidth() / 2) / (double) getParentWidth());
-        // }
         setNodePosition (pos.getX(), pos.getY());
         updatePosition();
     }
@@ -469,7 +459,7 @@ public:
         {
             updatePosition();
         }
-        else
+        else if (nullptr != getParentComponent())
         {
             // position is relative and parent might be resizing
             const auto b = getBoundsInParent();
@@ -779,7 +769,10 @@ GraphEditorComponent::GraphEditorComponent()
 GraphEditorComponent::~GraphEditorComponent()
 {
     data.removeListener (this);
+    graph = Node();
+    data = ValueTree();
     draggingConnector = nullptr;
+    resizePositionsFrozen = false;
     deleteAllChildren();
 }
 
@@ -792,8 +785,8 @@ void GraphEditorComponent::setNode (const Node& n)
     data.removeListener (this);
     data = graph.getValueTree();
     
-    verticalLayout = graph.getProperty ("vertical", true);
-    resizePositionsFrozen = (bool) graph.getProperty ("staticPos", resizePositionsFrozen);
+    verticalLayout = graph.getProperty (Tags::vertical, true);
+    resizePositionsFrozen = (bool) graph.getProperty (Tags::staticPos, false);
 
     draggingConnector = nullptr;
     deleteAllChildren();
@@ -843,6 +836,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         menu.addSeparator();
         menu.addItem (5, "Change orientation...");
         menu.addItem (7, "Gather nodes...");
+       #if JUCE_DEBUG
+        menu.addItem (100, "Misc testing item...");
+       #endif
         menu.addSeparator();
         menu.addItem (6, "Fixed node positions", true, areResizePositionsFrozen());
         menu.addSeparator();
@@ -936,6 +932,13 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                         updateConnectorComponents();
                     }
 
+                    return;
+                } break;
+                
+                case 100:
+                {
+                    updateFilterComponents (true);
+                    updateConnectorComponents();
                     return;
                 } break;
 
@@ -1050,7 +1053,7 @@ void GraphEditorComponent::updateConnectorComponents()
 void GraphEditorComponent::updateFilterComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
             fc->update (doPosition);
 }
 

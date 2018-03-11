@@ -29,7 +29,7 @@ public:
     ContentView();
     virtual ~ContentView();
 
-
+    virtual void willBeRemoved() { }
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
@@ -64,7 +64,7 @@ class ContentComponent :  public Component,
 {
 public:
     ContentComponent (AppController& app);
-    ~ContentComponent();
+    ~ContentComponent() noexcept;
 
     NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
 

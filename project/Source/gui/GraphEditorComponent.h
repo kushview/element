@@ -56,9 +56,10 @@ public:
             return;
         resizePositionsFrozen = shouldBeFrozen;
         if (graph.isValid ())
-            graph.setProperty ("staticPos", resizePositionsFrozen);
+            graph.setProperty (Tags::staticPos, resizePositionsFrozen);
     }
 
+    Node getGraph() const { return graph; }
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
     void createNewPlugin (const PluginDescription* desc, int x, int y);

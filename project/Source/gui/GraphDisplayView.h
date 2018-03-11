@@ -47,7 +47,7 @@ public:
        }
     }
 
-    void resized() override
+    inline void resized() override
     {
         auto r = getLocalBounds().reduced (2);
         if (breadcrumb.isVisible())

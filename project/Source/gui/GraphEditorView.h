@@ -18,6 +18,8 @@ public:
 
     void didBecomeActive() override;
     void stabilizeContent() override;
+    void willBeRemoved() override;
+    
     void paint (Graphics& g) override;
 
     bool keyPressed (const KeyPress& key, Component* c) override;

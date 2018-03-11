@@ -20,6 +20,11 @@ GraphEditorView::GraphEditorView()
 
 GraphEditorView::~GraphEditorView() { }
 
+void GraphEditorView::willBeRemoved()
+{
+    graph.setNode (Node());
+}
+
 bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
 {
     if (key.getKeyCode() == KeyPress::backspaceKey ||
@@ -65,6 +70,8 @@ void GraphEditorView::didBecomeActive()
     {
         stabilizeContent();
     }
+
+    graph.updateComponents();
 }
 
 void GraphEditorView::paint (Graphics& g)

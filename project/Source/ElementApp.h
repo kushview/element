@@ -60,6 +60,9 @@ namespace Tags
     const Identifier beatDivisor        = "beatDivisor";
     const Identifier midiChannel        = "midiChannel";
     const Identifier renderMode         = "renderMode";
+
+    const Identifier vertical           = "vertical";
+    const Identifier staticPos          = "staticPos";
 }
 
 struct Alert
