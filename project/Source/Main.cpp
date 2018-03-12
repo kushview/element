@@ -280,6 +280,14 @@ public:
         }
     }
 
+    void resumed() override
+    {
+       #if JUCE_WINDOWS
+        auto& devices (world->getDeviceManager());
+        devices.restartLastAudioDevice();
+       #endif
+    }
+
     void finishLaunching()
     {
         if (nullptr != controller || nullptr == startup)
