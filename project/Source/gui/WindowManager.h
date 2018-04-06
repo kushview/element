@@ -40,6 +40,14 @@ public:
         closeAllPluginWindows (true);
     }
 
+    inline DialogWindow* findDialogByName (const String& name) const
+    {
+        for (auto* const d : activeDialogs)
+            if (d->getName() == name)
+                return d;
+        return nullptr;
+    }
+
     /** Show and manage a window or dialog
 
         The window manager takes ownership of the passed-in object
@@ -57,11 +65,12 @@ public:
                     boost::bind (&WindowManager::onWindowClosed, this, window));
     }
 
-    inline void push (DialogWindow* dialog)
+    inline void push (DialogWindow* dialog, const bool alwaysOnTop = false)
     {
         if (! activeDialogs.contains (dialog))
         {
             activeDialogs.add (dialog);
+            dialog->setAlwaysOnTop (alwaysOnTop);
             dialog->addToDesktop();
             dialog->setVisible (true);
         }

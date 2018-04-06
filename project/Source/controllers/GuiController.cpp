@@ -139,15 +139,25 @@ bool GuiController::isWindowOpen (const String&)
 
 void GuiController::runDialog (const String& uri)
 {
+    
     if (uri == ELEMENT_PREFERENCES)
     {
+        if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog")) {
+            dialog->toFront (true);
+            return;
+        }
+
         DialogOptions opts;
         opts.content.set (new PreferencesComponent (world, *this), true);
+        opts.useNativeTitleBar = true;
         opts.dialogTitle = "Preferences";
         opts.componentToCentreAround = (Component*) mainWindow.get();
         
         if (DialogWindow* dw = opts.create())
-            windowManager->push (dw);
+        {
+            dw->setName ("PreferencesDialog");
+            windowManager->push (dw, true);        
+        }
     }
 }
 
