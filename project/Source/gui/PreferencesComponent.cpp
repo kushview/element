@@ -425,19 +425,13 @@ namespace Element {
             : devs (d, 0, 16, 0, 16, false, false, true, false),
               devices (d)
         {
-            devices.enableInputLevelMeasurement (true);
-            devices.enableOutputLevelMeasurement (true);
-
             addAndMakeVisible (devs);
             devs.setItemHeight (22);
-
             setSize (300, 400);
         }
 
         ~AudioSettingsComponent()
         {
-            devices.enableInputLevelMeasurement (false);
-            devices.enableOutputLevelMeasurement (false);
         }
 
         void resized() override { devs.setBounds (getLocalBounds()); }
