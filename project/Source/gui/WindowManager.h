@@ -54,8 +54,8 @@ public:
         The type needs to at least inherrit Compnent and WindowHook
 
         Another option would be to inherrit Component only, but provide
-        yourself the required  Signal& signalClosed()  method */
-
+        yourself the required  Signal& signalClosed()  method 
+     */
     inline void push (Window* window)
     {
         activeWindows.addIfNotAlreadyThere (window);
@@ -65,8 +65,11 @@ public:
                     boost::bind (&WindowManager::onWindowClosed, this, window));
     }
 
+    /** Show and manage a dialog window */
+        
     inline void push (DialogWindow* dialog, const bool alwaysOnTop = false)
     {
+        jassert (nullptr != dialog);
         if (! activeDialogs.contains (dialog))
         {
             activeDialogs.add (dialog);
