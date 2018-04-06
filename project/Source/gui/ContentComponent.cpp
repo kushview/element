@@ -575,7 +575,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
 //    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
 }
 
-ContentComponent::~ContentComponent()
+ContentComponent::~ContentComponent() noexcept
 {
     toolTips = nullptr;
 }
