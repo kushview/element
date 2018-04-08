@@ -70,7 +70,8 @@ public:
                 conf.addListener (this);
             }
             
-            ~Row() {
+            ~Row() noexcept 
+            {
                 text.removeListener (this);
             }
             
@@ -133,6 +134,15 @@ public:
                     g.fillAll (Colours::black);
                 else
                     ViewHelpers::drawBasicTextRow ("", g, getWidth(), getHeight(), selected);
+                
+                if (node.isRootGraph())
+                {
+                    const auto h = getHeight();
+                    const auto w = h;
+                    const int p = 1 + (int) node.getProperty (Tags::midiProgram, -1);
+                    if (p > 0)
+                        g.drawText (String (p), getWidth() - h, 0, w, h, Justification::centred);
+                }
             }
             
             void resized() override

@@ -284,10 +284,10 @@ namespace Element {
         {
             if (! locked)
             {
-                node.setProperty ("midiProgram", roundToInt(v) - 1);
+                node.setProperty (Tags::midiProgram, roundToInt(v) - 1);
                 if (GraphNodePtr ptr = node.getGraphNode())
                     if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
-                        root->setMidiProgram ((int) node.getProperty ("midiProgram"));
+                        root->setMidiProgram ((int) node.getProperty (Tags::midiProgram));
             }
             else
             {
@@ -296,7 +296,10 @@ namespace Element {
             }
         }
         
-        double getValue() const override { return 1.0 + (double)node.getProperty("midiProgram", -1); }
+        double getValue() const override 
+        { 
+            return 1.0 + (double)node.getProperty (Tags::midiProgram, -1);
+        }
         
         Node node;
         bool locked;

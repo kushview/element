@@ -82,7 +82,7 @@ public:
         {
             const Node c (nodes.getChild (i), false);
             if (! c.isIONode())   
-                addSubItem (new SessionNodeTreeItem (Node (nodes.getChild(i), false)));
+                addSubItem (new SessionNodeTreeItem (c));
         }
     }
 
@@ -300,6 +300,22 @@ public:
     {
         ViewHelpers::findContentComponent (getOwnerView())->getAppController()
             .findChild<EngineController>()->duplicateGraph (node);
+    }
+
+    void paintContent (Graphics& g, const Rectangle<int>& area) override
+    {
+        TreeItemBase::paintContent (g, area);
+
+        if (! node.isRootGraph())
+            return;
+       
+       #if !EL_FREE
+        // Paint the program number if it is enabled
+        const auto h = area.getHeight(); const auto w = h;
+        const int p = 1 + (int)node.getProperty (Tags::midiProgram, -1);
+        if (p > 0)
+            g.drawText (String (p), area.getWidth() - h, 0, w, h, Justification::centred);
+       #endif
     }
 
     void showSettings()
