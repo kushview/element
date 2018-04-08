@@ -1,6 +1,6 @@
 /*
     Commands.h - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016-2018 Kushview, LLC.  All rights reserved.
 */
 
 #pragma once

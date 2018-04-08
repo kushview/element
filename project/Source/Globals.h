@@ -52,9 +52,9 @@ public:
     void setEngine (EnginePtr engine);
 
 private:
-    String appName;
     friend class Application;
     class Impl;
+    String appName;
     ScopedPointer<Impl> impl;
 };
 

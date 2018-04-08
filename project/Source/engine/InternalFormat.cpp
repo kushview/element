@@ -9,6 +9,7 @@
 #include "engine/InternalFormat.h"
 
 #include "engine/AllPassFilterProcessor.h"
+#include "engine/AudioMixerProcessor.h"
 #include "engine/CombFilterProcessor.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/PlaceholderProcessor.h"
@@ -223,6 +224,11 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MidiSequenceProcessor().fillInPluginDescription (*desc);
         }
+        else if (fileOrId == "element.audioMixer")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            AudioMixerProcessor(4).fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -234,12 +240,14 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
+
        #if EL_USE_MIDI_SEQUENCER
         results.add ("element.midiSequencer");
        #endif
        #if EL_USE_SUBGRAPHS
         results.add ("element.graph");
        #endif
+        results.add ("element.audioMixer");
         return results;
     }
     
@@ -277,6 +285,9 @@ namespace Element {
         else if (desc.fileOrIdentifier == "element.midiSequencer")
             base = new MidiSequenceProcessor();
         
+        else if (desc.fileOrIdentifier == "element.audioMixer")
+            base = new AudioMixerProcessor();
+
         return base != nullptr ? base.release() : nullptr;
     }
     
