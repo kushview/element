@@ -56,10 +56,10 @@ public:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override
     {
         for (const auto& bus : layout.inputBuses)
-            if (bus.size() != 2)
+            if (bus != layout.getMainOutputChannelSet())
                 return false;
         for (const auto& bus : layout.outputBuses)
-            if (bus.size() != 2)
+            if (bus != layout.getMainOutputChannelSet())
                 return false;
         return true;
     }

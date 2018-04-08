@@ -1,7 +1,175 @@
 
 #include "engine/AudioMixerProcessor.h"
+#include "gui/HorizontalListBox.h"
 
 namespace Element {
+
+class AudioMixerComponent : public Component
+{
+public:
+    AudioMixerComponent() { 
+        addAndMakeVisible (channels);
+    }
+
+    void resized() override
+    {
+        channels.setBounds (getLocalBounds());
+    }
+
+private:
+    class ChannelStrip : public Component
+    {
+    public:
+        ChannelStrip()
+        { 
+            
+        }
+        
+        ~ChannelStrip() { }
+
+        void paint (Graphics& g) override
+        {
+            g.fillAll (Colours::orange);
+        }
+
+       
+        void refresh (int, bool) { }
+    };
+
+    class ChannelList : public HorizontalListBox,
+                        public ListBoxModel
+    {
+    public:
+        ChannelList()
+        {
+            setModel (this);
+            setRowHeight (64);
+        }
+
+        ~ChannelList()
+        {
+            setModel (nullptr);
+        }
+
+        int getNumRows() override { return 4; }
+
+        void paintListBoxItem (int rowNumber, Graphics& g,
+                               int width, int height, bool rowIsSelected) override { }
+        
+        Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
+                                           Component* existingComponentToUpdate) override
+        {
+            ChannelStrip* strip = dynamic_cast<ChannelStrip*> (existingComponentToUpdate);
+            if (nullptr == strip) strip = new ChannelStrip();
+            if (strip) strip->refresh (rowNumber, isRowSelected);
+            return strip;
+        }
+
+       #if 0
+        /** This can be overridden to react to the user clicking on a row.
+            @see listBoxItemDoubleClicked
+        */
+        virtual void listBoxItemClicked (int row, const MouseEvent&);
+
+        /** This can be overridden to react to the user double-clicking on a row.
+            @see listBoxItemClicked
+        */
+        virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
+
+        /** This can be overridden to react to the user clicking on a part of the list where
+            there are no rows.
+            @see listBoxItemClicked
+        */
+        virtual void backgroundClicked (const MouseEvent&);
+
+        /** Override this to be informed when rows are selected or deselected.
+
+            This will be called whenever a row is selected or deselected. If a range of
+            rows is selected all at once, this will just be called once for that event.
+
+            @param lastRowSelected      the last row that the user selected. If no
+                                        rows are currently selected, this may be -1.
+        */
+        virtual void selectedRowsChanged (int lastRowSelected);
+
+        /** Override this to be informed when the delete key is pressed.
+
+            If no rows are selected when they press the key, this won't be called.
+
+            @param lastRowSelected   the last row that had been selected when they pressed the
+                                    key - if there are multiple selections, this might not be
+                                    very useful
+        */
+        virtual void deleteKeyPressed (int lastRowSelected);
+
+        /** Override this to be informed when the return key is pressed.
+
+            If no rows are selected when they press the key, this won't be called.
+
+            @param lastRowSelected   the last row that had been selected when they pressed the
+                                    key - if there are multiple selections, this might not be
+                                    very useful
+        */
+        virtual void returnKeyPressed (int lastRowSelected);
+
+        /** Override this to be informed when the list is scrolled.
+
+            This might be caused by the user moving the scrollbar, or by programmatic changes
+            to the list position.
+        */
+        virtual void listWasScrolled();
+
+        /** To allow rows from your list to be dragged-and-dropped, implement this method.
+
+            If this returns a non-null variant then when the user drags a row, the listbox will
+            try to find a DragAndDropContainer in its parent hierarchy, and will use it to trigger
+            a drag-and-drop operation, using this string as the source description, with the listbox
+            itself as the source component.
+
+            @see DragAndDropContainer::startDragging
+        */
+        virtual var getDragSourceDescription (const SparseSet<int>& rowsToDescribe);
+
+        /** You can override this to provide tool tips for specific rows.
+            @see TooltipClient
+        */
+        virtual String getTooltipForRow (int row);
+
+        /** You can override this to return a custom mouse cursor for each row. */
+        virtual MouseCursor getMouseCursorForRow (int row);
+       #endif
+    };
+
+    ChannelList channels;
+};
+
+class AudioMixerEditor : public AudioProcessorEditor
+{
+public:
+    AudioMixerEditor (AudioMixerProcessor& p) 
+        : AudioProcessorEditor (&p)
+    {
+        // setOpaque (false);
+        setName ("AudioMixerEditor");
+        addAndMakeVisible (mixer);
+        setSize (640, 360);
+    }
+
+    ~AudioMixerEditor() noexcept { }
+
+    void paint (Graphics& g) override 
+    {
+        g.fillAll (Colours::black);
+    }
+
+    void resized() override
+    {
+        mixer.setBounds (getLocalBounds().reduced(2));
+    }
+
+private:
+    AudioMixerComponent mixer;
+};
 
 AudioMixerProcessor::~AudioMixerProcessor()
 {
@@ -39,7 +207,7 @@ void AudioMixerProcessor::addStereoTrack()
     auto* const input = getBus (true, getBusCount (true) - 1);
     
     if (input != nullptr)
-        wasAdded = input->setCurrentLayout (AudioChannelSet::stereo());
+        wasAdded = true; //input->setCurrentLayout (AudioChannelSet::stereo());
 
     if (wasAdded)
     {
@@ -63,7 +231,7 @@ void AudioMixerProcessor::addStereoTrack()
 
 AudioProcessorEditor* AudioMixerProcessor::createEditor()
 {
-    return nullptr;
+    return new AudioMixerEditor (*this);
 }
 
 void AudioMixerProcessor::prepareToPlay (const double sampleRate, const int bufferSize)
