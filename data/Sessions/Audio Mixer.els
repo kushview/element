@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<session name="Audio Mixer" tempo="120.00000000000000000000" notes=""
+         beatsPerBar="4" beatDivisor="2">
+  <graphs active="0">
+    <node type="graph" name="Audio Mixer" bypass="0" persistent="1" renderMode="single"
+          program="0" staticPos="0">
+      <nodes>
+        <node id="2" type="plugin" format="Internal" identifier="audio.output"
+              name="Built-in Output" relativeX="0.46899841017488075323" relativeY="0.87815126050420166948"
+              numAudioIns="2" numAudioOuts="0" bypass="0" program="0">
+          <ports>
+            <port index="0" type="audio" flow="input" name="Output 1"/>
+            <port index="1" type="audio" flow="input" name="Output 2"/>
+          </ports>
+        </node>
+        <node id="3" type="plugin" format="Internal" identifier="midi.input"
+              name="MIDI In" relativeX="0.47656250000000000000" relativeY="0.09541284403669725300"
+              numAudioIns="0" numAudioOuts="0" bypass="0" program="0">
+          <ports>
+            <port index="0" type="midi" flow="output" name="MIDI"/>
+          </ports>
+        </node>
+        <node format="Element" identifier="element.audioMixer" id="5" name="Audio Mixer"
+              type="plugin" numAudioIns="8" numAudioOuts="2" relativeX="0.47694753577106518971"
+              relativeY="0.62184873949579833052" bypass="0" program="1">
+          <nodes/>
+          <ports>
+            <port index="0" type="audio" flow="input" name="Left"/>
+            <port index="1" type="audio" flow="input" name="Right"/>
+            <port index="2" type="audio" flow="input" name="Unknown"/>
+            <port index="3" type="audio" flow="input" name="Unknown"/>
+            <port index="4" type="audio" flow="input" name="Unknown"/>
+            <port index="5" type="audio" flow="input" name="Unknown"/>
+            <port index="6" type="audio" flow="input" name="Unknown"/>
+            <port index="7" type="audio" flow="input" name="Unknown"/>
+            <port index="8" type="audio" flow="output" name="Left"/>
+            <port index="9" type="audio" flow="output" name="Right"/>
+          </ports>
+        </node>
+        <node format="AudioUnit" identifier="AudioUnit:Synths/aumu,samp,appl"
+              id="6" name="AUSampler" type="plugin" numAudioIns="0" numAudioOuts="2"
+              relativeX="0.23437500000000000000" relativeY="0.36880733944954130488"
+              windowX="650" windowY="339" windowVisible="0" state="1289.hAGaoMGcv.y2P7P.BL.AEXvAHjfBKvPCN7.DQDgDSvXMM53iR.YDQJAUtEVakckckI2bo8laV8VczAWczMEbg4lVI41bzIWcsUlazQEc4AWYZETUfXWYxMWZu4FUjEFcgwUag4VclE1XzUmbkI2V18VZiUFHi8VctQGUmEVZt8EDOXVZrUVKxUlYkIWYtMVYys0XuElbyUFHzUmakc0b0IFc4AWYYYVZtUFHzUmakgUUtQWZzwVYjAA.h.....fzAPQEVXESgkWYxM2WPHAQkYVX0wFcfjjayQmb00VYtQWnWfMFYnwFbzgGe.xN8f2d8EwfYUja1UFauAWYykUPsAGaoYVZkI2VC8latU1Xzk1atMGULYzSyo0SyMVZrwVXz8lbWYTZrQWYxMmTIQTUZ8lakMWngLsGhLRDjTxUk4VXhwVYjY0TzE1YkMWBmZxJt.iL1fyzmfRJQHgJUMGcgcVYTQWZsUVUiUmb1UFDTL8InjBKRzBDA.gESeBJo7hDp.g.SeBJoDiDp.w.RexLzTSUrUlckwFDDHxO.B..SeBJobiDp.QASeBJojiNp.gAhrynWqfzdHRDjjPp9nDTTgUXm4FcX+CPhDjPC4AQEYDIHwRDQjjUy8VcxMVYaQVYyQWZtEFco8laWkla1UlbyUVVzIWXtMmYuIWaWM1atQmbuwVUyMVXrUVDAvhDv.K..j.BhXDR...1+.jHAIzPdPzRLQBIuDAKOEQ.sHATP...IjfHBCL..f8O.IRPBMjGDEESjPxKQ7xSPbPBIf8O.IRPBMjGDUESjPxKQDySPrPBIj8O.IRVAo0PdHzVbQhWHAVDzvRVsEFdfXWXrUWYY0VZtAhcgwVckAgBR.EH..PBh7i.LnDBh7q.LnT1+.jHYEjVC4gPhYDIIgTYlEEKP.dBHHhwHA..PDe1+.jHYEjVC4gPnYDIpgDaQzFKPHeBhHDx...BhHLx...DHj8O.IRVAo0PdHzaFQRbHMGK4vhDP....jfHBgD..ffHBiD..f8O.IRPBMjGDUGSjPBKQbySR.B...PBIDZdR6gHQPRBR6gHQPRBU6gHF32eQfTfBJgUiUGcuYlYYIWYy8lag41Xkg.DnHhQbBD.gRX0dTnHFdXDHRhhjf0cgYWYl8lbsgkbu8FcfrVY4wEau8FbfTlagIFakQ1D+++++++++6eBPTTBRDVcsU2SPvB..............P...L.g........CTH.......v.FB.......LvgBiL..HQXvAGaP.DzRLWXsAG.H.PJ.3B.1.PO.DD.LAPT.vE.gAfa.nG.+APj.zI.kBvq.fK.5Bvu.PL.KC.3.HN.yCP+AbP.SD.FALR.qDfKAPS.1DPOATT.LEPSATU.bEfXAbV.sEvaAXW.3EfdADX.CFfhAvX.QFvkAjY.dFPoAbZ.tF.rATa.5FvtATb.VGP2Ajd.wGv9BLf.IH.CBDg.RHvDBfg.oH.KBDi.xHvLBfi.IIvRBvj.MIfWB.l.gIfXBTm.+IPhBrn.PJPjBXo.WJ.mB7p.wJfrBLq.3JftBzr.OK.zBTs.VKv1Bzs.vKP8BXu.6K.+CDv.RLvECfw.YLvFC.x.gLfICbx.xLPNCLz.DMfQCrz.MM.VCD1.pMvcC.3.ANvfCP3.IN.tCz6.+N.v........BD..........RB..................CTL"
+              programState="1289.hAGaoMGcv.y2P7P.BL.AEXvAHjfBKvPCN7.DQDgDSvXMM53iR.YDQJAUtEVakckckI2bo8laV8VczAWczMEbg4lVI41bzIWcsUlazQEc4AWYZETUfXWYxMWZu4FUjEFcgwUag4VclE1XzUmbkI2V18VZiUFHi8VctQGUmEVZt8EDOXVZrUVKxUlYkIWYtMVYys0XuElbyUFHzUmakc0b0IFc4AWYYYVZtUFHzUmakgUUtQWZzwVYjAA.h.....fzAPQEVXESgkWYxM2WPHAQkYVX0wFcfjjayQmb00VYtQWnWfMFYnwFbzgGe.xN8f2d8EwfYUja1UFauAWYykUPsAGaoYVZkI2VC8latU1Xzk1atMGULYzSyo0SyMVZrwVXz8lbWYTZrQWYxMmTIQTUZ8lakMWngLsGhLRDjTxUk4VXhwVYjY0TzE1YkMWBmZxJt.iL1fyzmfRJQHgJUMGcgcVYTQWZsUVUiUmb1UFDTL8InjBKRzBDA.gESeBJo7hDp.g.SeBJoDiDp.w.RexLzTSUrUlckwFDDHxO.B..SeBJobiDp.QASeBJojiNp.gAhrynWqfzdHRDjjPp9nDTTgUXm4FcX+CPhDjPC4AQEYDIHwRDQjjUy8VcxMVYaQVYyQWZtEFco8laWkla1UlbyUVVzIWXtMmYuIWaWM1atQmbuwVUyMVXrUVDAvhDv.K..j.BhXDR...1+.jHAIzPdPzRLQBIuDAKOEQ.sHATP...IjfHBCL..f8O.IRPBMjGDEESjPxKQ7xSPbPBIf8O.IRPBMjGDUESjPxKQDySPrPBIj8O.IRVAo0PdHzVbQhWHAVDzvRVsEFdfXWXrUWYY0VZtAhcgwVckAgBR.EH..PBh7i.LnDBh7q.LnT1+.jHYEjVC4gPhYDIIgTYlEEKP.dBHHhwHA..PDe1+.jHYEjVC4gPnYDIpgDaQzFKPHeBhHDx...BhHLx...DHj8O.IRVAo0PdHzaFQRbHMGK4vhDP....jfHBgD..ffHBiD..f8O.IRPBMjGDUGSjPBKQbySR.B...PBIDZdR6gHQPRBR6gHQPRBU6gHF32eQfTfBJgUiUGcuYlYYIWYy8lag41Xkg.DnHhQbBD.gRX0dTnHFdXDHRhhjf0cgYWYl8lbsgkbu8FcfrVY4wEau8FbfTlagIFakQ1D+++++++++6eBPTTBRDVcsU2SPvB..............P...L.g........CTH.......v.FB.......LvgBiL..HQXvAGaP.DzRLWXsAG.H.PJ.3B.1.PO.DD.LAPT.vE.gAfa.nG.+APj.zI.kBvq.fK.5Bvu.PL.KC.3.HN.yCP+AbP.SD.FALR.qDfKAPS.1DPOATT.LEPSATU.bEfXAbV.sEvaAXW.3EfdADX.CFfhAvX.QFvkAjY.dFPoAbZ.tF.rATa.5FvtATb.VGP2Ajd.wGv9BLf.IH.CBDg.RHvDBfg.oH.KBDi.xHvLBfi.IIvRBvj.MIfWB.l.gIfXBTm.+IPhBrn.PJPjBXo.WJ.mB7p.wJfrBLq.3JftBzr.OK.zBTs.VKv1Bzs.vKP8BXu.6K.+CDv.RLvECfw.YLvFC.x.gLfICbx.xLPNCLz.DMfQCrz.MM.VCD1.pMvcC.3.ANvfCP3.IN.tCz6.+N.v........BD..........RB..................CTL"
+              bypass="0" program="-1">
+          <nodes/>
+          <ports>
+            <port index="0" type="audio" flow="output" name="Output 1"/>
+            <port index="1" type="audio" flow="output" name="Output 2"/>
+            <port index="2" type="control" flow="input" name="Param"/>
+            <port index="3" type="control" flow="input" name="Param"/>
+            <port index="4" type="control" flow="input" name="Param"/>
+            <port index="5" type="control" flow="input" name="Param"/>
+            <port index="6" type="control" flow="input" name="Param"/>
+            <port index="7" type="control" flow="input" name="Param"/>
+            <port index="8" type="control" flow="input" name="Param"/>
+            <port index="9" type="control" flow="input" name="Param"/>
+            <port index="10" type="control" flow="input" name="Param"/>
+            <port index="11" type="control" flow="input" name="Param"/>
+            <port index="12" type="control" flow="input" name="Param"/>
+            <port index="13" type="midi" flow="input" name="MIDI Input"/>
+          </ports>
+        </node>
+        <node format="AudioUnit" identifier="AudioUnit:Synths/aumu,samp,appl"
+              name="AUSampler" type="plugin" numAudioIns="0" numAudioOuts="2"
+              state="1289.hAGaoMGcv.y2P7P.BL.AEXvAHjfBKvPCN7.DQDgDSvXMM53iR.YDQJAUtEVakckckI2bo8laV8VczAWczMEbg4lVI41bzIWcsUlazQEc4AWYZETUfXWYxMWZu4FUjEFcgwUag4VclE1XzUmbkI2V18VZiUFHi8VctQGUmEVZt8EDOXVZrUVKxUlYkIWYtMVYys0XuElbyUFHzUmakc0b0IFc4AWYYYVZtUFHzUmakgUUtQWZzwVYjAA.h.....fzAPQEVXESgkWYxM2WPHAQkYVX0wFcfjjayQmb00VYtQWnWfMFYnwFbzgGe.xN8f2d8EwfYUja1UFauAWYykUPsAGaoYVZkI2VC8latU1Xzk1atMGULYzSyo0SyMVZrwVXz8lbWYTZrQWYxMmTIQTUZ8lakMWngLsGhLRDjTxUk4VXhwVYjY0TzE1YkMWBmZxJt.iL1fyzmfRJQHgJUMGcgcVYTQWZsUVUiUmb1UFDTL8InjBKRzBDA.gESeBJo7hDp.g.SeBJoDiDp.w.RexLzTSUrUlckwFDDHxO.B..SeBJobiDp.QASeBJojiNp.gAhrynWqfzdHRDjjPp9nDTTgUXm4FcX+CPhDjPC4AQEYDIHwRDQjjUy8VcxMVYaQVYyQWZtEFco8laWkla1UlbyUVVzIWXtMmYuIWaWM1atQmbuwVUyMVXrUVDAvhDv.K..j.BhXDR...1+.jHAIzPdPzRLQBIuDAKOEQ.sHATP...IjfHBCL..f8O.IRPBMjGDEESjPxKQ7xSPbPBIf8O.IRPBMjGDUESjPxKQDySPrPBIj8O.IRVAo0PdHzVbQhWHAVDzvRVsEFdfXWXrUWYY0VZtAhcgwVckAgBR.EH..PBh7i.LnDBh7q.LnT1+.jHYEjVC4gPhYDIIgTYlEEKP.dBHHhwHA..PDe1+.jHYEjVC4gPnYDIpgDaQzFKPHeBhHDx...BhHLx...DHj8O.IRVAo0PdHzaFQRbHMGK4vhDP....jfHBgD..ffHBiD..f8O.IRPBMjGDUGSjPBKQbySR.B...PBIDZdR6gHQPRBR6gHQPRBU6gHF32eQfTfBJgUiUGcuYlYYIWYy8lag41Xkg.DnHhQbBD.gRX0dTnHFdXDHRhhjf0cgYWYl8lbsgkbu8FcfrVY4wEau8FbfTlagIFakQ1D+++++++++6eBPTTBRDVcsU2SPvB..............P...L.g........CTH.......v.FJjw.....LvgBgL..HQXvAGaP.DzRLWXsAG.H.PJ.3B.1.PO.DD.LAPT.vE.gAfa.nG.+APj.zI.kBvq.fK.5Bvu.PL.KC.3.HN.yCP+AbP.SD.FALR.qDfKAPS.1DPOATT.LEPSATU.bEfXAbV.sEvaAXW.3EfdADX.CFfhAvX.QFvkAjY.dFPoAbZ.tF.rATa.5FvtATb.VGP2Ajd.wGv9BLf.IH.CBDg.RHvDBfg.oH.KBDi.xHvLBfi.IIvRBvj.MIfWB.l.gIfXBTm.+IPhBrn.PJPjBXo.WJ.mB7p.wJfrBLq.3JftBzr.OK.zBTs.VKv1Bzs.vKP8BXu.6K.+CDv.RLvECfw.YLvFC.x.gLfICbx.xLPNCLz.DMfQCrz.MM.VCD1.pMvcC.3.ANvfCP3.IN.tCz6.+N.v........BD..........RB..................CTL"
+              programState="1289.hAGaoMGcv.y2P7P.BL.AEXvAHjfBKvPCN7.DQDgDSvXMM53iR.YDQJAUtEVakckckI2bo8laV8VczAWczMEbg4lVI41bzIWcsUlazQEc4AWYZETUfXWYxMWZu4FUjEFcgwUag4VclE1XzUmbkI2V18VZiUFHi8VctQGUmEVZt8EDOXVZrUVKxUlYkIWYtMVYys0XuElbyUFHzUmakc0b0IFc4AWYYYVZtUFHzUmakgUUtQWZzwVYjAA.h.....fzAPQEVXESgkWYxM2WPHAQkYVX0wFcfjjayQmb00VYtQWnWfMFYnwFbzgGe.xN8f2d8EwfYUja1UFauAWYykUPsAGaoYVZkI2VC8latU1Xzk1atMGULYzSyo0SyMVZrwVXz8lbWYTZrQWYxMmTIQTUZ8lakMWngLsGhLRDjTxUk4VXhwVYjY0TzE1YkMWBmZxJt.iL1fyzmfRJQHgJUMGcgcVYTQWZsUVUiUmb1UFDTL8InjBKRzBDA.gESeBJo7hDp.g.SeBJoDiDp.w.RexLzTSUrUlckwFDDHxO.B..SeBJobiDp.QASeBJojiNp.gAhrynWqfzdHRDjjPp9nDTTgUXm4FcX+CPhDjPC4AQEYDIHwRDQjjUy8VcxMVYaQVYyQWZtEFco8laWkla1UlbyUVVzIWXtMmYuIWaWM1atQmbuwVUyMVXrUVDAvhDv.K..j.BhXDR...1+.jHAIzPdPzRLQBIuDAKOEQ.sHATP...IjfHBCL..f8O.IRPBMjGDEESjPxKQ7xSPbPBIf8O.IRPBMjGDUESjPxKQDySPrPBIj8O.IRVAo0PdHzVbQhWHAVDzvRVsEFdfXWXrUWYY0VZtAhcgwVckAgBR.EH..PBh7i.LnDBh7q.LnT1+.jHYEjVC4gPhYDIIgTYlEEKP.dBHHhwHA..PDe1+.jHYEjVC4gPnYDIpgDaQzFKPHeBhHDx...BhHLx...DHj8O.IRVAo0PdHzaFQRbHMGK4vhDP....jfHBgD..ffHBiD..f8O.IRPBMjGDUGSjPBKQbySR.B...PBIDZdR6gHQPRBR6gHQPRBU6gHF32eQfTfBJgUiUGcuYlYYIWYy8lag41Xkg.DnHhQbBD.gRX0dTnHFdXDHRhhjf0cgYWYl8lbsgkbu8FcfrVY4wEau8FbfTlagIFakQ1D+++++++++6eBPTTBRDVcsU2SPvB..............P...L.g........CTH.......v.FJjw.....LvgBgL..HQXvAGaP.DzRLWXsAG.H.PJ.3B.1.PO.DD.LAPT.vE.gAfa.nG.+APj.zI.kBvq.fK.5Bvu.PL.KC.3.HN.yCP+AbP.SD.FALR.qDfKAPS.1DPOATT.LEPSATU.bEfXAbV.sEvaAXW.3EfdADX.CFfhAvX.QFvkAjY.dFPoAbZ.tF.rATa.5FvtATb.VGP2Ajd.wGv9BLf.IH.CBDg.RHvDBfg.oH.KBDi.xHvLBfi.IIvRBvj.MIfWB.l.gIfXBTm.+IPhBrn.PJPjBXo.WJ.mB7p.wJfrBLq.3JftBzr.OK.zBTs.VKv1Bzs.vKP8BXu.6K.+CDv.RLvECfw.YLvFC.x.gLfICbx.xLPNCLz.DMfQCrz.MM.VCD1.pMvcC.3.ANvfCP3.IN.tCz6.+N.v........BD..........RB..................CTL"
+              bypass="0" program="-1" id="7" relativeX="0.70312500000000000000"
+              relativeY="0.36697247706422020386" windowX="279" windowY="319"
+              windowVisible="0">
+          <nodes/>
+          <ports>
+            <port index="0" type="audio" flow="output" name="Output 1"/>
+            <port index="1" type="audio" flow="output" name="Output 2"/>
+            <port index="2" type="control" flow="input" name="Param"/>
+            <port index="3" type="control" flow="input" name="Param"/>
+            <port index="4" type="control" flow="input" name="Param"/>
+            <port index="5" type="control" flow="input" name="Param"/>
+            <port index="6" type="control" flow="input" name="Param"/>
+            <port index="7" type="control" flow="input" name="Param"/>
+            <port index="8" type="control" flow="input" name="Param"/>
+            <port index="9" type="control" flow="input" name="Param"/>
+            <port index="10" type="control" flow="input" name="Param"/>
+            <port index="11" type="control" flow="input" name="Param"/>
+            <port index="12" type="control" flow="input" name="Param"/>
+            <port index="13" type="midi" flow="input" name="MIDI Input"/>
+          </ports>
+        </node>
+      </nodes>
+      <ports/>
+      <arcs>
+        <arc sourceNode="3" sourcePort="0" destNode="6" destPort="13"/>
+        <arc sourceNode="3" sourcePort="0" destNode="7" destPort="13"/>
+        <arc sourceNode="5" sourcePort="8" destNode="2" destPort="0"/>
+        <arc sourceNode="5" sourcePort="9" destNode="2" destPort="1"/>
+        <arc sourceNode="6" sourcePort="0" destNode="5" destPort="0"/>
+        <arc sourceNode="6" sourcePort="1" destNode="5" destPort="1"/>
+        <arc sourceNode="7" sourcePort="0" destNode="5" destPort="2"/>
+        <arc sourceNode="7" sourcePort="1" destNode="5" destPort="3"/>
+      </arcs>
+    </node>
+  </graphs>
+</session>
