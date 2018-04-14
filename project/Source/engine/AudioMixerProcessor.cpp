@@ -3,9 +3,14 @@
 #include "gui/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
 
+#define MIXER_MIN -90.0
+
 namespace Element {
 
-class AudioMixerEditor : public AudioProcessorEditor
+typedef AudioMixerProcessor::MonitorPtr MonitorPtr;
+
+class AudioMixerEditor : public AudioProcessorEditor,
+                         private Timer
 {
 public:
     AudioMixerEditor (AudioMixerProcessor& p) 
@@ -17,6 +22,8 @@ public:
         setName ("AudioMixerEditor");
         addAndMakeVisible (channels);
         setSize (640, 360);
+
+        startTimerHz (60);
     }
 
     ~AudioMixerEditor() noexcept { }
@@ -28,7 +35,7 @@ public:
 
     void resized() override
     {
-        channels.setBounds (getLocalBounds().reduced(2));
+        channels.setBounds (getLocalBounds().reduced (2));
     }
 
     void rebuildTracks()
@@ -37,28 +44,41 @@ public:
         for (int i = 0; i < owner.getNumTracks(); ++i)
             monitors.add (owner.getMonitor (i));
         channels.updateContent();
+        resized();
     }
 
 private:
     AudioMixerProcessor& owner;
 
-    class ChannelStrip : public Component
+    class ChannelStrip : public Component,
+                         public Button::Listener,
+                         public Slider::Listener
     {
     public:
-        ChannelStrip (AudioMixerProcessor::Monitor* mon)
-            : monitor (mon),
+        ChannelStrip (AudioMixerEditor& ed, AudioMixerProcessor::Monitor* mon)
+            : editor (ed), monitor (mon),
               meter (mon->getNumChannels())
         {
             addAndMakeVisible (fader);
             fader.setSliderStyle (Slider::LinearBarVertical);
             fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
-            fader.setRange (0.0, 1.0, 0.001);
-            fader.setValue (0.90, dontSendNotification);
-
+            fader.setRange (MIXER_MIN, 12.0, 0.001);
+            fader.setValue (0.f, dontSendNotification);
+            fader.addListener (this);
+            
             addAndMakeVisible (meter);
+
+            editor.strips.add (this);
         }
         
-        ~ChannelStrip() { }
+        ~ChannelStrip() { editor.strips.removeFirstMatchingValue (this); }
+
+        void setMonitor (MonitorPtr ptr)
+        {
+            if (ptr == monitor)
+                return;
+            monitor = ptr;
+        }
 
         void paint (Graphics& g) override
         {
@@ -72,22 +92,40 @@ private:
             meter.setBounds (r);
         }
 
+        void buttonClicked (Button*) override {}
+
+        void sliderValueChanged (Slider* s) override
+        {
+            if (s == &fader)
+            {
+                DBG("VOL: " << s->getValue());
+                monitor->requestVolume (s->getValue());
+            }
+        }
+
         int getNumChannels() const { return (nullptr != monitor) ? monitor->getNumChannels()
                                                                  : 0; }
 
-        void setValue (const int channel, const float value)
-        {
-            if (! isPositiveAndBelow (channel, monitor->getNumChannels()))
-                return;
-            meter.setValue (channel, value);
-        }
-
-        void refresh (int, bool) { }
-
     private:
+        friend class AudioMixerEditor;
+
+        AudioMixerEditor& editor;
         AudioMixerProcessor::MonitorPtr monitor;
         Slider fader;
         DigitalMeter meter;
+
+        void stabilizeContent()
+        {
+            fader.setValue (Decibels::gainToDecibels (monitor->getGain(), (float) MIXER_MIN),
+                            dontSendNotification);
+        }
+
+        void processMeter()
+        {
+            for (int i = 0; i < monitor->getNumChannels(); ++i)
+                meter.setValue (i, monitor->getLevel (i));
+            meter.repaint();
+        }
     };
 
     typedef ReferenceCountedArray<AudioMixerProcessor::Monitor> MonitorList;
@@ -116,13 +154,21 @@ private:
         Component* refreshComponentForRow (int rowNumber, bool isRowSelected,
                                            Component* existingComponentToUpdate) override
         {
-            ChannelStrip* strip = dynamic_cast<ChannelStrip*> (existingComponentToUpdate);
-            if (nullptr == strip) 
-                if (auto mon = owner.monitors [rowNumber])
-                    strip = new ChannelStrip (mon);
-            if (strip)
-                strip->refresh (rowNumber, isRowSelected);
-            return strip;
+            if (auto monitor = owner.monitors [rowNumber])
+            {
+                ChannelStrip* strip = dynamic_cast<ChannelStrip*> (existingComponentToUpdate);
+                if (nullptr == strip)
+                    strip = new ChannelStrip (owner, monitor);
+                if (strip)
+                    strip->setMonitor (monitor);
+                return strip;
+            }
+            else
+            {
+                DBG("[EL] monitor not found for track: " << rowNumber);
+            }
+
+            return nullptr;
         }
 
        #if 0
@@ -204,8 +250,20 @@ private:
         AudioMixerEditor& owner;
     };
 
+    friend class ChannelList;
+    friend class ChannelStrip;
+
     ChannelList channels;
+    Array<ChannelStrip*> strips;
+    ScopedPointer<ChannelStrip> master;
     MonitorList monitors;
+
+    friend class Timer;
+    void timerCallback() override
+    {
+        for (auto* const strip : strips)
+            strip->processMeter();
+    }
 };
 
 AudioMixerProcessor::~AudioMixerProcessor()
@@ -314,19 +372,34 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
         auto input (getBusBuffer<float> (audio, true, track->busIdx));
         auto& rms = track->monitor->rms;
 
-        if (! track->mute)
+        if (track->mute)
         {
-            for (int c = 0; c < output.getNumChannels(); ++c) {
+            for (int c = 0; c < track->numInputs; ++c)
+                rms.getReference(c).set (0.0);
+        }
+        else
+        {
+            for (int c = 0; c < track->numInputs; ++c)
+            {
+                rms.getReference(c).set (track->gain * input.getRMSLevel (c, 0, numSamples));
                 tempBuffer.addFromWithRamp (c, 0, input.getReadPointer(c), numSamples,
                                             track->lastGain, track->gain);
-                rms.getReference(c).set (tempBuffer.getRMSLevel (c, 0, numSamples));
             }
         }
+
         track->lastGain = track->gain;
+
+        if (track->gain != track->monitor->nextGain.get())
+            track->gain = track->monitor->nextGain.get();
+        track->monitor->gain.set (track->gain);
+
+        if (track->mute != track->monitor->nextMute.get())
+            track->mute = track->monitor->nextMute.get();
+        track->monitor->muted.set (track->mute ? 1 : 0);
     }
 
     output.clear (0, audio.getNumSamples());
-    const float gain = Decibels::decibelsToGain ((float)*masterVolume, -120.f);
+    const float gain = Decibels::decibelsToGain ((float)*masterVolume, (float) MIXER_MIN);
     if (! *masterMute)
         for (int c = 0; c < output.getNumChannels(); ++c)
             output.copyFromWithRamp (c, 0, tempBuffer.getReadPointer(c), numSamples,

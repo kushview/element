@@ -17,9 +17,7 @@ public:
         explicit Monitor (const int track, const int totalChannels = 2)
             : trackId (track), numChannels (totalChannels)
         {
-            muted = 0;
-            while (rms.size() < numChannels)
-                rms.add (Atomic<float> (0.f));
+            reset();
         }
 
         ~Monitor()
@@ -27,16 +25,31 @@ public:
             rms.clear();
         }
 
-        int getNumChannels() const { return numChannels; }
-        int getTrackId() const { return trackId; }
+        inline float getGain()          const { return gain.get(); }
+        inline int getNumChannels()     const { return numChannels; }
+        inline int getTrackId()         const { return trackId; }
+        inline bool isMuted()           const { return muted.get() > 0; }
 
-        bool isMuted() const { return muted.get() > 0; }
-
-        float getLevel (const int channel)
+        inline float getLevel (const int channel)
         {
             if (isPositiveAndBelow (channel, rms.size()))
                 return rms.getReference(channel).get();
             return 0.f;
+        }
+
+        inline void requestMute (const bool muted)
+        {
+            nextMute.set (muted ? 1 : 0);
+        }
+
+        inline void requestGain (const float gain)
+        {
+            nextGain.set (gain);
+        }
+
+        inline void requestVolume (const float dB)
+        {
+            requestGain (Decibels::decibelsToGain (dB, -120.f));
         }
 
     private:
@@ -45,10 +58,36 @@ public:
         const int numChannels;
         Array<Atomic<float> > rms;
         Atomic<int> muted;
+        Atomic<int> nextMute;
         Atomic<float> gain;
+        Atomic<float> nextGain;
+
+        void reset()
+        {
+            muted = 0;
+            nextMute = 0;
+            gain = 1.f;
+            nextGain = 1.f;
+            if (rms.size() > 0)
+                rms.clearQuick();
+            while (rms.size() < numChannels)
+                rms.add (Atomic<float> (0.f));
+        }
     };
 
     typedef ReferenceCountedObjectPtr<Monitor> MonitorPtr;
+
+    struct Track
+    {
+        int index       = -1;
+        int busIdx      = -1;
+        int numInputs   = 0;
+        int numOutputs  = 0;
+        float lastGain  = 1.0;
+        float gain      = 1.0;
+        bool mute       = false;
+        MonitorPtr      monitor;
+    };
 
     explicit AudioMixerProcessor (int numTracks = 4,
                                   const double sampleRate = 44100.0,
@@ -125,18 +164,6 @@ public:
     void setStateInformation (const void*, int) override { }
 
 private:
-    struct Track
-    {
-        int index       = -1;
-        int busIdx      = -1;
-        int numInputs   = 0;
-        int numOutputs  = 0;
-        float lastGain  = 1.0;
-        float gain      = 1.0;
-        bool mute       = false;
-        MonitorPtr      monitor;
-    };
-
     MonitorPtr masterMonitor;
     Array<Track*> tracks;
     int numTracks = 0;
