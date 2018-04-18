@@ -422,7 +422,9 @@ namespace Element {
     {
     public:
         AudioSettingsComponent (DeviceManager& d)
-            : devs (d, 0, 16, 0, 16, false, false, true, false),
+            : devs (d, 0, DeviceManager::maxAudioChannels, 0, 
+                          DeviceManager::maxAudioChannels, 
+                          false, false, true, false),
               devices (d)
         {
             addAndMakeVisible (devs);

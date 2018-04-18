@@ -15,7 +15,8 @@ class DeviceManager :  public AudioDeviceManager
 {
 public:
     typedef AudioDeviceManager::AudioDeviceSetup AudioSettings;
-
+    static const int maxAudioChannels;
+    
     DeviceManager();
     ~DeviceManager();
 

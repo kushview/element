@@ -48,11 +48,14 @@ public:
         auto* props = settings.getUserSettings();
         if (ScopedXml dxml = props->getXmlValue ("devices"))
         {
-            devices.initialise (16, 16, dxml.get(), true, "default", nullptr);
+            devices.initialise (DeviceManager::maxAudioChannels,
+                                DeviceManager::maxAudioChannels, 
+                                dxml.get(), true, "default", nullptr);
         }
         else
         {
-            devices.initialiseWithDefaultDevices (16, 16);
+            devices.initialiseWithDefaultDevices (DeviceManager::maxAudioChannels,
+                                                  DeviceManager::maxAudioChannels);
         }
         
         if (usingThread)
