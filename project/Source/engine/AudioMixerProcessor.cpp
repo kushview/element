@@ -3,7 +3,7 @@
 #include "gui/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
 
-#define MIXER_MIN -90.0
+#define EL_FADER_MIN_DB     -90.0
 
 namespace Element {
 
@@ -23,7 +23,7 @@ public:
         addAndMakeVisible (channels);
         setSize (640, 360);
 
-        startTimerHz (60);
+        startTimerHz (24);
     }
 
     ~AudioMixerEditor() noexcept { }
@@ -35,7 +35,14 @@ public:
 
     void resized() override
     {
-        channels.setBounds (getLocalBounds().reduced (2));
+        auto r = getLocalBounds().reduced (2);
+        if (masterStrip)
+        {
+            masterStrip->setBounds (r.removeFromRight (64));
+            r.removeFromRight (2);
+        }
+
+        channels.setBounds (r);
     }
 
     void rebuildTracks()
@@ -44,12 +51,16 @@ public:
         for (int i = 0; i < owner.getNumTracks(); ++i)
             monitors.add (owner.getMonitor (i));
         channels.updateContent();
+
+        masterMonitor = owner.getMonitor();
+        masterStrip = new ChannelStrip (*this, masterMonitor);
+        addAndMakeVisible (masterStrip);
+
         resized();
     }
 
 private:
     AudioMixerProcessor& owner;
-
     class ChannelStrip : public Component,
                          public Button::Listener,
                          public Slider::Listener
@@ -62,7 +73,7 @@ private:
             addAndMakeVisible (fader);
             fader.setSliderStyle (Slider::LinearBarVertical);
             fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
-            fader.setRange (MIXER_MIN, 12.0, 0.001);
+            fader.setRange (EL_FADER_MIN_DB, 12.0, 0.001);
             fader.setValue (0.f, dontSendNotification);
             fader.addListener (this);
             
@@ -116,7 +127,7 @@ private:
 
         void stabilizeContent()
         {
-            fader.setValue (Decibels::gainToDecibels (monitor->getGain(), (float) MIXER_MIN),
+            fader.setValue (Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB),
                             dontSendNotification);
         }
 
@@ -255,8 +266,9 @@ private:
 
     ChannelList channels;
     Array<ChannelStrip*> strips;
-    ScopedPointer<ChannelStrip> master;
     MonitorList monitors;
+    ScopedPointer<ChannelStrip> masterStrip;
+    MonitorPtr masterMonitor;
 
     friend class Timer;
     void timerCallback() override
@@ -398,12 +410,20 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
         track->monitor->muted.set (track->mute ? 1 : 0);
     }
 
-    output.clear (0, audio.getNumSamples());
-    const float gain = Decibels::decibelsToGain ((float)*masterVolume, (float) MIXER_MIN);
+    output.clear (0, numSamples);
+    const float gain = Decibels::decibelsToGain ((float)*masterVolume, (float) EL_FADER_MIN_DB);
     if (! *masterMute)
         for (int c = 0; c < output.getNumChannels(); ++c)
             output.copyFromWithRamp (c, 0, tempBuffer.getReadPointer(c), numSamples,
                                      lastGain, gain);
+
+    masterMonitor->muted.set (*masterMute);
+    masterMonitor->gain.set (gain);
+
+    for (int i = 0; i < 2; ++i)
+        masterMonitor->rms.getReference(i).set (
+            output.getRMSLevel (i, 0, numSamples));
+
     lastGain = gain;
 }
 

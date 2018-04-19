@@ -101,6 +101,7 @@ public:
         setRateAndBufferSizeDetails (sampleRate, bufferSize);
         addParameter (masterMute = new AudioParameterBool ("masterMute", "Room Size", false));
         addParameter (masterVolume  = new AudioParameterFloat ("masterVolume",  "Damping", -120.0f, 12.0f, 0.f));
+        masterMonitor = new Monitor (-1, 2);
     }
 
     ~AudioMixerProcessor();
@@ -123,6 +124,7 @@ public:
     int getNumTracks() const { ScopedLock sl (getCallbackLock()); return tracks.size(); }
     
     MonitorPtr getMonitor (const int track = -1) const;
+    
     void setTrackGain  (const int track, const float gain);
     void setTrackMuted (const int track, const bool mute);
     bool isTrackMuted  (const int track) const;
