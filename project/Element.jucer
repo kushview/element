@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.16.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.2.1" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.3.1" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="14" companyCopyright="Copyright (c) 2017-2018 Kushview, LLC"
               defines="EL_RUNNING_AS_PLUGIN=0&#10;&#10;" userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;">
@@ -43,6 +43,10 @@
               file="Source/engine/AllPassFilterProcessor.h"/>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="Source/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="Source/engine/AudioEngine.h"/>
+        <FILE id="PyJVYH" name="AudioMixerProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/AudioMixerProcessor.cpp"/>
+        <FILE id="MJyDFf" name="AudioMixerProcessor.h" compile="0" resource="0"
+              file="Source/engine/AudioMixerProcessor.h"/>
         <FILE id="suk5ui" name="BaseProcessor.h" compile="0" resource="0" file="Source/engine/BaseProcessor.h"/>
         <FILE id="V0jXER" name="Buffer.cpp" compile="0" resource="0" file="Source/engine/Buffer.cpp"/>
         <FILE id="ndMomL" name="Buffer.h" compile="0" resource="0" file="Source/engine/Buffer.h"/>

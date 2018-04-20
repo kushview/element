@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.0
+  Created with Projucer version: 5.3.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -41,6 +41,8 @@ AudioIOPanelView::AudioIOPanelView ()
     inputGainDial->setTextBoxStyle (Slider::NoTextBox, false, 80, 20);
     inputGainDial->setColour (Slider::rotarySliderFillColourId, Colour (0xff4ed23f));
     inputGainDial->addListener (this);
+
+    inputGainDial->setBounds (17, 38, 48, 48);
 
     addAndMakeVisible (outputGainDial = new Slider ("outputGainDial"));
     outputGainDial->setRange (-70, 12, 0);
@@ -96,6 +98,8 @@ AudioIOPanelView::AudioIOPanelView ()
     nodeNameLabel->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
     nodeNameLabel->addListener (this);
 
+    nodeNameLabel->setBounds (10, 11, 150, 24);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -142,13 +146,11 @@ void AudioIOPanelView::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    inputGainDial->setBounds (17, 38, 48, 48);
     outputGainDial->setBounds ((getWidth() / 2) + 13, 38, 48, 48);
     inputGainLabel->setBounds (17 + 48 / 2 - (64 / 2), 74, 64, 24);
     outputGainLabel->setBounds (((getWidth() / 2) + 13) + 48 - 55, 74, 64, 24);
     inputGainDbLabel->setBounds (17 + 48, 50, 57, 24);
     outputGainDbLabel->setBounds (((getWidth() / 2) + 13) + 48, 50, 63, 24);
-    nodeNameLabel->setBounds (10, 11, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -221,44 +223,45 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff3b3b3b"/>
   <SLIDER name="inputGainDial" id="ad10f98d10a1ba0f" memberName="inputGainDial"
           virtualName="" explicitFocusOrder="0" pos="17 38 48 48" rotarysliderfill="ff4ed23f"
-          min="-70" max="12" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
+          min="-70.00000000000000000000" max="12.00000000000000000000"
+          int="0.00000000000000000000" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.00000000000000000000"
           needsCallback="1"/>
   <SLIDER name="outputGainDial" id="4c4d97e94f46242" memberName="outputGainDial"
           virtualName="" explicitFocusOrder="0" pos="13C 38 48 48" thumbcol="ff53752b"
-          rotarysliderfill="ff5f8f12" rotaryslideroutline="66000000" min="-70"
-          max="12" int="0" style="RotaryVerticalDrag" textBoxPos="NoTextBox"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1"
-          needsCallback="1"/>
+          rotarysliderfill="ff5f8f12" rotaryslideroutline="66000000" min="-70.00000000000000000000"
+          max="12.00000000000000000000" int="0.00000000000000000000" style="RotaryVerticalDrag"
+          textBoxPos="NoTextBox" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
   <LABEL name="inputGainLabel" id="578cfef930d9cb9b" memberName="inputGainLabel"
          virtualName="" explicitFocusOrder="0" pos="0Cc 74 64 24" posRelativeX="ad10f98d10a1ba0f"
          textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="Input Gain"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="12" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="12.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <LABEL name="outputGainLabel" id="381cc0608cacfbbf" memberName="outputGainLabel"
          virtualName="" explicitFocusOrder="0" pos="55R 74 64 24" posRelativeX="4c4d97e94f46242"
          textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="Output Gain"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="12" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="12.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <LABEL name="inputGainDbLabel" id="38e51ba306e21626" memberName="inputGainDbLabel"
          virtualName="" explicitFocusOrder="0" pos="0R 50 57 24" posRelativeX="ad10f98d10a1ba0f"
          textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="0.00 dB"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="14.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <LABEL name="outputGainDbLabel" id="9037e588101840e6" memberName="outputGainDbLabel"
          virtualName="" explicitFocusOrder="0" pos="0R 50 63 24" posRelativeX="4c4d97e94f46242"
          textCol="ffffffff" edTextCol="ff000000" edBkgCol="0" labelText="0.00 dB"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="14.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <LABEL name="nodeNameLabel" id="ad398bbca3f6dfab" memberName="nodeNameLabel"
          virtualName="" explicitFocusOrder="0" pos="10 11 150 24" edTextCol="ff000000"
          edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="1"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="18"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="18.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
