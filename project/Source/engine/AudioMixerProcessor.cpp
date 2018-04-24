@@ -141,9 +141,6 @@ private:
             for (int i = 0; i < monitor->getNumChannels(); ++i)
                 meter.setValue (i, monitor->getLevel (i));
             meter.repaint();
-
-            if (fader.getValue() != Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB))
-                stabilizeContent();
         }
     };
 
@@ -282,7 +279,10 @@ private:
     void timerCallback() override
     {
         for (auto* const strip : strips)
+        {
             strip->processMeter();
+            strip->stabilizeContent();
+        }
     }
 };
 
