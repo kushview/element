@@ -77,7 +77,7 @@ private:
             fader.setValue (0.f, dontSendNotification);
             fader.setSkewFactor (2);
             fader.addListener (this);
-            
+            stabilizeContent();
             addAndMakeVisible (meter);
 
             editor.strips.add (this);
@@ -136,6 +136,9 @@ private:
             for (int i = 0; i < monitor->getNumChannels(); ++i)
                 meter.setValue (i, monitor->getLevel (i));
             meter.repaint();
+
+            if (fader.getValue() != Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB))
+                stabilizeContent();
         }
     };
 
@@ -340,6 +343,7 @@ void AudioMixerProcessor::addStereoTrack()
 
         ScopedLock sl (getCallbackLock());
         tracks.add (track);
+        numTracks = tracks.size();
     }
     else
     {
@@ -488,6 +492,94 @@ float AudioMixerProcessor::getTrackGain (const int track) const
         return 1.f;
     ScopedLock sl (getCallbackLock());
     return tracks.getUnchecked(track)->gain;
+}
+
+void AudioMixerProcessor::getStateInformation (juce::MemoryBlock& block)
+{
+    OwnedArray<Track> t;
+    while (t.size() < numTracks)
+        t.add (new Track());
+    float volume = 0.0f;
+    bool mute = false;
+    {
+        ScopedLock sl (getCallbackLock());
+        for (int i = 0; i < numTracks; ++i)
+            t.getUnchecked(i)->update (tracks.getUnchecked (i));
+        volume = *masterVolume;
+        mute = *masterMute;
+    }
+
+    ValueTree state ("audiomixer");
+    state.setProperty (Tags::volume, volume, 0)
+         .setProperty ("mute", mute, 0);
+    for (int i = 0; i < numTracks; ++i)
+    {
+        ValueTree trk ("track");
+        auto* const track = t.getUnchecked (i);
+        trk.setProperty ("index",       track->index, 0)
+           .setProperty ("busIdx",      track->busIdx, 0)
+           .setProperty ("numInputs",   track->numInputs, 0)
+           .setProperty ("numOutputs",  track->numOutputs, 0)
+           .setProperty ("gain",        track->gain, 0)
+           .setProperty ("mute",        track->mute, 0);
+        state.addChild (trk, -1, 0);
+    }
+
+    if (auto* xml = state.createXml())
+    {
+        copyXmlToBinary (*xml, block);
+        deleteAndZero (xml);
+    }
+}
+
+void AudioMixerProcessor::setStateInformation (const void* data, int size)
+{
+    ValueTree state;
+    if (auto* xml = getXmlFromBinary (data, size))
+    {
+        state = ValueTree::fromXml (*xml);
+        deleteAndZero (xml);
+    }
+
+    if (! state.isValid())
+        return;
+
+    Array<Track*> newTracks;
+    for (int i = 0; i < state.getNumChildren(); ++i)
+    {
+        const ValueTree trk (state.getChild (i));
+        auto* const track   = new Track();
+        track->index        = trk.getProperty ("index", i);
+        track->busIdx       = trk.getProperty ("busIdx", i);
+        track->numInputs    = trk.getProperty ("numInputs", 2);
+        track->numOutputs   = trk.getProperty ("numOutputs", 2);
+        track->gain         = trk.getProperty ("gain", 1.f);
+        track->lastGain     = track->gain;
+        track->mute         = (bool) trk.getProperty ("mute", false);
+
+        track->monitor = new Monitor (track->index, track->numInputs);
+        track->monitor->gain.set (track->gain);
+        track->monitor->nextGain.set (track->gain);
+        track->monitor->muted.set (track->mute ? 1 : 0);
+        track->monitor->nextMute.set (track->mute ? 1 : 0);
+        
+        newTracks.add (track);
+    }
+
+    {
+        ScopedLock sl (getCallbackLock());
+        *masterVolume = (float) state.getProperty ("volume", 0.0);
+        *masterMute = (bool) state.getProperty ("mute", false);
+        masterMonitor->nextGain.set (Decibels::decibelsToGain ((float)*masterVolume, (float)EL_FADER_MIN_DB));
+        masterMonitor->gain.set (masterMonitor->nextGain.get());
+        masterMonitor->nextMute.set (*masterMute ? 1 : 0);
+        masterMonitor->muted.set (masterMonitor->nextMute.get());
+        tracks.swapWith (newTracks);
+    }
+
+    for (auto* dt : newTracks)
+        delete dt;
+    newTracks.clear();
 }
 
 }

@@ -87,6 +87,18 @@ public:
         float gain      = 1.0;
         bool mute       = false;
         MonitorPtr      monitor;
+
+        inline void update (const Track* const track)
+        {
+            this->index         = track->index;
+            this->busIdx        = track->busIdx;
+            this->numInputs     = track->numInputs;
+            this->numOutputs    = track->numOutputs;
+            this->gain          = track->gain;
+            this->lastGain      = track->gain;
+            this->mute          = track->mute;
+            this->monitor       = track->monitor;
+        }
     };
 
     explicit AudioMixerProcessor (int numTracks = 4,
@@ -162,8 +174,8 @@ public:
     void setCurrentProgram (int) override { }
     const String getProgramName (int) override { return "Program"; }
     void changeProgramName (int, const String&) override { }
-    void getStateInformation (juce::MemoryBlock&) override { }
-    void setStateInformation (const void*, int) override { }
+    void getStateInformation (juce::MemoryBlock&) override;
+    void setStateInformation (const void*, int) override;
 
 private:
     MonitorPtr masterMonitor;

@@ -26,9 +26,11 @@
           </ports>
         </node>
         <node format="Element" identifier="element.audioMixer" id="5" name="Audio Mixer"
-              type="plugin" numAudioIns="8" numAudioOuts="2" relativeX="0.49130434782608695121"
-              relativeY="0.57345971563981046337" bypass="0" program="1" persistent="1"
-              renderMode="single" windowX="757" windowY="55" windowVisible="1">
+              type="plugin" numAudioIns="8" numAudioOuts="2" relativeX="0.49158249158249156530"
+              relativeY="0.57342657342657343822" bypass="0" program="1" persistent="1"
+              renderMode="single" windowX="768" windowY="111" windowVisible="1"
+              state="463.VMjLgXb....OgUGYo8VaogWYxAhcuwVcsUVOhPiK3.SLv.iL0.iLzPSLz.iMxTCLv.iHfzVczUVOh.iH9vCcxE1XqARZtQVY30iHvHBHhU2bIQFd8HBLh.ha00VRtAWczMWOhHiHf3Vcs8TczAWczMWOhHiHfbVXo4VOh.iKz.yLzDyLvfyMwHSN0jiL3jSM0DiHfzVczUVOh.iHu3COzIWXisFHo4FYkgWOhDiHfHVcykDY30iHwHBHtUWaI4Fb0Q2b8HhLh.ha001S0QGb0Q2b8HhLh.xYgkla8HBLtXCLzbCNyTSNzXCL3LCL1fCNzbyMh.Ra0QWY8HBLh7hO7PmbgM1ZfjlajUFd8HhLh.hX0MWRjgWOhHiHf3VcskjavUGcy0iHxHBHtUWaOUGcvUGcy0iHxHBHmEVZt0iHw3BLv.CLv.CLv.CLv.CLv.CLv.CLvHBHsUGck0iHvHxK9vCcxE1XqARZtQVY30iHyHBHhU2bIQFd8HxLh.ha00VRtAWczMWOhHiHf3Vcs8TczAWczMWOhHiHfbVXo4VOhDiKv.CLv.CLv.CLv.CLv.CLv.CLv.iHfzVczUVOh.iHu3COuDVcjk1askFdkImO.."
+              programState="463.VMjLgXb....OgUGYo8VaogWYxAhcuwVcsUVOhPiK3.SLv.iL0.iLzPSLz.iMxTCLv.iHfzVczUVOh.iH9vCcxE1XqARZtQVY30iHvHBHhU2bIQFd8HBLh.ha00VRtAWczMWOhHiHf3Vcs8TczAWczMWOhHiHfbVXo4VOh.iKz.yLzDyLvfyMwHSN0jiL3jSM0DiHfzVczUVOh.iHu3COzIWXisFHo4FYkgWOhDiHfHVcykDY30iHwHBHtUWaI4Fb0Q2b8HhLh.ha001S0QGb0Q2b8HhLh.xYgkla8HBLtXCLzbCNyTSNzXCL3LCL1fCNzbyMh.Ra0QWY8HBLh7hO7PmbgM1ZfjlajUFd8HhLh.hX0MWRjgWOhHiHf3VcskjavUGcy0iHxHBHtUWaOUGcvUGcy0iHxHBHmEVZt0iHw3BLv.CLv.CLv.CLv.CLv.CLv.CLvHBHsUGck0iHvHxK9vCcxE1XqARZtQVY30iHyHBHhU2bIQFd8HxLh.ha00VRtAWczMWOhHiHf3Vcs8TczAWczMWOhHiHfbVXo4VOhDiKv.CLv.CLv.CLv.CLv.CLv.CLv.iHfzVczUVOh.iHu3COuDVcjk1askFdkImO..">
           <nodes/>
           <ports>
             <port index="0" type="audio" flow="input" name="Left"/>
