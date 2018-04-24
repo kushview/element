@@ -75,6 +75,7 @@ private:
             fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
             fader.setRange (EL_FADER_MIN_DB, 12.0, 0.001);
             fader.setValue (0.f, dontSendNotification);
+            fader.setSkewFactor (2);
             fader.addListener (this);
             
             addAndMakeVisible (meter);
@@ -109,7 +110,6 @@ private:
         {
             if (s == &fader)
             {
-                DBG("VOL: " << s->getValue());
                 monitor->requestVolume (s->getValue());
             }
         }
@@ -416,6 +416,11 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
         for (int c = 0; c < output.getNumChannels(); ++c)
             output.copyFromWithRamp (c, 0, tempBuffer.getReadPointer(c), numSamples,
                                      lastGain, gain);
+
+    if (gain != masterMonitor->nextGain.get())
+        *masterVolume = Decibels::gainToDecibels (masterMonitor->nextGain.get(), (float) EL_FADER_MIN_DB);
+    if (*masterMute != (bool) masterMonitor->nextMute.get())
+        *masterMute = masterMonitor->nextMute.get() <= 0 ? false : true;
 
     masterMonitor->muted.set (*masterMute);
     masterMonitor->gain.set (gain);
