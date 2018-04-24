@@ -4,6 +4,7 @@
 #include "gui/LookAndFeel.h"
 
 #define EL_FADER_MIN_DB     -90.0
+#define EL_FADER_MAX_DB     12.0
 
 namespace Element {
 
@@ -73,12 +74,15 @@ private:
             addAndMakeVisible (fader);
             fader.setSliderStyle (Slider::LinearBarVertical);
             fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
-            fader.setRange (EL_FADER_MIN_DB, 12.0, 0.001);
+            fader.setRange (EL_FADER_MIN_DB, EL_FADER_MAX_DB, 0.001);
             fader.setValue (0.f, dontSendNotification);
             fader.setSkewFactor (2);
             fader.addListener (this);
-            stabilizeContent();
+            
             addAndMakeVisible (meter);
+
+            stabilizeContent();
+            resized();
 
             editor.strips.add (this);
         }
@@ -127,8 +131,9 @@ private:
 
         void stabilizeContent()
         {
-            fader.setValue (Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB),
-                            dontSendNotification);
+            const double dB = (double) Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB);
+            if (fader.getValue() != dB)
+                fader.setValue (dB, dontSendNotification);
         }
 
         void processMeter()
@@ -179,7 +184,7 @@ private:
             }
             else
             {
-                DBG("[EL] monitor not found for track: " << rowNumber);
+                // noop: no monitor for strip
             }
 
             return nullptr;

@@ -544,7 +544,6 @@ namespace Element {
                 proc->getStateInformation (state);
                 if (state.getSize() > 0)
                 {
-                    DBG("[EL] state saved to node: " << getName());
                     objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
                 }
                 else
@@ -558,7 +557,6 @@ namespace Element {
 				proc->getCurrentProgramStateInformation (state);
 				if (state.getSize() > 0)
 				{
-					DBG("[EL] program state saved to node: " << getName());
 					objectData.setProperty(Tags::programState, state.toBase64Encoding(), 0);
 				}
 
