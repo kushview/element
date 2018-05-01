@@ -79,6 +79,20 @@ private:
             
             addAndMakeVisible (meter);
 
+            addAndMakeVisible (name); 
+            name.setFont (name.getFont().withHeight (14));
+            name.setJustificationType (Justification::centred);
+            setTrackName (monitor->getTrackId() >= 0 ? "Track " + String(monitor->getTrackId() + 1)
+                                                     : "Master");
+
+            addAndMakeVisible (mute);
+            mute.setColour (TextButton::buttonOnColourId, Colors::toggleRed);
+            mute.setButtonText ("M");
+            mute.addListener (this);
+
+            addAndMakeVisible (volume);
+            volume.setFont (volume.getFont().withHeight (12));
+            volume.setJustificationType (Justification::centred);
             stabilizeContent();
             resized();
 
@@ -86,6 +100,11 @@ private:
         }
         
         ~ChannelStrip() { editor.strips.removeFirstMatchingValue (this); }
+
+        void setTrackName (const String& n)
+        {
+            name.setText (n, dontSendNotification);
+        }
 
         void setMonitor (MonitorPtr ptr)
         {
@@ -102,17 +121,30 @@ private:
         void resized() override
         {
             auto r = getLocalBounds();
+            name.setBounds (r.removeFromTop (18));
+            
+            volume.setBounds (r.removeFromBottom (18));
+            auto r2 = r.removeFromBottom (18);
+            mute.setBounds (r2.removeFromRight (getWidth() / 3));
+            
             fader.setBounds (r.removeFromRight (getWidth() / 2));
             meter.setBounds (r);
         }
 
-        void buttonClicked (Button*) override {}
+        void buttonClicked (Button* button) override
+        {
+            if (button == &mute)
+            {
+                monitor->requestMute (! mute.getToggleState());
+            }
+        }
 
         void sliderValueChanged (Slider* s) override
         {
             if (s == &fader)
             {
                 monitor->requestVolume (s->getValue());
+                updateLabels();
             }
         }
 
@@ -126,12 +158,27 @@ private:
         AudioMixerProcessor::MonitorPtr monitor;
         Slider fader;
         DigitalMeter meter;
+        TextButton mute;
+        Label name;
+        Label volume;
+
+        void updateLabels()
+        {
+            String voltxt = String (fader.getValue(), 2);
+            voltxt << "dB";
+            volume.setText (voltxt, dontSendNotification);
+        }
 
         void stabilizeContent()
         {
             const double dB = (double) Decibels::gainToDecibels (monitor->getGain(), (float) EL_FADER_MIN_DB);
             if (fader.getValue() != dB)
+            {
                 fader.setValue (dB, dontSendNotification);
+                updateLabels();
+            }
+
+            mute.setToggleState (monitor->isMuted(), dontSendNotification);
         }
 
         void processMeter()
