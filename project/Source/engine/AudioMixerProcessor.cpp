@@ -19,11 +19,9 @@ public:
           owner (p),
           channels (*this)
     {
-        // setOpaque (false);
         setName ("AudioMixerEditor");
         addAndMakeVisible (channels);
-        setSize (640, 360);
-
+        setSize (330, 210);
         startTimerHz (24);
     }
 

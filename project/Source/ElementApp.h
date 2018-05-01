@@ -64,6 +64,8 @@ namespace Tags
 
     const Identifier vertical           = "vertical";
     const Identifier staticPos          = "staticPos";
+
+    const Identifier plugin             = "plugin";
 }
 
 struct Alert

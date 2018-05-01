@@ -138,8 +138,7 @@ bool GuiController::isWindowOpen (const String&)
 }
 
 void GuiController::runDialog (const String& uri)
-{
-    
+{ 
     if (uri == ELEMENT_PREFERENCES)
     {
         if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog")) {
@@ -194,25 +193,26 @@ ContentComponent* GuiController::getContentComponent()
     return content.get();
 }
 
-void GuiController::showPluginWindowsFor (const Node& node, const bool recursive)
+void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
+                                          const bool force)
 {
     if (! node.isGraph())
     {
-        if ((bool) node.getProperty ("windowVisible", false))
+        if (force || (bool) node.getProperty ("windowVisible", false))
             presentPluginWindow (node);
         return;
     }
 
     if (node.isGraph() && recursive)
         for (int i = 0; i < node.getNumNodes(); ++i)
-            showPluginWindowsFor (node.getNode(i), recursive);
+            showPluginWindowsFor (node.getNode (i), recursive, force);
 }
 
 void GuiController::presentPluginWindow (const Node& node)
 {
-    if (! windowManager)
+    if (! windowManager || ! node.hasEditor())
         return;
-    
+
     auto* window = windowManager->getPluginWindowFor (node);
     if (! window)
         window = windowManager->createPluginWindowFor (node);
@@ -286,7 +286,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showGraphEditor,
         Commands::showLastContentView,
         Commands::toggleVirtualKeyboard,
-        Commands::rotateContentView
+        Commands::rotateContentView,
+        Commands::showAllPluginWindows
     });
     
     commands.add (Commands::quit);
@@ -427,6 +428,11 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
             result.setInfo ("Rotate View...", "Show the graph editor", "Session", 0);
             break;
+
+        case Commands::showAllPluginWindows:
+            // result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
+            result.setInfo ("Show all plugin windows...", "Show all plugins for the current graph.", "Session", 0);
+            break;
             
         case Commands::checkNewerVersion:
             result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
@@ -525,7 +531,12 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::rotateContentView:
             content->nextMainView();
             break;
-            
+        
+        case Commands::showAllPluginWindows: {
+            if (auto s = getWorld().getSession())
+                showPluginWindowsFor (s->getActiveGraph(), true, true);
+        } break;
+
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;

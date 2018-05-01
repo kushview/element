@@ -599,6 +599,15 @@ namespace Element {
         return 0;
     }
 
+    bool Node::hasEditor() const
+    {
+        if (Tags::plugin == getNodeType())
+            if (auto gn = getGraphNode())
+                if (auto* const proc = getGraphNode()->getAudioProcessor())
+                    return proc->hasEditor();
+        return false;        
+    }
+
     void ConnectionBuilder::addConnections (GraphController& controller, const uint32 targetNodeId) const
     {
         GraphNodePtr tgt = controller.getNodeForId (targetNodeId);

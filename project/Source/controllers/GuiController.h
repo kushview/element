@@ -76,7 +76,8 @@ namespace Element {
         SessionRef session();
         
         /** show plugin windows of this node or child nodes */
-        void showPluginWindowsFor (const Node& node, const bool recursive = true);
+        void showPluginWindowsFor (const Node& node, const bool recursive = true,
+                                   const bool force = false);
         
         /** present a plugin window */
         void presentPluginWindow (const Node& node);

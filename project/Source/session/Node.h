@@ -263,6 +263,8 @@ namespace Element {
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
         
+        bool hasEditor() const;
+        
         ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
         ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
