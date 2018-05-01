@@ -123,12 +123,13 @@ public:
     {
         desc.name = getName();
         desc.fileOrIdentifier   = "element.audioMixer";
-        desc.descriptiveName    = "Audio Mixer";
+        desc.descriptiveName    = "Simple 4 track mixer";
+        desc.category           = "Mixer";
         desc.numInputChannels   = getTotalNumInputChannels();
         desc.numOutputChannels  = getTotalNumOutputChannels();
         desc.hasSharedContainer = false;
         desc.isInstrument       = false;
-        desc.manufacturerName   = "Kushview";
+        desc.manufacturerName   = "Element";
         desc.pluginFormatName   = "Element";
         desc.version            = "1.0.0";
     }
@@ -142,7 +143,7 @@ public:
     bool isTrackMuted  (const int track) const;
     float getTrackGain  (const int track) const;
 
-    inline bool acceptsMidi() const override { return false; }
+    inline bool acceptsMidi()  const override { return false; }
     inline bool producesMidi() const override { return false; }
     
     inline bool hasEditor() const override { return true; }
@@ -169,11 +170,13 @@ public:
                                  AudioProcessor::BusProperties& outProperties) override;
 
     double getTailLengthSeconds() const override { return 0.0; }
+    
     int getNumPrograms() override { return 1; }
     int getCurrentProgram() override { return 1; }
     void setCurrentProgram (int) override { }
-    const String getProgramName (int) override { return "Program"; }
+    const String getProgramName (int) override { return "Audio Mixer"; }
     void changeProgramName (int, const String&) override { }
+
     void getStateInformation (juce::MemoryBlock&) override;
     void setStateInformation (const void*, int) override;
 

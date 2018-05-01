@@ -127,6 +127,19 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
 };
 
+static bool elNodeIsAudioMixer (const Node& node)
+{
+    return node.getFormat().toString() == "Element"
+        && node.getIdentifier().toString() == "element.audioMixer";
+}
+
+static bool elNodeCanChangeIO (const Node& node)
+{
+    return !node.isIONode() 
+        && !node.isGraph()
+        && !elNodeIsAudioMixer (node);
+}
+
 class FilterComponent    : public Component,
                            public Button::Listener,
                            public AsyncUpdater
@@ -152,7 +165,7 @@ public:
         addAndMakeVisible (ioButton);
         ioButton.setButtonText ("IO");
         ioButton.addListener (this);
-        ioButton.setVisible (!node.isIONode() && !node.isGraph());
+        ioButton.setVisible (elNodeCanChangeIO (node));
 
         if (!node.isIONode() && !node.isGraph())
         {

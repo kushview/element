@@ -185,6 +185,9 @@ namespace Element {
                  objectData.getProperty(Tags::identifier) == "midi.output");
         }
         
+        const var& getFormat() const        { return objectData.getProperty(Tags::format); }
+        const var& getIdentifier() const    { return objectData.getProperty(Tags::identifier); }
+
         inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
         
         /** returns the first node by format and identifier */

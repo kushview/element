@@ -136,7 +136,7 @@ namespace Element {
     
     ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
         : world (g)
-    {  }
+    { }
     
     void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
     {
@@ -244,14 +244,17 @@ namespace Element {
        #if EL_USE_MIDI_SEQUENCER
         results.add ("element.midiSequencer");
        #endif
+       
        #if EL_USE_SUBGRAPHS
         results.add ("element.graph");
        #endif
+
         results.add ("element.audioMixer");
         return results;
     }
     
-    AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, double, int)
+    AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDescription& desc, 
+                                                                      double sampleRate, int blockSize)
     {
         ScopedPointer<AudioPluginInstance> base;
         
@@ -283,10 +286,10 @@ namespace Element {
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
         
         else if (desc.fileOrIdentifier == "element.midiSequencer")
-            base = new MidiSequenceProcessor();
+            base = (world.getUnlockStatus().isFullVersion() ? new MidiSequenceProcessor() : nullptr);
         
         else if (desc.fileOrIdentifier == "element.audioMixer")
-            base = new AudioMixerProcessor();
+            base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
 
         return base != nullptr ? base.release() : nullptr;
     }
@@ -298,7 +301,7 @@ namespace Element {
         if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
             callback (userData, i, String::empty);
         else
-            callback (userData, 0, String::empty);
+            callback (userData, nullptr, String::empty);
     }
     
     bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
