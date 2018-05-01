@@ -578,6 +578,7 @@ void AudioMixerProcessor::setStateInformation (const void* data, int size)
         masterMonitor->nextMute.set (*masterMute ? 1 : 0);
         masterMonitor->muted.set (masterMonitor->nextMute.get());
         tracks.swapWith (newTracks);
+        numTracks = tracks.size();
     }
 
     for (auto* dt : newTracks)
