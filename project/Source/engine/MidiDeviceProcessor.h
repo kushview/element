@@ -3,7 +3,7 @@
 #include "engine/BaseProcessor.h"
 
 namespace Element {
-    
+
 class MidiDeviceProcessor : public BaseProcessor,
                             public MidiInputCallback
 {
