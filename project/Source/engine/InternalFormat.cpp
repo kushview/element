@@ -11,6 +11,7 @@
 #include "engine/AllPassFilterProcessor.h"
 #include "engine/AudioMixerProcessor.h"
 #include "engine/CombFilterProcessor.h"
+#include "engine/MidiDeviceProcessor.h"
 #include "engine/MidiSequenceProcessor.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/ReverbProcessor.h"
@@ -53,6 +54,13 @@ namespace Element {
             PlaceholderProcessor p;
             p.fillInPluginDescription (placeholderDesc);
         }
+
+        {
+            MidiDeviceProcessor in (true);
+            in.fillInPluginDescription (midiInputDeviceDesc);
+            MidiDeviceProcessor out (false);
+            out.fillInPluginDescription (midiOutputDeviceDesc);
+        }
     }
 
     AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
@@ -89,6 +97,14 @@ namespace Element {
         {
             return nullptr;
         }
+        else if (desc.fileOrIdentifier == "element.midiInputDevice")
+        {
+            return new MidiDeviceProcessor (true);
+        }
+        else if (desc.fileOrIdentifier == "element.midiOutputDevice")
+        {
+            return new MidiDeviceProcessor (false);
+        }
 
         return nullptr;
     }
@@ -116,6 +132,8 @@ namespace Element {
         for (int i = 0; i < (int) audioOutputPort; ++i)
             results.add (new PluginDescription (*description ((InternalFormat::ID) i)));
         results.add (new PluginDescription (placeholderDesc));
+        results.add (new PluginDescription (midiInputDeviceDesc));
+        results.add (new PluginDescription (midiOutputDeviceDesc));
     }
     
     void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
