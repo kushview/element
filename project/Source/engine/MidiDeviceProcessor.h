@@ -4,7 +4,8 @@
 
 namespace Element {
     
-class MidiDeviceProcessor : public BaseProcessor
+class MidiDeviceProcessor : public BaseProcessor,
+                            public MidiInputCallback
 {
 public:
     explicit MidiDeviceProcessor (const bool isInput = true);
@@ -13,7 +14,7 @@ public:
     void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = "MIDI I/O Device";
-        desc.fileOrIdentifier   = inputDevice ? "element.midiInputDevice" : "element.midiOutputDevice";;
+        desc.fileOrIdentifier   = inputDevice ? "element.midiInputDevice" : "element.midiOutputDevice";
         desc.descriptiveName    = "MIDI device node";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;
@@ -45,12 +46,20 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    int getNumPrograms()        override { return 1; };
-    int getCurrentProgram()     override { return 1; };
-    void setCurrentProgram (int index)          override { ignoreUnused (index); };
-    const String getProgramName (int index)     override { ignoreUnused (index); }
+    int getNumPrograms()        override { return 1; }
+    int getCurrentProgram()     override { return 1; }
+    void setCurrentProgram (int index)          override { ignoreUnused (index); }
+    const String getProgramName (int index)     override { ignoreUnused (index); return String(); }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
+
+    void handleIncomingMidiMessage (MidiInput* source,
+                                    const MidiMessage& message) override;
+
+    void handlePartialSysexMessage (MidiInput* source,
+                                    const uint8* messageData,
+                                    int numBytesSoFar,
+                                    double timestamp) override;
 
 #if 0
     // Audio Processor Template
@@ -92,6 +101,7 @@ private:
     bool prepared = false;
     ScopedPointer<MidiInput> input;
     ScopedPointer<MidiOutput> output;
+    MidiMessageCollector inputMessages;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiDeviceProcessor);
 };
 
