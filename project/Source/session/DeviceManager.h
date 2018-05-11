@@ -1,10 +1,9 @@
 /*
     DeviceManager.h - This file is part of Element
-    Copyright (C) 2014  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2018  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef EL_DEVICE_MANAGER_H
-#define EL_DEVICE_MANAGER_H
+#pragma once
 
 #include "ElementApp.h"
 #include "engine/Engine.h"
@@ -20,19 +19,16 @@ public:
     DeviceManager();
     ~DeviceManager();
 
-    virtual void createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list) override;
-
     void getAudioDrivers (StringArray& drivers);
     void selectAudioDriver (const String& name);
     void attach (EnginePtr engine);
+
+    virtual void createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list) override;
+
 private:
-
     friend class World;
-
     class Private;
     Scoped<Private> impl;
 };
 
 }
-
-#endif // EL_DEVICE_MANAGER_H
