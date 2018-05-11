@@ -7,6 +7,23 @@
 namespace Element {
 struct AppMessage : public Message { };
 
+struct AddMidiDeviceMessage : public AppMessage
+{
+    AddMidiDeviceMessage (const String& name, const bool isInput)
+        : device (name), inputDevice (isInput) { }
+    const String device;
+    const bool inputDevice;
+    inline PluginDescription getPluginDescription() const
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = "Internal";
+        desc.fileOrIdentifier = inputDevice ? "element.midiInputDevice" : "element.midiOutputDevice";
+        desc.numInputChannels = desc.numOutputChannels = 0;
+        desc.isInstrument = 0;
+        return desc;
+    }
+};
+
 /** Send this to add a preset for a node */
 struct AddPresetMessage : public AppMessage
 {

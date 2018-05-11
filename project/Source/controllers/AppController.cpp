@@ -241,6 +241,10 @@ void AppController::handleMessage (const Message& msg)
         sess->openFile (osm->file);
         recentFiles.addFile (osm->file);
     }
+    else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add/Remove MIDI Device", mdm->device);
+    }
     else
     {
         handled = false;

@@ -875,11 +875,13 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         }
         else if (result >= 80000 && result < 90000)
         {
-            DBG("[EL] midi in: " << getMidiDeviceForMenuResult (result, true));
+            ViewHelpers::postMessageFor (this, 
+                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, true), true));
         }
         else if (result >= 90000 && result < 100000)
         {
-            DBG("[EL] midi out: " << getMidiDeviceForMenuResult (result, false))
+            ViewHelpers::postMessageFor (this, 
+                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, false), false));
         }
         else
         {
