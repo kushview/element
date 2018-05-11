@@ -1,3 +1,7 @@
+/*
+    DeviceManager.h - This file is part of Element
+    Copyright (C) 2017-2018  Kushview, LLC.  All rights reserved.
+*/
 
 #pragma once
 
@@ -5,6 +9,24 @@
 #include "session/PluginManager.h"
 
 namespace Element {
+
+inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput,
+                                         const int offset = 80000)
+{
+    jassert(offset > 0);
+    const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
+    for (int i = 0; i < devices.size(); ++i)
+        menu.addItem (i + offset, devices [i], true, false);
+}
+
+inline static String getMidiDeviceForMenuResult (const int result, const bool isInput,
+                                                 const int offset = 80000)
+{
+    jassert(offset > 0 && result >= offset);
+    const int index = result - offset;
+    const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
+    return isPositiveAndBelow (index, devices.size()) ? devices [index] : String();
+}
 
 class PluginsPopupMenu : public PopupMenu
 {
