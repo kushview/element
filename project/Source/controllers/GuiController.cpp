@@ -141,7 +141,13 @@ void GuiController::runDialog (const String& uri)
 { 
     if (uri == ELEMENT_PREFERENCES)
     {
-        if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog")) {
+        if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog"))
+        {
+            if (!dialog->isOnDesktop() || !dialog->isVisible())
+            {
+                dialog->setVisible (true);
+                dialog->addToDesktop();
+            }
             dialog->toFront (true);
             return;
         }
