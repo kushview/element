@@ -873,6 +873,14 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             if (const auto* desc = menu.getPluginDescription (result, verified))
                 ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc));
         }
+        else if (result >= 80000 && result < 90000)
+        {
+            DBG("[EL] midi in: " << getMidiDeviceForMenuResult (result, true));
+        }
+        else if (result >= 90000 && result < 100000)
+        {
+            DBG("[EL] midi out: " << getMidiDeviceForMenuResult (result, false))
+        }
         else
         {
             PluginDescription desc;
