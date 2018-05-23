@@ -846,11 +846,11 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             menu.addItem (4, "MIDI Output",     true, graph.hasMidiOutputNode());
             menu.addSeparator();
             PopupMenu submenu;
-            addMidiDevicesToMenu (submenu, true);
-            menu.addSubMenu ("MIDI Input Device", submenu, 80000);
+            addMidiDevicesToMenu (submenu, true, 80000);
+            menu.addSubMenu ("MIDI Input Device", submenu);
             submenu.clear();
-            addMidiDevicesToMenu (submenu, false);
-            menu.addSubMenu ("MIDI Output Device", submenu, 90000);
+            addMidiDevicesToMenu (submenu, false, 90000);
+            menu.addSubMenu ("MIDI Output Device", submenu);
         }
         
         menu.addSeparator();

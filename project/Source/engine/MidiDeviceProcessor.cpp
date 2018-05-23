@@ -6,9 +6,30 @@ namespace Element {
 MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput)
     : BaseProcessor(),
       inputDevice (isInput)
-{ }
+{ 
+    setPlayConfigDetails (0, 0, 44100.0, 1024);
+}
 
 MidiDeviceProcessor::~MidiDeviceProcessor() noexcept { }
+
+void MidiDeviceProcessor::setCurrentDevice (const String& device)
+{
+    const bool wasSuspended = isSuspended();
+    suspendProcessing (true);
+    const bool wasPrepared = prepared;
+    const double rate = getSampleRate();
+    const int block = getBlockSize();
+
+    if (prepared)
+        releaseResources();
+
+    deviceName = device;
+
+    if (wasPrepared)
+        prepareToPlay (rate, block);
+
+    suspendProcessing (wasSuspended);
+}
 
 const String MidiDeviceProcessor::getName() const
 {
@@ -22,24 +43,26 @@ const String MidiDeviceProcessor::getName() const
 void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
 {
     inputMessages.reset (sampleRate);
-    ignoreUnused (maximumExpectedSamplesPerBlock);
-
     if (prepared)
         return;
     
-    const int defaultIdx = inputDevice ? MidiInput::getDefaultDeviceIndex()
-                                       : MidiOutput::getDefaultDeviceIndex();
+    const StringArray devList = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
+    const int defaultIdx = inputDevice ? MidiInput::getDefaultDeviceIndex() : MidiOutput::getDefaultDeviceIndex();
+    int deviceIdx = deviceName.isNotEmpty() ? devList.indexOf (deviceName) : defaultIdx;
+    if (deviceIdx < 0) deviceIdx = defaultIdx;
+
     if (inputDevice)
     {
-        input = MidiInput::openDevice (defaultIdx, this);
+        input = MidiInput::openDevice (deviceIdx, this);
         if (input) input->start();
     }
     else
     {
-        output = MidiOutput::openDevice (defaultIdx);
+        output = MidiOutput::openDevice (deviceIdx);
         if (output) output->startBackgroundThread();
     }
 
+    setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     prepared = true;
 }
 

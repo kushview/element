@@ -243,7 +243,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))
     {
-        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Add/Remove MIDI Device", mdm->device);
+        ec->addMidiDeviceNode (mdm->device, mdm->inputDevice);
     }
     else
     {

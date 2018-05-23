@@ -3,6 +3,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
+#include "engine/MidiDeviceProcessor.h"
 #include "engine/SubGraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
@@ -819,6 +820,43 @@ Node EngineController::addPlugin (GraphController& c, const PluginDescription& d
     }
 
     return Node();
+}
+
+void EngineController::addMidiDeviceNode (const String& device, const bool isInput)
+{
+    GraphNodePtr ptr;
+    Node graph;
+    if (auto s = getWorld().getSession())
+        graph = s->getActiveGraph();
+    if (auto* const root = graphs->findActiveRootGraphController())
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = "Internal";
+        desc.fileOrIdentifier = isInput ? "element.midiInputDevice" : "element.midiOutputDevice";
+        ptr = root->getNodeForId (root->addFilter (&desc, 0.5, 0.5));
+    }
+
+    MidiDeviceProcessor* const proc = (ptr == nullptr) ? nullptr 
+        : dynamic_cast<MidiDeviceProcessor*> (ptr->getAudioProcessor());
+
+    if (proc != nullptr)
+    {
+        proc->setCurrentDevice (device);
+        for (int i = 0; i < graph.getNumNodes(); ++i)
+        {
+            auto node (graph.getNode (i));
+            if (node.getGraphNode() == ptr.get())
+            {
+                node.setProperty (Tags::name, proc->getCurrentDevice());
+                node.resetPorts();
+                break;
+            }
+        }
+    }
+    else
+    {
+        // noop
+    }
 }
 
 void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::BusesLayout& layout)

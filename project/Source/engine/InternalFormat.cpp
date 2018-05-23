@@ -81,22 +81,6 @@ namespace Element {
         {
             return new IOP (IOP::midiOutputNode);
         }
-        else if (desc.name == samplerDesc.name)
-        {
-            return nullptr;
-        }
-        else if (desc.fileOrIdentifier == metroDesc.fileOrIdentifier)
-        {
-            return new MidiSequenceProcessor();
-        }
-        else if (desc.fileOrIdentifier == "element.placeholder")
-        {
-            return new PlaceholderProcessor();
-        }
-        else if (desc.name == "Sequencer")
-        {
-            return nullptr;
-        }
         else if (desc.fileOrIdentifier == "element.midiInputDevice")
         {
             return new MidiDeviceProcessor (true);
@@ -104,6 +88,10 @@ namespace Element {
         else if (desc.fileOrIdentifier == "element.midiOutputDevice")
         {
             return new MidiDeviceProcessor (false);
+        }
+        else if (desc.fileOrIdentifier == "element.placeholder")
+        {
+            return new PlaceholderProcessor();
         }
 
         return nullptr;

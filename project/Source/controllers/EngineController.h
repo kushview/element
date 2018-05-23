@@ -39,6 +39,9 @@ public:
         a ConnectionBuilder */
     void addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder);
 
+    /** Adds a midi device node to the current root graph */
+    void addMidiDeviceNode (const String& device, const bool isInput);
+
     /** Removes a node from the current graph */
     void removeNode (const uint32);
     
