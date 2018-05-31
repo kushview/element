@@ -6,6 +6,8 @@ import os, sys
 sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
+VERSION='0.17.1'
+
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
@@ -25,12 +27,13 @@ def configure (conf):
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
 
+    conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
     conf.env.DEBUG = conf.options.debug
-    conf.env.EL_VERSION_STRING = '0.15.7'
+    conf.env.EL_VERSION_STRING = VERSION
     
     conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
     conf.define ('EL_FREE', 1 if conf.options.enable_free else 0)
