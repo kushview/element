@@ -33,11 +33,12 @@ void MidiDeviceProcessor::setCurrentDevice (const String& device)
 
 const String MidiDeviceProcessor::getName() const
 {
+    String name;
     if (isInputDevice() && input != nullptr)
-        return input->getName();
+        name = input->getName();
     if (isOutputDevice() && output != nullptr)
-        return output->getName();
-    return "Unknown";
+        name = output->getName();
+    return name.isNotEmpty() ? name : "N/A";
 }
 
 void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
@@ -59,7 +60,15 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
     else
     {
         output = MidiOutput::openDevice (deviceIdx);
-        if (output) output->startBackgroundThread();
+        if (output)
+        {
+            output->clearAllPendingMessages();
+            output->startBackgroundThread();
+        } 
+        else 
+        {
+            DBG("[EL] could not open MIDI output: " << deviceIdx << ": " << deviceName);
+        }
     }
 
     setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
@@ -77,8 +86,13 @@ void MidiDeviceProcessor::processBlock (AudioBuffer<float>& audio, MidiBuffer& m
     else
     {
         if (output && !midi.isEmpty())
+        {
+            traceMidi (midi); DBG("samplerate: " << getSampleRate());
+            const double delayMs = 6.0;
             output->sendBlockOfMessages (
-                midi, 6.0 + Time::getMillisecondCounterHiRes(), getSampleRate());
+                midi, delayMs + Time::getMillisecondCounterHiRes(), getSampleRate());
+        }
+
         midi.clear (0, nframes);
     }
 }
@@ -108,7 +122,7 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
-         .setProperty ("deviceName", getName(), 0);
+         .setProperty ("deviceName", deviceName, 0);
     if (ScopedPointer<XmlElement> xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -120,6 +134,11 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
         state = ValueTree::fromXml (*xml);
     if (! state.isValid())
         return;
+    if (inputDevice != (bool) state.getProperty ("inputDevice"))
+    {
+        DBG("[EL] MIDI Device node wrong direction");
+    }
+    setCurrentDevice (state.getProperty("deviceName", "").toString());
 }
 
 void MidiDeviceProcessor::handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)

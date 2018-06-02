@@ -881,7 +881,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         else if (result >= 90000 && result < 100000)
         {
             ViewHelpers::postMessageFor (this, 
-                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, false), false));
+                new AddMidiDeviceMessage (getMidiDeviceForMenuResult (result, false, 90000), false));
         }
         else
         {
