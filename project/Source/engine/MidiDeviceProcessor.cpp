@@ -1,7 +1,61 @@
 
 #include "engine/MidiDeviceProcessor.h"
+#include "gui/LookAndFeel.h"
 
 namespace Element {
+
+class MidiDeviceEditor : public AudioProcessorEditor,
+                         public ComboBox::Listener
+{
+public:
+    MidiDeviceEditor (MidiDeviceProcessor& p, const bool isInput)
+        : AudioProcessorEditor (&p), proc (p), inputDevice (isInput)
+    {
+        setOpaque (false);
+        addAndMakeVisible (deviceBox);
+        deviceBox.addListener (this);
+        setSize (240, 80);
+    }
+
+    ~MidiDeviceEditor()
+    {
+        deviceBox.removeListener (this);
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.fillAll (Element::LookAndFeel::backgroundColor);
+    }
+
+    void resized() override
+    {
+        deviceBox.setBounds (
+            getLocalBounds().withSizeKeepingCentre (180, 18));
+    }
+
+    void comboBoxChanged (ComboBox*) override
+    {
+        const auto deviceName = deviceBox.getItemText (deviceBox.getSelectedItemIndex());
+        proc.setCurrentDevice (deviceName);
+    }
+
+private:
+    friend class MidiDeviceProcessor;
+
+    MidiDeviceProcessor& proc;
+    const bool inputDevice;
+    StringArray devices;
+    ComboBox deviceBox;
+    void updateDevices (const bool resetList = true)
+    {
+        if (resetList)
+            devices = inputDevice ? MidiInput::getDevices() : MidiOutput::getDevices();
+        deviceBox.clear (dontSendNotification);
+        for (int i = 0; i < devices.size(); ++i)
+            deviceBox.addItem (devices [i], i + 1);
+        deviceBox.setSelectedItemIndex (devices.indexOf (proc.getName()));
+    }
+};
 
 MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput)
     : BaseProcessor(),
@@ -115,7 +169,9 @@ void MidiDeviceProcessor::releaseResources()
 
 AudioProcessorEditor* MidiDeviceProcessor::createEditor()
 {
-    return new GenericAudioProcessorEditor (this);
+    auto* const editor = new MidiDeviceEditor (*this, inputDevice);
+    editor->updateDevices (true);
+    return editor;
 }
 
 void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
