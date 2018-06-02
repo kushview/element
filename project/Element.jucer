@@ -82,6 +82,10 @@
         <FILE id="r5MLNe" name="MidiDataBase.cpp" compile="0" resource="0"
               file="Source/engine/MidiDataBase.cpp"/>
         <FILE id="ww06U1" name="MidiDataBase.h" compile="0" resource="0" file="Source/engine/MidiDataBase.h"/>
+        <FILE id="SgnSdh" name="MidiDeviceProcessor.cpp" compile="1" resource="0"
+              file="Source/engine/MidiDeviceProcessor.cpp"/>
+        <FILE id="L6YkjB" name="MidiDeviceProcessor.h" compile="0" resource="0"
+              file="Source/engine/MidiDeviceProcessor.h"/>
         <FILE id="aMLMSs" name="MidiSequenceProcessor.cpp" compile="1" resource="0"
               file="Source/engine/MidiSequenceProcessor.cpp"/>
         <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
