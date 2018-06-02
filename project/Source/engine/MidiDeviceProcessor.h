@@ -30,7 +30,10 @@ public:
 
     void setCurrentDevice (const String& device);
     const String& getCurrentDevice() const { return deviceName; }
+    bool isDeviceOpen() const;
 
+    void reload();
+    
     const String getName() const override;
     
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;

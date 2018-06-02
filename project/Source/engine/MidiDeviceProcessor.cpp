@@ -5,7 +5,9 @@
 namespace Element {
 
 class MidiDeviceEditor : public AudioProcessorEditor,
-                         public ComboBox::Listener
+                         public ComboBox::Listener,
+                         public Button::Listener,
+                         public Timer
 {
 public:
     MidiDeviceEditor (MidiDeviceProcessor& p, const bool isInput)
@@ -14,12 +16,38 @@ public:
         setOpaque (false);
         addAndMakeVisible (deviceBox);
         deviceBox.addListener (this);
+
+        addAndMakeVisible (statusButton);
+        statusButton.setColour (TextButton::buttonColourId, Colors::toggleRed);
+        statusButton.setColour (TextButton::buttonOnColourId, Colors::toggleGreen);
+        statusButton.setToggleState (false, dontSendNotification);
+        statusButton.addListener (this);
+
         setSize (240, 80);
+
+        startTimer (1000 * 2.5);
     }
 
     ~MidiDeviceEditor()
     {
+        stopTimer();
         deviceBox.removeListener (this);
+    }
+
+    void stabilizeComponents()
+    {
+        statusButton.setToggleState (proc.isDeviceOpen(), dontSendNotification);
+    }
+
+    void buttonClicked (Button*) override
+    {
+        proc.reload();
+        stabilizeComponents();
+    }
+
+    void timerCallback() override
+    {
+        stabilizeComponents();
     }
 
     void paint (Graphics& g) override
@@ -29,14 +57,18 @@ public:
 
     void resized() override
     {
-        deviceBox.setBounds (
-            getLocalBounds().withSizeKeepingCentre (180, 18));
+        const int widgetSize = 18;
+        const auto r = getLocalBounds().withSizeKeepingCentre (180, widgetSize);
+        deviceBox.setBounds (r.withLeft (r.getX() + 4 + widgetSize / 2));
+        statusButton.setBounds (deviceBox.getX() - widgetSize - 4, deviceBox.getY(), 
+                                widgetSize ,widgetSize);
     }
 
     void comboBoxChanged (ComboBox*) override
     {
         const auto deviceName = deviceBox.getItemText (deviceBox.getSelectedItemIndex());
         proc.setCurrentDevice (deviceName);
+        stabilizeComponents();
     }
 
 private:
@@ -46,6 +78,8 @@ private:
     const bool inputDevice;
     StringArray devices;
     ComboBox deviceBox;
+    TextButton statusButton;
+
     void updateDevices (const bool resetList = true)
     {
         if (resetList)
@@ -83,6 +117,17 @@ void MidiDeviceProcessor::setCurrentDevice (const String& device)
         prepareToPlay (rate, block);
 
     suspendProcessing (wasSuspended);
+}
+
+bool MidiDeviceProcessor::isDeviceOpen() const
+{
+    ScopedLock sl (getCallbackLock());
+    return inputDevice ? input != nullptr : output != nullptr;
+}
+
+void MidiDeviceProcessor::reload()
+{
+    setCurrentDevice (deviceName);
 }
 
 const String MidiDeviceProcessor::getName() const
@@ -141,7 +186,6 @@ void MidiDeviceProcessor::processBlock (AudioBuffer<float>& audio, MidiBuffer& m
     {
         if (output && !midi.isEmpty())
         {
-            traceMidi (midi); DBG("samplerate: " << getSampleRate());
             const double delayMs = 6.0;
             output->sendBlockOfMessages (
                 midi, delayMs + Time::getMillisecondCounterHiRes(), getSampleRate());
