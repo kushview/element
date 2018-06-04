@@ -19,6 +19,27 @@ struct GlobalLookAndFeel
     Element::LookAndFeel look;
 };
 
+struct GuiController::KeyPressManager : public KeyListener
+{
+    KeyPressManager (GuiController& g) : owner (g) { }
+    ~KeyPressManager() { }
+
+    bool keyPressed (const KeyPress& key, Component* component) override
+    {
+        ignoreUnused (key, component);
+        DBG("KEYPRESS: " << key.getKeyCode());
+        return false;
+    }
+
+    bool keyStateChanged (bool isKeyDown, Component* component) override
+    {
+        ignoreUnused (isKeyDown, component);
+        return false;
+    }
+
+    GuiController& owner;
+};
+
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> guiInstances;
 
@@ -28,6 +49,7 @@ GuiController::GuiController (Globals& w, AppController& a)
       windowManager (nullptr),
       mainWindow (nullptr)
 {
+    keys = new KeyPressManager (*this);
     if (guiInstances.size() <= 0)
         sGlobalLookAndFeel = new GlobalLookAndFeel();
     guiInstances.add (this);
@@ -41,6 +63,9 @@ GuiController::~GuiController()
 
     if (mainWindow)
     {
+        mainWindow->removeKeyListener (keys);
+        keys = nullptr;
+
         closeAllWindows();
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
@@ -110,7 +135,6 @@ void GuiController::closeAllWindows()
 {
     if (! windowManager)
         return;
-    
     windowManager->closeAll();
 }
 
@@ -243,6 +267,7 @@ void GuiController::run()
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     PropertiesFile* pf = globals().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
+    mainWindow->addKeyListener (keys);
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();

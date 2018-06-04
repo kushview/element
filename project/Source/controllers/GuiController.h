@@ -116,13 +116,15 @@ namespace Element {
         AppController& controller;
         Globals& world;
         SessionRef sessionRef;
-        
         OwnedArray<PluginWindow>         pluginWindows;
         ScopedPointer<WindowManager>     windowManager;
         ScopedPointer<MainWindow>        mainWindow;
         ScopedPointer<ContentComponent>  content;
         ScopedPointer<AboutComponent>    about;
         
+        struct KeyPressManager;
+        ScopedPointer<KeyPressManager> keys;
+
         void showSplash();
         void toggleAboutScreen();
         
