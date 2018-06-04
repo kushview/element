@@ -10,11 +10,13 @@ namespace Element {
 
 static inline bool isCapsLockOn()
 {
-    #if defined(__MINGW32__) || defined(_MSC_VER)
-    #elif defined(__APPLE__)
-    #else
+   #if defined(__MINGW32__) || defined(_MSC_VER)
+    return (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
+   #elif defined(__APPLE__)
+
+   #else
         #pragma error "Linux not yet supported caps lock"
-    #endif
+   #endif
 }
 
 }
