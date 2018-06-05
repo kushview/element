@@ -6,6 +6,14 @@
 
 #pragma once
 
+#if defined(__MINGW32__) || defined(_MSC_VER)
+ 
+#elif defined(__APPLE__)
+ #include <CoreGraphics/CoreGraphics.h>
+#else
+ #pragma error "Linux not yet supported caps lock"
+#endif
+
 namespace Element {
 
 static inline bool isCapsLockOn()
@@ -13,10 +21,12 @@ static inline bool isCapsLockOn()
    #if defined(__MINGW32__) || defined(_MSC_VER)
     return (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
    #elif defined(__APPLE__)
-
+    CGEventFlags flags = CGEventSourceFlagsState (kCGEventSourceStateHIDSystemState);
+    return (kCGEventFlagMaskAlphaShift & flags) != 0;
    #else
-        #pragma error "Linux not yet supported caps lock"
+    // linux
    #endif
+   return false;
 }
 
 }

@@ -8,6 +8,8 @@
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
+#include "gui/VirtualKeyboardView.h"
+#include "CapsLock.h"
 #include "Version.h"
 
 namespace Element {
@@ -26,14 +28,46 @@ struct GuiController::KeyPressManager : public KeyListener
 
     bool keyPressed (const KeyPress& key, Component* component) override
     {
-        ignoreUnused (key, component);
-        DBG("KEYPRESS: " << key.getKeyCode());
-        return false;
+        bool handled = false;
+        if (isCapsLockOn() && isVirtualKeyboardVisible())
+            handled = handleVirtualKeyboardPressed (key, component);
+        return handled;
     }
 
     bool keyStateChanged (bool isKeyDown, Component* component) override
     {
-        ignoreUnused (isKeyDown, component);
+        bool handled = false;
+        if (isCapsLockOn() && isVirtualKeyboardVisible())
+            handled = handleVirtualKeyboardStateChange (isKeyDown, component);
+        return handled;
+    }
+
+private:
+    bool isVirtualKeyboardVisible() const
+    {
+        if (auto* cc = owner.getContentComponent())
+            return cc->isVirtualKeyboardVisible();
+        return false;
+    }
+
+    VirtualKeyboardView* getVirtualKeyboardView() const
+    {
+        if (auto* cc = owner.getContentComponent())
+            return cc->getVirtualKeyboardView();
+        return nullptr;
+    }
+
+    bool handleVirtualKeyboardPressed (const KeyPress& key, Component* component)
+    {
+        if (auto* vcv = getVirtualKeyboardView())
+            return vcv->keyPressed (key, component);
+        return false;
+    }
+
+    bool handleVirtualKeyboardStateChange (bool isKeyDown, Component*)
+    {
+        if (auto* vcv = getVirtualKeyboardView())
+            return vcv->keyStateChanged (isKeyDown);
         return false;
     }
 

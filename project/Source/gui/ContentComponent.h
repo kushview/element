@@ -45,7 +45,6 @@ public:
 
     /** @internal */
     ApplicationCommandTarget* getNextCommandTarget() override { return nextCommandTarget; }
-
     /** @internal */
     virtual void paint (Graphics& g) override;
     /** @internal */
@@ -87,6 +86,7 @@ public:
     bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
     void setVirtualKeyboardVisible (const bool isVisible);
     void toggleVirtualKeyboard();
+    VirtualKeyboardView* getVirtualKeyboardView() const { return keyboard.get(); }
     
     void setCurrentNode (const Node& node);
     void stabilize (const bool refreshDataPathTrees = false);

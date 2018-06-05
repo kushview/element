@@ -58,8 +58,7 @@ static void showProductLockedAlert (const String& msg = String(), const String& 
 
 ContentView::ContentView()
 {
-    addKeyListener(this);
-    
+    addKeyListener (this);
 }
     
 ContentView::~ContentView()

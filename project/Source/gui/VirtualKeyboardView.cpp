@@ -113,4 +113,15 @@ void VirtualKeyboardView::didBecomeActive()
     }
 }
 
+bool VirtualKeyboardView::keyPressed (const KeyPress& k, Component* c)
+{
+    return keyboard != nullptr ? keyboard->keyPressed (k) 
+        : ContentView::keyPressed (k, c);
+}
+
+bool VirtualKeyboardView::keyStateChanged (bool isDown)
+{
+    return keyboard != nullptr ? keyboard->keyStateChanged (isDown) : false;
+}
+
 }
