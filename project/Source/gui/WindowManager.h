@@ -161,21 +161,8 @@ private:
     OwnedArray<DialogWindow> activeDialogs;
     void onWindowClosed (Window* c);
     
-    inline void deletePluginWindow (PluginWindow* window, const bool windowVisible)
-    {
-        jassert (activePluginWindows.contains (window));
-        deletePluginWindow (activePluginWindows.indexOf (window), windowVisible);
-    }
-    
-    inline void deletePluginWindow (const int index, const bool windowVisible)
-    {
-        if (auto* window = activePluginWindows.getUnchecked (index))
-        {
-            window->node.setProperty ("windowVisible", windowVisible);
-            activePluginWindows.remove (index);
-        }
-    }
-    
+    void deletePluginWindow (PluginWindow* window, const bool windowVisible);
+    void deletePluginWindow (const int index, const bool windowVisible);
     PluginWindow* createPluginWindowFor (const Node& n, Component* e);
 };
 

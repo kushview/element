@@ -41,6 +41,7 @@ namespace Element {
         CommandManager& commander();
         
         AppController& getAppController() const { return controller; }
+        KeyListener* getKeyListener() const;
         
         Globals& globals();
         

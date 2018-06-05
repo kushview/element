@@ -19,9 +19,27 @@ void WindowManager::onWindowClosed (Window* c)
 }
 
 
+void WindowManager::deletePluginWindow (PluginWindow* window, const bool windowVisible)
+{
+    jassert (activePluginWindows.contains (window));
+    deletePluginWindow (activePluginWindows.indexOf (window), windowVisible);
+}
+
+void WindowManager::deletePluginWindow (const int index, const bool windowVisible)
+{
+    if (auto* window = activePluginWindows.getUnchecked (index))
+    {
+        window->node.setProperty ("windowVisible", windowVisible);
+        window->removeKeyListener (gui.getKeyListener());
+        activePluginWindows.remove (index);
+    }
+}
+
 PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
 {
-    return activePluginWindows.add (new PluginWindow (gui, e, n));
+    auto* window = activePluginWindows.add (new PluginWindow (gui, e, n));
+    window->addKeyListener (gui.getKeyListener());
+    return window;
 }
 
 }

@@ -649,6 +649,8 @@ void GuiController::toggleAboutScreen()
     }
 }
 
+KeyListener* GuiController::getKeyListener() const { return keys.get(); }
+
 #if EL_RUNNING_AS_PLUGIN
 void GuiController::clearContentComponent()
 {
