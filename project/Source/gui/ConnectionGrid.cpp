@@ -661,21 +661,42 @@ namespace Element
     class ConnectionGrid::Quads : public QuadrantLayout
     {
     public:
-        Quads() : thicknessOnOtherQuads (190) { }
+        enum ResizeMode {
+            DynamicQ1 = 0
+        };
+
+        Quads() { }
         ~Quads() { }
         
+        void setResizeMode (const ResizeMode mode)
+        {
+            if (mode == resizeMode)
+                return;
+            resizeMode = mode;
+            resized();
+        }
+
         void updateCenter() override
         {
-            // keeps q2, q3, and q4 static
+            switch (resizeMode)
+            {
+                case DynamicQ1: updateForDynamicQ1(); break;
+            }
+        }
+        
+    private:
+        ResizeMode resizeMode = DynamicQ1;
+        int thicknessOnOtherQuads = 190;
+
+        // keeps q2, q3, and q4 static
+        void updateForDynamicQ1()
+        {
             const int w = getWidth();
             const int h = getHeight();
             const int x = (thicknessOnOtherQuads <= w) ? thicknessOnOtherQuads : 0;
             const int y = (h - thicknessOnOtherQuads >= 0) ? h - thicknessOnOtherQuads : 0;
-            setCenter (x, y);
+            setCenter (x, y);   
         }
-        
-    private:
-        int thicknessOnOtherQuads;
     };
     
     // MARK: PatchMatrix IMPL
