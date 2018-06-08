@@ -89,7 +89,7 @@ def copy_mingw_libs (bld):
 def build_mingw (bld):
     mingwEnv = bld.env.derive()
     mingwSrc = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp")
-    mingwSrc += bld.path.ant_glob('project/Source/**/*.cpp')
+    mingwSrc += bld.path.ant_glob('src/**/*.cpp')
     mingwSrc += bld.path.ant_glob('project/JuceLibraryCode/BinaryData*.cpp')
     mingwSrc.sort()
     
@@ -97,7 +97,7 @@ def build_mingw (bld):
         source      = mingwSrc,
         includes    =  [ '/opt/kushview/include', 'libs/JUCE/modules', \
                          'libs/kv/modules', 'project/JuceLibraryCode', \
-                         'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
+                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
                          os.path.expanduser('~') + '/SDKs/ASIOSDK/common' ],
         cxxflags    = '',
         target      = '%s/Element' % (mingwEnv.CROSS),
@@ -116,7 +116,7 @@ def build_plugin (bld, name):
     env.cxxshlib_PATTERN = env.cshlib_PATTERN = juce.plugin_pattern(bld)
     lib = bld.shlib (
         source = bld.path.ant_glob('%s/**/*.cpp' % plugin_dir),
-        includes = ['plugins', plugin_dir, 'project/Source'],
+        includes = ['plugins', plugin_dir, 'src'],
         name = name,
         target = 'modules/%s/%s' % (bundle, name),
         use = common_use_flags(),
@@ -145,12 +145,12 @@ def build_linux (bld):
 def build_mac (bld):
     appEnv = bld.env.derive()
     bld.program (
-        source      = bld.path.ant_glob ('project/Source/**/*.cpp') + \
+        source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp') + \
                       element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'project/Source', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
