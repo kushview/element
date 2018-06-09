@@ -145,6 +145,7 @@ void SessionController::newSession()
         
         setChangesFrozen (true);
         currentSession->clear();
+        currentSession->addGraph (Node::createDefaultGraph(), true);
         if (auto* ec = findSibling<EngineController>())
             ec->sessionReloaded();
         
