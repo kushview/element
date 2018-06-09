@@ -45,7 +45,6 @@ public:
         macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
         macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
         macMenu->addSeparator();
-        macMenu->addCommandItem (&cmd, Commands::signIn, "Manage License");
         macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");
         MenuBarModel::setMacMainMenu (this, macMenu.get());
        #else
@@ -238,7 +237,6 @@ private:
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");
         menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
-        menu.addCommandItem (&cmd, Commands::signIn, "Manage License");
         menu.addSeparator();
         menu.addCommandItem (&cmd, StandardApplicationCommandIDs::quit);
        #endif

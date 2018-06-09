@@ -34,6 +34,8 @@ public:
     
     void setMode (int);
     
+    void saveStatus();
+    
     /** @internal */
     void paint (Graphics&) override;
     /** @internal */

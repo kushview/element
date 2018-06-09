@@ -22,6 +22,7 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "gui/GuiCommon.h"
+#include "gui/UnlockForm.h"
 #include "Globals.h"
 #include "Settings.h"
 
@@ -29,7 +30,7 @@
 #define EL_AUDIO_SETTINGS_NAME "Audio"
 #define EL_MIDI_SETTINGS_NAME "MIDI"
 #define EL_PLUGINS_PREFERENCE_NAME  "Plugins"
-
+#define EL_LICENSE_SETTINGS_NAME "License"
 //[/Headers]
 
 #include "PreferencesComponent.h"
@@ -130,11 +131,11 @@ namespace Element {
             addAndMakeVisible (formatNotice);
             formatNotice.setText ("Note: enabled format changes take effect upon restart", dontSendNotification);
             formatNotice.setFont (Font (12.0, Font::italic));
-#if JUCE_MAC
+           #if JUCE_MAC
             availableFormats.addArray ({ "AudioUnit", "VST", "VST3" });
-#else
+           #else
             availableFormats.addArray ({ "VST", "VST3" });
-#endif
+           #endif
             for (const auto& f : availableFormats)
             {
                 auto* toggle = formatToggles.add (new ToggleButton (f));
@@ -670,6 +671,29 @@ namespace Element {
         }
     };
 
+    class LicenseSettingsPage : public SettingsPage
+    {
+    public:
+        LicenseSettingsPage (Globals& world)
+        {
+            setName (EL_LICENSE_SETTINGS_NAME);
+            addAndMakeVisible (form = new UnlockForm (world, 
+                "Enter your license key.", false, false, true, true));
+        }
+
+        void resized() override
+        {
+            form->setBounds (getLocalBounds().reduced (2));
+        }
+
+        ~LicenseSettingsPage()
+        {
+            form = nullptr;
+        }
+
+    private:
+        ScopedPointer<UnlockForm> form;
+    };
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -702,7 +726,7 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
-
+    addPage (EL_LICENSE_SETTINGS_NAME);
     setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
@@ -763,6 +787,8 @@ Component* PreferencesComponent::createPageForName (const String& name)
         return new PluginSettingsComponent (world);
     } else if (name == EL_MIDI_SETTINGS_NAME) {
         return new MidiSettingsPage (world);
+    } else if (name == EL_LICENSE_SETTINGS_NAME) {
+        return new LicenseSettingsPage (world);
     }
 
     return nullptr;

@@ -120,12 +120,13 @@ struct UnlockForm::OverlayComp  : public Component,
         
         delete this;
         
-        if (worked && a != Check)
+        if (worked && (a == Activate || a == Check))
         {
-            f.dismiss();
+            f.setMode (Deactivate);
+            f.saveStatus();
             g.getDeviceManager().restartLastAudioDevice();
         }
-        else if (!worked && a == Deactivate)
+        else if (worked && a == Deactivate)
         {
             f.setMode (Activate);
         }
@@ -446,14 +447,24 @@ void UnlockForm::setMode (int mode)
             delete c;
         }
     }
+    else if (status.isUnlocked())
+    {
+        info.deleteAndZero();
+        addAndMakeVisible (info = new Element::LicenseInfo (*this));
+    }
+
     resized();
+}
+
+void UnlockForm::saveStatus()
+{
+    status.save();
+    status.loadAll();
 }
 
 void UnlockForm::dismiss()
 {
-    status.save();
-    status.loadAll();
-    
+    saveStatus();
     if (auto *dw = findParentComponentOfClass<DialogWindow>())
         delete dw;
     else
