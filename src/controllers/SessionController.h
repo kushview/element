@@ -15,6 +15,7 @@ public:
     void activate() override;
     void deactivate() override;
     
+    void openDefaultSession();
     void openFile (const File& file);
     void closeSession();
     void saveSession (const bool saveAs = false);

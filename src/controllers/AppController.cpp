@@ -84,7 +84,7 @@ void AppController::run()
         }
         else
         {
-            // TODO: open a user specified default session if defined
+            sc->openDefaultSession();
         }
     }
     

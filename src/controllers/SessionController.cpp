@@ -33,6 +33,24 @@ void SessionController::deactivate()
     currentSession = nullptr;
 }
 
+void SessionController::openDefaultSession()
+{
+    if (auto* gc = findSibling<GuiController>())
+        gc->closeAllPluginWindows();
+    
+    setChangesFrozen (true);
+    currentSession->clear();
+    currentSession->addGraph (Node::createDefaultGraph(), true);
+
+    if (auto* ec = findSibling<EngineController>())
+        ec->sessionReloaded();
+    if (auto* gc = findSibling<GuiController>())
+        gc->stabilizeContent();
+    
+    document = new SessionDocument (currentSession);
+    setChangesFrozen (false);
+}
+
 void SessionController::openFile (const File& file)
 {
     bool didSomething = true;

@@ -45,11 +45,6 @@ namespace Element {
         Node graph (Tags::graph);
         graph.setProperty (Tags::name, name.isNotEmpty() ? name : "Graph");
         ValueTree nodes = graph.getNodesValueTree();
-        
-       #if 1
-        // TODO: work in progress to create default IO node models
-        // this creates them, but when added to a graph controller, doesn't bind
-        // correctly to actual IO processors (see IONodeEnforcer)
 
         const auto types = StringArray ({ "audio.input", "audio.output", "midi.input", "midi.output" });
         const auto names = StringArray ({ "Audio In", "Audio Out", "MIDI In", "MIDI Out" });
@@ -139,9 +134,6 @@ namespace Element {
             nodes.addChild (ioNode, -1, 0);
         }
 
-        // DBG(graph.getValueTree().toXmlString());
-       #endif
-        
         return graph;
     }
 
