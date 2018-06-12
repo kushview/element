@@ -333,7 +333,8 @@ void UnlockForm::resized()
     cancelButton.setBounds (buttonArea);
     
     r.removeFromBottom (20);
-    
+    message.setBounds (r);
+
     // (force use of a default system font to make sure it has the password blob character)
     Font font (Font::getDefaultTypefaceForFont (Font (Font::getDefaultSansSerifFontName(),
                                                       Font::getDefaultStyle(),
@@ -343,30 +344,14 @@ void UnlockForm::resized()
     
     if (useLicense)
     {
-        licenseBox.setBounds (r.removeFromBottom (boxHeight));
+        auto r2 = r;
+        r2.removeFromTop (r2.getHeight() / 2 + 40);
+        licenseBox.setBounds (r2.removeFromTop (boxHeight));
         licenseBox.setInputRestrictions (512);
         licenseBox.setFont (font);
-        r.removeFromBottom (20);
+        r2.removeFromBottom (20);
     }
-    
-    if (usePassword) {
-        passwordBox.setBounds (r.removeFromBottom (boxHeight));
-        passwordBox.setInputRestrictions (64);
-        passwordBox.setFont (font);
-        r.removeFromBottom (20);
-    }
-    
-    if (useEmail)
-    {
-        emailBox.setBounds (r.removeFromBottom (boxHeight));
-        emailBox.setInputRestrictions (512);
-        emailBox.setFont (font);
-    
-        r.removeFromBottom (20);
-    }
-    
-    message.setBounds (r);
-    
+
     if (info != nullptr)
         info->setBounds (getLocalBounds());
     
