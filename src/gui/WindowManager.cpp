@@ -29,7 +29,7 @@ void WindowManager::deletePluginWindow (const int index, const bool windowVisibl
 {
     if (auto* window = activePluginWindows.getUnchecked (index))
     {
-        window->node.setProperty ("windowVisible", windowVisible);
+        window->node.setProperty (Tags::windowVisible, windowVisible);
         window->removeKeyListener (gui.getKeyListener());
         activePluginWindows.remove (index);
     }

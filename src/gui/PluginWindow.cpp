@@ -50,6 +50,11 @@ public:
         powerButton.setClickingTogglesState (true);
         powerButton.addListener (this);
 
+        addAndMakeVisible (onTopButton);
+        onTopButton.setButtonText ("^");
+        onTopButton.setTooltip ("Keep plugin window on top of others");
+        onTopButton.addListener (this);
+
         updateSize();
     }
     
@@ -94,6 +99,10 @@ public:
             r3.removeFromRight (4);
             
             powerButton.setBounds (r3.removeFromLeft (16));
+
+            r3.removeFromLeft (4);
+            onTopButton.setBounds (r3.removeFromLeft (16));
+
             r3.removeFromRight (4);
         }
         
@@ -118,6 +127,16 @@ public:
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
         }
+        else if (button == &onTopButton)
+        {
+            if (auto* pw = findParentComponentOfClass<PluginWindow>())
+            {
+                pw->setAlwaysOnTop (! pw->isAlwaysOnTop());
+                node.setProperty (Tags::windowOnTop, pw->isAlwaysOnTop());
+            }
+        }
+
+        stabilizeComponents();
     }
     
     void componentMovedOrResized (Component& c, bool wasMoved, bool wasResized) override
@@ -130,21 +149,26 @@ public:
     }
     
     Toolbar* getToolbar() const { return toolbar.get(); }
-    
+
+    void stabilizeComponents()
+    {
+        if (auto* pw = findParentComponentOfClass<PluginWindow>())
+        {
+            onTopButton.setToggleState (pw->isAlwaysOnTop(), dontSendNotification);
+        }
+    }
 private:
     ScopedPointer<PluginWindowToolbar> toolbar;
     SettingButton nodeButton;
-    
     PowerButton powerButton;
+    SettingButton onTopButton;
     Value bypassValue;
 
     ScopedPointer<Component> editor, leftPanel, rightPanel;
     GraphNodePtr object;
     Node node;
 
-    AudioProcessor* getProcessor() {
-        return (object != nullptr) ? object->getAudioProcessor() : nullptr;
-    }
+    AudioProcessor* getProcessor() { return (object != nullptr) ? object->getAudioProcessor() : nullptr; }
 };
 
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
@@ -155,13 +179,14 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);
     setSize (400, 300);
-    setContentOwned (new PluginWindowContent (ui, node), true);
+    auto* const content = new PluginWindowContent (ui, node);
+    setContentOwned (content, true);
     
     if (node.isValid())
     {
-        setTopLeftPosition (node.getValueTree().getProperty ("windowX", Random::getSystemRandom().nextInt (500)),
-                            node.getValueTree().getProperty ("windowY", Random::getSystemRandom().nextInt (500)));
-        node.getValueTree().setProperty ("windowVisible", true, 0);
+        setTopLeftPosition (node.getValueTree().getProperty (Tags::windowX, Random::getSystemRandom().nextInt (500)),
+                            node.getValueTree().getProperty (Tags::windowY, Random::getSystemRandom().nextInt (500)));
+        node.getValueTree().setProperty (Tags::windowVisible, true, 0);
     }
     
 	if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
@@ -172,6 +197,10 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     {
         setResizable (ed->isResizable(), false);
     }
+
+    setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, false));
+
+    content->stabilizeComponents();
 }
 
 PluginWindow::~PluginWindow()
@@ -206,8 +235,8 @@ void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
     
 void PluginWindow::moved()
 {
-    node.setProperty ("windowX", getX());
-    node.setProperty ("windowY", getY());
+    node.setProperty (Tags::windowX, getX());
+    node.setProperty (Tags::windowY, getY());
 }
 
 void PluginWindow::closeButtonPressed()

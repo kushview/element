@@ -66,6 +66,11 @@ namespace Tags
     const Identifier staticPos          = "staticPos";
 
     const Identifier plugin             = "plugin";
+
+    const Identifier windowOnTop        = "windowOnTop";
+    const Identifier windowVisible      = "windowVisible";
+    const Identifier windowX            = "windowX";
+    const Identifier windowY            = "windowY";       
 }
 
 struct Alert
