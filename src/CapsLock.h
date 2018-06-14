@@ -7,7 +7,7 @@
 #pragma once
 
 #if defined(__MINGW32__) || defined(_MSC_VER)
- 
+ #include <Windows.h>
 #elif defined(__APPLE__)
  #include <CoreGraphics/CoreGraphics.h>
 #else

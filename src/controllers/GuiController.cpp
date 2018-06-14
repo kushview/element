@@ -139,6 +139,7 @@ void GuiController::saveProperties (PropertiesFile* props)
     if (mainWindow)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
+        props->setValue ("mainWindowFullScreen", mainWindow->isFullScreen());
     }
 
     if (content)
@@ -306,6 +307,8 @@ void GuiController::run()
     getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
     mainWindow->setVisible (true);
+    if (pf->getBoolValue ("mainWindowFullScreen"))
+        mainWindow->setFullScreen (true);
     findSibling<SessionController>()->resetChanges();
 }
 
