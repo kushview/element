@@ -176,7 +176,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))
     {
-        ec->disconnectNode (dnm2->node);
+        ec->disconnectNode (dnm2->node, dnm2->inputs, dnm2->outputs);
     }
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {

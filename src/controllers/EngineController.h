@@ -80,7 +80,7 @@ public:
     void removeConnection (const uint32, const uint32, const uint32, const uint32, const Node& target);
 
     /** Disconnect the provided node */
-    void disconnectNode (const Node& node);
+    void disconnectNode (const Node& node, const bool inputs = true, const bool outputs = true);
 
     /** Clear the root graph */
     void clear();

@@ -40,8 +40,7 @@ public:
                       uint32 nodeId = 0);
 
     void removeFilter (const uint32 filterUID);
-    void disconnectFilter (const uint32 filterUID);
-
+    void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true);
 
     int getNumConnections() const noexcept;
     const GraphProcessor::Connection* getConnection (const int index) const noexcept;

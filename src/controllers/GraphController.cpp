@@ -345,9 +345,23 @@ void GraphController::removeFilter (const uint32 uid)
     processorArcsChanged();
 }
 
-void GraphController::disconnectFilter (const uint32 id)
+void GraphController::disconnectFilter (const uint32 nodeId, const bool inputs, const bool outputs)
 {
-    if (processor.disconnectNode (id))
+    jassert(inputs || outputs);
+    bool doneAnything = false;
+
+    for (int i = getNumConnections(); --i >= 0;)
+    {
+        const auto* const c = processor.getConnection (i);
+        if ((outputs && c->sourceNode == nodeId) || 
+            (inputs && c->destNode == nodeId))
+        {
+            removeConnection (i);
+            doneAnything = true;
+        }
+    }
+
+    if (doneAnything)
         processorArcsChanged();
 }
 

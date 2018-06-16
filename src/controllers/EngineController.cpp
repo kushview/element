@@ -559,11 +559,11 @@ void EngineController::removeNode (const uint32 nodeId)
     root->removeFilter (nodeId);
 }
 
-void EngineController::disconnectNode (const Node& node)
+void EngineController::disconnectNode (const Node& node, const bool inputs, const bool outputs)
 {
     const auto graph (node.getParentGraph());
     if (auto* controller = graphs->findGraphControllerFor (graph))
-        controller->disconnectFilter (node.getNodeId());
+        controller->disconnectFilter (node.getNodeId(), inputs, outputs);
 }
 
 void EngineController::activate()

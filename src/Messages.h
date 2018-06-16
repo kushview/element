@@ -161,10 +161,11 @@ public:
 class DisconnectNodeMessage : public Message
 {
 public:
-    DisconnectNodeMessage (const Node& n)
-        : Message(), node (n) { }
-    DisconnectNodeMessage() { }
+    DisconnectNodeMessage (const Node& n, const bool i = true, const bool o = true)
+        : Message(), node (n), inputs(i), outputs(o) { }
+    DisconnectNodeMessage() : inputs(true), outputs(true) { }
     const Node node;
+    const bool inputs, outputs;
 };
 
 struct FinishedLaunchingMessage : public AppMessage

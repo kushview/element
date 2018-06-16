@@ -111,6 +111,8 @@ public:
         Duplicate = 1,
         RemoveNode,
         Disconnect,
+        DisconnectInputs,
+        DisconnectOutputs,
         LastItem
     };
     
@@ -169,6 +171,11 @@ public:
         }
     }
     
+    ~NodePopupMenu()
+    {
+        reset();
+    }
+
     inline void addProgramsMenu (const String& subMenuName = "Programs")
     {
         PopupMenu programs; getProgramsMenu (programs);
@@ -228,11 +235,6 @@ public:
         }
     }
     
-    ~NodePopupMenu()
-    {
-        reset();
-    }
-    
     Message* createMessageForResultCode (const int result)
     {
         if (result == RemoveNode)
@@ -241,6 +243,10 @@ public:
             return new DuplicateNodeMessage (node);
         else if (result == Disconnect)
             return new DisconnectNodeMessage (node);
+        else if (result == DisconnectInputs)
+            return new DisconnectNodeMessage (node, true, false);
+        else if (result == DisconnectOutputs)
+            return new DisconnectNodeMessage (node, false, true);
         else if (auto* op = resultMap [result])
         {
             if (auto* const msg = op->createMessage())
@@ -265,7 +271,8 @@ public:
         return nullptr;
     }
     
-    Message* showAndCreateMessage() {
+    Message* showAndCreateMessage()
+    {
         return createMessageForResultCode (this->show());
     }
     
@@ -412,8 +419,17 @@ private:
     {
         if (showHeader)
             addSectionHeader (node.getName());
-        addItem (Disconnect, getNameForItem (Disconnect));
-        addItem (Duplicate,  getNameForItem (Duplicate), ! node.isIONode());
+
+        {
+            PopupMenu disconnect;
+            disconnect.addItem (Disconnect, "All Ports");
+            disconnect.addSeparator();
+            disconnect.addItem (DisconnectInputs, "Input Ports");
+            disconnect.addItem (DisconnectOutputs, "Output Ports");
+            addSubMenu ("Disconnect", disconnect);
+        }
+
+        addItem (Duplicate, getNameForItem (Duplicate), ! node.isIONode());
         addSeparator();
         addItem (RemoveNode, getNameForItem (RemoveNode));
     }
