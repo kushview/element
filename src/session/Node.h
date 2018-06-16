@@ -9,7 +9,6 @@
 #include "engine/GraphNode.h"
 
 namespace Element {
-    
     class GraphController;
     class NodeArray;
     class PortArray;
@@ -309,7 +308,7 @@ namespace Element {
             target = newTarget;
         }
 
-        /** add a port that will be connected to the target's channel
+        /** Add a port that will be connected to the target's channel
             of the corresponding port type
          */
         ConnectionBuilder& addChannel (const Node& node, PortType t, const int sc, const int tc, bool input)

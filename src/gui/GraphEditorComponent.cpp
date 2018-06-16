@@ -133,11 +133,19 @@ static bool elNodeIsAudioMixer (const Node& node)
         && node.getIdentifier().toString() == "element.audioMixer";
 }
 
+static bool elNodeIsMidiDevice (const Node& node)
+{
+    return node.getFormat().toString() == "Internal"
+        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
+             node.getIdentifier().toString() == "element.midiOutputDevice" );
+}
+
 static bool elNodeCanChangeIO (const Node& node)
 {
     return !node.isIONode() 
         && !node.isGraph()
-        && !elNodeIsAudioMixer (node);
+        && !elNodeIsAudioMixer (node)
+        && !elNodeIsMidiDevice (node);
 }
 
 class FilterComponent    : public Component,
@@ -169,9 +177,9 @@ public:
 
         if (!node.isIONode() && !node.isGraph())
         {
-            addAndMakeVisible (powerButton);        
+            addAndMakeVisible (powerButton);
             powerButton.setColour (SettingButton::backgroundOnColourId,
-                                findColour (SettingButton::backgroundColourId));
+                                   findColour (SettingButton::backgroundColourId));
             powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
             powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
             powerButton.setClickingTogglesState (true);

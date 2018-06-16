@@ -355,7 +355,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showLastContentView,
         Commands::toggleVirtualKeyboard,
         Commands::rotateContentView,
-        Commands::showAllPluginWindows
+        Commands::showAllPluginWindows,
+        Commands::hideAllPluginWindows
     });
     
     commands.add (Commands::quit);
@@ -498,10 +499,14 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
 
         case Commands::showAllPluginWindows:
-            // result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
+            result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Show all plugin windows...", "Show all plugins for the current graph.", "Session", 0);
             break;
-            
+        case Commands::hideAllPluginWindows:
+            result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier);
+            result.setInfo ("Hide all plugin windows...", "Hides all plugins on the current graph.", "Session", 0);
+            break;
+
         case Commands::checkNewerVersion:
             result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
             break;
@@ -603,6 +608,10 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showAllPluginWindows: {
             if (auto s = getWorld().getSession())
                 showPluginWindowsFor (s->getActiveGraph(), true, true);
+        } break;
+
+        case Commands::hideAllPluginWindows: {
+                closeAllPluginWindows (false);
         } break;
 
         case Commands::quit:

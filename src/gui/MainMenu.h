@@ -246,7 +246,7 @@ private:
     void buildViewMenu (PopupMenu& menu) { buildViewMenu (cmd, menu); }
     void buildWindowMenu (PopupMenu& menu)
     {
-        menu.addItem (2000, "Close plugin windows...");
+        menu.addCommandItem (&cmd, Commands::hideAllPluginWindows, "Close plugin windows...");
         menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
     }
     
