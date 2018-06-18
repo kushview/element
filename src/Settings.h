@@ -18,6 +18,7 @@ public:
     static const char* checkForUpdatesKey;
     static const char* pluginListKey;
     static const char* pluginFormatsKey;
+    static const char* pluginWindowOnTopDefault;
     static const char* lastPluginScanPathPrefix;
     static const char* scanForPluginsOnStartKey;
     static const char* showPluginWindowsKey;
@@ -46,6 +47,9 @@ public:
     bool openLastUsedSession() const;
     void setOpenLastUsedSession (const bool);
 
+    /** True if plugin windows are on top by default */
+    bool pluginWindowsOnTop() const;
+    void setPluginWindowsOnTop (const bool);
 private:
     PropertiesFile* getProps() const;
 };

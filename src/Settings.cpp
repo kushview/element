@@ -9,6 +9,7 @@ namespace Element {
 
 const char* Settings::checkForUpdatesKey        = "checkForUpdates";
 const char* Settings::pluginFormatsKey          = "pluginFormatsKey";
+const char* Settings::pluginWindowOnTopDefault  = "pluginWindowOnTopDefault";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 const char* Settings::showPluginWindowsKey      = "showPluginWindows";
 const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
@@ -141,6 +142,21 @@ void Settings::setOpenLastUsedSession (const bool shouldOpen)
         return;
     if (auto* p = getProps())
         p->setValue (openLastUsedSessionKey, shouldOpen);
+}
+
+bool Settings::pluginWindowsOnTop() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (pluginWindowOnTopDefault, true);
+    return false;
+}
+
+void Settings::setPluginWindowsOnTop (const bool onTop)
+{
+    if (onTop == pluginWindowsOnTop())
+        return;
+    if (auto* p = getProps())
+        p->setValue (pluginWindowOnTopDefault, onTop);
 }
 
 }

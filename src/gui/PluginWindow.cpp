@@ -198,7 +198,8 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
         setResizable (ed->isResizable(), false);
     }
 
-    setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, false));
+    const bool defaultOnTop = g.getWorld().getSettings().pluginWindowsOnTop();
+    setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
 
     content->stabilizeComponents();
 }

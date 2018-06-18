@@ -269,19 +269,25 @@ namespace Element {
             scanForPlugins.setToggleState (settings.scanForPluginsOnStartup(), dontSendNotification);
             scanForPlugins.getToggleStateValue().addListener (this);
 
-            addAndMakeVisible ( showPluginWindowsLabel);
+            addAndMakeVisible (showPluginWindowsLabel);
             showPluginWindowsLabel.setText ("Automatically show plugin windows", dontSendNotification);
             showPluginWindowsLabel.setFont (Font (12.0, Font::bold));
-
             addAndMakeVisible (showPluginWindows);
             showPluginWindows.setClickingTogglesState (true);
             showPluginWindows.setToggleState (settings.showPluginWindowsWhenAdded(), dontSendNotification);
             showPluginWindows.getToggleStateValue().addListener (this);
 
-            addAndMakeVisible ( openLastSessionLabel);
+            addAndMakeVisible (pluginWindowsOnTopLabel);
+            pluginWindowsOnTopLabel.setText ("Plugin windows on top by default", dontSendNotification);
+            pluginWindowsOnTopLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (pluginWindowsOnTop);
+            pluginWindowsOnTop.setClickingTogglesState (true);
+            pluginWindowsOnTop.setToggleState (settings.pluginWindowsOnTop(), dontSendNotification);
+            pluginWindowsOnTop.getToggleStateValue().addListener (this);
+
+            addAndMakeVisible (openLastSessionLabel);
             openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
             openLastSessionLabel.setFont (Font (12.0, Font::bold));
-
             addAndMakeVisible (openLastSession);
             openLastSession.setClickingTogglesState (true);
             openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
@@ -347,6 +353,7 @@ namespace Element {
                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
 
             layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
+            layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
             layoutSetting (r, openLastSessionLabel, openLastSession);
 
             if (pluginSettings.isVisible())
@@ -387,6 +394,10 @@ namespace Element {
             {
                 settings.setOpenLastUsedSession (openLastSession.getToggleState());
             }
+            else if (value.refersToSameSourceAs (pluginWindowsOnTop.getToggleStateValue()))
+            {
+                settings.setPluginWindowsOnTop (pluginWindowsOnTop.getToggleState());
+            }
 
             settings.saveIfNeeded();
             gui.stabilizeContent();
@@ -407,6 +418,9 @@ namespace Element {
 
         Label showPluginWindowsLabel;
         SettingButton showPluginWindows;
+        
+        Label pluginWindowsOnTopLabel;
+        SettingButton pluginWindowsOnTop;
 
         Label openLastSessionLabel;
         SettingButton openLastSession;
