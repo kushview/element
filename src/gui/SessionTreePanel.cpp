@@ -184,6 +184,14 @@ public:
         ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
     }
     
+    void getSelectedNodes (NodeArray& nodes)
+    {
+        const auto numSelected = getOwnerView()->getNumSelectedItems();
+        for (int i = 0; i < numSelected; ++i)
+            if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (getOwnerView()->getSelectedItem (i)))
+                nodes.add (item->node);
+    }
+
     virtual void handlePopupMenuResult (int result) override
     {
         switch (result)
@@ -192,14 +200,31 @@ public:
             case 1: deleteItem(); break;
             case 2: duplicateItem(); break;
             case 5: addNewGraph(); break;
-            {
-                
+
+            case 10: {
+                NodeArray selected; getSelectedNodes (selected);
+                for (const auto& n : selected)
+                    DBG(node.getName());
             } break;
-                
+
             default: break;
         }
     }
     
+    virtual void showMultiSelectionPopupMenu()
+    {
+        PopupMenu menu;
+        if (node.isGraph())
+        {
+            menu.addItem (5, "Add New Graph");
+            menu.addSeparator();
+        }
+        
+        menu.addItem (10, "Delete Selected");
+        
+        launchPopupMenu (menu);
+    }
+
     virtual void showPopupMenu() override
     {
         PopupMenu menu;
@@ -216,7 +241,7 @@ public:
         launchPopupMenu (menu);
     }
     
-       bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
+    bool isInterestedInDragSource (const DragAndDropTarget::SourceDetails& details) override
     {
         const auto& desc (details.description);
         if (! node.isGraph())
@@ -469,6 +494,7 @@ SessionTreePanel::SessionTreePanel()
     tree.setRootItemVisible (false);
     tree.setInterceptsMouseClicks (true, true);
     tree.setDefaultOpenness (true);
+    tree.setMultiSelectEnabled (true);
     setRoot (new SessionRootTreeItem (*this));
     data.addListener (this);
 }
@@ -567,6 +593,15 @@ void SessionTreePanel::valueTreeParentChanged (ValueTree& tree)
 void SessionTreePanel::valueTreeRedirected (ValueTree& tree)
 {
 
+}
+
+bool SessionTreePanel::keyPressed (const KeyPress& k)
+{
+    if ((k.getKeyCode() == 'A' || k.getKeyCode() == 'a') && k.getModifiers().isCommandDown()) {
+        rootItem->getSubItem(0)->setSelected (true, true, dontSendNotification);
+        return true;
+    }
+    return TreePanelBase::keyPressed (k);
 }
 
 }

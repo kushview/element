@@ -70,6 +70,8 @@ public:
     void setSession (SessionPtr);
     SessionPtr getSession() const;
 
+    bool keyPressed (const KeyPress&) override;
+    
 private:
     SessionPtr session;
     ValueTree data;
