@@ -115,12 +115,31 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
     {
-        if (rnm->node.isValid())
-            ec->removeNode (rnm->node);
-        else if (rnm->node.getParentGraph().isRootGraph())
-            ec->removeNode (rnm->nodeId);
+        if (rnm->nodes.isEmpty())
+        {
+            if (rnm->node.isValid())
+                ec->removeNode (rnm->node);
+            else if (rnm->node.getParentGraph().isRootGraph())
+                ec->removeNode (rnm->nodeId);
+            else
+                handled = false;
+        }
         else
-            handled = false;
+        {
+            NodeArray graphs;
+            for (const auto& node : rnm->nodes)
+            {
+                if (node.isRootGraph())
+                    graphs.add (node);
+                else if (node.isValid())
+                    ec->removeNode (node);
+            }
+
+            for (const auto& graph : graphs) 
+            {
+                // noop
+            }
+        }
     }
     else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
     {

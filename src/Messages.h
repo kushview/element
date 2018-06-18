@@ -39,9 +39,11 @@ struct AddPresetMessage : public AppMessage
 struct RemoveNodeMessage : public AppMessage
 {
     RemoveNodeMessage (const Node& n) : nodeId (n.getNodeId()), node (n) { }
+    RemoveNodeMessage (const NodeArray& n) : nodeId(KV_INVALID_NODE) { nodes.addArray (n); }
     RemoveNodeMessage (const uint32 _nodeId) : nodeId (_nodeId) { }
     const uint32 nodeId;
     const Node node;
+    NodeArray nodes;
 };
 
 /** Send this to add a new connection */

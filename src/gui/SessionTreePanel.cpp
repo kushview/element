@@ -144,7 +144,7 @@ public:
 
     void setName (const String& newName) override   
     {
-        if (newName.isNotEmpty()) 
+        if (newName.isNotEmpty())
             node.setProperty (Tags::name, newName); 
     }
     
@@ -160,7 +160,7 @@ public:
     {
         if (! node.isRootGraph())
         {
-            ViewHelpers::postMessageFor(getOwnerView(), new RemoveNodeMessage (node));
+            ViewHelpers::postMessageFor (getOwnerView(), new RemoveNodeMessage (node));
         }
     }
     
@@ -192,6 +192,7 @@ public:
                 nodes.add (item->node);
     }
 
+
     virtual void handlePopupMenuResult (int result) override
     {
         switch (result)
@@ -203,15 +204,15 @@ public:
 
             case 10: {
                 NodeArray selected; getSelectedNodes (selected);
-                for (const auto& n : selected)
-                    DBG(node.getName());
+                ViewHelpers::postMessageFor (getOwnerView(), 
+                    new RemoveNodeMessage (selected));
             } break;
 
             default: break;
         }
     }
     
-    virtual void showMultiSelectionPopupMenu()
+    void showMultiSelectionPopupMenu() override
     {
         PopupMenu menu;
         if (node.isGraph())
