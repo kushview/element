@@ -38,6 +38,7 @@ namespace Tags
     const Identifier placeholder        = "placeholder";
     const Identifier port               = "port";
     const Identifier ports              = "ports";
+    const Identifier preset             = "preset";
 	const Identifier program			= "program";
     const Identifier sourceNode         = "sourceNode";
     const Identifier sourcePort         = "sourcePort";

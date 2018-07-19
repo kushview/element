@@ -260,11 +260,12 @@ public:
         else if (result >= 20000 && result < 30000)
         {
             Node n (node);
-            if (presetNodes[result - 20000].isValid())
+            const int index = result - 20000;
+            if (isPositiveAndBelow (index, presetNodes.size()) && presetNodes[index].isValid())
             {
-                const String state = presetNodes[result - 20000].getProperty (Tags::state).toString();
+                const String state = presetNodes[index].getProperty (Tags::state).toString();
                 n.getValueTree().setProperty (Tags::state, state, 0);
-                n.restorePluginState ();
+                n.restorePluginState();
             }
         }
         

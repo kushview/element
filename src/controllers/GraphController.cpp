@@ -189,7 +189,8 @@ uint32 GraphController::addNode (const Node& newNode)
         nodeId = node->nodeId;
         ValueTree data = newNode.getValueTree().createCopy();
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Tags::object, node, nullptr);
+            .setProperty (Tags::object, node, nullptr)
+            .setProperty (Tags::type, node->getTypeString(), nullptr);
         
         data.removeProperty ("relativeX", nullptr);
         data.removeProperty ("relativeY", nullptr);

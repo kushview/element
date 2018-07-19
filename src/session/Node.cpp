@@ -31,7 +31,6 @@ namespace Element {
         }
     }
     
-    
     int Port::getChannel() const
     {
         const Node node (objectData.getParent().getParent());
@@ -186,7 +185,6 @@ namespace Element {
     
     bool Node::writeToFile (const File& targetFile) const
     {
-        
         ValueTree data = objectData.createCopy();
         sanitizeProperties (data, true);
         
@@ -208,7 +206,7 @@ namespace Element {
             Node(*this).savePluginState();
         }
         
-        ValueTree preset ("preset");
+        ValueTree preset (Tags::preset);
         ValueTree data = objectData.createCopy();
         sanitizeProperties (data, true);
         preset.addChild (data, -1, 0);
@@ -484,8 +482,10 @@ namespace Element {
         
         if (GraphNodePtr obj = getGraphNode())
         {
-            if (auto* proc = obj->getAudioProcessor())
+            if (auto* const proc = obj->getAudioProcessor())
             {
+                proc->setCurrentProgram ((int) objectData.getProperty (Tags::program, 0));
+
                 auto data = getProperty(Tags::state).toString().trim();
                 if (data.isNotEmpty())
                 {
@@ -496,7 +496,6 @@ namespace Element {
                     }
                 }
 			    
-				proc->setCurrentProgram ((int) objectData.getProperty (Tags::program, 0));
 				data = getProperty(Tags::programState).toString().trim();
 				if (data.isNotEmpty())
 				{
@@ -549,7 +548,7 @@ namespace Element {
 				proc->getCurrentProgramStateInformation (state);
 				if (state.getSize() > 0)
 				{
-					objectData.setProperty(Tags::programState, state.toBase64Encoding(), 0);
+					objectData.setProperty (Tags::programState, state.toBase64Encoding(), 0);
 				}
 
                 setProperty (Tags::bypass, proc->isSuspended());
@@ -571,7 +570,6 @@ namespace Element {
     {
         if (auto* obj = getGraphNode())
             return (const_cast<AudioProcessor*>(obj->getAudioProcessor()))->getCurrentProgram();
-        
         return -1;
     }
     
@@ -586,8 +584,8 @@ namespace Element {
     int Node::getNumPrograms() const
     {
         if (auto* obj = getGraphNode())
-            return obj->getAudioProcessor()->getNumPrograms();
-        
+            if (auto* proc = obj->getAudioProcessor())
+                return proc->getNumPrograms();
         return 0;
     }
 

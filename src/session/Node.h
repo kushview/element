@@ -117,11 +117,13 @@ namespace Element {
 
         /** Create a value tree version of an arc */
         static ValueTree makeArc (const kv::Arc& arc);
+
+        /** Create an Arc from a ValueTree */
         static Arc arcFromValueTree (const ValueTree& data);
 
         Node getParentGraph() const;
         
-        bool isBypassed() const { return objectData.getProperty (Tags::bypass, false); }
+        bool isBypassed() const { return objectData.getProperty(Tags::bypass, false); }
         Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
         
         /** returns the number of connections on this node */

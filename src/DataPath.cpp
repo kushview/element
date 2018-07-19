@@ -73,7 +73,6 @@ namespace Element
     
     void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
     {
-        DBG("[EL] seraching for presets: " << format << "-" << identifier);
         DirectoryIterator iter (root.getChildFile("Presets"), true, "*.elpreset");
         while (iter.next())
         {

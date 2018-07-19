@@ -61,6 +61,8 @@ public:
     bool isRootGraph() const noexcept;
     bool isSubGraph() const noexcept;
     
+    const String& getTypeString() const;
+
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
     

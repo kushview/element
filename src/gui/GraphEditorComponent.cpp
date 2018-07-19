@@ -1324,7 +1324,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
                 const Node node (Node::parse (file));
                 if (node.isValid())
                 {
-                    ScopedPointer<AddNodeMessage> message (new AddNodeMessage (node, graph));
+                    std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph));
                     auto& builder (message->builder);
                     if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
                     {
