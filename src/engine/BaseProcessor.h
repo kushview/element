@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ElementApp.h"
+#include "JuceHeader.h"
 
 namespace Element {
     
