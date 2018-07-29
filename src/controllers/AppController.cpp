@@ -138,6 +138,7 @@ void AppController::handleMessage (const Message& msg)
             for (const auto& graph : graphs) 
             {
                 // noop
+                ignoreUnused (graph);
             }
         }
     }

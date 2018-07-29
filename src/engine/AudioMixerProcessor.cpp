@@ -459,8 +459,8 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
             track->gain = track->monitor->nextGain.get();
         track->monitor->gain.set (track->gain);
 
-        if (track->mute != track->monitor->nextMute.get())
-            track->mute = track->monitor->nextMute.get();
+        if (static_cast<int> (track->mute) != track->monitor->nextMute.get())
+            track->mute = track->monitor->nextMute.get() > 0;
         track->monitor->muted.set (track->mute ? 1 : 0);
     }
 
@@ -473,7 +473,7 @@ void AudioMixerProcessor::processBlock (AudioSampleBuffer& audio, MidiBuffer& mi
 
     if (gain != masterMonitor->nextGain.get())
         *masterVolume = Decibels::gainToDecibels (masterMonitor->nextGain.get(), (float) EL_FADER_MIN_DB);
-    if (*masterMute != (bool) masterMonitor->nextMute.get())
+    if (static_cast<int> (*masterMute) != masterMonitor->nextMute.get())
         *masterMute = masterMonitor->nextMute.get() <= 0 ? false : true;
 
     masterMonitor->muted.set (*masterMute);

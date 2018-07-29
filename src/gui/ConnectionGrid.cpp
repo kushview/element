@@ -346,9 +346,9 @@ namespace Element
                 }
                 else if (hasRequestedType)
                 {
-                    const ValueTree node = graph.getNodesValueTree()
+                    const ValueTree nodeToRemove = graph.getNodesValueTree()
                         .getChildWithProperty (Tags::identifier, desc.fileOrIdentifier);
-                    const Node model (node, false);
+                    const Node model (nodeToRemove, false);
                     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (model));
                 }
                 else
