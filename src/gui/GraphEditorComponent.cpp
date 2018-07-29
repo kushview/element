@@ -897,8 +897,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
             desc.pluginFormatName = "Internal";
             bool hasRequestedType = false;
             bool failure = false;
-            ValueTree node;
-            
+
             switch (result)
             {
                 case 1:

@@ -368,6 +368,8 @@ private:
 
             if (load)
             {
+                DataPath dataPath;
+                const auto file = dataPath.getRootDir().getChildFile("Presets");
                 FileChooser chooser ("Open FXB/FXP Preset", File(), "*.fxb;*.fxp", true);
                 bool wasOk = true;
                 if (chooser.browseForFileToOpen())
@@ -386,7 +388,11 @@ private:
             }
             else
             {
-                FileChooser chooser ("Save FXB/FXP Preset", File(), "*.fxb;*.fxp", true);
+                DataPath dataPath;
+                String path = "Presets/"; path << proc->getName();
+                const auto file = dataPath.getRootDir().getChildFile(path)
+                    .withFileExtension("fxp").getNonexistentSibling();
+                FileChooser chooser ("Save FXB/FXP Preset", file, "*.fxb;*.fxp", true);
                 if (chooser.browseForFileToSave (true))
                 {
                     const File f (chooser.getResult());
