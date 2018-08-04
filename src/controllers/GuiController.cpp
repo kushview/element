@@ -258,6 +258,18 @@ ContentComponent* GuiController::getContentComponent()
     return content.get();
 }
 
+int GuiController::getNumPluginWindows() const
+{
+    return (nullptr != windowManager) ? windowManager->getNumPluginWindows()
+                                      : 0;
+}
+
+PluginWindow* GuiController::getPluginWindow (const int window) const
+{
+    return (nullptr != windowManager) ? windowManager->getPluginWindow (window)
+                                      : 0;
+}
+
 void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
                                           const bool force)
 {

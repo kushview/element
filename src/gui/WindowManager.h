@@ -83,6 +83,11 @@ public:
     
     inline int getNumPluginWindows() const { return activePluginWindows.size(); }
     
+    inline PluginWindow* getPluginWindow (const int window) const
+    {
+        return activePluginWindows [window];
+    }
+    
     inline void closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible)
     {
         for (int i = 0; i < proc.getNumNodes(); ++i)

@@ -700,9 +700,7 @@ void EngineController::updateRootGraphMidiChannel (const int index, const int mi
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
-    auto& devices (getWorld().getDeviceManager());
     auto session = getWorld().getSession();
-    auto* root = graphs->findActiveRootGraphController();
     
    #if ! EL_RUNNING_AS_PLUGIN
     if (cb == &devices && root != nullptr)

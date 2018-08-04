@@ -32,9 +32,9 @@ namespace Element {
         void activate() override;
         void deactivate() override;
         
-        #if EL_RUNNING_AS_PLUGIN
+       #if EL_RUNNING_AS_PLUGIN
         void clearContentComponent();
-        #endif
+       #endif
         
         void run();
         void timerCallback() override;
@@ -83,7 +83,7 @@ namespace Element {
         /** present a plugin window */
         void presentPluginWindow (const Node& node);
         
-        
+        /** Sync UI elements with application/plugin */
         void stabilizeContent();
         
         /* Command manager... */
@@ -92,7 +92,11 @@ namespace Element {
         void getCommandInfo (CommandID commandID, ApplicationCommandInfo& result) override;
         bool perform (const InvocationInfo& info) override;
 
+        /** Returns the content component for this instance */
         ContentComponent* getContentComponent();
+        
+        int getNumPluginWindows() const;
+        PluginWindow* getPluginWindow (const int window) const;
         
         /** Close all plugin windows housed by this controller */
         void closeAllPluginWindows (const bool windowVisible = true);
