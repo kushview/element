@@ -8,6 +8,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
+#include "gui/SystemTray.h"
 #include "gui/VirtualKeyboardView.h"
 #include "CapsLock.h"
 #include "Version.h"
@@ -76,6 +77,7 @@ private:
 
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> guiInstances;
+static std::unique_ptr<SystemTray> sSystemTray;
 
 GuiController::GuiController (Globals& w, AppController& a)
     : AppController::Child(),
@@ -93,6 +95,12 @@ GuiController::GuiController (Globals& w, AppController& a)
 
 GuiController::~GuiController()
 {
+    if (sSystemTray != nullptr)
+    {
+        sSystemTray->removeFromDesktop();
+        sSystemTray.reset (nullptr);
+    }
+
     closeAllPluginWindows (true);
 
     if (mainWindow)
@@ -123,7 +131,7 @@ GuiController::~GuiController()
 
 Element::LookAndFeel& GuiController::getLookAndFeel()
 { 
-    jassert(sGlobalLookAndFeel);
+    jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look; 
 }
 
@@ -140,6 +148,7 @@ void GuiController::saveProperties (PropertiesFile* props)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
         props->setValue ("mainWindowFullScreen", mainWindow->isFullScreen());
+        props->setValue ("mainWindowVisible", mainWindow->isVisible());
     }
 
     if (content)
@@ -318,10 +327,18 @@ void GuiController::run()
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
-    mainWindow->setVisible (true);
+    mainWindow->setVisible (pf->getBoolValue ("mainWindowVisible", true));
     if (pf->getBoolValue ("mainWindowFullScreen"))
         mainWindow->setFullScreen (true);
     findSibling<SessionController>()->resetChanges();
+
+   #if ! EL_RUNNING_AS_PLUGIN
+    sSystemTray.reset (new SystemTray());
+    sSystemTray->setIconImage (
+        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize)    
+    );
+    sSystemTray->addToDesktop (0);
+   #endif
 }
 
 bool GuiController::shutdownApp()
