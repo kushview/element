@@ -4,7 +4,7 @@
 
 namespace Element {
 
-enum SystemTrayMenuAction
+enum SystemTrayMouseAction
 {
     ShowMenu = 0,
     ShowWindow
