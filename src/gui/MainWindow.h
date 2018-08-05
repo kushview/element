@@ -9,6 +9,7 @@
 
 namespace Element {
 
+class AppController;
 class Globals;
 class MainMenu;
 

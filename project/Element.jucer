@@ -12,7 +12,7 @@
         <FILE id="xMy9dk" name="PowerButton_48x48.png" compile="0" resource="1"
               file="../data/Assets/PowerButton_48x48.png"/>
       </GROUP>
-      <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="0" file="../data/ElementIcon.png"/>
+      <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="1" file="../data/ElementIcon.png"/>
       <FILE id="xX315d" name="test_icon.png" compile="0" resource="0" file="../data/test_icon.png"/>
     </GROUP>
     <GROUP id="{6DCE5EAD-3FF0-D894-03AB-2FB3D3485136}" name="src">
@@ -226,6 +226,8 @@
               file="../src/gui/SessionTreePanel.cpp" xcodeResource="0"/>
         <FILE id="QhIgwr" name="SessionTreePanel.h" compile="0" resource="0"
               file="../src/gui/SessionTreePanel.h"/>
+        <FILE id="yRnzCY" name="SystemTray.cpp" compile="1" resource="0" file="../src/gui/SystemTray.cpp"/>
+        <FILE id="Z8ELYJ" name="SystemTray.h" compile="0" resource="0" file="../src/gui/SystemTray.h"/>
         <FILE id="EO4hhC" name="TempoAndMeterBar.h" compile="0" resource="0"
               file="../src/gui/TempoAndMeterBar.h"/>
         <FILE id="u0qA7E" name="Timeline.h" compile="0" resource="0" file="../src/gui/Timeline.h"/>
