@@ -701,6 +701,8 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto session = getWorld().getSession();
+    auto* const root = graphs->findActiveRootGraphController();
+    auto& devices (getWorld().getDeviceManager());
     
    #if ! EL_RUNNING_AS_PLUGIN
     if (cb == &devices && root != nullptr)
