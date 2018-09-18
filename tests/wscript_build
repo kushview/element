@@ -2,8 +2,9 @@
 
 bld.program(
     source = bld.path.ant_glob("**/*.cpp"),
-    includes = ['.', '../project/Source', '../project/JuceLibraryCode'],
+    includes = ['.', '../project/Source', '../project/JuceLibraryCode', '../src',
+                 '../libs/JUCE/modules', '../libs/kv/modules' ],
     target = 'tests',
-    use = 'JUCE_CORE',
+    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ],
     install_path = None
 )

@@ -3,16 +3,15 @@
     Copyright (C) 2014-2017  Kushview, LLC.  All rights reserved.
 */
 
+#include "Tests.h"
+#include "engine/GraphProcessor.h"
+
+namespace Element {
 class GraphNodeTest : public UnitTest {
 public:
     GraphNodeTest() : UnitTest ("Graph Node", "Graphing") { }
 
-    virtual void initialise()
-    {
-
-        
-    }
-    
+    virtual void initialise() { }
     virtual void shutdown() { }
 
     virtual void runTest()
@@ -45,3 +44,5 @@ public:
 };
 
 static GraphNodeTest sGraphNodeTest;
+
+}

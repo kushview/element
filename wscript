@@ -198,5 +198,7 @@ def build (bld):
         build_linux (bld)
         build_desktop (bld)
 
+    # bld.recurse ('tests')
+
 def check (ctx):
     call (["build/tests/tests"])
