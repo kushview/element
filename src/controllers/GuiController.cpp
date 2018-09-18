@@ -132,7 +132,7 @@ GuiController::~GuiController()
 Element::LookAndFeel& GuiController::getLookAndFeel()
 { 
     jassert (sGlobalLookAndFeel);
-    return sGlobalLookAndFeel->look; 
+    return sGlobalLookAndFeel->look;
 }
 
 void GuiController::timerCallback()
@@ -327,9 +327,14 @@ void GuiController::run()
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
     mainWindow->addToDesktop();
-    mainWindow->setVisible (pf->getBoolValue ("mainWindowVisible", true));
-    if (pf->getBoolValue ("mainWindowFullScreen"))
-        mainWindow->setFullScreen (true);
+
+    if (pf->getBoolValue ("mainWindowVisible", true))
+    {
+        mainWindow->setVisible (true);
+        if (pf->getBoolValue ("mainWindowFullScreen"))
+            mainWindow->setFullScreen (true);
+    }
+    
     findSibling<SessionController>()->resetChanges();
 
    #if ! EL_RUNNING_AS_PLUGIN
