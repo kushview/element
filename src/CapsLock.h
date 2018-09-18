@@ -11,7 +11,7 @@
 #elif defined(__APPLE__)
  #include <CoreGraphics/CoreGraphics.h>
 #else
- #pragma error "Linux not yet supported caps lock"
+ #pragma warning "Linux not yet supported caps lock"
 #endif
 
 namespace Element {

@@ -43,6 +43,22 @@ def configure (conf):
 
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
+    conf.check(lib='curl', mandatory=False)
+    if juce.is_linux():
+        conf.check(lib='pthread', mandatory=True)
+        conf.check(lib='dl', mandatory=True)
+        conf.check_cfg(package='freetype2', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='x11', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='xext', args='--cflags --libs', \
+            mandatory=True)
+        conf.check_cfg(package='alsa', args='--cflags --libs', \
+            mandatory=True)
+    if cross.is_windows (conf):
+        conf.check(lib='ws2_32', mandatory=True)
+        conf.check(lib='pthread', mandatory=True)
+
     print
     juce.display_header ("Element Configuration")
     juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
@@ -57,7 +73,7 @@ def configure (conf):
     juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
-def build_desktop (bld, slug):
+def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
 
@@ -140,7 +156,19 @@ def build_plugins (bld):
     bld.add_group()
 
 def build_linux (bld):
-    return
+    appEnv = bld.env.derive()
+    bld.program (
+        source      = bld.path.ant_glob ('src/**/*.cpp') + \
+                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp') + \
+                      element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'bin/element',
+        name        = 'Element',
+        env         = appEnv,
+        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ]
+    )
 
 def build_mac (bld):
     appEnv = bld.env.derive()
@@ -163,14 +191,12 @@ def build_mac (bld):
 
 def build (bld):
     if cross.is_windows (bld):
-        return build_mingw (bld)
+        build_mingw (bld)
     elif juce.is_mac():
-        return build_mac (bld)
+        build_mac (bld)
     else:
         build_linux (bld)
-
-    for subdir in 'tests'.split():
-        bld.recurse (subdir)
+        build_desktop (bld)
 
 def check (ctx):
     call (["build/tests/tests"])
