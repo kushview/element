@@ -1360,7 +1360,7 @@ const String GraphProcessor::AudioGraphIOProcessor::getInputChannelName (int cha
         default:                break;
     }
 
-    return String::empty;
+    return String();
 }
 
 const String GraphProcessor::AudioGraphIOProcessor::getOutputChannelName (int channelIndex) const
@@ -1372,7 +1372,7 @@ const String GraphProcessor::AudioGraphIOProcessor::getOutputChannelName (int ch
         default:                break;
     }
 
-    return String::empty;
+    return String();
 }
 
 bool GraphProcessor::AudioGraphIOProcessor::isInputChannelStereoPair (int /*index*/) const
@@ -1392,17 +1392,17 @@ bool GraphProcessor::AudioGraphIOProcessor::hasEditor() const                  {
 AudioProcessorEditor* GraphProcessor::AudioGraphIOProcessor::createEditor()    { return nullptr; }
 #endif
 int GraphProcessor::AudioGraphIOProcessor::getNumParameters()                  { return 0; }
-const String GraphProcessor::AudioGraphIOProcessor::getParameterName (int)     { return String::empty; }
+const String GraphProcessor::AudioGraphIOProcessor::getParameterName (int)     { return String(); }
 
 float GraphProcessor::AudioGraphIOProcessor::getParameter (int)                { return 0.0f; }
-const String GraphProcessor::AudioGraphIOProcessor::getParameterText (int)     { return String::empty; }
+const String GraphProcessor::AudioGraphIOProcessor::getParameterText (int)     { return String(); }
 void GraphProcessor::AudioGraphIOProcessor::setParameter (int, float)          { }
 
 int GraphProcessor::AudioGraphIOProcessor::getNumPrograms()                    { return 0; }
 int GraphProcessor::AudioGraphIOProcessor::getCurrentProgram()                 { return 0; }
 void GraphProcessor::AudioGraphIOProcessor::setCurrentProgram (int)            { }
 
-const String GraphProcessor::AudioGraphIOProcessor::getProgramName (int)       { return String::empty; }
+const String GraphProcessor::AudioGraphIOProcessor::getProgramName (int)       { return String(); }
 void GraphProcessor::AudioGraphIOProcessor::changeProgramName (int, const String&) { }
 
 void GraphProcessor::AudioGraphIOProcessor::getStateInformation (MemoryBlock&) { }

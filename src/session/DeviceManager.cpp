@@ -40,13 +40,13 @@ void DeviceManager::attach (EnginePtr engine)
     if (old != nullptr)
     {
         removeAudioCallback (&old->getAudioIODeviceCallback());
-        removeMidiInputCallback (String::empty, &old->getMidiInputCallback());
+        removeMidiInputCallback (String(), &old->getMidiInputCallback());
     }
 
     if (engine)
     {
         addAudioCallback (&engine->getAudioIODeviceCallback());
-        addMidiInputCallback (String::empty, &engine->getMidiInputCallback());
+        addMidiInputCallback (String(), &engine->getMidiInputCallback());
     }
     else
     {

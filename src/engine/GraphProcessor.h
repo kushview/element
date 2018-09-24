@@ -283,15 +283,15 @@ public:
     virtual AudioProcessorEditor* createEditor() override            { return nullptr; }
 
     virtual int getNumParameters() override                          { return 0; }
-    virtual const String getParameterName (int) override             { return String::empty; }
+    virtual const String getParameterName (int) override             { return String(); }
     virtual float getParameter (int) override                        { return 0; }
-    virtual const String getParameterText (int) override             { return String::empty; }
+    virtual const String getParameterText (int) override             { return String(); }
     virtual void setParameter (int, float) override                  { }
 
     virtual int getNumPrograms() override                            { return 0; }
     virtual int getCurrentProgram() override                         { return 0; }
     virtual void setCurrentProgram (int) override                    { }
-    virtual const String getProgramName (int) override               { return String::empty; }
+    virtual const String getProgramName (int) override               { return String(); }
     virtual void changeProgramName (int, const String&) override     { }
 
     virtual void getStateInformation (MemoryBlock&) override;

@@ -175,7 +175,7 @@ String AssetTree::Item::getFilePath() const
     if (isFile())
         return data.getProperty(Slugs::path).toString();
     
-    return String::empty;
+    return String();
 }
 
 File AssetTree::Item::getFile() const

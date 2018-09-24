@@ -124,7 +124,7 @@
         if (PortType::Audio == portType.id() && isOutput())
             return getName() + String (channelIndex + 1);
 
-        return String::empty;
+        return String();
     }
 
     const String GraphPort::getOutputChannelName (int channelIndex) const
@@ -132,7 +132,7 @@
         if (PortType::Audio == portType.id() && isInput())
             return getName() + String (channelIndex + 1);
 
-        return String::empty;
+        return String();
     }
 
     bool GraphPort::isInputChannelStereoPair (int /*index*/) const
@@ -153,17 +153,17 @@
     AudioProcessorEditor* GraphPort::createEditor()    { return nullptr; }
     #endif
     int GraphPort::getNumParameters()                  { return 0; }
-    const String GraphPort::getParameterName (int)     { return String::empty; }
+    const String GraphPort::getParameterName (int)     { return String(); }
 
     float GraphPort::getParameter (int)                { return 0.0f; }
-    const String GraphPort::getParameterText (int)     { return String::empty; }
+    const String GraphPort::getParameterText (int)     { return String(); }
     void GraphPort::setParameter (int, float)          { }
 
     int GraphPort::getNumPrograms()                    { return 0; }
     int GraphPort::getCurrentProgram()                 { return 0; }
     void GraphPort::setCurrentProgram (int)            { }
 
-    const String GraphPort::getProgramName (int)       { return String::empty; }
+    const String GraphPort::getProgramName (int)       { return String(); }
     void GraphPort::changeProgramName (int, const String&) { }
 
     void GraphPort::getStateInformation (MemoryBlock&) { }

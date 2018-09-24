@@ -24,8 +24,8 @@ public:
     void processBlock (AudioSampleBuffer &buffer, MidiBuffer &midi);
     void processBlockBypassed (AudioSampleBuffer&, MidiBuffer&);
 
-    virtual const String getInputChannelName (int /*channelIndex*/) const { return String::empty; }
-    virtual const String getOutputChannelName (int /*channelIndex*/) const { return String::empty; }
+    virtual const String getInputChannelName (int /*channelIndex*/) const { return String(); }
+    virtual const String getOutputChannelName (int /*channelIndex*/) const { return String(); }
     virtual bool isInputChannelStereoPair (int /*index*/) const { return false; }
     virtual bool isOutputChannelStereoPair (int /*index*/) const { return false; }
     virtual void numChannelsChanged() { }
@@ -40,17 +40,17 @@ public:
     virtual bool hasEditor() const { return false; }
 
     virtual int getNumParameters() { return 0; }
-    const String getParameterName (int /*index*/) { return String::empty; }
+    const String getParameterName (int /*index*/) { return String(); }
     float getParameter (int /*index*/) { return 0.0f; }
-    const String getParameterText (int /*index*/) { return String::empty; }
-    virtual String getParameterName (int /*parameterIndex*/, int /*maximumStringLength*/) { return String::empty; }
-    virtual String getParameterText (int /*parameterIndex*/, int /*maximumStringLength*/) { return String::empty; }
+    const String getParameterText (int /*index*/) { return String(); }
+    virtual String getParameterName (int /*parameterIndex*/, int /*maximumStringLength*/) { return String(); }
+    virtual String getParameterText (int /*parameterIndex*/, int /*maximumStringLength*/) { return String(); }
     virtual void setParameter (int, float) { }
 
     virtual int getNumPrograms() { return 0; }
     virtual int getCurrentProgram() { return 0; }
     virtual void setCurrentProgram (int /*index*/) { }
-    virtual const String getProgramName (int /*index*/) { return String::empty; }
+    virtual const String getProgramName (int /*index*/) { return String(); }
     virtual void changeProgramName (int /*index*/, const String& /*newName*/) { }
 
     virtual void getStateInformation (MemoryBlock& /*destData*/) { }

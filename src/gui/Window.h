@@ -34,7 +34,7 @@ namespace Element {
         {
             dialogBackgroundColour = Colours::darkgrey;
             content.set (nullptr, true);
-            dialogTitle = String::empty;
+            dialogTitle = String();
             resizable = false;
             useBottomRightCornerResizer = false;
 #if JUCE_IOS

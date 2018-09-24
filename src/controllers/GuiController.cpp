@@ -248,7 +248,7 @@ void GuiController::runDialog (Component* c, const String& title)
 {
     DialogOptions opts;
     opts.content.set (c, true);
-    opts.dialogTitle = title != String::empty ? title : c->getName();
+    opts.dialogTitle = title.isNotEmpty() ? title : c->getName();
     opts.componentToCentreAround = (Component*) mainWindow.get();
     if (DialogWindow* dw = opts.create())
         windowManager->push (dw);

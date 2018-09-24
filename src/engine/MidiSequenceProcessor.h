@@ -30,15 +30,15 @@ public:
     AudioProcessorEditor* createEditor() override;
     
     int getNumParameters() override                       { return 0; }
-    const String getParameterName (int) override          { return String::empty; }
+    const String getParameterName (int) override          { return String(); }
     float getParameter (int) override                     { return 0; }
-    const String getParameterText (int) override          { return String::empty; }
+    const String getParameterText (int) override          { return String(); }
     void setParameter (int, float) override               { }
     
     int getNumPrograms() override                         { return 0; }
     int getCurrentProgram() override                      { return 0; }
     void setCurrentProgram (int) override                 { }
-    const String getProgramName (int) override            { return String::empty; }
+    const String getProgramName (int) override            { return String(); }
     void changeProgramName (int, const String&) override  { }
     
     void getStateInformation (MemoryBlock&) override;
@@ -53,8 +53,8 @@ public:
         d.version = "1.0.0";
     }
     
-    const String getInputChannelName (int) const override { return String::empty; }
-    const String getOutputChannelName (int) const override { return String::empty; }
+    const String getInputChannelName (int) const override { return String(); }
+    const String getOutputChannelName (int) const override { return String(); }
     bool isInputChannelStereoPair (int) const override { return false; }
     bool isOutputChannelStereoPair (int) const override { return false; }
     bool silenceInProducesSilenceOut() const override { return false; }

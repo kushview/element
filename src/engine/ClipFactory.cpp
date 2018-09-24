@@ -58,7 +58,7 @@ public:
 
         bool canCreateFrom (const ClipModel& model)
         {
-            return model.getProperty (Slugs::type, String::empty) == String("dummy");
+            return model.getProperty (Slugs::type, String()) == String("dummy");
         }
         
         bool canCreateFrom (const File&) { return false; }

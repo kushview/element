@@ -112,7 +112,7 @@ public:
         if (ListBoxModel* m = owner.getModel())
             return m->getTooltipForRow (row);
         
-        return String::empty;
+        return String();
     }
     
     ScopedPointer<Component> customComponent;

@@ -216,7 +216,7 @@ void SequencerComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& chil
         ClipModel model (child);
         assert (model.node().hasProperty ("media"));
 
-        const Identifier type (model.node().getProperty ("media", String::empty));
+        const Identifier type (model.node().getProperty ("media", String()));
 
         if (type == Slugs::pattern)
         {

@@ -22,7 +22,7 @@ public:
      The model pointer passed-in can be null, in which case you can set it later
      with setModel().
      */
-    HorizontalListBox (const String& componentName = String::empty,
+    HorizontalListBox (const String& componentName = String(),
                        ListBoxModel* model = nullptr);
     
     /** Destructor. */

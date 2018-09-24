@@ -77,7 +77,7 @@ Font TreeItemBase::getFont() const
 void TreeItemBase::paintItem (Graphics& g, int w, int h)
 {
     if (isSelected()) {
-       ViewHelpers::drawBasicTextRow (String::empty, g, w, w, true);
+       ViewHelpers::drawBasicTextRow (String(), g, w, w, true);
     }
 }
 

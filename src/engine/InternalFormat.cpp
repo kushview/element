@@ -129,7 +129,7 @@ namespace Element {
                                                void (*callback) (void*, AudioPluginInstance*, const String&))
     {
         if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
-            callback (userData, i, String::empty);
+            callback (userData, i, String());
     }
     
     bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
@@ -305,9 +305,9 @@ namespace Element {
                                                          void (*callback) (void*, AudioPluginInstance*, const String&))
     {
         if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
-            callback (userData, i, String::empty);
+            callback (userData, i, String());
         else
-            callback (userData, nullptr, String::empty);
+            callback (userData, nullptr, String());
     }
     
     bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept

@@ -56,7 +56,7 @@ namespace Element {
         MainWindow* getMainWindow() const { return mainWindow.get(); }
         
         void runDialog (const String& uri);
-        void runDialog (Component* c, const String& title = String::empty);
+        void runDialog (Component* c, const String& title = String());
         
         /** Open an existing session */
         void openSession();

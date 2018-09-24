@@ -727,7 +727,7 @@ void AudioEngine::activate()
 {
    #if ! EL_RUNNING_AS_PLUGIN
     auto& devices (world.getDeviceManager());
-    devices.addMidiInputCallback (String::empty, &getMidiInputCallback());
+    devices.addMidiInputCallback (String(), &getMidiInputCallback());
    #endif
 }
 
@@ -735,7 +735,7 @@ void AudioEngine::deactivate()
 {
    #if ! EL_RUNNING_AS_PLUGIN
     auto& devices (world.getDeviceManager());
-    devices.removeMidiInputCallback (String::empty, &getMidiInputCallback());
+    devices.removeMidiInputCallback (String(), &getMidiInputCallback());
    #endif
 }
 
