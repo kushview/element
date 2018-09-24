@@ -22,7 +22,7 @@ public:
     virtual bool isIconCrossedOut() const               { return false; }
     virtual void paintContent (Graphics& g, const Rectangle<int>& area);
     virtual int getMillisecsAllowedForDragGesture()     { return 120; }
-    virtual File getDraggableFile() const { return File::nonexistent; }
+    virtual File getDraggableFile() const { return File(); }
 
     virtual void deleteItem();
     virtual void deleteAllSelectedItems();

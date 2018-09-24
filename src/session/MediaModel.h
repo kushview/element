@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_MEDIA_MODEL_H
-#define ELEMENT_MEDIA_MODEL_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -27,18 +26,15 @@ namespace Element {
 class MediaModel :  public ObjectModel
 {
 public:
-
-    inline MediaModel () : ObjectModel() { }
+    inline MediaModel() : ObjectModel() { }
     inline MediaModel (const Identifier& type) : ObjectModel (type) { }
     inline MediaModel (const ValueTree& data) : ObjectModel (data) { }
 
     virtual void setFile (const File&) { }
-    virtual File getFile() const { return File::nonexistent; }
+    virtual File getFile() const { return File(); }
     virtual void getRelatedFiles (Array<File>&) { }
 };
 
 typedef Shared<MediaModel> MediaPtr;
 
 }
-
-#endif // ELEMENT_MEDIA_MODEL_H

@@ -118,7 +118,7 @@ void SessionController::saveSession (const bool saveAs)
     jassert(document && currentSession);
     
     if (saveAs) {
-        document->saveAs (File::nonexistent, true, true, true);
+        document->saveAs (File(), true, true, true);
     } else {
         document->save (true, true);
     }

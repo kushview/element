@@ -59,8 +59,7 @@ AssetTree::Item::removeFromTree()
 bool
 AssetTree::Item::addFile (const File& file, int insertIndex, const bool shouldCompile)
 {
-    if (file == File::nonexistent || file.isHidden()
-        || file.getFileName().startsWithChar ('.'))
+    if (! file.exists() || file.isHidden() || file.getFileName().startsWithChar ('.'))
         return false;
     
     if (file.isDirectory())
@@ -184,7 +183,7 @@ File AssetTree::Item::getFile() const
     if (isFile())
         return tree.resolveFilename (data.getProperty(Slugs::path).toString());
     
-    return File::nonexistent;
+    return File();
 }
 
 AssetTree::Item AssetTree::Item::findItemForFile (const File& file) const
@@ -426,7 +425,7 @@ File AssetTree::getRootDir() const
 File AssetTree::resolveFilename (const String& filename)
 {
     if (filename.isEmpty())
-        return File::nonexistent;
+        return File();
     
     return getFile().getSiblingFile (FileHelpers::currentOSStylePath (filename));
 }
