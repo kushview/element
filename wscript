@@ -175,19 +175,31 @@ def build_linux (bld):
     )
 
 def build_mac (bld):
+    libEnv = bld.env.derive()
+    bld.shlib (
+        source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'lib/kv',
+        name        = 'KV',
+        env         = libEnv,
+        use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
+                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE'
+    )
+
     appEnv = bld.env.derive()
+    
     bld.program (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp') + \
-                      element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
+                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
-        use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
-                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE',
+        use         = [ 'KV' ],
         mac_app     = True,
         mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
