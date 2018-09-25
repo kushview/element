@@ -49,7 +49,7 @@ public:
     SessionPtr getSession();
 
     const String& getAppName() const { return appName; }
-    void setEngine (EnginePtr engine);
+    void setEngine (AudioEnginePtr engine);
 
 private:
     friend class Application;

@@ -394,7 +394,7 @@ namespace Element
                 }
             }
             
-            return ValueTree::invalid;
+            return ValueTree();
         }
         
         static ValueTree findArc (const ValueTree& arcs, uint32 sourceNode, uint32 sourcePort,
@@ -412,7 +412,7 @@ namespace Element
                 }
             }
             
-            return ValueTree::invalid;
+            return ValueTree();
         }
         
         static ValueTree findArc (const ValueTree& arcs, const Node& sourceNode, int sourceChannel,

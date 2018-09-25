@@ -201,7 +201,7 @@ AssetTree::Item AssetTree::Item::findItemForFile (const File& file) const
         }
     }
     
-    return AssetTree::Item (tree, ValueTree::invalid);
+    return AssetTree::Item (tree, ValueTree());
 }
 
 
@@ -222,7 +222,7 @@ AssetTree::Item AssetTree::Item::findItemForId (const String &targetId) const
         }
     }
     
-    return AssetTree::Item (tree, ValueTree::invalid);
+    return AssetTree::Item (tree, ValueTree());
 }
 
 void AssetTree::Item::sortAlphabetically (bool keepGroupsAtStart)
@@ -355,7 +355,7 @@ AssetTree::Item AssetTree::findGroup (const String& name, bool recursive, bool c
     if (createIt)
         return addGroup (name);
     
-    return Item  (*this, ValueTree::invalid);
+    return Item  (*this, ValueTree());
     
 }
 

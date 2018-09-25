@@ -47,7 +47,7 @@ void SequencerClipItem::getTime (Range<double>& time) const
 void
 SequencerClipItem::reset()
 {
-    model.node() = ValueTree::invalid;
+    model.node() = ValueTree();
 }
 
 void SequencerClipItem::setTime (const Range<double>& time)

@@ -25,7 +25,7 @@ namespace Element {
 Note NoteSequence::addNote (const ValueTree& tree)
 {
     if (tree.hasType (Slugs::note))
-        return Note::make (ValueTree::invalid);
+        return Note::make (ValueTree());
     
     if (tree.getParent().isValid())
     {

@@ -26,7 +26,7 @@ public:
         state.removeListener (this);
         eventMap.clear();
         midi.clear();
-        state = ValueTree::invalid;
+        state = ValueTree();
     }
     
     void clipModelChanged (const ClipModel& model) override

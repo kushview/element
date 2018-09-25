@@ -111,7 +111,7 @@ namespace Element {
 
     Sequence::Track Sequence::getTrack (int index)
     {
-        ValueTree track (ValueTree::invalid);
+        ValueTree track;
 
         if (isPositiveAndBelow (index, numTracks()))
             track = trackNode (index);
@@ -306,6 +306,6 @@ namespace Element {
         if (isPositiveAndBelow (trackIndex, numTracks()))
             return sequenceNode().getChild (trackIndex);
 
-        return ValueTree::invalid;
+        return ValueTree();
     }
 }

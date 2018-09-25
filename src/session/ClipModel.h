@@ -26,7 +26,7 @@ namespace Element {
 class ClipModel :  public ObjectModel
 {
 public:
-    ClipModel (const ValueTree& data) : ObjectModel (data) { }
+    explicit ClipModel (const ValueTree& data = ValueTree()) : ObjectModel (data) { }
     ClipModel (const Identifier& type) : ObjectModel (type) { }
 
     ClipModel (ValueTree& data, double start, double length, double offset = 0.0f)

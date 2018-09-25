@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.19.2"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
-              jucerVersion="5.3.1" companyName="Kushview" companyWebsite="https://kushview.net"
+              jucerVersion="5.3.2" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="14" companyCopyright="Copyright (c) 2017-2018 Kushview, LLC"
               defines="EL_RUNNING_AS_PLUGIN=0&#10;&#10;" userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;">
@@ -450,6 +450,34 @@
         <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug"/>
+        <CONFIGURATION isDebug="0" name="Release"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
+        <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
+        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
+      </MODULEPATHS>
+    </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
