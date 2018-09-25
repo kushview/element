@@ -4,12 +4,54 @@
 */
 
 #include "Tests.h"
-#include "engine/GraphProcessor.h"
 
 namespace Element {
+
+class GraphProcessorTest : public UnitTest {
+public:
+    GraphProcessorTest() : UnitTest ("Graph Processor", "graph") { }
+
+    virtual void initialise() override
+    {
+        globals.reset (new Globals());
+        globals->getPluginManager().addDefaultFormats();
+    }
+
+    virtual void shutdown() override
+    {
+        globals.reset (nullptr);
+    }
+
+    virtual void runTest() override
+    {
+        if (auto* plugin = createPluginProcessor())
+        {
+            beginTest ("Channel/Port Mapping");
+            GraphProcessor graph;
+            GraphNodePtr node = graph.addNode (plugin);
+            expect (13 == node->getMidiInputPort());
+        }
+    }
+
+private:
+    std::unique_ptr<Globals> globals;
+    AudioPluginFormatManager plugins;
+    AudioProcessor* createPluginProcessor()
+    {
+        PluginDescription desc;
+        desc.pluginFormatName = "AudioUnit";
+        desc.fileOrIdentifier = "AudioUnit:Synths/aumu,samp,appl";
+        String msg;
+        return plugins.createPluginInstance (desc, 44100.0, 1024, msg);
+    }
+};
+
+static GraphProcessorTest sGraphProcessorTest;
+
+
 class GraphNodeTest : public UnitTest {
 public:
-    GraphNodeTest() : UnitTest ("Graph Node", "Graphing") { }
+    GraphNodeTest() : UnitTest ("Graph Node", "graph") { }
 
     virtual void initialise() { }
     virtual void shutdown() { }
@@ -27,17 +69,6 @@ public:
             beginTest ("Channel/Port Mapping");
             GraphProcessor graph;
             GraphNodePtr node = graph.addNode (plugin);
-            DBG("NUM PORTS: " << (int) node->getNumPorts());
-            DBG("NUM audio in: " << node->getNumAudioInputs());
-            DBG("NUM audio out: " << node->getNumAudioOutputs());
-            DBG("MIDI in PORT: " << (int) node->getMidiInputPort());
-            DBG("MIDI out PORT: " << (int) node->getMidiOutputPort());
-            for (uint32 port = 0; port < node->getNumPorts(); ++port)
-            {
-                const auto type (node->getPortType (port));
-                DBG("index: " << (int)port << " type: " << type.getName());
-            }
-            
             expect (13 == node->getMidiInputPort());
         }
     }

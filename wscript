@@ -189,17 +189,33 @@ def build_mac (bld):
     )
 
     appEnv = bld.env.derive()
-    
-    bld.program (
+
+    bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'lib/element',
+        name        = 'EL',
+        env         = appEnv,
+        use         = [ 'KV' ],
+        mac_app     = True,
+        mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
+        mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
+    )
+
+    bld.add_group()
+    
+    bld.program (
+        source      = [ 'project/Source/Main.cpp' ],
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
-        use         = [ 'KV' ],
+        use         = [ 'KV', 'EL' ],
         mac_app     = True,
         mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
@@ -214,7 +230,7 @@ def build (bld):
         build_linux (bld)
         build_desktop (bld)
 
-    # bld.recurse ('tests')
+    bld.recurse ('tests')
 
 def check (ctx):
     call (["build/tests/tests"])

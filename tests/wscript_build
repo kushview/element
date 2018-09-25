@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
-bld.program(
+bld.program (
     source = bld.path.ant_glob("**/*.cpp"),
     includes = ['.', '../project/Source', '../project/JuceLibraryCode', '../src',
                  '../libs/JUCE/modules', '../libs/kv/modules' ],
-    target = 'tests',
-    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ],
+    target = '../bin/test-element',
+    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL' ],
     install_path = None
 )

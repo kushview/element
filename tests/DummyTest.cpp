@@ -8,12 +8,13 @@
 class DummyTest : public UnitTest
 {
 public:
-    DummyTest() : UnitTest ("dummy") { }
+    DummyTest() : UnitTest ("Dummy", "dummy") { }
     virtual ~DummyTest() { }
 
     void runTest()
     {
-        expect (true);
+        beginTest ("getName() == 'Dummy'");
+        expect (getName() == "Dummy");
     }
 };
 
