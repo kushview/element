@@ -12,7 +12,7 @@ namespace Element {
 ClipModel Sequence::Track::addClip (const File &file, double startTime)
 {
 
-    ClipModel invalid (ValueTree::invalid);
+    ClipModel invalid;
 #if 0
     if (! supportsFile (file))
         return invalid;

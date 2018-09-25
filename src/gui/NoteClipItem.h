@@ -33,7 +33,7 @@ public:
     }
 
     inline void reset() {
-        Note null (Note::make (ValueTree::invalid));
+        Note null (Note::make (ValueTree()));
         setModel (null);
     }
 

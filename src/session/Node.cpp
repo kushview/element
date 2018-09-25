@@ -262,7 +262,7 @@ namespace Element {
         if (arcs.hasType(Tags::nodes))
             arcs = arcs.getParent();
         if (! arcs.isValid())
-            return ValueTree::invalid;
+            return ValueTree();
         
         jassert (arcs.hasType (Tags::node));
         return arcs.getOrCreateChildWithName (Tags::arcs, nullptr);
@@ -286,7 +286,7 @@ namespace Element {
 
     GraphNode* Node::getGraphNode() const
     {
-        return dynamic_cast<GraphNode*> (objectData.getProperty (Tags::object, var::null).getObject());
+        return dynamic_cast<GraphNode*> (objectData.getProperty (Tags::object, var()).getObject());
     }
     
     GraphNode* Node::getGraphNodeForId (const uint32 nodeId) const

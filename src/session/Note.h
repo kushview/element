@@ -56,7 +56,7 @@ namespace Element {
         make (const MidiMessage& midi, double beatLength)
         {
             if (! midi.isNoteOn())
-                return Note (ValueTree::invalid);
+                return Note (ValueTree());
 
             float velocity = (float)midi.getVelocity() / 127.f;
             return Note (midi.getNoteNumber(), midi.getTimeStamp(),

@@ -115,9 +115,8 @@ namespace Element {
             friend class Sequence;
             Sequence* session;
 
-            ClipModel createClip() { return ClipModel (ValueTree::invalid); }
+            ClipModel createClip() { return ClipModel (ValueTree()); }
             UndoManager* undoManager() const { return nullptr; }
-
         };
 
         virtual ~Sequence();

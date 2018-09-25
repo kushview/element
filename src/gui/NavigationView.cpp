@@ -73,7 +73,7 @@ public:
 
     var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override
     {
-        return var::null;
+        return var();
     }
 
     String getTooltipForRow (int row) override

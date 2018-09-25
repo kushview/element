@@ -280,7 +280,7 @@ public:
 private:
     EngineController& owner;
     SessionPtr session;
-    EnginePtr  engine;
+    AudioEnginePtr engine;
     OwnedArray<RootGraphHolder> graphs;
 };
 

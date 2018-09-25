@@ -22,7 +22,7 @@ static void buildCommandLine (CommandLine& cli, const String& c) {
 
     const var port = c.fromFirstOccurrenceOf("--port=", false, false)
                       .upToFirstOccurrenceOf(" ", false, false);
-    if (port != var::null)
+    if (port.isInt() || port.isInt64())
         cli.port = (int) port;
 }
 
@@ -155,7 +155,7 @@ SessionPtr Globals::getSession()
     return (impl) ? impl->session : nullptr;
 }
 
-void Globals::setEngine (EnginePtr engine)
+void Globals::setEngine (AudioEnginePtr engine)
 {
     if (impl->engine)
         impl->engine->deactivate();
