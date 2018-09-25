@@ -10,20 +10,12 @@
 
 namespace Element {
 
-// a dummy clip that can be used for testing purposes
+/** A dummy clip that can be used for testing purposes */
 class DummyClip :  public ClipSource
 {
-    int32 blockSize;
-
 public:
-
-    DummyClip()
-    {
-        DBG ("DummyClip(): created");
-        blockSize = 0;
-    }
-
-    ~DummyClip() { }
+    DummyClip() { }
+    ~DummyClip() noexcept { }
 
     void openClip (int, double) { Logger::writeToLog ("DummyClip::open()"); }
     void closeClip() { Logger::writeToLog ("DummyClip::close()"); }
@@ -65,6 +57,9 @@ public:
         ClipSource* createSource (Engine&, const File&) { return new DummyClip(); }
         ClipSource* createSource (Engine&, const ClipModel&) { return new DummyClip(); }
     };
+
+private:
+    int blockSize = 0;
 };
 
 class ClipFactory::Impl
