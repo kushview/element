@@ -17,10 +17,15 @@ int main (int argc, char** argv)
     else
         DBG("category not found: " << String::fromUTF8 (argv[1]));
 
-    int totalFails;
+    int totalFails, totalPass;
     for (int i = 0; i < runner.getNumResults(); ++i)
-        totalFails += runner.getResult(i)->failures;
+    {
+        const auto* const result = runner.getResult (i);
+        totalFails += result->failures;
+        totalPass += result->passes;
+    }
+
     juce::shutdownJuce_GUI();
-    DBG("total fails: " << totalFails);
+    DBG("pass: " << totalPass << " fail: " << totalFails);
     return totalFails;
 }

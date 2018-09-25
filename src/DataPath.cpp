@@ -79,7 +79,7 @@ namespace Element
             Node node (Node::parse (iter.getFile()));
             if (node.isValid() &&
                 (node.getProperty(Tags::identifier) == identifier || node.getProperty(Tags::file) == identifier) &&
-                node.getProperty(Tags::format) == format)
+                 node.getProperty(Tags::format) == format)
             {
                 nodes.add (node);
             }

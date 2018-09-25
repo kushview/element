@@ -1,6 +1,9 @@
+/*
+    ElementApp.h - This file is part of Element
+    Copyright (C) 2014-2018  Kushview, LLC.  All rights reserved.
+ */
 
-#ifndef EL_DATAPATH_H
-#define EL_DATAPATH_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -34,5 +37,3 @@ namespace Element
     
     class DataSearchPath { };
 }
-
-#endif  // EL_DATAPATH_H

@@ -46,7 +46,6 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool selected)
 {
     g.saveState();
-    AffineTransform::identity;
     g.addTransform (AffineTransform().rotated (1.57079633f, (float)w, 0.0f));
     
     if (selected)
