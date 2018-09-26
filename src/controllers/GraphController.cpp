@@ -182,6 +182,15 @@ uint32 GraphController::addNode (const Node& newNode)
     PluginDescription desc; 
     newNode.getPluginDescription (desc);
 
+    if (desc.pluginFormatName == "VST3")
+    {
+        OwnedArray<PluginDescription> types;
+        if (auto* format = pluginManager.getAudioPluginFormat (desc.pluginFormatName))
+            format->findAllTypesForFile (types, desc.fileOrIdentifier);
+        if (types.size() > 0)
+            desc = *types.getFirst();
+    }
+
     if (auto* node = createFilter (&desc, 0, 0))
     {
         auto* const proc = node->getAudioProcessor();
@@ -436,7 +445,18 @@ void GraphController::setNodeModel (const Node& node)
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
         Node node (nodes.getChild (i), false);
-        PluginDescription desc; node.getPluginDescription (desc);
+        PluginDescription desc; 
+        node.getPluginDescription (desc);
+        
+        if (desc.pluginFormatName == "VST3")
+        {
+            OwnedArray<PluginDescription> types;
+            if (auto* format = pluginManager.getAudioPluginFormat (desc.pluginFormatName))
+                format->findAllTypesForFile (types, desc.fileOrIdentifier);
+            if (types.size() > 0)
+                desc = *types.getFirst();
+        }
+        
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
