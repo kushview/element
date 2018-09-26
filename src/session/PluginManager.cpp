@@ -205,11 +205,11 @@ private:
     bool launchScanner (const int timeout = EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT, const int flags = 0)
     {
         resetScannerVariables();
-        return launchSlaveProcess (File::getSpecialLocation (File::currentExecutableFile),
+        return launchSlaveProcess (File::getSpecialLocation (File::invokedExecutableFile),
                                    EL_PLUGIN_SCANNER_PROCESS_ID, timeout, flags);
     }
 };
-  
+
 class PluginScannerSlave : public kv::ChildProcessSlave, public AsyncUpdater
 {
 public:
