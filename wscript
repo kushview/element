@@ -199,10 +199,7 @@ def build_mac (bld):
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = [ 'KV' ],
-        mac_app     = True,
-        mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
-        mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
+        use         = [ 'KV' ]
     )
 
     bld.add_group()
