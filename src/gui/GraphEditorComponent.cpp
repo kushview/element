@@ -879,7 +879,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         {
             bool verified = false;
             if (const auto* desc = menu.getPluginDescription (result, verified))
-                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc));
+                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc, verified));
         }
         else if (result >= 80000 && result < 90000)
         {

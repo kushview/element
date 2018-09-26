@@ -307,7 +307,7 @@ namespace Element
                 bool verified = false;
                 const auto* desc = menu.getPluginDescription (result, verified);
                 if (desc)
-                    ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc));
+                    ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc, verified));
             }
             else
             {

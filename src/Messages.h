@@ -143,12 +143,13 @@ public:
 
 struct AddPluginMessage : public AppMessage
 {
-    AddPluginMessage (const Node& g, const PluginDescription& d)
-        : graph (g), description (d)
+    AddPluginMessage (const Node& g, const PluginDescription& d, const bool v = true)
+        : graph (g), description (d), verified (v)
     { }
 
     const Node graph;
     const PluginDescription description;
+    const bool verified;
     ConnectionBuilder builder;
 };
 

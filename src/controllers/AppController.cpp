@@ -245,7 +245,7 @@ void AppController::handleMessage (const Message& msg)
         }
         else if (graph.isGraph())
         {
-            ec->addPlugin (graph, desc, apm->builder);
+            ec->addPlugin (graph, desc, apm->builder, apm->verified);
         }
         else
         {

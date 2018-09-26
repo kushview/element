@@ -761,14 +761,32 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
 }
 
 void EngineController::addPlugin (const Node& graph, const PluginDescription& desc,
-                                  const ConnectionBuilder& builder)
+                                  const ConnectionBuilder& builder, const bool verified)
 {
     if (! graph.isGraph())
         return;
     
+    OwnedArray<PluginDescription> plugs;
+    if (! verified)
+    {
+        auto* format = getWorld().getPluginManager().getAudioPluginFormat (desc.pluginFormatName);
+        jassert(format != nullptr);
+        auto& list (getWorld().getPluginManager().getKnownPlugins());
+        list.removeFromBlacklist (desc.fileOrIdentifier);
+        if (list.scanAndAddFile (desc.fileOrIdentifier, false, plugs, *format)) {
+            getWorld().getPluginManager().saveUserPlugins (getWorld().getSettings());
+        }
+    }
+    else
+    {
+        plugs.add (new PluginDescription (desc));
+    }
+    
+    const PluginDescription descToLoad = (plugs.size() > 0) ? *plugs.getFirst() : desc;
+
     if (auto* controller = graphs->findGraphControllerFor (graph))
     {
-        const Node node (addPlugin (*controller, desc));
+        const Node node (addPlugin (*controller, descToLoad));
         builder.addConnections (*controller, node.getNodeId());
     }
 }

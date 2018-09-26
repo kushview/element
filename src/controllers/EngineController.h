@@ -37,7 +37,7 @@ public:
     
     /** Adds a plugin to a specific graph and adds connections from
         a ConnectionBuilder */
-    void addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder);
+    void addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
 
     /** Adds a midi device node to the current root graph */
     void addMidiDeviceNode (const String& device, const bool isInput);
