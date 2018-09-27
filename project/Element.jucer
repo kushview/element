@@ -308,7 +308,7 @@
       <FILE id="tPXmZf" name="ElementApp.h" compile="0" resource="0" file="../src/ElementApp.h"/>
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="../src/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="../src/Globals.h"/>
-      <FILE id="dEn8dF" name="Main.cpp" compile="1" resource="0" file="../src/Main.cpp"/>
+      <FILE id="SpnOvr" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
       <FILE id="QrURzP" name="Messages.h" compile="0" resource="0" file="../src/Messages.h"/>
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="../src/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="../src/Settings.cpp"/>
