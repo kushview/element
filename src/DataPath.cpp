@@ -73,14 +73,19 @@ namespace Element
     
     void DataPath::findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const
     {
-        DirectoryIterator iter (root.getChildFile("Presets"), true, "*.elpreset");
+        const auto presetsDir = getRootDir().getChildFile ("Presets");
+        if (! presetsDir.exists() || ! presetsDir.isDirectory())
+            return;
+
+        DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
         while (iter.next())
         {
             Node node (Node::parse (iter.getFile()));
-            if (node.isValid() &&
-                (node.getProperty(Tags::identifier) == identifier || node.getProperty(Tags::file) == identifier) &&
-                 node.getProperty(Tags::format) == format)
+            if (node.isValid() && 
+                node.getFileOrIdentifier() == identifier && 
+                node.getFormat() == format)
             {
+                node.getIdentifier();
                 nodes.add (node);
             }
         }

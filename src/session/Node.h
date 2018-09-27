@@ -186,8 +186,18 @@ namespace Element {
                  objectData.getProperty(Tags::identifier) == "midi.output");
         }
         
-        const var& getFormat() const        { return objectData.getProperty(Tags::format); }
-        const var& getIdentifier() const    { return objectData.getProperty(Tags::identifier); }
+        /** Returns the format of this node */
+        inline const var& getFormat() const        { return objectData.getProperty(Tags::format); }
+
+        /** Returns this nodes identifier */
+        inline const var& getIdentifier() const    { return objectData.getProperty(Tags::identifier); }
+
+        /** Returns a file property if exists, otherwise the identifier property */
+        inline const var& getFileOrIdentifier() const
+        { 
+            return objectData.hasProperty(Tags::file) ? objectData.getProperty (Tags::file)
+                                                      : getIdentifier();
+        }
 
         inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
         
