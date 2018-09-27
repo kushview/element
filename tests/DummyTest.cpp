@@ -13,8 +13,43 @@ public:
 
     void runTest()
     {
+        testName();
+        testJavascript();
+    }
+
+private:
+    void testName()
+    {
         beginTest ("getName() == 'Dummy'");
         expect (getName() == "Dummy");
+    }
+
+    void testJavascript()
+    {
+        beginTest ("JS engine adds console.log(...)");
+        JavascriptEngine engine;
+        auto* object = new DynamicObject();
+        object->setMethod ("log", std::bind (&DummyTest::testLog, std::placeholders::_1));
+        engine.registerNativeObject (Identifier ("test"), object);
+        auto result = engine.execute ("var console = { log: test.log }; console.log(\"Hello World\", 123);");
+        if (result.failed())
+            DBG(result.getErrorMessage());
+        expect (! result.failed());
+    }
+
+    static var testLog (const var::NativeFunctionArgs& args)
+    {
+        if (args.numArguments == 1)
+        {
+            Logger::writeToLog (args.arguments->toString());
+        }
+        else if (args.numArguments > 1)
+        {
+            for (int i = 0; i < args.numArguments; ++i)
+                Logger::writeToLog ((args.arguments + i)->toString());
+        }
+
+        return var::undefined();
     }
 };
 
