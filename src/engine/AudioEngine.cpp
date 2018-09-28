@@ -285,7 +285,7 @@ struct RootGraphRender
         graph->setLocked (locked);
         graphs.add (graph);
         graph->engineIndex = graphs.size() - 1;
-        
+
         if (graph->engineIndex == 0)
         {
             setCurrentGraph (0);
@@ -572,7 +572,11 @@ public:
         if (isPrepared)
             prepareGraph (graph, sampleRate, blockSize);
         ScopedLock sl (lock);
-        graphs.addGraph (graph);
+        if (graphs.addGraph (graph))
+        {
+            graph->renderingSequenceChanged.connect (
+                std::bind (&AudioEngine::updateExternalLatencySamples, &engine));
+        }
     }
     
     void removeGraph (RootGraph* graph)
@@ -582,6 +586,7 @@ public:
             graphs.removeGraph (graph);
         }
         
+        graph->renderingSequenceChanged.disconnect_all_slots();
         if (isPrepared)
             graph->releaseResources();
     }
@@ -688,6 +693,8 @@ private:
     
     AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
     
+    int latencySamples = 0;
+
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
         graph->setPlayConfigDetails (numInputChans, numOutputChans,
@@ -881,4 +888,36 @@ void AudioEngine::releaseExternalResources()
 }
 
 Globals& AudioEngine::getWorld() const { return world; }
+
+void AudioEngine::updateExternalLatencySamples()
+{
+    int latencySamples = 0;
+
+    {
+        ScopedLock sl (priv->lock);
+
+        auto* current = priv->getCurrentGraph();
+        if (nullptr == current) return;
+    
+        if (current->getRenderMode() == RootGraph::SingleGraph)
+        {
+            latencySamples = current->getLatencySamples();
+        }
+        else
+        {
+            for (auto* const graph : priv->graphs.getGraphs())
+                if (graph->getRenderMode() == RootGraph::Parallel)
+                    latencySamples = jmax (latencySamples, graph->getLatencySamples());
+        }
+    }
+
+    priv->latencySamples = latencySamples;
+    sampleLatencyChanged();
+}
+
+int AudioEngine::getExternalLatencySamples() const
+{
+    return priv != nullptr ? priv->latencySamples : 0;
+}
+
 }

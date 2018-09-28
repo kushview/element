@@ -324,8 +324,7 @@ private:
 
         for (int i = graph.getNumConnections(); --i >= 0;)
         {
-            const GraphProcessor::Connection* const c = graph.getConnection (i);
-
+            const auto* const c = graph.getConnection (i);
             if (c->destNode == nodeID)
                 maxLatency = jmax (maxLatency, getNodeDelay (c->sourceNode));
         }
@@ -588,7 +587,7 @@ private:
 
         setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
         
-        if (proc->getTotalNumOutputChannels() == 0)
+        if (node->isAudioIONode() && proc->getTotalNumOutputChannels() == 0)
             totalLatency = maxLatency;
 
         int totalChans = jmax (node->getNumPorts (PortType::Audio, true),

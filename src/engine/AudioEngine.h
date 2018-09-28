@@ -114,6 +114,8 @@ private:
 class AudioEngine : public Engine
 {
 public:
+    Signal sampleLatencyChanged;
+
     AudioEngine (Globals&);
     virtual ~AudioEngine() noexcept;
 
@@ -161,7 +163,9 @@ public:
     void processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi);
     void processExternalPlayhead (AudioPlayHead* playhead, const int nframes);
     void releaseExternalResources();
-    
+    void updateExternalLatencySamples();
+    int getExternalLatencySamples() const;
+
     Globals& getWorld() const;
 
 private:
