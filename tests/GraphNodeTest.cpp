@@ -7,56 +7,69 @@
 
 namespace Element {
 
-class GraphProcessorTest : public UnitTest {
+class GraphProcessorTest : public UnitTestBase {
 public:
-    GraphProcessorTest() : UnitTest ("Graph Processor", "graph") { }
+    GraphProcessorTest() : UnitTestBase ("Graph Processor", "graphs", "processor") { }
 
-    virtual void initialise() override
+    void initialise() override
     {
         globals.reset (new Globals());
         globals->getPluginManager().addDefaultFormats();
+        globals->getPluginManager().addFormat (new ElementAudioPluginFormat (*globals));
+        globals->getPluginManager().setPlayConfig (44100.0, 512);
     }
 
-    virtual void shutdown() override
+    void shutdown() override
     {
         globals.reset (nullptr);
     }
 
-    virtual void runTest() override
+    void runTest() override
     {
-        if (auto* plugin = createPluginProcessor())
+        if (auto* const plugin = createPluginProcessor())
         {
-            beginTest ("Channel/Port Mapping");
             GraphProcessor graph;
+            graph.prepareToPlay (44100.0, 512);
+
+            beginTest ("adds/removes node");
             GraphNodePtr node = graph.addNode (plugin);
-            expect (13 == node->getMidiInputPort());
+            MessageManager::getInstance()->runDispatchLoopUntil (10);
+            expect (graph.getNumNodes() == 1, "node wasn't added");
+            expect (node != nullptr);
+            expect (node->getAudioProcessor() == plugin);
+            expect (graph.removeNode (node->nodeId), "node wasn't removed");
+
+            graph.releaseResources();
+            graph.clear();
         }
     }
 
 private:
     std::unique_ptr<Globals> globals;
-    AudioPluginFormatManager plugins;
     AudioProcessor* createPluginProcessor()
     {
+        auto& plugins (globals->getPluginManager());
+
         PluginDescription desc;
-        desc.pluginFormatName = "AudioUnit";
-        desc.fileOrIdentifier = "AudioUnit:Synths/aumu,samp,appl";
+        desc.pluginFormatName = "Element";
+        desc.fileOrIdentifier = "element.volume.stereo";
         String msg;
-        return plugins.createPluginInstance (desc, 44100.0, 1024, msg);
+
+        return plugins.createAudioPlugin (desc, msg);
     }
 };
 
 static GraphProcessorTest sGraphProcessorTest;
 
 
-class GraphNodeTest : public UnitTest {
+class GraphNodeTest : public UnitTestBase {
 public:
-    GraphNodeTest() : UnitTest ("Graph Node", "graph") { }
+    GraphNodeTest() : UnitTestBase ("Graph Node", "graphs", "node") { }
 
-    virtual void initialise() { }
-    virtual void shutdown() { }
+    void initialise() override { }
+    void shutdown() override { }
 
-    virtual void runTest()
+    void runTest() override
     {
         AudioPluginFormatManager plugins;
         plugins.addDefaultFormats();
@@ -66,7 +79,7 @@ public:
         String msg;
         if (auto* plugin = plugins.createPluginInstance (desc, 44100.0, 1024, msg))
         {
-            beginTest ("Channel/Port Mapping");
+            beginTest ("finds MIDI port");
             GraphProcessor graph;
             GraphNodePtr node = graph.addNode (plugin);
             expect (13 == node->getMidiInputPort());

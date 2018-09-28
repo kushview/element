@@ -73,7 +73,7 @@ public:
     AddChannelOp (const int srcChannelNum_, const int dstChannelNum_)
         : srcChannelNum (srcChannelNum_),
           dstChannelNum (dstChannelNum_)
-    {}
+    { }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>&, const int numSamples)
     {
@@ -261,9 +261,9 @@ private:
 class ProcessorGraphBuilder
 {
 public:
-
-    ProcessorGraphBuilder (GraphProcessor& graph_, const Array<void*>& orderedNodes_,
-                                   Array<void*>& renderingOps)
+    ProcessorGraphBuilder (GraphProcessor& graph_, 
+                           const Array<void*>& orderedNodes_,
+                           Array<void*>& renderingOps)
         : graph (graph_),
           orderedNodes (orderedNodes_),
           totalLatency (0)
@@ -587,13 +587,14 @@ private:
         } /* foreach port */
 
         setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
-
+        
         if (proc->getTotalNumOutputChannels() == 0)
+        {
             totalLatency = maxLatency;
+        }
 
         int totalChans = jmax (node->getNumPorts (PortType::Audio, true),
                                node->getNumPorts (PortType::Audio, false));
-
         renderingOps.add (new ProcessBufferOp (node, channelsToUse [PortType::Audio],
                                                totalChans, 0, channelsToUse));
     }
