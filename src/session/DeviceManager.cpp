@@ -7,12 +7,11 @@
 
 namespace Element {
 
-const int DeviceManager::maxAudioChannels          = 32;
+const int DeviceManager::maxAudioChannels   = 128;
 
 class DeviceManager::Private
 {
 public:
-
     Private() { }
     ~Private() { }
 
