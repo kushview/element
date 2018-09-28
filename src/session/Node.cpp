@@ -595,7 +595,7 @@ namespace Element {
             if (auto gn = getGraphNode())
                 if (auto* const proc = getGraphNode()->getAudioProcessor())
                     return proc->hasEditor();
-        return false;        
+        return false;
     }
 
     void ConnectionBuilder::addConnections (GraphController& controller, const uint32 targetNodeId) const

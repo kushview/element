@@ -296,7 +296,7 @@ void GuiController::showPluginWindowsFor (const Node& node, const bool recursive
 
 void GuiController::presentPluginWindow (const Node& node)
 {
-    if (! windowManager || ! node.hasEditor())
+    if (! windowManager)
         return;
 
     auto* window = windowManager->getPluginWindowFor (node);
