@@ -712,6 +712,7 @@ GraphProcessor::GraphProcessor()
 
 GraphProcessor::~GraphProcessor()
 {
+    renderingSequenceChanged.disconnect_all_slots();
     clearRenderingSequence();
     clear();
 }
@@ -1075,6 +1076,8 @@ void GraphProcessor::buildRenderingSequence()
 
     // delete the old ones..
     deleteRenderOpArray (newRenderingOps);
+
+    renderingSequenceChanged();
 }
 
 void GraphProcessor::getOrderedNodes (ReferenceCountedArray<GraphNode>& orderedNodes)

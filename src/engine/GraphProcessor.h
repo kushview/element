@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "engine/GraphNode.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -27,6 +28,8 @@ class JUCE_API GraphProcessor : public Processor,
                                 public AsyncUpdater
 {
 public:
+    Signal renderingSequenceChanged;
+
     /** Creates an empty graph. */
     GraphProcessor();
 

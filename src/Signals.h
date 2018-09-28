@@ -10,8 +10,9 @@
 
 namespace Element {
 
-typedef boost::signals2::signal<void()> Signal;
-typedef boost::signals2::signal<void(float)> FloatSignal;
-typedef boost::signals2::signal<void(const String&)> StringSignal;
+using namespace boost::signals2;
+using Signal       = signal<void()>;
+using FloatSignal  = signal<void(float)>;
+using StringSignal = signal<void(const String&)>;
 
 }

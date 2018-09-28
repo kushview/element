@@ -102,10 +102,16 @@ private:
     }
 };
 
+static void changedSequence (GraphController* controller) {
+    DBG("changed: " << controller->getGraphModel().getName());
+}
 
 GraphController::GraphController (GraphProcessor& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
-{ }
+{
+    auto func = std::bind (changedSequence, this);
+    processor.renderingSequenceChanged.connect (func);
+}
 
 GraphController::~GraphController()
 {
