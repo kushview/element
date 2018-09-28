@@ -42,6 +42,29 @@ public:
             graph.releaseResources();
             graph.clear();
         }
+
+        {
+            GraphProcessor graph;
+            graph.setPlayConfigDetails (0, 2, 44100.0, 512);
+            graph.prepareToPlay (44100.0, 512);
+            
+            beginTest ("latency reporting");
+            auto* const plugin1 = createPluginProcessor();
+            plugin1->setLatencySamples (100);
+            auto* const plugin2 = new Element::GraphProcessor::AudioGraphIOProcessor (
+                GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
+            
+            GraphNodePtr node1 = graph.addNode (plugin1);
+            GraphNodePtr node2 = graph.addNode (plugin2);
+            node1->connectAudioTo (node2);
+            MessageManager::getInstance()->runDispatchLoopUntil (15);
+
+            expect (graph.getNumConnections() == 2);
+            expect (graph.getLatencySamples() == 100);
+            
+            graph.releaseResources();
+            graph.clear();
+        }
     }
 
 private:

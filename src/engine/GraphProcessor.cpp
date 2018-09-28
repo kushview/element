@@ -589,9 +589,7 @@ private:
         setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
         
         if (proc->getTotalNumOutputChannels() == 0)
-        {
             totalLatency = maxLatency;
-        }
 
         int totalChans = jmax (node->getNumPorts (PortType::Audio, true),
                                node->getNumPorts (PortType::Audio, false));

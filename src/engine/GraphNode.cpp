@@ -93,18 +93,20 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     AudioPluginInstance* const dst = other->getAudioPluginInstance();
 
     const int totalChans = jmin (getNumAudioOutputs(), other->getNumAudioInputs());
-    bool failed = false;
+    int failed = 0;
     for (int chan = 0; chan < totalChans; ++chan)
     {
-        failed |= graph.addConnection (
+        if (! graph.addConnection (
             this->nodeId, Processor::getPortForAudioChannel(src, chan, false),
-            other->nodeId, Processor::getPortForAudioChannel(dst, chan, true)
-        );
+            other->nodeId, Processor::getPortForAudioChannel(dst, chan, true)))
+        {
+            ++failed;
+        }
     }
 
-    if (failed)
+    if (failed > 0)
     {
-        DBG("  failed " << src->getName() << " to " << dst->getName());
+        DBG("[EL] failed connecting audio from " << src->getName() << " to " << dst->getName());
     }
 }
 
