@@ -100,8 +100,8 @@ def build_desktop (bld, slug='element'):
         bld.install_files (element_data, 'data/element_icon.xpm')
 
 def common_use_flags():
-    return ['JUCE_AUDIO_UTILS', 'JUCE_GUI_EXTRA', 'JUCE_OPENGL', 'ELEMENT_GUI', \
-            'ELEMENT_ENGINES', 'ELEMENT_MODELS', 'ELEMENT_LV2', 'LILV', 'SUIL']
+    return [ 'JUCE_AUDIO_UTILS', 'JUCE_GUI_EXTRA', 'JUCE_OPENGL', 'KV_GUI', \
+             'KV_ENGINE', 'KV_MODELS', 'KV_LV2', 'LILV', 'SUIL' ]
 
 def copy_mingw_libs (bld):
     return
