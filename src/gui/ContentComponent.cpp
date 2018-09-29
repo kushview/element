@@ -229,8 +229,9 @@ class ContentComponent::StatusBar : public Component,
 {
 public:
     StatusBar (Globals& g)
-        : devices (g.getDeviceManager()),
-          plugins (g.getPluginManager())
+        : world (g),
+          devices (world.getDeviceManager()),
+          plugins (world.getPluginManager())
     {
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
@@ -295,8 +296,12 @@ public:
     
     void updateLabels()
     {
+        auto engine = world.getAudioEngine();
        #if EL_RUNNING_AS_PLUGIN
-        sampleRateLabel.setText ("", dontSendNotification);
+        String text = "Latency: ";
+        const int latencySamples = (engine != nullptr) ? engine->getExternalLatencySamples() : 0;
+        text << latencySamples << " samples";
+        sampleRateLabel.setText (text, dontSendNotification);
         streamingStatusLabel.setText ("", dontSendNotification);
         statusLabel.setText ("Plugin", dontSendNotification);
         
@@ -338,6 +343,7 @@ public:
     }
     
 private:
+    Globals& world;
     DeviceManager& devices;
     PluginManager& plugins;
     
