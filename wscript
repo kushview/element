@@ -15,21 +15,26 @@ def options (opt):
     opt.add_option ('--enable-free', default=False, action='store_true', dest='enable_free', \
         help="Build the free version")
 
-def configure (conf):
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
-
-    cross.setup_compiler (conf)
-    if len(conf.options.cross) <= 0:
-        conf.prefer_clang()
-    conf.load ("compiler_c compiler_cxx ar cross juce")
-    conf.check_cxx_version()
-
+def silence_warnings(conf):
+    '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
+
+def configure (conf):
+    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
+    
+    conf.check_ccache()
+    cross.setup_compiler (conf)
+    if len(conf.options.cross) <= 0:
+        conf.prefer_clang()
+    conf.load ("compiler_c compiler_cxx ar cross juce")
+    conf.check_cxx_version()
+
+    silence_warnings (conf)
 
     conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
