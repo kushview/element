@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "session/Session.h"
 
 namespace Element {
 
@@ -13,19 +14,24 @@ class AppController;
 class Globals;
 class MainMenu;
 
-class MainWindow : public DocumentWindow
+class MainWindow : public DocumentWindow,
+                   public ChangeListener
 {
 public:
     MainWindow (Globals&);
     virtual ~MainWindow();
-    void closeButtonPressed();
+    void closeButtonPressed() override;
     void refreshMenu();
     Globals& getWorld() { return world; }
     AppController& getAppController();
 
+    void changeListenerCallback (ChangeBroadcaster* source) override;
+
 private:
     Globals& world;
     ScopedPointer<MainMenu> mainMenu;
+    String sessionName;
+    void nameChanged (const String& value);
 };
 
 }

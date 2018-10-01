@@ -14,20 +14,40 @@ namespace Element {
 
 MainWindow::MainWindow (Globals& g)
     : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
-        world (g)
+      world (g)
 {
     setUsingNativeTitleBar (true);
     setResizable (true, false);
     
     mainMenu = new MainMenu (*this, g.getCommandManager());
     mainMenu->setupMenu();
-    
+
+    nameChanged (g.getSession()->getName());
+    g.getSession()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
 }
 
 MainWindow::~MainWindow()
 {
+    world.getSession()->removeChangeListener (this);
     mainMenu = nullptr;
+}
+
+void MainWindow::changeListenerCallback (ChangeBroadcaster*)
+{
+    nameChanged (world.getSession()->getName());
+}
+
+void MainWindow::nameChanged (const String& value)
+{
+    const auto newName = value.trim();
+    if (newName != sessionName)
+       sessionName = newName;
+
+    String title = "Element";
+    if (sessionName.isNotEmpty())
+        title << " - " << sessionName;
+    setName (title);
 }
 
 void MainWindow::closeButtonPressed()
