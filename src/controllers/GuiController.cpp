@@ -390,7 +390,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::toggleVirtualKeyboard,
         Commands::rotateContentView,
         Commands::showAllPluginWindows,
-        Commands::hideAllPluginWindows
+        Commands::hideAllPluginWindows,
+        Commands::showKeymapEditor
     });
     
     commands.add (Commands::quit);
@@ -402,20 +403,20 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
     switch (commandID)
     {
         case Commands::exportAudio:
-            result.setInfo ("Export Audio", "Export to an audio file", "Exporting", 0);
+            result.setInfo ("Export Audio", "Export to an audio file", "Session", 0);
             break;
         case Commands::exportMidi:
-            result.setInfo ("Exort MIDI", "Export to a MIDI file", "Exporting", 0);
+            result.setInfo ("Exort MIDI", "Export to a MIDI file", "Session", 0);
             break;
         case Commands::importGraph:
-            result.setInfo ("Import Graph", "Import graph to current session", "Exporting", 0);
+            result.setInfo ("Import graph", "Import a graph into current session", "Session", 0);
             break;
         case Commands::exportGraph:
-            result.setInfo ("Exort Graph", "Export graph to file", "Exporting", 0);
+            result.setInfo ("Export current graph", "Export the current graph to file", "Session", 0);
             break;
         case Commands::panic:
             result.addDefaultKeypress ('p', ModifierKeys::altModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Panic", "Sends all notes off to the engine", "Engine", 0);
+            result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
             
             // MARK: Session Commands
@@ -439,38 +440,39 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Save Session As", "Save the current session with a new name", Commands::Categories::session, 0);
             break;
         case Commands::sessionAddGraph:
-            result.addDefaultKeypress('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Add Graph", "Add a new graph to the session", Commands::Categories::session, 0);
+            result.addDefaultKeypress ('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
+            result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::session, 0);
             break;
         case Commands::sessionDuplicateGraph:
             result.addDefaultKeypress ('d', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Duplicate Graph", "Duplicate the current graph", Commands::Categories::session, 0);
+            result.setInfo ("Duplicate current graph", "Duplicates the currently active graph", Commands::Categories::session, 0);
             break;
         case Commands::sessionDeleteGraph:
             result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
-            result.setInfo ("Delete Graph", "Deletes the current graph", Commands::Categories::session, 0);
+            result.setInfo ("Delete current graph", "Deletes the current graph", Commands::Categories::session, 0);
             break;
         case Commands::sessionInsertPlugin:
             result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Insert Plugin", "Add a plugin in the current graph", Commands::Categories::session, Info::isDisabled);
+            result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::session, Info::isDisabled);
             break;
             
-            // MARK: Media Commands
+        // MARK: Media Commands
         case Commands::mediaNew:
-            result.setInfo ("New Media", "Close the current media", "Application", 0);
+            result.setInfo ("New Media", "Close the current media", "Session", 0);
             break;
         case Commands::mediaClose:
-            result.setInfo ("Close Media", "Close the current media", "Application", 0);
+            result.setInfo ("Close Media", "Close the current media", "Session", 0);
             break;
         case Commands::mediaOpen:
-            result.setInfo ("Open Media", "Opens a type of supported media", "Session Media", 0);
+            result.setInfo ("Open Media", "Opens a type of supported media", "Session", 0);
             break;
         case Commands::mediaSave:
-            result.setInfo ("Close Media", "Saves the currently viewed object", "Session Media", 0);
+            result.setInfo ("Save Media", "Saves the currently viewed object", "Session", 0);
             break;
+        
         case Commands::mediaSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Save Media As", "Saves the current object with another name", "Session Media", 0);
+            result.setInfo ("Save Media As", "Saves the current object with another name", "Session", 0);
             break;
             
             // MARK: Show Commands
@@ -529,16 +531,20 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         
         case Commands::rotateContentView:
             result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
-            result.setInfo ("Rotate View...", "Show the graph editor", "Session", 0);
+            result.setInfo ("Rotate View", "Show the graph editor", "Session", 0);
             break;
 
         case Commands::showAllPluginWindows:
             result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Show all plugin windows...", "Show all plugins for the current graph.", "Session", 0);
+            result.setInfo ("Show all plugin windows", "Show all plugins for the current graph.", "Session", 0);
             break;
         case Commands::hideAllPluginWindows:
             result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier);
-            result.setInfo ("Hide all plugin windows...", "Hides all plugins on the current graph.", "Session", 0);
+            result.setInfo ("Hide all plugin windows", "Hides all plugins on the current graph.", "Session", 0);
+            break;
+        case Commands::showKeymapEditor:
+            // result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Keymap Editor", "Show the keyboard shortcuts and edit them.", "User Interface", 0);
             break;
 
         case Commands::checkNewerVersion:
@@ -578,25 +584,25 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
             
         case Commands::transportRewind:
-            result.setInfo ("Rewind", "Transport Rewind", "Playback", 0);
+            result.setInfo ("Rewind", "Transport Rewind", "Engine", 0);
             result.addDefaultKeypress ('j', 0);
             break;
         case Commands::transportForward:
-            result.setInfo ("Forward", "Transport Fast Forward", "Playback", 0);
+            result.setInfo ("Forward", "Transport Fast Forward", "Engine", 0);
             result.addDefaultKeypress ('l', 0);
             break;
         case Commands::transportPlay:
-            result.setInfo ("Play", "Transport Play", "Playback", 0);
+            result.setInfo ("Play", "Transport Play", "Engine", 0);
             result.addDefaultKeypress (KeyPress::spaceKey, 0);
             break;
         case Commands::transportRecord:
-            result.setInfo ("Record", "Transport Record", "Playback", 0);
+            result.setInfo ("Record", "Transport Record", "Engine", 0);
             break;
         case Commands::transportSeekZero:
-            result.setInfo ("Seek Start", "Seek to Beginning", "Playback", 0);
+            result.setInfo ("Seek Start", "Seek to Beginning", "Engine", 0);
             break;
         case Commands::transportStop:
-            result.setInfo ("Stop", "Transport Stop", "Playback", 0);
+            result.setInfo ("Stop", "Transport Stop", "Engine", 0);
             break;
     }
 }
@@ -610,6 +616,9 @@ bool GuiController::perform (const InvocationInfo& info)
             toggleAboutScreen();
             break;
 
+        case Commands::showKeymapEditor:
+            content->setMainView ("KeymapEditorView");
+            break;
         case Commands::showPluginManager:
             content->setMainView ("PluginManager");
             break;

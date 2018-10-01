@@ -126,22 +126,40 @@ private:
         }
     }
     
+
     void run() override
     {
         Settings& settings (world.getSettings());
         AudioEnginePtr engine = new AudioEngine (world);
         engine->applySettings (settings);
         world.setEngine (engine); // this will also instantiate the session
-        SessionPtr session = world.getSession();
-        
-        setupPlugins();
-        
-        world.loadModule ("test");
         controller = new AppController (world);
-        
+
+        setupPlugins();
+        setupKeyMappings();
+
         sendActionMessage ("finishedLaunching");
     }
     
+    void setupAudioEngine()
+    {
+
+    }
+
+    void setupKeyMappings()
+    {
+        auto* const props = world.getSettings().getUserSettings();
+        auto* const keymp = world.getCommandManager().getKeyMappings();
+        if (props && keymp)
+        {
+            std::unique_ptr<XmlElement> xml;
+            xml.reset (props->getXmlValue ("keymappings"));
+            if (xml != nullptr)
+                world.getCommandManager().getKeyMappings()->restoreFromXml (*xml);
+            xml = nullptr;
+        }
+    }
+
     void setupPlugins()
     {
         auto& settings (world.getSettings());
@@ -229,7 +247,9 @@ public:
         plugins.saveUserPlugins (settings);
         if (ScopedXml el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el);
-        
+        if (ScopedXml keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
+            props->setValue ("keymappings", keymappings.get());
+
         engine = nullptr;
         controller = nullptr;
         world->setEngine (nullptr);

@@ -12,6 +12,7 @@
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
 #include "gui/GraphEditorView.h"
+#include "gui/KeymapEditorView.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
 #include "gui/NavigationView.h"
@@ -615,6 +616,8 @@ void ContentComponent::setMainView (const String& name)
         setContentView (new SessionContentView());
     } else if (name == "GraphSettings") {
         setContentView (new GraphSettingsView());
+    } else if (name == "KeymapEditorView") {
+        setContentView (new KeymapEditorView());
     }
     else
     {

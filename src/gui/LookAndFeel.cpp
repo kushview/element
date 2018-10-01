@@ -54,6 +54,10 @@ LookAndFeel::LookAndFeel()
     setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
     setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
     
+    // Keymap Editor
+    setColour (KeyMappingEditorComponent::textColourId, LookAndFeel::textColor);
+    setColour (KeyMappingEditorComponent::backgroundColourId, findColour (TreeView::backgroundColourId));
+
     // Directory Contents Display
     setColour (DirectoryContentsDisplayComponent::textColourId, textColor);
     setColour (DirectoryContentsDisplayComponent::highlightColourId, Colors::elemental.darker (0.6000006f));

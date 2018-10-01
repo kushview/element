@@ -33,6 +33,7 @@ namespace Commands {
         showGraphEditor,
         showLastContentView,
         showAllPluginWindows,
+        showKeymapEditor,
         hideAllPluginWindows,
 
         toggleVirtualKeyboard,

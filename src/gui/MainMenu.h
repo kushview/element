@@ -186,6 +186,7 @@ public:
         menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+        menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
     }
     
     static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
