@@ -163,6 +163,10 @@
               file="../src/gui/HorizontalListBox.h"/>
         <FILE id="qOKTw2" name="Icons.cpp" compile="1" resource="0" file="../src/gui/Icons.cpp"/>
         <FILE id="ksQT0O" name="Icons.h" compile="0" resource="0" file="../src/gui/Icons.h"/>
+        <FILE id="aoqw5d" name="KeymapEditorView.cpp" compile="1" resource="0"
+              file="../src/gui/KeymapEditorView.cpp"/>
+        <FILE id="pNgLqO" name="KeymapEditorView.h" compile="0" resource="0"
+              file="../src/gui/KeymapEditorView.h"/>
         <FILE id="Twc6WL" name="LookAndFeel.cpp" compile="1" resource="0" file="../src/gui/LookAndFeel.cpp"/>
         <FILE id="ysuQQn" name="LookAndFeel.h" compile="0" resource="0" file="../src/gui/LookAndFeel.h"/>
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="../src/gui/MainMenu.h"/>
