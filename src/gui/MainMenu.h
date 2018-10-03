@@ -187,6 +187,7 @@ public:
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
         menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
+        menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
     }
     
     static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)

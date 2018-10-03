@@ -391,7 +391,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::rotateContentView,
         Commands::showAllPluginWindows,
         Commands::hideAllPluginWindows,
-        Commands::showKeymapEditor
+        Commands::showKeymapEditor,
+        Commands::showControllerDevices
     });
     
     commands.add (Commands::quit);
@@ -521,7 +522,11 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress (KeyPress::F2Key, 0);
             result.setInfo ("Graph Editor", "Show the graph editor", "Session", flags);
         } break;
-            
+        
+        case Commands::showControllerDevices:
+            result.setInfo ("Controller Devices", "Show the session's controllers", "Session", 0);
+            break;
+        
         case Commands::toggleVirtualKeyboard:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -615,7 +620,9 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showAbout:
             toggleAboutScreen();
             break;
-
+        case Commands::showControllerDevices:
+            content->setMainView ("ControllerDevicesView");
+            break;
         case Commands::showKeymapEditor:
             content->setMainView ("KeymapEditorView");
             break;

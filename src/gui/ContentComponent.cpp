@@ -11,6 +11,7 @@
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/ControllerDevicesView.h"
 #include "gui/GraphEditorView.h"
 #include "gui/KeymapEditorView.h"
 #include "gui/MainWindow.h"
@@ -435,6 +436,7 @@ public:
         resized();
 
         content1->didBecomeActive();
+        content1->stabilizeContent();
     }
     
     void setAccessoryView (ContentView* view)
@@ -618,6 +620,8 @@ void ContentComponent::setMainView (const String& name)
         setContentView (new GraphSettingsView());
     } else if (name == "KeymapEditorView") {
         setContentView (new KeymapEditorView());
+    } else if (name == "ControllerDevicesView") {
+        setContentView (new ControllerDevicesView());
     }
     else
     {

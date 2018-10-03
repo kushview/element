@@ -2,6 +2,7 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
+#include "gui/ControllerDevicesView.h"
 #include "DataPath.h"
 
 namespace Element
@@ -448,6 +449,9 @@ public:
         // auto* c = new ElementsNavigationPanel();
         // c->setName ("Elements");
         // addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
+        auto* controllerMapsView = new ControllerMapsView ();
+        controllerMapsView->setComponentID ("ControllerMaps");
+        addPanelInternal (-1, controllerMapsView, "Controller maps", 0);
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");
