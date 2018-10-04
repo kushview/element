@@ -132,6 +132,7 @@ public:
 
         controllersBox.setTextWhenNoChoicesAvailable ("No Controllers");
         controllersBox.setTextWhenNothingSelected ("(Controllers)");
+        controllersBox.addListener (this);
         addAndMakeVisible (controllersBox);
 
         createButton.setButtonText ("+");
@@ -172,6 +173,7 @@ public:
         if (value.refersToSameSourceAs (deviceName))
         {
             updateComboBoxes();
+            ensureCorrectDeviceChosen();
         }
     }
 
@@ -194,7 +196,7 @@ public:
     void comboBoxChanged (ComboBox* box) override
     {
         editedDevice = ControllerDevice (getSession()->getControllerDeviceValueTree (box->getSelectedItemIndex()));
-        updateProperties();
+        stabilizeContent();
     }
 
     void resized() override 
@@ -233,10 +235,18 @@ public:
             controls.updateContent();
             updateProperties();
             updateComboBoxes();
+            ensureCorrectDeviceChosen();
+
+            if (controllersBox.getSelectedId() <= 0)
+            {
+                controllersBox.setSelectedItemIndex (0, dontSendNotification);
+                comboBoxChanged (&controllersBox);
+            }
         }
         else
         {
             setChildVisibility (false);
+            clear();
         }
     }
 
@@ -265,8 +275,15 @@ public:
 
     void deleteEditedController()
     {
-        getSession()->getValueTree().getChildWithName ("controllers")
-            .removeChild (editedDevice.getValueTree(), nullptr);
+        auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
+        int index = controllers.indexOf (editedDevice.getValueTree());
+        controllers.removeChild (index, nullptr);
+        index = jmin (index, controllers.getNumChildren() - 1);
+        if (index >= 0 && index < controllers.getNumChildren())
+            editedDevice = ControllerDevice (controllers.getChild (index));
+        else
+            editedDevice = ControllerDevice();
+
         stabilizeContent();
     }
 
@@ -291,28 +308,25 @@ private:
 
     void updateComboBoxes()
     {
-        const auto controllerName = controllersBox.getItemText (controllersBox.getSelectedItemIndex());
         const auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
-        int selectedId = 0;
-
         controllersBox.clear (dontSendNotification);
-
         for (int i = 0; i < controllers.getNumChildren(); ++i)
         {
             const auto controller = controllers.getChild (i);
             const auto name = controller.getProperty (Tags::name).toString();
             const int itemId = i + 1;
             controllersBox.addItem (name, itemId);
-            if (name.equalsIgnoreCase (controllerName) && selectedId <= 0)
-                selectedId = itemId;
         }
-        if (selectedId <= 0 && controllersBox.getNumItems() > 0)
-            selectedId = 1;
-        if (selectedId > 0)
-        {
-            editedDevice = ControllerDevice (controllers.getChild (selectedId - 1));
-            controllersBox.setSelectedId (selectedId, dontSendNotification);
-        }
+    }
+
+    void ensureCorrectDeviceChosen()
+    {
+        int index = 0;
+        const auto controllerName (editedDevice.getName().toString());
+        for (index = 0; index < controllersBox.getNumItems(); ++index)
+            if (controllerName.equalsIgnoreCase (controllersBox.getItemText (index)))
+                break;
+        controllersBox.setSelectedItemIndex (index, dontSendNotification);
     }
 
     void updateProperties()
