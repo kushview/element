@@ -24,13 +24,14 @@ namespace Element {
     public:
         struct ScopedFrozenLock
         {
-            ScopedFrozenLock(const Session& s) : session(s)
+            ScopedFrozenLock (const Session& s) : session(s)
             {
                 wasFrozen = session.freezeChangeNotification;
                 session.freezeChangeNotification = true;
             } 
 
-            ~ScopedFrozenLock() {
+            ~ScopedFrozenLock()
+            {
                 session.freezeChangeNotification = wasFrozen;
             }
 
