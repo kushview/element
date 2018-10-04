@@ -68,6 +68,10 @@ namespace Element {
         void restoreGraphState();
         
         inline int getNumControllerDevices() const { return objectData.getChildWithName("controllers").getNumChildren(); }
+        inline ValueTree getControllerDeviceValueTree (const int i) const
+        {
+            return objectData.getChildWithName("controllers").getChild(i);
+        }
 
     protected:
         Session();

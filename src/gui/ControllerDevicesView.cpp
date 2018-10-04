@@ -121,7 +121,8 @@ private:
 
 class ControllerDevicesView::Content : public Component,
                                        public Button::Listener,
-                                       public ComboBox::Listener
+                                       public ComboBox::Listener,
+                                       public Value::Listener
 {
 public:
     Content()
@@ -142,10 +143,37 @@ public:
         addAndMakeVisible (deleteButton);
 
         addAndMakeVisible (controls);
+        
+        addControlButton.setButtonText ("Add control");
+        addControlButton.addListener (this);
+        addAndMakeVisible (addControlButton);
+
         addAndMakeVisible (properties);
+
+        deviceName.addListener(this);
+
+        stabilizeContent();
     }
     
-    ~Content() { }
+    ~Content()
+    {
+        deviceName.removeListener(this);
+    }
+
+    bool haveControllers() const
+    { 
+        if (auto sess = (const_cast<Content*>(this))->getSession())
+            return sess->getNumControllerDevices() > 0;
+        return false;
+    }
+
+    void valueChanged (Value& value) override
+    {
+        if (value.refersToSameSourceAs (deviceName))
+        {
+            updateComboBoxes();
+        }
+    }
 
     void buttonClicked (Button* button) override
     {
@@ -157,19 +185,23 @@ public:
         {
             deleteEditedController();
         }
+        else if (button == &addControlButton)
+        {
+
+        }
     }
 
     void comboBoxChanged (ComboBox* box) override
     {
-        editedDevice = ControllerDevice (getSession()->getValueTree().getChildWithName("controllers")
-            .getChild (box->getSelectedItemIndex()));
+        editedDevice = ControllerDevice (getSession()->getControllerDeviceValueTree (box->getSelectedItemIndex()));
+        updateProperties();
     }
 
     void resized() override 
     {
         auto r1 (getLocalBounds());
         auto r2 (r1.removeFromTop (18));
-        controllersBox.setBounds (r2.removeFromLeft (200));
+        controllersBox.setBounds (r2.removeFromLeft (200).withHeight (24));
         createButton.setBounds (r2.removeFromRight (18));
         deleteButton.setBounds (r2.removeFromRight (18));
 
@@ -181,36 +213,90 @@ public:
 
     void clear()
     {
+        editedDevice = ControllerDevice();
         controllersBox.clear();
         properties.clear();
     }
 
+    void setChildVisibility (const bool visible)
+    {
+        properties.setVisible (visible);
+        controls.setVisible (visible);
+        addControlButton.setVisible (visible);
+    }
+
     void stabilizeContent()
     {
+        if (haveControllers())
+        {
+            setChildVisibility (true);
+            controls.updateContent();
+            updateProperties();
+            updateComboBoxes();
+        }
+        else
+        {
+            setChildVisibility (false);
+        }
+    }
+
+    void getControllerDeviceProperties (Array<PropertyComponent*>& props)
+    {
+        deviceName.removeListener (this);
+        deviceName = editedDevice.getPropertyAsValue (Tags::name);
+        props.add (new TextPropertyComponent (deviceName, "Name", 120, false, true));
+
+        StringArray keys = MidiInput::getDevices();
+        Array<var> values;
+        for (const auto& d : keys)
+            values.add (d);
+        props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
+            "Input Device", keys, values));
+        deviceName.addListener (this);
+    }
+
+    void createNewController()
+    {
+        editedDevice = ControllerDevice();
+        getSession()->getValueTree().getOrCreateChildWithName ("controllers", nullptr)
+            .addChild (editedDevice.getValueTree(), -1, nullptr);
+        stabilizeContent();
+    }
+
+    void deleteEditedController()
+    {
+        getSession()->getValueTree().getChildWithName ("controllers")
+            .removeChild (editedDevice.getValueTree(), nullptr);
+        stabilizeContent();
+    }
+
+    SessionPtr getSession (const bool force = false)
+    {
+        if (session == nullptr || force)
+            session = ViewHelpers::getSession (this);
+        return session;
+    }
+
+private:
+    ControllerDevice editedDevice;
+    SettingButton testButton;
+    SettingButton createButton;
+    SettingButton deleteButton;
+    ComboBox controllersBox;
+    ControlListBox controls;
+    SettingButton addControlButton;
+    PropertyPanel properties;
+    SessionPtr session;
+    Value deviceName;
+
+    void updateComboBoxes()
+    {
         const auto controllerName = controllersBox.getItemText (controllersBox.getSelectedItemIndex());
-        
-        clear();
-
-        controls.updateContent();
-
-        Array<PropertyComponent*> props;
-        getControllerDeviceProperties (props);
-        properties.addSection ("Device", props);
-        props.clearQuick();
-
-        // auto controls = editedDevice.getValueTree().getOrCreateChildWithName ("controls", 0);
-
-        // props.add (new TextPropertyComponent (controls.getPropertyAsValue (Tags::name, 0),
-        //      "Name", 120, false, true));
-
-        // keys = { "Knob", "Button", "Fader" };
-        // values = { "knob", "button", "fader" };
-        // props.add (new ChoicePropertyComponent (controls.getPropertyAsValue (Tags::type, 0),
-        //     "Type", keys, values));
-        // properties.addSection ("Control", props);
-
         const auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
         int selectedId = 0;
+
+        controllersBox.clear (dontSendNotification);
+
         for (int i = 0; i < controllers.getNumChildren(); ++i)
         {
             const auto controller = controllers.getChild (i);
@@ -229,50 +315,14 @@ public:
         }
     }
 
-    void getControllerDeviceProperties (Array<PropertyComponent*>& props)
+    void updateProperties()
     {
-        props.add (new TextPropertyComponent (editedDevice.getPropertyAsValue (Tags::name),
-             "Name", 120, false, true));
-
-        StringArray keys = MidiInput::getDevices();
-        Array<var> values;
-        for (const auto& d : keys)
-            values.add (d);
-        props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
-            "Input Device", keys, values));
+        properties.clear();
+        Array<PropertyComponent*> props;
+        getControllerDeviceProperties (props);
+        properties.addSection ("Device", props);
+        props.clearQuick();
     }
-
-    void createNewController()
-    {
-        editedDevice = ControllerDevice();
-        session->getValueTree().getOrCreateChildWithName ("controllers", nullptr)
-            .addChild (editedDevice.getValueTree(), -1, nullptr);
-        stabilizeContent();
-    }
-
-    void deleteEditedController()
-    {
-        session->getValueTree().getChildWithName ("controllers")
-            .removeChild(editedDevice.getValueTree(), nullptr);
-        stabilizeContent();
-    }
-
-    SessionPtr getSession (const bool force = false)
-    {
-        if (session == nullptr || force)
-            session = ViewHelpers::getSession (this);
-        return session;
-    }
-
-private:
-    ControllerDevice editedDevice;
-    SettingButton testButton;
-    SettingButton createButton;
-    SettingButton deleteButton;
-    ComboBox controllersBox;
-    ControlListBox controls;
-    PropertyPanel properties;
-    SessionPtr session;
 };
 
 ControllerDevicesView::ControllerDevicesView()
