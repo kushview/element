@@ -7,4 +7,20 @@
 
 namespace Element {
 
+ControllerDevice::ControllerDevice()
+    : ObjectModel (Identifier ("controllerDevice"))
+{
+    setMissingProperties();
+}
+
+ControllerDevice::ControllerDevice (const ValueTree& data)
+    : ObjectModel (data)
+{
+    jassert(data.getType() == Identifier("controllerDevice"));
+}
+
+void ControllerDevice::setMissingProperties()
+{
+    stabilizePropertyString (Tags::name, "New Device");
+}
 }

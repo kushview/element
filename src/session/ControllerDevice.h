@@ -16,11 +16,15 @@ namespace Element {
 class ControllerDevice : public ObjectModel
 {
 public:
-    ControllerDevice() : ObjectModel (Identifier ("controllerDevice")) { }
-    virtual ~ControllerDevice() { getName(); }
+    ControllerDevice();
+    ControllerDevice (const ValueTree& data);
+    virtual ~ControllerDevice() { }
 
     EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name)
     EL_OBJECT_GETTER(InputDevice, "inputDevice")
+
+private:
+    void setMissingProperties();
 };
 
 }

@@ -66,6 +66,8 @@ namespace Element {
         void saveGraphState();
         void restoreGraphState();
         
+        inline int getNumControllerDevices() const { return objectData.getChildWithName("controllers").getNumChildren(); }
+
     protected:
         Session();
         friend class Globals;
