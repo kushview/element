@@ -451,7 +451,7 @@ public:
         // addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
         auto* controllerMapsView = new ControllerMapsView ();
         controllerMapsView->setComponentID ("ControllerMaps");
-        addPanelInternal (-1, controllerMapsView, "Controller maps", 0);
+        addPanelInternal (-1, controllerMapsView, "Mappings", 0);
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");
