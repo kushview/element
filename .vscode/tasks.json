@@ -1,0 +1,38 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Waf Build",
+            "type": "shell",
+            "command": "python waf build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Waf Clean",
+            "type": "shell",
+            "command": "python waf clean"
+        },
+        {
+            "label": "Waf Configure w/ CCache",
+            "type": "shell",
+            "command": "python",
+            "args": [ "waf", "configure", "--debug" ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            }
+        },
+        {
+            "label": "echo",
+            "type": "shell",
+            "command": "python waf build"
+        }
+    ]
+}
