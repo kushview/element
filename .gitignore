@@ -29,4 +29,7 @@ build/
 .DS_Store
 *.autosave
 
-/.vscode
+/.vscode/**/*.*
+!/.vscode/tasks.json
+!/.vscode/launch.json
+!/.vscode/c_cpp_properties.json
