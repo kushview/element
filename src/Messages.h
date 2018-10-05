@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "session/ControllerDevice.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -187,9 +188,25 @@ struct ChangeBusesLayout : public AppMessage
 
 struct OpenSessionMessage : public AppMessage
 {
-    OpenSessionMessage (const File& f) : file(f) {}
+    OpenSessionMessage (const File& f) : file (f) { }
     ~OpenSessionMessage() { }
     const File file;
+};
+
+struct AddControllerDeviceMessage : public AppMessage
+{
+    AddControllerDeviceMessage (ControllerDevice& d)
+        : device (d) { }
+    ~AddControllerDeviceMessage() noexcept { }
+    const ControllerDevice device;
+};
+
+struct RemoveControllerDeviceMessage : public AppMessage
+{
+    RemoveControllerDeviceMessage (ControllerDevice& d)
+        : device (d) { }
+    ~RemoveControllerDeviceMessage() noexcept { }
+    const ControllerDevice device;
 };
 
 }

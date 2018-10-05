@@ -3,6 +3,7 @@
 #include "gui/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
 #include "session/ControllerDevice.h"
+#include "Messages.h"
 
 namespace Element {
 
@@ -10,10 +11,10 @@ class ControlListBox : public ListBox,
                        public ListBoxModel
 {
 public:
-    ControlListBox()
+    ControlListBox ()
     {
         setModel (this);
-        setRowHeight (24);
+        setRowHeight (48);
     }
 
     ~ControlListBox()
@@ -21,9 +22,15 @@ public:
         setModel (nullptr);
     }
 
+    void setControllerDevice (const ControllerDevice& dev)
+    {
+        editedDevice = dev;
+        updateContent();
+    }
+
     int getNumRows() override
     {
-        return 0;
+        return editedDevice.getNumChildren();
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g, int width, int height,
@@ -60,6 +67,8 @@ public:
    #endif
 
 private:
+    ControllerDevice editedDevice;
+
     class ControllerRow : public Component,
                           public Button::Listener
     {
@@ -73,6 +82,7 @@ private:
 
             status.setJustificationType (Justification::centredRight);
             status.setColour (Label::textColourId, Element::LookAndFeel::textColor.darker());
+            status.setInterceptsMouseClicks (false, false);
             addAndMakeVisible (status);
         }
 
@@ -83,6 +93,12 @@ private:
             learnButton.setToggleState (!learnButton.getToggleState(), dontSendNotification);
         }
 
+        void mouseDown (const MouseEvent&) override
+        {
+            list.selectRow (rowNumber, true);
+            setSelected (list.getSelectedRow() == rowNumber);
+        }
+
         void paint (Graphics& g) override
         {
             String text = "Knob #"; text << (1 + rowNumber);
@@ -91,8 +107,8 @@ private:
 
         void resized() override
         {
-            auto r (getLocalBounds().reduced (4));
-            learnButton.setBounds (r.removeFromRight (48));
+            auto r (getLocalBounds().reduced (8));
+            learnButton.setBounds (r.removeFromRight (4 + r.getHeight()));
             status.setBounds (r.removeFromRight (getWidth() / 2));
         }
 
@@ -127,9 +143,6 @@ class ControllerDevicesView::Content : public Component,
 public:
     Content()
     { 
-        // testButton.setButtonText ("Test Button");
-        // addAndMakeVisible (testButton);
-
         controllersBox.setTextWhenNoChoicesAvailable ("No Controllers");
         controllersBox.setTextWhenNothingSelected ("(Controllers)");
         controllersBox.addListener (this);
@@ -143,22 +156,26 @@ public:
         deleteButton.addListener (this);
         addAndMakeVisible (deleteButton);
 
+        controls.setControllerDevice (editedDevice);
         addAndMakeVisible (controls);
         
-        addControlButton.setButtonText ("Add control");
+        addControlButton.setButtonText ("+");
         addControlButton.addListener (this);
         addAndMakeVisible (addControlButton);
 
+        removeControlButton.setButtonText ("-");
+        addAndMakeVisible (removeControlButton);
+        removeControlButton.addListener (this);
         addAndMakeVisible (properties);
 
-        deviceName.addListener(this);
+        deviceName.addListener (this);
 
         stabilizeContent();
     }
     
     ~Content()
     {
-        deviceName.removeListener(this);
+        deviceName.removeListener (this);
     }
 
     bool haveControllers() const
@@ -189,7 +206,11 @@ public:
         }
         else if (button == &addControlButton)
         {
-
+            createNewControl();
+        }
+        else if (button == &removeControlButton)
+        {
+            deleteSelectedControl();
         }
     }
 
@@ -199,16 +220,25 @@ public:
         stabilizeContent();
     }
 
-    void resized() override 
+    void resized() override
     {
+        const int controlsWidth     = 280;
         auto r1 (getLocalBounds());
         auto r2 (r1.removeFromTop (18));
         controllersBox.setBounds (r2.removeFromLeft (200).withHeight (24));
         createButton.setBounds (r2.removeFromRight (18));
         deleteButton.setBounds (r2.removeFromRight (18));
 
-        r1.removeFromTop (2);
-        controls.setBounds (r1.removeFromLeft (240));
+        r1.removeFromTop (8);
+
+        auto r3 = r1.removeFromLeft (controlsWidth);
+        auto r4 = r3.removeFromBottom (32).reduced (2);
+
+        addControlButton.setBounds (r4.removeFromRight (48));
+        r4.removeFromRight (4);
+        removeControlButton.setBounds (r4.removeFromRight (48));
+        controls.setBounds (r3);
+
         r1.removeFromLeft (4);
         properties.setBounds (r1);
     }
@@ -232,7 +262,7 @@ public:
         if (haveControllers())
         {
             setChildVisibility (true);
-            controls.updateContent();
+            
             updateProperties();
             updateComboBoxes();
             ensureCorrectDeviceChosen();
@@ -242,6 +272,8 @@ public:
                 controllersBox.setSelectedItemIndex (0, dontSendNotification);
                 comboBoxChanged (&controllersBox);
             }
+
+            controls.setControllerDevice (editedDevice);
         }
         else
         {
@@ -275,6 +307,11 @@ public:
 
     void deleteEditedController()
     {
+        ViewHelpers::postMessageFor (this, new RemoveControllerDeviceMessage (editedDevice));
+    }
+
+    void controllerRemoved()
+    {
         auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
         int index = controllers.indexOf (editedDevice.getValueTree());
         controllers.removeChild (index, nullptr);
@@ -283,8 +320,21 @@ public:
             editedDevice = ControllerDevice (controllers.getChild (index));
         else
             editedDevice = ControllerDevice();
-
         stabilizeContent();
+    }
+
+    void deleteSelectedControl()
+    {
+        const auto selected = controls.getSelectedRow();
+        if (isPositiveAndBelow (selected, editedDevice.getNumChildren()))
+        {
+            editedDevice.getValueTree().removeChild (selected, nullptr);
+            controls.updateContent();
+            if (controls.getNumRows() > 0)
+                controls.selectRow (jmax (0, jmin (selected, controls.getNumRows() - 1)));
+            else
+                controls.deselectAllRows();
+        }
     }
 
     SessionPtr getSession (const bool force = false)
@@ -299,9 +349,10 @@ private:
     SettingButton testButton;
     SettingButton createButton;
     SettingButton deleteButton;
+    SettingButton addControlButton;
+    SettingButton removeControlButton;
     ComboBox controllersBox;
     ControlListBox controls;
-    SettingButton addControlButton;
     PropertyPanel properties;
     SessionPtr session;
     Value deviceName;
@@ -323,8 +374,13 @@ private:
     {
         int index = 0;
         const auto controllerName (editedDevice.getName().toString());
+        const auto controllerIndex (editedDevice.getValueTree().getParent()
+                                    .indexOf (editedDevice.getValueTree()));
+        if (controllerIndex < 0)
+            return;
+
         for (index = 0; index < controllersBox.getNumItems(); ++index)
-            if (controllerName.equalsIgnoreCase (controllersBox.getItemText (index)))
+            if (controllerIndex == index && controllerName.equalsIgnoreCase (controllersBox.getItemText (index)))
                 break;
         controllersBox.setSelectedItemIndex (index, dontSendNotification);
     }
@@ -336,6 +392,14 @@ private:
         getControllerDeviceProperties (props);
         properties.addSection ("Device", props);
         props.clearQuick();
+    }
+
+    void createNewControl()
+    {
+        ValueTree control ("control");
+        control.setProperty (Tags::name, "Control", nullptr);
+        editedDevice.getValueTree().addChild (control, -1, nullptr);
+        controls.updateContent();
     }
 };
 

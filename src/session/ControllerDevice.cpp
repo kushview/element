@@ -15,9 +15,7 @@ ControllerDevice::ControllerDevice()
 
 ControllerDevice::ControllerDevice (const ValueTree& data)
     : ObjectModel (data)
-{
-    jassert(data.getType() == Identifier("controllerDevice"));
-}
+{ }
 
 void ControllerDevice::setMissingProperties()
 {

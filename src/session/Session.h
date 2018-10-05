@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "session/ControllerDevice.h"
 #include "session/Node.h"
 
 #define EL_TEMPO_MIN 20
@@ -67,12 +68,14 @@ namespace Element {
         void saveGraphState();
         void restoreGraphState();
         
-        inline int getNumControllerDevices() const { return objectData.getChildWithName("controllers").getNumChildren(); }
-        inline ValueTree getControllerDeviceValueTree (const int i) const
+        inline int getNumControllerDevices() const { return getControllerDevicesValueTree().getNumChildren(); }
+        inline ValueTree getControllerDeviceValueTree (const int i) const { return getControllerDevicesValueTree().getChild(i); }
+        inline ControllerDevice getControllerDevice (const int index) const 
         {
-            return objectData.getChildWithName("controllers").getChild(i);
+            ControllerDevice device (getControllerDeviceValueTree (index));
+            return device;
         }
-
+        
     protected:
         Session();
         friend class Globals;
@@ -95,6 +98,7 @@ namespace Element {
         
         inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
         inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
+        inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName("controllers"); }
         
         friend class SessionController;
         friend struct ScopedFrozenLock;
