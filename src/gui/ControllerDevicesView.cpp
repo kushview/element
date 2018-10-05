@@ -1,3 +1,7 @@
+/*
+    ControllerDevice.cpp - This file is part of Element
+    Copyright (C) 2018  Kushview, LLC.  All rights reserved.
+*/
 
 #include "gui/Buttons.h"
 #include "gui/ControllerDevicesView.h"

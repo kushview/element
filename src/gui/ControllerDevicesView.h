@@ -1,3 +1,8 @@
+/*
+    ControllerDevice.cpp - This file is part of Element
+    Copyright (C) 2018  Kushview, LLC.  All rights reserved.
+*/
+
 #pragma once
 
 #include "gui/ContentComponent.h"
