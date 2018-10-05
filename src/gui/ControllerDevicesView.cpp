@@ -304,7 +304,7 @@ public:
     void createNewController()
     {
         editedDevice = ControllerDevice();
-        getSession()->getValueTree().getOrCreateChildWithName ("controllers", nullptr)
+        getSession()->getValueTree().getOrCreateChildWithName (Tags::controllers, nullptr)
             .addChild (editedDevice.getValueTree(), -1, nullptr);
         stabilizeContent();
     }
@@ -316,7 +316,7 @@ public:
 
     void controllerRemoved()
     {
-        auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
+        auto controllers = getSession()->getValueTree().getChildWithName (Tags::controllers);
         int index = controllers.indexOf (editedDevice.getValueTree());
         controllers.removeChild (index, nullptr);
         index = jmin (index, controllers.getNumChildren() - 1);
@@ -363,7 +363,7 @@ private:
 
     void updateComboBoxes()
     {
-        const auto controllers = getSession()->getValueTree().getChildWithName ("controllers");
+        const auto controllers = getSession()->getValueTree().getChildWithName (Tags::controllers);
         controllersBox.clear (dontSendNotification);
         for (int i = 0; i < controllers.getNumChildren(); ++i)
         {

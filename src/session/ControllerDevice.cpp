@@ -8,7 +8,7 @@
 namespace Element {
 
 ControllerDevice::ControllerDevice()
-    : ObjectModel (Identifier ("controllerDevice"))
+    : ObjectModel (Tags::controller)
 {
     setMissingProperties();
 }

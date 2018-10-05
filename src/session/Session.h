@@ -98,7 +98,7 @@ namespace Element {
         
         inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
         inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
-        inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName("controllers"); }
+        inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName(Tags::controllers); }
         
         friend class SessionController;
         friend struct ScopedFrozenLock;
