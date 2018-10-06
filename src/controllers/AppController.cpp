@@ -1,5 +1,6 @@
 
 #include "controllers/AppController.h"
+#include "controllers/DevicesController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
@@ -28,15 +29,18 @@ AppController::AppController (Globals& g)
     : world (g)
 {
     lastExportedGraph = DataPath::defaultGraphDir();
-    
     addChild (new GuiController (g, *this));
+    addChild (new DevicesController ());
     addChild (new EngineController ());
     addChild (new SessionController ());
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);
 }
 
-AppController::~AppController() { }
+AppController::~AppController()
+{ 
+
+}
 
 void AppController::activate()
 {
@@ -109,7 +113,8 @@ void AppController::handleMessage (const Message& msg)
 	auto* ec   = findChild<EngineController>();
     auto* gui  = findChild<GuiController>();
     auto* sess = findChild<SessionController>();
-	jassert(ec && gui && sess);
+    auto* devs = findChild<DevicesController>();
+	jassert(ec && gui && sess && devs);
 
     bool handled = true;
 
@@ -269,6 +274,16 @@ void AppController::handleMessage (const Message& msg)
     {
         ec->addMidiDeviceNode (mdm->device, mdm->inputDevice);
     }
+    else if (const auto* rcdm = dynamic_cast<const RemoveControllerDeviceMessage*> (&msg))
+    {
+        const auto device = rcdm->device;
+        devs->remove (device);
+    }
+    else if (const auto* acdm = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
+    {
+        const auto device = acdm->device;
+        devs->add (device);
+    }
     else
     {
         handled = false;
@@ -276,7 +291,7 @@ void AppController::handleMessage (const Message& msg)
     
     if (! handled)
     {
-        DBG("[EL] AppController: unhandled Message received");
+        DBG("[EL] unhandled Message received");
     }
 }
 

@@ -137,13 +137,31 @@ namespace Element {
         notifyChanged();
     }
 
-    void Session::valueTreeChildAdded (ValueTree& parentTree, ValueTree& child)
+    void Session::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
     {
+        // controller device added
+        if (parent.getParent() == objectData && 
+            parent.hasType (Tags::controllers) && 
+            child.hasType (Tags::controller))
+        {
+            const ControllerDevice device (child);
+            controllerDeviceAdded (device);
+        }
+
         notifyChanged();
     }
 
-    void Session::valueTreeChildRemoved (ValueTree& parentTree, ValueTree& child, int)
+    void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
     {
+        // controller device added
+        if (parent.getParent() == objectData && 
+            parent.hasType (Tags::controllers) && 
+            child.hasType (Tags::controller))
+        {
+            const ControllerDevice device (child);
+            controllerDeviceRemoved (device);
+        }
+
         notifyChanged();
     }
 

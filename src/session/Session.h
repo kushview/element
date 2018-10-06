@@ -8,6 +8,7 @@
 #include "ElementApp.h"
 #include "session/ControllerDevice.h"
 #include "session/Node.h"
+#include "Signals.h"
 
 #define EL_TEMPO_MIN 20
 #define EL_TEMPO_MAX 999
@@ -106,6 +107,10 @@ namespace Element {
         void notifyChanged();
         
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);
+    
+    public:
+        boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceAdded;
+        boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceRemoved;
     };
     
     typedef ReferenceCountedObjectPtr<Session> SessionPtr;

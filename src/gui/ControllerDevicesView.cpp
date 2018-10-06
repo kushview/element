@@ -259,6 +259,7 @@ public:
         properties.setVisible (visible);
         controls.setVisible (visible);
         addControlButton.setVisible (visible);
+        removeControlButton.setVisible (visible);
     }
 
     void stabilizeContent()
@@ -303,9 +304,13 @@ public:
 
     void createNewController()
     {
-        editedDevice = ControllerDevice();
-        getSession()->getValueTree().getOrCreateChildWithName (Tags::controllers, nullptr)
-            .addChild (editedDevice.getValueTree(), -1, nullptr);
+        auto newDevice = ControllerDevice();
+        ViewHelpers::postMessageFor (this, new AddControllerDeviceMessage (newDevice));
+    }
+
+    void controllerAdded (const ControllerDevice& device)
+    {
+        editedDevice = device;
         stabilizeContent();
     }
 
@@ -314,14 +319,14 @@ public:
         ViewHelpers::postMessageFor (this, new RemoveControllerDeviceMessage (editedDevice));
     }
 
-    void controllerRemoved()
+    void controllerRemoved (const ControllerDevice&)
     {
-        auto controllers = getSession()->getValueTree().getChildWithName (Tags::controllers);
-        int index = controllers.indexOf (editedDevice.getValueTree());
-        controllers.removeChild (index, nullptr);
-        index = jmin (index, controllers.getNumChildren() - 1);
-        if (index >= 0 && index < controllers.getNumChildren())
-            editedDevice = ControllerDevice (controllers.getChild (index));
+        DBG("num controllers: " << session->getNumControllerDevices());
+
+        int index = controllersBox.getSelectedItemIndex();
+        index = jmin (index, session->getNumControllerDevices() - 1);
+        if (index >= 0 && index < session->getNumControllerDevices())
+            editedDevice = session->getControllerDevice (index);
         else
             editedDevice = ControllerDevice();
         stabilizeContent();
@@ -344,7 +349,13 @@ public:
     SessionPtr getSession (const bool force = false)
     {
         if (session == nullptr || force)
+        {
+            if (session)
+                disconnectHandlers();
             session = ViewHelpers::getSession (this);
+            connectHandlers();
+        }
+
         return session;
     }
 
@@ -405,6 +416,27 @@ private:
         editedDevice.getValueTree().addChild (control, -1, nullptr);
         controls.updateContent();
     }
+
+    void connectHandlers()
+    {
+        disconnectHandlers();
+        if (session != nullptr)
+        {    
+            connections.add (session->controllerDeviceAdded.connect (
+                std::bind (&Content::controllerAdded, this, std::placeholders::_1)));
+            connections.add (session->controllerDeviceRemoved.connect (
+                std::bind (&Content::controllerRemoved, this, std::placeholders::_1)));
+            jassert(connections.size() == 2);
+        }
+    }
+
+    void disconnectHandlers()
+    {
+        for (auto connection : connections)
+            connection.disconnect();
+    }
+
+    Array<boost::signals2::connection> connections;
 };
 
 ControllerDevicesView::ControllerDevicesView()
