@@ -421,12 +421,11 @@ private:
     {
         disconnectHandlers();
         if (session != nullptr)
-        {    
+        {
             connections.add (session->controllerDeviceAdded.connect (
                 std::bind (&Content::controllerAdded, this, std::placeholders::_1)));
             connections.add (session->controllerDeviceRemoved.connect (
                 std::bind (&Content::controllerRemoved, this, std::placeholders::_1)));
-            jassert(connections.size() == 2);
         }
     }
 
@@ -434,6 +433,7 @@ private:
     {
         for (auto connection : connections)
             connection.disconnect();
+        connections.clear();
     }
 
     Array<boost::signals2::connection> connections;
