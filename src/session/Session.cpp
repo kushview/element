@@ -166,10 +166,9 @@ namespace Element {
     }
 
     void Session::valueTreeChildOrderChanged (ValueTree& parent, int, int) {  }
-
     void Session::valueTreeParentChanged (ValueTree& tree) { }
     void Session::valueTreeRedirected (ValueTree& tree) { }
-
+    
     void Session::saveGraphState()
     {
         for (int i = 0; i < getNumGraphs(); ++i)
