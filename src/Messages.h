@@ -30,7 +30,7 @@ struct AddPresetMessage : public AppMessage
 {
     AddPresetMessage (const Node& n, const String& name_ = String())
         : node (n), name (name_) { }
-    ~AddPresetMessage() { }
+    ~AddPresetMessage() noexcept { }
     
     const Node node;
     const String name;
@@ -193,20 +193,6 @@ struct OpenSessionMessage : public AppMessage
     const File file;
 };
 
-struct AddControllerDeviceMessage : public AppMessage
-{
-    AddControllerDeviceMessage (ControllerDevice& d)
-        : device (d) { }
-    ~AddControllerDeviceMessage() noexcept { }
-    const ControllerDevice device;
-};
-
-struct RemoveControllerDeviceMessage : public AppMessage
-{
-    RemoveControllerDeviceMessage (ControllerDevice& d)
-        : device (d) { }
-    ~RemoveControllerDeviceMessage() noexcept { }
-    const ControllerDevice device;
-};
-
 }
+
+#include "messages/ControllerDeviceMessages.h"

@@ -70,11 +70,21 @@ namespace Element {
         void restoreGraphState();
         
         inline int getNumControllerDevices() const { return getControllerDevicesValueTree().getNumChildren(); }
-        inline ValueTree getControllerDeviceValueTree (const int i) const { return getControllerDevicesValueTree().getChild(i); }
+        
+        inline ValueTree getControllerDeviceValueTree (const int i) const
+        {
+            return getControllerDevicesValueTree().getChild(i);
+        }
+        
         inline ControllerDevice getControllerDevice (const int index) const 
         {
             ControllerDevice device (getControllerDeviceValueTree (index));
             return device;
+        }
+        
+        inline int indexOf (const ControllerDevice& device) const
+        {
+            return getControllerDevicesValueTree().indexOf (device.getValueTree());
         }
         
     protected:

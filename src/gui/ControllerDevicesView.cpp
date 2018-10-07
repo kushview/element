@@ -321,8 +321,6 @@ public:
 
     void controllerRemoved (const ControllerDevice&)
     {
-        DBG("num controllers: " << session->getNumControllerDevices());
-
         int index = controllersBox.getSelectedItemIndex();
         index = jmin (index, session->getNumControllerDevices() - 1);
         if (index >= 0 && index < session->getNumControllerDevices())
@@ -332,7 +330,26 @@ public:
         stabilizeContent();
     }
 
+    void createNewControl()
+    {
+        ControllerDevice::Control newControl;
+        DBG(editedDevice.getValueTree().toXmlString());
+        ViewHelpers::postMessageFor (this, new AddControlMessage (editedDevice, newControl));
+    }
+
+    void controlAdded (const ControllerDevice::Control& control)
+    {
+        controls.updateContent();
+    }
+
     void deleteSelectedControl()
+    {
+        const auto selected (ControllerDevice::Control (
+            editedDevice.getControl (controls.getSelectedRow())));
+        ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
+    }
+
+    void controlRemoved (const ControllerDevice::Control& control)
     {
         const auto selected = controls.getSelectedRow();
         if (isPositiveAndBelow (selected, editedDevice.getNumChildren()))
@@ -407,14 +424,6 @@ private:
         getControllerDeviceProperties (props);
         properties.addSection ("Device", props);
         props.clearQuick();
-    }
-
-    void createNewControl()
-    {
-        ValueTree control ("control");
-        control.setProperty (Tags::name, "Control", nullptr);
-        editedDevice.getValueTree().addChild (control, -1, nullptr);
-        controls.updateContent();
     }
 
     void connectHandlers()

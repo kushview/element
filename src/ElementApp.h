@@ -28,6 +28,7 @@ namespace Tags
     const Identifier arc                = "arc";
     const Identifier arcs               = "arcs";
     const Identifier bypass             = "bypass";
+    const Identifier control            = "control";
     const Identifier controller         = "controller";
     const Identifier controllers        = "controllers";
     const Identifier graph              = "graph";

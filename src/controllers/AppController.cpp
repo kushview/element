@@ -279,10 +279,24 @@ void AppController::handleMessage (const Message& msg)
         const auto device = rcdm->device;
         devs->remove (device);
     }
-    else if (const auto* acdm = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
+    else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
     {
-        const auto device = acdm->device;
+        const auto device = addControllerDeviceMessage->device;
         devs->add (device);
+    }
+    else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
+    {
+        const auto device = removeControlMessage->device;
+        const auto control = removeControlMessage->control;
+        devs->remove (device, control);
+        gui->stabilizeContent();
+    }
+    else if (const auto* addControlMessage = dynamic_cast<const AddControlMessage*> (&msg))
+    {
+        const auto device (addControlMessage->device);
+        const auto control (addControlMessage->control);
+        devs->add (device, control);
+        gui->stabilizeContent();
     }
     else
     {
@@ -430,7 +444,7 @@ bool AppController::perform (const InvocationInfo& info)
                 msg.setTimeStamp (Time::getMillisecondCounterHiRes());
                 e->addMidiMessage (msg);
                 msg = MidiMessage::allSoundOff(c);
-                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
+                msg.setTimeStamp (msg.getTimeStamp());
                 e->addMidiMessage (msg);
             }
         }  break;
