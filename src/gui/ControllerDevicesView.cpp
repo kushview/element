@@ -11,6 +11,115 @@
 
 namespace Element {
 
+class MidiLearnButton : public SettingButton,
+                         public MidiInputCallback,
+                         public AsyncUpdater,
+                         public Button::Listener
+{
+public:
+    boost::signals2::signal<void()> messageReceived;
+
+    explicit MidiLearnButton (const String& deviceName = String())
+    { 
+        addListener (this);
+    }
+
+    void buttonClicked (Button*) override
+    {
+        // if (! isEnabled())
+        //     return;
+        // if (isListening()) stopListening();
+        // else startListening();
+    }
+
+    bool isListening() const { return input != nullptr; }
+    void updateToggleState() {
+        setToggleState (isListening(), dontSendNotification);
+    }
+
+    void setInputDevice (const String& deviceName)
+    {
+        if (inputName == deviceName)
+            return;
+        const bool wasListening = isListening();
+        stopListening();
+        inputName = deviceName;
+        if (wasListening)
+            startListening();
+    }
+
+    void stopListening()
+    {
+        if (input)
+        {
+            input->stop();
+            input.reset (nullptr);
+        }
+
+        updateToggleState();
+    }
+
+    void startListening()
+    {
+        stopListening();
+        clearMessage();
+        
+        const auto deviceIdx = MidiInput::getDevices().indexOf (inputName);
+        if (deviceIdx >= 0)
+            input.reset (MidiInput::openDevice (deviceIdx, this));
+        
+        if (input)
+        {
+            input->start();
+        }
+        else
+        {
+            DBG("[EL] could not start MIDI device: " << inputName);
+        }
+
+        updateToggleState();
+    }
+
+    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& msg) override
+    {
+        if (gotFirstMessage.get() && stopOnFirstMessage.get()) 
+            return;
+        gotFirstMessage.set (true);
+        ScopedLock sl (lock);
+        message = msg;
+        triggerAsyncUpdate();
+    }
+
+    void handleAsyncUpdate() override
+    {
+        if (gotFirstMessage.get() && stopOnFirstMessage.get())
+            stopListening();
+        messageReceived();
+    }
+
+    MidiMessage getMidiMessage() const
+    { 
+        ScopedLock sl (lock);
+        return message;
+    }
+
+private:
+
+    void clearMessage()
+    {
+        gotFirstMessage.set (false);
+        ScopedLock sl (lock);
+        message = MidiMessage();
+    }
+
+    CriticalSection lock;
+    Atomic<bool> gotFirstMessage = false;
+    Atomic<bool> stopOnFirstMessage = false;
+    MidiMessage message;
+    String inputName;
+    std::unique_ptr<MidiInput> input;
+};
+
 class ControlListBox : public ListBox,
                        public ListBoxModel
 {
@@ -32,6 +141,13 @@ public:
         updateContent();
     }
 
+    ControllerDevice::Control getSelectedControl() const
+    {
+        if (getNumSelectedRows() > 0 && getSelectedRow() < editedDevice.getNumControls())
+            return editedDevice.getControl (getSelectedRow());
+        return ControllerDevice::Control();
+    }
+
     int getNumRows() override
     {
         return editedDevice.getNumChildren();
@@ -50,9 +166,8 @@ public:
         if (row == nullptr)
             row = new ControllerRow (*this);
 
-        row->rowNumber = rowNumber;
-        row->selected = isRowSelected;
-        row->refresh();
+        row->refresh (editedDevice.getControl (rowNumber), 
+                      rowNumber, isRowSelected);
         
         return row;
     }
@@ -79,7 +194,7 @@ private:
     public:
         ControllerRow (ControlListBox& l) : list (l)
         {
-            addAndMakeVisible (learnButton);
+            // addAndMakeVisible (learnButton);
             learnButton.setButtonText ("Learn");
             learnButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
             learnButton.addListener (this);
@@ -105,8 +220,8 @@ private:
 
         void paint (Graphics& g) override
         {
-            String text = "Knob #"; text << (1 + rowNumber);
-            ViewHelpers::drawBasicTextRow (text, g, getWidth(), getHeight(), selected);
+            ViewHelpers::drawBasicTextRow (control.getName().toString(), 
+                g, getWidth(), getHeight(), selected);
         }
 
         void resized() override
@@ -116,10 +231,22 @@ private:
             status.setBounds (r.removeFromRight (getWidth() / 2));
         }
 
-        void refresh()
+        void refresh (const ControllerDevice::Control& ctl, int row, bool isNowSelected)
         {
-            status.setText ("Unassigned", dontSendNotification);
-            setSelected (rowNumber == list.getSelectedRow());
+            control = ctl;
+            rowNumber = row;
+            setSelected (isNowSelected);
+
+            const auto midi = control.getMappingData();
+            String text = "N/A";
+            if (midi.isNoteOn())
+                text = midi.getMidiNoteName (midi.getNoteNumber(), true, true, 4);
+            if (midi.isController()) {
+                text = "CC "; text << midi.getControllerNumber();
+            }
+
+            status.setText (text, dontSendNotification);
+            list.repaintRow (rowNumber);
         }
 
         void setSelected (const bool isNowSelected)
@@ -129,11 +256,11 @@ private:
             selected = isNowSelected;
         }
 
+        ControllerDevice::Control control;
         int rowNumber = -1;
         bool selected = false;
-        SettingButton learnButton;
         Label status;
-
+        SettingButton learnButton;
     private:
         ControlListBox& list;
     };
@@ -167,19 +294,41 @@ public:
         addControlButton.addListener (this);
         addAndMakeVisible (addControlButton);
 
+        learnButton.setButtonText ("Learn");
+        learnButton.messageReceived.connect (
+            std::bind (&Content::onLearnMidi, this));
+        learnButton.addListener (this);
+        addAndMakeVisible (learnButton);
+
         removeControlButton.setButtonText ("-");
         addAndMakeVisible (removeControlButton);
         removeControlButton.addListener (this);
         addAndMakeVisible (properties);
 
         deviceName.addListener (this);
+        inputDevice.addListener (this);
 
         stabilizeContent();
     }
     
     ~Content()
     {
+        learnButton.messageReceived.disconnect_all_slots();
         deviceName.removeListener (this);
+    }
+
+    void onLearnMidi()
+    {
+        const auto message (learnButton.getMidiMessage());
+        const auto control (controls.getSelectedControl());
+        if (message.getRawDataSize() > 0)
+        {
+            const var mappingData ((void*) message.getRawData(),
+                                  (size_t) message.getRawDataSize());
+            ValueTree data = control.getValueTree();
+            data.setProperty (Tags::mappingData, mappingData, nullptr);
+        }
+        controls.updateContent();
     }
 
     bool haveControllers() const
@@ -195,6 +344,10 @@ public:
         {
             updateComboBoxes();
             ensureCorrectDeviceChosen();
+        }
+        else if (value.refersToSameSourceAs (inputDevice))
+        {
+            DBG("input device changed");
         }
     }
 
@@ -215,6 +368,18 @@ public:
         else if (button == &removeControlButton)
         {
             deleteSelectedControl();
+        }
+        else if (button == &learnButton)
+        {
+            if (learnButton.isListening())
+            {
+                learnButton.stopListening();
+            }
+            else
+            {
+                learnButton.setInputDevice (inputDevice.toString().trim());
+                learnButton.startListening();
+            }
         }
     }
 
@@ -241,6 +406,9 @@ public:
         addControlButton.setBounds (r4.removeFromRight (48));
         r4.removeFromRight (4);
         removeControlButton.setBounds (r4.removeFromRight (48));
+        r4.removeFromRight (4);
+        learnButton.setBounds (r4.removeFromRight (48));
+        
         controls.setBounds (r3);
 
         r1.removeFromLeft (4);
@@ -290,6 +458,8 @@ public:
     void getControllerDeviceProperties (Array<PropertyComponent*>& props)
     {
         deviceName.removeListener (this);
+        inputDevice.removeListener (this);
+
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Name", 120, false, true));
 
@@ -297,8 +467,11 @@ public:
         Array<var> values;
         for (const auto& d : keys)
             values.add (d);
+        inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
         props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
             "Input Device", keys, values));
+
+        inputDevice.addListener (this);
         deviceName.addListener (this);
     }
 
@@ -332,14 +505,16 @@ public:
 
     void createNewControl()
     {
-        ControllerDevice::Control newControl;
-        DBG(editedDevice.getValueTree().toXmlString());
+        const ControllerDevice::Control newControl;
         ViewHelpers::postMessageFor (this, new AddControlMessage (editedDevice, newControl));
     }
 
     void controlAdded (const ControllerDevice::Control& control)
     {
         controls.updateContent();
+        const auto index = editedDevice.indexOf (control);
+        if (index >= 0 && index < controls.getNumRows())
+            controls.selectRow (index);        
     }
 
     void deleteSelectedControl()
@@ -383,11 +558,12 @@ private:
     SettingButton deleteButton;
     SettingButton addControlButton;
     SettingButton removeControlButton;
+    MidiLearnButton learnButton;
     ComboBox controllersBox;
     ControlListBox controls;
     PropertyPanel properties;
     SessionPtr session;
-    Value deviceName;
+    Value deviceName, inputDevice;
 
     void updateComboBoxes()
     {
@@ -435,6 +611,10 @@ private:
                 std::bind (&Content::controllerAdded, this, std::placeholders::_1)));
             connections.add (session->controllerDeviceRemoved.connect (
                 std::bind (&Content::controllerRemoved, this, std::placeholders::_1)));
+            connections.add (session->controlAdded.connect (
+                std::bind (&Content::controlAdded, this, std::placeholders::_1)));
+            connections.add (session->controlRemoved.connect (
+                std::bind (&Content::controlRemoved, this, std::placeholders::_1)));
         }
     }
 

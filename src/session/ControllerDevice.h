@@ -19,12 +19,21 @@ public:
     class Control : public ObjectModel
     {
     public:
-        Control() : ObjectModel (Tags::controller) { }
+        Control() : ObjectModel (Tags::control) { }
         Control (const ValueTree& data) : ObjectModel (data) { }
         ~Control() noexcept { }
 
         EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name);
         EL_OBJECT_GETTER(ControlType, Tags::type);
+
+        MidiMessage getMappingData() const
+        {
+            const var& data (objectData.getProperty (Tags::mappingData));
+            if (const auto* block = data.getBinaryData())
+                if (block->getSize() > 0)
+                    return MidiMessage (block->getData(), block->getSize());
+            return MidiMessage();
+        }
     };
 
     ControllerDevice();

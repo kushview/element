@@ -121,6 +121,8 @@ namespace Element {
     public:
         boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceAdded;
         boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceRemoved;
+        boost::signals2::signal<void(const ControllerDevice::Control&)> controlAdded;
+        boost::signals2::signal<void(const ControllerDevice::Control&)> controlRemoved;
     };
     
     typedef ReferenceCountedObjectPtr<Session> SessionPtr;

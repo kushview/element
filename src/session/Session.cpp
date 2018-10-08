@@ -114,6 +114,8 @@ namespace Element {
             objectData.removeAllChildren (nullptr);
         
         ValueTree graphs = objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
+        ValueTree controllers = objectData.getOrCreateChildWithName (Tags::controllers, nullptr);
+        ignoreUnused (graphs, controllers);
     }
 
     void Session::notifyChanged()
@@ -148,12 +150,22 @@ namespace Element {
             controllerDeviceAdded (device);
         }
 
+        // controller device control added
+        if (parent.getParent().getParent() == objectData && 
+            parent.getParent().hasType (Tags::controllers) && 
+            parent.hasType (Tags::controller) && 
+            child.hasType (Tags::control))
+        {
+            const ControllerDevice::Control control (child);
+            controlAdded (control);
+        }
+
         notifyChanged();
     }
 
     void Session::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int)
     {
-        // controller device added
+        // controller device removed
         if (parent.getParent() == objectData && 
             parent.hasType (Tags::controllers) && 
             child.hasType (Tags::controller))
@@ -162,6 +174,16 @@ namespace Element {
             controllerDeviceRemoved (device);
         }
 
+        // controller device control removed
+        if (parent.getParent().getParent() == objectData && 
+            parent.getParent().hasType (Tags::controllers) && 
+            parent.hasType (Tags::controller) && 
+            child.hasType (Tags::control))
+        {
+            const ControllerDevice::Control control (child);
+            controlRemoved (control);
+        }
+        
         notifyChanged();
     }
 

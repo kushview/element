@@ -282,7 +282,15 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
     {
         const auto device = addControllerDeviceMessage->device;
-        devs->add (device);
+        if (device.getValueTree().isValid())
+        {
+            devs->add (device);
+        }
+        else
+        {
+            DBG("[EL] device not valid");
+            DBG(device.getValueTree().toXmlString());
+        }
     }
     else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
     {

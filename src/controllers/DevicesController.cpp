@@ -39,7 +39,7 @@ void DevicesController::add (const ControllerDevice& device)
 {
     auto session = getWorld().getSession();
     if (! session) return;
-    auto controllers = session->getValueTree().getChildWithName(Tags::controllers);
+    auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
     if (controllers.indexOf (device.getValueTree()) < 0)
         controllers.addChild (device.getValueTree(), -1, nullptr);
 }

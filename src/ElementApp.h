@@ -33,6 +33,7 @@ namespace Tags
     const Identifier controllers        = "controllers";
     const Identifier graph              = "graph";
     const Identifier graphs             = "graphs";
+    const Identifier mappingData        = "mappingData";
     const Identifier missing            = "missing";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
@@ -88,31 +89,37 @@ struct Alert
     }
 };
 
+inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
+{
+    if (msg.isMidiClock())
+    {
+        DBG("clock:");
+    }
+    if (msg.isNoteOn())
+    {
+        DBG("NOTE ON: " << msg.getMidiNoteName (msg.getNoteNumber(), true, false, 4));
+    }
+    if (msg.isNoteOff())
+    {
+        DBG("NOTE OFF: " << msg.getMidiNoteName (msg.getNoteNumber(), true, false, 4));
+    }
+    
+    if (msg.isController())
+    {
+        msg.isControllerOfType (0);
+        DBG("MIDI CC: " << msg.getControllerNumber() << ":" << msg.getControllerValue());
+    }
+
+    if (frame >= 0 && (msg.isAllNotesOff() || msg.isAllSoundOff()))
+        DBG("got it: " << frame);
+}
+
 inline static void traceMidi (MidiBuffer& buf)
 {
     MidiBuffer::Iterator iter (buf);
     MidiMessage msg; int frame = 0;
-    
     while (iter.getNextEvent (msg, frame))
-    {
-        if (msg.isMidiClock())
-        {
-            DBG("clock:");
-        }
-        if (msg.isNoteOn())
-        {
-            DBG("NOTE ON");
-            
-        }
-        if (msg.isNoteOff())
-        {
-            DBG("NOTE OFF");
-        }
-        
-        if (msg.isAllNotesOff() || msg.isAllSoundOff()) {
-            DBG("got it: " << frame);
-        }
-    }
+        traceMidi (msg, frame);
 }
 
 }
