@@ -509,12 +509,15 @@ public:
         ViewHelpers::postMessageFor (this, new AddControlMessage (editedDevice, newControl));
     }
 
-    void controlAdded (const ControllerDevice::Control& control)
+    void onControlAdded (const ControllerDevice::Control& control)
     {
         controls.updateContent();
         const auto index = editedDevice.indexOf (control);
         if (index >= 0 && index < controls.getNumRows())
+        {
             controls.selectRow (index);        
+            controls.repaintRow (index);
+        }
     }
 
     void deleteSelectedControl()
@@ -524,17 +527,19 @@ public:
         ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
     }
 
-    void controlRemoved (const ControllerDevice::Control& control)
+    void onControlRemoved (const ControllerDevice::Control& control)
     {
-        const auto selected = controls.getSelectedRow();
-        if (isPositiveAndBelow (selected, editedDevice.getNumChildren()))
+        auto selected = controls.getSelectedRow();
+        controls.updateContent();
+        if (controls.getNumRows() > 0)
         {
-            editedDevice.getValueTree().removeChild (selected, nullptr);
-            controls.updateContent();
-            if (controls.getNumRows() > 0)
-                controls.selectRow (jmax (0, jmin (selected, controls.getNumRows() - 1)));
-            else
-                controls.deselectAllRows();
+            selected = (selected < 0) ? 0 : jmax (0, jmin (selected, controls.getNumRows() - 1));
+            controls.selectRow (selected);
+            controls.repaintRow (selected);
+        }
+        else
+        {
+            controls.deselectAllRows();
         }
     }
 
@@ -612,9 +617,9 @@ private:
             connections.add (session->controllerDeviceRemoved.connect (
                 std::bind (&Content::controllerRemoved, this, std::placeholders::_1)));
             connections.add (session->controlAdded.connect (
-                std::bind (&Content::controlAdded, this, std::placeholders::_1)));
+                std::bind (&Content::onControlAdded, this, std::placeholders::_1)));
             connections.add (session->controlRemoved.connect (
-                std::bind (&Content::controlRemoved, this, std::placeholders::_1)));
+                std::bind (&Content::onControlRemoved, this, std::placeholders::_1)));
         }
     }
 
