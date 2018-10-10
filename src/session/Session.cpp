@@ -113,9 +113,9 @@ namespace Element {
         if (resetExisting)
             objectData.removeAllChildren (nullptr);
         
-        ValueTree graphs = objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
-        ValueTree controllers = objectData.getOrCreateChildWithName (Tags::controllers, nullptr);
-        ignoreUnused (graphs, controllers);
+        objectData.getOrCreateChildWithName (Tags::graphs, nullptr);
+        objectData.getOrCreateChildWithName (Tags::controllers, nullptr);
+        objectData.getOrCreateChildWithName (Tags::maps, nullptr);
     }
 
     void Session::notifyChanged()

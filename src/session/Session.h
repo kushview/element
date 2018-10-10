@@ -76,7 +76,7 @@ namespace Element {
             return getControllerDevicesValueTree().getChild(i);
         }
         
-        inline ControllerDevice getControllerDevice (const int index) const 
+        inline ControllerDevice getControllerDevice (const int index) const
         {
             ControllerDevice device (getControllerDeviceValueTree (index));
             return device;
@@ -107,10 +107,11 @@ namespace Element {
         ScopedPointer<Private> priv;
         void setMissingProperties (bool resetExisting = false);
         
-        inline ValueTree getGraphsValueTree() const { return objectData.getChildWithName (Tags::graphs); }
-        inline ValueTree getGraphValueTree (const int index) const { return getGraphsValueTree().getChild(index); }
-        inline ValueTree getControllerDevicesValueTree() const { return objectData.getChildWithName(Tags::controllers); }
-        
+        inline ValueTree getGraphsValueTree()                   const { return objectData.getChildWithName (Tags::graphs); }
+        inline ValueTree getGraphValueTree (const int index)    const { return getGraphsValueTree().getChild(index); }
+        inline ValueTree getControllerDevicesValueTree()        const { return objectData.getChildWithName(Tags::controllers); }
+        inline ValueTree getControllerMapsValueTree()           const { return objectData.getChildWithName(Tags::maps); }
+
         friend class SessionController;
         friend struct ScopedFrozenLock;
         mutable bool freezeChangeNotification = false;

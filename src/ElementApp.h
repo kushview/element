@@ -34,6 +34,8 @@ namespace Tags
     const Identifier graph              = "graph";
     const Identifier graphs             = "graphs";
     const Identifier mappingData        = "mappingData";
+    const Identifier map                = "map";
+    const Identifier maps               = "maps";
     const Identifier missing            = "missing";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";

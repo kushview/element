@@ -274,9 +274,9 @@ void AppController::handleMessage (const Message& msg)
     {
         ec->addMidiDeviceNode (mdm->device, mdm->inputDevice);
     }
-    else if (const auto* rcdm = dynamic_cast<const RemoveControllerDeviceMessage*> (&msg))
+    else if (const auto* removeControllerDeviceMessage = dynamic_cast<const RemoveControllerDeviceMessage*> (&msg))
     {
-        const auto device = rcdm->device;
+        const auto device = removeControllerDeviceMessage->device;
         devs->remove (device);
     }
     else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))

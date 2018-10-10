@@ -59,4 +59,12 @@ private:
     void setMissingProperties();
 };
 
+class ControllerMap : public ObjectModel
+{
+public:
+    ControllerMap() : ObjectModel (Tags::map) { }
+    ControllerMap (const ValueTree& data) : ObjectModel (data) { }
+    ~ControllerMap() noexcept { }
+};
+
 }
