@@ -15,7 +15,7 @@ ControllerDevice::ControllerDevice()
 
 ControllerDevice::ControllerDevice (const ValueTree& data)
     : ObjectModel (data)
-{ 
+{
     jassert (data.hasType (Tags::controller));
 }
 

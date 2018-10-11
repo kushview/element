@@ -16,6 +16,7 @@ public:
     ~MappingEngine();
 
     bool addInput (const ControllerDevice&);
+    bool removeInput (const ControllerDevice&);
 
     void startMapping();
     void stopMapping();

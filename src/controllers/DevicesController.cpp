@@ -39,6 +39,9 @@ void DevicesController::deactivate()
 void DevicesController::add (const ControllerDevice& device)
 {
     auto& mapping (getWorld().getMappingEngine());
+    if (! mapping.addInput (device))
+        return;
+
     auto session = getWorld().getSession();
     if (! session) return;
     auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
@@ -65,6 +68,9 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
 
 void DevicesController::remove (const ControllerDevice& device)
 {
+    auto& mapping (getWorld().getMappingEngine());
+    if (! mapping.removeInput (device))
+        return;
     if (auto session = getWorld().getSession())
         session->getValueTree().getChildWithName (Tags::controllers)
             .removeChild (device.getValueTree(), nullptr);

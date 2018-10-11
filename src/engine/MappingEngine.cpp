@@ -77,21 +77,18 @@ private:
 class ControllerMapInput : public MidiInputCallback
 {
 public:
-    ControllerMapInput (const String& name)
-        : deviceName (name) 
-    { 
-
-    }
+    explicit ControllerMapInput (const ControllerDevice& device)
+        : controllerDevice (device) 
+    { }
     
     ~ControllerMapInput()
     {
         close();
-        deviceName.clear();
     }
 
     void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
     {
-        DBG("midi in controller map input: " << source->getName());
+        DBG("[EL] midi in controller map input: " << source->getName());
         for (auto* handler : handlers)
             if (handler->wants (message))
                 handler->perform (message);
@@ -115,7 +112,7 @@ public:
         if (midiInput == nullptr)
         {
             const auto devices = MidiInput::getDevices();
-            const auto index = devices.indexOf (deviceName);
+            const auto index = devices.indexOf (controllerDevice.getName().toString());
             if (isPositiveAndBelow (index, devices.size()))
                 midiInput.reset (MidiInput::openDevice (index, this));
         }
@@ -137,8 +134,18 @@ public:
             midiInput->stop();
     }
 
+    bool isInputFor (const ControllerDevice& device) const
+    {
+        return device.getValueTree() == controllerDevice.getValueTree();
+    }
+
+    bool isInputFor (const ControllerDevice::Control& control) const
+    {
+        return isInputFor (control.getControllerDevice());
+    }
+
 private:
-    String deviceName;
+    ControllerDevice controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
     OwnedArray<ControllerMapHandler> handlers;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllerMapInput)
@@ -157,31 +164,57 @@ public:
         return inputs.contains (input);
     }
 
+    bool remove (const ControllerDevice& device)
+    {
+        if (auto* input = findInput (device))
+            inputs.removeObject (input, true);
+        return ! containsInputFor (device);
+    }
+
     void clear()
     {
+        stop();
         for (auto* input : inputs)
-        {
-            input->stop();
             input->close();
-        }
-
         inputs.clear (true);
     }
 
     void start()
     {
+        if (isRunning())
+            stop();
+
         for (auto* input : inputs)
             input->start();
+
+        running = true;
     }
 
     void stop()
     {
+        running = false;
         for (auto* input : inputs)
             input->stop();
     }
 
+    ControllerMapInput* findInput (const ControllerDevice& controller) const
+    {
+        for (auto* const input : inputs)
+            if (input->isInputFor (controller))
+                return input;
+        return nullptr;
+    }
+
+    bool containsInputFor (const ControllerDevice& controller) const
+    {
+        return findInput (controller) != nullptr;
+    }
+
+    bool isRunning() const { return running; }
+
 private:
     OwnedArray<ControllerMapInput> inputs;
+    bool running = false;
 };
 
 MappingEngine::MappingEngine()
@@ -197,11 +230,18 @@ MappingEngine::~MappingEngine()
 
 bool MappingEngine::addInput (const ControllerDevice& controller)
 {
-    const auto devices (MidiInput::getDevices());
-    const auto inputDevice (controller.getInputDevice().toString());
-    if (isPositiveAndBelow (devices.indexOf (inputDevice), devices.size()))
-        return inputs->add (new ControllerMapInput (inputDevice));
-    return false;
+    DBG("[EL] MappingEngine::addInput(...)");
+    if (inputs->containsInputFor (controller))
+        return true;
+    return inputs->add (new ControllerMapInput (controller));
+}
+
+bool MappingEngine::removeInput (const ControllerDevice& controller)
+{
+    DBG("[EL] MappingEngine::removeInput(...)");
+    if (! inputs->containsInputFor (controller))
+        return true;
+    return inputs->remove (controller);
 }
 
 void MappingEngine::startMapping()
