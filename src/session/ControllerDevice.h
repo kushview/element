@@ -34,6 +34,12 @@ public:
                     return MidiMessage (block->getData(), block->getSize());
             return MidiMessage();
         }
+
+        ControllerDevice getControllerDevice() const
+        {
+            const ControllerDevice device (objectData.getParent());
+            return device;
+        }
     };
 
     ControllerDevice();
