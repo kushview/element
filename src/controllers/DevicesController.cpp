@@ -1,6 +1,7 @@
 
-#include "session/Session.h"
 #include "controllers/DevicesController.h"
+#include "engine/MappingEngine.h"
+#include "session/Session.h"
 #include "Globals.h"
 
 namespace Element {
@@ -37,6 +38,10 @@ void DevicesController::deactivate()
 
 void DevicesController::add (const ControllerDevice& device)
 {
+    auto& mapping (getWorld().getMappingEngine());
+    if (! mapping.addInput (device))
+        return;
+
     auto session = getWorld().getSession();
     if (! session) return;
     auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
@@ -46,6 +51,9 @@ void DevicesController::add (const ControllerDevice& device)
 
 void DevicesController::add (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
+    auto& mapping (getWorld().getMappingEngine());
+    
+
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
     {
@@ -56,6 +64,8 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     {
         DBG(String("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
+
+    
 }
 
 void DevicesController::remove (const ControllerDevice& device)

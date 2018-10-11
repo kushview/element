@@ -5,6 +5,7 @@
 
 namespace Element {
 
+class ControllerDevice;
 class ControllerMapHandler;
 class GraphNode;
 
@@ -13,6 +14,8 @@ class MappingEngine
 public:
     MappingEngine();
     ~MappingEngine();
+
+    bool addInput (const ControllerDevice&);
 
     void startMapping();
     void stopMapping();

@@ -15,9 +15,16 @@ public:
     {
         testName();
         testJavascript();
+        testUuid();
     }
 
 private:
+    void testUuid()
+    {
+        beginTest ("UUID handling");
+        DBG(Uuid().toDashedString().toUpperCase());
+    }
+
     void testName()
     {
         beginTest ("getName() == 'Dummy'");

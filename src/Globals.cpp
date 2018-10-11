@@ -17,7 +17,8 @@
 
 namespace Element {
 
-static void buildCommandLine (CommandLine& cli, const String& c) {
+static void buildCommandLine (CommandLine& cli, const String& c)
+{
     cli.fullScreen = c.contains ("--full-screen");
 
     const var port = c.fromFirstOccurrenceOf("--port=", false, false)
@@ -53,6 +54,7 @@ public:
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
     ScopedPointer<UnlockStatus>   unlock;
+    std::unique_ptr<MappingEngine> mapping;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
    #endif
@@ -71,6 +73,7 @@ private:
         commands = new CommandManager();
         unlock   = new UnlockStatus (owner);
         session  = new Session();
+        mapping.reset (new MappingEngine());
     }
     
     void freeAll()
@@ -110,6 +113,12 @@ DeviceManager& Globals::getDeviceManager()
 {
     jassert (impl->devices != nullptr);
     return *impl->devices;
+}
+
+MappingEngine& Globals::getMappingEngine()
+{
+    jassert (impl != nullptr && impl->mapping != nullptr);
+    return *impl->mapping;
 }
 
 MediaManager& Globals::getMediaManager()

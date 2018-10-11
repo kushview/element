@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "engine/AudioEngine.h"
+#include "engine/MappingEngine.h"
 #include "session/Session.h"
 #include "URIs.h"
 #include "WorldBase.h"
@@ -41,6 +42,7 @@ public:
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
+    MappingEngine& getMappingEngine();
     PluginManager& getPluginManager();
     Settings& getSettings();
     MediaManager& getMediaManager();
