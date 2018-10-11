@@ -18,6 +18,11 @@
             "command": "python waf clean"
         },
         {
+            "label": "Waf Rebuild",
+            "type": "shell",
+            "command": "python waf clean build"
+        },
+        {
             "label": "Waf Configure w/ CCache",
             "type": "shell",
             "command": "python",
