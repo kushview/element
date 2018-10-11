@@ -70,7 +70,7 @@ namespace Element {
         void restoreGraphState();
         
         inline int getNumControllerDevices() const { return getControllerDevicesValueTree().getNumChildren(); }
-        
+       
         inline ValueTree getControllerDeviceValueTree (const int i) const
         {
             return getControllerDevicesValueTree().getChild(i);
@@ -86,6 +86,10 @@ namespace Element {
         {
             return getControllerDevicesValueTree().indexOf (device.getValueTree());
         }
+        
+        inline int getNumControllerMaps() const { return getControllerMapsValueTree().getNumChildren(); }
+        inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
+        inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.getValueTree()); }
         
     protected:
         Session();

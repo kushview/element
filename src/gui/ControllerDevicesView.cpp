@@ -655,7 +655,4 @@ void ControllerDevicesView::stabilizeContent()
     content->stabilizeContent();
 }
 
-ControllerMapsView::ControllerMapsView() { }
-ControllerMapsView::~ControllerMapsView() { }
-
 }

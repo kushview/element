@@ -3,11 +3,11 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/ControllerDevicesView.h"
+#include "gui/ControllerMapsView.h"
 #include "DataPath.h"
 
-namespace Element
-{
-    
+namespace Element {
+
 class ElementsNavigationPanel : public SessionGraphsListBox
 {
 public:

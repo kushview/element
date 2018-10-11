@@ -23,11 +23,4 @@ private:
     std::unique_ptr<Content> content;
 };
 
-class ControllerMapsView : public ContentView
-{
-public:
-    ControllerMapsView();
-    virtual ~ControllerMapsView();
-};
-
 }
