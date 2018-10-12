@@ -18,7 +18,9 @@ public:
     void add (const ControllerDevice&, const ControllerDevice::Control&);
     void remove (const ControllerDevice&);
     void remove (const ControllerDevice&, const ControllerDevice::Control&);
-
+    void refresh (const ControllerDevice&);
+    void refresh();
+    
 private:
     class Impl; friend class Impl;
     std::unique_ptr<Impl> impl;

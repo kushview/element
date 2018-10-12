@@ -17,7 +17,8 @@ public:
 
     bool addInput (const ControllerDevice&);
     bool removeInput (const ControllerDevice&);
-
+    bool refreshInput (const ControllerDevice&);
+    void clear();
     void startMapping();
     void stopMapping();
 

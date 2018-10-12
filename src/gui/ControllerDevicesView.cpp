@@ -33,7 +33,9 @@ public:
     }
 
     bool isListening() const { return input != nullptr; }
-    void updateToggleState() {
+
+    void updateToggleState()
+    {
         setToggleState (isListening(), dontSendNotification);
     }
 
@@ -104,7 +106,6 @@ public:
     }
 
 private:
-
     void clearMessage()
     {
         gotFirstMessage.set (false);
@@ -317,11 +318,17 @@ public:
         deviceName.removeListener (this);
     }
 
+    static bool supportedForMapping (const MidiMessage& message, const ControllerDevice::Control& control)
+    {
+        ignoreUnused (control);
+        return message.isController() && message.getRawDataSize() > 0;
+    }
+
     void onLearnMidi()
     {
         const auto message (learnButton.getMidiMessage());
         const auto control (controls.getSelectedControl());
-        if (message.getRawDataSize() > 0)
+        if (supportedForMapping (message, control))
         {
             const var mappingData ((void*) message.getRawData(),
                                   (size_t) message.getRawDataSize());
@@ -347,7 +354,8 @@ public:
         }
         else if (value.refersToSameSourceAs (inputDevice))
         {
-            DBG("input device changed");
+            ViewHelpers::postMessageFor (this, 
+                new RefreshControllerDeviceMessage (editedDevice));
         }
     }
 

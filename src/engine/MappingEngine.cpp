@@ -112,7 +112,7 @@ public:
         if (midiInput == nullptr)
         {
             const auto devices = MidiInput::getDevices();
-            const auto index = devices.indexOf (controllerDevice.getName().toString());
+            const auto index = devices.indexOf (controllerDevice.getInputDevice().toString());
             if (isPositiveAndBelow (index, devices.size()))
                 midiInput.reset (MidiInput::openDevice (index, this));
         }
@@ -160,14 +160,19 @@ public:
     bool add (ControllerMapInput* input)
     {
         inputs.addIfNotAlreadyThere (input);
-        input->start();
+        if (isRunning())
+            input->start();
         return inputs.contains (input);
     }
 
     bool remove (const ControllerDevice& device)
     {
         if (auto* input = findInput (device))
+        {
+            input->close();
             inputs.removeObject (input, true);
+        }
+
         return ! containsInputFor (device);
     }
 
@@ -212,6 +217,12 @@ public:
 
     bool isRunning() const { return running; }
 
+    ControllerMapInput** begin()  const noexcept { return inputs.begin(); }
+    ControllerMapInput** end()    const noexcept { return inputs.end(); }
+    int size()                    const noexcept { return inputs.size(); }
+
+    void swapWith (OwnedArray<ControllerMapInput>& other) { inputs.swapWith (other); }
+
 private:
     OwnedArray<ControllerMapInput> inputs;
     bool running = false;
@@ -242,6 +253,26 @@ bool MappingEngine::removeInput (const ControllerDevice& controller)
     if (! inputs->containsInputFor (controller))
         return true;
     return inputs->remove (controller);
+}
+
+bool MappingEngine::refreshInput (const ControllerDevice& device)
+{
+    if (! inputs) return false;
+
+    if (auto* const input = inputs->findInput (device))
+    {
+        input->close();
+        if (inputs->isRunning())
+            input->start();
+    }
+
+    return true;
+}
+
+void MappingEngine::clear()
+{
+    stopMapping();
+    inputs->clear();
 }
 
 void MappingEngine::startMapping()

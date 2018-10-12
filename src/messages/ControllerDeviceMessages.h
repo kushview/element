@@ -5,6 +5,14 @@
 
 namespace Element {
 
+struct RefreshControllerDeviceMessage : public AppMessage
+{
+    RefreshControllerDeviceMessage (const ControllerDevice& d)
+        : device (d) { }
+    ~RefreshControllerDeviceMessage() { }
+    const ControllerDevice device;
+};
+
 struct AddControllerDeviceMessage : public AppMessage
 {
     AddControllerDeviceMessage (const ControllerDevice& d)

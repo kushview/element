@@ -29,11 +29,13 @@ DevicesController::~DevicesController()
 void DevicesController::activate()
 {
     Controller::activate();
+    getWorld().getMappingEngine().startMapping();
 }
 
 void DevicesController::deactivate()
 {
     Controller::deactivate();
+    getWorld().getMappingEngine().startMapping();
 }
 
 void DevicesController::add (const ControllerDevice& device)
@@ -62,8 +64,6 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     {
         DBG(String("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
-
-    
 }
 
 void DevicesController::remove (const ControllerDevice& device)
@@ -88,6 +88,21 @@ void DevicesController::remove (const ControllerDevice& device, const Controller
     {
         DBG(String("[EL] device not found in session: ") << session->getName() << " / " << device.getName().toString());
     }
+}
+
+void DevicesController::refresh (const ControllerDevice& device)
+{
+    getWorld().getMappingEngine().refreshInput (device);
+}
+
+void DevicesController::refresh()
+{
+    auto& mapping (getWorld().getMappingEngine());
+    auto session = getWorld().getSession();
+    mapping.clear();
+    for (int i = 0; i < session->getNumControllerDevices(); ++i)
+        mapping.addInput (session->getControllerDevice (i));
+    mapping.startMapping();
 }
 
 }
