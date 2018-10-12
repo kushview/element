@@ -336,6 +336,7 @@ public:
             data.setProperty (Tags::mappingData, mappingData, nullptr);
         }
         controls.updateContent();
+        ViewHelpers::postMessageFor (this, new RefreshControllerDeviceMessage (editedDevice));
     }
 
     bool haveControllers() const

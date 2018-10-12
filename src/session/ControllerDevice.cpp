@@ -19,11 +19,15 @@ ControllerDevice::ControllerDevice (const ValueTree& data)
     if (data.isValid())
     {
         jassert (data.hasType (Tags::controller));
+        jassert (data.hasProperty (Tags::uuid));
+        setMissingProperties();
     }
 }
 
 void ControllerDevice::setMissingProperties()
 {
+    stabilizePropertyString (Tags::uuid, Uuid().toString());
     stabilizePropertyString (Tags::name, "New Device");
 }
+
 }

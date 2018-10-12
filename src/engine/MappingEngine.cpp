@@ -79,16 +79,23 @@ class ControllerMapInput : public MidiInputCallback
 public:
     explicit ControllerMapInput (const ControllerDevice& device)
         : controllerDevice (device) 
-    { }
+    {
+
+    }
     
     ~ControllerMapInput()
     {
         close();
     }
 
-    void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
+    void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
     {
-        DBG("[EL] midi in controller map input: " << source->getName());
+        if (! message.isController() || ! controllerNumbers [message.getControllerNumber()])
+            return;
+
+        DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
+            << " : " << message.getControllerValue());
+
         for (auto* handler : handlers)
             if (handler->wants (message))
                 handler->perform (message);
@@ -102,12 +109,22 @@ public:
             midiInput.reset (nullptr);
         }
 
+        controllerNumbers.setRange (0, 127, false);
         return midiInput == nullptr;
     }
 
     bool open()
     {
         close();
+
+        for (int i = controllerDevice.getNumControls(); --i >= 0;)
+        {
+            const auto control (controllerDevice.getControl (i));
+            const auto midi (control.getMappingData());
+            if (! midi.isController())
+                continue;
+            controllerNumbers.setBit (midi.getControllerNumber(), true);
+        }
 
         if (midiInput == nullptr)
         {
@@ -148,6 +165,7 @@ private:
     ControllerDevice controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
     OwnedArray<ControllerMapHandler> handlers;
+    BigInteger controllerNumbers;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllerMapInput)
 };
 

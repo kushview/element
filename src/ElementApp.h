@@ -78,6 +78,8 @@ namespace Tags
     const Identifier windowVisible      = "windowVisible";
     const Identifier windowX            = "windowX";
     const Identifier windowY            = "windowY";       
+
+    const Identifier uuid               = "uuid";
 }
 
 struct Alert

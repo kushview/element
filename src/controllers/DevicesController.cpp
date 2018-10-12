@@ -59,6 +59,7 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     {
         auto data = device.getValueTree();
         data.addChild (control.getValueTree(), -1, nullptr);
+        refresh (device);
     }
     else
     {
@@ -83,6 +84,7 @@ void DevicesController::remove (const ControllerDevice& device, const Controller
     {
         auto data = device.getValueTree();
         data.removeChild (control.getValueTree(), nullptr);
+        refresh (device);
     }
     else
     {

@@ -275,6 +275,7 @@ namespace Element {
     
     void Node::setMissingProperties()
     {
+        stabilizePropertyString (Tags::uuid, Uuid().toString());
         stabilizePropertyString (Tags::type, "default");
         stabilizePropertyString (Tags::name, "Node");
         stabilizeProperty (Tags::bypass, false);
