@@ -2,16 +2,19 @@
 #pragma once
 
 #include "JuceHeader.h"
+#include "session/ControllerDevice.h"
+#include "Signals.h"
 
 namespace Element {
 
-class ControllerDevice;
 class ControllerMapHandler;
+class ControllerMapInput;
 class GraphNode;
 
 class MappingEngine
 {
 public:
+    typedef boost::signals2::signal<void()> CapturedEventSignal;
     MappingEngine();
     ~MappingEngine();
 
@@ -22,9 +25,35 @@ public:
     void startMapping();
     void stopMapping();
 
+    void capture (const bool start = true) { capturedEvent.capture.set (start); }
+    MidiMessage getCapturedMidiMessage() const { return capturedEvent.message; }
+    ControllerDevice::Control getCapturedControl() const { return capturedEvent.control; }
+    CapturedEventSignal& capturedSignal() { return capturedEvent.callback; }
+
 private:
-    class Inputs;
-    std::unique_ptr<Inputs> inputs;
+    friend class ControllerMapInput;
+    class Inputs; std::unique_ptr<Inputs> inputs;
+
+    class CapturedEvent : public AsyncUpdater
+    {
+    public:
+        CapturedEvent() { capture.set (false); }
+        ~CapturedEvent() { }
+        inline void handleAsyncUpdate() override 
+        {
+            capture.set (false);
+            callback();
+        }
+
+    private:
+        friend class MappingEngine;
+        Atomic<bool> capture;
+        ControllerDevice::Control control;
+        MidiMessage message;
+        CapturedEventSignal callback;
+    } capturedEvent;
+
+    bool captureNextEvent (ControllerMapInput&, const ControllerDevice::Control&, const MidiMessage&);
 };
 
 }

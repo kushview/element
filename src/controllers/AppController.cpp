@@ -4,6 +4,7 @@
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
+#include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
@@ -33,6 +34,7 @@ AppController::AppController (Globals& g)
     addChild (new DevicesController ());
     addChild (new EngineController ());
     addChild (new SessionController ());
+    addChild (new MappingController ());
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);
 }

@@ -77,8 +77,8 @@ private:
 class ControllerMapInput : public MidiInputCallback
 {
 public:
-    explicit ControllerMapInput (const ControllerDevice& device)
-        : controllerDevice (device) 
+    explicit ControllerMapInput (MappingEngine& owner, const ControllerDevice& device)
+        : mapping(owner), controllerDevice (device) 
     {
 
     }
@@ -93,9 +93,9 @@ public:
         if (! message.isController() || ! controllerNumbers [message.getControllerNumber()])
             return;
 
-        DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
-            << " : " << message.getControllerValue());
-
+        // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
+        //     << " : " << message.getControllerValue());
+        mapping.captureNextEvent (*this, controls [message.getControllerNumber()], message);
         for (auto* handler : handlers)
             if (handler->wants (message))
                 handler->perform (message);
@@ -124,6 +124,7 @@ public:
             if (! midi.isController())
                 continue;
             controllerNumbers.setBit (midi.getControllerNumber(), true);
+            controls.set (midi.getControllerNumber(), control);
         }
 
         if (midiInput == nullptr)
@@ -162,10 +163,12 @@ public:
     }
 
 private:
+    MappingEngine& mapping;
     ControllerDevice controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
     OwnedArray<ControllerMapHandler> handlers;
     BigInteger controllerNumbers;
+    HashMap<int, ControllerDevice::Control> controls;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllerMapInput)
 };
 
@@ -249,6 +252,7 @@ private:
 MappingEngine::MappingEngine()
 { 
     inputs.reset (new Inputs());
+    capturedEvent.capture.set (true);
 }
 
 MappingEngine::~MappingEngine()
@@ -259,15 +263,17 @@ MappingEngine::~MappingEngine()
 
 bool MappingEngine::addInput (const ControllerDevice& controller)
 {
-    DBG("[EL] MappingEngine::addInput(...)");
     if (inputs->containsInputFor (controller))
         return true;
-    return inputs->add (new ControllerMapInput (controller));
+    
+    std::unique_ptr<ControllerMapInput> input;
+    input.reset (new ControllerMapInput (*this, controller));
+
+    return inputs->add (input.release());
 }
 
 bool MappingEngine::removeInput (const ControllerDevice& controller)
 {
-    DBG("[EL] MappingEngine::removeInput(...)");
     if (! inputs->containsInputFor (controller))
         return true;
     return inputs->remove (controller);
@@ -302,6 +308,21 @@ void MappingEngine::startMapping()
 void MappingEngine::stopMapping()
 {
     inputs->stop();
+}
+
+bool MappingEngine::captureNextEvent (ControllerMapInput& input, 
+                                      const ControllerDevice::Control& control, 
+                                      const MidiMessage& message)
+{
+    if (! capturedEvent.capture.get())
+        return false;
+    capture (false);
+
+    capturedEvent.cancelPendingUpdate();
+    capturedEvent.control = control;
+    capturedEvent.message = message;
+    capturedEvent.triggerAsyncUpdate();
+    return true;
 }
 
 }
