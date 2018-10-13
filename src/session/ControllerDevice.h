@@ -19,8 +19,13 @@ public:
     class Control : public ObjectModel
     {
     public:
-        Control() : ObjectModel (Tags::control) { }
-        Control (const ValueTree& data) : ObjectModel (data) { }
+        Control() : ObjectModel (Tags::control) { setMissingProperties(); }
+        Control (const ValueTree& data) : ObjectModel (data) 
+        {
+            if (data.isValid())
+                setMissingProperties();
+        }
+
         ~Control() noexcept { }
 
         EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name);
@@ -40,6 +45,15 @@ public:
             const ControllerDevice device (objectData.getParent());
             return device;
         }
+
+        String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
+
+    private:
+        void setMissingProperties()
+        {
+            stabilizePropertyString (Tags::name, "Control");
+            stabilizePropertyString (Tags::uuid, Uuid().toString());
+        }
     };
 
     ControllerDevice();
@@ -48,6 +62,7 @@ public:
 
     EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name)
     EL_OBJECT_GETTER(InputDevice, "inputDevice")
+    inline String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
 
     inline int getNumControls() const { return getNumChildren(); }
     inline Control getControl (const int index) const

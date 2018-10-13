@@ -72,6 +72,7 @@ public:
         
         if (input)
         {
+            DBG("[EL] started learning midi");
             input->start();
         }
         else
@@ -441,6 +442,8 @@ public:
 
     void stabilizeContent()
     {
+        auto sess = getSession ();
+
         if (haveControllers())
         {
             setChildVisibility (true);

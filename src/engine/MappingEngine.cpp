@@ -52,7 +52,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler
           controllerNumber (message.getControllerNumber()),
           parameter (processor->getParameters()[_parameter])
     {
-        jassert (message.isNoteOnOrOff());
+        jassert (message.isController());
         jassert (node && processor && parameter);
     }
 
@@ -96,6 +96,7 @@ public:
         // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
         //     << " : " << message.getControllerValue());
         mapping.captureNextEvent (*this, controls [message.getControllerNumber()], message);
+
         for (auto* handler : handlers)
             if (handler->wants (message))
                 handler->perform (message);
@@ -160,6 +161,13 @@ public:
     bool isInputFor (const ControllerDevice::Control& control) const
     {
         return isInputFor (control.getControllerDevice());
+    }
+
+    void addHandler (ControllerMapHandler* handler)
+    {
+        stop();
+        handlers.add (handler);
+        start();
     }
 
 private:
@@ -269,7 +277,23 @@ bool MappingEngine::addInput (const ControllerDevice& controller)
     std::unique_ptr<ControllerMapInput> input;
     input.reset (new ControllerMapInput (*this, controller));
 
+    DBG("[EL] added input for " << controller.getName().toString());
     return inputs->add (input.release());
+}
+
+bool MappingEngine::addHandler (const ControllerDevice::Control& control, 
+                                const Node& node, const int parameter)
+{
+    if (auto* input = inputs->findInput (control.getControllerDevice()))
+    {
+        const auto message (control.getMappingData());
+        std::unique_ptr<MidiCCControllerMapHandler> handler;
+        handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
+        input->addHandler (handler.release());
+        return true;
+    }
+
+    return false;
 }
 
 bool MappingEngine::removeInput (const ControllerDevice& controller)

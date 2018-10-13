@@ -6,7 +6,7 @@
 #pragma once
 
 #include "controllers/SessionController.h"
-
+#include "controllers/MappingController.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
@@ -130,6 +130,12 @@ public:
         {
             auto&  app = owner.getAppController();
             DBG("has changed: " << (int) app.findChild<SessionController>()->hasSessionChanged());
+        }
+        else if (index == 3333)
+        {
+            auto&  app = owner.getAppController();
+            if (auto* mapping = app.findChild<MappingController>())
+                mapping->learn();
         }
         #endif
         
@@ -257,6 +263,7 @@ private:
         menu.addItem (1000, "Dump session to console");
         menu.addItem (1111, "Report bug");
         menu.addItem (2222, "Show changed status");
+        menu.addItem (3333, "Arbitrary Menu Item");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     

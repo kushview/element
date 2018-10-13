@@ -19,6 +19,8 @@ public:
     ~MappingEngine();
 
     bool addInput (const ControllerDevice&);
+    bool addHandler (const ControllerDevice::Control&, const Node&, const int);
+
     bool removeInput (const ControllerDevice&);
     bool refreshInput (const ControllerDevice&);
     void clear();

@@ -1,5 +1,6 @@
 
 #include "controllers/AppController.h"
+#include "engine/GraphNode.h"
 #include "session/ControllerDevice.h"
 #include "Signals.h"
 
@@ -12,13 +13,16 @@ public:
     ~MappingController();
 
     void activate() override;
-    void deactivate() override;
-    
+    void deactivate() override;    
+    void learn (const bool shouldLearn = true);
+
 private:
     class Impl; friend class Impl;
     std::unique_ptr<Impl> impl;
     boost::signals2::connection capturedConnection;
-    void onEventCaptured();
+    boost::signals2::connection capturedParamConnection;
+    void onControlCaptured();
+    void onParameterCaptured (const Node&, int);
 };
 
 }

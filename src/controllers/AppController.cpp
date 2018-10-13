@@ -71,7 +71,8 @@ void AppController::run()
 {
     auto* sessCtl = findChild<SessionController>();
     auto* devsCtl = findChild<DevicesController>();
-    assert(sessCtl && devsCtl);
+    auto* mapsCtl = findChild<MappingController>();
+    assert(sessCtl && devsCtl && mapsCtl);
     sessCtl->setChangesFrozen (true);
 
     activate();
@@ -109,7 +110,6 @@ void AppController::run()
     
     sessCtl->resetChanges();
     sessCtl->setChangesFrozen (false);
-
     devsCtl->refresh();
 }
 
@@ -302,14 +302,12 @@ void AppController::handleMessage (const Message& msg)
         const auto device = removeControlMessage->device;
         const auto control = removeControlMessage->control;
         devs->remove (device, control);
-        gui->stabilizeContent();
     }
     else if (const auto* addControlMessage = dynamic_cast<const AddControlMessage*> (&msg))
     {
         const auto device (addControlMessage->device);
         const auto control (addControlMessage->control);
         devs->add (device, control);
-        gui->stabilizeContent();
     }
     else if (const auto* refreshControllerDevice = dynamic_cast<const RefreshControllerDeviceMessage*> (&msg))
     {

@@ -122,6 +122,8 @@ namespace Element {
         static Arc arcFromValueTree (const ValueTree& data);
 
         Node getParentGraph() const;
+        String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
+        Uuid getUuid() const { return Uuid (getUuidString()); }
         
         bool isBypassed() const { return objectData.getProperty(Tags::bypass, false); }
         Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
