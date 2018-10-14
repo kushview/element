@@ -214,11 +214,10 @@ void MappingController::onControlCaptured()
             {
                 DBG("[EL] controller input handler added");
                 ValueTree newMap (Tags::map);
-                newMap.setProperty ("controllerId", impl->control.getControllerDevice().getUuidString(), nullptr)
-                      .setProperty ("controlId", impl->control.getUuidString(), nullptr)
-                      .setProperty (Tags::nodeId, impl->node.getUuidString(), nullptr)
-                      .setProperty ("pluginParameter", impl->parameter, nullptr);
-                
+                newMap.setProperty (Tags::controller,   impl->control.getControllerDevice().getUuidString(), nullptr)
+                      .setProperty (Tags::control,      impl->control.getUuidString(), nullptr)
+                      .setProperty (Tags::node,         impl->node.getUuidString(), nullptr)
+                      .setProperty (Tags::parameter,    impl->parameter, nullptr);
                 auto maps = session->getValueTree().getChildWithName(Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
             }

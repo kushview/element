@@ -91,7 +91,15 @@ namespace Element {
         inline ControllerMap getControllerMap (const int index) const { return ControllerMap (getControllerMapsValueTree().getChild (index)); }
         inline int indexOf (const ControllerMap& controllerMap) const { return getControllerMapsValueTree().indexOf (controllerMap.getValueTree()); }
         
+        Node findNodeById (const Uuid&);
+        ControllerDevice findControllerDeviceById (const Uuid&);
+
+        typedef std::function<void(const ValueTree& tree)> ValueTreeFunction;
+        void forEach (ValueTreeFunction handler) const;
+
     protected:
+        void forEach (const ValueTree tree, ValueTreeFunction handler) const;
+
         Session();
         friend class Globals;
  

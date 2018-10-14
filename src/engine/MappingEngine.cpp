@@ -233,6 +233,8 @@ public:
 
     ControllerMapInput* findInput (const ControllerDevice& controller) const
     {
+        if (! controller.isValid())
+            return nullptr;
         for (auto* const input : inputs)
             if (input->isInputFor (controller))
                 return input;
@@ -284,6 +286,15 @@ bool MappingEngine::addInput (const ControllerDevice& controller)
 bool MappingEngine::addHandler (const ControllerDevice::Control& control, 
                                 const Node& node, const int parameter)
 {
+    if (! control.isValid() || ! node.isValid())
+        return false;
+    auto* const object = node.getGraphNode();
+    auto* const proc   = object == nullptr ? nullptr : object->getAudioProcessor();
+    if (nullptr == object || nullptr == proc)
+        return false;
+    if (! isPositiveAndBelow (parameter, proc->getParameters().size()))
+        return false;
+
     if (auto* input = inputs->findInput (control.getControllerDevice()))
     {
         const auto message (control.getMappingData());

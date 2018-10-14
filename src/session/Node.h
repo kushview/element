@@ -76,6 +76,10 @@ namespace Element {
                 jassert (data.hasType (Tags::node));
                 setMissingProperties();
             }
+            else
+            {
+                // noop
+            }
         }
         
         Node (const Identifier& nodeType)

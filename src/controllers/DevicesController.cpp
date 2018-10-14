@@ -105,48 +105,23 @@ void DevicesController::refresh()
     for (int i = 0; i < session->getNumControllerDevices(); ++i)
         mapping.addInput (session->getControllerDevice (i));
 
-    const auto maps = session->getValueTree().getChildWithName(Tags::maps);
-    for (int i = 0; i < maps.getNumChildren(); ++i)
+    for (int i = 0; i < session->getNumControllerMaps(); ++i)
     {
-        const auto child (maps.getChild (i));
-        const auto nodeId = child.getProperty ("nodeId").toString();
-        const auto controllerId = child.getProperty ("controllerId").toString();
-        const auto controlId = child.getProperty ("controlId").toString();
-        const int parameter = (int) child.getProperty ("parameter");
-        Node node; ControllerDevice device; ControllerDevice::Control control;
-        for (int i = 0; i < session->getNumGraphs(); ++i)
-        {
-            const auto graph = session->getGraph (i);
-            const auto n = graph.getNodesValueTree().getChildWithProperty (Tags::uuid, nodeId);
-            if (n.isValid())
-            {
-                node = Node (n);
-                break;
-            }
-        }
-
-        for (int i = 0; i < session->getNumControllerDevices(); ++i)
-        {
-            const auto d (session->getControllerDevice (i));
-            if (d.getUuidString() == controllerId)
-            {
-                device = d;
-                break;
-            }
-        }
-
-        for (int i = 0; i < device.getNumControls(); ++i)
-        {
-            if (device.getControl (i).getUuidString() == controlId)
-            {
-                control = device.getControl (i);
-                break;
-            }
-        }
-
-        if (mapping.addHandler (control, node, parameter))
+        const auto child (session->getControllerMap (i));
+        const int parameter = child.getParameterIndex();
+        Node node = session->findNodeById (Uuid (child.getProperty (Tags::node).toString()));
+        ControllerDevice device = session->findControllerDeviceById (
+            Uuid (child.getProperty (Tags::controller).toString()));
+        ControllerDevice::Control control = device.findControlById (
+            Uuid (child.getProperty (Tags::control).toString()));
+        const bool valid = device.isValid() && control.isValid() && node.isValid() && parameter >= 0;
+        if (valid && mapping.addHandler (control, node, parameter))
         {
             DBG("[EL] added handler in refresh: " << control.getName().toString());
+        }
+        else
+        {
+            DBG("[EL] failed adding handler: " << control.getName().toString());
         }
     }
 

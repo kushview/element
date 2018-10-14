@@ -8,6 +8,20 @@
 
 namespace Element {
 
+    static void setMissingNodeProperties (const ValueTree& tree)
+    {
+        if (tree.hasType (Tags::node))
+        {
+            const Node node (tree, true);
+            ignoreUnused (node);
+        }
+        else if (tree.hasType (Tags::controller) ||
+                 tree.hasType (Tags::control))
+        {
+            DBG("[EL] set missing for: " << tree.getProperty(Tags::name).toString());
+        }
+    }
+
     SessionDocument::SessionDocument (SessionPtr s)
         : FileBasedDocument (".els", "*.els", "Open Session", "Save Session"),
           session (s)
@@ -45,7 +59,12 @@ namespace Element {
         {
             error = "Not a valid session file";
         }
-        
+
+        if (error.isEmpty())
+        {
+            session->forEach (setMissingNodeProperties);
+        }
+
         return (error.isNotEmpty()) ? Result::fail (error) : Result::ok();
     }
 

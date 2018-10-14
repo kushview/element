@@ -19,14 +19,16 @@ public:
     class Control : public ObjectModel
     {
     public:
-        Control() : ObjectModel (Tags::control) { setMissingProperties(); }
-        Control (const ValueTree& data) : ObjectModel (data) 
+        explicit Control (const ValueTree& data = ValueTree()) 
+            : ObjectModel (data) 
         {
             if (data.isValid())
                 setMissingProperties();
         }
 
         ~Control() noexcept { }
+
+        bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::control); }
 
         EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name);
         EL_OBJECT_GETTER(ControlType, Tags::type);
@@ -56,9 +58,10 @@ public:
         }
     };
 
-    ControllerDevice();
-    ControllerDevice (const ValueTree& data);
+    explicit ControllerDevice (const ValueTree& data = ValueTree());
     virtual ~ControllerDevice() { }
+
+    inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::controller); }
 
     EL_OBJECT_GETTER_AND_SETTER(Name, Tags::name)
     EL_OBJECT_GETTER(InputDevice, "inputDevice")
@@ -76,6 +79,12 @@ public:
         return objectData.getChildWithName (childType).indexOf (model.getValueTree());
     }
 
+    inline Control findControlById (const Uuid& uuid)
+    {
+        const Control control (objectData.getChildWithProperty (Tags::uuid, uuid.toString()));
+        return control;
+    }
+
 private:
     void setMissingProperties();
 };
@@ -83,9 +92,10 @@ private:
 class ControllerMap : public ObjectModel
 {
 public:
-    ControllerMap() : ObjectModel (Tags::map) { }
-    ControllerMap (const ValueTree& data) : ObjectModel (data) { }
+    explicit ControllerMap (const ValueTree& data = ValueTree()) : ObjectModel (data) { }
     ~ControllerMap() noexcept { }
+    inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::map); }
+    inline int getParameterIndex() const  { return (int) objectData.getProperty (Tags::parameter, -1); }
 };
 
 }

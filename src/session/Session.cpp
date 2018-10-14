@@ -118,6 +118,36 @@ namespace Element {
         objectData.getOrCreateChildWithName (Tags::maps, nullptr);
     }
 
+    Node Session::findNodeById (const Uuid& uuid)
+    {   
+        Node node;
+        for (int i = getNumGraphs(); --i >= 0;)
+        {
+            const auto graph = getGraph (i);
+            const auto n = graph.getNodesValueTree()
+                .getChildWithProperty (Tags::uuid, uuid.toString());
+            if (n.isValid())
+            {
+                node = Node (n);
+                break;
+            }
+        }
+        return node;
+    }
+
+    ControllerDevice Session::findControllerDeviceById (const Uuid& uuid)
+    {
+        ControllerDevice device;
+        const auto controllerId = uuid.toString();
+        for (int i = getNumControllerDevices(); --i >= 0;)
+        {
+            device = getControllerDevice (i);
+            if (device.getUuidString() == controllerId)
+                return device;
+        }
+        return device;
+    }
+
     void Session::notifyChanged()
     {
         if (freezeChangeNotification)
@@ -201,5 +231,17 @@ namespace Element {
     {
         for (int i = 0; i < getNumGraphs(); ++i)
             getGraph(i).restorePluginState();
+    }
+
+    void Session::forEach (ValueTreeFunction handler) const
+    {
+        forEach (objectData, handler);
+    }
+
+    void Session::forEach (const ValueTree tree, ValueTreeFunction handler) const
+    {
+        handler (tree);
+        for (int i = 0; i < tree.getNumChildren(); ++i)
+            forEach (tree.getChild (i), handler);
     }
 }

@@ -7,12 +7,6 @@
 
 namespace Element {
 
-ControllerDevice::ControllerDevice()
-    : ObjectModel (Tags::controller)
-{
-    setMissingProperties();
-}
-
 ControllerDevice::ControllerDevice (const ValueTree& data)
     : ObjectModel (data)
 {

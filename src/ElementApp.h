@@ -80,6 +80,7 @@ namespace Tags
     const Identifier windowY            = "windowY";       
 
     const Identifier uuid               = "uuid";
+    const Identifier parameter          = "parameter";
 }
 
 struct Alert

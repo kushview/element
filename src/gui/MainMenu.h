@@ -4,9 +4,9 @@
 */
 
 #pragma once
-
-#include "controllers/SessionController.h"
+#include "controllers/DevicesController.h"
 #include "controllers/MappingController.h"
+#include "controllers/SessionController.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
@@ -135,7 +135,13 @@ public:
         {
             auto&  app = owner.getAppController();
             if (auto* mapping = app.findChild<MappingController>())
-                mapping->learn();
+                mapping->learn (true);
+        }
+        else if (index == 4444)
+        {
+            auto&  app = owner.getAppController();
+            if (auto* devices = app.findChild<DevicesController>())
+                devices->refresh();
         }
         #endif
         
@@ -263,7 +269,8 @@ private:
         menu.addItem (1000, "Dump session to console");
         menu.addItem (1111, "Report bug");
         menu.addItem (2222, "Show changed status");
-        menu.addItem (3333, "Arbitrary Menu Item");
+        menu.addItem (3333, "Quick Map");
+        menu.addItem (4444, "Refresh Mapping Engine");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     
