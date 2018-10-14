@@ -99,7 +99,8 @@ void ContentView::disableIfNotUnlocked()
 // MARK: Toolbar
     
 class ContentComponent::Toolbar : public Component,
-                                  public Button::Listener
+                                  public Button::Listener,
+                                  public Timer
 {
 public:
     Toolbar (ContentComponent& o)
@@ -118,6 +119,11 @@ public:
             b->addListener (this);
         addAndMakeVisible (tempoBar);
         addAndMakeVisible (transport);
+
+        mapButton.setButtonText ("map");
+        mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
+        mapButton.addListener (this);
+        addAndMakeVisible (mapButton);
     }
     
     ~Toolbar() { }
@@ -179,6 +185,13 @@ public:
                                 .withSizeKeepingCentre(tempoBarHeight * 2, tempoBarHeight));
         }
         
+        if (mapButton.isVisible())
+        {
+            r.removeFromRight (4);
+            mapButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
+                                  .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
+        }
+
         if (transport.isVisible())
         {
             r = getLocalBounds().withX ((getWidth() / 2) - (transport.getWidth() / 2));
@@ -213,6 +226,29 @@ public:
             if (99999 == menu.show())
                 ViewHelpers::closePluginWindows (this, false);
         }
+        else if (btn == &mapButton)
+        {
+            if (auto* mapping = owner.getAppController().findChild<MappingController>())
+            {
+                mapping->learn (! mapButton.getToggleState());
+                mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
+                if (mapping->isLearning()) {
+                    startTimer (600);
+                }
+            }
+        }
+    }
+
+    void timerCallback() override
+    {
+        if (auto* mapping = owner.getAppController().findChild<MappingController>())
+        {
+            if (! mapping->isLearning())
+            {
+                mapButton.setToggleState (false, dontSendNotification);
+                stopTimer();
+            }
+        }
     }
 
 private:
@@ -220,6 +256,7 @@ private:
     SessionPtr session;
     SettingButton menuBtn;
     SettingButton viewBtn;
+    SettingButton mapButton;
     PanicButton panicBtn;
     TempoAndMeterBar tempoBar;
     TransportBar     transport;

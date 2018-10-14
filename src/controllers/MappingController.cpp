@@ -165,6 +165,11 @@ void MappingController::deactivate()
     getWorld().getMappingEngine().stopMapping();
 }
 
+bool MappingController::isLearning() const
+{
+    return impl && impl->learnState != CaptureStopped;
+}
+
 void MappingController::learn (const bool shouldLearn)
 {
     auto& capture (impl->capture);

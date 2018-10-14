@@ -15,6 +15,7 @@ public:
     void activate() override;
     void deactivate() override;    
     void learn (const bool shouldLearn = true);
+    bool isLearning() const;
     void remove (const ControllerMap&);
 private:
     class Impl; friend class Impl;
