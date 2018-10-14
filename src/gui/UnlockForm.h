@@ -7,6 +7,7 @@ namespace Element {
 	class UnlockStatus;
 	struct LicenseInfo;
     class Globals;
+    class GuiController;
 }
 
 class UnlockForm  : public Component,
@@ -16,7 +17,7 @@ public:
     /** Creates an unlock form that will work with the given status object.
         The userInstructions will be displayed above the email and password boxes.
      */
-    UnlockForm (Element::Globals&,
+    UnlockForm (Element::Globals&, Element::GuiController&,
                 const String& userInstructions,
                 bool hasEmailBox = true,
                 bool hasPasswordBox = true,
@@ -50,6 +51,7 @@ public:
 private:
     Element::Globals& world;
     Element::UnlockStatus& status;
+    Element::GuiController& gui;
     bool useLicense, useEmail, usePassword;
     
     ScopedPointer<BubbleMessageComponent> bubble;

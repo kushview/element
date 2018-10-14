@@ -1,4 +1,6 @@
-
+#include "controllers/GuiController.h"
+#include "controllers/DevicesController.h"
+#include "controllers/MappingController.h"
 #include "gui/UnlockForm.h"
 #include "session/UnlockStatus.h"
 #include "session/DeviceManager.h"
@@ -117,6 +119,7 @@ struct UnlockForm::OverlayComp  : public Component,
         auto& g = world;
         const auto a = action;
         UnlockForm& f = form;
+        auto& gui = f.gui;
         
         delete this;
         
@@ -130,6 +133,13 @@ struct UnlockForm::OverlayComp  : public Component,
         {
             f.setMode (Activate);
         }
+
+        if (auto* devs = gui.findSibling<Element::DevicesController>())
+            devs->refresh();
+        if (auto* maps = gui.findSibling<Element::MappingController>())
+            maps->learn (false);
+
+        gui.stabilizeContent();
     }
     
     const Action action;
@@ -142,7 +152,6 @@ struct UnlockForm::OverlayComp  : public Component,
     friend class LicenseInfo;
     JUCE_LEAK_DETECTOR (UnlockForm::OverlayComp)
 };
-
 
 namespace Element {
 struct LicenseInfo : public Component,
@@ -229,7 +238,7 @@ static juce_wchar getDefaultPasswordChar() noexcept
 #endif
 }
 
-UnlockForm::UnlockForm (Element::Globals& s,
+UnlockForm::UnlockForm (Element::Globals& s, Element::GuiController& g,
                         const String& userInstructions,
                         bool hasEmailBox,
                         bool hasPasswordBox,
@@ -241,6 +250,7 @@ UnlockForm::UnlockForm (Element::Globals& s,
       cancelButton (TRANS ("Cancel")),
       world (s),
       status (s.getUnlockStatus()),
+      gui (g),
       useLicense (hasLicenseBox),
       useEmail (hasEmailBox),
       usePassword (hasPasswordBox)

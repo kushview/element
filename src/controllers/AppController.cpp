@@ -479,7 +479,8 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            auto* form = new UnlockForm (getWorld(), "Enter your license key.",
+            auto* form = new UnlockForm (getWorld(), *findChild<GuiController>(),
+                                        "Enter your license key.",
                                          false, false, true, true);
             DialogWindow::LaunchOptions opts;
             opts.content.setOwned (form);

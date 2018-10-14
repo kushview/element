@@ -151,6 +151,8 @@ public:
             tempoBar.stabilizeWithSession (false);
         }
         
+        mapButton.setEnabled ((bool) status.isFullVersion());
+
         resized();
     }
     
@@ -208,6 +210,7 @@ public:
     
     void buttonClicked (Button* btn) override
     {
+        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
         if (btn == &viewBtn)
         {
             const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
@@ -228,12 +231,15 @@ public:
         }
         else if (btn == &mapButton)
         {
-            if (auto* mapping = owner.getAppController().findChild<MappingController>())
+            if ((bool) status.isFullVersion())
             {
-                mapping->learn (! mapButton.getToggleState());
-                mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                if (mapping->isLearning()) {
-                    startTimer (600);
+                if (auto* mapping = owner.getAppController().findChild<MappingController>())
+                {
+                    mapping->learn (! mapButton.getToggleState());
+                    mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
+                    if (mapping->isLearning()) {
+                        startTimer (600);
+                    }
                 }
             }
         }

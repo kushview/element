@@ -5,6 +5,8 @@
 
 namespace Element {
 
+#define returnIfNotFullVersion if (! (bool) getWorld().getUnlockStatus().isFullVersion()) return;
+
 class Controller
 {
 public:

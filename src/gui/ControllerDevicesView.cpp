@@ -113,7 +113,7 @@ public:
         ViewHelpers::postMessageFor (this, new RemoveControllerMapMessage (mapp));
     }
 
-    void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&)
+    void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&) override
     {
         auto* const objects = maps [rowNumber];
         if (! objects) return;
@@ -847,6 +847,7 @@ void ControllerDevicesView::resized()
 
 void ControllerDevicesView::stabilizeContent()
 {
+    disableIfNotUnlocked();
     content->stabilizeContent();
 }
 

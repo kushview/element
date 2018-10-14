@@ -620,9 +620,11 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showAbout:
             toggleAboutScreen();
             break;
-        case Commands::showControllerDevices:
+        case Commands::showControllerDevices: {
+            if (! (bool) getWorld().getUnlockStatus().isFullVersion())
+                Alert::showProductLockedAlertAsync ("Controller Mapping is available in the full version only.");
             content->setMainView ("ControllerDevicesView");
-            break;
+        } break;
         case Commands::showKeymapEditor:
             content->setMainView ("KeymapEditorView");
             break;

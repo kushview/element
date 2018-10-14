@@ -688,10 +688,10 @@ namespace Element {
     class LicenseSettingsPage : public SettingsPage
     {
     public:
-        LicenseSettingsPage (Globals& world)
+        LicenseSettingsPage (Globals& world, GuiController& gui)
         {
             setName (EL_LICENSE_SETTINGS_NAME);
-            addAndMakeVisible (form = new UnlockForm (world, 
+            addAndMakeVisible (form = new UnlockForm (world, gui,
                 "Enter your license key.", false, false, true, true));
         }
 
@@ -802,7 +802,7 @@ Component* PreferencesComponent::createPageForName (const String& name)
     } else if (name == EL_MIDI_SETTINGS_NAME) {
         return new MidiSettingsPage (world);
     } else if (name == EL_LICENSE_SETTINGS_NAME) {
-        return new LicenseSettingsPage (world);
+        return new LicenseSettingsPage (world, gui);
     }
 
     return nullptr;
