@@ -18,6 +18,13 @@ ControllerDevice::ControllerDevice (const ValueTree& data)
     }
 }
 
+ControllerDevice::ControllerDevice (const String& name)
+    : ObjectModel (Tags::controller)
+{
+    setName (name);
+    setMissingProperties();
+}
+
 void ControllerDevice::setMissingProperties()
 {
     stabilizePropertyString (Tags::uuid, Uuid().toString());

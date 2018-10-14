@@ -6,6 +6,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "session/Node.h"
 
 #define EL_OBJECT_GETTER(a,b) inline const var& get##a () const { return objectData.getProperty(b); }
 #define EL_OBJECT_SETTER(a,b) inline void set##a (const var& value) { objectData.setProperty (b, value, nullptr); }
@@ -59,6 +60,7 @@ public:
     };
 
     explicit ControllerDevice (const ValueTree& data = ValueTree());
+    ControllerDevice (const String& name);
     virtual ~ControllerDevice() { }
 
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::controller); }
@@ -79,7 +81,7 @@ public:
         return objectData.getChildWithName (childType).indexOf (model.getValueTree());
     }
 
-    inline Control findControlById (const Uuid& uuid)
+    inline Control findControlById (const Uuid& uuid) const
     {
         const Control control (objectData.getChildWithProperty (Tags::uuid, uuid.toString()));
         return control;
@@ -92,6 +94,7 @@ private:
 class ControllerMap : public ObjectModel
 {
 public:
+
     explicit ControllerMap (const ValueTree& data = ValueTree()) : ObjectModel (data) { }
     ~ControllerMap() noexcept { }
     inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::map); }

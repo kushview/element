@@ -11,6 +11,127 @@
 
 namespace Element {
 
+class ControllerMapsTable : public TableListBox,
+                      public TableListBoxModel
+{
+public:
+    enum Columns { Device = 1, Control, Node, Parameter };
+
+    ControllerMapsTable()
+    { 
+        setModel (this);
+        const int flags = TableHeaderComponent::notSortable;
+        getHeader().addColumn ("Device", Device, 100, 30, -1, flags);
+        getHeader().addColumn ("Control", Control, 100, 30, -1, flags);
+        getHeader().addColumn ("Node", Node, 100, 30, -1, flags);
+        getHeader().addColumn ("Parameter", Parameter, 100, 30, -1, flags);
+        setHeaderHeight (22);         
+        setRowHeight (20);
+    }
+
+    ~ControllerMapsTable()
+    { 
+        setModel (nullptr);
+    }
+
+    void updateWith (SessionPtr sess, 
+                     const ControllerDevice& device = ControllerDevice(),
+                     const ControllerDevice::Control& control = ControllerDevice::Control())
+    {
+        session = sess;
+        maps.clear (true);
+        
+        if (session)
+        {
+            for (int i = 0; i < session->getNumControllerMaps(); ++i)
+            {
+                std::unique_ptr<ControllerMapObjects> objects;
+                objects.reset (new ControllerMapObjects (session, session->getControllerMap (i)));
+                if (!device.isValid() || 
+                        (device.isValid() && device.getUuidString() == objects->device.getUuidString()))
+                {
+                    maps.add (objects.release());
+                }
+            }
+        }
+
+        updateContent();
+        repaint();
+    }
+
+    int getNumRows() override { return maps.size(); }
+
+    void paintRowBackground (Graphics& g, int rowNumber,
+                             int width, int height,
+                             bool rowIsSelected) override
+    {
+        ViewHelpers::drawBasicTextRow ("", g, width, height, rowIsSelected);
+    }
+
+    void paintCell (Graphics& g, int rowNumber,
+                    int columnId, int width, int height,
+                    bool rowIsSelected) override
+    {
+        auto* const objects = maps [rowNumber];
+        if (! objects) return;
+
+        const auto mapp (objects->controllerMap);
+        const auto device (objects->device);
+        const auto control (objects->control);
+        const auto node (objects->node);
+        g.setColour (LookAndFeel::textColor);
+        
+        String text = "N/A";
+        switch (columnId)
+        {
+            case Device: {
+                text = device.getName().toString();
+            } break;
+
+            case Control: {
+                text = control.getName().toString();
+            } break;
+
+            case Node: {
+                text = node.getName();
+            } break;
+
+            case Parameter: {
+                if (auto* obj = node.getGraphNode())
+                    if (auto* proc = obj->getAudioProcessor())
+                        if (auto* param = proc->getParameters()[mapp.getParameterIndex()])
+                            text = param->getName (64);
+            } break;
+        }
+
+        g.drawText (text, 0,0, width, height, Justification::centredLeft);
+    }
+
+    void deleteKeyPressed (int lastRowSelected) override
+    {
+        const auto mapp (session->getControllerMap (lastRowSelected));
+    }
+
+#if 0
+    virtual Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
+                                                Component* existingComponentToUpdate);
+    virtual void cellClicked (int rowNumber, int columnId, const MouseEvent&);
+    virtual void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&);
+    virtual void backgroundClicked (const MouseEvent&);
+    virtual void sortOrderChanged (int newSortColumnId, bool isForwards);
+    virtual int getColumnAutoSizeWidth (int columnId);
+    virtual String getCellTooltip (int rowNumber, int columnId);
+    virtual void selectedRowsChanged (int lastRowSelected);
+    
+    virtual void returnKeyPressed (int lastRowSelected);
+    virtual void listWasScrolled();
+    virtual var getDragSourceDescription (const SparseSet<int>& currentlySelectedRows);
+#endif
+private:
+    SessionPtr session;
+    OwnedArray<ControllerMapObjects> maps;
+};
+
 class MidiLearnButton : public SettingButton,
                          public MidiInputCallback,
                          public AsyncUpdater,
@@ -126,6 +247,8 @@ class ControlListBox : public ListBox,
                        public ListBoxModel
 {
 public:
+    std::function<void()> selectionChanged;
+
     ControlListBox ()
     {
         setModel (this);
@@ -141,6 +264,7 @@ public:
     {
         editedDevice = dev;
         updateContent();
+        repaint();
     }
 
     ControllerDevice::Control getSelectedControl() const
@@ -172,6 +296,13 @@ public:
                       rowNumber, isRowSelected);
         
         return row;
+    }
+
+    void listBoxItemClicked (int row, const MouseEvent&) override { DBG("clicked");}
+    void selectedRowsChanged (int lastRowSelected) override
+    { 
+        if (selectionChanged)
+            selectionChanged();
     }
 
    #if 0
@@ -271,7 +402,8 @@ private:
 class ControllerDevicesView::Content : public Component,
                                        public Button::Listener,
                                        public ComboBox::Listener,
-                                       public Value::Listener
+                                       public Value::Listener,
+                                       public AsyncUpdater
 {
 public:
     Content()
@@ -290,6 +422,7 @@ public:
         addAndMakeVisible (deleteButton);
 
         controls.setControllerDevice (editedDevice);
+        controls.selectionChanged = std::bind (&Content::triggerAsyncUpdate, this);
         addAndMakeVisible (controls);
         
         addControlButton.setButtonText ("+");
@@ -307,17 +440,23 @@ public:
         removeControlButton.addListener (this);
         addAndMakeVisible (properties);
 
+        addAndMakeVisible (maps);
+
         deviceName.addListener (this);
         inputDevice.addListener (this);
+        controlName.addListener (this);
 
         stabilizeContent();
     }
     
     ~Content()
     {
+        controls.selectionChanged = nullptr;
         learnButton.messageReceived.disconnect_all_slots();
         deviceName.removeListener (this);
     }
+
+    void handleAsyncUpdate() override { stabilizeContent(); }
 
     static bool supportedForMapping (const MidiMessage& message, const ControllerDevice::Control& control)
     {
@@ -358,6 +497,10 @@ public:
         {
             ViewHelpers::postMessageFor (this, 
                 new RefreshControllerDeviceMessage (editedDevice));
+        }
+        else if (value.refersToSameSourceAs (controlName))
+        {
+            triggerAsyncUpdate();
         }
     }
 
@@ -403,6 +546,9 @@ public:
     {
         const int controlsWidth     = 280;
         auto r1 (getLocalBounds());
+
+        maps.setBounds (r1.removeFromBottom (128));
+
         auto r2 (r1.removeFromTop (18));
         controllersBox.setBounds (r2.removeFromLeft (200).withHeight (24));
         createButton.setBounds (r2.removeFromRight (18));
@@ -411,7 +557,7 @@ public:
         r1.removeFromTop (8);
 
         auto r3 = r1.removeFromLeft (controlsWidth);
-        auto r4 = r3.removeFromBottom (32).reduced (2);
+        auto r4 = r3.removeFromTop (32).reduced (2);
 
         addControlButton.setBounds (r4.removeFromRight (48));
         r4.removeFromRight (4);
@@ -438,11 +584,12 @@ public:
         controls.setVisible (visible);
         addControlButton.setVisible (visible);
         removeControlButton.setVisible (visible);
+        learnButton.setVisible (visible);
     }
 
     void stabilizeContent()
     {
-        auto sess = getSession ();
+        auto sess = getSession (true);
 
         if (haveControllers())
         {
@@ -459,6 +606,7 @@ public:
             }
 
             controls.setControllerDevice (editedDevice);
+            maps.updateWith (sess, editedDevice, controls.getSelectedControl());
         }
         else
         {
@@ -471,9 +619,10 @@ public:
     {
         deviceName.removeListener (this);
         inputDevice.removeListener (this);
+        controlName.removeListener (this);
 
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
-        props.add (new TextPropertyComponent (deviceName, "Name", 120, false, true));
+        props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
         StringArray keys = MidiInput::getDevices();
         Array<var> values;
@@ -483,13 +632,23 @@ public:
         props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
             "Input Device", keys, values));
 
+        auto control = controls.getSelectedControl();
+
+        if (control.isValid())
+        {
+            controlName = control.getPropertyAsValue (Tags::name);
+            props.add (new TextPropertyComponent (controlName, 
+                "Control Name", 120, false, true));
+        }
+
+        controlName.addListener (this);
         inputDevice.addListener (this);
         deviceName.addListener (this);
     }
 
     void createNewController()
     {
-        auto newDevice = ControllerDevice();
+        auto newDevice = ControllerDevice ("New Device");
         ViewHelpers::postMessageFor (this, new AddControllerDeviceMessage (newDevice));
     }
 
@@ -579,8 +738,9 @@ private:
     ComboBox controllersBox;
     ControlListBox controls;
     PropertyPanel properties;
+    ControllerMapsTable maps;
     SessionPtr session;
-    Value deviceName, inputDevice;
+    Value deviceName, inputDevice, controlName;
 
     void updateComboBoxes()
     {
@@ -615,7 +775,7 @@ private:
         properties.clear();
         Array<PropertyComponent*> props;
         getControllerDeviceProperties (props);
-        properties.addSection ("Device", props);
+        properties.addProperties (props);
         props.clearQuick();
     }
 

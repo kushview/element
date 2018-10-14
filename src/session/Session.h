@@ -140,4 +140,26 @@ namespace Element {
     
     typedef ReferenceCountedObjectPtr<Session> SessionPtr;
     typedef SessionPtr SessionRef;
+
+    struct ControllerMapObjects
+    {
+        ControllerMapObjects (SessionPtr s, const ControllerMap& m)
+            : session (s), controllerMap (m)
+        {
+            if (session != nullptr)
+            {
+                device = session->findControllerDeviceById (Uuid (controllerMap.getProperty(Tags::controller)));
+                control = device.findControlById (Uuid (controllerMap.getProperty (Tags::control)));
+                node = session->findNodeById (Uuid (controllerMap.getProperty(Tags::node)));
+            }
+        }
+
+        inline bool isValid() const { return device.isValid() && control.isValid() && node.isValid(); }
+
+        SessionPtr session;
+        ControllerMap controllerMap;
+        Node node;
+        ControllerDevice device;
+        ControllerDevice::Control control;
+    };
 }
