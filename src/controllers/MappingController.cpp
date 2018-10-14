@@ -1,5 +1,7 @@
 
 #include "controllers/MappingController.h"
+#include "controllers/DevicesController.h"
+#include "controllers/GuiController.h"
 #include "engine/MappingEngine.h"
 #include "session/ControllerDevice.h"
 #include "Globals.h"
@@ -160,7 +162,7 @@ void MappingController::deactivate()
     Controller::deactivate();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
-    getWorld().getMappingEngine().startMapping();
+    getWorld().getMappingEngine().stopMapping();
 }
 
 void MappingController::learn (const bool shouldLearn)
@@ -183,7 +185,6 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
 {
     if (impl->learnState == CaptureParameter)
     {
-        DBG("[EL] received captured param: " << node.getName() << " : " << parameter);
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureControl;
         impl->node = node;
@@ -202,17 +203,14 @@ void MappingController::onControlCaptured()
 
     if (impl->learnState == CaptureControl)
     {
-        DBG("[EL] received captured event");
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureStopped;
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
         if (impl->isCaptureComplete())
         {
-            DBG("[EL] capture complete");
             if (mapping.addHandler (impl->control, impl->node, impl->parameter))
             {
-                DBG("[EL] controller input handler added");
                 ValueTree newMap (Tags::map);
                 newMap.setProperty (Tags::controller,   impl->control.getControllerDevice().getUuidString(), nullptr)
                       .setProperty (Tags::control,      impl->control.getUuidString(), nullptr)
@@ -220,12 +218,27 @@ void MappingController::onControlCaptured()
                       .setProperty (Tags::parameter,    impl->parameter, nullptr);
                 auto maps = session->getValueTree().getChildWithName(Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
+
+                if (auto* gui = findSibling<GuiController>())
+                    gui->stabilizeContent();
             }
         }
     }
     else
     {
         DBG("[EL] received captured control: invalid state: " << (int) impl->learnState);
+    }
+}
+
+void MappingController::remove (const ControllerMap& controllerMap)
+{
+    auto session = getWorld().getSession();
+    auto maps = session->getValueTree().getChildWithName(Tags::maps);
+    if (controllerMap.getValueTree().isAChildOf (maps))
+    {
+        maps.removeChild (controllerMap.getValueTree(), nullptr);
+        if (auto* devs = findSibling<DevicesController>())
+            devs->refresh();
     }
 }
 

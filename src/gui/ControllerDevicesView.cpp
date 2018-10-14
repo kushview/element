@@ -21,9 +21,9 @@ public:
     { 
         setModel (this);
         const int flags = TableHeaderComponent::notSortable;
-        getHeader().addColumn ("Device", Device, 100, 30, -1, flags);
-        getHeader().addColumn ("Control", Control, 100, 30, -1, flags);
+        // getHeader().addColumn ("Device", Device, 100, 30, -1, flags);
         getHeader().addColumn ("Node", Node, 100, 30, -1, flags);
+        getHeader().addColumn ("Control", Control, 100, 30, -1, flags);
         getHeader().addColumn ("Parameter", Parameter, 100, 30, -1, flags);
         setHeaderHeight (22);         
         setRowHeight (20);
@@ -79,7 +79,7 @@ public:
         const auto device (objects->device);
         const auto control (objects->control);
         const auto node (objects->node);
-        g.setColour (LookAndFeel::textColor);
+        g.setColour (objects->isValid() ? LookAndFeel::textColor : Colours::red);
         
         String text = "N/A";
         switch (columnId)
@@ -110,13 +110,22 @@ public:
     void deleteKeyPressed (int lastRowSelected) override
     {
         const auto mapp (session->getControllerMap (lastRowSelected));
+        ViewHelpers::postMessageFor (this, new RemoveControllerMapMessage (mapp));
     }
 
+    void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&)
+    {
+        auto* const objects = maps [rowNumber];
+        if (! objects) return;
+
+        if (columnId == Node && objects->node.isValid())
+            ViewHelpers::presentPluginWindow (this, objects->node);
+    }
 #if 0
     virtual Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
                                                 Component* existingComponentToUpdate);
     virtual void cellClicked (int rowNumber, int columnId, const MouseEvent&);
-    virtual void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&);
+    
     virtual void backgroundClicked (const MouseEvent&);
     virtual void sortOrderChanged (int newSortColumnId, bool isForwards);
     virtual int getColumnAutoSizeWidth (int columnId);
@@ -327,11 +336,6 @@ private:
     public:
         ControllerRow (ControlListBox& l) : list (l)
         {
-            // addAndMakeVisible (learnButton);
-            learnButton.setButtonText ("Learn");
-            learnButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
-            learnButton.addListener (this);
-
             status.setJustificationType (Justification::centredRight);
             status.setColour (Label::textColourId, Element::LookAndFeel::textColor.darker());
             status.setInterceptsMouseClicks (false, false);
@@ -342,7 +346,6 @@ private:
         {
             list.selectRow (rowNumber, true, true);
             setSelected (list.getSelectedRow() == rowNumber);
-            learnButton.setToggleState (!learnButton.getToggleState(), dontSendNotification);
         }
 
         void mouseDown (const MouseEvent&) override
@@ -360,7 +363,6 @@ private:
         void resized() override
         {
             auto r (getLocalBounds().reduced (8));
-            learnButton.setBounds (r.removeFromRight (4 + r.getHeight()));
             status.setBounds (r.removeFromRight (getWidth() / 2));
         }
 
@@ -393,7 +395,6 @@ private:
         int rowNumber = -1;
         bool selected = false;
         Label status;
-        SettingButton learnButton;
     private:
         ControlListBox& list;
     };
@@ -414,10 +415,12 @@ public:
         addAndMakeVisible (controllersBox);
 
         createButton.setButtonText ("+");
+        createButton.setTooltip ("Add a new controller device");
         createButton.addListener (this);
         addAndMakeVisible (createButton);
 
         deleteButton.setButtonText ("-");
+        deleteButton.setTooltip ("Remove the current controller device");
         deleteButton.addListener (this);
         addAndMakeVisible (deleteButton);
 
@@ -426,16 +429,20 @@ public:
         addAndMakeVisible (controls);
         
         addControlButton.setButtonText ("+");
+        addControlButton.setTooltip ("Add a new control");
         addControlButton.addListener (this);
         addAndMakeVisible (addControlButton);
 
         learnButton.setButtonText ("Learn");
+        learnButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
+        learnButton.setTooltip ("Learn MIDI");
         learnButton.messageReceived.connect (
             std::bind (&Content::onLearnMidi, this));
         learnButton.addListener (this);
         addAndMakeVisible (learnButton);
 
         removeControlButton.setButtonText ("-");
+        removeControlButton.setTooltip ("Remove the selected control");
         addAndMakeVisible (removeControlButton);
         removeControlButton.addListener (this);
         addAndMakeVisible (properties);
@@ -446,11 +453,13 @@ public:
         inputDevice.addListener (this);
         controlName.addListener (this);
 
-        stabilizeContent();
+        triggerAsyncUpdate();
     }
     
     ~Content()
     {
+        disconnectHandlers();
+        session = nullptr;
         controls.selectionChanged = nullptr;
         learnButton.messageReceived.disconnect_all_slots();
         deviceName.removeListener (this);
@@ -547,23 +556,28 @@ public:
         const int controlsWidth     = 280;
         auto r1 (getLocalBounds());
 
-        maps.setBounds (r1.removeFromBottom (128));
+        auto mb = r1.removeFromBottom (jmax (10, mappingsSize));
+        mb.removeFromTop (4);
+        maps.setBounds (mb);
 
-        auto r2 (r1.removeFromTop (18));
-        controllersBox.setBounds (r2.removeFromLeft (200).withHeight (24));
-        createButton.setBounds (r2.removeFromRight (18));
-        deleteButton.setBounds (r2.removeFromRight (18));
-
-        r1.removeFromTop (8);
+        auto r2 (r1.removeFromTop (22));
+        controllersBox.setBounds (r2.removeFromLeft (controlsWidth).withHeight (22));
+        r2.removeFromRight (2);
+        createButton.setBounds (r2.removeFromRight (22).reduced(1));
+        r2.removeFromRight (2);
+        deleteButton.setBounds (r2.removeFromRight (22).reduced(1));
+        
+        r1.removeFromTop (4);
 
         auto r3 = r1.removeFromLeft (controlsWidth);
-        auto r4 = r3.removeFromTop (32).reduced (2);
+        auto r4 = r3.removeFromBottom (24).reduced (2);
 
-        addControlButton.setBounds (r4.removeFromRight (48));
-        r4.removeFromRight (4);
-        removeControlButton.setBounds (r4.removeFromRight (48));
-        r4.removeFromRight (4);
         learnButton.setBounds (r4.removeFromRight (48));
+        r4.removeFromRight (8);
+        
+        removeControlButton.setBounds (r4.removeFromLeft (24));
+        r4.removeFromLeft (4);
+        addControlButton.setBounds (r4.removeFromLeft (24));
         
         controls.setBounds (r3);
 
@@ -676,7 +690,9 @@ public:
 
     void createNewControl()
     {
-        const ControllerDevice::Control newControl;
+        String controlName = "Control ";
+        controlName << (controls.getNumRows() + 1);
+        const ControllerDevice::Control newControl (controlName);
         ViewHelpers::postMessageFor (this, new AddControlMessage (editedDevice, newControl));
     }
 
@@ -727,6 +743,12 @@ public:
         return session;
     }
 
+    void setMappingSize (const int newSize)
+    {
+        mappingsSize = newSize;
+        resized();
+    }
+
 private:
     ControllerDevice editedDevice;
     SettingButton testButton;
@@ -742,6 +764,7 @@ private:
     SessionPtr session;
     Value deviceName, inputDevice, controlName;
 
+    int mappingsSize = 150;
     void updateComboBoxes()
     {
         const auto controllers = getSession()->getValueTree().getChildWithName (Tags::controllers);
@@ -797,7 +820,7 @@ private:
 
     void disconnectHandlers()
     {
-        for (auto connection : connections)
+        for (auto& connection : connections)
             connection.disconnect();
         connections.clear();
     }

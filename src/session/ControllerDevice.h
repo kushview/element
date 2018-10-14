@@ -27,6 +27,13 @@ public:
                 setMissingProperties();
         }
 
+        Control (const String& name)
+            : ObjectModel (Tags::control)
+        {
+            setName (name);
+            setMissingProperties();
+        }
+        
         ~Control() noexcept { }
 
         bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::control); }

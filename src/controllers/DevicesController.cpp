@@ -94,7 +94,24 @@ void DevicesController::remove (const ControllerDevice& device, const Controller
 
 void DevicesController::refresh (const ControllerDevice& device)
 {
-    getWorld().getMappingEngine().refreshInput (device);
+    refresh();
+    return;
+    // TODO: handle individual re-build of device handlers and state
+    auto session = getWorld().getSession();
+    auto& mapping = getWorld().getMappingEngine();
+    mapping.refreshInput (device);
+    
+    for (int i = 0; i < session->getNumControllerMaps(); ++i)
+    {
+        const auto child (session->getControllerMap (i));
+        const int parameter = child.getParameterIndex();
+        const ControllerMapObjects objects (session, child);
+
+        if (objects.isValid() && mapping.addHandler (objects.control, objects.node, parameter))
+        {
+            DBG("[EL] added handler in refresh: " << objects.control.getName().toString());
+        }
+    }
 }
 
 void DevicesController::refresh()

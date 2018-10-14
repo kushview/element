@@ -119,7 +119,8 @@ void AppController::handleMessage (const Message& msg)
     auto* gui  = findChild<GuiController>();
     auto* sess = findChild<SessionController>();
     auto* devs = findChild<DevicesController>();
-	jassert(ec && gui && sess && devs);
+    auto* maps = findChild<MappingController>();
+	jassert(ec && gui && sess && devs && maps);
 
     bool handled = true;
 
@@ -313,6 +314,12 @@ void AppController::handleMessage (const Message& msg)
     {
         const auto device = refreshControllerDevice->device;
         devs->refresh (device);
+    }
+    else if (const auto* removeMapMessage = dynamic_cast<const RemoveControllerMapMessage*> (&msg))
+    {
+        const auto controllerMap = removeMapMessage->controllerMap;
+        maps->remove (controllerMap);
+        gui->stabilizeContent();
     }
     else
     {

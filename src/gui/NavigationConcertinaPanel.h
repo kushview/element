@@ -446,12 +446,14 @@ public:
         sess->setComponentID ("Session");
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
 
+#if 0
         // auto* c = new ElementsNavigationPanel();
         // c->setName ("Elements");
         // addPanelInternal (-1, c, "Elements", new ElementsHeader (*this, *c));
         auto* controllerMapsView = new ControllerMapsView ();
         controllerMapsView->setComponentID ("ControllerMaps");
         addPanelInternal (-1, controllerMapsView, "Mappings", 0);
+#endif
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");

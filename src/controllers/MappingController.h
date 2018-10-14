@@ -15,7 +15,7 @@ public:
     void activate() override;
     void deactivate() override;    
     void learn (const bool shouldLearn = true);
-
+    void remove (const ControllerMap&);
 private:
     class Impl; friend class Impl;
     std::unique_ptr<Impl> impl;

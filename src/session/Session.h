@@ -94,6 +94,8 @@ namespace Element {
         Node findNodeById (const Uuid&);
         ControllerDevice findControllerDeviceById (const Uuid&);
 
+        void cleanOrphanControllerMaps();
+
         typedef std::function<void(const ValueTree& tree)> ValueTreeFunction;
         void forEach (ValueTreeFunction handler) const;
 

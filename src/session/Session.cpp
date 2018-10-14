@@ -244,4 +244,22 @@ namespace Element {
         for (int i = 0; i < tree.getNumChildren(); ++i)
             forEach (tree.getChild (i), handler);
     }
+
+    void Session::cleanOrphanControllerMaps()
+    {
+        Array<ValueTree> toRemove;
+        for (int i = 0; i < getNumControllerMaps(); ++i)
+        {
+            const ControllerMapObjects objects (this, getControllerMap (i));
+            if (! objects.isValid())
+                toRemove.add (objects.controllerMap.getValueTree());
+        }
+        if (toRemove.size() > 0)
+        {
+            auto maps = getControllerMapsValueTree();
+            for (const auto& tree : toRemove)
+                maps.removeChild (tree, nullptr);
+            toRemove.clearQuick();
+        }
+    }
 }

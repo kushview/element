@@ -47,4 +47,12 @@ struct RemoveControlMessage : public AppMessage
     const ControllerDevice::Control control;
 };
 
+struct RemoveControllerMapMessage : public AppMessage
+{
+    RemoveControllerMapMessage (const ControllerMap& mapp)
+        : controllerMap (mapp) { }
+    ~RemoveControllerMapMessage() noexcept { }
+    const ControllerMap controllerMap;
+};
+
 }

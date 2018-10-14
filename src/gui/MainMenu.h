@@ -7,6 +7,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
+#include "controllers/GuiController.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
@@ -139,9 +140,13 @@ public:
         }
         else if (index == 4444)
         {
-            auto&  app = owner.getAppController();
+            if (auto session = owner.getAppController().getWorld().getSession())
+                session->cleanOrphanControllerMaps();
+            auto& app = owner.getAppController();
             if (auto* devices = app.findChild<DevicesController>())
                 devices->refresh();
+            if (auto* gui = app.findChild<GuiController>())
+                gui->stabilizeContent();
         }
         #endif
         
