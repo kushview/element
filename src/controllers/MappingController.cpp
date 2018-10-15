@@ -160,9 +160,9 @@ void MappingController::activate()
 void MappingController::deactivate() 
 {
     Controller::deactivate();
+    getWorld().getMappingEngine().stopMapping();
     capturedConnection.disconnect();
     capturedParamConnection.disconnect();
-    getWorld().getMappingEngine().stopMapping();
 }
 
 bool MappingController::isLearning() const

@@ -46,7 +46,7 @@ public:
             const var& data (objectData.getProperty (Tags::mappingData));
             if (const auto* block = data.getBinaryData())
                 if (block->getSize() > 0)
-                    return MidiMessage (block->getData(), block->getSize());
+                    return MidiMessage (block->getData(), (int) block->getSize());
             return MidiMessage();
         }
 

@@ -566,15 +566,18 @@ static ContentView* createLastContentView (Settings& settings)
     auto* props = settings.getUserSettings();
     const String lastContentView = props->getValue ("lastContentView");
     ScopedPointer<ContentView> view;
-    
+    typedef GraphEditorView DefaultView;
+
     if (lastContentView.isEmpty())
-        view = new ConnectionGrid();
+        view = new DefaultView();
     else if (lastContentView == "PatchBay")
         view = new ConnectionGrid();
     else if (lastContentView == "GraphEditor")
         view = new GraphEditorView();
+    else if (lastContentView == "ControllerDevicesView")
+        view = new ControllerDevicesView();
     else
-        view = new ConnectionGrid();
+        view = new DefaultView();
     
     return view ? view.release() : nullptr;
 }

@@ -36,13 +36,10 @@ public:
         setModel (nullptr);
     }
 
-    void updateWith (SessionPtr sess, 
-                     const ControllerDevice& device = ControllerDevice(),
-                     const ControllerDevice::Control& control = ControllerDevice::Control())
+    void refreshContent (const ControllerDevice& device = ControllerDevice(),
+                         const ControllerDevice::Control& control = ControllerDevice::Control())
     {
-        session = sess;
         maps.clear (true);
-        
         if (session)
         {
             for (int i = 0; i < session->getNumControllerMaps(); ++i)
@@ -59,6 +56,14 @@ public:
 
         updateContent();
         repaint();
+    }
+
+    void updateWith (SessionPtr sess, 
+                     const ControllerDevice& device = ControllerDevice(),
+                     const ControllerDevice::Control& control = ControllerDevice::Control())
+    {
+        session = sess;
+        refreshContent();
     }
 
     int getNumRows() override { return maps.size(); }
@@ -111,16 +116,15 @@ public:
 
     void deleteKeyPressed (int lastRowSelected) override
     {
-        const auto mapp (session->getControllerMap (lastRowSelected));
-        ViewHelpers::postMessageFor (this, new RemoveControllerMapMessage (mapp));
+        if (auto* objects = maps [lastRowSelected])
+        {
+            ViewHelpers::postMessageFor (this, new RemoveControllerMapMessage (objects->controllerMap));
+        }
     }
 
     void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&) override
     {
-        auto* const objects = maps [rowNumber];
-        if (! objects) return;
-
-        if (columnId == Node && objects->node.isValid())
+        if(auto* const objects = maps [rowNumber])
             ViewHelpers::presentPluginWindow (this, objects->node);
     }
 #if 0

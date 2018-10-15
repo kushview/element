@@ -88,8 +88,7 @@ struct Alert
     inline static String productLockedMessage (const String& msg = String())
     {
         String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature." : msg;
-        message << "\nGet a copy @ https://kushview.net,"
-                << "\n\nor enter your license key in preferences.";
+        message << "\nGrab a copy at https://kushview.net, or enter your license key in preferences.";
         return message;
     }
 
@@ -98,7 +97,6 @@ struct Alert
         const auto message = productLockedMessage (msg);
         if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
             URL("https://kushview.net/products/element/").launchInDefaultBrowser();
-        
     }
 
     inline static void showProductLockedAlertAsync (const String& msg = String(), 
