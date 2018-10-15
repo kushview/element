@@ -165,18 +165,43 @@ def build_plugins (bld):
     bld.add_group()
 
 def build_linux (bld):
+    libEnv = bld.env.derive()
+    bld.shlib (
+        source      = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'lib/kv',
+        name        = 'KV',
+        env         = libEnv,
+        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ]
+    )
+
     appEnv = bld.env.derive()
-    bld.program (
+
+    bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp') + \
-                      element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
+                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
+        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'lib/element',
+        name        = 'EL',
+        env         = appEnv,
+        use         = [ 'KV' ]
+    )
+
+    bld.add_group()
+
+    bld.program (
+        source      = [ 'project/Source/Main.cpp' ],
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'bin/element',
         name        = 'Element',
         env         = appEnv,
-        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ]
+        use         = [ 'KV', 'EL' ],
     )
 
 def build_mac (bld):

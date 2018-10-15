@@ -8,10 +8,12 @@
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceRoot}/build",
-            "environment": [ ],
+            "environment": [{ "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }],
             "externalConsole": false,
             "linux": {
                 "MIMode": "gdb",
+                "program": "${workspaceRoot}/build/bin/element",
+                
                 "setupCommands": [
                     {
                         "description": "Enable pretty-printing for gdb",
