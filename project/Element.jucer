@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.19.5"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.20.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               jucerVersion="5.3.2" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
@@ -22,6 +22,10 @@
         <FILE id="dUnv0f" name="AppController.h" compile="0" resource="0" file="../src/controllers/AppController.h"/>
         <FILE id="zrLMkT" name="Controller.cpp" compile="1" resource="0" file="../src/controllers/Controller.cpp"/>
         <FILE id="fTUDgM" name="Controller.h" compile="0" resource="0" file="../src/controllers/Controller.h"/>
+        <FILE id="MDUTVj" name="DevicesController.cpp" compile="1" resource="0"
+              file="../src/controllers/DevicesController.cpp"/>
+        <FILE id="uF0dLv" name="DevicesController.h" compile="0" resource="0"
+              file="../src/controllers/DevicesController.h"/>
         <FILE id="RWYfG0" name="EngineController.cpp" compile="1" resource="0"
               file="../src/controllers/EngineController.cpp"/>
         <FILE id="zhBGLF" name="EngineController.h" compile="0" resource="0"
@@ -33,6 +37,10 @@
         <FILE id="cSUiJ4" name="GuiController.cpp" compile="1" resource="0"
               file="../src/controllers/GuiController.cpp"/>
         <FILE id="Tyum0W" name="GuiController.h" compile="0" resource="0" file="../src/controllers/GuiController.h"/>
+        <FILE id="aH86Wo" name="MappingController.cpp" compile="1" resource="0"
+              file="../src/controllers/MappingController.cpp"/>
+        <FILE id="HwpGta" name="MappingController.h" compile="0" resource="0"
+              file="../src/controllers/MappingController.h"/>
         <FILE id="fdOpQ6" name="SessionController.cpp" compile="1" resource="0"
               file="../src/controllers/SessionController.cpp"/>
         <FILE id="BaCFvB" name="SessionController.h" compile="0" resource="0"
@@ -73,6 +81,9 @@
               file="../src/engine/InternalFormat.cpp"/>
         <FILE id="NbNubd" name="InternalFormat.h" compile="0" resource="0"
               file="../src/engine/InternalFormat.h"/>
+        <FILE id="f4ZaUt" name="MappingEngine.cpp" compile="1" resource="0"
+              file="../src/engine/MappingEngine.cpp"/>
+        <FILE id="aakXuR" name="MappingEngine.h" compile="0" resource="0" file="../src/engine/MappingEngine.h"/>
         <FILE id="LAe9tF" name="MidiClipSource.cpp" compile="1" resource="0"
               file="../src/engine/MidiClipSource.cpp"/>
         <FILE id="MVLD5m" name="MidiClipSource.h" compile="0" resource="0"
@@ -142,6 +153,14 @@
         <FILE id="sKIHTU" name="ContextMenus.cpp" compile="1" resource="0"
               file="../src/gui/ContextMenus.cpp"/>
         <FILE id="UeLvAw" name="ContextMenus.h" compile="0" resource="0" file="../src/gui/ContextMenus.h"/>
+        <FILE id="FMHqI7" name="ControllerDevicesView.cpp" compile="1" resource="0"
+              file="../src/gui/ControllerDevicesView.cpp"/>
+        <FILE id="lvq0vt" name="ControllerDevicesView.h" compile="0" resource="0"
+              file="../src/gui/ControllerDevicesView.h"/>
+        <FILE id="tY8jTv" name="ControllerMapsView.cpp" compile="1" resource="0"
+              file="../src/gui/ControllerMapsView.cpp"/>
+        <FILE id="ENzduu" name="ControllerMapsView.h" compile="0" resource="0"
+              file="../src/gui/ControllerMapsView.h"/>
         <FILE id="IlpPf7" name="GraphDisplayView.h" compile="0" resource="0"
               file="../src/gui/GraphDisplayView.h"/>
         <FILE id="N6IdK1" name="GraphEditorComponent.cpp" compile="1" resource="0"
@@ -266,6 +285,10 @@
         <FILE id="IsKejY" name="ClipModel.h" compile="0" resource="0" file="../src/session/ClipModel.h"/>
         <FILE id="lcKFiX" name="CommandManager.h" compile="0" resource="0"
               file="../src/session/CommandManager.h"/>
+        <FILE id="t2F1IJ" name="ControllerDevice.cpp" compile="1" resource="0"
+              file="../src/session/ControllerDevice.cpp"/>
+        <FILE id="FpmUMz" name="ControllerDevice.h" compile="0" resource="0"
+              file="../src/session/ControllerDevice.h"/>
         <FILE id="UKzIUg" name="DeviceManager.cpp" compile="1" resource="0"
               file="../src/session/DeviceManager.cpp"/>
         <FILE id="sXUPNn" name="DeviceManager.h" compile="0" resource="0" file="../src/session/DeviceManager.h"/>
