@@ -36,6 +36,12 @@ public:
         setModel (nullptr);
     }
 
+    void clear()
+    {
+        maps.clearQuick(true);
+        updateContent();
+    }
+
     void refreshContent (const ControllerDevice& device = ControllerDevice(),
                          const ControllerDevice::Control& control = ControllerDevice::Control())
     {
@@ -63,7 +69,7 @@ public:
                      const ControllerDevice::Control& control = ControllerDevice::Control())
     {
         session = sess;
-        refreshContent();
+        refreshContent (device, control);
     }
 
     int getNumRows() override { return maps.size(); }
@@ -596,6 +602,7 @@ public:
         editedDevice = ControllerDevice();
         controllersBox.clear();
         properties.clear();
+        maps.clear();
     }
 
     void setChildVisibility (const bool visible)
