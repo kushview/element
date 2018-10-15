@@ -299,6 +299,12 @@ void GuiController::presentPluginWindow (const Node& node)
     if (! windowManager)
         return;
 
+    if (node.isIONode())
+    {
+        DBG("[EL] not showing pugin window for: " << node.getName());
+        return;
+    }
+    
     auto* window = windowManager->getPluginWindowFor (node);
     if (! window)
         window = windowManager->createPluginWindowFor (node);
