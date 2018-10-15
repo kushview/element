@@ -461,6 +461,9 @@ public:
     
     void setMainView (ContentView* view)
     {
+        if (view)
+            view->initializeView (owner.getAppController());
+
         if (content1)
         {
             content1->willBeRemoved();

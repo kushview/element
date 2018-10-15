@@ -29,6 +29,7 @@ public:
     ContentView();
     virtual ~ContentView();
 
+    virtual void initializeView (AppController&) { }
     virtual void willBeRemoved() { }
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }

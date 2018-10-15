@@ -3,11 +3,13 @@
     Copyright (C) 2018  Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/GuiController.h"
 #include "gui/Buttons.h"
 #include "gui/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
 #include "session/ControllerDevice.h"
 #include "Messages.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -603,7 +605,7 @@ public:
 
     void stabilizeContent()
     {
-        auto sess = getSession (true);
+        auto sess = getSession (false);
 
         if (haveControllers())
         {
@@ -642,6 +644,17 @@ public:
         Array<var> values;
         for (const auto& d : keys)
             values.add (d);
+
+        const auto& inputDeviceVar = editedDevice.getInputDevice();
+        if (inputDeviceVar.toString().isNotEmpty() && 
+            ! keys.contains (inputDeviceVar.toString()))
+        {
+            keys.add (String());
+            values.add (String());
+            keys.add (inputDeviceVar.toString()); 
+            values.add (inputDeviceVar);
+        }
+
         inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
         props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
             "Input Device", keys, values));
@@ -728,6 +741,18 @@ public:
         {
             controls.deselectAllRows();
         }
+    }
+
+    void setSession (SessionPtr s, const bool stabilize = false)
+    {
+        if (s == session)
+            return;
+        disconnectHandlers();
+        session = s;
+        connectHandlers();
+
+        if (stabilize)
+            triggerAsyncUpdate();
     }
 
     SessionPtr getSession (const bool force = false)
@@ -833,6 +858,12 @@ ControllerDevicesView::ControllerDevicesView()
     setName ("ControllerDevicesView");
     content.reset (new Content());
     addAndMakeVisible (content.get());
+}
+
+void ControllerDevicesView::initializeView (AppController& app)
+{
+    if (content)
+        content->setSession (app.getWorld().getSession(), false);
 }
 
 ControllerDevicesView::~ControllerDevicesView()

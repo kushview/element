@@ -17,7 +17,7 @@ public:
 
     void resized() override;
     void stabilizeContent() override;
-    
+    void initializeView (AppController&) override;
 private:
     class Content;
     std::unique_ptr<Content> content;
