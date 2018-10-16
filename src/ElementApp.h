@@ -129,7 +129,9 @@ inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
     }
 
     if (frame >= 0 && (msg.isAllNotesOff() || msg.isAllSoundOff()))
+    {
         DBG("got it: " << frame);
+    }
 }
 
 inline static void traceMidi (MidiBuffer& buf)
