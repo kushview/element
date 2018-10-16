@@ -453,6 +453,28 @@
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1" debugInformationFormat="ProgramDatabase"
                        enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
+        <CONFIGURATION name="DebugFree" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;"
+                       binaryPath="../build/x64/DebugFree" characterSet="MultiByte"
+                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;EL_FREE=1"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
+        <CONFIGURATION name="ReleaseFree" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
+                       isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/x64/ReleaseFree"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_FREE=1&#10;"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
+        <CONFIGURATION name="DebugFree" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/Win32/DebugFree"
+                       headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;"
+                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;EL_FREE=1"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
+        <CONFIGURATION name="ReleaseFree" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+                       isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/Win32/ReleaseFree"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_FREE=1"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
