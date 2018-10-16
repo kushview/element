@@ -1,3 +1,7 @@
+/*
+    GuiController.cpp - This file is part of Element
+    Copyright (C) 2018 Kushview, LLC.  All rights reserved.
+*/
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
@@ -398,7 +402,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showAllPluginWindows,
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
-        Commands::showControllerDevices
+        Commands::showControllerDevices,
+        Commands::toggleUserInterface
     });
     
     commands.add (Commands::quit);
@@ -513,16 +518,14 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Graph Settings", "Graph Settings", "Session", flags);
         } break;
         
-        case Commands::showPatchBay:
-        {
+        case Commands::showPatchBay: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "PatchBay") flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F1Key, 0);
             result.setInfo ("Patch Bay", "Show the patch bay", "Session", flags);
         } break;
         
-        case Commands::showGraphEditor:
-        {
+        case Commands::showGraphEditor: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "GraphEditor") flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F2Key, 0);
@@ -531,6 +534,10 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         
         case Commands::showControllerDevices:
             result.setInfo ("Controller Devices", "Show the session's controllers", "Session", 0);
+            break;
+        
+        case Commands::toggleUserInterface:
+            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", "User Interface", 0);
             break;
         
         case Commands::toggleVirtualKeyboard:
@@ -671,7 +678,17 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::hideAllPluginWindows: {
                 closeAllPluginWindows (false);
         } break;
-
+        case Commands::toggleUserInterface: {
+            auto session = getWorld().getSession();
+            if (auto* const window = mainWindow.get())
+            {
+                window->setVisible (! window->isVisible());
+                if (window->isVisible() && session)
+                    showPluginWindowsFor (session->getActiveGraph(), true, false);
+                else
+                    closeAllPluginWindows (true);
+            }
+        } break;
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;

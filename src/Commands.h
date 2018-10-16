@@ -46,6 +46,7 @@ namespace Commands {
         mediaSaveAs,
 
         showControllerDevices,
+        toggleUserInterface,
         
         sessionClose           = 0x0300,
         sessionOpen,

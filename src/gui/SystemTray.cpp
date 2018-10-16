@@ -1,6 +1,13 @@
+/*
+    GuiController.cpp - This file is part of Element
+    Copyright (C) 2017 Kushview, LLC.  All rights reserved.
+*/
 
 #include "gui/MainWindow.h"
 #include "gui/SystemTray.h"
+#include "Globals.h"
+#include "Commands.h"
+#include "session/CommandManager.h"
 
 namespace Element {
 
@@ -25,24 +32,24 @@ static MainWindow* getMainWindow()
 
 void SystemTray::mouseUp (const MouseEvent& ev)
 {
+    auto* window = getMainWindow();
+    if (! window)
+        return;
+    auto* const cmd = &window->getWorld().getCommandManager();
+
     if (mouseUpAction == ShowMenu)
     {
         PopupMenu menu;
-        menu.addItem (ShowHideToggle, "Show/Hide");
+        menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
         menu.addSeparator();
-        menu.addItem (ExitApplication, "Exit");
-        const auto result = menu.show();
-        if (result == ExitApplication)
-        {
-            JUCEApplication::getInstance()->systemRequestedQuit();
-        }
-        else if (result == ShowHideToggle)
-        {
-            if (auto* const window = getMainWindow())
-                window->setVisible (! window->isVisible());
-        }
+        menu.addCommandItem (cmd, Commands::quit, "Exit");
+       #if JUCE_MAC
+        showDropdownMenu (menu);
+       #else
+        menu.show();
+       #endif
     }
-    else if (mouseUpAction == ShowWindow)
+    else 
     {
         if (auto* const window = getMainWindow())
         {
@@ -58,7 +65,7 @@ void SystemTray::mouseUp (const MouseEvent& ev)
 
 void SystemTray::mouseDown (const MouseEvent& ev)
 {
-    if (ev.mods.isRightButtonDown())
+    if (ev.mods.isPopupMenu())
     {
         mouseUpAction = ShowMenu;
     }
