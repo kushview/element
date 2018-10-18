@@ -56,7 +56,8 @@
                     "CC": "ccache clang",
                     "CXX": "ccache clang++"
                 }
-            }
+            },
+            "problemMatcher": []
         },
         {
             "label": "echo",
@@ -79,7 +80,7 @@
             "args": [
                 "installers/packages/uninstall.sh"
             ],
-            "problemMatcher": [ ]
+            "problemMatcher": []
         }
     ]
 }
