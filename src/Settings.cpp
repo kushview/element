@@ -13,6 +13,7 @@ const char* Settings::pluginWindowOnTopDefault  = "pluginWindowOnTopDefault";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 const char* Settings::showPluginWindowsKey      = "showPluginWindows";
 const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
+const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
 
 #if JUCE_32BIT
  #if JUCE_MAC
@@ -157,6 +158,25 @@ void Settings::setPluginWindowsOnTop (const bool onTop)
         return;
     if (auto* p = getProps())
         p->setValue (pluginWindowOnTopDefault, onTop);
+}
+
+const File Settings::getDefaultNewSessionFile() const
+{
+    if (auto* p = getProps())
+    {
+        const auto value = p->getValue (defaultNewSessionFile);
+        if (value.isNotEmpty() && File::isAbsolutePath (value))
+            return File (value);
+    }
+
+    return File();
+}
+
+void Settings::setDefaultNewSessionFile (const File& file)
+{
+    if (auto* p = getProps())
+        p->setValue (defaultNewSessionFile, 
+            file.existsAsFile() ? file.getFullPathName() : "");
 }
 
 }

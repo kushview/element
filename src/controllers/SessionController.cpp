@@ -144,16 +144,36 @@ void SessionController::newSession()
             gc->closeAllPluginWindows();
         
         setChangesFrozen (true);
-        currentSession->clear();
-        currentSession->addGraph (Node::createDefaultGraph(), true);
-        if (auto* ec = findSibling<EngineController>())
-            ec->sessionReloaded();
-        
-        if (auto* gc = findSibling<GuiController>())
-            gc->stabilizeContent();
-        
+        loadNewSessionData();
         document = new SessionDocument (currentSession);
         setChangesFrozen (false);
+
+        if (auto* ec = findSibling<EngineController>())
+            ec->sessionReloaded();
+        if (auto* gc = findSibling<GuiController>())
+            gc->stabilizeContent();
+    }
+}
+
+void SessionController::loadNewSessionData()
+{
+    currentSession->clear();
+    const auto file = getWorld().getSettings().getDefaultNewSessionFile();
+    bool wasLoaded = false;
+
+    if (file.existsAsFile())
+    {
+        ValueTree data;
+        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (file))
+            data = ValueTree::fromXml (*xml);
+        if (data.isValid() && data.hasType (Tags::session))
+            wasLoaded = currentSession->loadData (data);
+    }
+
+    if (! wasLoaded)
+    {   
+        currentSession->clear();
+        currentSession->addGraph (Node::createDefaultGraph(), true);
     }
 }
 

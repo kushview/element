@@ -229,7 +229,9 @@ namespace Element {
     // MARK: General Settings
 
     class GeneralSettingsPage : public SettingsPage,
-                                public Value::Listener
+                                public Value::Listener,
+                                public FilenameComponentListener,
+                                public Button::Listener
     {
     public:
         enum ComboBoxIDs
@@ -243,7 +245,12 @@ namespace Element {
               settings (world.getSettings()),
               engine (world.getAudioEngine()),
               status (world.getUnlockStatus()),
-              gui (g)
+              gui (g),
+              defaultSessionFile ("Default Session", File(), true, false,
+                  false,         // bool isForSaving,
+                  "*.els",      //const String& fileBrowserWildcard,
+                  "",           //const String& enforcedSuffix,
+                  "None")       //const String& textWhenNothingSelected)
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -293,6 +300,16 @@ namespace Element {
             openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
             openLastSession.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible (defaultSessionFileLabel);
+            defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
+            defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (defaultSessionFile);
+            defaultSessionFile.setCurrentFile (settings.getDefaultNewSessionFile(), dontSendNotification);
+            defaultSessionFile.addListener (this);
+            addAndMakeVisible (defaultSessionClearButton);
+            defaultSessionClearButton.setButtonText ("X");
+            defaultSessionClearButton.addListener (this);
+
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -314,11 +331,30 @@ namespace Element {
             clockSource.removeListener (this);
         }
 
-        void layoutSetting (Rectangle<int>& r, Label& label, SettingButton& setting)
+        void filenameComponentChanged (FilenameComponent* f) override
+        {
+            if (f == &defaultSessionFile)
+            {
+                if (f->getCurrentFile().existsAsFile())
+                    settings.setDefaultNewSessionFile (f->getCurrentFile());
+                else 
+                    settings.setDefaultNewSessionFile (File());
+            }
+
+            settings.saveIfNeeded();
+        }
+
+        void buttonClicked (Button* b) override
+        {
+            if (b == &defaultSessionClearButton)
+                defaultSessionFile.setCurrentFile (File(), false, sendNotificationAsync);
+        }
+        void layoutSetting (Rectangle<int>& r, Label& label, Component& setting,
+                            const int valueWidth = -1)
         {
             const int spacingBetweenSections = 6;
             const int settingHeight = 22;
-            const int toggleWidth = 40;
+            const int toggleWidth = valueWidth > 0 ? valueWidth : 40;
             const int toggleHeight = 18;
 
             r.removeFromTop (spacingBetweenSections);
@@ -355,6 +391,10 @@ namespace Element {
             layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
             layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
             layoutSetting (r, openLastSessionLabel, openLastSession);
+            layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
+            defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
+                                                 defaultSessionFile.getY(),
+                                                 settingHeight - 2, defaultSessionFile.getHeight());
 
             if (pluginSettings.isVisible())
             {
@@ -424,6 +464,10 @@ namespace Element {
 
         Label openLastSessionLabel;
         SettingButton openLastSession;
+
+        Label defaultSessionFileLabel;
+        FilenameComponent defaultSessionFile;
+        TextButton defaultSessionClearButton;
 
         Settings& settings;
         AudioEnginePtr engine;
