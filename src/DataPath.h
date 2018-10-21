@@ -30,6 +30,7 @@ namespace Element
         const File& getRootDir() const { return root; }
         File createNewPresetFile (const Node& node, const String& name = String()) const;
         void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
+        void findPresetFiles (StringArray& results) const;
         
     private:
         File root;

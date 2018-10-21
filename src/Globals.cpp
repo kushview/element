@@ -8,6 +8,7 @@
 #include "session/DeviceManager.h"
 #include "session/MediaManager.h"
 #include "session/PluginManager.h"
+#include "session/Presets.h"
 #include "session/Session.h"
 #include "session/UnlockStatus.h"
 #include "Settings.h"
@@ -20,7 +21,6 @@ namespace Element {
 static void buildCommandLine (CommandLine& cli, const String& c)
 {
     cli.fullScreen = c.contains ("--full-screen");
-
     const var port = c.fromFirstOccurrenceOf("--port=", false, false)
                       .upToFirstOccurrenceOf(" ", false, false);
     if (port.isInt() || port.isInt64())
@@ -55,6 +55,7 @@ public:
     ScopedPointer<Settings>       settings;
     ScopedPointer<UnlockStatus>   unlock;
     std::unique_ptr<MappingEngine> mapping;
+    std::unique_ptr<PresetCollection> presets;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
    #endif
@@ -63,9 +64,9 @@ private:
     friend class Globals;
     void init()
     {
-#if !ELEMENT_LV2_PLUGIN_HOST
+       #if !ELEMENT_LV2_PLUGIN_HOST
         symbols  = new SymbolMap();
-#endif
+       #endif
         plugins  = new PluginManager();
         devices  = new DeviceManager();
         media    = new MediaManager();
@@ -74,6 +75,7 @@ private:
         unlock   = new UnlockStatus (owner);
         session  = new Session();
         mapping.reset (new MappingEngine());
+        presets.reset (new PresetCollection());
     }
     
     void freeAll()
@@ -86,6 +88,7 @@ private:
         session  = nullptr;
         media    = nullptr;
         devices  = nullptr;
+        presets  = nullptr;
     }
 };
 
@@ -133,6 +136,12 @@ PluginManager& Globals::getPluginManager()
 {
     jassert (impl->plugins != nullptr);
     return *impl->plugins;
+}
+
+PresetCollection& Globals::getPresetCollection() 
+{
+    jassert (impl->presets != nullptr);
+    return *impl->presets;
 }
 
 Settings& Globals::getSettings()

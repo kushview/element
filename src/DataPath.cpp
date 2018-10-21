@@ -85,9 +85,18 @@ namespace Element
                 node.getFileOrIdentifier() == identifier && 
                 node.getFormat() == format)
             {
-                node.getIdentifier();
                 nodes.add (node);
             }
         }
+    }
+
+    void DataPath::findPresetFiles (StringArray& results) const
+    {
+        const auto presetsDir = getRootDir().getChildFile ("Presets");
+        if (! presetsDir.exists() || ! presetsDir.isDirectory())
+            return;
+        DirectoryIterator iter (presetsDir, true, EL_PRESET_FILE_EXTENSIONS);
+        while (iter.next())
+            results.add (iter.getFile().getFullPathName());
     }
 }

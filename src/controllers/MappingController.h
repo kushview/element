@@ -17,6 +17,7 @@ public:
     void learn (const bool shouldLearn = true);
     bool isLearning() const;
     void remove (const ControllerMap&);
+
 private:
     class Impl; friend class Impl;
     std::unique_ptr<Impl> impl;

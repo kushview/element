@@ -8,6 +8,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"
+#include "session/Presets.h"
 
 namespace Element {
 static Array <PluginWindow*> activePluginWindows;
@@ -120,10 +121,13 @@ public:
         }
         else if (button == &nodeButton)
         {
+            auto* const world = ViewHelpers::getGlobals (this);
+
             NodePopupMenu menu (node);
             menu.addSeparator();
             menu.addProgramsMenu();
-            menu.addPresetsMenu();
+            if (world)
+                menu.addPresetsMenu (world->getPresetCollection());
             if (auto* message = menu.showAndCreateMessage())
                 ViewHelpers::postMessageFor (this, message);
         }

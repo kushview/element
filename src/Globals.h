@@ -18,6 +18,7 @@ class CommandManager;
 class DeviceManager;
 class MediaManager;
 class PluginManager;
+class PresetCollection;
 class Settings;
 class UnlockStatus;
 class Writer;
@@ -44,6 +45,7 @@ public:
     DeviceManager& getDeviceManager();
     MappingEngine& getMappingEngine();
     PluginManager& getPluginManager();
+    PresetCollection& getPresetCollection();
     Settings& getSettings();
     MediaManager& getMediaManager();
     UnlockStatus& getUnlockStatus();

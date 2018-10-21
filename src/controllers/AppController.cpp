@@ -6,11 +6,14 @@
 #include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
+#include "controllers/PresetsController.h"
+
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
 #include "gui/UnlockForm.h"
 #include "gui/GuiCommon.h"
 #include "session/UnlockStatus.h"
+#include "session/Presets.h"
 #include "Commands.h"
 #include "Globals.h"
 #include "Messages.h"
@@ -22,7 +25,7 @@ namespace Element {
 Globals& AppController::Child::getWorld()
 {
     auto* app = dynamic_cast<AppController*> (getRoot());
-    jassert(app);
+    jassert (app);
     return app->getWorld();
 }
 
@@ -35,6 +38,8 @@ AppController::AppController (Globals& g)
     addChild (new EngineController ());
     addChild (new SessionController ());
     addChild (new MappingController ());
+    addChild (new PresetsController ());
+    
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);
 }
@@ -69,10 +74,11 @@ void AppController::deactivate()
 
 void AppController::run()
 {
-    auto* sessCtl = findChild<SessionController>();
-    auto* devsCtl = findChild<DevicesController>();
-    auto* mapsCtl = findChild<MappingController>();
-    assert(sessCtl && devsCtl && mapsCtl);
+    auto* const sessCtl = findChild<SessionController>();
+    auto* const devsCtl = findChild<DevicesController>();
+    auto* const mapsCtl = findChild<MappingController>();
+    auto* const presets = findChild<PresetsController>();
+    assert(sessCtl && devsCtl && mapsCtl && presets);
     sessCtl->setChangesFrozen (true);
 
     activate();
@@ -111,16 +117,18 @@ void AppController::run()
     sessCtl->resetChanges();
     sessCtl->setChangesFrozen (false);
     devsCtl->refresh();
+    presets->refresh();
 }
 
 void AppController::handleMessage (const Message& msg)
 {
-	auto* ec   = findChild<EngineController>();
-    auto* gui  = findChild<GuiController>();
-    auto* sess = findChild<SessionController>();
-    auto* devs = findChild<DevicesController>();
-    auto* maps = findChild<MappingController>();
-	jassert(ec && gui && sess && devs && maps);
+	auto* ec        = findChild<EngineController>();
+    auto* gui       = findChild<GuiController>();
+    auto* sess      = findChild<SessionController>();
+    auto* devs      = findChild<DevicesController>();
+    auto* maps      = findChild<MappingController>();
+    auto* presets   = findChild<PresetsController>();
+	jassert(ec && gui && sess && devs && maps && presets);
 
     bool handled = true;
 
@@ -215,10 +223,10 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
-        const DataPath path;
         String name = aps->name;
+        const Node node = aps->node;
         bool canceled = false;
-        
+
         if (name.isEmpty ())
         {
             AlertWindow alert ("Add Preset", "Enter preset name", AlertWindow::NoIcon, 0);
@@ -228,14 +236,9 @@ void AppController::handleMessage (const Message& msg)
             canceled = 0 == alert.runModalLoop();
             name = alert.getTextEditorContents ("name");
         }
-        
+
         if (! canceled)
-        {
-             if (! aps->node.savePresetTo (path, name))
-                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Preset", "Could not save preset");
-             if (auto* cc = gui->getContentComponent())
-                cc->stabilize (true);
-        }
+            presets->add (node, name);
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {

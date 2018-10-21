@@ -7,6 +7,7 @@
 
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
+#include "session/Presets.h"
 
 namespace Element {
 
@@ -182,14 +183,14 @@ public:
         addSubMenu (subMenuName, programs);
     }
     
-    inline void addPresetsMenu (const String& subMenuName = "Presets")
+    inline void addPresetsMenu (PresetCollection& collection, const String& subMenuName = "Presets")
     {
         PopupMenu presets;
-        getPresetsMenu (presets);
+        getPresetsMenu (collection, presets);
         addSubMenu (subMenuName, presets);
     }
     
-    inline void getPresetsMenu (PopupMenu& menu)
+    inline void getPresetsMenu (PresetCollection& collection, PopupMenu& menu)
     {
        #if EL_USE_PRESETS
         const int offset = 20000;
@@ -213,16 +214,16 @@ public:
         if (identifier.isEmpty())
             identifier = node.getProperty (Tags::file);
         
-        presetNodes.clearQuick();
-        path.findPresetsFor (node.getProperty (Tags::format), identifier, presetNodes);
-        
+        presetItems.clear();
+        collection.getPresetsFor (node, presetItems);
+       
         menu.addSeparator();
         
-        if (presetNodes.size() <= 0)
+        if (presetItems.size() <= 0)
             menu.addItem (offset, "(none)", false);
         
-        for (int i = 0; i < presetNodes.size(); ++i)
-            menu.addItem (offset + i, presetNodes[i].getName());
+        for (int i = 0; i < presetItems.size(); ++i)
+            menu.addItem (offset + i, presetItems[i]->name);
        #endif
     }
     
@@ -261,11 +262,17 @@ public:
         {
             Node n (node);
             const int index = result - 20000;
-            if (isPositiveAndBelow (index, presetNodes.size()) && presetNodes[index].isValid())
+            if (auto* const item = presetItems [index])
             {
-                const String state = presetNodes[index].getProperty (Tags::state).toString();
-                n.getValueTree().setProperty (Tags::state, state, 0);
-                n.restorePluginState();
+                const auto data = Node::parse (item->file);
+                if (n.isValid() && data.isValid() && data.hasProperty (Tags::state))
+                {
+                    const String state = data.getProperty(Tags::state).toString();
+                    n.getValueTree().setProperty (Tags::state, state, 0);
+                    if (data.hasProperty (Tags::programState))
+                        n.getValueTree().setProperty (Tags::programState, data.getProperty (Tags::programState), 0);
+                    n.restorePluginState();
+                }
             }
         }
         
@@ -279,11 +286,11 @@ public:
     
     void reset()
     {
+        this->clear();
         resultMap.clear();
         deleter.clearQuick (true);
-        presetNodes.clearQuick();
+        presetItems.clear();
         currentResultOpId = firstResultOpId;
-        this->clear();
     }
 
     void setNode (const Node& n, const bool header = true)
@@ -296,7 +303,7 @@ public:
 
 private:
     Node node;
-    NodeArray presetNodes;
+    OwnedArray<PresetDescription> presetItems;
     Port port;
     const int firstResultOpId = 1024;
     int currentResultOpId = 1024;

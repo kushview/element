@@ -9,7 +9,7 @@
 #include "engine/GraphProcessor.h"
 #include "gui/HorizontalListBox.h"
 #include "session/PluginManager.h"
-
+#include "session/Presets.h"
 #include "gui/ConnectionGrid.h"
 
 #define EL_MATRIX_SIZE 30
@@ -183,9 +183,12 @@ namespace Element
         
         void showMenuForNode (const Node& node)
         {
+            auto* const world = ViewHelpers::getGlobals (this);
+
             NodePopupMenu menu (node);
             menu.addProgramsMenu();
-            menu.addPresetsMenu();
+            if (world)
+                menu.addPresetsMenu (world->getPresetCollection());
             
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
@@ -198,9 +201,12 @@ namespace Element
         
         void showMenuForNodeAndPort (const Node& n, const Port& p)
         {
+            auto* const world = ViewHelpers::getGlobals (this);
+
             NodePopupMenu menu (n, p);
             menu.addProgramsMenu();
-            menu.addPresetsMenu();
+            if (world)
+                menu.addPresetsMenu (world->getPresetCollection());
             const int result = menu.show();
             if (auto* message = menu.createMessageForResultCode (result))
             {

@@ -79,6 +79,8 @@ public:
             child->deactivate();
     }
     
+    inline const OwnedArray<Controller>& getChildren() const { return children; }
+    
 private:
     OwnedArray<Controller> children;
     Controller* parent;

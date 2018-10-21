@@ -18,6 +18,7 @@
 
 #include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
+#include "session/Presets.h"
 #include "session/Node.h"
 #include "gui/GraphEditorComponent.h"
 
@@ -241,10 +242,12 @@ public:
         
         if (e.mods.isPopupMenu())
         {
+            auto* const world = ViewHelpers::getGlobals (this);
             NodePopupMenu menu (node);
             menu.addSeparator();
             menu.addProgramsMenu();
-            menu.addPresetsMenu();
+            if (world)
+                menu.addPresetsMenu (world->getPresetCollection());
             
             if (auto* message = menu.showAndCreateMessage ())
             {
