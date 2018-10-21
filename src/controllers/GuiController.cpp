@@ -415,16 +415,16 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
     switch (commandID)
     {
         case Commands::exportAudio:
-            result.setInfo ("Export Audio", "Export to an audio file", "Session", 0);
+            result.setInfo ("Export Audio", "Export to an audio file", Commands::Categories::Session, 0);
             break;
         case Commands::exportMidi:
-            result.setInfo ("Exort MIDI", "Export to a MIDI file", "Session", 0);
+            result.setInfo ("Exort MIDI", "Export to a MIDI file", Commands::Categories::Session, 0);
             break;
         case Commands::importGraph:
-            result.setInfo ("Import graph", "Import a graph into current session", "Session", 0);
+            result.setInfo ("Import graph", "Import a graph into current session", Commands::Categories::Session, 0);
             break;
         case Commands::exportGraph:
-            result.setInfo ("Export current graph", "Export the current graph to file", "Session", 0);
+            result.setInfo ("Export current graph", "Export the current graph to file", Commands::Categories::Session, 0);
             break;
         case Commands::panic:
             result.addDefaultKeypress ('p', ModifierKeys::altModifier | ModifierKeys::commandModifier);
@@ -433,172 +433,178 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             
             // MARK: Session Commands
         case Commands::sessionClose:
-            result.setInfo ("Close Session", "Close the current session", "Session", 0);
+            result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
             break;
         case Commands::sessionNew:
             result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
-            result.setInfo ("New Session", "Create a new session", "Session", 0);
+            result.setInfo ("New Session", "Create a new session", Commands::Categories::Session, 0);
             break;
         case Commands::sessionOpen:
             result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
-            result.setInfo ("Open Session", "Open an existing session", "Session", 0);
+            result.setInfo ("Open Session", "Open an existing session", Commands::Categories::Session, 0);
             break;
         case Commands::sessionSave:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-            result.setInfo ("Save Session", "Save the current session", Commands::Categories::session, 0);
+            result.setInfo ("Save Session", "Save the current session", 
+                            Commands::Categories::Session, 0);
             break;
         case Commands::sessionSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Save Session As", "Save the current session with a new name", Commands::Categories::session, 0);
+            result.setInfo ("Save Session As", "Save the current session with a new name", Commands::Categories::Session, 0);
             break;
         case Commands::sessionAddGraph:
             result.addDefaultKeypress ('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::session, 0);
+            result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::Session, 0);
             break;
         case Commands::sessionDuplicateGraph:
             result.addDefaultKeypress ('d', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Duplicate current graph", "Duplicates the currently active graph", Commands::Categories::session, 0);
+            result.setInfo ("Duplicate current graph", "Duplicates the currently active graph", Commands::Categories::Session, 0);
             break;
         case Commands::sessionDeleteGraph:
             result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
-            result.setInfo ("Delete current graph", "Deletes the current graph", Commands::Categories::session, 0);
+            result.setInfo ("Delete current graph", "Deletes the current graph", Commands::Categories::Session, 0);
             break;
         case Commands::sessionInsertPlugin:
             result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::session, Info::isDisabled);
+            result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::Session, Info::isDisabled);
             break;
             
         // MARK: Media Commands
         case Commands::mediaNew:
-            result.setInfo ("New Media", "Close the current media", "Session", 0);
+            result.setInfo ("New Media", "Close the current media", Commands::Categories::Session, 0);
             break;
         case Commands::mediaClose:
-            result.setInfo ("Close Media", "Close the current media", "Session", 0);
+            result.setInfo ("Close Media", "Close the current media", Commands::Categories::Session, 0);
             break;
         case Commands::mediaOpen:
-            result.setInfo ("Open Media", "Opens a type of supported media", "Session", 0);
+            result.setInfo ("Open Media", "Opens a type of supported media", Commands::Categories::Session, 0);
             break;
         case Commands::mediaSave:
-            result.setInfo ("Save Media", "Saves the currently viewed object", "Session", 0);
+            result.setInfo ("Save Media", "Saves the currently viewed object", Commands::Categories::Session, 0);
             break;
         
         case Commands::mediaSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Save Media As", "Saves the current object with another name", "Session", 0);
+            result.setInfo ("Save Media As", "Saves the current object with another name", Commands::Categories::Session, 0);
             break;
             
             // MARK: Show Commands
         case Commands::showPreferences:
-            result.setInfo ("Show Preferences", "Element Preferences", "Application", 0);
+            result.setInfo ("Show Preferences", "Element Preferences", Commands::Categories::Application, 0);
             result.addDefaultKeypress (',', ModifierKeys::commandModifier);
             break;
         case Commands::showAbout:
-            result.setInfo ("Show About", "About this program", "Application", 0);
+            result.setInfo ("Show About", "About this program", Commands::Categories::Application, 0);
             break;
         case Commands::showLegacyView:
-            result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", "Interfaces", 0);
+            result.setInfo ("Legacy View", "Shows the legacy Beat Thang Virtual GUI", 
+                            Commands::Categories::UserInterface, 0);
             break;
         case Commands::showPluginManager:
-            result.setInfo ("Plugin Manager", "Element Plugin Management", "Application", 0);
+            result.setInfo ("Plugin Manager", "Element Plugin Management", Commands::Categories::Application, 0);
             break;
         
         case Commands::showLastContentView:
-            result.setInfo ("Last View", "Shows the last content view", "User Interface", 0);
+            result.setInfo ("Last View", "Shows the last content view", Commands::Categories::UserInterface, 0);
             break;
         case Commands::showSessionConfig:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
-            result.setInfo ("Session Settings", "Session Settings", "Session", flags);
+            result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
         } break;
         case Commands::showGraphConfig:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "GraphSettings") flags |= Info::isTicked;
-            result.setInfo ("Graph Settings", "Graph Settings", "Session", flags);
+            result.setInfo ("Graph Settings", "Graph Settings", Commands::Categories::Session, flags);
         } break;
         
         case Commands::showPatchBay: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "PatchBay") flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F1Key, 0);
-            result.setInfo ("Patch Bay", "Show the patch bay", "Session", flags);
+            result.setInfo ("Patch Bay", "Show the patch bay", Commands::Categories::Session, flags);
         } break;
         
         case Commands::showGraphEditor: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "GraphEditor") flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F2Key, 0);
-            result.setInfo ("Graph Editor", "Show the graph editor", "Session", flags);
+            result.setInfo ("Graph Editor", "Show the graph editor", Commands::Categories::Session, flags);
         } break;
         
         case Commands::showControllerDevices:
-            result.setInfo ("Controller Devices", "Show the session's controllers", "Session", 0);
+            result.setInfo ("Controller Devices", "Show the session's controllers", Commands::Categories::Session, 0);
             break;
         
         case Commands::toggleUserInterface:
-            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", "User Interface", 0);
+            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", Commands::Categories::UserInterface, 0);
             break;
         
         case Commands::toggleVirtualKeyboard:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->isVirtualKeyboardVisible()) flags |= Info::isTicked;
-            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", "Session", flags);
+            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", Commands::Categories::Session, flags);
         } break;
         
         case Commands::rotateContentView:
             result.addDefaultKeypress ('r', ModifierKeys::commandModifier | ModifierKeys::altModifier);
-            result.setInfo ("Rotate View", "Show the graph editor", "Session", 0);
+            result.setInfo ("Rotate View", "Show the graph editor", Commands::Categories::Session, 0);
             break;
 
         case Commands::showAllPluginWindows:
             result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Show all plugin windows", "Show all plugins for the current graph.", "Session", 0);
+            result.setInfo ("Show all plugin windows", "Show all plugins for the current graph.", Commands::Categories::Session, 0);
             break;
         case Commands::hideAllPluginWindows:
             result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier);
-            result.setInfo ("Hide all plugin windows", "Hides all plugins on the current graph.", "Session", 0);
+            result.setInfo ("Hide all plugin windows", "Hides all plugins on the current graph.", Commands::Categories::Session, 0);
             break;
         case Commands::showKeymapEditor:
             // result.addDefaultKeypress ('w', ModifierKeys::commandModifier | ModifierKeys::altModifier | ModifierKeys::shiftModifier);
-            result.setInfo ("Keymap Editor", "Show the keyboard shortcuts and edit them.", "User Interface", 0);
+            result.setInfo ("Keymap Editor", "Show the keyboard shortcuts and edit them.", 
+                            Commands::Categories::UserInterface, 0);
             break;
 
         case Commands::checkNewerVersion:
-            result.setInfo ("Check For Updates", "Check newer version", "Application", 0);
+            result.setInfo ("Check For Updates", "Check newer version", 
+                            Commands::Categories::Application, 0);
             break;
             
         case Commands::signIn:
-            result.setInfo ("Sign In", "Saves the current object with another name", "Application", 0);
+            result.setInfo ("Sign In", "Saves the current object with another name", 
+                            Commands::Categories::Application, 0);
             break;
         case Commands::signOut:
-            result.setInfo ("Sign Out", "Saves the current object with another name", "Application",   0);
+            result.setInfo ("Sign Out", "Saves the current object with another name", 
+                            Commands::Categories::Application,   0);
             break;
             
         case Commands::quit:
-            result.setInfo ("Quit", "Quit the app", "Application", 0);
+            result.setInfo ("Quit", "Quit the app", Commands::Categories::Application, 0);
             result.addDefaultKeypress ('q', ModifierKeys::commandModifier);
             break;
         case Commands::undo:
-            result.setInfo ("Undo", "Undo the last operation", "Application", 0);
+            result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, 0);
             break;
         case Commands::redo:
-            result.setInfo ("Redo", "Redo the last operation", "Application", 0);
+            result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, 0);
             break;
         case Commands::cut:
-            result.setInfo ("Cut", "Cut", "Application", 0);
+            result.setInfo ("Cut", "Cut", Commands::Categories::Application, 0);
             break;
         case Commands::copy:
             result.addDefaultKeypress ('c', ModifierKeys::commandModifier);
-            result.setInfo ("Copy", "Copy", "Application", Info::isDisabled);
+            result.setInfo ("Copy", "Copy", Commands::Categories::Application, Info::isDisabled);
             break;
         case Commands::paste:
             result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Paste", "Paste", "Application", Info::isDisabled);
+            result.setInfo ("Paste", "Paste", Commands::Categories::Application, Info::isDisabled);
             break;
         case Commands::selectAll:
-            result.setInfo ("Select All", "Select all", "Application", 0);
+            result.setInfo ("Select All", "Select all", Commands::Categories::Application, 0);
             break;
             
         case Commands::transportRewind:

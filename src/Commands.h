@@ -13,12 +13,13 @@ namespace Commands {
 
     namespace Categories
     {
-        static const char* const application   = "Application";
-        static const char* const general       = "General";
-        static const char* const editing       = "Editing";
-        static const char* const view          = "View";
-        static const char* const windows       = "Windows";
-        static const char* const session       = "Session";
+        static const char* const Application   = "Application";
+        static const char* const General       = "General";
+        static const char* const Editing       = "Editing";
+        static const char* const View          = "View";
+        static const char* const Windows       = "Windows";
+        static const char* const Session       = "Session";
+        static const char* const UserInterface = "User Interface";
     }
 
     enum AppCommands
