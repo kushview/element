@@ -14,7 +14,7 @@
 namespace Element {
 
 class ControllerMapsTable : public TableListBox,
-                      public TableListBoxModel
+                            public TableListBoxModel
 {
 public:
     enum Columns { Device = 1, Control, Node, Parameter };
@@ -459,6 +459,16 @@ public:
         removeControlButton.addListener (this);
         addAndMakeVisible (properties);
 
+        addAndMakeVisible (saveControllerButton);
+        saveControllerButton.setTooltip ("Save a controller to disk");
+        saveControllerButton.setButtonText ("S");
+        saveControllerButton.addListener (this);
+
+        addAndMakeVisible (openControllerButton);
+        openControllerButton.setTooltip ("Open a controller from disk");
+        openControllerButton.setButtonText ("O");
+        openControllerButton.addListener (this);
+
         addAndMakeVisible (maps);
 
         deviceName.addListener (this);
@@ -555,6 +565,32 @@ public:
                 learnButton.startListening();
             }
         }
+        else if (button == &saveControllerButton)
+        {
+            auto name = editedDevice.getName().toString();
+            if (name.isEmpty()) name << "Controller";
+            name << ".xml";
+
+            FileChooser chooser ("Save Controller Device",
+                DataPath::defaultControllersDir().getChildFile(name).getNonexistentSibling(),
+                "*.xml", true, false);
+            if (chooser.browseForFileToSave (true))
+            {
+                DBG("[EL] save device");
+                if (ScopedPointer<XmlElement> xml = editedDevice.getValueTree().createXml())
+                    xml->writeToFile (chooser.getResult(), String());
+            }
+        }
+        else if (button == &openControllerButton)
+        {
+            FileChooser chooser ("Open Controller Device",
+                DataPath::defaultControllersDir(), "*.xml", true, false);
+            if (chooser.browseForFileToOpen ())
+            {
+                ViewHelpers::postMessageFor (this,
+                    new AddControllerDeviceMessage (chooser.getResult()));
+            }
+        }
     }
 
     void comboBoxChanged (ComboBox* box) override
@@ -578,6 +614,10 @@ public:
         createButton.setBounds (r2.removeFromRight (22).reduced(1));
         r2.removeFromRight (2);
         deleteButton.setBounds (r2.removeFromRight (22).reduced(1));
+        r2.removeFromRight (2);
+        openControllerButton.setBounds (r2.removeFromRight (22).reduced(1));
+        r2.removeFromRight (2);
+        saveControllerButton.setBounds (r2.removeFromRight (22).reduced(1));
         
         r1.removeFromTop (4);
 
@@ -607,11 +647,11 @@ public:
 
     void setChildVisibility (const bool visible)
     {
-        properties.setVisible (visible);
-        controls.setVisible (visible);
-        addControlButton.setVisible (visible);
-        removeControlButton.setVisible (visible);
-        learnButton.setVisible (visible);
+        Array<Component*> comps ({ &properties, &controls, &addControlButton,
+            &removeControlButton, &learnButton,
+            &saveControllerButton });
+        for (auto* comp : comps)
+            comp->setVisible (visible);
     }
 
     void stabilizeContent()
@@ -792,6 +832,8 @@ private:
     SettingButton deleteButton;
     SettingButton addControlButton;
     SettingButton removeControlButton;
+    SettingButton saveControllerButton;
+    SettingButton openControllerButton;
     MidiLearnButton learnButton;
     ComboBox controllersBox;
     ControlListBox controls;

@@ -16,6 +16,7 @@ public:
 
     void add (const ControllerDevice&);
     void add (const ControllerDevice&, const ControllerDevice::Control&);
+    void add (const File& file);
     void remove (const ControllerDevice&);
     void remove (const ControllerDevice&, const ControllerDevice::Control&);
     void refresh (const ControllerDevice&);

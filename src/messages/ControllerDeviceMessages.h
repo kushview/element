@@ -17,8 +17,11 @@ struct AddControllerDeviceMessage : public AppMessage
 {
     AddControllerDeviceMessage (const ControllerDevice& d)
         : device (d) { }
+    AddControllerDeviceMessage (const File& f)
+        : file (f) { }
     ~AddControllerDeviceMessage() noexcept { }
     const ControllerDevice device;
+    const File file;
 };
 
 struct RemoveControllerDeviceMessage : public AppMessage

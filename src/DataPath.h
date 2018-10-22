@@ -26,7 +26,8 @@ namespace Element
         static const File defaultLocation();
         static const File defaultSessionDir();
         static const File defaultGraphDir();
-        
+        static const File defaultControllersDir();
+
         const File& getRootDir() const { return root; }
         File createNewPresetFile (const Node& node, const String& name = String()) const;
         void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;

@@ -70,6 +70,29 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
     }
 }
 
+void DevicesController::add (const File& file)
+{
+    ValueTree data;
+    if (ScopedXml xml = XmlDocument::parse (file))
+        data = ValueTree::fromXml (*xml);
+    if (data.isValid() && data.hasType (Tags::controller))
+    {
+        // Avoid UUID conflicts by replacing all
+        data.setProperty (Tags::uuid, Uuid().toString(), 0);
+        for (int i = 0; i < data.getNumChildren(); ++i)
+            data.getChild(i).setProperty (Tags::uuid, Uuid().toString(), 0);
+
+        if (auto s = getWorld().getSession())
+            s->getValueTree().getChildWithName (Tags::controllers)
+                .addChild (data, -1, 0);
+    }
+    else
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, "Open Controller Device",
+            "Could not open the controller device file.");
+    }
+}
+
 void DevicesController::remove (const ControllerDevice& device)
 {
     returnIfNotFullVersion

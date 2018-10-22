@@ -57,9 +57,10 @@ namespace Element
             .getChildFile ("Element");
     }
     
-    const File DataPath::defaultSessionDir()    { return defaultLocation().getChildFile ("Sessions"); }
-    const File DataPath::defaultGraphDir()      { return defaultLocation().getChildFile ("Graphs"); }
-    
+    const File DataPath::defaultSessionDir()        { return defaultLocation().getChildFile ("Sessions"); }
+    const File DataPath::defaultGraphDir()          { return defaultLocation().getChildFile ("Graphs"); }
+    const File DataPath::defaultControllersDir()    { return defaultLocation().getChildFile ("Controllers"); }
+
     File DataPath::createNewPresetFile (const Node& node, const String& name) const
     {
         String path = "Presets/";

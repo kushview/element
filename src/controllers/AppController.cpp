@@ -291,13 +291,18 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* addControllerDeviceMessage = dynamic_cast<const AddControllerDeviceMessage*> (&msg))
     {
         const auto device = addControllerDeviceMessage->device;
+        const auto file   = addControllerDeviceMessage->file;
+        if (file.existsAsFile())
+        {
+            devs->add (file);
+        }
         if (device.getValueTree().isValid())
         {
             devs->add (device);
         }
         else
         {
-            DBG("[EL] device not valid");
+            DBG("[EL] add controller device not valid");
             DBG(device.getValueTree().toXmlString());
         }
     }
