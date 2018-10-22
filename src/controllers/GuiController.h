@@ -32,10 +32,6 @@ namespace Element {
         void activate() override;
         void deactivate() override;
         
-       #if EL_RUNNING_AS_PLUGIN
-        void clearContentComponent();
-       #endif
-        
         void run();
         void timerCallback() override;
         CommandManager& commander();
@@ -89,6 +85,7 @@ namespace Element {
         */
         void closePluginWindowsFor (uint32 nodeId, const bool windowVisible);
         
+        /** Close plugin windows for a Node */
         void closePluginWindowsFor (const Node& node, const bool windowVisible);
 
         /** @internal close a specific plugin window
@@ -96,8 +93,13 @@ namespace Element {
           */
         void closePluginWindow (PluginWindow*);
         
+        /** Get the look and feel used by this instance */
         Element::LookAndFeel& getLookAndFeel();
-        
+
+       #if EL_RUNNING_AS_PLUGIN
+        void clearContentComponent();
+       #endif
+
     private:
         AppController& controller;
         Globals& world;

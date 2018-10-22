@@ -203,7 +203,7 @@ void GuiController::openWindow (Component* c)
 }
 
 void GuiController::runDialog (const String& uri)
-{ 
+{
     if (uri == ELEMENT_PREFERENCES)
     {
         if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog"))
