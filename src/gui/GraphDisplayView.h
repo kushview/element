@@ -12,7 +12,7 @@ class GraphDisplayView : public ContentView,
 {
 public:
     GraphDisplayView()
-    { 
+    {
         addAndMakeVisible (breadcrumb);
         addAndMakeVisible (configButton);
         configButton.setButtonText ("*");
