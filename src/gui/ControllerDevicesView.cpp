@@ -648,8 +648,7 @@ public:
     void setChildVisibility (const bool visible)
     {
         Array<Component*> comps ({ &properties, &controls, &addControlButton,
-            &removeControlButton, &learnButton,
-            &saveControllerButton });
+            &removeControlButton, &learnButton, &saveControllerButton });
         for (auto* comp : comps)
             comp->setVisible (visible);
     }
