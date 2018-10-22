@@ -7,21 +7,46 @@
 namespace Element {
 
 /** This is a simple container which displays a breadcrumb above a content area */
-class GraphDisplayView : public ContentView
+class GraphDisplayView : public ContentView,
+                         public Button::Listener
 {
 public:
     GraphDisplayView()
     { 
         addAndMakeVisible (breadcrumb);
+        addAndMakeVisible (configButton);
+        configButton.setButtonText ("*");
+        configButton.addListener (this);
     }
 
-    virtual ~GraphDisplayView() { }
+    virtual ~GraphDisplayView()
+    { 
+        configButton.removeListener (this);
+    }
+
+    inline void buttonClicked (Button* b) override
+    {
+        auto* const world = ViewHelpers::getGlobals(this);
+        if (! world) return;
+        if (b == &configButton) {
+            world->getCommandManager().invokeDirectly (Commands::showGraphConfig, true);
+        }
+    }
 
     inline void setBreadCrumbVisible (const bool isVisible)
     {
         if (isVisible != breadcrumb.isVisible())
         {
             breadcrumb.setVisible (isVisible);
+            resized();
+        }
+    }
+
+    inline void setConfigButtonVisible (const bool isVisible)
+    {
+        if (isVisible != configButton.isVisible())
+        {
+            configButton.setVisible (isVisible);
             resized();
         }
     }
@@ -53,6 +78,10 @@ public:
         if (breadcrumb.isVisible())
             breadcrumb.setBounds (r.removeFromTop (24));
         graphDisplayResized (r);
+
+        const int configButtonSize = 14;
+        configButton.setBounds (getWidth() - configButtonSize - 4, 4, 
+                                configButtonSize, configButtonSize);
     }
 
     Node getGraph() const { return graph; }
@@ -65,6 +94,7 @@ protected:
 private:
     Node graph, node;
     BreadCrumbComponent breadcrumb;
+    SettingButton configButton;
 };
 
 }
