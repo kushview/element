@@ -190,11 +190,6 @@ CommandManager& GuiController::commander() {
     return world.getCommandManager();
 }
 
-Globals& GuiController::globals()
-{
-    return world;
-}
-
 void GuiController::openWindow (Component* c)
 {
     Window* win = new Window (c->getName());
@@ -324,7 +319,7 @@ void GuiController::run()
     mainWindow = new MainWindow (world);
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
-    PropertiesFile* pf = globals().getSettings().getUserSettings();
+    PropertiesFile* pf = getWorld().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys);
     mainWindow->addKeyListener (commander().getKeyMappings());
@@ -355,8 +350,6 @@ SessionRef GuiController::session()
         sessionRef = world.getSession();
     return sessionRef;
 }
-
-
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()
 {

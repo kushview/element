@@ -1,6 +1,5 @@
 
-#ifndef EL_GUI_CONTROLLER_H
-#define EL_GUI_CONTROLLER_H
+#pragma once
 
 #include "ElementApp.h"
 #include "controllers/AppController.h"
@@ -38,9 +37,7 @@ namespace Element {
         
         AppController& getAppController() const { return controller; }
         KeyListener* getKeyListener() const;
-        
-        Globals& globals();
-        
+                
         void closeAllWindows();
         void openWindow (Component* c);
         
@@ -119,5 +116,3 @@ namespace Element {
         void saveProperties (PropertiesFile* props);
     };
 }
-
-#endif  // EL_GUI_CONTROLLER_H
