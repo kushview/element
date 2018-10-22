@@ -46,38 +46,19 @@ namespace Element {
         Globals& globals();
         
         void closeAllWindows();
-        
-        /** Open an application window by uri
-         Not fully operable, the widget factory needs implemented first */
-        void openWindow (const String& uri);
         void openWindow (Component* c);
-        bool isWindowOpen (const String& uri);
         
         MainWindow* getMainWindow() const { return mainWindow.get(); }
         
         void runDialog (const String& uri);
         void runDialog (Component* c, const String& title = String());
-        
-        /** Open an existing session */
-        void openSession();
-        
-        /** Create a new session */
-        void newSession();
-        
-        /** Save the session with 'save as' abilities if desired */
-        void saveSession (bool saveAs = false);
-        
-        /** Shutdown the gui and application
-         This will be called in  JUCEApplication::systemRequestedQuit().  If
-         this method returns true a subsequence JUCEApplication::quit() call is
-         made, otherwise the app will continue to run un-altered */
-        bool shutdownApp();
-        
+
         /** Get a reference to Sesison data */
         SessionRef session();
         
-        /** show plugin windows of this node or child nodes */
-        void showPluginWindowsFor (const Node& node, const bool recursive = true,
+        /** Show plugin windows for a node */
+        void showPluginWindowsFor (const Node& node, 
+                                   const bool recursive = true,
                                    const bool force = false);
         
         /** present a plugin window */
@@ -126,13 +107,13 @@ namespace Element {
         ScopedPointer<MainWindow>        mainWindow;
         ScopedPointer<ContentComponent>  content;
         ScopedPointer<AboutComponent>    about;
-        
+
         struct KeyPressManager;
         ScopedPointer<KeyPressManager> keys;
 
         void showSplash();
         void toggleAboutScreen();
-        
+
         void saveProperties (PropertiesFile* props);
     };
 }

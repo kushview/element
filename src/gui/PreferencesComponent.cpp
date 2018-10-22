@@ -349,6 +349,7 @@ namespace Element {
             if (b == &defaultSessionClearButton)
                 defaultSessionFile.setCurrentFile (File(), false, sendNotificationAsync);
         }
+
         void layoutSetting (Rectangle<int>& r, Label& label, Component& setting,
                             const int valueWidth = -1)
         {

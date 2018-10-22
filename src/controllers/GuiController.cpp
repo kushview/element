@@ -195,18 +195,11 @@ Globals& GuiController::globals()
     return world;
 }
 
-void GuiController::openWindow (const String& uri) { }
-
 void GuiController::openWindow (Component* c)
 {
     Window* win = new Window (c->getName());
     win->setContentOwned (c, true);
     windowManager->push (win);
-}
-
-bool GuiController::isWindowOpen (const String&)
-{
-    return false;
 }
 
 void GuiController::runDialog (const String& uri)
@@ -356,12 +349,6 @@ void GuiController::run()
    #endif
 }
 
-bool GuiController::shutdownApp()
-{
-    jassertfalse;
-    return true;
-}
-
 SessionRef GuiController::session()
 {
     if (! sessionRef)
@@ -369,17 +356,7 @@ SessionRef GuiController::session()
     return sessionRef;
 }
 
-void GuiController::openSession()
-{
-}
 
-void GuiController::newSession()
-{
-}
-
-void GuiController::saveSession (bool saveAs)
-{
-}
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()
 {

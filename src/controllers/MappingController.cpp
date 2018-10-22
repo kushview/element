@@ -111,7 +111,7 @@ class MappingController::Impl
 public:
     Impl() { }
     ~Impl()
-    { 
+    {
         capture.clear();
     }
 
