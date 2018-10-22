@@ -331,6 +331,11 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 cc->setCurrentNode (node);
         }
+        else if (node.getValueTree().hasProperty (Tags::placeholder))
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, 
+                node.getName(), "This node is running as a placeholder. The original plugin could not be found for loading.", "Ok");
+        }
         else if (node.isValid())
         {
             ViewHelpers::presentPluginWindow (this, node);
@@ -373,6 +378,14 @@ public:
         
         const auto box (getBoxRectangle());
         g.fillRect (box);
+
+        if (node.getValueTree().hasProperty (Tags::placeholder))
+        {
+            g.setColour (Colour (0xff333333));
+            g.setFont (9.f);
+            auto pr = box; pr.removeFromTop (4);
+            g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
+        }
 
         g.setColour (Colours::black);
         g.setFont (font);
