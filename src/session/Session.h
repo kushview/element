@@ -105,8 +105,8 @@ namespace Element {
         Session();
         friend class Globals;
  
-        /** Set a property.  This is a wrapper around the internal ValueTree */
-        inline void setProperty (const Identifier& prop, const var& val) { node().setProperty (prop, val, nullptr); }
+        /** Set a property. */
+        inline void setProperty (const Identifier& prop, const var& val) { objectData.setProperty (prop, val, nullptr); }
 
         friend class ValueTree;
         virtual void valueTreePropertyChanged (ValueTree& treeWhosePropertyHasChanged, const Identifier& property);

@@ -243,13 +243,16 @@ public:
         if (e.mods.isPopupMenu())
         {
             auto* const world = ViewHelpers::getGlobals (this);
+            auto& plugins (world->getPluginManager());
             NodePopupMenu menu (node);
+            menu.addReplaceSubmenu (plugins);
             menu.addSeparator();
             menu.addProgramsMenu();
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
             
-            if (auto* message = menu.showAndCreateMessage ())
+            const int result = menu.show();
+            if (auto* message = menu.createMessageForResultCode (result))
             {
                 ViewHelpers::postMessageFor (this, message);
                 for (const auto& nodeId : getGraphPanel()->selectedNodes)
@@ -265,6 +268,12 @@ public:
                         }
                     }
                 }
+            }
+            else if (plugins.getKnownPlugins().getIndexChosenByMenu(result) >= 0)
+            {
+                const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
+                if (const auto* desc = plugins.getKnownPlugins().getType (index))
+                    ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
             }
         }
 
@@ -331,10 +340,13 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 cc->setCurrentNode (node);
         }
-        else if (node.getValueTree().hasProperty (Tags::placeholder))
+        else if (node.hasProperty (Tags::offline))
         {
+            String message = "This node is offline and running as a Placeholder.\n";
+            message << node.getName() << " (" << node.getFormat().toString() 
+                    << ") could not be found for loading.";
             AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, 
-                node.getName(), "This node is running as a placeholder. The original plugin could not be found for loading.", "Ok");
+                node.getName(), message, "Ok");
         }
         else if (node.isValid())
         {
@@ -379,7 +391,7 @@ public:
         const auto box (getBoxRectangle());
         g.fillRect (box);
 
-        if (node.getValueTree().hasProperty (Tags::placeholder))
+        if (node.getValueTree().hasProperty (Tags::offline))
         {
             g.setColour (Colour (0xff333333));
             g.setFont (9.f);

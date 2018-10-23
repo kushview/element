@@ -6,6 +6,10 @@
 #include "session/Node.h"
 
 namespace Element {
+
+class AppController;
+class Globals;
+
 struct AppMessage : public Message { };
 
 struct AddMidiDeviceMessage : public AppMessage
@@ -31,7 +35,6 @@ struct AddPresetMessage : public AppMessage
     AddPresetMessage (const Node& n, const String& name_ = String())
         : node (n), name (name_) { }
     ~AddPresetMessage() noexcept { }
-    
     const Node node;
     const String name;
 };
@@ -152,6 +155,20 @@ struct AddPluginMessage : public AppMessage
     const PluginDescription description;
     const bool verified;
     ConnectionBuilder builder;
+};
+
+struct ReplaceNodeMessage : public AppMessage
+{
+    ReplaceNodeMessage (const Node& n, const PluginDescription& d, const bool v = true)
+        : graph (n.getParentGraph()), node (n), description (d), verified (v) {}
+    const Node graph;
+    const Node node;
+    const PluginDescription description;
+    const bool verified;
+    virtual UndoableAction* createUndoableAction (Globals& world, AppController& app) {
+        return nullptr;
+    }
+    boost::signals2::signal<void()> success;
 };
 
 class DuplicateNodeMessage : public Message {

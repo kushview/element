@@ -7,19 +7,23 @@
 namespace Element {
 
 class PlaceholderProcessor : public BaseProcessor
-{
-    int numInputs  = 0;
-    int numOutputs = 0;
-    bool acceptMidi  = false;
-    bool produceMidi = false;
-    
+{    
 public:
     PlaceholderProcessor() { }
     PlaceholderProcessor (const Node& node) { setupFor (node, 44100.0, 1024); }
+    PlaceholderProcessor (const int numAudioIns, const int numAudioOuts,
+                          const bool hasMidiIn, const bool hasMidiOut)
+        : numInputs (numAudioIns), numOutputs (numAudioOuts),
+          acceptMidi (hasMidiIn), produceMidi (hasMidiOut)
+    {
+        setPlayConfigDetails (numInputs, numOutputs, 44100.0, 1024);
+    }
+
     virtual ~PlaceholderProcessor() { }
-    const String getName() const override { return "Placeholder"; };
+
+    inline const String getName() const override { return "Placeholder"; };
     
-    void setupFor (const Node& node, double sampleRate, int bufferSize)
+    inline void setupFor (const Node& node, double sampleRate, int bufferSize)
     {
         PortArray ins, outs;
         node.getPorts (ins, outs, PortType::Audio);
@@ -34,41 +38,42 @@ public:
         setPlayConfigDetails (numInputs, numOutputs, sampleRate, bufferSize);
     }
     
-    void fillInPluginDescription (PluginDescription& d) const override
+    inline void fillInPluginDescription (PluginDescription& d) const override
     {
         d.name = "Placeholder";
         d.version = "1.0.0";
-        d.pluginFormatName = "Internal";
-        d.fileOrIdentifier = "elemment.placeholder";
+        d.pluginFormatName = "Element";
+        d.manufacturerName = "Element";
+        d.fileOrIdentifier = "element.placeholder";
         d.numInputChannels = numInputs;
         d.numOutputChannels = numOutputs;
     }
     
-    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override {
+    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override {
         setPlayConfigDetails (numInputs, numOutputs, sampleRate, maximumExpectedSamplesPerBlock);
     }
     
-    void releaseResources() override { }
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override {
+    inline void releaseResources() override { }
+    inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override {
         processBlockBypassed (buffer, midiMessages);
     }
     
-    double getTailLengthSeconds() const override { return 0.0; }
+    inline double getTailLengthSeconds() const override { return 0.0; }
     
-    bool acceptsMidi() const override       { return acceptMidi; }
-    bool producesMidi() const override      { return produceMidi; }
+    inline bool acceptsMidi() const override       { return acceptMidi; }
+    inline bool producesMidi() const override      { return produceMidi; }
     
-    AudioProcessorEditor* createEditor() override { return 0; }
-    bool hasEditor() const override { return false; }
+    inline AudioProcessorEditor* createEditor() override { return nullptr; }
+    inline bool hasEditor() const override { return false; }
     
-    void getStateInformation (juce::MemoryBlock&) override { }
-    void setStateInformation (const void*, int) override { }
+    inline void getStateInformation (juce::MemoryBlock&) override { }
+    inline void setStateInformation (const void*, int) override { }
 
-    int getNumPrograms() override        { return 1; };
-    int getCurrentProgram() override     { return 1; };
-    void setCurrentProgram (int index) override { ignoreUnused (index); };
-    const String getProgramName (int index) override { ignoreUnused (index); return ""; }
-    void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
+    inline int getNumPrograms() override        { return 1; };
+    inline int getCurrentProgram() override     { return 1; };
+    inline void setCurrentProgram (int index) override { ignoreUnused (index); };
+    inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
+    inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
     
    #if 0
     // Audio Processor Template
@@ -104,6 +109,10 @@ protected:
    #endif
     
 private:
+    int numInputs       = 2;
+    int numOutputs      = 2;
+    bool acceptMidi     = true;
+    bool produceMidi    = true;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PlaceholderProcessor)
 };
 

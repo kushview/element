@@ -81,6 +81,7 @@ namespace Tags
 
     const Identifier uuid               = "uuid";
     const Identifier parameter          = "parameter";
+    const Identifier offline            = "offline";
 }
 
 struct Alert

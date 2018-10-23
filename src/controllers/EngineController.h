@@ -94,6 +94,9 @@ public:
     /** called when the session loads or re-loads */
     void sessionReloaded();
     
+    /** replace a node with a given plugin */
+    void replace (const Node&, const PluginDescription&);
+    
     void changeBusesLayout (const Node& node, const AudioProcessor::BusesLayout& layout);
     
 private:

@@ -235,6 +235,11 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             AudioMixerProcessor(4).fillInPluginDescription (*desc);
         }
+        else if (fileOrId == "element.placeholder")
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            PlaceholderProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -246,6 +251,7 @@ namespace Element {
         results.add ("element.volume");
         results.add ("element.wetDry");
         results.add ("element.reverb");
+        results.add ("element.placeholder");
 
        #if EL_USE_MIDI_SEQUENCER
         results.add ("element.midiSequencer");
@@ -297,6 +303,9 @@ namespace Element {
         else if (desc.fileOrIdentifier == "element.audioMixer")
             base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
 
+        else if (desc.fileOrIdentifier == "element.placeholder")
+            base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
+        
         return base != nullptr ? base.release() : nullptr;
     }
     

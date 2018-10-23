@@ -167,7 +167,7 @@ GraphNode* GraphController::createPlaceholder (const Node& node)
     ph->setupFor (node, processor.getSampleRate(), processor.getBlockSize());
     return processor.addNode (ph, node.getNodeId());
 }
-    
+
 uint32 GraphController::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
@@ -504,9 +504,9 @@ void GraphController::setNodeModel (const Node& node)
         }
         else if (GraphNodePtr ph = createPlaceholder (node))
         {
-            DBG("[EL] couldn't create node: " << node.getName() << ". Creating placeholder");
+            DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
-            node.getValueTree().setProperty (Tags::placeholder, true, nullptr);
+            node.getValueTree().setProperty (Tags::offline, true, nullptr);
         }
         else
         {

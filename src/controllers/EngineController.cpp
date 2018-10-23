@@ -914,4 +914,68 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
     }
 }
 
+void EngineController::replace (const Node& node, const PluginDescription& desc)
+{
+    const auto graph (node.getParentGraph());
+    if (! graph.isGraph())
+        return;
+
+    if (auto* ctl = graphs->findGraphControllerFor (graph))
+    {
+        double x = 0.0, y = 0.0;
+        node.getRelativePosition (x, y);
+        const auto oldNodeId = node.getNodeId();
+        const auto wasWindowOpen = (bool) node.getProperty ("windowVisible");
+        const auto nodeId = ctl->addFilter (&desc, x, y);
+        if (nodeId != KV_INVALID_NODE)
+        {
+            GraphNodePtr newptr = ctl->getNodeForId (nodeId);
+            const GraphNodePtr oldptr = node.getGraphNode();
+            jassert(newptr && oldptr);
+            // attempt to retain connections from the replaced node
+            for (int i = ctl->getNumConnections(); --i >= 0;)
+            {
+                const auto* arc = ctl->getConnection (i);
+                if (oldNodeId == arc->sourceNode)
+                {
+                    ctl->addConnection (
+                        nodeId,
+                        newptr->getPortForChannel (
+                            oldptr->getPortType (arc->sourcePort),
+                            oldptr->getChannelPort (arc->sourcePort),
+                            oldptr->isPortInput (arc->sourcePort)
+                        ),
+                        arc->destNode,
+                        arc->destPort
+                    );
+                }
+                else if (oldNodeId == arc->destNode)
+                {
+                    ctl->addConnection (
+                        arc->sourceNode,
+                        arc->sourcePort,
+                        nodeId,
+                        newptr->getPortForChannel (
+                            oldptr->getPortType (arc->destPort),
+                            oldptr->getChannelPort (arc->destPort),
+                            oldptr->isPortInput (arc->destPort)
+                        )
+                    );
+                }
+            }
+
+            auto newNode (ctl->getNodeModelForId (nodeId));
+            newNode.setRelativePosition (x, y); // TODO: GraphController should handle these
+            newNode.setProperty ("windowX", (int) node.getProperty ("windowX"))
+                   .setProperty ("windowY", (int) node.getProperty ("windowY"));
+
+            removeNode (node);
+            if (wasWindowOpen)
+                findSibling<GuiController>()->presentPluginWindow (newNode);
+        }
+    }
+    
+    findSibling<GuiController>()->stabilizeContent();
+}
+
 }

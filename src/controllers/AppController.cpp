@@ -329,6 +329,17 @@ void AppController::handleMessage (const Message& msg)
         maps->remove (controllerMap);
         gui->stabilizeContent();
     }
+    else if (const auto* replaceNodeMessage = dynamic_cast<const ReplaceNodeMessage*> (&msg))
+    {
+        const auto graph = replaceNodeMessage->graph;
+        const auto node  = replaceNodeMessage->node;
+        const auto desc (replaceNodeMessage->description);
+        if (graph.isValid() && node.isValid() && 
+            graph.getNodesValueTree() == node.getValueTree().getParent())
+        {
+            ec->replace (node, desc);
+        }
+    }
     else
     {
         handled = false;

@@ -177,6 +177,15 @@ public:
         reset();
     }
 
+    inline void addReplaceSubmenu (PluginManager& plugins)
+    {
+        PopupMenu menu;
+        plugins.getKnownPlugins()
+            .addToMenu (menu, KnownPluginList::sortByCategory, 
+                        node.getFileOrIdentifier().toString());
+        addSubMenu ("Replace", menu);
+    }
+
     inline void addProgramsMenu (const String& subMenuName = "Programs")
     {
         PopupMenu programs; getProgramsMenu (programs);
