@@ -40,7 +40,8 @@
                 "waf",
                 "clean",
                 "build"
-            ]
+            ],
+            "problemMatcher": []
         },
         {
             "label": "Waf Configure w/ CCache",
