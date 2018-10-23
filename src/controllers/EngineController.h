@@ -1,11 +1,11 @@
 #include "controllers/AppController.h"
+#include "session/Node.h"
 
 namespace Element {
 
 struct ConnectionBuilder;
 class GraphController;
 class RootGraphController;
-class Node;
     
 class EngineController : public AppController::Child,
                          private ChangeListener
@@ -37,7 +37,7 @@ public:
     
     /** Adds a plugin to a specific graph and adds connections from
         a ConnectionBuilder */
-    void addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
+    Node addPlugin (const Node& graph, const PluginDescription& desc, const ConnectionBuilder& builder, const bool verified = true);
 
     /** Adds a midi device node to the current root graph */
     void addMidiDeviceNode (const String& device, const bool isInput);

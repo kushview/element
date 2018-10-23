@@ -130,8 +130,17 @@ void AppController::handleMessage (const Message& msg)
     auto* presets   = findChild<PresetsController>();
 	jassert(ec && gui && sess && devs && maps && presets);
 
-    bool handled = true;
+    if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
+    {
+        if (auto* action = message->createUndoableAction (*this))
+        {
+            undo.beginNewTransaction();
+            undo.perform (action);
+            return;
+        }
+    }
 
+    bool handled = true; // final else condition will set false
     if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
         ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
@@ -384,7 +393,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::transportPlay
     });
-    cids.addArray({ Commands::copy, Commands::paste });
+    cids.addArray({ Commands::copy, Commands::paste, Commands::undo });
 }
 
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -399,6 +408,11 @@ bool AppController::perform (const InvocationInfo& info)
     bool res = true;
     switch (info.commandID)
     {
+        case Commands::undo: {
+            if (undo.canUndo())
+                undo.undo();
+        } break;
+        
         case Commands::sessionOpen:
         {
             FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);

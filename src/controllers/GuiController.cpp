@@ -558,6 +558,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case Commands::undo:
             result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, 0);
+            result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
             break;
         case Commands::redo:
             result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, 0);

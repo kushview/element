@@ -760,11 +760,11 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     }
 }
 
-void EngineController::addPlugin (const Node& graph, const PluginDescription& desc,
+Node EngineController::addPlugin (const Node& graph, const PluginDescription& desc,
                                   const ConnectionBuilder& builder, const bool verified)
 {
     if (! graph.isGraph())
-        return;
+        return Node();
     
     OwnedArray<PluginDescription> plugs;
     if (! verified)
@@ -788,7 +788,10 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     {
         const Node node (addPlugin (*controller, descToLoad));
         builder.addConnections (*controller, node.getNodeId());
+        return node;
     }
+
+    return Node();
 }
 
 void EngineController::sessionReloaded()

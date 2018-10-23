@@ -10,7 +10,10 @@ namespace Element {
 class AppController;
 class Globals;
 
-struct AppMessage : public Message { };
+struct AppMessage : public Message
+{
+    inline virtual UndoableAction* createUndoableAction (AppController&) const  { return nullptr; }
+};
 
 struct AddMidiDeviceMessage : public AppMessage
 {
@@ -155,6 +158,7 @@ struct AddPluginMessage : public AppMessage
     const PluginDescription description;
     const bool verified;
     ConnectionBuilder builder;
+    UndoableAction* createUndoableAction (AppController&) const override;
 };
 
 struct ReplaceNodeMessage : public AppMessage

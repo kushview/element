@@ -186,6 +186,7 @@ public:
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::copy, "Copy");
         menu.addCommandItem (&cmd, Commands::paste, "Paste");
+        menu.addCommandItem (&cmd, Commands::undo, "Undo");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
     }

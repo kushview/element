@@ -48,7 +48,7 @@ private:
     Globals& world;
     CommandManager commands;
     RecentlyOpenedFilesList recentFiles;
-
+    UndoManager undo;
     void run();
 };
 
