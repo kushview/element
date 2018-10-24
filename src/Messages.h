@@ -61,9 +61,9 @@ struct AddConnectionMessage : public AppMessage
     AddConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& tgt = Node())
         : target (tgt)
     {
-        sourceNode = s; 
+        sourceNode = s;
         destNode = d;
-        sourceChannel = sc; 
+        sourceChannel = sc;
         destChannel = dc;
         sourcePort = destPort = KV_INVALID_PORT;
         jassert (useChannels());
