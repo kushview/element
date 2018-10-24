@@ -21,7 +21,8 @@ public:
         });
 
         readOnly.addArray ({
-            Commands::copy, Commands::paste
+            Commands::copy, Commands::paste, 
+            Commands::undo, Commands::redo
         });
     }
 

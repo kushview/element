@@ -285,6 +285,8 @@ namespace Element {
         
         bool hasEditor() const;
         
+        void getArcs (OwnedArray<Arc>&) const;
+
         ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
         ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
@@ -316,6 +318,21 @@ namespace Element {
     
     struct ConnectionBuilder
     {
+        ConnectionBuilder (const ConnectionBuilder& o)
+        { 
+            operator= (o);
+        }
+
+        ConnectionBuilder& operator= (const ConnectionBuilder& o)
+        {
+            this->arcs = o.arcs;
+            this->target = o.target;
+            this->lastError = o.lastError;
+            this->portChannelMap.addCopiesOf (
+                o.portChannelMap, 0, o.portChannelMap.size());
+            return *this;
+        }
+
         ConnectionBuilder() : arcs (Tags::arcs) { }
         ConnectionBuilder (const Node& tgt)
             : arcs (Tags::arcs),  target (tgt)

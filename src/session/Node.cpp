@@ -635,4 +635,16 @@ namespace Element {
             lastError = "Could not find target node";
         }
     }
+
+    void Node::getArcs (OwnedArray<Arc>& results) const
+    {
+        const ValueTree arcs (getParentArcsNode());
+        for (int i = 0; i < arcs.getNumChildren(); ++i)
+        {
+            std::unique_ptr<Arc> arc;
+            arc.reset (new Arc (arcFromValueTree (arcs.getChild (i))));
+            if (arc->sourceNode == getNodeId() || arc->destNode == getNodeId())
+                results.add (arc.release());
+        }
+    }
 }

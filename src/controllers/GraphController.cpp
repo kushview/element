@@ -190,7 +190,9 @@ uint32 GraphController::addNode (const Node& newNode)
             desc = *types.getFirst();
     }
 
-    if (auto* node = createFilter (&desc, 0, 0))
+    
+    if (auto* node = createFilter (&desc, 0, 0,
+        newNode.hasProperty(Tags::id) ? newNode.getNodeId() : 0))
     {
         auto* const proc = node->getAudioProcessor();
 
@@ -200,8 +202,8 @@ uint32 GraphController::addNode (const Node& newNode)
             .setProperty (Tags::object, node, nullptr)
             .setProperty (Tags::type, node->getTypeString(), nullptr);
         
-        data.removeProperty ("relativeX", nullptr);
-        data.removeProperty ("relativeY", nullptr);
+        // data.removeProperty ("relativeX", nullptr);
+        // data.removeProperty ("relativeY", nullptr);
         data.removeProperty ("windowX", nullptr);
         data.removeProperty ("windowY", nullptr);
         data.removeProperty ("windowVisible", nullptr);

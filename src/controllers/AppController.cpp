@@ -147,32 +147,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
     {
-        if (rnm->nodes.isEmpty())
-        {
-            if (rnm->node.isValid())
-                ec->removeNode (rnm->node);
-            else if (rnm->node.getParentGraph().isRootGraph())
-                ec->removeNode (rnm->nodeId);
-            else
-                handled = false;
-        }
-        else
-        {
-            NodeArray graphs;
-            for (const auto& node : rnm->nodes)
-            {
-                if (node.isRootGraph())
-                    graphs.add (node);
-                else if (node.isValid())
-                    ec->removeNode (node);
-            }
-
-            for (const auto& graph : graphs) 
-            {
-                // noop
-                ignoreUnused (graph);
-            }
-        }
+        
     }
     else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
     {
@@ -393,7 +368,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::transportPlay
     });
-    cids.addArray({ Commands::copy, Commands::paste, Commands::undo });
+    cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
 
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
@@ -413,6 +388,11 @@ bool AppController::perform (const InvocationInfo& info)
                 undo.undo();
         } break;
         
+        case Commands::redo: {
+            if (undo.canRedo())
+                undo.redo();
+        } break;
+
         case Commands::sessionOpen:
         {
             FileChooser chooser ("Open Session", lastSavedFile, "*.els", true, false);
@@ -423,6 +403,7 @@ bool AppController::perform (const InvocationInfo& info)
             }
 
         } break;
+
         case Commands::sessionNew:
             findChild<SessionController>()->newSession();
             break;

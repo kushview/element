@@ -51,6 +51,8 @@ struct RemoveNodeMessage : public AppMessage
     const uint32 nodeId;
     const Node node;
     NodeArray nodes;
+
+    virtual UndoableAction* createUndoableAction (AppController&) const;
 };
 
 /** Send this to add a new connection */
@@ -114,7 +116,8 @@ public:
     inline bool usePorts() const { return !useChannels(); }
 };
 
-class AddNodeMessage : public Message {
+class AddNodeMessage : public Message
+{
 public:
     AddNodeMessage (const Node& n, const Node& t = Node())
         : node (n.getValueTree().createCopy()),

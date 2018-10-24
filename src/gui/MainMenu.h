@@ -184,9 +184,12 @@ public:
         menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
         menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");
         menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::undo, "Undo");
+        menu.addCommandItem (&cmd, Commands::redo, "Redo");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::cut, "Cut");
         menu.addCommandItem (&cmd, Commands::copy, "Copy");
         menu.addCommandItem (&cmd, Commands::paste, "Paste");
-        menu.addCommandItem (&cmd, Commands::undo, "Undo");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::sessionInsertPlugin, "Insert plugin...");
     }

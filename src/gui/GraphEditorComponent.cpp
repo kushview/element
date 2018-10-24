@@ -1409,12 +1409,14 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
 
 void GraphEditorComponent::deleteSelectedNodes()
 {
+    NodeArray toRemove;
     for (const auto& nodeId : selectedNodes)
     {
         const auto node = graph.getNodeById (nodeId);
-        ViewHelpers::postMessageFor (this, new RemoveNodeMessage (node));
+        toRemove.add (node);
     }
 
+    ViewHelpers::postMessageFor (this, new RemoveNodeMessage (toRemove));
     selectedNodes.deselectAll();
 }
 
