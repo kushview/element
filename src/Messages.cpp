@@ -77,8 +77,6 @@ void RemoveNodeMessage::createActions (AppController& app,
             const Node newNode (nodeData, false);
             ec.addNode (newNode, targetGraph, builder);
  
-            DBG("[EL] graph undo remove node: " << targetGraph.getName());
-
             for (const auto* arc : arcs)
             {
                 ec.addConnection (arc->sourceNode, arc->sourcePort,
