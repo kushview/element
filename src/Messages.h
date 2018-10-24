@@ -12,7 +12,7 @@ class Globals;
 
 struct AppMessage : public Message
 {
-    inline virtual UndoableAction* createUndoableAction (AppController&) const  { return nullptr; }
+    inline virtual void createActions (AppController&, OwnedArray<UndoableAction>&) const { }
 };
 
 struct AddMidiDeviceMessage : public AppMessage
@@ -52,7 +52,7 @@ struct RemoveNodeMessage : public AppMessage
     const Node node;
     NodeArray nodes;
 
-    virtual UndoableAction* createUndoableAction (AppController&) const;
+    virtual void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const;
 };
 
 /** Send this to add a new connection */
@@ -161,7 +161,7 @@ struct AddPluginMessage : public AppMessage
     const PluginDescription description;
     const bool verified;
     ConnectionBuilder builder;
-    UndoableAction* createUndoableAction (AppController&) const override;
+    void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 struct ReplaceNodeMessage : public AppMessage
@@ -172,9 +172,6 @@ struct ReplaceNodeMessage : public AppMessage
     const Node node;
     const PluginDescription description;
     const bool verified;
-    virtual UndoableAction* createUndoableAction (Globals& world, AppController& app) {
-        return nullptr;
-    }
     boost::signals2::signal<void()> success;
 };
 

@@ -48,6 +48,8 @@ public:
     /** remove a node by object */
     void removeNode (const Node& node);
 
+    void removeNode (const Uuid&);
+    
     /** Adds a new root graph */
     void addGraph();
     

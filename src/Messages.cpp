@@ -5,7 +5,7 @@
 
 namespace Element {
 
-UndoableAction* AddPluginMessage::createUndoableAction (AppController& app) const
+void AddPluginMessage::createActions (AppController& app, OwnedArray<UndoableAction>& actions) const
 {
     class AddPluginAction : public UndoableAction
     {
@@ -45,89 +45,44 @@ UndoableAction* AddPluginMessage::createUndoableAction (AppController& app) cons
         Node addedNode;
     };
 
-    return new AddPluginAction (app, *this);
+    actions.add (new AddPluginAction (app, *this));
 }
 
-UndoableAction* RemoveNodeMessage::createUndoableAction (AppController& app) const
+void RemoveNodeMessage::createActions (AppController& app,
+                                       OwnedArray<UndoableAction>& actions) const
 {
     class RemoveNodeAction : public UndoableAction
     {
     public:
-        RemoveNodeAction (AppController& a, const RemoveNodeMessage& msg)
-            : app(a), node (msg.node), graph(msg.node.getParentGraph()),
-              nodeId (msg.nodeId)
+        explicit RemoveNodeAction (AppController& a, const Node& node)
+            : app(a), nodeUuid (node.getUuid()), targetGraph (node.getParentGraph())
         {
-            nodes.addArray (msg.nodes);
             node.getArcs (arcs);
-            for (const auto& n : nodes)
-            {
-                n.getArcs (arcs);
-                graphs.add (n.getParentGraph());
-            }
+            nodeData = node.getValueTree().createCopy();
+            Node::sanitizeRuntimeProperties (nodeData);
         }
         
         bool perform() override
         {
             auto& ec = *app.findChild<EngineController>();
-
-            bool handled = true;
-            if (nodes.isEmpty())
-            {
-                if (node.isValid())
-                    ec.removeNode (node);
-                else if (node.getParentGraph().isRootGraph())
-                    ec.removeNode (nodeId);
-                else
-                    handled = false;
-            }
-            else
-            {
-                NodeArray graphs;
-                for (const auto& node : nodes)
-                {
-                    if (node.isRootGraph())
-                        graphs.add (node);
-                    else if (node.isValid())
-                        ec.removeNode (node);
-                }
-
-                for (const auto& graph : graphs)
-                {
-                    // noop
-                    ignoreUnused (graph);
-                }
-            }
-
-            return handled;
+            ec.removeNode (nodeUuid);
+            return true;
         }
         
         bool undo() override
         {
             auto& ec = *app.findChild<EngineController>();
             bool handled = true;
-            if (nodes.isEmpty())
-            {
-                ec.addNode (node, graph, builder);
-            }
-            else
-            {
-                jassert (graphs.size() >= nodes.size());
-                for (int i = 0; i < nodes.size(); ++i)
-                {
-                    ec.addNode (nodes.getUnchecked(i),
-                                graphs.getUnchecked(i), 
-                                builder);
-                }
-            }
+
+            const Node newNode (nodeData, false);
+            ec.addNode (newNode, targetGraph, builder);
  
-            DBG("[EL] graph undo remove node: " << graph.getName());
+            DBG("[EL] graph undo remove node: " << targetGraph.getName());
 
             for (const auto* arc : arcs)
             {
-                const auto g (findGraph (*arc));
-                if (g.isGraph())
-                    ec.addConnection (arc->sourceNode, arc->sourcePort,
-                        arc->destNode, arc->destPort, g);
+                ec.addConnection (arc->sourceNode, arc->sourcePort,
+                    arc->destNode, arc->destPort, targetGraph);
             }
 
             return handled;
@@ -135,23 +90,21 @@ UndoableAction* RemoveNodeMessage::createUndoableAction (AppController& app) con
 
     private:
         AppController& app;
-        Node graph, node;
-        NodeArray nodes, graphs;
-        uint32 nodeId;
+        ValueTree nodeData;
+        const Node targetGraph;
+        const Uuid nodeUuid;
         ConnectionBuilder builder;
         OwnedArray<Arc> arcs;
 
-        const Node findGraph (const Arc& arc)
-        {
-            if (graph.isValid())
-                return graph;
-            if (graphs.size() > 0)
-                return graphs.getFirst();
-            return Node();
+        bool isDataValid() const {
+            return targetGraph.isGraph() && !nodeUuid.isNull() && nodeData.isValid();
         }
     };
 
-    return new RemoveNodeAction (app, *this);
+    if (node.isValid())
+        actions.add (new RemoveNodeAction (app, node));
+    for (const auto& n : nodes)
+        actions.add (new RemoveNodeAction (app, n));
 }
 
 }

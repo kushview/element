@@ -190,7 +190,6 @@ uint32 GraphController::addNode (const Node& newNode)
             desc = *types.getFirst();
     }
 
-    
     if (auto* node = createFilter (&desc, 0, 0,
         newNode.hasProperty(Tags::id) ? newNode.getNodeId() : 0))
     {
@@ -202,8 +201,8 @@ uint32 GraphController::addNode (const Node& newNode)
             .setProperty (Tags::object, node, nullptr)
             .setProperty (Tags::type, node->getTypeString(), nullptr);
         
-        // data.removeProperty ("relativeX", nullptr);
-        // data.removeProperty ("relativeY", nullptr);
+        data.removeProperty ("relativeX", nullptr);
+        data.removeProperty ("relativeY", nullptr);
         data.removeProperty ("windowX", nullptr);
         data.removeProperty ("windowY", nullptr);
         data.removeProperty ("windowVisible", nullptr);
@@ -274,7 +273,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
              .setProperty ("relativeX", rx, 0)
              .setProperty ("relativeY", ry, 0);
         
-        Node n (model, false);
+        Node n (model, true);
 
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
         {

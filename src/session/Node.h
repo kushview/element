@@ -267,6 +267,8 @@ namespace Element {
         void getPossibleDestinations (NodeArray& nodes) const;
         
         Node getNodeById (const uint32 nodeId) const;
+        Node getNodeByUuid (const Uuid& uuid) const;
+
         void resetPorts();
         Port getPort (const int index) const;
         bool canConnect (const uint32 sourceNode, const uint32 sourcePort,

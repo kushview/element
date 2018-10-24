@@ -430,6 +430,13 @@ namespace Element {
         return node;
     }
     
+    Node Node::getNodeByUuid (const Uuid& uuid) const
+    {
+        const ValueTree nodes = getNodesValueTree();
+        Node node (nodes.getChildWithProperty (Tags::uuid, uuid.toString()), false);
+        return node;
+    }
+
     Port Node::getPort (const int index) const
     {
         Port port (getPortsValueTree().getChildWithProperty (Tags::index, index));

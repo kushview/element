@@ -132,10 +132,14 @@ void AppController::handleMessage (const Message& msg)
 
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
-        if (auto* action = message->createUndoableAction (*this))
+        OwnedArray<UndoableAction> actions;
+        message->createActions (*this, actions);
+        if (! actions.isEmpty())
         {
             undo.beginNewTransaction();
-            undo.perform (action);
+            for (auto* action : actions)
+                undo.perform (action);
+            actions.clearQuick (false);
             return;
         }
     }

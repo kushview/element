@@ -549,6 +549,21 @@ void EngineController::removeNode (const Node& node)
     }
 }
 
+void EngineController::removeNode (const Uuid& uuid)
+{
+    auto session = getWorld().getSession();
+    Node nodeToRemove = Node();
+    for (int i = 0; i < session->getNumGraphs(); ++i)
+    {
+        nodeToRemove = session->getGraph(i).getNodeByUuid (uuid);
+        if (nodeToRemove.isValid())
+            break;
+    }
+
+    if (nodeToRemove.isValid())
+        removeNode (nodeToRemove);
+}
+
 void EngineController::removeNode (const uint32 nodeId)
 {
     auto* root = graphs->findActiveRootGraphController();
@@ -788,6 +803,7 @@ Node EngineController::addPlugin (const Node& graph, const PluginDescription& de
     {
         const Node node (addPlugin (*controller, descToLoad));
         builder.addConnections (*controller, node.getNodeId());
+        jassert(! node.getUuid().isNull());
         return node;
     }
 
@@ -836,7 +852,12 @@ Node EngineController::addPlugin (GraphController& c, const PluginDescription& d
         const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
             findSibling<GuiController>()->presentPluginWindow (node);
-
+        if (node.getUuid().isNull())
+        {
+            jassertfalse;
+            ValueTree nodeData = node.getValueTree();
+            nodeData.setProperty (Tags::uuid, Uuid().toString(), 0);
+        }
         return node;
     }
 
