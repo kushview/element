@@ -149,43 +149,6 @@ void AppController::handleMessage (const Message& msg)
     {
         ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);
     }
-    else if (const auto* rnm = dynamic_cast<const RemoveNodeMessage*> (&msg))
-    {
-        
-    }
-    else if (const auto* acm = dynamic_cast<const AddConnectionMessage*> (&msg))
-    {
-        if (acm->useChannels())
-        {
-            jassertfalse;
-            // ec->connectChannels (acm->sourceNode, acm->sourceChannel, acm->destNode, acm->destChannel);
-        }
-        else
-        {
-            if (!acm->target.isValid() || acm->target.isRootGraph())
-                ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort);
-            else if (acm->target.isGraph())
-                ec->addConnection (acm->sourceNode, acm->sourcePort, acm->destNode, acm->destPort, acm->target);
-            else
-                handled = false;
-        }
-    }
-    else if (const auto* rcm = dynamic_cast<const RemoveConnectionMessage*> (&msg))
-    {
-        if (rcm->useChannels())
-		{
-            jassertfalse; // channels not yet supported
-        }
-        else
-        {
-            if (! rcm->target.isValid() || rcm->target.isRootGraph())
-                ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort);
-            else if (rcm->target.isGraph())
-                ec->removeConnection (rcm->sourceNode, rcm->sourcePort, rcm->destNode, rcm->destPort, rcm->target);
-            else
-                handled = false;
-        }
-    }
     else if (const auto* dnm = dynamic_cast<const DuplicateNodeMessage*> (&msg))
     {
         Node node = dnm->node;
@@ -239,24 +202,6 @@ void AppController::handleMessage (const Message& msg)
             ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
-    }
-    else if (const auto* apm = dynamic_cast<const AddPluginMessage*> (&msg))
-    {
-        const auto graph (apm->graph);
-        const auto desc (apm->description);
-        
-        if (desc.fileOrIdentifier == "element.graph" && !getWorld().getUnlockStatus().isFullVersion())
-        {
-            Alert::showProductLockedAlert ("Nested graphs are not supported without a license");
-        }
-        else if (graph.isGraph())
-        {
-            ec->addPlugin (graph, desc, apm->builder, apm->verified);
-        }
-        else
-        {
-            handled = false;
-        }
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
