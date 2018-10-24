@@ -124,7 +124,7 @@ class AddNodeMessage : public Message
 public:
     AddNodeMessage (const Node& n, const Node& t = Node())
         : node (n.getValueTree().createCopy()),
-          target(t)
+          target (t)
     { }
     
     const Node node;

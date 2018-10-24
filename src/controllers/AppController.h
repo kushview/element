@@ -18,6 +18,7 @@ public:
     inline CommandManager& getCommandManager() { return commands; }
     inline Globals& getWorld() { return getGlobals(); }
     inline Globals& getGlobals() { return world; }
+    inline UndoManager& getUndoManager() { return undo; }
     
     void activate() override;
     void deactivate() override;

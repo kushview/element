@@ -106,6 +106,11 @@ void AppController::run()
             sc->openDefaultSession();
     }
     
+    sessCtl->resetChanges();
+    sessCtl->setChangesFrozen (false);
+    devsCtl->refresh();
+    presets->refresh();
+
     if (auto* gui = findChild<GuiController>())
     {
         const Node graph (session->getCurrentGraph());
@@ -113,11 +118,6 @@ void AppController::run()
         if (graph.isValid())
             gui->showPluginWindowsFor (graph);
     }
-    
-    sessCtl->resetChanges();
-    sessCtl->setChangesFrozen (false);
-    devsCtl->refresh();
-    presets->refresh();
 }
 
 void AppController::handleMessage (const Message& msg)
@@ -335,11 +335,13 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::undo: {
             if (undo.canUndo())
                 undo.undo();
+            findChild<GuiController>()->stabilizeContent();
         } break;
         
         case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
+            findChild<GuiController>()->stabilizeContent();
         } break;
 
         case Commands::sessionOpen:

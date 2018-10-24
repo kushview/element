@@ -556,14 +556,20 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Quit", "Quit the app", Commands::Categories::Application, 0);
             result.addDefaultKeypress ('q', ModifierKeys::commandModifier);
             break;
-        case Commands::undo:
+        
+        case Commands::undo: {
+            int flags = getAppController().getUndoManager().canUndo() ? 0 : Info::isDisabled;
             result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, 0);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
-            break;
-        case Commands::redo:
-            result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, 0);
+        } break;
+        case Commands::redo: {
+            bool canRedo = getAppController().getUndoManager().canRedo();
+            int flags = canRedo ? 0 : Info::isDisabled;
+            DBG("can redo: " << (int) canRedo);
+            result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
-            break;
+        } break;
+        
         case Commands::cut:
             result.setInfo ("Cut", "Cut", Commands::Categories::Application, 0);
             break;
@@ -687,6 +693,8 @@ void GuiController::stabilizeContent()
 {
     if (auto* cc = content.get())
         cc->stabilize();
+    if (auto* win = mainWindow.get())
+        win->refreshMenu();
 }
 
 void GuiController::toggleAboutScreen()
