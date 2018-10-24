@@ -58,6 +58,8 @@ void RemoveNodeMessage::createActions (AppController& app,
             : app(a), nodeUuid (node.getUuid()), targetGraph (node.getParentGraph())
         {
             node.getArcs (arcs);
+            Node mutableNode (node);
+            mutableNode.savePluginState();
             nodeData = node.getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (nodeData);
         }

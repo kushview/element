@@ -200,14 +200,13 @@ uint32 GraphController::addNode (const Node& newNode)
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Tags::object, node, nullptr)
             .setProperty (Tags::type, node->getTypeString(), nullptr);
-        
         data.removeProperty ("relativeX", nullptr);
         data.removeProperty ("relativeY", nullptr);
         data.removeProperty ("windowX", nullptr);
         data.removeProperty ("windowY", nullptr);
         data.removeProperty ("windowVisible", nullptr);
 
-        Node n (data, false);
+        Node n (data, true);
         n.restorePluginState();
         
         PortArray ins, outs;
