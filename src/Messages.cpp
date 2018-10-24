@@ -95,6 +95,76 @@ private:
     }
 };
 
+class AddConnectionAction : public UndoableAction
+{
+public:
+    AddConnectionAction (AppController& a, const Node& targetGraph,
+                                           const uint32 sn, const uint32 sp,
+                                           const uint32 dn, const uint32 dp)
+        : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
+    { }
+
+    bool perform() override
+    {
+        auto& ec = *app.findChild<EngineController>();
+        if (! graph.isValid())
+            ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
+        else
+            ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort, graph);
+        return true;
+    }
+
+    bool undo() override
+    {
+        auto& ec = *app.findChild<EngineController>();
+        if (! graph.isValid())
+            ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
+        else
+            ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort, graph);
+        return true;
+    }
+
+private:
+    AppController& app;
+    const Node graph;
+    const Arc arc;
+};
+
+class RemoveConnectionAction : public UndoableAction
+{
+public:
+    RemoveConnectionAction (AppController& a, const Node& targetGraph,
+                                              const uint32 sn, const uint32 sp,
+                                              const uint32 dn, const uint32 dp)
+        : app (a), graph (targetGraph), arc (sn, sp, dn, dp)
+    { }
+
+    bool perform() override
+    {
+        auto& ec = *app.findChild<EngineController>();
+        if (! graph.isValid())
+            ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
+        else
+            ec.removeConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort, graph);
+        return true;
+    }
+
+    bool undo() override
+    {
+        auto& ec = *app.findChild<EngineController>();
+        if (! graph.isValid())
+            ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort);
+        else
+            ec.addConnection (arc.sourceNode, arc.sourcePort, arc.destNode, arc.destPort, graph);
+        return true;
+    }
+
+private:
+    AppController& app;
+    const Node graph;
+    const Arc arc;
+};
+
 void AddPluginMessage::createActions (AppController& app, OwnedArray<UndoableAction>& actions) const
 {
     actions.add (new AddPluginAction (app, *this));
@@ -106,6 +176,18 @@ void RemoveNodeMessage::createActions (AppController& app, OwnedArray<UndoableAc
         actions.add (new RemoveNodeAction (app, node));
     for (const auto& n : nodes)
         actions.add (new RemoveNodeAction (app, n));
+}
+
+void AddConnectionMessage::createActions (AppController& app, OwnedArray<UndoableAction>& actions) const
+{
+    jassert (usePorts()); // channel-ports not yet supported
+    actions.add (new AddConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));
+}
+
+void RemoveConnectionMessage::createActions (AppController& app, OwnedArray<UndoableAction>& actions) const
+{
+    jassert (usePorts()); // channel-ports not yet supported
+    actions.add (new RemoveConnectionAction (app, target, sourceNode, sourcePort, destNode, destPort));
 }
 
 }

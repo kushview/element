@@ -85,10 +85,12 @@ struct AddConnectionMessage : public AppMessage
 
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }
+    void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 /** Send this to remove a connection from the graph */
-class RemoveConnectionMessage : public Message {
+class RemoveConnectionMessage : public AppMessage
+{
 public:
     RemoveConnectionMessage (uint32 s, int sc, uint32 d, int dc, const Node& t = Node()) 
         : target (t)
@@ -114,6 +116,7 @@ public:
     
     inline bool useChannels() const { return sourceChannel >= 0 && destChannel >= 0; }
     inline bool usePorts() const { return !useChannels(); }
+    void createActions (AppController& app, OwnedArray<UndoableAction>& actions) const override;
 };
 
 class AddNodeMessage : public Message
