@@ -16,7 +16,6 @@ public:
     bool perform() override
     {
         addedNode = Node();
-
         if (auto* ec = app.findChild<EngineController>())
             if (graph.isGraph())
                 addedNode = ec->addPlugin (graph, description, builder, verified);

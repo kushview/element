@@ -20,6 +20,7 @@ class Node;
 class RackView;
 class TransportBar;
 class VirtualKeyboardView;
+class NodeChannelStripView;
 
 class ContentView : public Component,
                     public ApplicationCommandTarget,
@@ -89,6 +90,9 @@ public:
     void toggleVirtualKeyboard();
     VirtualKeyboardView* getVirtualKeyboardView() const { return keyboard.get(); }
     
+    void setNodeChannelStripVisible (const bool isVisible);
+    bool isNodeChannelStripVisible() const;
+
     void setCurrentNode (const Node& node);
     void stabilize (const bool refreshDataPathTrees = false);
     
@@ -129,6 +133,7 @@ private:
     ScopedPointer<StatusBar> statusBar;
     
     ScopedPointer<VirtualKeyboardView> keyboard;
+    ScopedPointer<NodeChannelStripView> nodeStrip;
         
     bool statusBarVisible;
     int statusBarSize;
@@ -136,6 +141,7 @@ private:
     int toolBarSize;
     bool virtualKeyboardVisible = false;
     int virtualKeyboardSize = 80;
+    int nodeStripSize = 90;
     
     String lastMainView;
     

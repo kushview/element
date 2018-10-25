@@ -28,15 +28,11 @@ public:
     /** Destructor. */
     ~HorizontalListBox();
     
-    
-    
     /** Changes the current data model to display. */
     void setModel (ListBoxModel* newModel);
     
     /** Returns the current list model. */
     ListBoxModel* getModel() const noexcept                     { return model; }
-    
-    
     
     /** Causes the list to refresh its content.
      
@@ -50,44 +46,44 @@ public:
     
     /** Turns on multiple-selection of rows.
      
-     By default this is disabled.
+        By default this is disabled.
      
-     When your row component gets clicked you'll need to call the
-     selectRowsBasedOnModifierKeys() method to tell the list that it's been
-     clicked and to get it to do the appropriate selection based on whether
-     the ctrl/shift keys are held down.
+        When your row component gets clicked you'll need to call the
+        selectRowsBasedOnModifierKeys() method to tell the list that it's been
+        clicked and to get it to do the appropriate selection based on whether
+        the ctrl/shift keys are held down.
      */
     void setMultipleSelectionEnabled (bool shouldBeEnabled) noexcept;
     
     /** If enabled, this makes the listbox flip the selection status of
-     each row that the user clicks, without affecting other selected rows.
-     
-     (This only has an effect if multiple selection is also enabled).
-     If not enabled, you can still get the same row-flipping behaviour by holding
-     down CMD or CTRL when clicking.
+        each row that the user clicks, without affecting other selected rows.
+        
+        (This only has an effect if multiple selection is also enabled).
+        If not enabled, you can still get the same row-flipping behaviour by holding
+        down CMD or CTRL when clicking.
      */
     void setClickingTogglesRowSelection (bool flipRowSelection) noexcept;
     
     /** Makes the list react to mouse moves by selecting the row that the mouse if over.
      
-     This function is here primarily for the ComboBox class to use, but might be
-     useful for some other purpose too.
+        This function is here primarily for the ComboBox class to use, but might be
+        useful for some other purpose too.
      */
     void setMouseMoveSelectsRows (bool shouldSelect);
     
     
     /** Selects a row.
      
-     If the row is already selected, this won't do anything.
+        If the row is already selected, this won't do anything.
      
-     @param rowNumber                the row to select
-     @param dontScrollToShowThisRow  if true, the list's position won't change; if false and
-     the selected row is off-screen, it'll scroll to make
-     sure that row is on-screen
-     @param deselectOthersFirst      if true and there are multiple selections, these will
-     first be deselected before this item is selected
-     @see isRowSelected, selectRowsBasedOnModifierKeys, flipRowSelection, deselectRow,
-     deselectAllRows, selectRangeOfRows
+        @param rowNumber                the row to select
+        @param dontScrollToShowThisRow  if true, the list's position won't change; if false and
+        the selected row is off-screen, it'll scroll to make
+        sure that row is on-screen
+        @param deselectOthersFirst      if true and there are multiple selections, these will
+        first be deselected before this item is selected
+        @see isRowSelected, selectRowsBasedOnModifierKeys, flipRowSelection, deselectRow,
+        deselectAllRows, selectRangeOfRows
      */
     void selectRow (int rowNumber,
                     bool dontScrollToShowThisRow = false,
@@ -95,11 +91,11 @@ public:
     
     /** Selects a set of rows.
      
-     This will add these rows to the current selection, so you might need to
-     clear the current selection first with deselectAllRows()
-     
-     @param firstRow     the first row to select (inclusive)
-     @param lastRow      the last row to select (inclusive)
+        This will add these rows to the current selection, so you might need to
+        clear the current selection first with deselectAllRows()
+        
+        @param firstRow     the first row to select (inclusive)
+        @param lastRow      the last row to select (inclusive)
      */
     void selectRangeOfRows (int firstRow,
                             int lastRow);
@@ -345,23 +341,23 @@ public:
     int getVisibleContentWidth() const noexcept;
     
     /** Repaints one of the rows.
-     
-     This does not invoke updateContent(), it just invokes a straightforward repaint
-     for the area covered by this row.
+
+        This does not invoke updateContent(), it just invokes a straightforward repaint
+        for the area covered by this row.
      */
     void repaintRow (int rowNumber) noexcept;
     
     /** This fairly obscure method creates an image that just shows the currently
-     selected row components.
-     
-     It's a handy method for doing drag-and-drop, as it can be passed to the
-     DragAndDropContainer for use as the drag image.
-     
-     Note that it will make the row components temporarily invisible, so if you're
-     using custom components this could affect them if they're sensitive to that
-     sort of thing.
-     
-     @see Component::createComponentSnapshot
+        selected row components.
+
+        It's a handy method for doing drag-and-drop, as it can be passed to the
+        DragAndDropContainer for use as the drag image.
+
+        Note that it will make the row components temporarily invisible, so if you're
+        using custom components this could affect them if they're sensitive to that
+        sort of thing.
+
+        @see Component::createComponentSnapshot
      */
     virtual Image createSnapshotOfSelectedRows (int& x, int& y);
     
@@ -397,7 +393,6 @@ public:
     void startDragAndDrop (const MouseEvent&, const var& dragDescription, bool allowDraggingToOtherWindows);
     
 private:
-    
     JUCE_PUBLIC_IN_DLL_BUILD (class ListViewport)
     JUCE_PUBLIC_IN_DLL_BUILD (class RowComponent)
     friend class ListViewport;
@@ -415,10 +410,10 @@ private:
     void selectRowInternal (int rowNumber, bool dontScrollToShowThisRow,
                             bool deselectOthersFirst, bool isMouseClick);
     
-#if JUCE_CATCH_DEPRECATED_CODE_MISUSE
+   #if JUCE_CATCH_DEPRECATED_CODE_MISUSE
     // This method's bool parameter has changed: see the new method signature.
     JUCE_DEPRECATED (void setSelectedRows (const SparseSet<int>&, bool));
-#endif
+   #endif
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HorizontalListBox)
 };

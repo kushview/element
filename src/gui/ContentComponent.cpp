@@ -13,7 +13,9 @@
 #include "gui/ConnectionGrid.h"
 #include "gui/ControllerDevicesView.h"
 #include "gui/GraphEditorView.h"
+#include "gui/GraphMixerView.h"
 #include "gui/KeymapEditorView.h"
+#include "gui/NodeChannelStripView.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
 #include "gui/NavigationView.h"
@@ -43,10 +45,20 @@
  #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
 
+#ifndef EL_USE_GRAPH_MIXER_VIEW
+ #define EL_USE_GRAPH_MIXER_VIEW 0
+#endif
+
+#ifndef EL_USE_NODE_CHANNEL_STRIP
+ #define EL_USE_NODE_CHANNEL_STRIP 1
+#endif
+
 #define EL_NAV_MIN_WIDTH 100
 #define EL_NAV_MAX_WIDTH 360
 
 namespace Element {
+
+
 
 static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
 {
@@ -487,15 +499,20 @@ public:
     
     void setAccessoryView (ContentView* view)
     {
+        if (view)
+            view->initializeView (owner.getAppController());
         if (content2)
             removeChildComponent (content2);
+       
         content2 = view;
+        
         if (content2)
         {
             content2->willBecomeActive();
             addAndMakeVisible (content2);
             content2->didBecomeActive();
         }
+
         updateLayout();
         resized();
     }
@@ -542,7 +559,7 @@ public:
     Resizer (ContentComponent& contentComponent, StretchableLayoutManager* layoutToUse,
              int itemIndexInLayout, bool isBarVertical)
     : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
-    owner (contentComponent)
+      owner (contentComponent)
     { }
     
     void mouseDown (const MouseEvent& ev) override
@@ -610,6 +627,13 @@ ContentComponent::ContentComponent (AppController& ctl_)
     container->setMainView (createLastContentView (settings));
     setVirtualKeyboardVisible (virtualKeyboardSetting (settings));
     
+   #if EL_USE_NODE_CHANNEL_STRIP
+    addAndMakeVisible (nodeStrip = new NodeChannelStripView());
+   #endif
+   
+   #if EL_USE_GRAPH_MIXER_VIEW
+    setAccessoryView ("GraphMixerView");
+   #endif
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
     
@@ -719,8 +743,19 @@ void ContentComponent::setContentView (ContentView* view, const bool accessory)
 
 void ContentComponent::setAccessoryView (const String& name)
 {
+    bool wasAdded = true;
     if (name == "PatchBay") {
-        setContentView (new ConnectionGrid());
+        setContentView (new ConnectionGrid(), true);
+    } else if (name == "GraphMixerView") {
+        setContentView (new GraphMixerView(), true);
+    }
+    else
+    {
+        wasAdded = false;
+    }
+    if (wasAdded)
+    {
+        container->setShowAccessoryView (true);
     }
 }
 
@@ -739,7 +774,9 @@ void ContentComponent::resized()
         statusBar->setBounds (r.removeFromBottom (statusBarSize));
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
-    
+    if (nodeStrip && nodeStrip->isVisible())
+        nodeStrip->setBounds (r.removeFromRight (nodeStripSize));
+
     Component* comps [3] = { nav.get(), bar1.get(), container.get() };
     layout.layOutComponents (comps, 3, r.getX(), r.getY(),
                              r.getWidth(), r.getHeight(),
@@ -956,6 +993,30 @@ void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
     virtualKeyboardVisible = isVisible;
     resized();
 }
+
+void ContentComponent::setNodeChannelStripVisible (const bool isVisible)
+{
+    if (! nodeStrip) nodeStrip = new NodeChannelStripView();
+    if (isVisible == nodeStrip->isVisible())
+        return;
+    
+    if (isVisible)
+    {
+        nodeStrip->willBecomeActive();
+        addAndMakeVisible (nodeStrip);
+        nodeStrip->didBecomeActive();
+        if (nodeStrip->isShowing() || nodeStrip->isOnDesktop())
+            nodeStrip->grabKeyboardFocus();
+    }
+    else
+    {
+        nodeStrip->setVisible (false);
+    }
+    
+    resized();
+}
+
+bool ContentComponent::isNodeChannelStripVisible() const { return nodeStrip && nodeStrip->isVisible(); }
 
 void ContentComponent::toggleVirtualKeyboard()
 {

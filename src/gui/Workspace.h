@@ -25,27 +25,26 @@
 
 namespace Element {
 
-    class Workspace :  public Component
-    {
-    public:
+class Workspace :  public Component
+{
+public:
 
-        Workspace();
-        virtual ~Workspace();
+    Workspace();
+    virtual ~Workspace();
 
-        void setMainComponent (Component* c);
+    void setMainComponent (Component* c);
 
-        void paint (Graphics& g);
-        void mouseDown (const MouseEvent& ev);
+    void paint (Graphics& g);
+    void mouseDown (const MouseEvent& ev);
 
-        void resized();
+    void resized();
 
-        Dock& getDock();
+    Dock& getDock();
 
-    private:
+private:
+    ScopedPointer<Dock> dock;
 
-        ScopedPointer<Dock> dock;
-
-    };
+};
 
 }
 

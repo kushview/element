@@ -148,6 +148,11 @@ public:
             if (auto* gui = app.findChild<GuiController>())
                 gui->stabilizeContent();
         }
+        else if (index == 5555)
+        {
+            auto *cc = ViewHelpers::findContentComponent (&owner);
+            cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
+        }
         #endif
         
         if (menu == File && index >= recentMenuOffset)
@@ -280,6 +285,7 @@ private:
         menu.addItem (2222, "Show changed status");
         menu.addItem (3333, "Quick Map");
         menu.addItem (4444, "Refresh Mapping Engine");
+        menu.addItem (5555, "Toggle Node Channel Strip");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     
