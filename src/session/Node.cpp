@@ -430,11 +430,31 @@ namespace Element {
         return node;
     }
     
-    Node Node::getNodeByUuid (const Uuid& uuid) const
+    static Node findNodeRecursive (const Node& node, const Uuid& uuid)
     {
-        const ValueTree nodes = getNodesValueTree();
-        Node node (nodes.getChildWithProperty (Tags::uuid, uuid.toString()), false);
-        return node;
+        Node found;
+        for (int i = node.getNumNodes(); --i >= 0;)
+        {
+            found = node.getNode (i);
+            if (found.getUuid() == uuid)
+                return found;
+            found = findNodeRecursive (found, uuid);
+            if (found.isValid())
+                break;
+        }
+        return found;
+    }
+
+    Node Node::getNodeByUuid (const Uuid& uuid, const bool recursive) const
+    {
+        if (! recursive)
+        {
+            const ValueTree nodes = getNodesValueTree();
+            Node node (nodes.getChildWithProperty (Tags::uuid, uuid.toString()), false);
+            return node;
+        }
+
+        return findNodeRecursive (*this, uuid);
     }
 
     Port Node::getPort (const int index) const

@@ -556,15 +556,22 @@ void EngineController::removeNode (const Uuid& uuid)
 {
     auto session = getWorld().getSession();
     Node nodeToRemove = Node();
+
     for (int i = 0; i < session->getNumGraphs(); ++i)
     {
-        nodeToRemove = session->getGraph(i).getNodeByUuid (uuid);
+        nodeToRemove = session->getGraph(i).getNodeByUuid (uuid, true);
         if (nodeToRemove.isValid())
             break;
     }
 
     if (nodeToRemove.isValid())
+    {
         removeNode (nodeToRemove);
+    }
+    else
+    {
+        DBG("[EL] node not found: " << uuid.toString());
+    }
 }
 
 void EngineController::removeNode (const uint32 nodeId)

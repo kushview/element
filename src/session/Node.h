@@ -267,7 +267,7 @@ namespace Element {
         void getPossibleDestinations (NodeArray& nodes) const;
         
         Node getNodeById (const uint32 nodeId) const;
-        Node getNodeByUuid (const Uuid& uuid) const;
+        Node getNodeByUuid (const Uuid& uuid, const bool recursive = true) const;
 
         void resetPorts();
         Port getPort (const int index) const;
