@@ -27,7 +27,7 @@ public:
     void addNode (const Node& node);
     
     /** Adds a new node to a specificied graph */
-    void addNode (const Node& node, const Node& target, const ConnectionBuilder&);
+    Node addNode (const Node& node, const Node& target, const ConnectionBuilder&);
 
     /** Adds a plugin by description to the current graph */
     void addPlugin (const PluginDescription& desc, const bool verified = true, const float rx = 0.5f, const float ry = 0.5f);

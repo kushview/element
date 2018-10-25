@@ -465,7 +465,7 @@ void EngineController::removeConnection (const uint32 s, const uint32 sp, const 
         controller->removeConnection (s, sp, d, dp);
 }
 
-void EngineController::addNode (const Node& node, const Node& target,
+Node EngineController::addNode (const Node& node, const Node& target,
                                 const ConnectionBuilder& builder)
 {
     if (auto* controller = graphs->findGraphControllerFor (target))
@@ -475,8 +475,11 @@ void EngineController::addNode (const Node& node, const Node& target,
         if (referencedNode.isValid())
         {
             builder.addConnections (*controller, nodeId);
+            return referencedNode;
         }
-    }    
+    }
+
+    return Node();
 }
 
 void EngineController::addNode (const Node& node)

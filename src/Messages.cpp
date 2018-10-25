@@ -19,7 +19,6 @@ public:
         if (auto* ec = app.findChild<EngineController>())
             if (graph.isGraph())
                 addedNode = ec->addPlugin (graph, description, builder, verified);
-
         return addedNode.isValid();
     }
 
@@ -27,6 +26,9 @@ public:
     {
         if (! addedNode.isValid())
             return false;
+        if (! havePosition)
+            addedNode.getRelativePosition (x, y);
+        havePosition = true;
         if (auto* ec = app.findChild<EngineController>())
             ec->removeNode (addedNode);
         addedNode = Node();
@@ -39,6 +41,8 @@ private:
     const PluginDescription description;
     const ConnectionBuilder builder;
     const bool verified = true;
+    double x, y;
+    bool havePosition = false;
     Node addedNode;
 };
 
@@ -69,13 +73,12 @@ public:
         bool handled = true;
 
         const Node newNode (nodeData, false);
-        ec.addNode (newNode, targetGraph, builder);
+        auto createdNode (ec.addNode (newNode, targetGraph, builder));
+        createdNode.setRelativePosition (x, y); // TODO: GraphController should handle this
 
         for (const auto* arc : arcs)
-        {
             ec.addConnection (arc->sourceNode, arc->sourcePort,
                 arc->destNode, arc->destPort, targetGraph);
-        }
 
         return handled;
     }
