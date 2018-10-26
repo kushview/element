@@ -335,13 +335,18 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::undo: {
             if (undo.canUndo())
                 undo.undo();
-            findChild<GuiController>()->stabilizeContent();
+            if (auto* cc = findChild<GuiController>()->getContentComponent())
+                cc->stabilizeViews();
+            findChild<GuiController>()->refreshMainMenu();
+
         } break;
         
-        case Commands::redo: {
+        case Commands::redo:{
             if (undo.canRedo())
                 undo.redo();
-            findChild<GuiController>()->stabilizeContent();
+            if (auto* cc = findChild<GuiController>()->getContentComponent())
+                cc->stabilizeViews();
+            findChild<GuiController>()->refreshMainMenu();
         } break;
 
         case Commands::sessionOpen:

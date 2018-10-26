@@ -42,6 +42,7 @@ namespace Element {
         void openWindow (Component* c);
         
         MainWindow* getMainWindow() const { return mainWindow.get(); }
+        void refreshMainMenu();
         
         void runDialog (const String& uri);
         void runDialog (Component* c, const String& title = String());

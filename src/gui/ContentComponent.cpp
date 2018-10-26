@@ -923,6 +923,14 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
             data->refresh();
 }
 
+void ContentComponent::stabilizeViews()
+{
+    if (container->content1)
+        container->content1->stabilizeContent();
+    if (container->content2)
+        container->content2->stabilizeContent();
+}
+
 void ContentComponent::saveState (PropertiesFile* props)
 {
     jassert (props);

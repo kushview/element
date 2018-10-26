@@ -95,7 +95,8 @@ public:
 
     void setCurrentNode (const Node& node);
     void stabilize (const bool refreshDataPathTrees = false);
-    
+    void stabilizeViews();
+
     void post (Message*);
     AppController& getAppController() { return controller; }
     Globals& getGlobals();

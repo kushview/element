@@ -693,6 +693,11 @@ void GuiController::stabilizeContent()
 {
     if (auto* cc = content.get())
         cc->stabilize();
+    refreshMainMenu();
+}
+
+void GuiController::refreshMainMenu()
+{
     if (auto* win = mainWindow.get())
         win->refreshMenu();
 }
