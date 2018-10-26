@@ -12,7 +12,6 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
-    
     setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
     setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
@@ -23,7 +22,7 @@ LookAndFeel::LookAndFeel()
     // Slider
     setColour (Slider::thumbColourId,               Colours::black);
     setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
-    setColour (Slider::trackColourId,               Colours::red);
+    setColour (Slider::trackColourId,               Colours::black);
     
     // Text Editor
     setColour (TextEditor::textColourId,            textColor);
@@ -64,7 +63,6 @@ LookAndFeel::LookAndFeel()
 
     // List Box
     setColour (ListBox::textColourId, textColor);
-    
 }
 
 
@@ -136,6 +134,40 @@ void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float> 
                                             Colour backgroundColour, bool isOpen, bool isMouseOver)
 {
     LookAndFeel_KV1::drawTreeviewPlusMinusBox (g, area, backgroundColour, isOpen, isMouseOver);
+}
+
+void LookAndFeel::drawLinearSliderBackground (Graphics& g, int x, int y, int width, int height,
+                                              float /*sliderPos*/,
+                                              float /*minSliderPos*/,
+                                              float /*maxSliderPos*/,
+                                              const Slider::SliderStyle /*style*/, 
+                                              Slider& slider)
+{
+    const float sliderRadius = (float) (getSliderThumbRadius (slider) - 4);
+
+    const Colour trackColour (slider.findColour (Slider::trackColourId));
+    const Colour gradCol1 (trackColour.overlaidWith (Colour (slider.isEnabled() ? 0x13000000 : 0x09000000)));
+    const Colour gradCol2 (trackColour.overlaidWith (Colour (0x06000000)));
+    Path indent;
+    const float cornerSize = 1.f;
+
+    if (slider.isHorizontal())
+    {
+        auto iy = y + height * 0.5f - sliderRadius * 0.5f;
+        g.setGradientFill (ColourGradient::vertical (gradCol1, iy, gradCol2, iy + sliderRadius));
+        indent.addRoundedRectangle (x - sliderRadius * 0.5f, iy, width + sliderRadius, sliderRadius, cornerSize);
+    }
+    else
+    {
+        auto ix = x + width * 0.5f - sliderRadius * 0.5f;
+        g.setGradientFill (ColourGradient::horizontal (gradCol1, ix, gradCol2, ix + sliderRadius));
+        indent.addRoundedRectangle (ix, y - sliderRadius * 0.5f, sliderRadius, height + sliderRadius, cornerSize);
+    }
+
+    g.fillPath (indent);
+
+    g.setColour (trackColour.contrasting (0.5f));
+    g.strokePath (indent, PathStrokeType (0.5f));
 }
 
 }

@@ -99,6 +99,8 @@ GuiController::GuiController (Globals& w, AppController& a)
 
 GuiController::~GuiController()
 {
+    nodeSelected.disconnect_all_slots();
+
     if (sSystemTray != nullptr)
     {
         sSystemTray->removeFromDesktop();

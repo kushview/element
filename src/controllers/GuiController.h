@@ -1,14 +1,14 @@
 
 #pragma once
 
-#include "ElementApp.h"
 #include "controllers/AppController.h"
-#include "session/Session.h"
 #include "gui/LookAndFeel.h"
 #include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
 #include "session/CommandManager.h"
-#include "URIs.h"
+#include "session/Node.h"
+#include "session/Session.h"
+#include "Signals.h"
 
 namespace Element {
     class AboutComponent;
@@ -25,6 +25,7 @@ namespace Element {
                           public Timer
     {
     public:
+        Signal nodeSelected;
         GuiController (Globals& w, AppController& a);
         ~GuiController();
         
@@ -98,6 +99,16 @@ namespace Element {
         void clearContentComponent();
        #endif
 
+        // TODO: content manager on selected nodes
+        Node getSelectedNode() const    { return selectedNode; }
+        // TODO: content manager on selected nodes.
+        // WARNING: don't call from outside the main thread.
+        void selectNode (const Node& node)
+        {
+            selectedNode = node;
+            nodeSelected();
+        }
+
     private:
         AppController& controller;
         Globals& world;
@@ -107,6 +118,8 @@ namespace Element {
         ScopedPointer<MainWindow>        mainWindow;
         ScopedPointer<ContentComponent>  content;
         ScopedPointer<AboutComponent>    about;
+        
+        Node selectedNode; // TODO: content manager
 
         struct KeyPressManager;
         ScopedPointer<KeyPressManager> keys;

@@ -628,7 +628,7 @@ ContentComponent::ContentComponent (AppController& ctl_)
     setVirtualKeyboardVisible (virtualKeyboardSetting (settings));
     
    #if EL_USE_NODE_CHANNEL_STRIP
-    addAndMakeVisible (nodeStrip = new NodeChannelStripView());
+    setNodeChannelStripVisible (true);
    #endif
    
    #if EL_USE_GRAPH_MIXER_VIEW
@@ -1004,7 +1004,12 @@ void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 
 void ContentComponent::setNodeChannelStripVisible (const bool isVisible)
 {
-    if (! nodeStrip) nodeStrip = new NodeChannelStripView();
+    if (! nodeStrip)
+    {
+        nodeStrip = new NodeChannelStripView();
+        nodeStrip->initializeView (getAppController());
+    }
+
     if (isVisible == nodeStrip->isVisible())
         return;
     
@@ -1013,6 +1018,7 @@ void ContentComponent::setNodeChannelStripVisible (const bool isVisible)
         nodeStrip->willBecomeActive();
         addAndMakeVisible (nodeStrip);
         nodeStrip->didBecomeActive();
+        nodeStrip->stabilizeContent();
         if (nodeStrip->isShowing() || nodeStrip->isOnDesktop())
             nodeStrip->grabKeyboardFocus();
     }

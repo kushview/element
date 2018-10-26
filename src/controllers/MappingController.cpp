@@ -82,17 +82,7 @@ public:
         for (int i = 0; i < session->getNumGraphs(); ++i)
         {
             const auto graph (session->getGraph (i));
-            for (int j = 0; j < graph.getNumNodes(); ++j)
-            {
-                const auto node (graph.getNode (j));
-                if (GraphNodePtr object = node.getGraphNode())
-                    if (auto* proc = object->getAudioProcessor())
-                        { 
-                            nodeMap2.set (proc, node);
-                            proc->addListener (this); 
-                            DBG("[EL] added listener: " << proc->getName());
-                        }
-            }
+            addNodesRecursive (graph);
         }
 
         capture.set (true);
@@ -104,6 +94,25 @@ public:
     AudioProcessor* processor   = nullptr;
     int parameter               = -1;
     HashMap<AudioProcessor*, Node> nodeMap2;
+
+private:
+    void addNodesRecursive (const Node& node)
+    {
+        for (int j = 0; j < node.getNumNodes(); ++j)
+        {
+            const auto n (node.getNode (j));
+            if (GraphNodePtr object = n.getGraphNode())
+            {
+                if (auto* proc = object->getAudioProcessor())
+                { 
+                    nodeMap2.set (proc, n);
+                    proc->addListener (this); 
+                }
+            }
+            if (n.getNumChildren() > 0)
+                addNodesRecursive (n);
+        }
+    }
 };
 
 class MappingController::Impl

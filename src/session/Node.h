@@ -185,6 +185,18 @@ namespace Element {
                  objectData.getProperty(Tags::identifier) == "audio.output");
         }
         
+        inline bool isAudioInputNode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                objectData.getProperty(Tags::identifier) == "audio.input";
+        }
+
+        inline bool isAudioOutputNode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                objectData.getProperty(Tags::identifier) == "audio.output";
+        }
+
         inline bool isMidiIONode() const
         {
             return objectData.getProperty(Tags::format) == "Internal" &&

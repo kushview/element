@@ -239,7 +239,9 @@ public:
         toFront (true);
         dragging = false;
         selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
-        
+        if (auto* cc = ViewHelpers::findContentComponent (this))
+            cc->getAppController().findChild<GuiController>()->selectNode (node);
+
         if (e.mods.isPopupMenu())
         {
             auto* const world = ViewHelpers::getGlobals (this);

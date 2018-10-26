@@ -61,7 +61,8 @@ public:
     ~PowerButton() { }
 };
 
-class DragableIntLabel : public Component
+class DragableIntLabel : public Component,
+                         public Value::Listener
 {
 public:
     enum ColourIds
@@ -71,8 +72,16 @@ public:
         backgroundOnColorId
     };
     
-    DragableIntLabel() { tempoValue.setValue (120.0); }
-    ~DragableIntLabel() { }
+    DragableIntLabel()
+    { 
+        tempoValue.addListener (this);
+        setValue (120.0);
+    }
+    
+    ~DragableIntLabel()
+    { 
+        tempoValue.removeListener (this);
+    }
     
     void paint (Graphics& g) override
     {
@@ -83,7 +92,11 @@ public:
         String text;
         if (isEnabled() && tempoValue.toString().isNotEmpty())
         {
-            text = String ((double) tempoValue.getValue(), 0);
+            const auto val = (double) tempoValue.getValue();
+            if (val <= minValue && useMinMax && textWhenMinimum.isNotEmpty())
+                text = textWhenMinimum;
+            else
+                text = String (val, places);
         }
         else
         {
@@ -122,8 +135,7 @@ public:
         
         if (tempo != newTempo)
         {
-            tempoValue.setValue (newTempo);
-            repaint();
+            setValue (newTempo);
         }
         
         lastY = ev.getDistanceFromDragStartY();
@@ -139,11 +151,46 @@ public:
     
     void setDragable (const bool yn) { dragable = yn; }
     
+    inline void setValue (double value)
+    {
+        if (useMinMax)
+        {
+            if (value < minValue) value = minValue;
+            if (value > maxValue) value = maxValue;
+        }
+
+        tempoValue.setValue (value); 
+        repaint();    
+    }
+
+    inline void setMinMax (const double newMin, const double newMax)
+    {
+        useMinMax = true;
+        minValue = newMin;
+        maxValue = newMax;
+        jassert (maxValue > minValue);
+        const double val = (double) tempoValue.getValue();
+        if (val < minValue) setValue (minValue);
+        if (val > maxValue) setValue (maxValue);
+    }
+
+    inline void setTextWhenMinimum (const String& t) { textWhenMinimum = t; repaint(); }
+    inline Value& getValueObject() { return tempoValue; }
+
+    void setNumDecimalPlaces (const int numPlaces) { places = jmax (0, numPlaces); repaint(); }
+
+    /** @internal */
+    inline void valueChanged (Value&) override { repaint(); }
+
     Value tempoValue;
     int stickyValue = 0;
+    String textWhenMinimum;
     int decimalPlaces = 0;
     int lastY = 0;
-    
+    int places = 0;
+    bool useMinMax = false;
+    double minValue = 0.0, maxValue = 0.0;
+
 private:
     bool dragable = true;
 };
