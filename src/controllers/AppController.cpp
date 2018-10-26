@@ -338,10 +338,9 @@ bool AppController::perform (const InvocationInfo& info)
             if (auto* cc = findChild<GuiController>()->getContentComponent())
                 cc->stabilizeViews();
             findChild<GuiController>()->refreshMainMenu();
-
         } break;
         
-        case Commands::redo:{
+        case Commands::redo: {
             if (undo.canRedo())
                 undo.redo();
             if (auto* cc = findChild<GuiController>()->getContentComponent())
