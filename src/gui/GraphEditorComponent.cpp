@@ -22,7 +22,51 @@
 #include "session/Node.h"
 #include "gui/GraphEditorComponent.h"
 
+#ifndef EL_USE_PIG_WHIP
+ #define EL_USE_PIG_WHIP 0
+#endif
+
 namespace Element {
+
+class PigWhipSource : public Component {
+public:
+    PigWhipSource ()
+    {
+        int ssize = 10;
+        setSize (ssize, ssize);
+        path.addEllipse (2.0, 2.0, ssize - 2, ssize - 2);
+    }
+
+    ~PigWhipSource() { }
+
+    void paint (Graphics& g) override
+    {
+        g.setColour (LookAndFeel::widgetBackgroundColor);
+        g.fillPath (path);
+    }
+
+    void mouseDown (const MouseEvent& e) override
+    {
+        DBG("down");
+    }
+
+    void mouseDrag (const MouseEvent& e) override
+    {
+        DBG("drag");
+    }
+
+    void mouseUp (const MouseEvent& e) override
+    {
+        DBG("up");
+    }
+
+private:
+    Path path;
+    GraphEditorComponent* getGraphPanel() const {
+        return findParentComponentOfClass<GraphEditorComponent>();
+    }
+};
+
 class PinComponent   : public Component,
                        public SettableTooltipClient
 {
@@ -53,7 +97,7 @@ public:
         setSize (16, 16);
     }
 
-    void paint (Graphics& g)
+    void paint (Graphics& g) override
     {
         const float w = (float) getWidth();
         const float h = (float) getHeight();
@@ -93,7 +137,7 @@ public:
         return Colours::orange;
     }
 
-    void mouseDown (const MouseEvent& e)
+    void mouseDown (const MouseEvent& e) override
     {
         getGraphPanel()->beginConnectorDrag (isInput ? 0 : filterID,
                                              port,
@@ -102,12 +146,12 @@ public:
                                              e);
     }
 
-    void mouseDrag (const MouseEvent& e)
+    void mouseDrag (const MouseEvent& e) override
     {
         getGraphPanel()->dragConnector (e);
     }
 
-    void mouseUp (const MouseEvent& e)
+    void mouseUp (const MouseEvent& e) override
     {
         getGraphPanel()->endDraggingConnector (e);
     }
@@ -153,6 +197,7 @@ class FilterComponent    : public Component,
                            public Button::Listener,
                            public AsyncUpdater
 {
+    PigWhipSource pigWhip;
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
         : filterID (node_.getNodeId()),
@@ -168,6 +213,9 @@ public:
     {
         setBufferedToImage (true);
 
+       #if EL_USE_PIG_WHIP
+        addAndMakeVisible (pigWhip);
+       #endif
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
         
@@ -449,6 +497,13 @@ public:
                 }
             }
         }
+
+       #if EL_USE_PIG_WHIP
+        const auto ssize = pigWhip.getWidth();
+        pigWhip.setBounds (getBoxRectangle()
+            .removeFromBottom (ssize)
+            .removeFromLeft (ssize));
+       #endif
     }
 
     void getPinPos (const int index, const bool isInput, float& x, float& y)
