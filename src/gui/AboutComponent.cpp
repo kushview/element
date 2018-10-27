@@ -56,7 +56,7 @@ AboutComponent::AboutComponent ()
 
     //[UserPreSize]
     String versionText = ProjectInfo::projectName;
-    versionText << " v" << ProjectInfo::versionString << " (build 1)";
+    versionText << " v" << ProjectInfo::versionString;
     label2->setText (versionText, dontSendNotification);
     label2->setInterceptsMouseClicks(false, true);
     label->setInterceptsMouseClicks(false, true);
