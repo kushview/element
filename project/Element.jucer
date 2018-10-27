@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.20.1"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.21.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               jucerVersion="5.3.2" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
@@ -41,6 +41,10 @@
               file="../src/controllers/MappingController.cpp"/>
         <FILE id="HwpGta" name="MappingController.h" compile="0" resource="0"
               file="../src/controllers/MappingController.h"/>
+        <FILE id="zXmnCZ" name="PresetsController.cpp" compile="1" resource="0"
+              file="../src/controllers/PresetsController.cpp"/>
+        <FILE id="AADoei" name="PresetsController.h" compile="0" resource="0"
+              file="../src/controllers/PresetsController.h"/>
         <FILE id="fdOpQ6" name="SessionController.cpp" compile="1" resource="0"
               file="../src/controllers/SessionController.cpp"/>
         <FILE id="BaCFvB" name="SessionController.h" compile="0" resource="0"
@@ -142,6 +146,10 @@
               file="../src/gui/BreadCrumbComponent.h"/>
         <FILE id="jVVEl0" name="Buttons.cpp" compile="1" resource="0" file="../src/gui/Buttons.cpp"/>
         <FILE id="dsmRAw" name="Buttons.h" compile="0" resource="0" file="../src/gui/Buttons.h"/>
+        <FILE id="jUBLZM" name="ChannelStripComponent.cpp" compile="1" resource="0"
+              file="../src/gui/ChannelStripComponent.cpp"/>
+        <FILE id="yOhJd7" name="ChannelStripComponent.h" compile="0" resource="0"
+              file="../src/gui/ChannelStripComponent.h"/>
         <FILE id="sg07lP" name="ConnectionGrid.cpp" compile="1" resource="0"
               file="../src/gui/ConnectionGrid.cpp"/>
         <FILE id="EZVC8d" name="ConnectionGrid.h" compile="0" resource="0"
@@ -150,6 +158,8 @@
               file="../src/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
               file="../src/gui/ContentComponent.h"/>
+        <FILE id="pGrB1K" name="ContentView.cpp" compile="1" resource="0" file="../src/gui/ContentView.cpp"/>
+        <FILE id="lrVf1u" name="ContentView.h" compile="0" resource="0" file="../src/gui/ContentView.h"/>
         <FILE id="sKIHTU" name="ContextMenus.cpp" compile="1" resource="0"
               file="../src/gui/ContextMenus.cpp"/>
         <FILE id="UeLvAw" name="ContextMenus.h" compile="0" resource="0" file="../src/gui/ContextMenus.h"/>
@@ -171,6 +181,10 @@
               file="../src/gui/GraphEditorView.cpp"/>
         <FILE id="dqN1CW" name="GraphEditorView.h" compile="0" resource="0"
               file="../src/gui/GraphEditorView.h"/>
+        <FILE id="nLtMCk" name="GraphMixerView.cpp" compile="1" resource="0"
+              file="../src/gui/GraphMixerView.cpp"/>
+        <FILE id="y9E54B" name="GraphMixerView.h" compile="0" resource="0"
+              file="../src/gui/GraphMixerView.h"/>
         <FILE id="E28o6i" name="GraphSettingsView.cpp" compile="1" resource="0"
               file="../src/gui/GraphSettingsView.cpp"/>
         <FILE id="A1WRg0" name="GraphSettingsView.h" compile="0" resource="0"
@@ -205,6 +219,10 @@
               file="../src/gui/NavigationView.cpp"/>
         <FILE id="nbrl8E" name="NavigationView.h" compile="0" resource="0"
               file="../src/gui/NavigationView.h"/>
+        <FILE id="m7GVkZ" name="NodeChannelStripView.cpp" compile="1" resource="0"
+              file="../src/gui/NodeChannelStripView.cpp"/>
+        <FILE id="OgVW4P" name="NodeChannelStripView.h" compile="0" resource="0"
+              file="../src/gui/NodeChannelStripView.h"/>
         <FILE id="vcZQ4S" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../src/gui/NodeIOConfiguration.cpp"/>
         <FILE id="O0M4gV" name="NodeIOConfiguration.h" compile="0" resource="0"
@@ -314,6 +332,7 @@
         <FILE id="r3Ufcg" name="PluginManager.cpp" compile="1" resource="0"
               file="../src/session/PluginManager.cpp"/>
         <FILE id="KgUf2F" name="PluginManager.h" compile="0" resource="0" file="../src/session/PluginManager.h"/>
+        <FILE id="TWcktE" name="Presets.h" compile="0" resource="0" file="../src/session/Presets.h"/>
         <FILE id="Jl8txX" name="PublicKey.h" compile="0" resource="0" file="../src/session/PublicKey.h"/>
         <FILE id="Xwhlg4" name="Sequence.cpp" compile="1" resource="0" file="../src/session/Sequence.cpp"/>
         <FILE id="GZJ2EU" name="Sequence.h" compile="0" resource="0" file="../src/session/Sequence.h"/>
@@ -327,6 +346,7 @@
               file="../src/session/UnlockStatus.cpp"/>
         <FILE id="UnTwR7" name="UnlockStatus.h" compile="0" resource="0" file="../src/session/UnlockStatus.h"/>
       </GROUP>
+      <FILE id="n7sipW" name="CapsLock.h" compile="0" resource="0" file="../src/CapsLock.h"/>
       <FILE id="lFdHY3" name="Commands.cpp" compile="1" resource="0" file="../src/Commands.cpp"/>
       <FILE id="aH8YyX" name="Commands.h" compile="0" resource="0" file="../src/Commands.h"/>
       <FILE id="Kkwkaz" name="CommonConfig.h" compile="0" resource="0" file="../src/CommonConfig.h"/>
@@ -336,6 +356,7 @@
       <FILE id="ENsZWs" name="Globals.cpp" compile="1" resource="0" file="../src/Globals.cpp"/>
       <FILE id="v2aCFt" name="Globals.h" compile="0" resource="0" file="../src/Globals.h"/>
       <FILE id="SpnOvr" name="Main.cpp" compile="1" resource="0" file="Source/Main.cpp"/>
+      <FILE id="hec6cG" name="Messages.cpp" compile="1" resource="0" file="../src/Messages.cpp"/>
       <FILE id="QrURzP" name="Messages.h" compile="0" resource="0" file="../src/Messages.h"/>
       <FILE id="pKGLwj" name="Module.h" compile="0" resource="0" file="../src/Module.h"/>
       <FILE id="huaOwP" name="Settings.cpp" compile="1" resource="0" file="../src/Settings.cpp"/>
