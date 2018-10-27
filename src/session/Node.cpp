@@ -3,10 +3,12 @@
 #include "controllers/GraphController.h"
 
 namespace Element {
+
     struct NameSorter
     {
         NameSorter() { }
-        int compareElements (const Node& lhs, const Node& rhs) {
+        int compareElements (const Node& lhs, const Node& rhs)
+        {
             return lhs.getName() < rhs.getName() ? -1 :
             lhs.getName() == rhs.getName() ? 0 : 1;
         }
@@ -15,7 +17,10 @@ namespace Element {
     
     static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescription& pd)
     {
-        if (p.getProperty(Tags::type) == "graph")
+        const auto& type = p.getProperty (Tags::type);
+        const auto& format = p.getProperty (Tags::format);
+
+        if (type == "graph")
         {
             pd.name = p.getProperty (Tags::name);
             pd.fileOrIdentifier = "element.graph";
@@ -24,10 +29,11 @@ namespace Element {
         else
         {
             // plugins and io nodes
+            pd.name = p.getProperty (Tags::pluginName);
             pd.pluginFormatName = p.getProperty (Tags::format);
             pd.fileOrIdentifier = p.getProperty (Tags::identifier);
             if (pd.fileOrIdentifier.isEmpty())
-                pd.fileOrIdentifier = p.getProperty (Slugs::file);
+                pd.fileOrIdentifier = p.getProperty (Tags::file);
         }
     }
     

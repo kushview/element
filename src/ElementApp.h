@@ -77,8 +77,11 @@ namespace Tags
     const Identifier windowOnTop        = "windowOnTop";
     const Identifier windowVisible      = "windowVisible";
     const Identifier windowX            = "windowX";
-    const Identifier windowY            = "windowY";       
-
+    const Identifier windowY            = "windowY";
+    const Identifier relativeX          = "relativeX";
+    const Identifier relativeY          = "relativeY";
+    const Identifier pluginName         = "pluginName";
+    const Identifier pluginIdentifierString = "pluginIdentifierString";
     const Identifier uuid               = "uuid";
     const Identifier parameter          = "parameter";
     const Identifier offline            = "offline";

@@ -11,6 +11,7 @@
 
 namespace Element {
 
+class Node;
 class PluginScannerMaster;
 class PluginScanner;
 
@@ -31,6 +32,7 @@ public:
 
     /** Access to the main known plugins list */
     KnownPluginList& getKnownPlugins();
+    const KnownPluginList& getKnownPlugins() const;
 
     /** Scan/Add a description to the known plugins */
     void addToKnownPlugins (const PluginDescription& desc);
@@ -39,7 +41,7 @@ public:
     AudioPluginFormatManager& getAudioPluginFormats();
 
     /** Returns an audio plugin format by name */
-    AudioPluginFormat* getAudioPluginFormat (const String& formatName);
+    AudioPluginFormat* getAudioPluginFormat (const String& formatName) const;
     
     /** Returns an audio plugin format by type */
     template<class FormatType>
@@ -102,6 +104,9 @@ public:
     
     /** Restore User Plugins From a file */
     void restoreAudioPlugins (const File&);
+
+    /** Get a PluginDescription for a Node */
+    PluginDescription findDescriptionFor (const Node&) const;
 
 private:
     PropertiesFile* props = nullptr;
