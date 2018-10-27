@@ -12,13 +12,11 @@ static StringArray getFullVesrionPluginIdentifiers() {
 return { "element.audioMixer",
          "element.graph",
          "element.placeholder",
-         "element." 
-        });
+         "element." };
 }
 
 static bool isFullVersionPlugin (const PluginDescription& desc) {
-    return 
-        .contains (desc.fileOrIdentifier);
+    return getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
 }
 
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
@@ -442,7 +440,7 @@ void GraphController::setNodeModel (const Node& node)
         {
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
-            node.getValueTree().setProperty (Tags::offline, true, nullptr);
+            node.getValueTree().setProperty (Tags::missing, true, nullptr);
         }
         else
         {

@@ -106,8 +106,15 @@ namespace Element {
         static void sanitizeProperties (ValueTree node, const bool recursive = false)
         {
             node.removeProperty (Tags::object, nullptr);
+            
             if (node.hasType (Tags::node))
-                node.removeProperty ("placeholder", nullptr);
+            {
+                Array<Identifier> properties ({ Tags::offline, 
+                    Tags::placeholder, Tags::missing });
+                for (const auto& property : properties)
+                    node.removeProperty (property, nullptr);
+            }
+
             if (recursive)
                 for (int i = 0; i < node.getNumChildren(); ++i)
                     sanitizeProperties (node.getChild(i), recursive);

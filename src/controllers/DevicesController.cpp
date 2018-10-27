@@ -56,7 +56,6 @@ void DevicesController::add (const ControllerDevice& device)
 void DevicesController::add (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
     returnIfNotFullVersion
-    auto& mapping (getWorld().getMappingEngine());
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
     {

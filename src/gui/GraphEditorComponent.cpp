@@ -342,9 +342,9 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 cc->setCurrentNode (node);
         }
-        else if (node.hasProperty (Tags::offline))
+        else if (node.hasProperty (Tags::missing))
         {
-            String message = "This node is offline and running as a Placeholder.\n";
+            String message = "This node is unavailable and running as a Placeholder.\n";
             message << node.getName() << " (" << node.getFormat().toString() 
                     << ") could not be found for loading.";
             AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, 
@@ -393,7 +393,7 @@ public:
         const auto box (getBoxRectangle());
         g.fillRect (box);
 
-        if (node.getValueTree().hasProperty (Tags::offline))
+        if (node.getValueTree().hasProperty (Tags::missing))
         {
             g.setColour (Colour (0xff333333));
             g.setFont (9.f);
