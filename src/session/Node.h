@@ -43,8 +43,7 @@ namespace Element {
             return getProperty("flow", "").toString() == "output";
         }
         
-        const String getName() const { return getProperty (Slugs::name, "Port"); }
-        
+        const String getName() const { return getProperty (Tags::name, "Port"); }
         const PortType getType() const {
             return PortType (getProperty (Slugs::type, "unknown"));
         }
@@ -157,9 +156,17 @@ namespace Element {
         void getRelativePosition (double& x, double& y) const;
         
         const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
-        
-        const String getName() const { return getProperty (Slugs::name); }
-        
+
+        /** Returns the node name defined by the user. Initially this is equal
+            to the plugin name from a PluginDescription.
+         */        
+        const String getName()          const { return getProperty (Slugs::name); }
+
+        /** Returns the plugin name as provided by the plugin binary when
+            scanned by an AudioPluginFormat
+         */
+        const String getPluginName()    const { return getProperty (Tags::name); }
+
         GraphNode* getGraphNode() const;
         
         int getNumNodes() const         { return getNodesValueTree().getNumChildren(); }
@@ -249,6 +256,7 @@ namespace Element {
         bool hasMidiInputNode() const       { return hasChildNode ("Internal", "midi.input"); }
         bool hasMidiOutputNode() const      { return hasChildNode ("Internal", "midi.output"); }
         
+        /** Fill a plugin Description for loading with the plugin manager */
         void getPluginDescription (PluginDescription&) const;
         
         /** Write the contents of this node to file */

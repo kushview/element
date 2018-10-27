@@ -178,17 +178,7 @@ uint32 GraphController::addNode (const Node& newNode)
     }
     
     uint32 nodeId = KV_INVALID_NODE;
-    PluginDescription desc; 
-    newNode.getPluginDescription (desc);
-
-    if (desc.pluginFormatName == "VST3")
-    {
-        OwnedArray<PluginDescription> types;
-        if (auto* format = pluginManager.getAudioPluginFormat (desc.pluginFormatName))
-            format->findAllTypesForFile (types, desc.fileOrIdentifier);
-        if (types.size() > 0)
-            desc = *types.getFirst();
-    }
+    const PluginDescription desc (pluginManager.findDescriptionFor (newNode)); 
 
     if (auto* node = createFilter (&desc, 0, 0))
     {
@@ -198,13 +188,14 @@ uint32 GraphController::addNode (const Node& newNode)
         ValueTree data = newNode.getValueTree().createCopy();
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Tags::object, node, nullptr)
-            .setProperty (Tags::type, node->getTypeString(), nullptr);
+            .setProperty (Tags::type, node->getTypeString(), nullptr)
+            .setProperty (Tags::pluginIdentifierString, desc.createIdentifierString(), nullptr);
         
-        data.removeProperty ("relativeX", nullptr);
-        data.removeProperty ("relativeY", nullptr);
-        data.removeProperty ("windowX", nullptr);
-        data.removeProperty ("windowY", nullptr);
-        data.removeProperty ("windowVisible", nullptr);
+        data.removeProperty (Tags::relativeX, nullptr);
+        data.removeProperty (Tags::relativeY, nullptr);
+        data.removeProperty (Tags::windowX, nullptr);
+        data.removeProperty (Tags::windowY, nullptr);
+        data.removeProperty (Tags::windowVisible, nullptr);
 
         Node n (data, false);
         n.restorePluginState();
@@ -269,8 +260,10 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
         nodeId = node->nodeId;
         ValueTree model = node->getMetadata().createCopy();
         model.setProperty (Tags::object, node, nullptr)
-             .setProperty ("relativeX", rx, 0)
-             .setProperty ("relativeY", ry, 0);
+             .setProperty (Tags::relativeX, rx, nullptr)
+             .setProperty (Tags::relativeY, ry, nullptr)
+             .setProperty (Tags::pluginIdentifierString, 
+                           desc->createIdentifierString(), nullptr);
         
         Node n (model, false);
 
@@ -444,33 +437,11 @@ void GraphController::setNodeModel (const Node& node)
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
         Node node (nodes.getChild (i), false);
-        PluginDescription desc; 
-        node.getPluginDescription (desc);
-        
-        if (desc.pluginFormatName == "VST3")
-        {
-            OwnedArray<PluginDescription> types;
-            if (auto* format = pluginManager.getAudioPluginFormat (desc.pluginFormatName))
-                format->findAllTypesForFile (types, desc.fileOrIdentifier);
-            if (types.size() > 0)
-                desc = *types.getFirst();
-        }
-        
+        const PluginDescription desc (pluginManager.findDescriptionFor (node));
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
             node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
             auto* const proc = obj->getAudioProcessor();
-            // const int numPorts = node.getPortsValueTree().getNumChildren();
-            // const bool isIONode = obj->isAudioIONode() || obj->isMidiIONode();
-            // if (isIONode)
-            // {
-            //     for (int i = 0; i < numPorts; ++i)
-            //     {
-            //         Port port (node.getPort (i));
-            //         DBG (port.getValueTree().toXmlString());
-            //     }
-            // }
-
             PortArray ins, outs;
             node.getPorts (ins, outs, PortType::Audio);
 

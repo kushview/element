@@ -4,6 +4,8 @@
 */
 
 #include "session/PluginManager.h"
+#include "session/Node.h"
+
 #include "DataPath.h"
 #include "Settings.h"
 
@@ -714,9 +716,9 @@ AudioPluginFormatManager& PluginManager::getAudioPluginFormats()
     return priv->formats;
 }
 
-AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name)
+AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name) const
 {
-    auto& manager = getAudioPluginFormats();
+    auto& manager = priv->formats;
     for (int i = 0; i < manager.getNumFormats(); ++i)
     {
         AudioPluginFormat* fmt = manager.getFormat (i);
@@ -728,9 +730,8 @@ AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name)
 }
 
 KnownPluginList& PluginManager::getKnownPlugins() { return priv->allPlugins; }
+const KnownPluginList& PluginManager::getKnownPlugins() const { return priv->allPlugins; }
 const File& PluginManager::getDeadAudioPluginsFile() const { return priv->deadAudioPlugins; }
-
-
 
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
@@ -846,6 +847,52 @@ const File& PluginScanner::getSlavePluginListFile()
         _listTempFile = DataPath::applicationDataDir().getChildFile (EL_PLUGIN_SCANNER_SLAVE_LIST_PATH);
    #endif
     return _listTempFile;
+}
+
+PluginDescription PluginManager::findDescriptionFor (const Node& node) const
+{
+    PluginDescription desc;
+    
+    if (node.getFormat() != "VST3")
+    {
+        node.getPluginDescription (desc);
+        return desc;
+    }
+
+    const String identifierString (node.getProperty (Tags::pluginIdentifierString).toString());
+    bool wasFound = false;
+
+    if (identifierString.isNotEmpty())
+    {
+        // fastest, find by identifer string in known plugins
+        if (const auto* type = getKnownPlugins().getTypeForIdentifierString (
+            node.getProperty (Tags::pluginIdentifierString).toString()))
+        {
+            desc = *type;
+            wasFound = true;
+        }
+    }
+
+    if (! wasFound)
+    {
+        // Manually load and search
+        OwnedArray<PluginDescription> types;
+        if (auto* format = getAudioPluginFormat (desc.pluginFormatName))
+            format->findAllTypesForFile (types, desc.fileOrIdentifier);
+        if (! types.isEmpty())
+        {
+            desc = *types.getFirst();
+            wasFound = true;
+        }
+    }
+
+    if (! wasFound)
+    {
+        // last resort
+        node.getPluginDescription (desc);
+    }
+
+    return desc;
 }
 
 }
