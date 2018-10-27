@@ -812,8 +812,11 @@ Node EngineController::addPlugin (const Node& graph, const PluginDescription& de
     if (auto* controller = graphs->findGraphControllerFor (graph))
     {
         const Node node (addPlugin (*controller, descToLoad));
-        builder.addConnections (*controller, node.getNodeId());
-        jassert(! node.getUuid().isNull());
+        if (node.isValid())
+        {
+            builder.addConnections (*controller, node.getNodeId());
+            jassert(! node.getUuid().isNull());
+        }
         return node;
     }
 

@@ -3,8 +3,38 @@
 #include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
 #include "session/PluginManager.h"
+#include "session/UnlockStatus.h"
+#include "Globals.h"
 
 namespace Element {
+
+static StringArray getFullVesrionPluginIdentifiers() {
+return { "element.audioMixer",
+         "element.graph",
+         "element.placeholder",
+         "element." 
+        });
+}
+
+static bool isFullVersionPlugin (const PluginDescription& desc) {
+    return 
+        .contains (desc.fileOrIdentifier);
+}
+
+static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
+{
+    String header = "Plugin Instantiation Failed";
+    String message;
+    if (isFullVersionPlugin (desc))
+        message << desc.name << " is available in the pro version.";
+    else
+        message << desc.name << " could not be instantiated";
+
+    if (async)
+        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, header, message);
+    else
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, header, message);
+}
 
 /** This enforces correct IO nodes based on the graph processor's settings
     in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
@@ -146,9 +176,7 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     {
         if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
             sub->initController (pluginManager);
-        
         instance->enableAllBuses();
-        
         node = processor.addNode (instance, nodeId);
     }
     
@@ -284,8 +312,7 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
     else
     {
         nodeId = KV_INVALID_NODE;
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon, "Couldn't create filter",
-                                     "The plugin could not be instantiated");
+        showFailedInstantiationAlert (*desc, true);
     }
 
     return nodeId;
