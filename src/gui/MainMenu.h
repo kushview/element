@@ -206,6 +206,7 @@ public:
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
         menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
         menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");

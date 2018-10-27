@@ -162,6 +162,7 @@ void GuiController::saveProperties (PropertiesFile* props)
         props->setValue ("lastContentView", content->getMainViewName());
         props->setValue ("navSize",         content->getNavSize());
         props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
+        props->setValue ("channelStrip",    content->isNodeChannelStripVisible());
         content->saveState (props);
     }
 }
@@ -375,7 +376,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
-        Commands::toggleUserInterface
+        Commands::toggleUserInterface,
+        Commands::toggleChannelStrip
     });
     
     commands.add (Commands::quit);
@@ -507,13 +509,26 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         } break;
         
         case Commands::showControllerDevices:
-            result.setInfo ("Controller Devices", "Show the session's controllers", Commands::Categories::Session, 0);
-            break;
+        {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->getMainViewName() == "ControllerDevicesView") flags |= Info::isTicked;
+            result.setInfo ("Controller Devices", "Show the session's controllers", 
+                Commands::Categories::Session, flags);
+        } break;
         
         case Commands::toggleUserInterface:
-            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", Commands::Categories::UserInterface, 0);
+            result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", 
+                Commands::Categories::UserInterface, 0);
             break;
         
+        case Commands::toggleChannelStrip:
+        {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->isNodeChannelStripVisible()) flags |= Info::isTicked;
+            result.setInfo ("Channel Strip", "Toggles the global channel strip", 
+                Commands::Categories::UserInterface, flags);
+        } break;
+
         case Commands::toggleVirtualKeyboard:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -648,7 +663,10 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;
-            
+        case Commands::toggleChannelStrip:
+            content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
+            break;
+
         case Commands::showLastContentView:
             content->backMainView();
             break;

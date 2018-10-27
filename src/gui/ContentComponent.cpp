@@ -599,10 +599,10 @@ static ContentView* createLastContentView (Settings& settings)
     return view ? view.release() : nullptr;
 }
 
-static bool virtualKeyboardSetting (Settings& settings)
+static bool booleanProperty (Settings& settings, const String& property)
 {
     auto* props = settings.getUserSettings();
-    return props == nullptr ? false : props->getBoolValue ("virtualKeyboard");
+    return props == nullptr ? false : props->getBoolValue (property);
 }
 
 struct ContentComponent::Tooltips
@@ -610,7 +610,7 @@ struct ContentComponent::Tooltips
     Tooltips() { tooltipWindow = new TooltipWindow(); }
     ScopedPointer<TooltipWindow> tooltipWindow;
 };
-    
+
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
 {
@@ -625,11 +625,8 @@ ContentComponent::ContentComponent (AppController& ctl_)
     
     auto& settings (controller.getGlobals().getSettings());
     container->setMainView (createLastContentView (settings));
-    setVirtualKeyboardVisible (virtualKeyboardSetting (settings));
-    
-   #if EL_USE_NODE_CHANNEL_STRIP
-    setNodeChannelStripVisible (true);
-   #endif
+    setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard"));    
+    setNodeChannelStripVisible (booleanProperty (settings, "channelStrip"));
    
    #if EL_USE_GRAPH_MIXER_VIEW
     setAccessoryView ("GraphMixerView");
@@ -658,7 +655,6 @@ ContentComponent::ContentComponent (AppController& ctl_)
 
 ContentComponent::~ContentComponent() noexcept
 {
-    toolTips = nullptr;
 }
 
 Globals& ContentComponent::getGlobals() { return controller.getGlobals(); }

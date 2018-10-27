@@ -48,6 +48,7 @@ namespace Commands {
 
         showControllerDevices,
         toggleUserInterface,
+        toggleChannelStrip,
         
         sessionClose           = 0x0300,
         sessionOpen,

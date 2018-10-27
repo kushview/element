@@ -118,10 +118,8 @@ private:
     
     struct Tooltips;
     SharedResourcePointer<Tooltips> tips;
-    
     ScopedPointer<NavigationConcertinaPanel> nav;
     ScopedPointer<ContentContainer> container;
-    ScopedPointer<TooltipWindow> toolTips;
     StretchableLayoutManager layout;
     
     class Resizer; friend class Resizer;
@@ -135,7 +133,7 @@ private:
     
     ScopedPointer<VirtualKeyboardView> keyboard;
     ScopedPointer<NodeChannelStripView> nodeStrip;
-        
+
     bool statusBarVisible;
     int statusBarSize;
     bool toolBarVisible;
