@@ -6,8 +6,6 @@ namespace Element {
 ChannelStripComponent::ChannelStripComponent()
     : meter (2, false)
 {
-    
-
     addAndMakeVisible (fader);
     fader.setSliderStyle (Slider::LinearVertical);
     fader.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
@@ -25,9 +23,9 @@ ChannelStripComponent::ChannelStripComponent()
     name.setText ("Name", dontSendNotification);
 
     addAndMakeVisible (mute);
-    mute.setColour (TextButton::buttonOnColourId, Colors::toggleRed);
+    mute.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
     mute.setButtonText ("M");
-    // mute.addListener (this);
+    mute.addListener (this);
 
     addAndMakeVisible (volume);
     volume.setNumDecimalPlaces (1);
@@ -62,9 +60,18 @@ void ChannelStripComponent::resized()
     scale.setBounds (meter.getBoundsInParent());
 }
 
+void ChannelStripComponent::buttonClicked (Button* b)
+{
+    if (b == &mute)
+    {
+        mute.setToggleState (! mute.getToggleState(), false);
+        powerChanged();
+    }
+}
+
 void ChannelStripComponent::valueChanged (Value& value)
 {
-
+    volumeChanged (fader.getValue());
 }
 
 void ChannelStripComponent::paint (Graphics&)

@@ -1009,7 +1009,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
         }
     }
     
-    findSibling<GuiController>()->stabilizeContent();
+    findSibling<GuiController>()->stabilizeViews();
 }
 
 }

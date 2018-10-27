@@ -511,7 +511,7 @@ namespace Element {
     
     void Node::restorePluginState()
     {
-        if (! isValid() || !objectData.hasProperty (Tags::state))
+        if (! isValid())// || !objectData.hasProperty (Tags::state))
             return;
         
         if (GraphNodePtr obj = getGraphNode())
@@ -543,6 +543,11 @@ namespace Element {
 
                 proc->suspendProcessing (isBypassed());
             }
+
+            if (hasProperty ("gain"))
+                obj->setGain (getProperty ("gain"));
+            if (hasProperty ("inputGain"))
+                obj->setInputGain (getProperty ("inputGain"));
         }
 
         // this was originally here to help reduce memory usage

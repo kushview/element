@@ -698,6 +698,12 @@ void GuiController::stabilizeContent()
     refreshMainMenu();
 }
 
+void GuiController::stabilizeViews()
+{
+    if (auto* cc = content.get())
+        cc->stabilizeViews();
+}
+
 void GuiController::refreshMainMenu()
 {
     if (auto* win = mainWindow.get())

@@ -197,39 +197,8 @@ uint32 GraphController::addNode (const Node& newNode)
         data.removeProperty (Tags::windowY, nullptr);
         data.removeProperty (Tags::windowVisible, nullptr);
 
-        Node n (data, true);
-        n.restorePluginState();
-        
-        PortArray ins, outs;
-        n.getPorts (ins, outs, PortType::Audio);
+        setupNode (data, node);
 
-        // try to match ports
-        if (proc->getTotalNumInputChannels() != ins.size() ||
-            proc->getTotalNumOutputChannels() != outs.size())
-        {
-            AudioProcessor::BusesLayout layout;
-            layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
-            layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
-            
-            if (proc->checkBusesLayoutSupported (layout))
-            {
-                proc->suspendProcessing (true);
-                proc->releaseResources ();
-                proc->setBusesLayoutWithoutEnabling (layout);
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                proc->suspendProcessing (false);
-            }
-            
-            n.resetPorts();
-        }
-
-        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
-        {
-            sub->getController().setNodeModel (n);
-            IONodeEnforcer enforceIONodes (sub->getController());
-            n.resetPorts();
-        }
-        
         nodes.addChild (data, -1, nullptr);
         changed();
     }
@@ -440,38 +409,7 @@ void GraphController::setNodeModel (const Node& node)
         const PluginDescription desc (pluginManager.findDescriptionFor (node));
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
-            node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
-            auto* const proc = obj->getAudioProcessor();
-            PortArray ins, outs;
-            node.getPorts (ins, outs, PortType::Audio);
-
-            // try to match ports
-            if (proc->getTotalNumInputChannels() != ins.size() ||
-                proc->getTotalNumOutputChannels() != outs.size())
-            {
-                AudioProcessor::BusesLayout layout;
-                layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
-                layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
-                
-                if (proc->checkBusesLayoutSupported (layout))
-                {
-                    proc->suspendProcessing (true);
-                    proc->releaseResources();
-                    proc->setBusesLayoutWithoutEnabling (layout);
-                    proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                    proc->suspendProcessing (false);
-                }
-                
-                node.resetPorts();
-            }
-            
-            if (auto* sub = dynamic_cast<SubGraphProcessor*> (proc))
-            {
-                sub->getController().setNodeModel (node);
-                node.resetPorts();
-            }
-            
-            node.restorePluginState();
+            setupNode (node.getValueTree(), obj);
         }
         else if (GraphNodePtr ph = createPlaceholder (node))
         {
@@ -593,10 +531,48 @@ void GraphController::processorArcsChanged()
     changed();
 }
 
+void GraphController::setupNode (const ValueTree& data, GraphNodePtr obj)
+{
+    jassert (obj && data.hasType (Tags::node));
+    Node node (data, false);
+    node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+    auto* const proc = obj->getAudioProcessor();
+    PortArray ins, outs;
+    node.getPorts (ins, outs, PortType::Audio);
+
+    // try to match ports
+    if (proc->getTotalNumInputChannels() != ins.size() ||
+        proc->getTotalNumOutputChannels() != outs.size())
+    {
+        AudioProcessor::BusesLayout layout;
+        layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
+        layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
+        
+        if (proc->checkBusesLayoutSupported (layout))
+        {
+            proc->suspendProcessing (true);
+            proc->releaseResources();
+            proc->setBusesLayoutWithoutEnabling (layout);
+            proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+            proc->suspendProcessing (false);
+        }
+        
+        node.resetPorts();
+    }
+    
+    if (auto* sub = dynamic_cast<SubGraphProcessor*> (proc))
+    {
+        sub->getController().setNodeModel (node);
+        node.resetPorts();
+    }
+    
+    node.restorePluginState();
+}
+
 // MARK: Root Graph Controller
 void RootGraphController::unloadGraph()
 {
     getRootGraph().clear();
 }
-    
+
 }

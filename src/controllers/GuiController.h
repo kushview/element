@@ -59,9 +59,12 @@ namespace Element {
         /** present a plugin window */
         void presentPluginWindow (const Node& node);
         
-        /** Sync UI elements with application/plugin */
+        /** Sync all UI elements with application/plugin */
         void stabilizeContent();
         
+        /** Stabilize Views Only */
+        void stabilizeViews();
+
         /* Command manager... */
         ApplicationCommandTarget* getNextCommandTarget() override;
         void getAllCommands (Array <CommandID>& commands) override;

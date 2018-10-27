@@ -260,7 +260,7 @@ void AppController::handleMessage (const Message& msg)
     {
         const auto controllerMap = removeMapMessage->controllerMap;
         maps->remove (controllerMap);
-        gui->stabilizeContent();
+        gui->stabilizeViews();
     }
     else if (const auto* replaceNodeMessage = dynamic_cast<const ReplaceNodeMessage*> (&msg))
     {
