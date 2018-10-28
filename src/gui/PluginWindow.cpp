@@ -122,14 +122,13 @@ public:
         else if (button == &nodeButton)
         {
             auto* const world = ViewHelpers::getGlobals (this);
-
-            NodePopupMenu menu (node);
+            auto* callback = new MenuCallback (this, node);
+            NodePopupMenu& menu (callback->menu);
             menu.addSeparator();
             menu.addProgramsMenu();
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
-            if (auto* message = menu.showAndCreateMessage())
-                ViewHelpers::postMessageFor (this, message);
+            menu.show (0, 0, 0, 0, callback);
         }
         else if (button == &onTopButton)
         {
@@ -161,7 +160,14 @@ public:
             onTopButton.setToggleState (pw->isAlwaysOnTop(), dontSendNotification);
         }
     }
+
+    void handleMenuResult (int result)
+    {
+        // noop, might need when the menu gets more complex
+    }
+
 private:
+    JUCE_DECLARE_WEAK_REFERENCEABLE(PluginWindowContent);
     ScopedPointer<PluginWindowToolbar> toolbar;
     SettingButton nodeButton;
     PowerButton powerButton;
@@ -171,6 +177,23 @@ private:
     ScopedPointer<Component> editor, leftPanel, rightPanel;
     GraphNodePtr object;
     Node node;
+
+    class MenuCallback : public ModalComponentManager::Callback {
+    public:
+        MenuCallback (PluginWindowContent* c, const Node& n)
+            : content (c), menu (n)
+        { }
+
+        void modalStateFinished (int returnValue) override
+        {
+            if (! content.wasObjectDeleted())
+                if (auto* const msg = menu.createMessageForResultCode (returnValue))
+                    ViewHelpers::postMessageFor (content.get(), msg);
+        }
+
+        WeakReference<PluginWindowContent> content;
+        NodePopupMenu menu;
+    };
 
     AudioProcessor* getProcessor() { return (object != nullptr) ? object->getAudioProcessor() : nullptr; }
 };
