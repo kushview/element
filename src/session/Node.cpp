@@ -511,14 +511,18 @@ namespace Element {
     
     void Node::restorePluginState()
     {
-        if (! isValid())// || !objectData.hasProperty (Tags::state))
+        if (! isValid())
             return;
         
         if (GraphNodePtr obj = getGraphNode())
         {
             if (auto* const proc = obj->getAudioProcessor())
             {
-                proc->setCurrentProgram ((int) objectData.getProperty (Tags::program, 0));
+                const int wantedProgram = objectData.getProperty (Tags::program, -1);
+                const bool shouldSetProgram = proc->getNumPrograms() > 0 && 
+                    isPositiveAndBelow (wantedProgram, proc->getNumPrograms());
+                if (shouldSetProgram)
+                    proc->setCurrentProgram (wantedProgram);
 
                 auto data = getProperty(Tags::state).toString().trim();
                 if (data.isNotEmpty())
@@ -531,13 +535,13 @@ namespace Element {
                 }
 			    
 				data = getProperty(Tags::programState).toString().trim();
-				if (data.isNotEmpty())
+				if (shouldSetProgram && data.isNotEmpty())
 				{
 					MemoryBlock state; state.fromBase64Encoding (data);
 					if (state.getSize() > 0)
 					{
-						proc->setCurrentProgramStateInformation(state.getData(), 
-							(int)state.getSize());
+						proc->setCurrentProgramStateInformation (state.getData(),
+							(int) state.getSize());
 					}
 				}
 
