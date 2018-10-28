@@ -945,7 +945,8 @@ void ContentComponent::setCurrentNode (const Node& node)
 {
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) ||
         getMainViewName() == "SessionSettings" || 
-        getMainViewName() == "PluginManager") && 
+        getMainViewName() == "PluginManager" ||
+        getMainViewName() == "ControllerDevicesView") && 
         getSession()->getNumGraphs() > 0)
     {
         setMainView ("GraphEditor");

@@ -81,7 +81,7 @@ public:
         for (int i = 0; i < nodes.getNumChildren(); ++i)
         {
             const Node c (nodes.getChild (i), false);
-            if (! c.isIONode())   
+            if (! c.isIONode())
                 addSubItem (new SessionNodeTreeItem (c));
         }
     }
@@ -136,6 +136,13 @@ public:
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
             c->setCurrentNode (graph);
         }
+
+        if (! node.isRootGraph())
+            gui->selectNode (node);
+        else if (node.isRootGraph() && node.hasAudioOutputNode())
+            gui->selectNode (node.getNodeByFormat ("Internal", "audio.output"));
+        
+        gui->refreshMainMenu();
     }
 
     bool mightContainSubItems() override            { return node.isGraph(); }
@@ -335,7 +342,7 @@ public:
         if (! node.isRootGraph())
             return;
        
-       #if !EL_FREE
+       #if ! EL_FREE
         // Paint the program number if it is enabled
         const auto h = area.getHeight(); const auto w = h;
         const int p = 1 + (int)node.getProperty (Tags::midiProgram, -1);
