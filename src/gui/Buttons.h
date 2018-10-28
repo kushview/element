@@ -2,6 +2,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "gui/Icons.h"
 #include "gui/LookAndFeel.h"
 #include "session/Node.h"
 
@@ -28,6 +29,7 @@ public:
     }
     
     inline void setIcon (const Image& image) { icon = image; }
+    inline void setPath (const Path& p) { path = p; }
 
 protected:
     virtual Colour getTextColour()
@@ -42,6 +44,7 @@ private:
     String yes = "Yes";
     String no  = "No";
     Image icon;
+    Path path;
 };
 
 class PanicButton : public SettingButton {
@@ -59,6 +62,20 @@ public:
     }
 
     ~PowerButton() { }
+};
+
+class ConfigButton : public SettingButton
+{
+public:
+    ConfigButton() { setPath (getIcons().config); }
+    ~ConfigButton() { }
+};
+
+class GraphButton : public SettingButton
+{
+public:
+    GraphButton() { setPath (getIcons().graph); }
+    ~GraphButton() { }
 };
 
 class DragableIntLabel : public Component,

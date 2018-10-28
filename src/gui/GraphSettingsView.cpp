@@ -7,9 +7,6 @@
 
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;
-    
-
-
     class GraphMidiChannels : public PropertyComponent
     {
     public:
@@ -362,6 +359,9 @@ namespace Element {
     {
         setName ("GraphSettings");
         addAndMakeVisible (props = new GraphPropertyPanel());
+        addAndMakeVisible (graphButton);
+        graphButton.setTooltip ("Show graph editor");
+        graphButton.addListener (this);
         setEscapeTriggersClose (true);
     }
     
@@ -394,6 +394,14 @@ namespace Element {
     void GraphSettingsView::resized()
     {
         props->setBounds (getLocalBounds().reduced (2));
+        const int configButtonSize = 14;
+        graphButton.setBounds (getWidth() - configButtonSize - 4, 4, 
+                                configButtonSize, configButtonSize);
+    }
+    void GraphSettingsView::buttonClicked (Button* button)
+    {
+        if (button == &graphButton)
+            if (auto* const world = ViewHelpers::getGlobals (this))
+                world->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
     }
 }
-

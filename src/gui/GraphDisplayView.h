@@ -15,12 +15,12 @@ public:
     {
         addAndMakeVisible (breadcrumb);
         addAndMakeVisible (configButton);
-        configButton.setButtonText ("*");
+        configButton.setTooltip ("Show graph settings");
         configButton.addListener (this);
     }
 
     virtual ~GraphDisplayView()
-    { 
+    {
         configButton.removeListener (this);
     }
 
@@ -94,7 +94,7 @@ protected:
 private:
     Node graph, node;
     BreadCrumbComponent breadcrumb;
-    SettingButton configButton;
+    ConfigButton configButton;
 };
 
 }

@@ -24,6 +24,14 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     
     g.fillAll (fill);
     
+    if (! path.isEmpty())
+    {
+        Icon icon (path, getTextColour());
+        Rectangle<float> r { 0.0, 0.0, (float)getWidth(), (float)getHeight() };
+
+        icon.draw (g, r.reduced (2), false);
+    }
+
     if (icon.isNull() || !icon.isValid())
     {
         String text = getButtonText();
