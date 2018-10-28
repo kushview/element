@@ -109,7 +109,7 @@ public:
     void setInputRMS (int chan, float val);
     float getInputRMS(int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked(chan)->get() : 0.0f; }
     void setOutputRMS (int chan, float val);
-    float getOutpputRMS(int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
+    float getOutputRMS(int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
 
     void connectAudioTo (const GraphNode* other);
 

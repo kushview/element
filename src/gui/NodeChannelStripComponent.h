@@ -68,12 +68,24 @@ public:
         const bool isAudioOut = node.isAudioIONode ();
         if (GraphNodePtr ptr = node.getGraphNode())
         {
-            if (isAudioOutNode)
-                for (int c = 0; c < 2; ++c)
-                    meter.setValue (c, ptr->getInputRMS (c));
+            if (ptr->getNumAudioOutputs() == 1)
+            {
+                if (isAudioOutNode)
+                    for (int c = 0; c < 2; ++c)
+                        meter.setValue (c, ptr->getInputRMS (0));
+                else
+                    for (int c = 0; c < 2; ++c)
+                        meter.setValue (c, ptr->getOutputRMS (0));
+            }
             else
-                for (int c = 0; c < 2; ++c)
-                    meter.setValue (c, ptr->getOutpputRMS (c));
+            {
+                if (isAudioOutNode)
+                    for (int c = 0; c < 2; ++c)
+                        meter.setValue (c, ptr->getInputRMS (c));
+                else
+                    for (int c = 0; c < 2; ++c)
+                        meter.setValue (c, ptr->getOutputRMS (c));
+            }
             channelStrip.setPower (! ptr->isSuspended(), false);
         }
         else
