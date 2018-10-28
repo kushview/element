@@ -138,8 +138,9 @@ struct UnlockForm::OverlayComp  : public Component,
             devs->refresh();
         if (auto* maps = gui.findSibling<Element::MappingController>())
             maps->learn (false);
-
+        
         gui.stabilizeContent();
+        gui.stabilizeViews();
     }
     
     const Action action;

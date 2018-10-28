@@ -117,6 +117,7 @@ void GraphMixerView::resized()
 
 void GraphMixerView::stabilizeContent()
 {
+    disableIfNotUnlocked();
     if (content)
         content->stabilize();
 }

@@ -23,6 +23,13 @@ public:
     {
         unbindSignals();
     }
+    
+    void paint (Graphics& g) override
+    {
+        NodeChannelStripComponent::paint (g);
+        g.setColour (LookAndFeel::contentBackgroundColor);
+        g.drawLine (0.0, 0.0, 0.0, getHeight());
+    }
 };
 
 NodeChannelStripView::NodeChannelStripView()
@@ -37,13 +44,14 @@ NodeChannelStripView::~NodeChannelStripView()
 void NodeChannelStripView::resized()
 {
     if (content)
-        content->setBounds (getLocalBounds().reduced (2));
+        content->setBounds (getLocalBounds());
 }
 
 void NodeChannelStripView::stabilizeContent()
 {
     if (content)
         content->nodeSelected();
+    disableIfNotUnlocked();
 }
 
 void NodeChannelStripView::initializeView (AppController& app)

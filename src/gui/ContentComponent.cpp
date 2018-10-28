@@ -626,7 +626,7 @@ public:
         setSize (props->getIntValue ("ContentContainer_width", 48),
                  props->getIntValue ("ContentContainer_height", 48));
         content1->setSize (getWidth(), props->getIntValue ("ContentContainer_height1", 48));
-        content2->setSize (getWidth(), props->getIntValue ("ContentContainer_height2", 48));
+        content2->setSize (getWidth(), props->getIntValue ("ContentContainer_height2", lastAccessoryHeight));
         lastAccessoryHeight = content2->getHeight();
         updateLayout();
     }
@@ -641,7 +641,8 @@ private:
     
     bool showAccessoryView = false;
     int barSize = 2;
-    int lastAccessoryHeight = 140;
+    int lastAccessoryHeight = 172;
+    int capturedAccessoryHeight = 172;
     bool locked = true;
 
     void lockLayout()
@@ -1109,6 +1110,8 @@ void ContentComponent::stabilizeViews()
         container->content1->stabilizeContent();
     if (container->content2)
         container->content2->stabilizeContent();
+    if (nodeStrip)
+        nodeStrip->stabilizeContent();
 }
 
 void ContentComponent::saveState (PropertiesFile* props)

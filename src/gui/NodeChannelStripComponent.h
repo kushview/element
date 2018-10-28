@@ -54,12 +54,10 @@ public:
         channelStrip.setBounds (r.removeFromBottom (jmin (240, r.getHeight())));
     }
 
-    inline void paint (Graphics& g) override
+    inline virtual void paint (Graphics& g) override
     {
         g.setColour (LookAndFeel::widgetBackgroundColor);
         g.fillAll();
-        g.setColour (LookAndFeel::contentBackgroundColor);
-        g.drawLine (getWidth() - 1.f, 0.0, getWidth() - 1.f, getHeight());
     }
 
     inline void timerCallback() override
