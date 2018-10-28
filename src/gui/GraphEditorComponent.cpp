@@ -28,6 +28,27 @@
 
 namespace Element {
 
+static bool elNodeIsAudioMixer (const Node& node)
+{
+    return node.getFormat().toString() == "Element"
+        && node.getIdentifier().toString() == "element.audioMixer";
+}
+
+static bool elNodeIsMidiDevice (const Node& node)
+{
+    return node.getFormat().toString() == "Internal"
+        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
+             node.getIdentifier().toString() == "element.midiOutputDevice" );
+}
+
+static bool elNodeCanChangeIO (const Node& node)
+{
+    return !node.isIONode() 
+        && !node.isGraph()
+        && !elNodeIsAudioMixer (node)
+        && !elNodeIsMidiDevice (node);
+}
+
 class PigWhipSource : public Component {
 public:
     PigWhipSource ()
@@ -171,27 +192,6 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
 };
-
-static bool elNodeIsAudioMixer (const Node& node)
-{
-    return node.getFormat().toString() == "Element"
-        && node.getIdentifier().toString() == "element.audioMixer";
-}
-
-static bool elNodeIsMidiDevice (const Node& node)
-{
-    return node.getFormat().toString() == "Internal"
-        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
-             node.getIdentifier().toString() == "element.midiOutputDevice" );
-}
-
-static bool elNodeCanChangeIO (const Node& node)
-{
-    return !node.isIONode() 
-        && !node.isGraph()
-        && !elNodeIsAudioMixer (node)
-        && !elNodeIsMidiDevice (node);
-}
 
 class FilterComponent    : public Component,
                            public Button::Listener,
@@ -637,9 +637,7 @@ public:
           graph (graph_),
           lastInputX (0), lastInputY (0),
           lastOutputX (0), lastOutputY (0)
-    {
-        setAlwaysOnTop (true);
-    }
+    { }
 
     ~ConnectorComponent() { }
 
@@ -894,10 +892,13 @@ void GraphEditorComponent::setNode (const Node& n)
     verticalLayout = graph.getProperty (Tags::vertical, true);
     resizePositionsFrozen = (bool) graph.getProperty (Tags::staticPos, false);
 
-    draggingConnector = nullptr;
+    if (draggingConnector)
+        removeChildComponent (draggingConnector);
     deleteAllChildren();
     updateComponents();
-
+    if (draggingConnector)
+        addAndMakeVisible (draggingConnector);
+    
     data.addListener (this);
 }
 
@@ -1176,7 +1177,7 @@ void GraphEditorComponent::updateFilterComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
         if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
-            fc->update (doPosition);
+            { fc->update (doPosition); }
 }
 
 void GraphEditorComponent::updateComponents()
@@ -1190,7 +1191,7 @@ void GraphEditorComponent::updateComponents()
         if (connector == nullptr)
         {
             connector = new ConnectorComponent (graph);
-            addAndMakeVisible (connector);
+            addAndMakeVisible (connector, i);
         }
         
         connector->setGraph (this->graph);
@@ -1205,7 +1206,7 @@ void GraphEditorComponent::updateComponents()
         if (comp == nullptr)
         {
             comp = new FilterComponent (graph, node, verticalLayout);
-            addAndMakeVisible (comp);
+            addAndMakeVisible (comp, i + 10000);
         }
     }
 
@@ -1224,7 +1225,7 @@ void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const in
     draggingConnector->setGraph (this->graph);
     draggingConnector->setInput (sourceNode, sourceFilterChannel);
     draggingConnector->setOutput (destNode, destFilterChannel);
-
+    draggingConnector->setAlwaysOnTop (true);
     addAndMakeVisible (draggingConnector);
     draggingConnector->toFront (false);
 
@@ -1434,11 +1435,6 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
     }
 }
 
-bool shouldDrawDragImageWhenOver()
-{
-    return true;
-}
-
 void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
 {
     if (child.hasType (Tags::node))
@@ -1446,7 +1442,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
         child.setProperty ("relativeX", verticalLayout ? lastDropX : lastDropY, 0);
         child.setProperty ("relativeY", verticalLayout ? lastDropY : lastDropX, 0);
         auto* comp = new FilterComponent (graph, Node (child, false), verticalLayout);
-        addAndMakeVisible (comp);
+        addAndMakeVisible (comp, 20000);
         comp->update();
     }
     else if (child.hasType (Tags::arc) || child.hasType (Tags::nodes) ||
