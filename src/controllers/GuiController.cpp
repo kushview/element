@@ -163,6 +163,7 @@ void GuiController::saveProperties (PropertiesFile* props)
         props->setValue ("navSize",         content->getNavSize());
         props->setValue ("virtualKeyboard", content->isVirtualKeyboardVisible());
         props->setValue ("channelStrip",    content->isNodeChannelStripVisible());
+        props->setValue ("accessoryView",   content->showAccessoryView());
         content->saveState (props);
     }
 }
@@ -327,6 +328,7 @@ void GuiController::run()
     mainWindow->addKeyListener (keys);
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
+    
     mainWindow->addToDesktop();
 
     if (pf->getBoolValue ("mainWindowVisible", true))
@@ -377,7 +379,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
         Commands::toggleUserInterface,
-        Commands::toggleChannelStrip
+        Commands::toggleChannelStrip,
+        Commands::showGraphMixer
     });
     
     commands.add (Commands::quit);
@@ -505,7 +508,19 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->getMainViewName() == "GraphEditor") flags |= Info::isTicked;
             result.addDefaultKeypress (KeyPress::F2Key, 0);
-            result.setInfo ("Graph Editor", "Show the graph editor", Commands::Categories::Session, flags);
+            result.setInfo ("Graph Editor", "Show the graph editor", 
+                Commands::Categories::UserInterface, flags);
+        } break;
+
+        case Commands::showGraphMixer: {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->showAccessoryView() && 
+                content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER) 
+            {
+                flags |= Info::isTicked;
+            }
+            result.setInfo ("Graph Mixer", "Show/hide the graph mixer", 
+                Commands::Categories::UserInterface, flags);
         } break;
         
         case Commands::showControllerDevices:
@@ -660,6 +675,14 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::showGraphEditor:
             content->setMainView ("GraphEditor");
             break;
+        case Commands::showGraphMixer:
+        {
+            if (content->showAccessoryView())
+                content->setShowAccessoryView (false);
+            else
+                content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            
+        } break;
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;

@@ -10,6 +10,14 @@ namespace Element {
 class AppController;
 class Globals;
 
+class Action : public UndoableAction
+{
+public:
+    virtual ~Action() { }
+protected:
+    Action() { }
+};
+
 struct AppMessage : public Message
 {
     inline virtual void createActions (AppController&, OwnedArray<UndoableAction>&) const { }

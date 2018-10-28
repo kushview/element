@@ -8,6 +8,9 @@
 #include "engine/GraphNode.h"
 #include "session/Session.h"
 
+
+#define EL_VIEW_GRAPH_MIXER "GraphMixerView"
+
 namespace Element {
 
 class AppController;
@@ -77,6 +80,8 @@ public:
     void setMainView (const String& name);
     void setAccessoryView (const String& name);
     String getMainViewName() const;
+    String getAccessoryViewName() const;
+
     void nextMainView();
     void backMainView();
     
@@ -113,6 +118,8 @@ public:
     bool perform (const InvocationInfo&) override { return false; }
     ApplicationCommandTarget* getNextCommandTarget() override;
 
+    void setShowAccessoryView (const bool show);
+    bool showAccessoryView() const;
 private:
     AppController& controller;
     

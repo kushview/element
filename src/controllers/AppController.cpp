@@ -140,6 +140,7 @@ void AppController::handleMessage (const Message& msg)
             for (auto* action : actions)
                 undo.perform (action);
             actions.clearQuick (false);
+            gui->stabilizeViews();
             return;
         }
     }

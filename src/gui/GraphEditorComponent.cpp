@@ -917,7 +917,7 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
 
 void GraphEditorComponent::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::contentBackgroundColor);
+    g.fillAll (LookAndFeel::widgetBackgroundColor.darker().darker());
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)

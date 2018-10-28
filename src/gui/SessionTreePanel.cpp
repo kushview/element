@@ -143,6 +143,7 @@ public:
             gui->selectNode (node.getNodeByFormat ("Internal", "audio.output"));
         
         gui->refreshMainMenu();
+        gui->stabilizeViews();
     }
 
     bool mightContainSubItems() override            { return node.isGraph(); }

@@ -1,21 +1,23 @@
 
-#include "gui/ChannelStripComponent.h"
+#include "controllers/AppController.h"
+#include "gui/NodeChannelStripComponent.h"
 #include "gui/GraphMixerView.h"
 #include "gui/GraphMixerView.h"
 #include "gui/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
-
+#include "session/Session.h"
+#include "Globals.h"
 namespace Element {
 
 class GraphMixerListBoxModel : public ListBoxModel
 {
 public:
-    GraphMixerListBoxModel() { }
+    GraphMixerListBoxModel (GuiController& g) : gui (g) { }
     ~GraphMixerListBoxModel() { }
 
-    virtual int getNumRows() override
+    int getNumRows() override
     {
-        return 8;
+        return gui.getWorld().getSession()->getActiveGraph().getNumNodes();
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g,
@@ -25,12 +27,17 @@ public:
         ignoreUnused (rowNumber, g, width, height, rowIsSelected);
     }
 
+    Node getNode (int r) {
+        return gui.getWorld().getSession()->getActiveGraph().getNode (r);
+    }
 
     Component* refreshComponentForRow (int rowNumber, bool isRowSelected, 
                                        Component* existing) override
     {
-        ChannelStripComponent* const strip = existing == nullptr
-            ? new ChannelStripComponent() : dynamic_cast<ChannelStripComponent*> (existing);
+        NodeChannelStripComponent* const strip = existing == nullptr
+            ? new NodeChannelStripComponent (gui, false) 
+            : dynamic_cast<NodeChannelStripComponent*> (existing);
+        strip->setNode (getNode (rowNumber));
         return strip;
     }
 
@@ -46,18 +53,21 @@ public:
     virtual String getTooltipForRow (int row);
     virtual MouseCursor getMouseCursorForRow (int row);
    #endif
+private:
+    GuiController& gui;
 };
 
 class GraphMixerView::Content : public Component 
 {
 public:
-    Content (GraphMixerView& v)
-        : view (v)
+    Content (GraphMixerView& v, GuiController& gui, Session* sess)
+        : session (sess), view (v)
     {
         addAndMakeVisible (box);
         box.setRowHeight (80);
-        model.reset (new GraphMixerListBoxModel ());
+        model.reset (new GraphMixerListBoxModel (gui));
         box.setModel (model.get());
+        box.updateContent();
     }
 
     ~Content()
@@ -77,7 +87,12 @@ public:
         g.fillAll();
     }
 
+    void stabilize() {
+        box.updateContent();
+    }
+
 private:
+    SessionPtr session;
     GraphMixerView& view;
     std::unique_ptr<GraphMixerListBoxModel> model;
     ChannelStripComponent channelStrip;
@@ -86,8 +101,7 @@ private:
 
 GraphMixerView::GraphMixerView()
 {
-    content.reset (new Content (*this));
-    addAndMakeVisible (content.get());
+    setName (EL_VIEW_GRAPH_MIXER);
 }
 
 GraphMixerView::~GraphMixerView()
@@ -97,17 +111,22 @@ GraphMixerView::~GraphMixerView()
 
 void GraphMixerView::resized()
 {
-    content->setBounds (getLocalBounds());
+    if (content)
+        content->setBounds (getLocalBounds());
 }
 
 void GraphMixerView::stabilizeContent()
 {
-
+    if (content)
+        content->stabilize();
 }
 
-void GraphMixerView::initializeView (AppController&)
+void GraphMixerView::initializeView (AppController& app)
 {
-
+    content.reset (new Content (*this, *app.findChild<GuiController>(),
+                                app.getGlobals().getSession()));
+    addAndMakeVisible (content.get());
+    content->stabilize();
 }
 
 }

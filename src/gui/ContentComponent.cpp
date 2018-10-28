@@ -46,7 +46,7 @@
 #endif
 
 #ifndef EL_USE_GRAPH_MIXER_VIEW
- #define EL_USE_GRAPH_MIXER_VIEW 0
+ #define EL_USE_GRAPH_MIXER_VIEW 1
 #endif
 
 #ifndef EL_USE_NODE_CHANNEL_STRIP
@@ -67,7 +67,50 @@ static void showProductLockedAlert (const String& msg = String(), const String& 
     if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
         URL("https://kushview.net/products/element/").launchInDefaultBrowser();
 }
+
+class SmartLayoutManager : public StretchableLayoutManager {
+public:
+    SmartLayoutManager() { }
+    virtual ~SmartLayoutManager() { }
+
+private:
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SmartLayoutManager);
+};
+
+class SmartLayoutResizeBar : public StretchableLayoutResizerBar
+{
+public:
+    Signal mousePressed, mouseReleased;
+    SmartLayoutResizeBar (StretchableLayoutManager* layoutToUse,
+                          int itemIndexInLayout, bool isBarVertical)
+    : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),
+      layout (nullptr)
+    {
+        mousePressed.disconnect_all_slots();
+        mouseReleased.disconnect_all_slots();
+    }
     
+    ~SmartLayoutResizeBar()
+    {
+        layout = nullptr;
+    }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseDown (ev);
+        mousePressed();
+    }
+    
+    void mouseUp (const MouseEvent& ev) override
+    {
+        StretchableLayoutResizerBar::mouseUp (ev);
+        mouseReleased();
+    }
+    
+private:
+    SmartLayoutManager* layout;
+};
+
 // MARK: Content View
 
 ContentView::ContentView()
@@ -442,7 +485,12 @@ public:
         : owner (cc)
     {
         addAndMakeVisible (content1 = new ContentView());
-        addAndMakeVisible (bar = new StretchableLayoutResizerBar (&layout, 1, false));
+        addAndMakeVisible (bar = new SmartLayoutResizeBar (&layout, 1, false));
+        bar->mousePressed.connect (
+            std::bind (&ContentContainer::updateLayout, this));
+        bar->mouseReleased.connect (
+            std::bind (&ContentContainer::lockLayout, this));
+
         addAndMakeVisible (content2 = new ContentView());
         updateLayout();
         resized();
@@ -457,6 +505,9 @@ public:
         comps[1] = bar.get();
         comps[2] = content2.get();
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
+        if (locked && showAccessoryView && content2->getHeight() <= 50) {
+            setShowAccessoryView (false);
+        }
     }
     
     void setNode (const Node& node)
@@ -490,8 +541,14 @@ public:
             addAndMakeVisible (content1);
         }
 
-        updateLayout();
-        resized();
+        if (showAccessoryView)
+        {
+            resized();
+        }
+        else
+        {
+            updateLayout();
+        }
 
         content1->didBecomeActive();
         content1->stabilizeContent();
@@ -510,11 +567,19 @@ public:
         {
             content2->willBecomeActive();
             addAndMakeVisible (content2);
-            content2->didBecomeActive();
         }
 
-        updateLayout();
-        resized();
+        if (! showAccessoryView)
+        {
+            setShowAccessoryView (true);
+        }
+        else
+        {
+            resized();
+        }
+
+        content2->didBecomeActive();
+        content2->stabilizeContent();
     }
     
     void setShowAccessoryView (const bool show)
@@ -522,33 +587,106 @@ public:
         if (showAccessoryView == show)
             return;
         showAccessoryView = show;
-        updateLayout();
+        const auto retainHeight = lastAccessoryHeight;
+
+        if (show)
+        {
+            layout.setItemLayout (0, 48, -1.0, content1->getHeight() - 4 - lastAccessoryHeight);
+            layout.setItemLayout (1, barSize, barSize, barSize);
+            layout.setItemLayout (2, 48, -1.0, lastAccessoryHeight);
+        }
+        else
+        {
+            layout.setItemLayout (0, 48, -1.0, content1->getHeight());
+            layout.setItemLayout (1, 0, 0, 0);
+            layout.setItemLayout (2, 0, -1.0, 0);
+        }
+        
+        resized();
+
+        if (show)
+        {
+        }
+
+        lastAccessoryHeight = retainHeight;
+
+        owner.getAppController().findChild<GuiController>()->refreshMainMenu();
     }
     
+    void saveState (PropertiesFile* props)
+    {
+        props->setValue ("ContentContainer_width", getWidth());
+        props->setValue ("ContentContainer_height", getHeight());
+        props->setValue ("ContentContainer_height1", content1->getHeight());
+        props->setValue ("ContentContainer_height2", content2->getHeight());
+    }
+
+    void restoreState (PropertiesFile* props)
+    {
+        setSize (props->getIntValue ("ContentContainer_width", 48),
+                 props->getIntValue ("ContentContainer_height", 48));
+        content1->setSize (getWidth(), props->getIntValue ("ContentContainer_height1", 48));
+        content2->setSize (getWidth(), props->getIntValue ("ContentContainer_height2", 48));
+        lastAccessoryHeight = content2->getHeight();
+        updateLayout();
+    }
+
 private:
     friend class ContentComponent;
     ContentComponent& owner;
     StretchableLayoutManager layout;
-    ScopedPointer<StretchableLayoutResizerBar> bar;
+    ScopedPointer<SmartLayoutResizeBar> bar;
     ScopedPointer<ContentView> content1;
     ScopedPointer<ContentView> content2;
     
     bool showAccessoryView = false;
-    int barSize = 4;
-    
-    void updateLayout()
+    int barSize = 2;
+    int lastAccessoryHeight = 140;
+    bool locked = true;
+
+    void lockLayout()
     {
+        locked = true;
+        
+        const int content1Min = 48;
         if (showAccessoryView)
         {
-            layout.setItemLayout (0, 200, -1.0, 200);
+            layout.setItemLayout (0, content1Min, -1.0, content1->getHeight());
             layout.setItemLayout (1, barSize, barSize, barSize);
-            layout.setItemLayout (2, 1, -1.0, 0);
+            layout.setItemLayout (2, content2->getHeight(), content2->getHeight(), content2->getHeight());
+        }
+        else
+        {
+            layout.setItemLayout (0, content1Min, -1.0, content1->getHeight());
+            layout.setItemLayout (1, 0, 0, 0);
+            layout.setItemLayout (2, 0, -1.0, 0);
+        }
+       
+        resized();
+    }
+
+    void updateLayout()
+    {
+        locked = false;
+
+        if (showAccessoryView)
+        {
+            layout.setItemLayout (0, 48, -1.0, content1->getHeight());
+            layout.setItemLayout (1, barSize, barSize, barSize);
+            layout.setItemLayout (2, 48, -1.0, content2->getHeight());
         }
         else
         {
             layout.setItemLayout (0, 200, -1.0, 200);
             layout.setItemLayout (1, 0, 0, 0);
             layout.setItemLayout (2, 0, -1.0, 0);
+        }
+
+        resized();
+
+        if (showAccessoryView)
+        {
+            lastAccessoryHeight = content2->getHeight();
         }
     }
 };
@@ -599,10 +737,45 @@ static ContentView* createLastContentView (Settings& settings)
     return view ? view.release() : nullptr;
 }
 
-static bool booleanProperty (Settings& settings, const String& property)
+static String stringProperty (Settings& settings, const String& property, const String defaultValue = String())
 {
     auto* props = settings.getUserSettings();
-    return props == nullptr ? false : props->getBoolValue (property);
+    return props == nullptr ? String() : props->getValue (property, defaultValue);
+}
+
+static bool booleanProperty (Settings& settings, const String& property, const bool defaultValue)
+{
+    auto* props = settings.getUserSettings();
+    return props == nullptr ? false : props->getBoolValue (property, defaultValue);
+}
+
+static void windowSizeProperty (Settings& settings, const String& property, int& w, int& h,
+                                const int defaultW, const int defaultH)
+{
+    auto* props = settings.getUserSettings();
+    StringArray tokens;
+    tokens.addTokens (props->getValue(property).trim(), false);
+    tokens.removeEmptyStrings();
+    tokens.trim();
+
+    w = defaultW; h = defaultH;
+
+    const bool fs = tokens[0].startsWithIgnoreCase ("fs");
+    const int firstCoord = fs ? 1 : 0;
+
+    if (tokens.size() != firstCoord + 4)
+        return;
+
+    Rectangle<int> newPos (tokens[firstCoord].getIntValue(),
+                           tokens[firstCoord + 1].getIntValue(),
+                           tokens[firstCoord + 2].getIntValue(),
+                           tokens[firstCoord + 3].getIntValue());
+
+    if (! newPos.isEmpty())
+    {
+        w = newPos.getWidth();
+        h = newPos.getHeight();
+    }
 }
 
 struct ContentComponent::Tooltips
@@ -614,6 +787,8 @@ struct ContentComponent::Tooltips
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
 {
+    auto& settings (controller.getGlobals().getSettings());
+
     setOpaque (true);
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
@@ -623,14 +798,28 @@ ContentComponent::ContentComponent (AppController& ctl_)
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
     addAndMakeVisible (toolBar = new Toolbar (*this));
     
-    auto& settings (controller.getGlobals().getSettings());
+    {
+        int w, h;
+        windowSizeProperty (settings, "mainWindowState", w, h, 760, 480);
+        setSize (w, h);
+        updateLayout();
+        resized();
+    }
+
     container->setMainView (createLastContentView (settings));
-    setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard"));    
-    setNodeChannelStripVisible (booleanProperty (settings, "channelStrip"));
-   
-   #if EL_USE_GRAPH_MIXER_VIEW
-    setAccessoryView ("GraphMixerView");
-   #endif
+    
+    if (booleanProperty (settings, "accessoryView", false))
+    {
+        setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
+    }
+    else
+    {
+        setShowAccessoryView (false);
+    }
+    
+    setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));    
+    setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
+
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
     
@@ -638,8 +827,6 @@ ContentComponent::ContentComponent (AppController& ctl_)
     toolBarSize = 32;
     statusBarVisible = true;
     statusBarSize = 22;
-    
-    setSize (760, 480);
     
     {
         int navSize = controller.getGlobals().getSettings().getUserSettings()->getIntValue ("navSize", 220);
@@ -651,6 +838,8 @@ ContentComponent::ContentComponent (AppController& ctl_)
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 //    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
+
+    resized();
 }
 
 ContentComponent::~ContentComponent() noexcept
@@ -664,6 +853,13 @@ String ContentComponent::getMainViewName() const
 {
     if (container && container->content1)
         return container->content1->getName();
+    return String();
+}
+
+String ContentComponent::getAccessoryViewName() const
+{
+    if (container && container->content2)
+        return container->content2->getName();
     return String();
 }
 
@@ -739,19 +935,10 @@ void ContentComponent::setContentView (ContentView* view, const bool accessory)
 
 void ContentComponent::setAccessoryView (const String& name)
 {
-    bool wasAdded = true;
     if (name == "PatchBay") {
         setContentView (new ConnectionGrid(), true);
-    } else if (name == "GraphMixerView") {
+    } else if (name == EL_VIEW_GRAPH_MIXER) {
         setContentView (new GraphMixerView(), true);
-    }
-    else
-    {
-        wasAdded = false;
-    }
-    if (wasAdded)
-    {
-        container->setShowAccessoryView (true);
     }
 }
 
@@ -906,10 +1093,7 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
         
     toolBar->setSession (session);
     
-    if (container->content1)
-        container->content1->stabilizeContent();
-    if (container->content2)
-        container->content2->stabilizeContent();
+    stabilizeViews();
     
     if (auto* main = findParentComponentOfClass<MainWindow>())
         main->refreshMenu();
@@ -932,6 +1116,8 @@ void ContentComponent::saveState (PropertiesFile* props)
     jassert (props);
     if (nav)
         nav->saveState (props);
+    if (container)
+        container->saveState (props);
 }
 
 void ContentComponent::restoreState (PropertiesFile* props)
@@ -939,6 +1125,9 @@ void ContentComponent::restoreState (PropertiesFile* props)
     jassert (props);
     if (nav)
         nav->restoreState (props);
+    if (container)
+        container->restoreState (props);
+    resized();
 }
 
 void ContentComponent::setCurrentNode (const Node& node)
@@ -958,7 +1147,7 @@ void ContentComponent::setCurrentNode (const Node& node)
 void ContentComponent::updateLayout()
 {
     layout.setItemLayout (0, EL_NAV_MIN_WIDTH, EL_NAV_MAX_WIDTH, nav->getWidth());
-    layout.setItemLayout (1, 4, 4, 4);
+    layout.setItemLayout (1, 2, 2, 2);
     layout.setItemLayout (2, 300, -1, 400);
 }
 
@@ -970,14 +1159,13 @@ void ContentComponent::resizerMouseDown()
 void ContentComponent::resizerMouseUp()
 {
     layout.setItemLayout (0, nav->getWidth(), nav->getWidth(), nav->getWidth());
-    layout.setItemLayout (1, 4, 4, 4);
+    layout.setItemLayout (1, 2, 2, 2);
     layout.setItemLayout (2, 300, -1, 400);
     resized();
 }
 
 void ContentComponent::setVirtualKeyboardVisible (const bool isVisible)
 {
-    
     if (isVisible == virtualKeyboardVisible)
         return;
     
@@ -1037,6 +1225,16 @@ void ContentComponent::toggleVirtualKeyboard()
 ApplicationCommandTarget* ContentComponent::getNextCommandTarget()
 {
     return (container) ? container->content1.get() : nullptr;
+}
+
+void ContentComponent::setShowAccessoryView (const bool show)
+{
+    if (container) container->setShowAccessoryView (show);
+}
+
+bool ContentComponent::showAccessoryView() const
+{
+    return (container) ? container->showAccessoryView : false;
 }
 
 }
