@@ -679,8 +679,9 @@ bool GuiController::perform (const InvocationInfo& info)
         {
             if (content->showAccessoryView())
                 content->setShowAccessoryView (false);
-            else
+            else {
                 content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            }
             
         } break;
         case Commands::toggleVirtualKeyboard:

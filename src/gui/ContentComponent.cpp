@@ -504,10 +504,14 @@ public:
         comps[0] = content1.get();
         comps[1] = bar.get();
         comps[2] = content2.get();
+        if (content2->getHeight() >= accessoryHeightThreshold)
+            lastAccessoryHeight = content2->getHeight();
+
         layout.layOutComponents (comps, 3, 0, 0, getWidth(), getHeight(), true, true);
-        if (locked && showAccessoryView && content2->getHeight() <= 50) {
+        if (locked && showAccessoryView && content2->getHeight() < accessoryHeightThreshold) {
             setShowAccessoryView (false);
-        }
+            locked = false; 
+        }       
     }
     
     void setNode (const Node& node)
@@ -569,15 +573,7 @@ public:
             addAndMakeVisible (content2);
         }
 
-        if (! showAccessoryView)
-        {
-            setShowAccessoryView (true);
-        }
-        else
-        {
-            resized();
-        }
-
+        resized();
         content2->didBecomeActive();
         content2->stabilizeContent();
     }
@@ -587,19 +583,30 @@ public:
         if (showAccessoryView == show)
             return;
         showAccessoryView = show;
-        const auto retainHeight = lastAccessoryHeight;
 
         if (show)
         {
+            lastAccessoryHeight = jmax (accessoryHeightThreshold + 1, lastAccessoryHeight);
             layout.setItemLayout (0, 48, -1.0, content1->getHeight() - 4 - lastAccessoryHeight);
             layout.setItemLayout (1, barSize, barSize, barSize);
             layout.setItemLayout (2, 48, -1.0, lastAccessoryHeight);
         }
         else
         {
+            if (capturedAccessoryHeight > 0 && capturedAccessoryHeight != lastAccessoryHeight) {
+                int i = 0;
+                lastAccessoryHeight = capturedAccessoryHeight;
+                
+            }
+            else
+            {
+                lastAccessoryHeight = content2->getHeight();
+            }
+
             layout.setItemLayout (0, 48, -1.0, content1->getHeight());
             layout.setItemLayout (1, 0, 0, 0);
             layout.setItemLayout (2, 0, -1.0, 0);
+            capturedAccessoryHeight = -1;
         }
         
         resized();
@@ -608,8 +615,7 @@ public:
         {
         }
 
-        lastAccessoryHeight = retainHeight;
-
+        locked = false;
         owner.getAppController().findChild<GuiController>()->refreshMainMenu();
     }
     
@@ -623,8 +629,8 @@ public:
 
     void restoreState (PropertiesFile* props)
     {
-        setSize (props->getIntValue ("ContentContainer_width", 48),
-                 props->getIntValue ("ContentContainer_height", 48));
+        setSize (props->getIntValue ("ContentContainer_width",  jmax (48, getWidth())),
+                 props->getIntValue ("ContentContainer_height", jmax (48, getHeight())));
         content1->setSize (getWidth(), props->getIntValue ("ContentContainer_height1", 48));
         content2->setSize (getWidth(), props->getIntValue ("ContentContainer_height2", lastAccessoryHeight));
         lastAccessoryHeight = content2->getHeight();
@@ -642,7 +648,8 @@ private:
     bool showAccessoryView = false;
     int barSize = 2;
     int lastAccessoryHeight = 172;
-    int capturedAccessoryHeight = 172;
+    int capturedAccessoryHeight = -1;
+    const int accessoryHeightThreshold = 50;
     bool locked = true;
 
     void lockLayout()
@@ -664,6 +671,11 @@ private:
         }
        
         resized();
+
+        if (showAccessoryView)
+        {
+            capturedAccessoryHeight = content2->getHeight();
+        }
     }
 
     void updateLayout()
@@ -687,7 +699,7 @@ private:
 
         if (showAccessoryView)
         {
-            lastAccessoryHeight = content2->getHeight();
+            capturedAccessoryHeight = content2->getHeight();
         }
     }
 };
@@ -941,6 +953,8 @@ void ContentComponent::setAccessoryView (const String& name)
     } else if (name == EL_VIEW_GRAPH_MIXER) {
         setContentView (new GraphMixerView(), true);
     }
+
+    container->setShowAccessoryView (true);
 }
 
 void ContentComponent::paint (Graphics &g)
