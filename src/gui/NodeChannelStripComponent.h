@@ -84,11 +84,6 @@ public:
         if (GraphNodePtr ptr = node.getGraphNode())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
-            if (startChannel > 1)
-            {
-                DBG("start: " << startChannel);
-            }
-
             if (ptr->getNumAudioOutputs() == 1)
             {
                 if (isAudioOutNode)
@@ -108,7 +103,7 @@ public:
                     for (int c = startChannel; c < endChannel; ++c)
                         meter.setValue (c - startChannel, ptr->getOutputRMS (c));
             }
-            channelStrip.setPower (! ptr->isSuspended(), false);
+            channelStrip.setPower (!ptr->isSuspended(), false);
         }
         else
         {

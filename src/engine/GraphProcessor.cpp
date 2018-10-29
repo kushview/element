@@ -112,7 +112,7 @@ public:
     CopyMidiBufferOp (const int srcBufferNum_, const int dstBufferNum_)
         : srcBufferNum (srcBufferNum_),
           dstBufferNum (dstBufferNum_)
-    {}
+    { }
 
     void perform (AudioSampleBuffer&, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int)
     {
