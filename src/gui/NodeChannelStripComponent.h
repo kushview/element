@@ -8,7 +8,8 @@
 namespace Element {
 
 class NodeChannelStripComponent : public Component,
-                                  public Timer
+                                  public Timer,
+                                  public ComboBox::Listener
 {
 public:
     NodeChannelStripComponent (GuiController& g, bool handleNodeSelected = true)
@@ -20,6 +21,13 @@ public:
         nodeName.setJustificationType (Justification::centredBottom);
         nodeName.setEditable (false, true, false);
         nodeName.setFont (10.f);
+
+        addAndMakeVisible (channelBox);
+        channelBox.setJustificationType (Justification::centred);
+
+        addAndMakeVisible (flowBox);
+        flowBox.setJustificationType (Justification::centred);
+
         bindSignals();
     }
 
@@ -31,6 +39,7 @@ public:
     void bindSignals()
     {
         unbindSignals();
+        flowBox.addListener (this);
         if (listenForNodeSelected)
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&NodeChannelStripComponent::nodeSelected, this));
@@ -42,6 +51,7 @@ public:
 
     void unbindSignals()
     {
+        flowBox.removeListener (this);
         nodeSelectedConnection.disconnect();
         volumeChangedConnection.disconnect();
         powerChangedConnection.disconnect();
@@ -51,7 +61,12 @@ public:
     {
         auto r (getLocalBounds());
         nodeName.setBounds (r.removeFromTop(22).reduced (2));
-        channelStrip.setBounds (r.removeFromBottom (jmin (240, r.getHeight())));
+
+        auto r2 = r.removeFromBottom (jmin (268, r.getHeight()));
+        int boxSize = r2.getWidth() - 8;
+        flowBox.setBounds (r2.removeFromTop (16).withSizeKeepingCentre (boxSize, 14));
+        channelBox.setBounds (r2.removeFromTop(16).withSizeKeepingCentre (boxSize, 14));
+        channelStrip.setBounds (r2);
     }
 
     inline virtual void paint (Graphics& g) override
@@ -68,23 +83,30 @@ public:
         const bool isAudioOut = node.isAudioIONode ();
         if (GraphNodePtr ptr = node.getGraphNode())
         {
+            const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
+            if (startChannel > 1)
+            {
+                DBG("start: " << startChannel);
+            }
+
             if (ptr->getNumAudioOutputs() == 1)
             {
                 if (isAudioOutNode)
                     for (int c = 0; c < 2; ++c)
-                        meter.setValue (c, ptr->getInputRMS (0));
+                        meter.setValue (c, ptr->getInputRMS (startChannel));
                 else
                     for (int c = 0; c < 2; ++c)
-                        meter.setValue (c, ptr->getOutputRMS (0));
+                        meter.setValue (c, ptr->getOutputRMS (startChannel));
             }
             else
             {
-                if (isAudioOutNode)
-                    for (int c = 0; c < 2; ++c)
-                        meter.setValue (c, ptr->getInputRMS (c));
+                const int endChannel = startChannel + 2;
+                if (isAudioOutNode || isMonitoringInputs())
+                    for (int c = startChannel; c < endChannel; ++c)
+                        meter.setValue (c - startChannel, ptr->getInputRMS (c));
                 else
-                    for (int c = 0; c < 2; ++c)
-                        meter.setValue (c, ptr->getOutputRMS (c));
+                    for (int c = startChannel; c < endChannel; ++c)
+                        meter.setValue (c - startChannel, ptr->getOutputRMS (c));
             }
             channelStrip.setPower (! ptr->isSuspended(), false);
         }
@@ -100,12 +122,19 @@ public:
 
     inline void setNode (const Node& newNode)
     {
+        if (node.getValueTree() == newNode.getValueTree())
+            return;
+        
         node = newNode;
         isAudioOutNode = node.isAudioOutputNode();
+        isAudioInNode  = node.isAudioInputNode();
         
+        audioIns.clearQuick(); audioOuts.clearQuick();
+
         if (node.isValid())
         {
             nodeName.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+            node.getPorts (audioIns, audioOuts, PortType::Audio);
         }
 
         if (GraphNodePtr object = node.getGraphNode())
@@ -119,7 +148,17 @@ public:
             b2.unblock();
         }
 
+        updateComboBoxes();
+
         startTimer (meterSpeedMillis);
+    }
+
+    void comboBoxChanged (ComboBox* box) override
+    {    
+        if (box == &flowBox)
+        {
+            updateComboBoxes (false, true);
+        }
     }
 
 private:
@@ -127,14 +166,84 @@ private:
     GuiController& gui;
     Label nodeName;
     Node node;
+    PortArray audioIns, audioOuts;
+    ComboBox channelBox, flowBox;
     ChannelStripComponent channelStrip;
     bool listenForNodeSelected;
+    
+    int meterSpeedMillis = 44;
+    bool isAudioOutNode = false;
+    bool isAudioInNode  = false;
+    bool monoMeter      = false;
+
     boost::signals2::connection nodeSelectedConnection;
     boost::signals2::connection volumeChangedConnection;
     boost::signals2::connection powerChangedConnection;
 
-    int meterSpeedMillis = 44;
-    bool isAudioOutNode = false;
+    inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
+    inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 1; }
+
+    void updateComboBoxes (bool doFlowBox = true, bool doChannelBox = true)
+    {
+        if (doFlowBox)
+        {
+            int flowId = flowBox.getSelectedId();
+            if (flowId <= 0)
+                flowId = 2;
+            flowBox.clear();
+            
+            
+            flowBox.setTooltip ("Signal flow to monitor");
+            
+            if (audioIns.size() > 0)
+                flowBox.addItem ("Input", 1);
+            if (audioOuts.size() > 0)
+                flowBox.addItem ("Output", 2);
+        
+            if (flowBox.getNumItems() > 0 && !isAudioInNode && !isAudioOutNode)
+            {
+                flowBox.setVisible (true);
+                flowBox.setSelectedId (flowId, false);
+                if (flowBox.getSelectedId() <= 0)
+                    flowBox.setSelectedItemIndex (0);
+            }
+            else
+            {
+                flowBox.setVisible (false);
+            }
+        }
+
+        if (doChannelBox)
+        {
+            channelBox.setTooltip ("Channel(s) to monitor");
+            channelBox.clear();
+
+            // audio out node ports flipped until more robust
+            auto& ports = isAudioOutNode ? audioIns :        
+                    isMonitoringInputs() ? audioIns : audioOuts;
+            
+            const bool monoPorts = ports.size() % 2 != 0;
+            const int step = monoPorts ? 1 : 2;
+            
+            for (int i = 0; i < ports.size(); i += step)
+            {
+                String text (int (i + 1));
+                if (! monoPorts)
+                    text << " - " << int (i + 2);
+                channelBox.addItem (text, i + 1);
+            }
+
+            if (channelBox.getNumItems() > 0)
+            {
+                channelBox.setVisible (true);
+                channelBox.setSelectedItemIndex (0);
+            }
+            else
+            {
+                channelBox.setVisible (false);
+            }
+        }
+    }
 
     void nodeSelected()
     {
