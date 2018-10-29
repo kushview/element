@@ -115,36 +115,45 @@ public:
         meter.repaint();
     }
 
-    inline void setNode (const Node& newNode)
+    inline void stabilizeContent()
     {
-        if (node.getValueTree() == newNode.getValueTree())
-            return;
-        
-        node = newNode;
-        isAudioOutNode = node.isAudioOutputNode();
-        isAudioInNode  = node.isAudioInputNode();
-        
-        audioIns.clearQuick(); audioOuts.clearQuick();
+        updateComboBoxes();
 
         if (node.isValid())
         {
             nodeName.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-            node.getPorts (audioIns, audioOuts, PortType::Audio);
         }
 
+        updateChannelStrip();
+    }
+
+    inline void updateChannelStrip()
+    {
         if (GraphNodePtr object = node.getGraphNode())
         {
             shared_connection_block b1 (volumeChangedConnection);
             shared_connection_block b2 (powerChangedConnection);
-            float gain = isAudioOutNode ? object->getInputGain() : object->getGain();
+            float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
             channelStrip.setVolume (Decibels::gainToDecibels (gain, -60.f));
             channelStrip.setPower (! object->isSuspended());
             b1.unblock();
             b2.unblock();
         }
+    }
 
-        updateComboBoxes();
+    inline void setNode (const Node& newNode)
+    {
+        if (node.getValueTree() == newNode.getValueTree())
+            return;
+        
+        stopTimer();
+        node = newNode;
+        isAudioOutNode = node.isAudioOutputNode();
+        isAudioInNode  = node.isAudioInputNode();
+        audioIns.clearQuick(); audioOuts.clearQuick();
+        node.getPorts (audioIns, audioOuts, PortType::Audio);
 
+        stabilizeContent();
         startTimer (meterSpeedMillis);
     }
 
@@ -153,6 +162,7 @@ public:
         if (box == &flowBox)
         {
             updateComboBoxes (false, true);
+            updateChannelStrip();
         }
     }
 
@@ -166,7 +176,7 @@ private:
     ChannelStripComponent channelStrip;
     bool listenForNodeSelected;
     
-    int meterSpeedMillis = 44;
+    int meterSpeedMillis = 60;
     bool isAudioOutNode = false;
     bool isAudioInNode  = false;
     bool monoMeter      = false;
@@ -250,7 +260,7 @@ private:
         if (GraphNodePtr object = node.getGraphNode())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
-            if (node.isAudioOutputNode())
+            if (isAudioOutNode || isMonitoringInputs())
             {
                 node.setProperty ("inputGain", gain);
                 object->setInputGain (static_cast<float> (gain));
