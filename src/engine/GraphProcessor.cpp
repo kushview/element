@@ -146,7 +146,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE (AddMidiBufferOp)
 };
 
-
 class DelayChannelOp : public Task
 {
 public:
@@ -213,14 +212,15 @@ public:
         }
 
         AudioSampleBuffer buffer (channels, totalChans, numSamples);
-        for (int i = numAudioIns; --i >= 0;)
-            node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
         
         if (node->getInputGain() != node->getLastInputGain()) {
             buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
         } else {
             buffer.applyGain(0, numSamples, node->getInputGain());
         }
+
+        for (int i = numAudioIns; --i >= 0;)
+            node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
 
         if (! processor->isSuspended ())
         {
