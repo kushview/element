@@ -107,7 +107,18 @@ struct Alert
                                                     const String& title = "Feature not Available")
     {
         const auto message = productLockedMessage (msg);
-        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, title, message, "Ok");
+        class Callback : public ModalComponentManager::Callback
+        {
+        public:
+            void modalStateFinished (int returnValue)
+            {
+                if (returnValue > 0)
+                    URL("https://kushview.net/products/element/").launchInDefaultBrowser();
+            }
+        };
+
+        AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, 
+            "Upgrade", "Cancel", nullptr, new Callback());
     }
 };
 

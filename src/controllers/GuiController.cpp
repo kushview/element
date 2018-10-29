@@ -677,19 +677,29 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showGraphMixer:
         {
-            if (content->showAccessoryView())
-                content->setShowAccessoryView (false);
-            else {
-                content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            if (getWorld().getUnlockStatus().isFullVersion())
+            {
+                if (content->showAccessoryView())
+                    content->setShowAccessoryView (false);
+                else
+                    content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            }
+            else
+            {
+                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
             }
             
         } break;
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;
-        case Commands::toggleChannelStrip:
-            content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-            break;
+
+        case Commands::toggleChannelStrip: {
+            if (getWorld().getUnlockStatus().isFullVersion())
+                content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
+            else
+                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
+        } break;
 
         case Commands::showLastContentView:
             content->backMainView();
