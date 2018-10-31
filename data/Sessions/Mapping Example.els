@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<session name="Mapping Example" tempo="161" notes="Demontration of MIDI mapping capabilities."
+         beatsPerBar="4" beatDivisor="2">
+  <graphs active="0">
+    <node type="graph" name="Graph 1" bypass="0" persistent="1" renderMode="single"
+          program="0" uuid="d57d3caddc3c4e369614202799e21d2d" staticPos="0"
+          midiProgram="26">
+      <nodes>
+        <node id="2" type="plugin" format="Internal" identifier="audio.output"
+              name="Built-in Output" relativeX="0.41505791505791506113" relativeY="0.87096774193548387455"
+              numAudioIns="2" numAudioOuts="0" bypass="0" program="0" persistent="1"
+              renderMode="single" uuid="87d7059dc0944b95ad6f2ebeb9b35e3e">
+          <nodes/>
+          <ports>
+            <port index="0" type="audio" flow="input" name="Output 1"/>
+            <port index="1" type="audio" flow="input" name="Output 2"/>
+          </ports>
+        </node>
+        <node id="3" type="plugin" format="Internal" identifier="midi.input"
+              name="MIDI In" relativeX="0.13294797687861270585" relativeY="0.09538461538461538713"
+              numAudioIns="0" numAudioOuts="0" bypass="0" program="0" persistent="1"
+              renderMode="single" uuid="973f699e88cc4f84ad098188570f0a64">
+          <nodes/>
+          <ports>
+            <port index="0" type="midi" flow="output" name="MIDI"/>
+          </ports>
+        </node>
+        <node format="Internal" identifier="midi.output" id="6" name="MIDI Out"
+              type="plugin" numAudioIns="0" numAudioOuts="0" relativeX="0.74951830443159928041"
+              relativeY="0.52923076923076928235" uuid="6edb2dd935904faba31d0fe3785500db"
+              bypass="0" persistent="1" renderMode="single" program="0">
+          <nodes/>
+          <ports>
+            <port index="0" type="midi" flow="input" name="MIDI"/>
+          </ports>
+        </node>
+        <node type="graph" name="Graph 2" bypass="0" persistent="1" renderMode="single"
+              uuid="e0523bc8527f45ac99d399ff02829fdc" id="5" program="0" vertical="1"
+              relativeX="0.27177177177177175293" relativeY="0.45528455284552843407">
+          <nodes>
+            <node id="2" type="plugin" format="Internal" identifier="audio.output"
+                  name="Audio Output" relativeX="0.35735735735735735252" relativeY="0.88346883468834691566"
+                  numAudioIns="2" numAudioOuts="0" bypass="0" program="0" uuid="056ff228d65c46dcb43dbe162e06ec84"
+                  persistent="1" renderMode="single">
+              <ports>
+                <port index="0" type="audio" flow="input" name="Output 1"/>
+                <port index="1" type="audio" flow="input" name="Output 2"/>
+              </ports>
+              <nodes/>
+            </node>
+            <node id="3" type="plugin" format="Internal" identifier="midi.input"
+                  name="Midi Input" relativeX="0.22857142857142856429" relativeY="0.11706349206349206393"
+                  numAudioIns="0" numAudioOuts="0" bypass="0" program="0" uuid="cf872ef9058c44a493c39d8ff145da25"
+                  persistent="1" renderMode="single">
+              <ports>
+                <port index="0" type="midi" flow="output" name="MIDI"/>
+              </ports>
+              <nodes/>
+            </node>
+            <node format="AudioUnit" identifier="AudioUnit:Effects/aufx,dely,appl"
+                  id="8" name="AUDelay" type="plugin" numAudioIns="2" numAudioOuts="2"
+                  uuid="df94f2eb01624982b3329da7b3952e35" bypass="0" persistent="1"
+                  renderMode="single" state="183.hAGaoMGcv.i0AHv.DTfAGfPBJr.CT4VXsUFWsEla0YVXiQWcxUlbTQVXzEFUzkGbkc0b0IFc4AWYWYWYxMWZu4FVU4FcoQGakQlDgAGbr8DDr...............D.....PPXqyd....AzyZimN...f.Bs67X....LfQiHIDRDVclgmDjUFa4AA.HTgFmvRL4DjRO42fHB.......DP..........z....................fh"
+                  programState="183.hAGaoMGcv.i0AHv.DTfAGfPBJr.CT4VXsUFWsEla0YVXiQWcxUlbTQVXzEFUzkGbkc0b0IFc4AWYWYWYxMWZu4FVU4FcoQGakQlDgAGbr8DDr...............D.....PPXqyd....AzyZimN...f.Bs67X....LfQiHIDRDVclgmDjUFa4AA.HTgFmvRL4DjRO42fHB.......DP..........z....................fh"
+                  program="-1" relativeX="0.36598639455782311369" relativeY="0.61111111111111116045"
+                  windowX="97" windowY="498" windowVisible="0">
+              <nodes/>
+              <ports>
+                <port index="0" type="audio" flow="input" name="Input 1"/>
+                <port index="1" type="audio" flow="input" name="Input 2"/>
+                <port index="2" type="audio" flow="output" name="Output 1"/>
+                <port index="3" type="audio" flow="output" name="Output 2"/>
+                <port index="4" type="control" flow="input" name="Param"/>
+                <port index="5" type="control" flow="input" name="Param"/>
+                <port index="6" type="control" flow="input" name="Param"/>
+                <port index="7" type="control" flow="input" name="Param"/>
+              </ports>
+            </node>
+            <node format="Internal" identifier="audio.input" id="9" name="Audio Input"
+                  type="plugin" numAudioIns="0" numAudioOuts="2" uuid="35202379bd1f4081bfa18b9db6479e5f"
+                  bypass="0" persistent="1" renderMode="single" program="0" relativeX="0.65467625899280579294"
+                  relativeY="0.34042553191489360875">
+              <nodes/>
+              <ports>
+                <port index="0" type="audio" flow="output" name="Input 1"/>
+                <port index="1" type="audio" flow="output" name="Input 2"/>
+              </ports>
+            </node>
+            <node format="VST" identifier="/Users/mfisher/Library/Audio/Plug-Ins/VST/JuceDemoPlugin.vst"
+                  id="10" name="Juce Demo Plugin" type="plugin" numAudioIns="8"
+                  numAudioOuts="8" relativeX="0.24174174174174173357" relativeY="0.35772357723577236088"
+                  uuid="262a1b5cfe6d4eff964869ee7602fd5b" bypass="0" persistent="1"
+                  renderMode="single" windowX="129" windowY="235" state="257.CMlaKA....fQBMDZ....AnzXj0F.A.......A...............................................................................................................................................................................gY0PxDBV....7zTVPwTUGkjSSUDUTkjSGMEH0k1UoQFcn0iHz.CLh.RcogTYocFZz0iHx.CLh.xYgkla8HRLh.BYkwVX40iHv3xLvbiL3byLyTyL4TCNwHSN3fiL3HxK9.."
+                  programState="157.CMlaKA....fQPMDZ....AnzXj0F.A.......A.........................................PXVMjLgfE....OMkETLU0QI4zTEQEUI4zQSARcocUZjQGZ8HBMv.iHfTWZHUVZmgFc8HhLv.iHfbVXo4VOhDiHfPVYrEVd8HBLtLCL2HCN2LyL0LSN0fSLxjCN3HCNh7hO.."
+                  program="0" windowVisible="1">
+              <nodes/>
+              <ports>
+                <port index="0" type="audio" flow="input" name="Input L"/>
+                <port index="1" type="audio" flow="input" name="Input R"/>
+                <port index="2" type="audio" flow="input" name="Aux 1 L"/>
+                <port index="3" type="audio" flow="input" name="Aux 1 R"/>
+                <port index="4" type="audio" flow="input" name="Aux 2 L"/>
+                <port index="5" type="audio" flow="input" name="Aux 2 R"/>
+                <port index="6" type="audio" flow="input" name="Aux 3 L"/>
+                <port index="7" type="audio" flow="input" name="Aux 3 R"/>
+                <port index="8" type="audio" flow="output" name="Output L"/>
+                <port index="9" type="audio" flow="output" name="Output R"/>
+                <port index="10" type="audio" flow="output" name="Aux 1 L"/>
+                <port index="11" type="audio" flow="output" name="Aux 1 R"/>
+                <port index="12" type="audio" flow="output" name="Aux 2 L"/>
+                <port index="13" type="audio" flow="output" name="Aux 2 R"/>
+                <port index="14" type="audio" flow="output" name="Aux 3 L"/>
+                <port index="15" type="audio" flow="output" name="Aux 3 R"/>
+                <port index="16" type="control" flow="input" name="Param"/>
+                <port index="17" type="control" flow="input" name="Param"/>
+                <port index="18" type="midi" flow="input" name="MIDI Input"/>
+                <port index="19" type="midi" flow="output" name="MIDI Output"/>
+              </ports>
+            </node>
+          </nodes>
+          <arcs>
+            <arc sourceNode="3" sourcePort="0" destNode="10" destPort="18"/>
+            <arc sourceNode="8" sourcePort="2" destNode="2" destPort="0"/>
+            <arc sourceNode="8" sourcePort="3" destNode="2" destPort="1"/>
+            <arc sourceNode="9" sourcePort="0" destNode="8" destPort="0"/>
+            <arc sourceNode="9" sourcePort="1" destNode="8" destPort="1"/>
+            <arc sourceNode="10" sourcePort="8" destNode="8" destPort="0"/>
+            <arc sourceNode="10" sourcePort="9" destNode="8" destPort="1"/>
+          </arcs>
+          <ports>
+            <port index="0" type="audio" flow="input" name="Input 1"/>
+            <port index="1" type="audio" flow="input" name="Input 2"/>
+            <port index="2" type="audio" flow="output" name="Output 1"/>
+            <port index="3" type="audio" flow="output" name="Output 2"/>
+            <port index="4" type="midi" flow="input" name="MIDI Input"/>
+            <port index="5" type="midi" flow="output" name="MIDI Output"/>
+          </ports>
+        </node>
+      </nodes>
+      <ports/>
+      <arcs>
+        <arc sourceNode="3" sourcePort="0" destNode="5" destPort="4"/>
+        <arc sourceNode="5" sourcePort="2" destNode="2" destPort="0"/>
+        <arc sourceNode="5" sourcePort="3" destNode="2" destPort="1"/>
+      </arcs>
+    </node>
+  </graphs>
+  <controllers>
+    <controller name="Launchkey Mini" uuid="b899d570f8724f9eb218f009acbb72dc"
+                inputDevice="Launchkey Mini LK Mini MIDI">
+      <control name="Control 1" uuid="f250e470c9134479812ce3f60c224326" base64:mappingData="3.vVQU"/>
+      <control name="Control 2" uuid="314df372ed7c412b9b29f15c21e4953d" base64:mappingData="3.vZQL"/>
+      <control name="Control 3" uuid="25a18d8352cb47bc9651a1afa31f6bd4" base64:mappingData="3.vdgX"/>
+      <control name="Control 4" uuid="9754a506eced41d3abfee13a5af95c7f" base64:mappingData="3.vhwU"/>
+      <control name="Control 5" uuid="498db2cab435494fb487be6079cf2d21" base64:mappingData="3.vlgK"/>
+      <control name="Control 6" uuid="029d9fa15a52456aa256fc8e67787d6b" base64:mappingData="3.vpQY"/>
+      <control name="Control 7" uuid="5f7a2d5224104f9e888ac56dacc3858b" base64:mappingData="3.vtgB"/>
+      <control name="Control 8" uuid="6dd3812c24ca4d0db4f2d02d994fe819" base64:mappingData="3.vxQK"/>
+    </controller>
+  </controllers>
+  <maps>
+    <map controller="b899d570f8724f9eb218f009acbb72dc" control="f250e470c9134479812ce3f60c224326"
+         node="262a1b5cfe6d4eff964869ee7602fd5b" parameter="0"/>
+  </maps>
+</session>
