@@ -6,6 +6,10 @@
 #include "session/DeviceManager.h"
 #include "Globals.h"
 
+#if EL_RUNNING_AS_PLUGIN
+ #include "../../plugins/Element/Source/PluginEditor.h"
+#endif
+
 struct Spinner  : public Component, private Timer
 {
     Spinner()                       { startTimer (1000 / 50); }
@@ -127,7 +131,9 @@ struct UnlockForm::OverlayComp  : public Component,
         {
             f.setMode (Deactivate);
             f.saveStatus();
+           #if ! EL_RUNNING_AS_PLUGIN
             g.getDeviceManager().restartLastAudioDevice();
+           #endif
         }
         else if (worked && a == Deactivate)
         {
@@ -138,9 +144,14 @@ struct UnlockForm::OverlayComp  : public Component,
             devs->refresh();
         if (auto* maps = gui.findSibling<Element::MappingController>())
             maps->learn (false);
-        
         gui.stabilizeContent();
         gui.stabilizeViews();
+        
+       #if EL_RUNNING_AS_PLUGIN
+        typedef ElementPluginAudioProcessorEditor EdType;
+        if (EdType* editor = form.findParentComponentOfClass<EdType>())
+            editor->triggerAsyncUpdate();
+       #endif
     }
     
     const Action action;
