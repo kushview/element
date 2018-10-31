@@ -3,6 +3,15 @@
 
 namespace Element {
 
+ChannelStripComponent::VolumeLabel::VolumeLabel() { }
+ChannelStripComponent::VolumeLabel::~VolumeLabel() { }
+
+void ChannelStripComponent::VolumeLabel::settingLabelDoubleClicked()
+{
+    if (auto* const strip = findParentComponentOfClass<ChannelStripComponent>())
+        strip->volumeLabelDoubleClicked();
+}
+
 ChannelStripComponent::ChannelStripComponent()
     : meter (2, false)
 {

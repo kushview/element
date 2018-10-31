@@ -47,6 +47,8 @@ public:
             std::bind (&NodeChannelStripComponent::volumeChanged, this, std::placeholders::_1));
         powerChangedConnection = channelStrip.powerChanged.connect (
             std::bind (&NodeChannelStripComponent::powerChanged, this));
+        volumeDoubleClickedConnection = channelStrip.volumeLabelDoubleClicked.connect (
+            std::bind (&NodeChannelStripComponent::setUnityGain, this));
     }
 
     void unbindSignals()
@@ -55,6 +57,7 @@ public:
         nodeSelectedConnection.disconnect();
         volumeChangedConnection.disconnect();
         powerChangedConnection.disconnect();
+        volumeDoubleClickedConnection.disconnect();
     }
 
     void resized() override
@@ -157,7 +160,8 @@ public:
         startTimer (meterSpeedMillis);
     }
 
-    void comboBoxChanged (ComboBox* box) override
+    /** @internal */
+    inline void comboBoxChanged (ComboBox* box) override
     {    
         if (box == &flowBox)
         {
@@ -184,6 +188,7 @@ private:
     boost::signals2::connection nodeSelectedConnection;
     boost::signals2::connection volumeChangedConnection;
     boost::signals2::connection powerChangedConnection;
+    boost::signals2::connection volumeDoubleClickedConnection;
 
     inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 1; }
@@ -280,6 +285,11 @@ private:
         if (auto* obj = node.getGraphNode())
             if (auto* proc = obj->getAudioProcessor())
                 proc->suspendProcessing (! channelStrip.isPowerOn());
+    }
+
+    void setUnityGain()
+    {
+        channelStrip.setVolume (0.0);
     }
 };
 

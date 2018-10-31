@@ -88,6 +88,8 @@ namespace Element {
             setMissingProperties();
         }
         
+        ~Node() noexcept { }
+        
         static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
                                       const uint32 destNode, const uint32 destPort);
         

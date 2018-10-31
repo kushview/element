@@ -38,13 +38,21 @@ public:
 
     boost::signals2::signal<void(double)> volumeChanged;
     boost::signals2::signal<void()> powerChanged;
-
+    boost::signals2::signal<void()> volumeLabelDoubleClicked;
+    
 private:
     Slider fader;
     DigitalMeter meter;
     DecibelScaleComponent scale;
     Label name;
-    DragableIntLabel volume;
+    class VolumeLabel : public DragableIntLabel 
+    {
+    public:
+        VolumeLabel();
+        ~VolumeLabel();
+        void settingLabelDoubleClicked() override;
+    } volume;
+    
     PowerButton mute;
 
     void stabilizeContent();

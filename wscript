@@ -19,8 +19,8 @@ def silence_warnings(conf):
     '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
-    conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
-    conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
+    # conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
+    # conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
 
