@@ -3,6 +3,8 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
+#include "session/DeviceManager.h"
+#include "Globals.h"
 #include "Settings.h"
 
 namespace Element {
@@ -15,6 +17,27 @@ const char* Settings::showPluginWindowsKey      = "showPluginWindows";
 const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
 const char* Settings::askToSaveSessionKey       = "askToSaveSession";
 const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
+
+enum OptionsMenuItemId
+{
+    CheckForUpdatesOnStart = 1000000,
+    ScanFormPluginsOnStart,
+    AutomaticallyShowPluginWindows,
+    PluginWindowsOnTop,
+    OpenLastUsedSession,
+    AskToSaveSessions,
+
+    MidiInputDevice = 2000000,
+    MidiOutputDevice = 3000000,
+    AudioInputDevice = 4000000,
+    AudioOutputDevice = 5000000,
+    SampleRate = 6000000,
+    BufferSize = 7000000
+};
+
+static bool settingResultIsFor (const int result, const int optionMenuId) {
+    return (result >= optionMenuId && result < optionMenuId + 1000000);
+}
 
 #if JUCE_32BIT
  #if JUCE_MAC
@@ -191,6 +214,186 @@ void Settings::setDefaultNewSessionFile (const File& file)
     if (auto* p = getProps())
         p->setValue (defaultNewSessionFile, 
             file.existsAsFile() ? file.getFullPathName() : "");
+}
+
+void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
+{
+    DeviceManager& devices (world.getDeviceManager());
+    PopupMenu sub;
+
+    sub.addItem (CheckForUpdatesOnStart, "Check Updates at Startup", 
+        true, checkForUpdates());
+    
+    sub.addSeparator(); // plugins items
+    
+    sub.addItem (ScanFormPluginsOnStart, "Scan Plugins at Startup", 
+        true, scanForPluginsOnStartup());
+    sub.addItem (AutomaticallyShowPluginWindows, "Automatically Show Plugin Windows", 
+        true, showPluginWindowsWhenAdded());
+    sub.addItem (PluginWindowsOnTop, "Plugins On Top By Default", 
+        true, pluginWindowsOnTop());
+    
+    sub.addSeparator(); // session items
+    
+    sub.addItem (OpenLastUsedSession, "Open Last Saved Session", 
+        true, openLastUsedSession());
+    sub.addItem (AskToSaveSessions, "Ask To Save Session", 
+        true, askToSaveSession());
+    
+    menu.addSubMenu ("General", sub);
+
+    menu.addSeparator();
+
+    int index = 0; sub.clear();
+    for (const auto& device : MidiInput::getDevices())
+        sub.addItem (MidiInputDevice + index++, device, true, 
+            devices.isMidiInputEnabled (device));
+    menu.addSubMenu ("MIDI Input Devices", sub);
+
+    index = 0; sub.clear();
+    for (const auto& device : MidiOutput::getDevices())
+        sub.addItem (MidiOutputDevice + index++, device, true, 
+            device == devices.getDefaultMidiOutputName());
+    menu.addSubMenu ("MIDI Ouptut Device", sub);
+
+    if (auto* type = devices.getCurrentDeviceTypeObject())
+    {
+        AudioDeviceManager::AudioDeviceSetup setup;
+        devices.getAudioDeviceSetup (setup);
+        menu.addSeparator();
+        index = 0; sub.clear();
+        for (const auto& device : type->getDeviceNames (true))
+            sub.addItem (AudioInputDevice + index++, device, true,
+                device == setup.inputDeviceName);
+        menu.addSubMenu ("Audio Input Device", sub);
+
+        index = 0; sub.clear();
+        for (const auto& device : type->getDeviceNames (false))
+            sub.addItem (AudioOutputDevice + index++, device, true,
+                device == setup.outputDeviceName);
+        menu.addSubMenu ("Audio Output Device", sub);
+    }
+
+    if (auto* device = devices.getCurrentAudioDevice())
+    {
+        index = 0; sub.clear();
+        for (const auto rate : device->getAvailableSampleRates())
+            sub.addItem (SampleRate + index++, String(int (rate)), true, 
+                rate == device->getCurrentSampleRate());
+        menu.addSubMenu ("Sample Rate", sub);
+
+        index = 0; sub.clear();
+        for (const auto bufSize : device->getAvailableBufferSizes())
+            sub.addItem (BufferSize + index++, String(bufSize), true, 
+                bufSize == device->getCurrentBufferSizeSamples());
+        menu.addSubMenu ("Buffer Size", sub);
+    }
+}
+
+bool Settings::performMenuResult (Globals& world, const int result)
+{
+    auto& devices (world.getDeviceManager());
+    bool handled = true;
+
+    switch (result)
+    {
+        case CheckForUpdatesOnStart: setCheckForUpdates (! checkForUpdates()); break;
+        case ScanFormPluginsOnStart: setScanForPluginsOnStartup (! scanForPluginsOnStartup()); break;
+        case AutomaticallyShowPluginWindows: setShowPluginWindowsWhenAdded (! showPluginWindowsWhenAdded()); break;
+        case PluginWindowsOnTop: setPluginWindowsOnTop (! pluginWindowsOnTop()); break;
+        case OpenLastUsedSession: setOpenLastUsedSession (! openLastUsedSession()); break;
+        case AskToSaveSessions: setAskToSaveSession (! askToSaveSession()); break;
+        default: handled = false; break;
+    }
+
+    if (handled)
+    {
+        saveIfNeeded();
+        return true;
+    }
+
+    handled = true;
+    if (settingResultIsFor (result, MidiInputDevice))
+    {
+        // MIDI input device
+        const auto device = MidiInput::getDevices()[result - MidiInputDevice];
+        if (device.isNotEmpty())
+            devices.setMidiInputEnabled (device, ! devices.isMidiInputEnabled (device));
+    }
+    else if (settingResultIsFor (result, MidiOutputDevice))
+    {
+        // MIDI Output device
+        const auto device = MidiOutput::getDevices()[result - MidiOutputDevice];
+        if (device.isNotEmpty() && device == devices.getDefaultMidiOutputName())
+            devices.setDefaultMidiOutput ({});
+        else if (device.isNotEmpty())
+            devices.setDefaultMidiOutput (device);
+    }
+    else if (settingResultIsFor (result, AudioInputDevice))
+    {
+        if (auto* type = devices.getCurrentDeviceTypeObject())
+        {
+            AudioDeviceManager::AudioDeviceSetup setup;
+            devices.getAudioDeviceSetup (setup);
+            const auto device = type->getDeviceNames(true)[result - AudioInputDevice];
+            if (device.isNotEmpty() && device != setup.inputDeviceName)
+            {
+                setup.inputDeviceName = device;
+                devices.setAudioDeviceSetup (setup, true);
+            }
+        }
+    }
+    else if (settingResultIsFor (result, AudioOutputDevice))
+    {
+        if (auto* type = devices.getCurrentDeviceTypeObject())
+        {
+            AudioDeviceManager::AudioDeviceSetup setup;
+            devices.getAudioDeviceSetup (setup);
+            const auto device = type->getDeviceNames(false)[result - AudioOutputDevice];
+            if (device.isNotEmpty() && device != setup.outputDeviceName)
+            {
+                setup.outputDeviceName = device;
+                devices.setAudioDeviceSetup (setup, true);
+            }
+        }
+    }
+    else if (settingResultIsFor (result, SampleRate))
+    {
+        if (auto* device = devices.getCurrentAudioDevice())
+        {
+            const auto rate = device->getAvailableSampleRates()[result - SampleRate];
+            if (rate > 0 && rate != device->getCurrentSampleRate())
+            {
+                AudioDeviceManager::AudioDeviceSetup setup;
+                devices.getAudioDeviceSetup (setup);
+                setup.sampleRate = rate;
+                devices.setAudioDeviceSetup (setup, false);
+            }
+        }
+    }
+    else if (settingResultIsFor (result, BufferSize))
+    {
+        if (auto* device = devices.getCurrentAudioDevice())
+        {
+            const auto bufSize = device->getAvailableBufferSizes()[result - BufferSize];
+            if (bufSize > 0 && bufSize != device->getCurrentBufferSizeSamples())
+            {
+                AudioDeviceManager::AudioDeviceSetup setup;
+                devices.getAudioDeviceSetup (setup);
+                setup.bufferSize = bufSize;
+                devices.setAudioDeviceSetup (setup, false);
+            }
+        }
+    }
+    else
+    {
+        handled = false;
+    }
+
+    if (handled)
+        saveIfNeeded();
+
+    return handled;
 }
 
 }

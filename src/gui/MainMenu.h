@@ -118,6 +118,12 @@ public:
             ViewHelpers::closePluginWindows (&owner, false);
         }
         
+        if (menu == Options)
+        {
+            world.getSettings().performMenuResult (world, index);
+            owner.refreshMenu();
+        }
+
        #if JUCE_DEBUG
         if (index == 1000)
         {
@@ -294,14 +300,7 @@ private:
     void buildOptionsMenu (PopupMenu& menu)
     {
         Settings& settings (world.getSettings());
-        PopupMenu sub;
-        int itemId = 0;
-        sub.addItem (++itemId, "Scan for plugins at startup", true, settings.scanForPluginsOnStartup());
-        sub.addItem (++itemId, "Automatically show plugin windows", true, settings.showPluginWindowsWhenAdded());
-        menu.addSubMenu ("General", sub);
-        sub.clear();
-        menu.addSubMenu ("MIDI", sub);
-        menu.addSubMenu ("Audio", sub);
+        settings.addItemsToMenu (world, menu);
     }
 
     void buildDebugMenu (PopupMenu& menu)

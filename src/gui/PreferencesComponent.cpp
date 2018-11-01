@@ -22,6 +22,7 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "gui/GuiCommon.h"
+#include "gui/MainWindow.h"
 #include "gui/UnlockForm.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -592,6 +593,9 @@ namespace Element {
         void changeListenerCallback (ChangeBroadcaster*) override
         {
             updateDevices();
+            for (int i = 0; i < DocumentWindow::getNumTopLevelWindows(); ++i)
+                if (auto* main = dynamic_cast<MainWindow*> (DocumentWindow::getTopLevelWindow (i)))
+                    main->refreshMenu();
         }
 
     private:

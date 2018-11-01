@@ -9,6 +9,8 @@
 
 namespace Element {
 
+class Globals;
+
 class Settings :  public ApplicationProperties
 {
 public:
@@ -58,6 +60,9 @@ public:
 
     const File getDefaultNewSessionFile() const;
     void setDefaultNewSessionFile (const File&);
+
+    void addItemsToMenu (Globals&, PopupMenu&);
+    bool performMenuResult (Globals&, const int result);
 
 private:
     PropertiesFile* getProps() const;
