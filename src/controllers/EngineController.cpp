@@ -849,7 +849,6 @@ void EngineController::sessionReloaded()
         }
 
         setRootNode (session->getCurrentGraph());
-        DBG("[EL] session was reloaded in EC");
     }
 }
 

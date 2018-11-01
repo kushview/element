@@ -30,13 +30,11 @@ DevicesController::~DevicesController()
 void DevicesController::activate()
 {
     Controller::activate();
-    getWorld().getMappingEngine().startMapping();
 }
 
 void DevicesController::deactivate()
 {
     Controller::deactivate();
-    getWorld().getMappingEngine().startMapping();
 }
 
 void DevicesController::add (const ControllerDevice& device)

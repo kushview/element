@@ -1,7 +1,10 @@
 
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
+#include "controllers/DevicesController.h"
+#include "controllers/MappingController.h"
 #include "controllers/GuiController.h"
+#include "controllers/PresetsController.h"
 #include "controllers/SessionController.h"
 #include "session/Node.h"
 #include "Globals.h"
@@ -39,12 +42,8 @@ void SessionController::openDefaultSession()
         gc->closeAllPluginWindows();
         
     loadNewSessionData();
-        
-    if (auto* ec = findSibling<EngineController>())
-        ec->sessionReloaded();
-    if (auto* gc = findSibling<GuiController>())
-        gc->stabilizeContent();
-
+    refreshOtherControllers();
+    findSibling<GuiController>()->stabilizeContent();
     resetChanges();
 }
 
@@ -58,7 +57,6 @@ void SessionController::openFile (const File& file)
         if (Node::isProbablyGraphNode (node))
         {
             const Node model (node, true);
-            DBG("[EL] add graph to session: " << model.getName());
             if (auto* ec = findSibling<EngineController>())
                 ec->addGraph (model);
         }
@@ -74,12 +72,9 @@ void SessionController::openFile (const File& file)
         {
             if (auto* gc = findSibling<GuiController>())
                 gc->closeAllPluginWindows();
-            if (auto* ec = findSibling<EngineController>())
-                ec->sessionReloaded();
-            
-            // controllers handling session reload might change the model
-            // this needs to happen after other controllers are finished
-            document->setChangedFlag (false);
+            refreshOtherControllers();
+            findSibling<GuiController>()->stabilizeContent();
+            resetChanges();
             DBG("[EL] opened: " << document->getFile().getFullPathName());
         }
     }
@@ -145,18 +140,12 @@ void SessionController::newSession()
     
     if (res == 1 || res == 2)
     {
-        if (auto* gc = findSibling<GuiController>())
-            gc->closeAllPluginWindows();
-        
+        findSibling<GuiController>()->closeAllPluginWindows();
         loadNewSessionData();
-        
-        if (auto* ec = findSibling<EngineController>())
-            ec->sessionReloaded();
-        if (auto* gc = findSibling<GuiController>())
-            gc->stabilizeContent();
+        refreshOtherControllers();
+        findSibling<GuiController>()->stabilizeContent();
+        resetChanges();
     }
-
-    resetChanges();
 }
 
 void SessionController::loadNewSessionData()
@@ -179,6 +168,14 @@ void SessionController::loadNewSessionData()
         currentSession->clear();
         currentSession->addGraph (Node::createDefaultGraph(), true);
     }
+}
+
+void SessionController::refreshOtherControllers()
+{
+    findSibling<EngineController>()->sessionReloaded();
+    findSibling<DevicesController>()->refresh();
+    findSibling<MappingController>()->learn (false);
+    findSibling<PresetsController>()->refresh();
 }
 
 }

@@ -37,18 +37,15 @@ AppController::AppController (Globals& g)
     addChild (new GuiController (g, *this));
     addChild (new DevicesController ());
     addChild (new EngineController ());
-    addChild (new SessionController ());
     addChild (new MappingController ());
     addChild (new PresetsController ());
+    addChild (new SessionController ());
     
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);
 }
 
-AppController::~AppController()
-{ 
-
-}
+AppController::~AppController() {}
 
 void AppController::activate()
 {
@@ -81,7 +78,6 @@ void AppController::run()
     auto* const presets = findChild<PresetsController>();
     assert(sessCtl && devsCtl && mapsCtl && presets);
     
-
     activate();
     
     auto session = getWorld().getSession();
@@ -107,10 +103,6 @@ void AppController::run()
         if (loadDefault)
             sc->openDefaultSession();
     }
-    
-    sessCtl->resetChanges();
-    devsCtl->refresh();
-    presets->refresh();
 
     if (auto* gui = findChild<GuiController>())
     {

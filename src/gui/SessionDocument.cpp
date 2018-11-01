@@ -18,7 +18,7 @@ namespace Element {
         else if (tree.hasType (Tags::controller) ||
                  tree.hasType (Tags::control))
         {
-            DBG("[EL] set missing for: " << tree.getProperty(Tags::name).toString());
+            // noop
         }
     }
 

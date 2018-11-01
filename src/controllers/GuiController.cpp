@@ -597,7 +597,6 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case Commands::redo: {
             bool canRedo = getAppController().getUndoManager().canRedo();
             int flags = canRedo ? 0 : Info::isDisabled;
-            DBG("can redo: " << (int) canRedo);
             result.setInfo ("Redo", "Redo the last operation", Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
         } break;

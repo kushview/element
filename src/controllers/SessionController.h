@@ -36,6 +36,7 @@ private:
     SessionPtr currentSession;
     ScopedPointer<SessionDocument> document;
     void loadNewSessionData();
+    void refreshOtherControllers();
 };
 
 }
