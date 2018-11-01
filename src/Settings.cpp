@@ -13,6 +13,7 @@ const char* Settings::pluginWindowOnTopDefault  = "pluginWindowOnTopDefault";
 const char* Settings::scanForPluginsOnStartKey  = "scanForPluginsOnStart";
 const char* Settings::showPluginWindowsKey      = "showPluginWindows";
 const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
+const char* Settings::askToSaveSessionKey       = "askToSaveSession";
 const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
 
 #if JUCE_32BIT
@@ -150,6 +151,19 @@ bool Settings::pluginWindowsOnTop() const
     if (auto* p = getProps())
         return p->getBoolValue (pluginWindowOnTopDefault, true);
     return false;
+}
+
+bool Settings::askToSaveSession()
+{
+    if (auto* props = getProps())
+        return props->getBoolValue (askToSaveSessionKey, true);
+    return false;
+}
+
+void Settings::setAskToSaveSession (const bool value)
+{
+    if (auto* props = getProps())
+        props->setValue (askToSaveSessionKey, value);
 }
 
 void Settings::setPluginWindowsOnTop (const bool onTop)

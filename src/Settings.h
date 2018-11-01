@@ -23,6 +23,7 @@ public:
     static const char* scanForPluginsOnStartKey;
     static const char* showPluginWindowsKey;
     static const char* openLastUsedSessionKey;
+    static const char* askToSaveSessionKey;
     static const char* defaultNewSessionFile;
     
     XmlElement* getLastGraph() const;
@@ -51,6 +52,9 @@ public:
     /** True if plugin windows are on top by default */
     bool pluginWindowsOnTop() const;
     void setPluginWindowsOnTop (const bool);
+
+    bool askToSaveSession();
+    void setAskToSaveSession (const bool);
 
     const File getDefaultNewSessionFile() const;
     void setDefaultNewSessionFile (const File&);

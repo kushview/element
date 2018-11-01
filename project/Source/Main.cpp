@@ -269,19 +269,27 @@ public:
         
         auto* sc = controller->findChild<SessionController>();
         
-        // - 0 if the third button was pressed ('cancel')
-        // - 1 if the first button was pressed ('yes')
-        // - 2 if the middle button was pressed ('no')
-        
-        const int res = !sc->hasSessionChanged() ? 2
-            : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon,
-                                               "Save Session",
-                                               "This session may have changes. Would you like to save before exiting?");
-        if (res == 1)
+        if (world->getSettings().askToSaveSession())
+        {
+            // - 0 if the third button was pressed ('cancel')
+            // - 1 if the first button was pressed ('yes')
+            // - 2 if the middle button was pressed ('no')
+
+            const int res = !sc->hasSessionChanged() ? 2
+                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon,
+                                                "Save Session",
+                                                "This session may have changes. Would you like to save before exiting?");
+            if (res == 1)
+                sc->saveSession();
+            
+            if (res != 0)
+                Application::quit();
+        }
+        else
+        {
             sc->saveSession();
-        
-        if (res != 0)
             Application::quit();
+        }
     }
 
     void anotherInstanceStarted (const String& commandLine) override

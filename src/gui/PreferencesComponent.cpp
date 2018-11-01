@@ -300,6 +300,14 @@ namespace Element {
             openLastSession.setToggleState (settings.openLastUsedSession(), dontSendNotification);
             openLastSession.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible (askToSaveSessionLabel);
+            askToSaveSessionLabel.setText ("Ask to save sessions", dontSendNotification);
+            askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (askToSaveSession);
+            askToSaveSession.setClickingTogglesState (true);
+            askToSaveSession.setToggleState (settings.askToSaveSession(), dontSendNotification);
+            askToSaveSession.getToggleStateValue().addListener (this);
+
             addAndMakeVisible (defaultSessionFileLabel);
             defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
             defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
@@ -392,6 +400,7 @@ namespace Element {
             layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
             layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
             layoutSetting (r, openLastSessionLabel, openLastSession);
+            layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
             defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                                  defaultSessionFile.getY(),
@@ -439,9 +448,14 @@ namespace Element {
             {
                 settings.setPluginWindowsOnTop (pluginWindowsOnTop.getToggleState());
             }
+            else if (value.refersToSameSourceAs (askToSaveSession.getToggleStateValue()))
+            {
+                settings.setAskToSaveSession (askToSaveSession.getToggleState());
+            }
 
             settings.saveIfNeeded();
-            gui.stabilizeContent();
+            gui.stabilizeViews();
+            gui.refreshMainMenu();
         }
 
     private:
@@ -465,6 +479,9 @@ namespace Element {
 
         Label openLastSessionLabel;
         SettingButton openLastSession;
+
+        Label askToSaveSessionLabel;
+        SettingButton askToSaveSession;
 
         Label defaultSessionFileLabel;
         FilenameComponent defaultSessionFile;
