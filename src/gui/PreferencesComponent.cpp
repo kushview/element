@@ -822,6 +822,7 @@ PreferencesComponent::~PreferencesComponent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+    gui.refreshMainMenu();
     //[/Destructor]
 }
 
