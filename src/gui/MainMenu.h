@@ -21,6 +21,7 @@
 #include "session/UnlockStatus.h"
 #include "Commands.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -31,9 +32,9 @@ public:
     enum RootNames
     {
        #if JUCE_DEBUG
-        File, Edit, View, Window, DebugItem, Help, NumMenus
+        File, Edit, View, Window, Options, DebugItem, Help, NumMenus
        #else
-        File, Edit, View, Window, Help, NumMenus
+        File, Edit, View, Window, Options, Help, NumMenus
        #endif
     };
 
@@ -67,15 +68,16 @@ public:
     StringArray getMenuBarNames() override
     {
        #if JUCE_DEBUG
-        const char* const names[] = { "File", "Edit", "View", "Window", "Debug", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "View", "Window", "Options", "Debug", "Help", nullptr };
        #else
-        const char* const names[] = { "File", "Edit", "View", "Window", "Help", nullptr };
+        const char* const names[] = { "File", "Edit", "View", "Window", "Options", "Help", nullptr };
        #endif
         return StringArray (names, MainMenu::NumMenus);
     }
 
     PopupMenu getMenuForIndex (int index, const String& name) override
     {
+        ignoreUnused (index);
         PopupMenu menu;
         
         if (name == "File")
@@ -86,6 +88,8 @@ public:
             buildViewMenu (menu);
         else if (name == "Window")
             buildWindowMenu (menu);
+        else if (name == "Options")
+            buildOptionsMenu (menu);
         else if (name == "Help")
             buildHelpMenu (menu);
        #if JUCE_DEBUG
@@ -287,6 +291,19 @@ private:
         menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
     }
     
+    void buildOptionsMenu (PopupMenu& menu)
+    {
+        Settings& settings (world.getSettings());
+        PopupMenu sub;
+        int itemId = 0;
+        sub.addItem (++itemId, "Scan for plugins at startup", true, settings.scanForPluginsOnStartup());
+        sub.addItem (++itemId, "Automatically show plugin windows", true, settings.showPluginWindowsWhenAdded());
+        menu.addSubMenu ("General", sub);
+        sub.clear();
+        menu.addSubMenu ("MIDI", sub);
+        menu.addSubMenu ("Audio", sub);
+    }
+
     void buildDebugMenu (PopupMenu& menu)
     {
         menu.addItem (1000, "Dump session to console");
