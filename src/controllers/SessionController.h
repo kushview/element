@@ -22,27 +22,11 @@ public:
     void newSession();
     bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
 
-    inline void setChangesFrozen (const bool areNowFrozen)
-    {
-        if (! currentSession)
-            return;
-        currentSession->freezeChangeNotification = areNowFrozen;
-        if (document)
-            document->setChangedFlag (false);
-    }
-
     inline void resetChanges()
     {
-        if (! document)
-            return;
-        const bool wasFrozen = currentSession->freezeChangeNotification;
-        currentSession->freezeChangeNotification = true;
-        const File file = (document) ? document->getLastDocumentOpened() : File();
-        document = new SessionDocument (currentSession);
-        document->setFile (file);
+        jassert (document);
         document->setChangedFlag (false);
-        currentSession->freezeChangeNotification = wasFrozen;
-        jassert(! hasSessionChanged());
+        jassert (! document->hasChangedSinceSaved());
     }
     
     void exportGraph (const Node& node, const File& targetFile);

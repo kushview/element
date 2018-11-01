@@ -80,11 +80,12 @@ void AppController::run()
     auto* const mapsCtl = findChild<MappingController>();
     auto* const presets = findChild<PresetsController>();
     assert(sessCtl && devsCtl && mapsCtl && presets);
-    sessCtl->setChangesFrozen (true);
+    
 
     activate();
     
     auto session = getWorld().getSession();
+    Session::ScopedFrozenLock freeze (*session);
 
     if (auto* gui = findChild<GuiController>())
         gui->run();
@@ -108,7 +109,6 @@ void AppController::run()
     }
     
     sessCtl->resetChanges();
-    sessCtl->setChangesFrozen (false);
     devsCtl->refresh();
     presets->refresh();
 

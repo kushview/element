@@ -166,6 +166,7 @@ namespace Element {
         if (tree == objectData && property == Tags::tempo) {
         
         }
+        
         notifyChanged();
     }
 

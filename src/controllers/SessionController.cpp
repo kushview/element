@@ -37,18 +37,15 @@ void SessionController::openDefaultSession()
 {
     if (auto* gc = findSibling<GuiController>())
         gc->closeAllPluginWindows();
-    
-    setChangesFrozen (true);
-    currentSession->clear();
-    currentSession->addGraph (Node::createDefaultGraph(), true);
-
+        
+    loadNewSessionData();
+        
     if (auto* ec = findSibling<EngineController>())
         ec->sessionReloaded();
     if (auto* gc = findSibling<GuiController>())
         gc->stabilizeContent();
-    
-    document = new SessionDocument (currentSession);
-    setChangesFrozen (false);
+
+    resetChanges();
 }
 
 void SessionController::openFile (const File& file)
@@ -70,15 +67,20 @@ void SessionController::openFile (const File& file)
     {
         DBG("[El] opening session " << file.getFullPathName());
         document->saveIfNeededAndUserAgrees();
+        Session::ScopedFrozenLock freeze (*currentSession);
         Result result = document->loadFrom (file, true);
+        
         if (result.wasOk())
         {
-            setChangesFrozen (true);
             if (auto* gc = findSibling<GuiController>())
                 gc->closeAllPluginWindows();
             if (auto* ec = findSibling<EngineController>())
                 ec->sessionReloaded();
-            setChangesFrozen (false);
+            
+            // controllers handling session reload might change the model
+            // this needs to happen after other controllers are finished
+            document->setChangedFlag (false);
+            DBG("[EL] opened: " << document->getFile().getFullPathName());
         }
     }
     else
@@ -115,7 +117,10 @@ void SessionController::closeSession()
 
 void SessionController::saveSession (const bool saveAs)
 {
-    jassert(document && currentSession);
+    jassert (document && currentSession);
+    DBG("getFile(): " << document->getFile().getFullPathName());
+    DBG("getLastDocumentOpened(): " << document->getLastDocumentOpened().getFullPathName());
+    DBG("hasChangedSinceSaved(): " << (int) document->hasChangedSinceSaved());
     
     if (saveAs) {
         document->saveAs (File(), true, true, true);
@@ -143,16 +148,15 @@ void SessionController::newSession()
         if (auto* gc = findSibling<GuiController>())
             gc->closeAllPluginWindows();
         
-        setChangesFrozen (true);
         loadNewSessionData();
-        document = new SessionDocument (currentSession);
-        setChangesFrozen (false);
-
+        
         if (auto* ec = findSibling<EngineController>())
             ec->sessionReloaded();
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
     }
+
+    resetChanges();
 }
 
 void SessionController::loadNewSessionData()
