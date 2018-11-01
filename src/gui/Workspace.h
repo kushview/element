@@ -19,15 +19,25 @@ public:
 
     void setMainComponent (Component* c);
 
-    void paint (Graphics& g);
-    void mouseDown (const MouseEvent& ev);
+    void paint (Graphics& g) override;
+    void mouseDown (const MouseEvent& ev) override;
 
-    void resized();
+    void resized() override;
 
     Dock& getDock();
 
 private:
     ScopedPointer<Dock> dock;
+};
+
+class WorkspaceWindow : public DocumentWindow
+{
+public:
+    WorkspaceWindow() : DocumentWindow ("Workspace", Colours::black, DocumentWindow::allButtons, true)
+    {
+        setContentOwned (new Workspace(), true);
+        centreWithSize (1280, 640);
+    }
 };
 
 }

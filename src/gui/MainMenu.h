@@ -11,6 +11,7 @@
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
 #include "gui/PluginWindow.h"
+#include "gui/Workspace.h"
 
 #include "engine/AudioEngine.h"
 
@@ -153,6 +154,11 @@ public:
             auto *cc = ViewHelpers::findContentComponent (&owner);
             cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
         }
+        else if (index == 6666)
+        {
+            auto* window = new WorkspaceWindow();
+            window->setVisible (true);
+        }
         #endif
         
         if (menu == File && index >= recentMenuOffset)
@@ -289,6 +295,7 @@ private:
         menu.addItem (3333, "Quick Map");
         menu.addItem (4444, "Refresh Mapping Engine");
         menu.addItem (5555, "Toggle Node Channel Strip");
+        menu.addItem (6666, "Show Workspace Window");
         menu.addCommandItem (&cmd, Commands::panic, "Panic!");
     }
     

@@ -11,6 +11,9 @@ namespace Element {
 Workspace::Workspace()
 {
     addAndMakeVisible (dock = new Dock());
+
+    setSize (1280, 640);
+
     setMainComponent (new ScreenDisplay());
     dock->getBottomArea().setVisible (false);
 }
