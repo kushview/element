@@ -116,7 +116,7 @@ public:
         jassert(session != nullptr && cc != nullptr && gui != nullptr);
         
         auto root = node;
-        while (!root.isRootGraph() || !root.isValid())
+        while (!root.isRootGraph() && root.isValid())
             root = root.getParentGraph();
 
         if (root.isRootGraph() && root != session->getCurrentGraph())
