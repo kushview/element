@@ -166,8 +166,10 @@ public:
         }
         else if (index == 6666)
         {
+           #if EL_DOCKING
             auto* window = new WorkspaceWindow();
             window->setVisible (true);
+           #endif
         }
         #endif
         
