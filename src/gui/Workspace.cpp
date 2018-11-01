@@ -2,7 +2,7 @@
     Workspace.cpp - This file is part of Element
 */
 
-#if ELEMENT_DOCKING_WINDOWS
+#if EL_DOCKING
 
 #include "Workspace.h"
 

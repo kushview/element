@@ -14,6 +14,8 @@ def options (opt):
         help="Build without license protection [ Default: False ]")
     opt.add_option ('--enable-free', default=False, action='store_true', dest='enable_free', \
         help="Build the free version")
+    opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
+        help="Build with docking window support")
 
 def silence_warnings(conf):
     '''TODO: resolve these'''
@@ -48,6 +50,8 @@ def configure (conf):
     conf.define ('EL_FREE', 1 if conf.options.enable_free else 0)
     conf.define ('EL_FULL', 0 if conf.options.enable_free else 1)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
+    conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
+    conf.define ('KV_DOCKING_WINDOWS', 1 if conf.options.enable_docking else 0)
     conf.define ('EL_USE_JACK', 0)
 
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
@@ -74,6 +78,7 @@ def configure (conf):
     juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
     juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
     juce.display_msg (conf, "Element Free", conf.options.enable_free)
+    juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
     juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
 
     print
