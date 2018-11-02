@@ -195,7 +195,7 @@ void GuiController::deactivate()
         keys = nullptr;
 
         closeAllWindows();
-        mainWindow->setVisible(false);
+        mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
         mainWindow = nullptr;
     }
@@ -209,6 +209,7 @@ void GuiController::deactivate()
     {
         content = nullptr;
     }
+
     Controller::deactivate();
 }
 
@@ -225,9 +226,17 @@ CommandManager& GuiController::commander() {
 
 void GuiController::openWindow (Component* c)
 {
-    Window* win = new Window (c->getName());
-    win->setContentOwned (c, true);
-    windowManager->push (win);
+    if (windowManager)
+    {
+        Window* win = new Window (c->getName());
+        win->setContentOwned (c, true);
+        windowManager->push (win);
+    }
+    else
+    {
+        jassertfalse;
+        deleteAndZero (c);
+    }
 }
 
 void GuiController::runDialog (const String& uri)
@@ -259,13 +268,13 @@ void GuiController::runDialog (const String& uri)
     }
 }
 
-void GuiController::closePluginWindow (PluginWindow* w) { windowManager->closePluginWindow (w); }
-void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
-void GuiController::closeAllPluginWindows (const bool visible) { windowManager->closeAllPluginWindows (visible); }
+void GuiController::closePluginWindow (PluginWindow* w) { if (windowManager) windowManager->closePluginWindow (w); }
+void GuiController::closePluginWindowsFor (uint32 nodeId, const bool visible) { if (windowManager) windowManager->closeOpenPluginWindowsFor (nodeId, visible); }
+void GuiController::closeAllPluginWindows (const bool visible) { if (windowManager) windowManager->closeAllPluginWindows (visible); }
 
 void GuiController::closePluginWindowsFor (const Node& node, const bool visible)
 {
-    if (! node.isGraph())
+    if (! node.isGraph() && windowManager)
         windowManager->closeOpenPluginWindowsFor (node, visible);
 }
 
@@ -275,8 +284,9 @@ void GuiController::runDialog (Component* c, const String& title)
     opts.content.set (c, true);
     opts.dialogTitle = title.isNotEmpty() ? title : c->getName();
     opts.componentToCentreAround = (Component*) mainWindow.get();
-    if (DialogWindow* dw = opts.create())
-        windowManager->push (dw);
+    if (windowManager)
+        if (DialogWindow* dw = opts.create())
+            windowManager->push (dw);
 }
 
 void GuiController::showSplash() { }
@@ -301,7 +311,7 @@ int GuiController::getNumPluginWindows() const
 PluginWindow* GuiController::getPluginWindow (const int window) const
 {
     return (nullptr != windowManager) ? windowManager->getPluginWindow (window)
-                                      : 0;
+                                      : nullptr;
 }
 
 void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
