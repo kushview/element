@@ -630,7 +630,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         
         case Commands::undo: {
             int flags = getAppController().getUndoManager().canUndo() ? 0 : Info::isDisabled;
-            result.setInfo ("Undo", "Undo the last operation", Commands::Categories::Application, 0);
+            result.setInfo ("Undo", "Undo the last operation", 
+                Commands::Categories::Application, flags);
             result.addDefaultKeypress ('z', ModifierKeys::commandModifier);
         } break;
         case Commands::redo: {
