@@ -69,7 +69,7 @@ Settings::Settings()
     opts.storageFormat       = PropertiesFile::storeAsCompressedBinary;
 
    #if JUCE_DEBUG
-    opts.applicationName     = "ElementDebug";
+    opts.applicationName << "Debug";
     opts.storageFormat       = PropertiesFile::storeAsXML;
    #endif
     
