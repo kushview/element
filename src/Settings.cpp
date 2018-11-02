@@ -261,21 +261,26 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
         AudioDeviceManager::AudioDeviceSetup setup;
         devices.getAudioDeviceSetup (setup);
         menu.addSeparator();
-        index = 0; sub.clear();
-        for (const auto& device : type->getDeviceNames (true))
-            sub.addItem (AudioInputDevice + index++, device, true,
-                device == setup.inputDeviceName);
-        menu.addSubMenu ("Audio Input Device", sub);
-
+        if (type->getTypeName() != "ASIO")
+        {
+            index = 0; sub.clear();
+            for (const auto& device : type->getDeviceNames(true))
+                sub.addItem(AudioInputDevice + index++, device, true,
+                    device == setup.inputDeviceName);
+            menu.addSubMenu("Audio Input Device", sub);
+        }
         index = 0; sub.clear();
         for (const auto& device : type->getDeviceNames (false))
             sub.addItem (AudioOutputDevice + index++, device, true,
                 device == setup.outputDeviceName);
-        menu.addSubMenu ("Audio Output Device", sub);
+        const auto menuName = type->getTypeName() == "ASIO"
+            ? "Audio Device" : "Audio Output Device";
+        menu.addSubMenu (menuName, sub);
     }
 
     if (auto* device = devices.getCurrentAudioDevice())
     {
+        menu.addSeparator();
         index = 0; sub.clear();
         for (const auto rate : device->getAvailableSampleRates())
             sub.addItem (SampleRate + index++, String(int (rate)), true, 
@@ -340,6 +345,8 @@ bool Settings::performMenuResult (Globals& world, const int result)
             if (device.isNotEmpty() && device != setup.inputDeviceName)
             {
                 setup.inputDeviceName = device;
+                if (type->getTypeName() == "ASIO")
+                    setup.outputDeviceName = device;
                 devices.setAudioDeviceSetup (setup, true);
             }
         }
@@ -354,6 +361,8 @@ bool Settings::performMenuResult (Globals& world, const int result)
             const auto device = type->getDeviceNames(false)[result - AudioOutputDevice];
             if (device.isNotEmpty() && device != setup.outputDeviceName)
             {
+                if (type->getTypeName() == "ASIO")
+                    setup.inputDeviceName = device;
                 setup.outputDeviceName = device;
                 devices.setAudioDeviceSetup (setup, true);
             }
