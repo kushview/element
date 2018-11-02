@@ -99,6 +99,7 @@ GuiController::GuiController (Globals& w, AppController& a)
 
 GuiController::~GuiController()
 {
+#if 0
     nodeSelected.disconnect_all_slots();
 
     if (sSystemTray != nullptr)
@@ -129,7 +130,7 @@ GuiController::~GuiController()
     {
         content = nullptr;
     }
-    
+#endif
     guiInstances.removeFirstMatchingValue (this);
     if (guiInstances.size() <= 0)
         sGlobalLookAndFeel = nullptr;
@@ -177,9 +178,37 @@ void GuiController::activate()
 void GuiController::deactivate()
 {
     stopTimer();
-
     saveProperties (getWorld().getSettings().getUserSettings());
-    
+    nodeSelected.disconnect_all_slots();
+
+    if (sSystemTray != nullptr)
+    {
+        sSystemTray->removeFromDesktop();
+        sSystemTray.reset(nullptr);
+    }
+
+    closeAllPluginWindows(true);
+
+    if (mainWindow)
+    {
+        mainWindow->removeKeyListener(keys);
+        keys = nullptr;
+
+        closeAllWindows();
+        mainWindow->setVisible(false);
+        mainWindow->removeFromDesktop();
+        mainWindow = nullptr;
+    }
+
+    if (windowManager)
+    {
+        windowManager = nullptr;
+    }
+
+    if (content)
+    {
+        content = nullptr;
+    }
     Controller::deactivate();
 }
 
