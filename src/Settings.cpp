@@ -331,6 +331,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
     }
     else if (settingResultIsFor (result, AudioInputDevice))
     {
+        // Audio input device
         if (auto* type = devices.getCurrentDeviceTypeObject())
         {
             AudioDeviceManager::AudioDeviceSetup setup;
@@ -345,6 +346,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
     }
     else if (settingResultIsFor (result, AudioOutputDevice))
     {
+        // Audio output device
         if (auto* type = devices.getCurrentDeviceTypeObject())
         {
             AudioDeviceManager::AudioDeviceSetup setup;
@@ -359,6 +361,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
     }
     else if (settingResultIsFor (result, SampleRate))
     {
+        // sample rate
         if (auto* device = devices.getCurrentAudioDevice())
         {
             const auto rate = device->getAvailableSampleRates()[result - SampleRate];
@@ -373,6 +376,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
     }
     else if (settingResultIsFor (result, BufferSize))
     {
+        // buffer size
         if (auto* device = devices.getCurrentAudioDevice())
         {
             const auto bufSize = device->getAvailableBufferSizes()[result - BufferSize];
