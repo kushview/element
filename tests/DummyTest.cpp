@@ -5,6 +5,8 @@
 
 #include "Tests.h"
 
+using namespace Element;
+
 class DummyTest : public UnitTest
 {
 public:
@@ -13,12 +15,27 @@ public:
 
     void runTest()
     {
+        testLicenseFiles();
         testName();
         testJavascript();
         testUuid();
     }
 
 private:
+    void testLicenseFiles()
+    {
+        beginTest ("License Files");
+        Globals world;
+        auto& unlock (world.getUnlockStatus());
+        const File keyFile ("/Users/mfisher/workspace/kushview/Element/data/TrialLicense.elc");
+        FileInputStream stream (keyFile);
+        expect (true == keyFile.existsAsFile());
+        expect (true == unlock.applyKeyFile (stream.readEntireStreamAsString()));
+        DBG("time: " << unlock.getExpiryTime().toMilliseconds());
+
+        unlock.dump();
+    }
+
     void testUuid()
     {
         beginTest ("UUID handling");

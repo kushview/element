@@ -8,6 +8,7 @@
 #include "engine/InternalFormat.h"
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
+#include "session/UnlockStatus.h"
 #include "Globals.h"
 
 namespace Element 

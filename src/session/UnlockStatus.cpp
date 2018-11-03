@@ -4,10 +4,10 @@
 #include "Settings.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
-
+#define EL_USE_LOCAL_AUTH 1
 #if EL_USE_LOCAL_AUTH
  #define EL_PRODUCT_ID "15"
- #define EL_BASE_URL "http://kushview.dev"
+ #define EL_BASE_URL "http://kushview.local"
  #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
  #define EL_PUBKEY "3,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
  #define EL_PRIVKEY "4e290ea703612261cb143aaaad7e2be03282bec968eea82b7d064226e66321ab,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
@@ -97,7 +97,8 @@ namespace Element {
     
     StringArray UnlockStatus::getLocalMachineIDs()
     {
-        auto ids (OnlineUnlockStatus::getLocalMachineIDs());
+        // auto ids (OnlineUnlockStatus::getLocalMachineIDs());
+        StringArray ids ({ "12345" });
         return ids;
     }
 }
