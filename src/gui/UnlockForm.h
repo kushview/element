@@ -8,7 +8,7 @@ namespace Element {
 	struct LicenseInfo;
     class Globals;
     class GuiController;
-}
+
 
 class UnlockForm  : public Component,
                     private Button::Listener
@@ -69,3 +69,5 @@ private:
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (UnlockForm)
 };
+
+}

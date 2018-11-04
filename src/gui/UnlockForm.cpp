@@ -1,7 +1,10 @@
 #include "controllers/GuiController.h"
 #include "controllers/DevicesController.h"
 #include "controllers/MappingController.h"
+#include "controllers/EngineController.h"
+#include "gui/ContentComponent.h"
 #include "gui/UnlockForm.h"
+#include "gui/ViewHelpers.h"
 #include "session/UnlockStatus.h"
 #include "session/DeviceManager.h"
 #include "Globals.h"
@@ -9,6 +12,9 @@
 #if EL_RUNNING_AS_PLUGIN
  #include "../../plugins/Element/Source/PluginEditor.h"
 #endif
+
+namespace Element 
+{
 
 struct Spinner  : public Component, private Timer
 {
@@ -63,8 +69,15 @@ struct UnlockForm::OverlayComp  : public Component,
         spinner.setBounds ((getWidth() - spinnerSize) / 2, proportionOfHeight (0.6f), spinnerSize, spinnerSize);
     }
     
+    void clearLicense()
+    {
+        form.status.saveState (String());
+        form.status.loadAll();
+    }
+
     void run() override
     {
+        clearLicense();
         switch (action)
         {
             case Deactivate:
@@ -117,7 +130,7 @@ struct UnlockForm::OverlayComp  : public Component,
             URL url (result.urlToLaunch);
             url.launchInDefaultBrowser();
         }
-        
+
         // (local copies because we're about to delete this)
         const bool worked = result.succeeded;
         auto& g = world;
@@ -131,19 +144,27 @@ struct UnlockForm::OverlayComp  : public Component,
         {
             f.setMode (Deactivate);
             f.saveStatus();
-           #if ! EL_RUNNING_AS_PLUGIN
-            g.getDeviceManager().restartLastAudioDevice();
-           #endif
         }
         else if (worked && a == Deactivate)
         {
+            f.status.saveState (String());
+            f.status.loadAll();
             f.setMode (Activate);
+        }
+        else if (! worked && (a == Activate || a == Check) && f.status.isExpiring())
+        {
+            f.setMode (Deactivate);
+            f.saveStatus();
         }
 
         if (auto* devs = gui.findSibling<Element::DevicesController>())
             devs->refresh();
         if (auto* maps = gui.findSibling<Element::MappingController>())
             maps->learn (false);
+        if (auto* maps = gui.findSibling<Element::MappingController>())
+            maps->learn (false);
+        if (auto* engine = gui.findSibling<Element::EngineController>())
+            engine->sessionReloaded();
         gui.stabilizeContent();
         gui.stabilizeViews();
         
@@ -151,7 +172,11 @@ struct UnlockForm::OverlayComp  : public Component,
         typedef ElementPluginAudioProcessorEditor EdType;
         if (EdType* editor = form.findParentComponentOfClass<EdType>())
             editor->triggerAsyncUpdate();
+       #else
+        g.getDeviceManager().restartLastAudioDevice();
        #endif
+
+       f.status.dump();
     }
     
     const Action action;
@@ -165,7 +190,6 @@ struct UnlockForm::OverlayComp  : public Component,
     JUCE_LEAK_DETECTOR (UnlockForm::OverlayComp)
 };
 
-namespace Element {
 struct LicenseInfo : public Component,
                      public Button::Listener
 {
@@ -185,6 +209,22 @@ struct LicenseInfo : public Component,
         addAndMakeVisible (deactivateButton);
         deactivateButton.setButtonText ("Deactivate");
         deactivateButton.addListener (this);
+
+        if (f.status.isExpiring() && Time::getCurrentTime() > f.status.getExpiryTime())
+        {
+            addAndMakeVisible (expiredNotice);
+            String text = "Expired: "; text << f.status.getExpiryTime().toString(true, false);
+            expiredNotice.setText (text, dontSendNotification);
+            expiredNotice.setJustificationType (Justification::centred);
+            expiredNotice.setColour (Label::textColourId, Colours::red);
+        }
+        else if (f.status.isExpiring() && Time::getCurrentTime() <= f.status.getExpiryTime())
+        {
+            addAndMakeVisible (expiredNotice);
+            String text = "Expires: "; text << f.status.getExpiryTime().toString(true, false);
+            expiredNotice.setText (text, dontSendNotification);
+            expiredNotice.setJustificationType (Justification::centred);
+        }
     }
     
     void paint (Graphics&g) override {
@@ -195,6 +235,8 @@ struct LicenseInfo : public Component,
     {
         Rectangle<int> r (getLocalBounds());
         r.removeFromBottom (80);
+        if (expiredNotice.isVisible())
+            expiredNotice.setBounds (r.removeFromBottom (14));
         licenseKey.setBounds (r);
         
         refreshButton.setBounds ((getWidth() / 2) - 92, getHeight() - 40, 90, 30);
@@ -206,6 +248,16 @@ struct LicenseInfo : public Component,
     
     void buttonClicked (Button* b) override
     {
+        if (b == &deactivateButton && form.status.isExpiring() && Time::getCurrentTime() > form.status.getExpiryTime())
+        {
+            // server won't allow deactivating an expired license, so clear it
+            auto& f (form);
+            f.status.saveState (String());
+            f.status.loadAll();
+            f.setMode (Overlay::Activate);
+            return;
+        }
+
         if (b == &deactivateButton)
             deacviateLicense();
         else if (b == &refreshButton)
@@ -217,6 +269,7 @@ private:
     TextButton deactivateButton, refreshButton;
     Label email;
     Label licenseKey;
+    Label expiredNotice;
     UnlockForm& form;
     Component::SafePointer<Component> overlay;
     
@@ -239,7 +292,6 @@ private:
     JUCE_LEAK_DETECTOR (LicenseInfo);
 };
 
-}
 
 static juce_wchar getDefaultPasswordChar() noexcept
 {
@@ -250,7 +302,7 @@ static juce_wchar getDefaultPasswordChar() noexcept
 #endif
 }
 
-UnlockForm::UnlockForm (Element::Globals& s, Element::GuiController& g,
+UnlockForm::UnlockForm (Globals& s, GuiController& g,
                         const String& userInstructions,
                         bool hasEmailBox,
                         bool hasPasswordBox,
@@ -310,7 +362,7 @@ UnlockForm::UnlockForm (Element::Globals& s, Element::GuiController& g,
     activateButton.addListener (this);
     cancelButton.addListener (this);
     
-    if (status.isUnlocked()) {
+    if (status.isFullVersion() || (status.isExpiring() && Time::getCurrentTime() > status.getExpiryTime())) {
         addAndMakeVisible (info = new Element::LicenseInfo (*this));
     }
     
@@ -454,6 +506,12 @@ void UnlockForm::setMode (int mode)
             delete c;
         }
     }
+    else if (mode == OverlayComp::Deactivate)
+    {
+        info.deleteAndZero();
+        if (status.isUnlocked() || status.isExpiring())
+            addAndMakeVisible (info = new Element::LicenseInfo (*this));
+    }
     else if (status.isUnlocked())
     {
         info.deleteAndZero();
@@ -473,7 +531,9 @@ void UnlockForm::dismiss()
 {
     saveStatus();
     if (auto *dw = findParentComponentOfClass<DialogWindow>())
-        delete dw;
+        dw->closeButtonPressed();
     else
         delete this;
+}
+
 }

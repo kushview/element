@@ -13,6 +13,8 @@
 #endif
 
 #include "DataPath.h"
+#include "Signals.h"
+
 namespace kv { }
 using namespace kv;
 
@@ -155,6 +157,24 @@ inline static void traceMidi (MidiBuffer& buf)
     MidiMessage msg; int frame = 0;
     while (iter.getNextEvent (msg, frame))
         traceMidi (msg, frame);
+}
+
+static bool canConnectToWebsite (const URL& url, const int timeout = 2000)
+{
+    std::unique_ptr<InputStream> in (url.createInputStream (false, nullptr, nullptr, String(), timeout, nullptr));
+    return in != nullptr;
+}
+
+static bool areMajorWebsitesAvailable()
+{
+    const char* urlsToTry[] = { "http://google.com",  "http://bing.com",  "http://amazon.com",
+                                "https://google.com", "https://bing.com", "https://amazon.com", nullptr};
+
+    for (const char** url = urlsToTry; *url != nullptr; ++url)
+        if (canConnectToWebsite (URL (*url)))
+            return true;
+
+    return false;
 }
 
 }

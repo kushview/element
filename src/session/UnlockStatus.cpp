@@ -4,9 +4,11 @@
 #include "Settings.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
-#define EL_USE_LOCAL_AUTH 1
+
 #if EL_USE_LOCAL_AUTH
  #define EL_PRODUCT_ID "15"
+ #define EL_TRIAL_PRICE_ID 2
+ #define EL_PRO_PRICE_ID 1
  #define EL_BASE_URL "http://kushview.local"
  #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
  #define EL_PUBKEY "3,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
@@ -18,12 +20,16 @@
 
 #elif EL_USE_CI_AUTH
  #define EL_PRODUCT_ID "12"
+ #define EL_TRIAL_PRICE_ID 2
+ #define EL_PRO_PRICE_ID 1
  #define EL_BASE_URL "https://ci.kushview.net"
  #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
  #define EL_PUBKEY "5,7bc48fe0cef16975604686123c4b8c9f597b8d62b839e14f6300e632f993d613c406c068ecccd912c845ab314574ae727d55ef1ce8257e6d6dfd239a1cf5831753632a8eb9615d1033264e132edfcf537bc1e643288f45138e364fb2e2afe91c43ceaf929209d3d26428f6f276242b8505e63a923702f3990000fa043a324473"
 
 #else
  #define EL_PUBKEY_ENCODED 1
+ #define EL_TRIAL_PRICE_ID 2
+ #define EL_PRO_PRICE_ID 1
  #define EL_PRODUCT_ID "20"
  #define EL_BASE_URL "https://kushview.net"
  #define EL_AUTH_URL EL_BASE_URL "/products/authorize"
@@ -39,9 +45,10 @@ namespace Element {
 
     const char* UnlockStatus::propsKey = "props";
     const char* UnlockStatus::fullKey = "f";
+    const char* UnlockStatus::trialKey = "t";
     const char* UnlockStatus::priceIdKey = "price_id";
     
-    UnlockStatus::UnlockStatus (Globals& g) : settings (g.getSettings()) { }
+    UnlockStatus::UnlockStatus (Globals& g) : Thread("elt"), settings (g.getSettings()) { }
     String UnlockStatus::getProductID() { return EL_PRODUCT_ID; }
     bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
     {
@@ -97,8 +104,48 @@ namespace Element {
     
     StringArray UnlockStatus::getLocalMachineIDs()
     {
-        // auto ids (OnlineUnlockStatus::getLocalMachineIDs());
-        StringArray ids ({ "12345" });
+        auto ids (OnlineUnlockStatus::getLocalMachineIDs());
         return ids;
+    }
+
+    void UnlockStatus::run()
+    {
+        const auto key (getLicenseKey());
+        if (key.isEmpty())
+            return;
+        if (!areMajorWebsitesAvailable() || !canConnectToWebsite (URL (EL_BASE_URL), 10000)) {
+            DBG("[EL] cannot connect to server to check license: " << EL_AUTH_URL);
+            return;
+        }
+        saveState (String());
+        loadAll();
+        result = checkLicense (key);
+        startTimer (200);
+    }
+
+    void UnlockStatus::timerCallback()
+    {
+        if (result.errorMessage.isNotEmpty())
+        {
+            DBG("[EL] check license error: " << result.errorMessage);
+        }
+        
+        if (result.informativeMessage.isNotEmpty())
+        {
+            DBG("[EL] check license info: " << result.informativeMessage);;
+        }
+        
+        if (result.urlToLaunch.isNotEmpty())
+        {
+            URL url (result.urlToLaunch);
+            DBG("[EL] check url: " << url.toString (true));
+        }
+
+        save();
+        loadAll();
+        refreshed();
+        stopTimer();
+
+        dump();
     }
 }

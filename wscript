@@ -12,10 +12,15 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
         help="Build without license protection [ Default: False ]")
+    opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
+        help="Build without license protection [ Default: False ]")
     opt.add_option ('--enable-free', default=False, action='store_true', dest='enable_free', \
         help="Build the free version")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
+    opt.add_option ('--enable-local-auth', default=False, action='store_true', dest='enable_local_auth', \
+        help="Authenticate locally")
+
 
 def silence_warnings(conf):
     '''TODO: resolve these'''
@@ -47,6 +52,8 @@ def configure (conf):
     conf.env.EL_VERSION_STRING = VERSION
     
     conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
+    conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
+
     conf.define ('EL_FREE', 1 if conf.options.enable_free else 0)
     conf.define ('EL_FULL', 0 if conf.options.enable_free else 1)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
@@ -76,10 +83,12 @@ def configure (conf):
     juce.display_header ("Element Configuration")
     juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
     juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
+    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
+
     juce.display_msg (conf, "Element Free", conf.options.enable_free)
     juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
-    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
+    juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
+    juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)
 
     print
     juce.display_header ("Compiler")

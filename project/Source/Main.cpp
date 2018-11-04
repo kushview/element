@@ -204,6 +204,8 @@ public:
     {
         world = new Globals (commandLine);
         world->getUnlockStatus().loadAll();
+        world->getUnlockStatus().dump();
+        
         initializeModulePath();
         
         if (maybeLaunchSlave (commandLine))
@@ -335,6 +337,8 @@ public:
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
 
+        world->getUnlockStatus().checkLicenseInBackground();
+        
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = world->cli.commandLine.unquoted().trim();

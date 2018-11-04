@@ -1,7 +1,7 @@
 /*
     GuiController.cpp - This file is part of Element
     Copyright (C) 2018 Kushview, LLC.  All rights reserved.
-*/
+ */
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
@@ -243,7 +243,7 @@ void GuiController::runDialog (const String& uri)
 {
     if (uri == ELEMENT_PREFERENCES)
     {
-        if (auto* const dialog = windowManager->findDialogByName ("PreferencesDialog"))
+        if (auto* const dialog = windowManager->findDialogByName ("Preferences"))
         {
             if (!dialog->isOnDesktop() || !dialog->isVisible())
             {
@@ -262,7 +262,8 @@ void GuiController::runDialog (const String& uri)
         
         if (DialogWindow* dw = opts.create())
         {
-            dw->setName ("PreferencesDialog");
+            dw->setName ("Preferences");
+            dw->setComponentID ("PreferencesDialog");
             windowManager->push (dw, true);        
         }
     }
@@ -716,28 +717,31 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showGraphMixer:
         {
-            if (getWorld().getUnlockStatus().isFullVersion())
-            {
-                if (content->showAccessoryView())
-                    content->setShowAccessoryView (false);
-                else
-                    content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+            bool showedIt = false;
+            
+            if (content->showAccessoryView()) {
+                content->setShowAccessoryView (false);
             }
             else
             {
-                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
+                content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+                showedIt = true;
             }
+
+            if (showedIt && ! (bool) getWorld().getUnlockStatus().isFullVersion())
+                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
             
         } break;
+        
         case Commands::toggleVirtualKeyboard:
             content->toggleVirtualKeyboard();
             break;
 
         case Commands::toggleChannelStrip: {
-            if (getWorld().getUnlockStatus().isFullVersion())
-                content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-            else
-                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
+            const bool wasHidden = ! content->isNodeChannelStripVisible();
+            content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
+            if (wasHidden && ! (bool) getWorld().getUnlockStatus().isFullVersion())
+                Alert::showProductLockedAlertAsync (String(), "Channel Strip Unavailable");
         } break;
 
         case Commands::showLastContentView:

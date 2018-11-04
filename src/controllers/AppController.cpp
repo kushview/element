@@ -56,11 +56,16 @@ void AppController::activate()
         recentFiles.restoreFromString (stream.readEntireStreamAsString());
     }
 
+    licenseRefreshedConnection = getWorld().getUnlockStatus().refreshed.connect (
+        std::bind (&AppController::licenseRefreshed, this));
+
     Controller::activate();
 }
 
 void AppController::deactivate()
 {
+    licenseRefreshedConnection.disconnect();
+    
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (! recentList.existsAsFile())
         recentList.create();
@@ -471,6 +476,24 @@ bool AppController::perform (const InvocationInfo& info)
         default: res = false; break;
     }
     return res;
+}
+
+void AppController::licenseRefreshed()
+{
+    findChild<Element::DevicesController>()->refresh();
+    findChild<Element::MappingController>()->learn (false);
+        
+   #if EL_RUNNING_AS_PLUGIN
+    // FIXME: this came from UnlockForm.cpp
+    // typedef ElementPluginAudioProcessorEditor EdType;
+    // if (EdType* editor = form.findParentComponentOfClass<EdType>())
+    //     editor->triggerAsyncUpdate();
+   #else
+    getWorld().getDeviceManager().restartLastAudioDevice();
+   #endif
+
+    findChild<GuiController>()->stabilizeContent();
+    findChild<GuiController>()->stabilizeViews();
 }
 
 }

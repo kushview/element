@@ -50,6 +50,8 @@ private:
     CommandManager commands;
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;
+    boost::signals2::connection licenseRefreshedConnection;
+    void licenseRefreshed();
     void run();
 };
 

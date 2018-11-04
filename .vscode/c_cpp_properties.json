@@ -31,7 +31,7 @@
                     "${workspaceRoot}/libs/lv2",
                     "${workspaceRoot}/libs/JUCE/modules"
                 ],
-                "limitSymbolsToIncludedHeaders": true,
+                "limitSymbolsToIncludedHeaders": false,
                 "databaseFilename": "",
                 "defines": [
                     "JUCE_PLUGINHOST_VST=1 "

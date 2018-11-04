@@ -50,8 +50,7 @@
             "args": [
                 "waf",
                 "configure",
-                "--debug",
-                "--enable-docking"
+                "--debug"
             ],
             "options": {
                 "env": {

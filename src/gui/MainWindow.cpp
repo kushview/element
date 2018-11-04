@@ -47,6 +47,7 @@ void MainWindow::nameChanged (const String& value)
     String title = "Element";
     if (sessionName.isNotEmpty())
         title << " - " << sessionName;
+    
     setName (title);
 }
 

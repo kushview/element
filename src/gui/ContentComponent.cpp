@@ -1031,8 +1031,11 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
             FileInputStream src (file);
             if (unlock.applyKeyFile (src.readString()))
             {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Apply License File", "Your software has successfully been unlocked.");
+                unlock.save();
+                unlock.loadAll();
+                stabilizeViews();
+                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
+                    "Your software has successfully been unlocked.");
             }
             else
             {
