@@ -6,7 +6,7 @@ import os, sys
 sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
-VERSION='0.21.1'
+VERSION='0.21.2'
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")

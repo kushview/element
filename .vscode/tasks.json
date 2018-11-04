@@ -50,7 +50,8 @@
             "args": [
                 "waf",
                 "configure",
-                "--debug"
+                "--debug",
+                "--enable-local-auth"
             ],
             "options": {
                 "env": {
