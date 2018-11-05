@@ -159,13 +159,13 @@ inline static void traceMidi (MidiBuffer& buf)
         traceMidi (msg, frame);
 }
 
-static bool canConnectToWebsite (const URL& url, const int timeout = 2000)
+inline static bool canConnectToWebsite (const URL& url, const int timeout = 2000)
 {
     std::unique_ptr<InputStream> in (url.createInputStream (false, nullptr, nullptr, String(), timeout, nullptr));
     return in != nullptr;
 }
 
-static bool areMajorWebsitesAvailable()
+inline static bool areMajorWebsitesAvailable()
 {
     const char* urlsToTry[] = { "http://google.com",  "http://bing.com",  "http://amazon.com",
                                 "https://google.com", "https://bing.com", "https://amazon.com", nullptr};

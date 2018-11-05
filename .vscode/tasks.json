@@ -83,6 +83,33 @@
                 "installers/packages/uninstall.sh"
             ],
             "problemMatcher": []
+        },
+        {
+            "label": "OSX Deploy Element Free",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "tools/build-free-osx.sh"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "OSX Deploy Element Pro",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "tools/build-osx.sh"
+            ],
+            
+            "problemMatcher": []
+        },
+        {
+            "label": "OSX Deploy",
+            "type": "shell",
+            "command": "echo",
+            "args": [ "'OSX Deploy Finished'"],
+            "dependsOn": [ "OSX Deploy Element Pro", "OSX Deploy Element Free" ],
+            "problemMatcher": []
         }
     ]
 }
