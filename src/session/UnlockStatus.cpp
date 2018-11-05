@@ -18,6 +18,11 @@
  #define EL_LICENSE_3 "15311c04ee9991ae7ef698a30b0a789c"
  #define EL_LICENSE_4 "b2dbbd725140bd7cbb4da9f3975740fb"
 
+ // Free Trial
+ #define EL_TRIAL_PRODUCT_ID "2000"
+ #define EL_TRIAL_PUBKEY EL_PUBKEY
+ #define EL_TRIAL_PRIVKEY EL_PRIVKEY
+ 
 #elif EL_USE_CI_AUTH
  #define EL_PRODUCT_ID "12"
  #define EL_TRIAL_PRICE_ID 2
@@ -33,6 +38,7 @@
  #define EL_PRODUCT_ID "20"
  #define EL_BASE_URL "https://kushview.net"
  #define EL_AUTH_URL EL_BASE_URL "/products/authorize"
+ #define EL_TRIAL_PRODUCT_ID "300"
 #endif
 
 namespace Element {
@@ -50,9 +56,12 @@ namespace Element {
     
     UnlockStatus::UnlockStatus (Globals& g) : Thread("elt"), settings (g.getSettings()) { }
     String UnlockStatus::getProductID() { return EL_PRODUCT_ID; }
+    String UnlockStatus::getTrialProductID() { return EL_TRIAL_PRODUCT_ID; }
+
     bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
     {
-        return getProductID() == returnedIDFromServer;
+        const StringArray pids { getProductID(), getTrialProductID() };
+        return pids.contains (returnedIDFromServer);
     }
     
     RSAKey UnlockStatus::getPublicKey()

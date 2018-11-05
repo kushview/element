@@ -78,6 +78,7 @@ public:
     
     void launchProUpgradeUrl();
     
+    String getTrialProductID();
     String getProductID() override;
     bool doesProductIDMatch (const String& returnedIDFromServer) override;
     RSAKey getPublicKey() override;
