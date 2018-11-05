@@ -104,12 +104,19 @@
             "problemMatcher": []
         },
         {
+            "label": "OSX Upload",
+            "type": "shell",
+            "command": "bash",
+            "args": [
+                "tools/upload.sh"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "OSX Deploy",
             "type": "shell",
-            "command": "echo",
-            "args": [ "'OSX Deploy Finished'"],
-            "dependsOn": [ "OSX Deploy Element Pro", "OSX Deploy Element Free" ],
-            "problemMatcher": []
+            "command": "tools/build-osx.sh && tools/build-free-osx.sh && tools/upload.sh",
+            "problemMatcher": [ ]
         }
     ]
 }
