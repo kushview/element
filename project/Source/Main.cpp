@@ -204,7 +204,6 @@ public:
     {
         world = new Globals (commandLine);
         world->getUnlockStatus().loadAll();
-        world->getUnlockStatus().dump();
         
         initializeModulePath();
         

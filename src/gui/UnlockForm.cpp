@@ -142,8 +142,8 @@ struct UnlockForm::OverlayComp  : public Component,
         
         if (worked && (a == Activate || a == Check))
         {
-            f.setMode (Deactivate);
             f.saveStatus();
+            f.setMode (Deactivate);
         }
         else if (worked && a == Deactivate)
         {
@@ -153,8 +153,8 @@ struct UnlockForm::OverlayComp  : public Component,
         }
         else if (! worked && (a == Activate || a == Check) && f.status.isExpiring())
         {
-            f.setMode (Deactivate);
             f.saveStatus();
+            f.setMode (Deactivate);
         }
 
         if (auto* devs = gui.findSibling<Element::DevicesController>())
@@ -175,8 +175,6 @@ struct UnlockForm::OverlayComp  : public Component,
        #else
         g.getDeviceManager().restartLastAudioDevice();
        #endif
-
-       f.status.dump();
     }
     
     const Action action;
@@ -213,7 +211,8 @@ struct LicenseInfo : public Component,
         if (f.status.isExpiring() && Time::getCurrentTime() > f.status.getExpiryTime())
         {
             addAndMakeVisible (expiredNotice);
-            String text = "Expired: "; text << f.status.getExpiryTime().toString(true, false);
+            String text = (bool)f.status.isTrial() ? "Trial " : "";
+            text << "Expired: " << f.status.getExpiryTime().toString(true, false);
             expiredNotice.setText (text, dontSendNotification);
             expiredNotice.setJustificationType (Justification::centred);
             expiredNotice.setColour (Label::textColourId, Colours::red);
@@ -221,7 +220,8 @@ struct LicenseInfo : public Component,
         else if (f.status.isExpiring() && Time::getCurrentTime() <= f.status.getExpiryTime())
         {
             addAndMakeVisible (expiredNotice);
-            String text = "Expires: "; text << f.status.getExpiryTime().toString(true, false);
+            String text = (bool)f.status.isTrial() ? "Trial " : "";
+            text << "Expires: " << f.status.getExpiryTime().toString(true, false);
             expiredNotice.setText (text, dontSendNotification);
             expiredNotice.setJustificationType (Justification::centred);
         }

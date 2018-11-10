@@ -3,13 +3,8 @@
 
 #include "ElementApp.h"
 
-
 #ifndef EL_DEBUG_LICENSE
- #define EL_DEBUG_LICENSE 0
-#endif
-
-#ifndef EL_LITE_VERSION_DEV
- #define EL_LITE_VERSION_DEV 1
+ #define EL_DEBUG_LICENSE 1
 #endif
 
 #ifndef EL_DISABLE_UNLOCKING
@@ -57,28 +52,24 @@ public:
         return result;
     }
 
+    inline var isTrial() const { return props [trialKey]; }
+
     inline var isFullVersion() const
     {
        #if EL_DISABLE_UNLOCKING
         return var (true);
-        
-       #elif EL_LITE_VERSION_DEV
+       #endif
 
         if (getExpiryTime() > Time() && Time::getCurrentTime() < getExpiryTime())
-            return props [trialKey];
+            return !isUnlocked() && (props [trialKey] || props [fullKey]);
 
         if (! (bool) isUnlocked())
-            return var (0);
+            return isUnlocked();
         return props [fullKey];
-        
-       #else
-        return isUnlocked();
-       #endif
     }
     
     void launchProUpgradeUrl();
     
-    String getTrialProductID();
     String getProductID() override;
     bool doesProductIDMatch (const String& returnedIDFromServer) override;
     RSAKey getPublicKey() override;
@@ -87,18 +78,6 @@ public:
     String getWebsiteName() override;
     URL getServerAuthenticationURL() override;
     StringArray getLocalMachineIDs() override;
-
-    inline void dump()
-    {
-       #if EL_DEBUG_LICENSE
-        DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
-        DBG("[EL] getLicenseKey(): " << getLicenseKey());
-        DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
-        DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
-        DBG("[EL] getProperty('price_id')  " << (int) getProperty ("price_id"));
-        DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
-       #endif
-    }
 
     inline void checkLicenseInBackground() {
         if (isThreadRunning())
@@ -121,36 +100,22 @@ private:
 
     void run() override;
     void timerCallback() override;
-
-    inline void loadProps()
+    void loadProps();
+    
+    inline void dump()
     {
-        props = ValueTree (propsKey);
-
-       #if EL_LITE_VERSION_DEV
-       #if EL_USE_LOCAL_AUTH
-        const var full (1); const var trial (2); const var zero (0);
-       #else
-        const var full (1); const var trial (2); const var zero (0);
-       #endif
-        if (full == getProperty (priceIdKey) || zero == getProperty (priceIdKey))
-        {
-            props.setProperty (fullKey, 1, nullptr);
-            props.removeProperty (trialKey, nullptr);
-        }
-        else if (trial == getProperty (priceIdKey))
-        {
-            props.removeProperty (fullKey, nullptr);
-            props.removeProperty (trialKey, nullptr);
-            if (getExpiryTime() > Time() && Time::getCurrentTime() < getExpiryTime())
-                props.setProperty (trialKey, 1, nullptr);
-        }
-        else
-        {
-            props.removeProperty (fullKey, nullptr);
-            props.removeProperty (trialKey, nullptr);
-        }
+       #if EL_DEBUG_LICENSE
+        DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
+        DBG("[EL] isTrial(): " << ((bool)isTrial() ? "yes" : "no"));
+        DBG("[EL] getLicenseKey(): " << getLicenseKey());
+        DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
+        DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
+        DBG("[EL] getProperty('price_id')  " << (int) getProperty ("price_id"));
+        DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
+        DBG(props.toXmlString());
        #endif
     }
+
 };
 
 }

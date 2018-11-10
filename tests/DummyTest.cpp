@@ -32,8 +32,6 @@ private:
         expect (true == keyFile.existsAsFile());
         expect (true == unlock.applyKeyFile (stream.readEntireStreamAsString()));
         DBG("time: " << unlock.getExpiryTime().toMilliseconds());
-
-        unlock.dump();
     }
 
     void testUuid()
