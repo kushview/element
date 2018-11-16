@@ -130,7 +130,8 @@ public:
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
 
         return object && proc && isPositiveAndBelow (parameter, proc->getParameters().size()) &&
-            message.isController() && control.getValueTree().isValid();
+            (message.isController() || message.isNoteOn()) && 
+            control.getValueTree().isValid();
     }
 
     AudioProcessorParameterCapture capture;
@@ -230,7 +231,7 @@ void MappingController::onControlCaptured()
                       .setProperty (Tags::control,      impl->control.getUuidString(), nullptr)
                       .setProperty (Tags::node,         impl->node.getUuidString(), nullptr)
                       .setProperty (Tags::parameter,    impl->parameter, nullptr);
-                auto maps = session->getValueTree().getChildWithName(Tags::maps);
+                auto maps = session->getValueTree().getChildWithName (Tags::maps);
                 maps.addChild (newMap, -1, nullptr);
 
                 if (auto* gui = findSibling<GuiController>())

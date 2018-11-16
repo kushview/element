@@ -21,15 +21,21 @@ struct MidiNoteControllerMap : public ControllerMapHandler
         : node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           noteNumber (message.getNoteNumber()),
-          parameter (processor->getParameters()[_parameter])
+          parameter (nullptr)
     {
-        jassert (message.isNoteOnOrOff());
-        jassert (node && processor && parameter);
+        jassert (message.isNoteOn());
+        jassert (node && processor);
+
+        if (isPositiveAndBelow (_parameter, processor->getParameters().size()))
+        {
+            parameter = processor->getParameters()[_parameter];
+            jassert (nullptr != parameter);
+        }
     }
 
     bool wants (const MidiMessage& message) const override
     {
-        return message.isNoteOnOrOff() && message.getNoteNumber() == noteNumber;
+        return message.isNoteOn() && message.getNoteNumber() == noteNumber;
     }
 
     void perform (const MidiMessage&) override
@@ -78,7 +84,7 @@ class ControllerMapInput : public MidiInputCallback
 {
 public:
     explicit ControllerMapInput (MappingEngine& owner, const ControllerDevice& device)
-        : mapping(owner), controllerDevice (device) 
+        : mapping (owner), controllerDevice (device)
     {
 
     }
@@ -90,12 +96,16 @@ public:
 
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
     {
-        if (! message.isController() || ! controllerNumbers [message.getControllerNumber()])
+        if ((! message.isController() || !controllerNumbers [message.getControllerNumber()]) &&
+            (!message.isNoteOn() || !noteNumbers [message.getNoteNumber()]))
             return;
 
         // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
         //     << " : " << message.getControllerValue());
-        mapping.captureNextEvent (*this, controls [message.getControllerNumber()], message);
+        if (message.isNoteOn())
+            mapping.captureNextEvent (*this, notes[message.getNoteNumber()], message);
+        else if (message.isController())
+            mapping.captureNextEvent (*this, controls[message.getControllerNumber()], message);
 
         for (auto* handler : handlers)
             if (handler->wants (message))
@@ -111,6 +121,7 @@ public:
         }
 
         controllerNumbers.setRange (0, 127, false);
+        noteNumbers.setRange (0, 127, false);
         return midiInput == nullptr;
     }
 
@@ -122,10 +133,16 @@ public:
         {
             const auto control (controllerDevice.getControl (i));
             const auto midi (control.getMappingData());
-            if (! midi.isController())
-                continue;
-            controllerNumbers.setBit (midi.getControllerNumber(), true);
-            controls.set (midi.getControllerNumber(), control);
+            if (midi.isController())
+            {
+                controllerNumbers.setBit (midi.getControllerNumber(), true);
+                controls.set (midi.getControllerNumber(), control);
+            }
+            else if (midi.isNoteOn())
+            {
+                noteNumbers.setBit (midi.getNoteNumber(), true);
+                notes.set (midi.getNoteNumber(), control);
+            }
         }
 
         if (midiInput == nullptr)
@@ -175,8 +192,8 @@ private:
     ControllerDevice controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
     OwnedArray<ControllerMapHandler> handlers;
-    BigInteger controllerNumbers;
-    HashMap<int, ControllerDevice::Control> controls;
+    BigInteger controllerNumbers, noteNumbers;
+    HashMap<int, ControllerDevice::Control> controls, notes;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ControllerMapInput)
 };
 
@@ -298,10 +315,18 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     if (auto* input = inputs->findInput (control.getControllerDevice()))
     {
         const auto message (control.getMappingData());
-        std::unique_ptr<MidiCCControllerMapHandler> handler;
-        handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
-        input->addHandler (handler.release());
-        return true;
+        std::unique_ptr<ControllerMapHandler> handler;
+
+        if (message.isController())
+            handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
+        else if (message.isNoteOn())
+            handler.reset (new MidiNoteControllerMap (message, node, parameter));
+
+        if (nullptr != handler)
+        {
+            input->addHandler (handler.release());
+            return true;
+        }
     }
 
     return false;
@@ -352,7 +377,6 @@ bool MappingEngine::captureNextEvent (ControllerMapInput& input,
     if (! capturedEvent.capture.get())
         return false;
     capture (false);
-
     capturedEvent.cancelPendingUpdate();
     capturedEvent.control = control;
     capturedEvent.message = message;
