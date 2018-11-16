@@ -134,8 +134,8 @@ public:
     {
         if (GraphNodePtr object = node.getGraphNode())
         {
-            shared_connection_block b1 (volumeChangedConnection);
-            shared_connection_block b2 (powerChangedConnection);
+            boost::signals2::shared_connection_block b1 (volumeChangedConnection);
+            boost::signals2::shared_connection_block b2 (powerChangedConnection);
             float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
             channelStrip.setVolume (Decibels::gainToDecibels (gain, -60.f));
             channelStrip.setPower (! object->isSuspended());

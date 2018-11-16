@@ -478,7 +478,7 @@ public:
         triggerAsyncUpdate();
     }
     
-    ~Content()
+    ~Content() noexcept
     {
         disconnectHandlers();
         session = nullptr;
@@ -492,7 +492,8 @@ public:
     static bool supportedForMapping (const MidiMessage& message, const ControllerDevice::Control& control)
     {
         ignoreUnused (control);
-        return message.isController() && message.getRawDataSize() > 0;
+        return (message.isController() || message.isNoteOn())
+            && message.getRawDataSize() > 0;
     }
 
     void onLearnMidi()

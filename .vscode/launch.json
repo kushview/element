@@ -6,10 +6,11 @@
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            "stopAtEntry": false,
+            
             "cwd": "${workspaceRoot}/build",
             "environment": [{ "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }],
             "externalConsole": false,
+            "stopAtEntry": false,
             "linux": {
                 "MIMode": "gdb",
                 "program": "${workspaceRoot}/build/bin/element",
@@ -25,7 +26,6 @@
             "osx": {
                 "MIMode": "lldb",
                 "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element",
-                // "program": "${workspaceRoot}/build/bin/test-element",
             },
             "windows": {
                 "MIMode": "gdb",

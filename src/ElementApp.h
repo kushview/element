@@ -5,13 +5,7 @@
 
 #pragma once
 
-#if HAVE_JUCE_CORE
- #include <juce/juce.h>
- #include <element/element.h>
-#else
- #include "JuceHeader.h"
-#endif
-
+#include "JuceHeader.h"
 #include "DataPath.h"
 #include "Signals.h"
 
