@@ -570,9 +570,11 @@ namespace Element {
         if (! isValid())
             return;
         
-        if (GraphNodePtr obj = getGraphNode())
+        GraphNodePtr obj = getGraphNode();
+        if (obj && obj->isPrepared)
         {
             MemoryBlock state;
+            
             if (auto* proc = obj->getAudioProcessor())
             {
                 proc->getStateInformation (state);
