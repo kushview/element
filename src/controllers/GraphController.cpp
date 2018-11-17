@@ -435,6 +435,8 @@ void GraphController::setNodeModel (const Node& node)
         if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
             setupNode (node.getValueTree(), obj);
+            obj->setEnabled (node.isEnabled());
+            node.setProperty (Tags::enabled, obj->isEnabled());
         }
         else if (GraphNodePtr ph = createPlaceholder (node))
         {

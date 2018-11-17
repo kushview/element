@@ -34,8 +34,8 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
       isPrepared (false),
       metadata (Tags::node)
 {
-    proc = processor_;
     parent = nullptr;
+    proc = processor_;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
     jassert (proc != nullptr);
@@ -54,6 +54,7 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
 
 GraphNode::~GraphNode()
 {
+    parent = nullptr;
     proc = nullptr;
 }
 
@@ -271,7 +272,7 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
     parent = parentGraph;
     AudioProcessor* instance = proc.get();
     
-    if (! isPrepared)
+    if (enabled && ! isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph);
@@ -312,7 +313,25 @@ void GraphNode::unprepare()
         inRMS.clear (true);
         outRMS.clear (true);
         proc->releaseResources();
-        parent = nullptr;
+        // parent = nullptr;
+    }
+}
+
+void GraphNode::setEnabled (const bool shouldBeEnabled)
+{
+    if (shouldBeEnabled == enabled)
+        return;
+
+    enabled = shouldBeEnabled;
+
+    if (shouldBeEnabled)
+    {
+        jassert (parent);
+        prepare (parent->getSampleRate(), parent->getBlockSize(), parent);
+    }
+    else
+    {
+        unprepare();
     }
 }
 

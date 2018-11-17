@@ -213,6 +213,13 @@ public:
 
         AudioSampleBuffer buffer (channels, totalChans, numSamples);
         
+        if (! node->isEnabled())
+        {
+            for (int ch = numAudioIns; ch < numAudioOuts; ++ch)
+                buffer.clear (ch, 0, buffer.getNumSamples());
+            return;
+        }
+
         if (node->getInputGain() != node->getLastInputGain()) {
             buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
         } else {

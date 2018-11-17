@@ -195,9 +195,11 @@ private:
 
 class FilterComponent    : public Component,
                            public Button::Listener,
-                           public AsyncUpdater
+                           public AsyncUpdater,
+                           public Value::Listener
 {
     PigWhipSource pigWhip;
+    Value nodeEnabled;
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
         : filterID (node_.getNodeId()),
@@ -212,6 +214,8 @@ public:
           vertical (vertical_)
     {
         setBufferedToImage (true);
+        nodeEnabled = node.getPropertyAsValue (Tags::enabled);
+        nodeEnabled.addListener (this);
 
        #if EL_USE_PIG_WHIP
         addAndMakeVisible (pigWhip);
@@ -240,7 +244,15 @@ public:
 
     ~FilterComponent() noexcept
     {
+        nodeEnabled.removeListener (this);
         deleteAllPins();
+    }
+
+    void valueChanged (Value& value) override
+    {
+        if (nodeEnabled.refersToSameSourceAs (value)) {
+            repaint();
+        }
     }
 
     void handleAsyncUpdate() override
@@ -436,7 +448,7 @@ public:
     
     void paint (Graphics& g) override
     {
-        g.setColour (isEnabled() ? Colours::lightgrey : Colours::lightgrey.darker());
+        g.setColour (isEnabled() && node.isEnabled() ? Colours::lightgrey : Colours::lightgrey.darker());
         
         const auto box (getBoxRectangle());
         g.fillRect (box);

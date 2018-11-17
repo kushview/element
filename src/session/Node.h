@@ -101,6 +101,9 @@ namespace Element {
         /** Returns true if the value tree is probably a graph node */
         static bool isProbablyGraphNode (const ValueTree& data);
 
+        /** Returns true if this node should be enabled */
+        inline const bool isEnabled() const { return (bool) getProperty (Tags::enabled, true); }
+
         /** Load a node from file */
         static ValueTree parse (const File& file);
         

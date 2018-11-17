@@ -329,6 +329,25 @@ private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ResultOp);
     };
     
+    struct EnableNodeOp : public ResultOp
+    {
+        const Node node;
+        EnableNodeOp (const Node& n) : node (n) { }
+        bool isTicked() override { return false; }
+        bool perform() override
+        {
+            if (GraphNodePtr ptr = node.getGraphNode())
+            {
+                ptr->setEnabled (! ptr->isEnabled());
+                auto data = node.getValueTree();
+                data.setProperty (Tags::enabled, ptr->isEnabled(), nullptr);
+                return true;
+            }
+
+            return false;
+        }
+    };
+
     struct SingleConnectOp : public ResultOp
     {
         SingleConnectOp (const Node& sn, const Port& sp, const Node& dn, const Port& dp)
@@ -443,6 +462,9 @@ private:
         if (showHeader)
             addSectionHeader (node.getName());
 
+        addItemInternal (*this, node.isEnabled() ? "Disable" : "Enable", new EnableNodeOp (node));
+        addSeparator();
+
         {
             PopupMenu disconnect;
             disconnect.addItem (Disconnect, "All Ports");
@@ -452,7 +474,7 @@ private:
             addSubMenu ("Disconnect", disconnect);
         }
 
-        addItem (Duplicate, getNameForItem (Duplicate), ! node.isIONode());
+        addItem (Duplicate, getNameForItem (Duplicate), !node.isIONode());
         addSeparator();
         addItem (RemoveNode, getNameForItem (RemoveNode));
     }

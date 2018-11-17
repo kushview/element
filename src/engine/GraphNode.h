@@ -109,9 +109,15 @@ public:
     void setInputRMS (int chan, float val);
     float getInputRMS(int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked(chan)->get() : 0.0f; }
     void setOutputRMS (int chan, float val);
-    float getOutputRMS(int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
+    float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
 
     void connectAudioTo (const GraphNode* other);
+
+    /** Enable or disable this node */
+    void setEnabled (const bool shouldBeEnabled);
+
+    /** Returns true if this node is enabled */
+    bool isEnabled() const { return enabled; }
 
 private:
     friend class GraphProcessor;
@@ -120,7 +126,8 @@ private:
     friend class Node;
 
     ScopedPointer<AudioProcessor> proc;
-    bool isPrepared;
+    bool isPrepared = false;
+    bool enabled = true;
     GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);
