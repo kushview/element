@@ -159,8 +159,8 @@ void DevicesController::refresh()
             Uuid (child.getProperty (Tags::controller).toString()));
         ControllerDevice::Control control = device.findControlById (
             Uuid (child.getProperty (Tags::control).toString()));
-        const bool valid = device.isValid() && control.isValid() && node.isValid() && parameter >= 0;
-        if (valid && mapping.addHandler (control, node, parameter))
+                
+        if (mapping.addHandler (control, node, parameter))
         {
             DBG("[EL] added handler in refresh: " << control.getName().toString());
         }
