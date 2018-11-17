@@ -38,7 +38,7 @@ public:
 
     void clear()
     {
-        maps.clearQuick(true);
+        maps.clearQuick (true);
         updateContent();
     }
 
@@ -130,12 +130,47 @@ public:
 
     void cellDoubleClicked (int rowNumber, int columnId, const MouseEvent&) override
     {
-        if(auto* const objects = maps [rowNumber])
-            ViewHelpers::presentPluginWindow (this, objects->node);
+        if (auto* const objects = maps [rowNumber])
+        {
+            switch (columnId)
+            {
+                case Node:
+                    ViewHelpers::presentPluginWindow (this, objects->node);
+                    break;
+                default: {
+                    DialogOptions d;
+                    d.content.setOwned (new Component());
+                    d.content->setSize (240, 240);
+                    d.dialogTitle = "Test Dialog";
+                    d.componentToCentreAround = ViewHelpers::findContentComponent (this);
+                    d.launchAsync();
+                } break;
+            }
+        }
     }
+
+    Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
+                                        Component* existing) override
+    {
+        return nullptr;
+        #if 0
+        CellContent* const content = nullptr == existing 
+            ? new CellContent() : dynamic_cast<CellContent*> (existing);
+        jassert (content);
+        
+        content->columnId = columnId;
+        content->rowNumber = rowNumber;
+        if (auto* const objects = maps [rowNumber])
+            content->mapp = *objects;
+        else
+            content->mapp = ControllerMapObjects();
+        content->stabilize();
+        return content;
+        #endif
+    }
+
 #if 0
-    virtual Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
-                                                Component* existingComponentToUpdate);
+    
     virtual void cellClicked (int rowNumber, int columnId, const MouseEvent&);
     
     virtual void backgroundClicked (const MouseEvent&);
@@ -151,6 +186,37 @@ public:
 private:
     SessionPtr session;
     OwnedArray<ControllerMapObjects> maps;
+
+    class CellContent : public Component
+    {
+    public:
+        
+        CellContent()
+        {
+            setInterceptsMouseClicks (false, true);
+            addAndMakeVisible (comboBox);
+        }
+
+        void resized() override 
+        {
+            comboBox.setBounds (getLocalBounds().reduced (2));
+        }
+
+        void stabilize()
+        {
+            comboBox.clear();
+            comboBox.addItem ("Item 1", 1);
+            comboBox.addItem ("Item 2", 2);
+            comboBox.addItem ("Item 3", 3);
+        }
+
+    private:
+        friend class ControllerMapsTable;
+        ComboBox comboBox;
+        int columnId = 0;
+        int rowNumber = -1;
+        ControllerMapObjects mapp;
+    };
 };
 
 class MidiLearnButton : public SettingButton,
@@ -273,7 +339,7 @@ public:
     ControlListBox ()
     {
         setModel (this);
-        setRowHeight (48);
+        setRowHeight (32);
     }
 
     ~ControlListBox()
@@ -407,6 +473,7 @@ private:
         int rowNumber = -1;
         bool selected = false;
         Label status;
+
     private:
         ControlListBox& list;
     };

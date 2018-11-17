@@ -145,6 +145,7 @@ namespace Element {
 
     struct ControllerMapObjects
     {
+        ControllerMapObjects() = default;
         ControllerMapObjects (SessionPtr s, const ControllerMap& m)
             : session (s), controllerMap (m)
         {
@@ -156,6 +157,19 @@ namespace Element {
             }
         }
 
+        ControllerMapObjects (const ControllerMapObjects& o) { operator= (o); }
+        ControllerMapObjects& operator= (const ControllerMapObjects& o)
+        {
+            this->session = o.session;
+            this->controllerMap = o.controllerMap;
+            this->node = o.node;
+            this->device = o.device;
+            this->control = o.control;
+            return *this;
+        }
+
+        ~ControllerMapObjects() = default;
+        
         inline bool isValid() const { return device.isValid() && control.isValid() && node.isValid(); }
 
         SessionPtr session;

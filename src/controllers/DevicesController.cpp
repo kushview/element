@@ -167,9 +167,6 @@ void DevicesController::refresh()
         else
         {
             DBG("[EL] failed adding handler: " << control.getName().toString());
-            jassert(node.isValid());
-            jassert(device.isValid());
-            jassert(control.isValid());
         }
     }
 
