@@ -163,6 +163,7 @@ void AppController::handleMessage (const Message& msg)
         if (newNode.isValid() && graph.isValid())
         {
             newNode.getValueTree().removeProperty (Tags::id, 0);
+            newNode.setProperty (Tags::uuid, Uuid().toString());
             ConnectionBuilder dummy;
             ec->addNode (newNode, graph, dummy);
         }
