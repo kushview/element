@@ -106,7 +106,7 @@ private:
                 if (auto* proc = object->getAudioProcessor())
                 { 
                     nodeMap2.set (proc, n);
-                    proc->addListener (this); 
+                    proc->addListener (this);
                 }
             }
             if (n.getNumChildren() > 0)
