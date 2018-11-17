@@ -13,6 +13,21 @@
 #include "session/Session.h"
 
 namespace Element {
+
+    static Node findNodeRecursive (const Node& start, const Uuid& uuid)
+    {
+        if (! uuid.isNull() && uuid == start.getUuid())
+            return start;
+
+        for (int i = start.getNumNodes(); --i >= 0;)
+        {
+            const auto node = findNodeRecursive (start.getNode(i), uuid);
+            if (node.isValid()) return node;
+        }
+
+        return Node();
+    }
+
     class Session::Private
     {
     public:
@@ -119,19 +134,15 @@ namespace Element {
     }
 
     Node Session::findNodeById (const Uuid& uuid)
-    {   
+    {
         Node node;
+
         for (int i = getNumGraphs(); --i >= 0;)
         {
-            const auto graph = getGraph (i);
-            const auto n = graph.getNodesValueTree()
-                .getChildWithProperty (Tags::uuid, uuid.toString());
-            if (n.isValid())
-            {
-                node = Node (n);
-                break;
-            }
+            node = findNodeRecursive (getGraph (i), uuid);
+            if (node.isValid()) break;
         }
+
         return node;
     }
 
