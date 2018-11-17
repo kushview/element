@@ -137,14 +137,8 @@ public:
                 case Node:
                     ViewHelpers::presentPluginWindow (this, objects->node);
                     break;
-                default: {
-                    DialogOptions d;
-                    d.content.setOwned (new Component());
-                    d.content->setSize (240, 240);
-                    d.dialogTitle = "Test Dialog";
-                    d.componentToCentreAround = ViewHelpers::findContentComponent (this);
-                    d.launchAsync();
-                } break;
+                default:
+                    break;
             }
         }
     }

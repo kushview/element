@@ -272,7 +272,7 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
     parent = parentGraph;
     AudioProcessor* instance = proc.get();
     
-    if (enabled && ! isPrepared)
+    if (enabled.get() == 1 && ! isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph);
@@ -313,16 +313,15 @@ void GraphNode::unprepare()
         inRMS.clear (true);
         outRMS.clear (true);
         proc->releaseResources();
-        // parent = nullptr;
     }
 }
 
 void GraphNode::setEnabled (const bool shouldBeEnabled)
 {
-    if (shouldBeEnabled == enabled)
+    if (shouldBeEnabled == isEnabled())
         return;
 
-    enabled = shouldBeEnabled;
+    enabled.set (shouldBeEnabled ? 1 : 0);
 
     if (shouldBeEnabled)
     {
@@ -333,6 +332,8 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     {
         unprepare();
     }
+
+    enablementChanged (this);
 }
 
 static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcessor* proc, ValueTree& ports)

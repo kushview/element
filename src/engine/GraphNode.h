@@ -117,8 +117,9 @@ public:
     void setEnabled (const bool shouldBeEnabled);
 
     /** Returns true if this node is enabled */
-    bool isEnabled() const { return enabled; }
+    inline bool isEnabled() const { return enabled.get() == 1; }
 
+    boost::signals2::signal<void(GraphNode*)> enablementChanged;
 private:
     friend class GraphProcessor;
     friend class GraphController;
@@ -127,7 +128,7 @@ private:
 
     ScopedPointer<AudioProcessor> proc;
     bool isPrepared = false;
-    bool enabled = true;
+    Atomic<int> enabled { 1 };
     GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);

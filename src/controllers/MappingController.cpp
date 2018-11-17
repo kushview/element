@@ -55,7 +55,7 @@ public:
         const auto captured (nodeMap2 [capturedProcessor]);
         if (auto* node = captured.getGraphNode())
             if (auto* proc = node->getAudioProcessor())
-                if (proc == capturedProcessor && isPositiveAndBelow (capturedParameter, proc->getParameters().size()))
+                if (proc == capturedProcessor && (capturedParameter == -2 || isPositiveAndBelow (capturedParameter, proc->getParameters().size())))
                     callback (captured, capturedParameter);
 
         clear();
@@ -66,6 +66,10 @@ public:
     void clear()
     {
         capture.set (false);
+
+        for (auto& c : nodeConnections)
+            c.disconnect();
+        nodeConnections.clear();
 
         for (const auto& item : nodeMap2)
             if (auto* node = item.getGraphNode())
@@ -96,6 +100,18 @@ public:
     HashMap<AudioProcessor*, Node> nodeMap2;
 
 private:
+    Array<boost::signals2::connection> nodeConnections;
+
+    void onEnablementChanged (GraphNode* ptr) {
+        if (capture.get() == false)
+            return;
+        capture.set (false);
+        ScopedLock sl (lock);
+        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
+        parameter = -2;
+        triggerAsyncUpdate();
+    }
+
     void addNodesRecursive (const Node& node)
     {
         for (int j = 0; j < node.getNumNodes(); ++j)
@@ -104,8 +120,11 @@ private:
             if (GraphNodePtr object = n.getGraphNode())
             {
                 if (auto* proc = object->getAudioProcessor())
-                { 
+                {
                     nodeMap2.set (proc, n);
+                    nodeConnections.add (object->enablementChanged.connect (std::bind (
+                        &AudioProcessorParameterCapture::onEnablementChanged, this, 
+                        std::placeholders::_1)));
                     proc->addListener (this);
                 }
             }
@@ -128,8 +147,8 @@ public:
     {
         GraphNodePtr object = node.getGraphNode();
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-
-        return object && proc && isPositiveAndBelow (parameter, proc->getParameters().size()) &&
+        return object && proc && 
+            (parameter == -2 || isPositiveAndBelow (parameter, proc->getParameters().size())) &&
             (message.isController() || message.isNoteOn()) && 
             control.getValueTree().isValid();
     }

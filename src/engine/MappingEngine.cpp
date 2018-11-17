@@ -15,20 +15,22 @@ struct ControllerMapHandler
     virtual void perform (const MidiMessage& message) =0;
 };
 
-struct MidiNoteControllerMap : public ControllerMapHandler
+struct MidiNoteControllerMap : public ControllerMapHandler,
+                               public AsyncUpdater
 {
     MidiNoteControllerMap (const MidiMessage& message, const Node& _node, const int _parameter)
-        : node (_node.getGraphNode()),
+        : model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           noteNumber (message.getNoteNumber()),
+          parameterIndex (_parameter),
           parameter (nullptr)
     {
         jassert (message.isNoteOn());
         jassert (node && processor);
 
-        if (isPositiveAndBelow (_parameter, processor->getParameters().size()))
+        if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
-            parameter = processor->getParameters()[_parameter];
+            parameter = processor->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
     }
@@ -40,12 +42,27 @@ struct MidiNoteControllerMap : public ControllerMapHandler
 
     void perform (const MidiMessage&) override
     {
-        parameter->setValue (parameter->getValue() < 0.5 ? 1.f : 0.f);
+        if (parameter != nullptr)
+        {
+            parameter->setValue (parameter->getValue() < 0.5 ? 1.f : 0.f);
+        }
+        else if (parameterIndex == -2)
+        {
+            triggerAsyncUpdate();
+        }
+    }
+
+    void handleAsyncUpdate() override
+    {
+        node->setEnabled (! node->isEnabled());
+        model.setProperty (Tags::enabled, node->isEnabled());
     }
 
 private:
+    Node model;
     GraphNodePtr node;
     AudioProcessor* processor;
+    int parameterIndex = -1;
     AudioProcessorParameter* parameter;
     const int noteNumber;
 };
@@ -309,26 +326,25 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     auto* const proc   = object == nullptr ? nullptr : object->getAudioProcessor();
     if (nullptr == object || nullptr == proc)
         return false;
-    if (! isPositiveAndBelow (parameter, proc->getParameters().size()))
-        return false;
-
-    if (auto* input = inputs->findInput (control.getControllerDevice()))
+    if (parameter == -2 || isPositiveAndBelow (parameter, proc->getParameters().size()))
     {
-        const auto message (control.getMappingData());
-        std::unique_ptr<ControllerMapHandler> handler;
-
-        if (message.isController())
-            handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
-        else if (message.isNoteOn())
-            handler.reset (new MidiNoteControllerMap (message, node, parameter));
-
-        if (nullptr != handler)
+        if (auto* input = inputs->findInput (control.getControllerDevice()))
         {
-            input->addHandler (handler.release());
-            return true;
+            const auto message (control.getMappingData());
+            std::unique_ptr<ControllerMapHandler> handler;
+
+            if (message.isController())
+                handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
+            else if (message.isNoteOn())
+                handler.reset (new MidiNoteControllerMap (message, node, parameter));
+
+            if (nullptr != handler)
+            {
+                input->addHandler (handler.release());
+                return true;
+            }
         }
     }
-
     return false;
 }
 
