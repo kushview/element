@@ -110,10 +110,16 @@ public:
             } break;
 
             case Parameter: {
-                if (auto* obj = node.getGraphNode())
+                if (mapp.getParameterIndex() == -2)
+                {
+                    text = "Enable/Disable";
+                }
+                else if (auto* obj = node.getGraphNode())
+                {
                     if (auto* proc = obj->getAudioProcessor())
                         if (auto* param = proc->getParameters()[mapp.getParameterIndex()])
                             text = param->getName (64);
+                }
             } break;
         }
 
