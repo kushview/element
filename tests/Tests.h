@@ -6,6 +6,7 @@
 #include "engine/GraphProcessor.h"
 #include "engine/MappingEngine.h"
 #include "engine/InternalFormat.h"
+#include "engine/VelocityCurve.h"
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
