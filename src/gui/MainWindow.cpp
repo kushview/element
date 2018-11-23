@@ -16,15 +16,13 @@ MainWindow::MainWindow (Globals& g)
     : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
-    setUsingNativeTitleBar (true);
-    setResizable (true, false);
-    
     mainMenu = new MainMenu (*this, g.getCommandManager());
     mainMenu->setupMenu();
-
     nameChanged (g.getSession()->getName());
     g.getSession()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
+    setUsingNativeTitleBar (true);
+    setResizable (true, false);
 }
 
 MainWindow::~MainWindow()
@@ -34,6 +32,12 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::changeListenerCallback (ChangeBroadcaster*)
+{
+    refreshName();
+    // refreshMenu();
+}
+
+void MainWindow::refreshName()
 {
     nameChanged (world.getSession()->getName());
 }
@@ -45,6 +49,9 @@ void MainWindow::nameChanged (const String& value)
        sessionName = newName;
 
     String title = "Element";
+   #ifdef EL_FREE
+    title << " FREE";
+   #endif
     if (sessionName.isNotEmpty())
         title << " - " << sessionName;
     

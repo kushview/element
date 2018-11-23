@@ -156,6 +156,7 @@ namespace Element {
 
     void UnlockStatus::loadProps()
     {
+       #ifndef EL_FREE
         props = ValueTree (propsKey);
         const var full (EL_PRO_PRICE_ID); 
         const var trial (EL_TRIAL_PRICE_ID); 
@@ -176,6 +177,11 @@ namespace Element {
             props.removeProperty (fullKey, nullptr);
             props.removeProperty (trialKey, nullptr);
         }
+
+       #else
+        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (trialKey, nullptr);
+       #endif
 
         dump();
     }

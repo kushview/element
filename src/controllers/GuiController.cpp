@@ -380,7 +380,7 @@ void GuiController::run()
     
     findSibling<SessionController>()->resetChanges();
 
-   #if ! EL_RUNNING_AS_PLUGIN
+   #if !EL_RUNNING_AS_PLUGIN
     sSystemTray.reset (new SystemTray());
     sSystemTray->setIconImage (
         ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize)    
@@ -791,6 +791,8 @@ void GuiController::stabilizeContent()
     if (auto* cc = content.get())
         cc->stabilize();
     refreshMainMenu();
+    if (mainWindow)
+        mainWindow->refreshName();
 }
 
 void GuiController::stabilizeViews()

@@ -343,7 +343,7 @@ public:
         if (! node.isRootGraph())
             return;
        
-       #if ! EL_FREE
+       #ifndef EL_FREE
         // Paint the program number if it is enabled
         const auto h = area.getHeight(); const auto w = h;
         const int p = 1 + (int)node.getProperty (Tags::midiProgram, -1);

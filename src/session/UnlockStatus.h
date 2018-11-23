@@ -56,6 +56,7 @@ public:
 
     inline var isFullVersion() const
     {
+       #ifndef EL_FREE
        #if EL_DISABLE_UNLOCKING
         return var (true);
        #endif
@@ -66,6 +67,11 @@ public:
         if (! (bool) isUnlocked())
             return isUnlocked();
         return props [fullKey];
+       #endif
+       
+       var r1 (false); var r2 (false);
+       r2.swapWith (r1);
+       return r1;
     }
     
     void launchProUpgradeUrl();
@@ -79,10 +85,13 @@ public:
     URL getServerAuthenticationURL() override;
     StringArray getLocalMachineIDs() override;
 
-    inline void checkLicenseInBackground() {
+    inline void checkLicenseInBackground()
+    {
+       #ifndef EL_FREE
         if (isThreadRunning())
             return;
         startThread (4);
+       #endif
     }
 
     Signal refreshed;

@@ -21,7 +21,6 @@ def options (opt):
     opt.add_option ('--enable-local-auth', default=False, action='store_true', dest='enable_local_auth', \
         help="Authenticate locally")
 
-
 def silence_warnings(conf):
     '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
@@ -55,7 +54,6 @@ def configure (conf):
     conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
 
     conf.define ('EL_FREE', 1 if conf.options.enable_free else 0)
-    conf.define ('EL_FULL', 0 if conf.options.enable_free else 1)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1 if conf.options.enable_docking else 0)

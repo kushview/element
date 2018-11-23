@@ -196,9 +196,11 @@ public:
         menu.addCommandItem (&cmd, Commands::sessionSave,   "Save Session");
         menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
         
+       #ifndef EL_FREE
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
         menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
+       #endif
     }
     
     static void buildEditMenu (CommandManager& cmd, PopupMenu& menu)
@@ -219,6 +221,7 @@ public:
     
     static void buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     {
+       #ifndef EL_FREE
         menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
         menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
         menu.addSeparator();
@@ -235,6 +238,22 @@ public:
         menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
         menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
         menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
+       #else
+        menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
+        menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
+        menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
+        menu.addSeparator();
+        menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
+        menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");       
+       #endif
     }
     
     static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
@@ -278,10 +297,12 @@ private:
         menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
         menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
 
+       #ifndef EL_FREE
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
         menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-        
+       #endif
+
        #if ! JUCE_MAC
         menu.addSeparator();
         menu.addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates..");

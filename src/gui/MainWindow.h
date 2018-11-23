@@ -27,6 +27,7 @@ public:
 
     void changeListenerCallback (ChangeBroadcaster* source) override;
 
+    void refreshName();
 private:
     Globals& world;
     ScopedPointer<MainMenu> mainMenu;
