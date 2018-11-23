@@ -990,6 +990,12 @@ void GraphProcessor::setMidiChannel (const int channel) noexcept
         midiChannel = newChannel;
 }
 
+void GraphProcessor::setVelocityCurveMode (const VelocityCurve::Mode mode) noexcept
+{
+    ScopedLock sl (getCallbackLock());
+    velocityCurve.setMode (mode);
+}
+
 static void deleteRenderOpArray (Array<void*>& ops)
 {
     for (int i = ops.size(); --i >= 0;)
@@ -1152,7 +1158,7 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
     
-    if (midiChannel <= 0)
+    if (midiChannel <= 0 && velocityCurve.getMode() == VelocityCurve::Linear)
     {
         currentMidiInputBuffer = &midiMessages;
     }
@@ -1165,8 +1171,15 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
         while (iter.getNextEvent (msg, frame))
         {
             chan = msg.getChannel();
-            if (chan == 0 || chan == midiChannel)
-                filteredMidi.addEvent (msg, frame);
+            if (midiChannel > 0 && chan != midiChannel)
+                continue;
+
+            if (msg.isNoteOn())
+            {
+                msg.setVelocity (velocityCurve.process (msg.getFloatVelocity()));
+            }
+
+            filteredMidi.addEvent (msg, frame);
         }
         
         currentMidiInputBuffer = &filteredMidi;

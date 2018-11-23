@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "engine/GraphNode.h"
+#include "engine/VelocityCurve.h"
 #include "Signals.h"
 
 namespace Element {
@@ -160,6 +161,9 @@ public:
     /** Set the allowed MIDI channel of this Graph */
     void setMidiChannel (const int channel) noexcept;
     
+    /** Set the MIDI curve of this graph */
+    void setVelocityCurveMode (const VelocityCurve::Mode) noexcept;
+
     /** A special number that represents the midi channel of a node.
 
         This is used as a channel index value if you want to refer to the midi input
@@ -327,6 +331,7 @@ private:
     MidiBuffer currentMidiOutputBuffer;
     
     int midiChannel = 0;
+    VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
     
     void handleAsyncUpdate() override;

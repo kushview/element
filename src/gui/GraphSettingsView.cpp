@@ -1,6 +1,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
+#include "engine/VelocityCurve.h"
 #include "gui/GuiCommon.h"
 #include "gui/GraphSettingsView.h"
 #include "session/UnlockStatus.h"
@@ -237,6 +238,39 @@ namespace Element {
         bool locked;
     };
 
+    class VelocityCurvePropertyComponent : public ChoicePropertyComponent
+    {
+    public:
+        VelocityCurvePropertyComponent (const Node& g)
+            : ChoicePropertyComponent ("Velocity Curve"),
+              graph (g)
+        {
+            for (int i = 0; i < VelocityCurve::numModes; ++i)
+                choices.add (VelocityCurve::getModeName (i));
+        }
+
+        inline int getIndex() const override
+        {
+            return graph.getProperty ("velocityCurveMode", (int) VelocityCurve::Linear);
+        }
+        
+        inline void setIndex (const int i) override
+        {
+            if (! isPositiveAndBelow (i, (int) VelocityCurve::numModes))
+                return;
+            
+            graph.setProperty ("velocityCurveMode", i);
+            
+            if (auto* obj = graph.getGraphNode())
+                if (auto* proc = dynamic_cast<RootGraph*> (obj->getAudioProcessor()))
+                    proc->setVelocityCurveMode ((VelocityCurve::Mode) i);
+        }
+
+    private:
+        Node graph;
+        int index;
+    };
+
     class RootGraphMidiChanel : public MidiChannelPropertyComponent
     {
     public:
@@ -343,6 +377,7 @@ namespace Element {
                                                   TRANS("Name"), 256, false));
 
             props.add (new RenderModePropertyComponent (g));
+            props.add (new VelocityCurvePropertyComponent (g));
             props.add (new RootGraphMidiChanel (g));
             props.add (new MidiProgramPropertyComponent (g));
 

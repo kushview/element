@@ -19,7 +19,7 @@ namespace Element {
 struct RootGraphHolder
 {
     RootGraphHolder (const Node& n, Globals& world)
-        : plugins (world.getPluginManager()), 
+        : plugins (world.getPluginManager()),
           devices (world.getDeviceManager()),
           status  (world.getUnlockStatus()),
           model (n)
@@ -378,8 +378,6 @@ void EngineController::duplicateGraph()
     auto& world  = getWorld();
     auto engine  = world.getAudioEngine();
     auto session = world.getSession();
-    
-    String err;
     const Node current (session->getCurrentGraph());
     duplicateGraph (current);
 }
@@ -688,6 +686,8 @@ void EngineController::setRootNode (const Node& newRootNode)
     if (auto* proc = holder->getRootGraph())
     {
         proc->setMidiChannel ((int) newRootNode.getProperty (Tags::midiChannel, 0));
+        proc->setVelocityCurveMode ((VelocityCurve::Mode)(int) newRootNode.getProperty (
+            "velocityCurveMode", (int) VelocityCurve::Linear));
     }
     else
     {
@@ -716,8 +716,9 @@ void EngineController::setRootNode (const Node& newRootNode)
 
 void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)
 {
-    auto engine   = getWorld().getAudioEngine();
-    if (auto* g = engine->getGraph (index)) {
+    auto engine = getWorld().getAudioEngine();
+    if (auto* g = engine->getGraph (index))
+    {
         g->setMidiChannel (midiChannel);
     }
 }

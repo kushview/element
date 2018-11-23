@@ -63,7 +63,7 @@ public:
 
     inline float process (float velocity)
     {
-        if (mode == Linear || t == 0.5)
+        if (mode == Linear)
         {
             return velocity;
         }
@@ -73,7 +73,8 @@ public:
         }
 
         jassert (velocity >= 0 && velocity <= 1.f);
-
+        jassert (mode >= Soft_1 && mode <= Hard_3);
+        
         if (t < 0.5)
         {
             velocity = c1 - sqrtf (rsq - square (127.f * velocity - c0));
