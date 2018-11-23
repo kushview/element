@@ -5,7 +5,11 @@
 
 namespace Element {
 
-#define returnIfNotFullVersion if (! (bool) getWorld().getUnlockStatus().isFullVersion()) return;
+#ifndef EL_FREE
+ #define returnIfNotFullVersion if (! (bool) getWorld().getUnlockStatus().isFullVersion()) return;
+#else
+ #define returnIfNotFullVersion return;
+#endif
 
 class Controller
 {
