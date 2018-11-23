@@ -377,7 +377,9 @@ namespace Element {
                                                   TRANS("Name"), 256, false));
 
             props.add (new RenderModePropertyComponent (g));
+           #ifndef EL_FREE
             props.add (new VelocityCurvePropertyComponent (g));
+           #endif
             props.add (new RootGraphMidiChanel (g));
             props.add (new MidiProgramPropertyComponent (g));
 
