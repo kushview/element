@@ -53,7 +53,7 @@ def configure (conf):
     conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
     conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
 
-    conf.define ('EL_FREE', 1 if conf.options.enable_free else 0)
+    if conf.options.enable_free: conf.define ('EL_FREE', 1)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1 if conf.options.enable_docking else 0)
