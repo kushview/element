@@ -103,8 +103,6 @@ public:
 
     inline void cancelLicenseCheck()
     {
-        if (cancelled.get() != 0 || isThreadRunning())
-            return;
         stopTimer();
         cancelled.set (1);
         stopThread (1500);
