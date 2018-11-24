@@ -124,10 +124,12 @@ namespace Element {
             DBG("[EL] cannot connect to server to check license: " << EL_AUTH_URL);
             return;
         }
-        saveState (String());
-        loadAll();
-        result = checkLicense (key);
-        startTimer (200);
+        
+        if (cancelled.get() == 0)
+        {
+            result = checkLicense (key);
+            startTimer (200);
+        }
     }
 
     void UnlockStatus::timerCallback()

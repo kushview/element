@@ -21,7 +21,8 @@ class Globals;
 class Settings;
 
 class UnlockStatus :  public kv::EDDOnlineUnlockStatus,
-                      private Thread, private Timer
+                      private Thread, 
+                      private Timer
 {
 public:
     struct LockableObject
@@ -32,7 +33,10 @@ public:
     };
 
     UnlockStatus (Globals&);
-    ~UnlockStatus() { }
+    ~UnlockStatus()
+    {
+        cancelLicenseCheck();
+    }
 
     inline void loadAll()
     {
@@ -90,8 +94,20 @@ public:
        #ifndef EL_FREE
         if (isThreadRunning())
             return;
+        saveState (String());
+        loadAll();
+        cancelled.set (0);
         startThread (4);
        #endif
+    }
+
+    inline void cancelLicenseCheck()
+    {
+        if (cancelled.get() != 0 || isThreadRunning())
+            return;
+        stopTimer();
+        cancelled.set (1);
+        stopThread (1500);
     }
 
     Signal refreshed;
@@ -103,6 +119,7 @@ private:
     static const char* priceIdKey;
     static const char* trialKey;
     
+    Atomic<int> cancelled { 0 };
     Settings& settings;
     ValueTree props;
     UnlockResult result;
