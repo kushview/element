@@ -94,7 +94,7 @@ public:
        #ifndef EL_FREE
         if (isThreadRunning())
             return;
-        saveState (String());
+        
         loadAll();
         cancelled.set (0);
         startThread (4);
