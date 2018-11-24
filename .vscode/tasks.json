@@ -62,6 +62,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Waf Configure FREE w/ CCache",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-free"
+            ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "echo",
             "type": "shell",
             "command": "python waf build"
@@ -115,7 +133,7 @@
         {
             "label": "OSX Deploy",
             "type": "shell",
-            "command": "tools/build-osx.sh && tools/build-free-osx.sh && tools/upload.sh",
+            "command": "tools/build-osx.sh && tools/build-free-osx.sh",
             "problemMatcher": [ ]
         }
     ]
