@@ -32,7 +32,8 @@ static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) noexcept
     : nodeId (nodeId_),
       isPrepared (false),
-      metadata (Tags::node)
+      metadata (Tags::node),
+      enablement (*this)
 {
     parent = nullptr;
     proc = processor_;
@@ -54,6 +55,7 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
 
 GraphNode::~GraphNode()
 {
+    enablement.cancelPendingUpdate();
     pluginState.reset();
     parent = nullptr;
     proc = nullptr;
@@ -323,6 +325,13 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     if (shouldBeEnabled == isEnabled())
         return;
 
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        enablement.cancelPendingUpdate();
+        enablement.triggerAsyncUpdate();
+        return;
+    }
+
     if (shouldBeEnabled)
     {
         if (parent)
@@ -356,6 +365,12 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     }
 
     enablementChanged (this);
+}
+
+void GraphNode::EnablementUpdater::handleAsyncUpdate()
+{
+    DBG("[EL] Async node enabled changed");
+    graph.setEnabled (! graph.isEnabled());
 }
 
 static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcessor* proc, ValueTree& ports)

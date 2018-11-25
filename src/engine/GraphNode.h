@@ -146,6 +146,13 @@ private:
     ValueTree metadata, node;
     GraphProcessor* parent;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
+
+    struct EnablementUpdater : public AsyncUpdater {
+        EnablementUpdater (GraphNode& g) : graph (g) { }
+        ~EnablementUpdater() { }
+        void handleAsyncUpdate() override;
+        GraphNode& graph;
+    } enablement;
 };
 
 /** A convenient typedef for referring to a pointer to a node object. */
