@@ -18,7 +18,7 @@
 #define EL_PLUGIN_SCANNER_START_ID              "start"
 #define EL_PLUGIN_SCANNER_FINISHED_ID           "finished"
 
-#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       10000  // 60 Seconds
+#define EL_PLUGIN_SCANNER_DEFAULT_TIMEOUT       20000  // 20 Seconds
 
 namespace Element {
 
