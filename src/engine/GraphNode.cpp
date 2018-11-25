@@ -54,6 +54,7 @@ GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) no
 
 GraphNode::~GraphNode()
 {
+    pluginState.reset();
     parent = nullptr;
     proc = nullptr;
 }
@@ -267,12 +268,13 @@ uint32 GraphNode::getMidiOutputPort() const
 }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,
-                         GraphProcessor* const parentGraph)
+                         GraphProcessor* const parentGraph,
+                         bool willBeEnabled)
 {
     parent = parentGraph;
     AudioProcessor* instance = proc.get();
     
-    if (enabled.get() == 1 && ! isPrepared)
+    if ((willBeEnabled || enabled.get() == 1) && !isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph);
@@ -321,15 +323,35 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     if (shouldBeEnabled == isEnabled())
         return;
 
-    enabled.set (shouldBeEnabled ? 1 : 0);
-
     if (shouldBeEnabled)
     {
-        jassert (parent);
-        prepare (parent->getSampleRate(), parent->getBlockSize(), parent);
+        if (parent)
+        {
+            prepare (parent->getSampleRate(), parent->getBlockSize(), parent, true);
+            if (pluginState.getSize() > 0)
+            {
+                proc->setStateInformation (pluginState.getData(), (int) pluginState.getSize());
+                pluginState.reset();
+                jassert (pluginState.getSize() == 0);
+            }
+            enabled.set (1);
+        }
+        else
+        {
+            enabled.set (0);
+        }
     }
     else
     {
+        enabled.set (0);
+
+        if (proc)
+        {
+            if (pluginState.getSize() > 0)
+                pluginState.reset();
+            proc->getStateInformation (pluginState);
+        }
+
         unprepare();
     }
 

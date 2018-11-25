@@ -120,11 +120,14 @@ public:
     inline bool isEnabled() const { return enabled.get() == 1; }
 
     boost::signals2::signal<void(GraphNode*)> enablementChanged;
+
 private:
     friend class GraphProcessor;
     friend class GraphController;
     friend class EngineController;
     friend class Node;
+
+    MemoryBlock pluginState;
 
     ScopedPointer<AudioProcessor> proc;
     bool isPrepared = false;
@@ -132,7 +135,7 @@ private:
     GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);
-    void prepare (double sampleRate, int blockSize, GraphProcessor*);
+    void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
     
