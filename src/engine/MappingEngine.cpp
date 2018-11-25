@@ -6,8 +6,9 @@
 
 namespace Element {
 
-struct ControllerMapHandler
+class ControllerMapHandler
 {
+public:
     ControllerMapHandler() { }
     virtual ~ControllerMapHandler() { }
 

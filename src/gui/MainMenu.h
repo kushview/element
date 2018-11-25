@@ -151,7 +151,7 @@ public:
         }
         else if (index == 4444)
         {
-            if (auto session = owner.getAppController().getWorld().getSession())
+            if (session)
                 session->cleanOrphanControllerMaps();
             auto& app = owner.getAppController();
             if (auto* devices = app.findChild<DevicesController>())

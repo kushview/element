@@ -208,8 +208,6 @@ uint32 GraphController::addNode (const Node& newNode)
     if (auto* node = createFilter (&desc, 0, 0,
         newNode.hasProperty(Tags::id) ? newNode.getNodeId() : 0))
     {
-        auto* const proc = node->getAudioProcessor();
-
         nodeId = node->nodeId;
         ValueTree data = newNode.getValueTree().createCopy();
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)

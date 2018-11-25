@@ -593,10 +593,9 @@ public:
         }
         else
         {
-            if (capturedAccessoryHeight > 0 && capturedAccessoryHeight != lastAccessoryHeight) {
-                int i = 0;
-                lastAccessoryHeight = capturedAccessoryHeight;
-                
+            if (capturedAccessoryHeight > 0 && capturedAccessoryHeight != lastAccessoryHeight)
+            {
+                lastAccessoryHeight = capturedAccessoryHeight;    
             }
             else
             {

@@ -51,13 +51,10 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     }
     else 
     {
-        if (auto* const window = getMainWindow())
-        {
-            window->setVisible (true);
-            if (window->isMinimised())
-                window->setMinimised (false);
-            window->toFront (true);
-        }
+        window->setVisible (true);
+        if (window->isMinimised())
+            window->setMinimised (false);
+        window->toFront (true);
     }
 
     mouseUpAction = -1;

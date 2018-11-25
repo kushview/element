@@ -18,7 +18,6 @@ namespace Element {
     static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescription& pd)
     {
         const auto& type = p.getProperty (Tags::type);
-        const auto& format = p.getProperty (Tags::format);
 
         if (type == "graph")
         {
