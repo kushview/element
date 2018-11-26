@@ -387,6 +387,20 @@ void GuiController::run()
     );
     sSystemTray->addToDesktop (0);
    #endif
+
+   if (getWorld().getUnlockStatus().isTrial())
+   {
+        if (getWorld().getUnlockStatus().getExpiryTime() > Time() &&
+            getWorld().getUnlockStatus().getExpiryTime() < Time::getCurrentTime())
+        {
+            if (AlertWindow::showOkCancelBox (AlertWindow::WarningIcon, "Trial Expired",
+                "The trial period has expired. If you like Element and would like to continue using all features, please upgrade your license.",
+                "Upgrade", "Cancel"))
+            {
+                URL("https://kushview.net/account/licenses/").launchInDefaultBrowser();
+            }
+        }
+   }
 }
 
 SessionRef GuiController::session()
