@@ -161,6 +161,12 @@ public:
     /** Set the allowed MIDI channel of this Graph */
     void setMidiChannel (const int channel) noexcept;
     
+    /** Set the allowed MIDI channels of this Graph */
+    void setMidiChannels (const BigInteger channels) noexcept;
+
+    /** Set the allowed MIDI channels of this Graph */
+    void setMidiChannels (const kv::MidiChannels channels) noexcept;
+
     /** Set the MIDI curve of this graph */
     void setVelocityCurveMode (const VelocityCurve::Mode) noexcept;
 
@@ -330,7 +336,7 @@ private:
     MidiBuffer* currentMidiInputBuffer;
     MidiBuffer currentMidiOutputBuffer;
     
-    int midiChannel = 0;
+    kv::MidiChannels midiChannels;
     VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
     

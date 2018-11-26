@@ -140,6 +140,30 @@ namespace Element {
         String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
         Uuid getUuid() const { return Uuid (getUuidString()); }
         
+        inline kv::MidiChannels getMidiChannels() const
+        {
+            kv::MidiChannels chans;
+           #ifndef EL_FREE
+            if (objectData.hasProperty (Tags::midiChannels))
+            {
+                if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
+                {
+                    BigInteger data; data.loadFromMemoryBlock (*block);
+                    chans.setChannels (data);
+                }
+            }
+            else
+           #endif
+            {
+                const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
+                if (channel > 0)
+                    chans.setChannel (channel);
+                else
+                    chans.setOmni (true);
+            }
+            return chans;
+        }
+
         bool isBypassed() const { return objectData.getProperty(Tags::bypass, false); }
         Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
         

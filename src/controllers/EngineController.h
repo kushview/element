@@ -91,9 +91,6 @@ public:
     /** Change root node */
     void setRootNode (const Node&);
     
-    /** Updates the MIDI channel of a root graph by index */
-    void updateRootGraphMidiChannel (const int index, const int midiChannel);
-    
     /** called when the session loads or re-loads */
     void sessionReloaded();
     

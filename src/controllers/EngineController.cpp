@@ -54,13 +54,13 @@ struct RootGraphHolder
         {
             const auto modeStr = model.getProperty (Tags::renderMode, "single").toString().trim().toLowerCase();
             const auto mode = modeStr == "single" ? RootGraph::SingleGraph : RootGraph::Parallel;
-            const auto channel = (int) model.getProperty (Tags::midiChannel, 0);
+            const auto channels = model.getMidiChannels();
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
             root->setLocked (!(bool) status.isFullVersion());
             root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
-            root->setMidiChannel (channel);
+            root->setMidiChannels (channels);
             root->setMidiProgram (program);
 
             if (engine->addGraph (root))
@@ -685,7 +685,7 @@ void EngineController::setRootNode (const Node& newRootNode)
 
     if (auto* proc = holder->getRootGraph())
     {
-        proc->setMidiChannel ((int) newRootNode.getProperty (Tags::midiChannel, 0));
+        proc->setMidiChannels (newRootNode.getMidiChannels().get());
         proc->setVelocityCurveMode ((VelocityCurve::Mode)(int) newRootNode.getProperty (
             "velocityCurveMode", (int) VelocityCurve::Linear));
     }
@@ -712,15 +712,6 @@ void EngineController::setRootNode (const Node& newRootNode)
     }
     
     engine->refreshSession();
-}
-
-void EngineController::updateRootGraphMidiChannel (const int index, const int midiChannel)
-{
-    auto engine = getWorld().getAudioEngine();
-    if (auto* g = engine->getGraph (index))
-    {
-        g->setMidiChannel (midiChannel);
-    }
 }
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)

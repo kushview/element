@@ -982,12 +982,23 @@ bool GraphProcessor::removeIllegalConnections()
 
 void GraphProcessor::setMidiChannel (const int channel) noexcept
 {
-    int newChannel = channel;
-    if (newChannel < 0)     newChannel = 0;
-    if (newChannel > 16)    newChannel = 16;
+    jassert (isPositiveAndBelow (channel, 17));
+    if (channel <= 0)
+        midiChannels.setOmni (true);
+    else
+        midiChannels.setChannel (channel);
+}
+
+void GraphProcessor::setMidiChannels (const BigInteger channels) noexcept
+{
     ScopedLock sl (getCallbackLock());
-    if (midiChannel != newChannel)
-        midiChannel = newChannel;
+    midiChannels.setChannels (channels);
+}
+
+void GraphProcessor::setMidiChannels (const kv::MidiChannels channels) noexcept
+{
+    ScopedLock sl (getCallbackLock());
+    midiChannels = channels;
 }
 
 void GraphProcessor::setVelocityCurveMode (const VelocityCurve::Mode mode) noexcept
@@ -1158,7 +1169,7 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
     currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();
     
-    if (midiChannel <= 0 && velocityCurve.getMode() == VelocityCurve::Linear)
+    if (midiChannels.isOmni() && velocityCurve.getMode() == VelocityCurve::Linear)
     {
         currentMidiInputBuffer = &midiMessages;
     }
@@ -1171,7 +1182,7 @@ void GraphProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMe
         while (iter.getNextEvent (msg, frame))
         {
             chan = msg.getChannel();
-            if (midiChannel > 0 && chan != midiChannel)
+            if (chan > 0 && midiChannels.isOff (chan))
                 continue;
 
             if (msg.isNoteOn())

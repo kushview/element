@@ -63,6 +63,7 @@ namespace Tags
     const Identifier beatsPerBar        = "beatsPerBar";
     const Identifier beatDivisor        = "beatDivisor";
     const Identifier midiChannel        = "midiChannel";
+    const Identifier midiChannels       = "midiChannels";
     const Identifier midiProgram        = "midiProgram";
     const Identifier renderMode         = "renderMode";
 
