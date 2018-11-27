@@ -27,6 +27,7 @@ public:
     static const char* openLastUsedSessionKey;
     static const char* askToSaveSessionKey;
     static const char* defaultNewSessionFile;
+    static const char* generateMidiClockKey;
     
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -63,6 +64,9 @@ public:
 
     void addItemsToMenu (Globals&, PopupMenu&);
     bool performMenuResult (Globals&, const int result);
+
+    void setGenerateMidiClock (const bool);
+    bool generateMidiClock() const;
 
 private:
     PropertiesFile* getProps() const;

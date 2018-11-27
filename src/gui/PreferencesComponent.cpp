@@ -113,6 +113,22 @@ namespace Element {
     public:
         SettingsPage() = default;
         virtual ~SettingsPage() { }
+
+    protected:
+        virtual void layoutSetting (Rectangle<int>& r, Label& label, Component& setting,
+                                    const int valueWidth = -1)
+        {
+            const int spacingBetweenSections = 6;
+            const int settingHeight = 22;
+            const int toggleWidth = valueWidth > 0 ? valueWidth : 40;
+            const int toggleHeight = 18;
+
+            r.removeFromTop (spacingBetweenSections);
+            auto r2 = r.removeFromTop (settingHeight);
+            label.setBounds (r2.removeFromLeft (getWidth() / 2));
+            setting.setBounds (r2.removeFromLeft (toggleWidth)
+                                 .withSizeKeepingCentre (toggleWidth, toggleHeight));
+        }
     };
 
     // MARK: Plugin Settings (included in general)
@@ -359,21 +375,6 @@ namespace Element {
                 defaultSessionFile.setCurrentFile (File(), false, sendNotificationAsync);
         }
 
-        void layoutSetting (Rectangle<int>& r, Label& label, Component& setting,
-                            const int valueWidth = -1)
-        {
-            const int spacingBetweenSections = 6;
-            const int settingHeight = 22;
-            const int toggleWidth = valueWidth > 0 ? valueWidth : 40;
-            const int toggleHeight = 18;
-
-            r.removeFromTop (spacingBetweenSections);
-            auto r2 = r.removeFromTop (settingHeight);
-            label.setBounds (r2.removeFromLeft (getWidth() / 2));
-            setting.setBounds (r2.removeFromLeft (toggleWidth)
-                                 .withSizeKeepingCentre (toggleWidth, toggleHeight));
-        }
-
         void resized() override
         {
             const int spacingBetweenSections = 6;
@@ -529,9 +530,10 @@ namespace Element {
                              public ChangeListener
     {
     public:
-        MidiSettingsPage (Globals& world)
-            : devices (world.getDeviceManager()),
-              settings (world.getSettings())
+        MidiSettingsPage (Globals& g)
+            : devices (g.getDeviceManager()),
+              settings (g.getSettings()),
+              world (g)
         {
             addAndMakeVisible (midiOutputLabel);
             midiOutputLabel.setFont (Font (12.0, Font::bold));
@@ -539,6 +541,15 @@ namespace Element {
 
             addAndMakeVisible (midiOutput);
             midiOutput.addListener (this);
+
+            addAndMakeVisible (generateClockLabel);
+            generateClockLabel.setFont (Font (12.0, Font::bold));
+            generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
+            addAndMakeVisible (generateClock);
+            generateClock.setYesNoText ("Yes", "No");
+            generateClock.setClickingTogglesState (true);
+            generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
+            generateClock.addListener (this);
 
             addAndMakeVisible(midiInputHeader);
             midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
@@ -570,6 +581,7 @@ namespace Element {
             auto r2 = r.removeFromTop (settingHeight);
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+            layoutSetting (r, generateClockLabel, generateClock);
 
             r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
@@ -578,9 +590,15 @@ namespace Element {
             midiInputs->updateSize();
         }
 
-        void buttonClicked (Button*) override
+        void buttonClicked (Button* button) override
         {
-
+            if (button == &generateClock)
+            {
+                settings.setGenerateMidiClock (generateClock.getToggleState());
+                generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
+                if (auto engine = world.getAudioEngine())
+                    engine->applySettings (settings);
+            }
         }
 
         void comboBoxChanged (ComboBox* box) override
@@ -601,9 +619,12 @@ namespace Element {
     private:
         DeviceManager& devices;
         Settings& settings;
+        Globals& world;
 
         Label midiOutputLabel;
         ComboBox midiOutput;
+        Label generateClockLabel;
+        SettingButton generateClock;
         Label midiInputHeader;
         StringArray outputs;
 

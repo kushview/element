@@ -452,8 +452,12 @@ public:
                 
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
-            midiClockMaster.setTempo (transport.getTempo());
-            midiClockMaster.render (incomingMidi, numSamples);
+            if (generateMidiClock.get() == 1)
+            {
+                midiClockMaster.setTempo (transport.getTempo());
+                midiClockMaster.render (incomingMidi, numSamples);
+            }
+
             const double delayMs = 6.0;
             if (! incomingMidi.isEmpty())
                 midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
@@ -691,6 +695,7 @@ private:
     Value externalClockValue;
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
+    Atomic<int> generateMidiClock { 0 };
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
     
@@ -767,6 +772,7 @@ void AudioEngine::applySettings (Settings& settings)
     if (useMidiClock)
         priv->resetMidiClock();
     priv->processMidiClock.set (useMidiClock ? 1 : 0);
+    priv->generateMidiClock.set (settings.generateMidiClock() ? 1 : 0);
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)
