@@ -63,7 +63,7 @@ namespace Element
         
         int getBeatsPerBar()    const { return getTimeScale().beatsPerBar(); }
         int getBeatType()       const { return getTimeScale().beatType(); }
-        
+
         inline void requestPlayState (bool p) { while (! playState.set (p)) { } }
         inline void requestPlayPause() { requestPlayState (! playState.get()); }
         inline void requestRecordState (bool r) { while (! recordState.set (r)) { } }

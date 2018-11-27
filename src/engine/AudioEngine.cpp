@@ -452,6 +452,8 @@ public:
                 
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
+            midiClockMaster.setTempo (transport.getTempo());
+            midiClockMaster.render (incomingMidi, numSamples);
             const double delayMs = 6.0;
             if (! incomingMidi.isEmpty())
                 midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
@@ -690,6 +692,7 @@ private:
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
     MidiClock midiClock;
+    MidiClockMaster midiClockMaster;
     
     AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
     
@@ -705,6 +708,8 @@ private:
     
     void prepareToPlay (double sampleRate, int estimatedBlockSize)
     {
+        midiClockMaster.setSampleRate (sampleRate);
+        midiClockMaster.setTempo (transport.getTempo());
         for (int i = 0; i < graphs.size(); ++i)
             prepareGraph (graphs.getGraph(i), sampleRate, estimatedBlockSize);
     }
