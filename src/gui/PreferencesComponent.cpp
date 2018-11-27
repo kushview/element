@@ -542,6 +542,7 @@ namespace Element {
             addAndMakeVisible (midiOutput);
             midiOutput.addListener (this);
 
+           #ifndef EL_FREE
             addAndMakeVisible (generateClockLabel);
             generateClockLabel.setFont (Font (12.0, Font::bold));
             generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
@@ -550,7 +551,8 @@ namespace Element {
             generateClock.setClickingTogglesState (true);
             generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
             generateClock.addListener (this);
-
+           #endif
+            
             addAndMakeVisible(midiInputHeader);
             midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
             midiInputHeader.setFont (Font (12, Font::bold));

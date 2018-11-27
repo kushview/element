@@ -452,11 +452,13 @@ public:
                 
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
+           #ifndef EL_FREE
             if (generateMidiClock.get() == 1)
             {
                 midiClockMaster.setTempo (transport.getTempo());
                 midiClockMaster.render (incomingMidi, numSamples);
             }
+           #endif
 
             const double delayMs = 6.0;
             if (! incomingMidi.isEmpty())
