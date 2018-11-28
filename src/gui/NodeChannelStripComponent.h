@@ -134,8 +134,8 @@ public:
     {
         if (GraphNodePtr object = node.getGraphNode())
         {
-            boost::signals2::shared_connection_block b1 (volumeChangedConnection);
-            boost::signals2::shared_connection_block b2 (powerChangedConnection);
+            SharedConnectionBlock b1 (volumeChangedConnection);
+            SharedConnectionBlock b2 (powerChangedConnection);
             float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
             channelStrip.setVolume (Decibels::gainToDecibels (gain, -60.f));
             channelStrip.setPower (! object->isSuspended());
@@ -185,10 +185,10 @@ private:
     bool isAudioInNode  = false;
     bool monoMeter      = false;
 
-    boost::signals2::connection nodeSelectedConnection;
-    boost::signals2::connection volumeChangedConnection;
-    boost::signals2::connection powerChangedConnection;
-    boost::signals2::connection volumeDoubleClickedConnection;
+    SignalConnection nodeSelectedConnection;
+    SignalConnection volumeChangedConnection;
+    SignalConnection powerChangedConnection;
+    SignalConnection volumeDoubleClickedConnection;
 
     inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 1; }
