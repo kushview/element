@@ -44,10 +44,17 @@ namespace Element {
         keyHiSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         keyHiSlider.setTextBoxIsEditable (false);
         keyHiSlider.setValue (127);
+
+        keyLowSlider.addListener (this);
+        keyHiSlider.addListener (this);
+        transposeSlider.addListener (this);
     }
 
     NodeContentView::~NodeContentView()
     {
+        keyLowSlider.removeListener (this);
+        keyHiSlider.removeListener (this);
+        transposeSlider.removeListener (this);
         selectedNodeConnection.disconnect();
     }
 
@@ -62,9 +69,9 @@ namespace Element {
         r.removeFromTop (4);
         r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
-        layoutComponent (r, transposeLabel, transposeSlider);
         layoutComponent (r, keyLowLabel, keyLowSlider);
         layoutComponent (r, keyHiLabel, keyHiSlider);
+        layoutComponent (r, transposeLabel, transposeSlider);
     }
 
     void NodeContentView::layoutComponent (Rectangle<int>& r, Label& l, Component& c)
@@ -88,6 +95,45 @@ namespace Element {
                 &NodeContentView::stabilizeContent, this));
         node = gui.getSelectedNode();
         nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+
+        if (GraphNodePtr object = node.getGraphNode())
+        {
+            const auto range (object->getKeyRange());
+            keyLowSlider.setValue ((double) range.getStart(), dontSendNotification);
+            keyHiSlider.setValue ((double) range.getEnd(), dontSendNotification);
+            transposeSlider.setValue ((double) object->getTransposeOffset(), dontSendNotification);
+        }
+
         DBG("[EL] update node content view for " << node.getName());
+    }
+
+    void NodeContentView::sliderValueChanged (Slider* slider)
+    {
+        GraphNodePtr object = node.getGraphNode();
+        if (object == nullptr)
+            return;
+        
+        if (slider == &keyLowSlider)
+        {
+            auto keyRange (object->getKeyRange());
+            keyRange.setStart (roundToInt (slider->getValue()));
+            object->setKeyRange (keyRange);
+        }
+        else if (slider == &keyHiSlider)
+        {
+            auto keyRange (object->getKeyRange());
+            keyRange.setEnd (roundToInt (slider->getValue()));
+            object->setKeyRange (keyRange);
+        }
+        else if (slider == &transposeSlider)
+        {
+            object->setTransposeOffset (roundToInt (slider->getValue()));
+        }
+        
+        ValueTree data (node.getValueTree());
+        auto range (object->getKeyRange());
+        data.setProperty ("keyRangeStart", range.getStart(), nullptr)
+            .setProperty ("keyRangeEnd", range.getEnd(), nullptr)
+            .setProperty ("transposeOffset", object->getTransposeOffset(), nullptr);
     }
 }

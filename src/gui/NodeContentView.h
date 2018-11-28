@@ -5,7 +5,8 @@
 
 namespace Element {
 
-class NodeContentView : public ContentView
+class NodeContentView : public ContentView,
+                        public Slider::Listener
 {
 public:
     NodeContentView();
@@ -14,6 +15,7 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
     void stabilizeContent() override;
+    void sliderValueChanged (Slider*) override;
 
 private:
     Node node;

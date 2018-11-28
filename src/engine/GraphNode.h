@@ -117,9 +117,28 @@ public:
     void setEnabled (const bool shouldBeEnabled);
 
     /** Returns true if this node is enabled */
-    inline bool isEnabled() const { return enabled.get() == 1; }
+    inline bool isEnabled()  const { return enabled.get() == 1; }
 
-    boost::signals2::signal<void(GraphNode*)> enablementChanged;
+    inline void setKeyRange (const int low, const int high)
+    {
+        jassert (low <= high);
+        jassert (isPositiveAndBelow (low, 128));
+        jassert (isPositiveAndBelow (high, 128));
+        keyRangeLow.set (low); keyRangeHigh.set (high);
+    }
+
+    inline void setKeyRange (const Range<int>& range) { setKeyRange (range.getStart(), range.getEnd()); }
+
+    inline Range<int> getKeyRange() const { return Range<int> { keyRangeLow.get(), keyRangeHigh.get() }; }
+
+    inline void setTransposeOffset (const int value)
+    {
+        jassert (value >= -24 && value <= 24);
+        transposeOffset.set (value);
+    }
+    inline int getTransposeOffset() const { return transposeOffset.get(); }
+
+    Signal<void(GraphNode*)> enablementChanged;
 
 private:
     friend class GraphProcessor;
@@ -145,14 +164,20 @@ private:
     ChannelConfig channels;
     ValueTree metadata, node;
     GraphProcessor* parent;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
+    
+    Atomic<int> keyRangeLow { 0 };
+    Atomic<int> keyRangeHigh { 127 };
+    Atomic<int> transposeOffset { 0 };
 
-    struct EnablementUpdater : public AsyncUpdater {
+    struct EnablementUpdater : public AsyncUpdater
+    {
         EnablementUpdater (GraphNode& g) : graph (g) { }
         ~EnablementUpdater() { }
         void handleAsyncUpdate() override;
         GraphNode& graph;
     } enablement;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
 
 /** A convenient typedef for referring to a pointer to a node object. */
