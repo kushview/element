@@ -1,5 +1,9 @@
-#include "gui/NodeContentView.h"
+
+#include "controllers/AppController.h"
+#include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
+#include "gui/NodeContentView.h"
+#include "gui/ViewHelpers.h"
 
 namespace Element {
 
@@ -44,7 +48,7 @@ namespace Element {
 
     NodeContentView::~NodeContentView()
     {
-
+        selectedNodeConnection.disconnect();
     }
 
     void NodeContentView::paint (Graphics& g)
@@ -55,6 +59,8 @@ namespace Element {
     void NodeContentView::resized()
     {
         auto r (getLocalBounds().reduced (2));
+        r.removeFromTop (4);
+        r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
         layoutComponent (r, transposeLabel, transposeSlider);
         layoutComponent (r, keyLowLabel, keyLowSlider);
@@ -70,5 +76,18 @@ namespace Element {
         l.setBounds (r2.removeFromLeft (labelWidth));
         c.setBounds (r2);
         r.removeFromTop (spacing);
+    }
+
+    void NodeContentView::stabilizeContent()
+    {
+        auto *cc = ViewHelpers::findContentComponent(this);
+        jassert(cc);
+        auto& gui = *cc->getAppController().findChild<GuiController>();
+        if (! selectedNodeConnection.connected())
+            selectedNodeConnection = gui.nodeSelected.connect (std::bind (
+                &NodeContentView::stabilizeContent, this));
+        node = gui.getSelectedNode();
+        nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+        DBG("[EL] update node content view for " << node.getName());
     }
 }

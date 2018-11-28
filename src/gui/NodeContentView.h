@@ -13,8 +13,12 @@ public:
 
     void resized() override;
     void paint (Graphics& g) override;
-    
+    void stabilizeContent() override;
+
 private:
+    Node node;
+    SignalConnection selectedNodeConnection;
+    
     Label nameLabel;
     TextEditor nameEditor;
     

@@ -19,10 +19,7 @@ LookAndFeel::LookAndFeel()
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
     
-    // Slider
-    setColour (Slider::thumbColourId,               Colours::black);
-    setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
-    setColour (Slider::trackColourId,               Colours::black);
+
     
     // Text Editor
     setColour (TextEditor::textColourId,            textColor);
@@ -63,6 +60,15 @@ LookAndFeel::LookAndFeel()
 
     // List Box
     setColour (ListBox::textColourId, textColor);
+
+    // Slider
+    setColour (Slider::thumbColourId,               Colours::black);
+    setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
+    setColour (Slider::trackColourId,               Colours::black);
+    setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
+    setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
+    setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
+    setColour (Slider::textBoxTextColourId,         findColour (TextEditor::textColourId));
 }
 
 

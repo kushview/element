@@ -370,7 +370,7 @@ public:
         setLookAndFeel (nullptr);
     }
     
-    void saveState (PropertiesFile* props)
+    inline void saveState (PropertiesFile* props)
     {
         ValueTree state (Tags::state);
 
