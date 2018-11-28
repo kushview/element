@@ -13,11 +13,17 @@ public:
 
     void resized() override;
     void paint (Graphics& g) override;
+    
 private:
     Label nameLabel;
     TextEditor nameEditor;
-    Label keyrangeLabel;
-    Slider keyrangeSlider;
+    
+    Label keyLowLabel;
+    Slider keyLowSlider;
+
+    Label keyHiLabel;
+    Slider keyHiSlider;
+
     Label transposeLabel;
     Slider transposeSlider;
 
