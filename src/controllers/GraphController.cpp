@@ -24,7 +24,7 @@ static void showFailedInstantiationAlert (const PluginDescription& desc, const b
     String header = "Plugin Instantiation Failed";
     String message;
     if (isFullVersionPlugin (desc))
-        message << desc.name << " is available in the pro version.";
+        message << desc.name << " is available in the paid version.";
     else
         message << desc.name << " could not be instantiated";
 

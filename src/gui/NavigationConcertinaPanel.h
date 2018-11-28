@@ -4,6 +4,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/ControllerDevicesView.h"
 #include "gui/ControllerMapsView.h"
+#include "gui/NodeContentView.h"
 #include "DataPath.h"
 
 namespace Element {
@@ -454,6 +455,11 @@ public:
         controllerMapsView->setComponentID ("ControllerMaps");
         addPanelInternal (-1, controllerMapsView, "Mappings", 0);
 #endif
+
+        auto* nv = new NodeContentView();
+        nv->setName ("Node");
+        nv->setComponentID ("Node");
+        addPanelInternal (-1, nv, "Node", nullptr);
 
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());
         pv->setName ("Plugins");

@@ -8,6 +8,8 @@
 #include "engine/InternalFormat.h"
 #include "engine/MidiClipSource.h"
 #include "engine/MidiClock.h"
+#include "engine/MidiChannelMap.h"
+#include "engine/MidiTranspose.h"
 #include "engine/Transport.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
@@ -313,7 +315,7 @@ struct RootGraphRender
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
     
-    /** passing in true turns off all rendering features in the pro version */
+    /** passing in true turns off all rendering features in the paid version */
     void setLocked (const bool l)
     {
         locked = l;
@@ -449,7 +451,7 @@ public:
 
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
-                
+
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
            #ifndef EL_FREE

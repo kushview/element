@@ -58,8 +58,6 @@
 
 namespace Element {
 
-
-
 static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
 {
     String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature.\nGet a copy @ https://kushview.net"

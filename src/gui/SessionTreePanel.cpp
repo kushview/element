@@ -295,7 +295,7 @@ public:
             {
                 if (p->fileOrIdentifier == "element.graph" && !(bool) world->getUnlockStatus().isFullVersion())
                 {
-                    Alert::showProductLockedAlert ("Nested graphs are only available in the pro version.");
+                    Alert::showProductLockedAlert ("Nested graphs are only available in the paid version.");
                 }
                 else
                 {
