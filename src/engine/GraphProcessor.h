@@ -29,7 +29,7 @@ class JUCE_API GraphProcessor : public Processor,
                                 public AsyncUpdater
 {
 public:
-    Signal renderingSequenceChanged;
+    Signal<void()> renderingSequenceChanged;
 
     /** Creates an empty graph. */
     GraphProcessor();

@@ -54,7 +54,7 @@ public:
         The type needs to at least inherrit Compnent and WindowHook
 
         Another option would be to inherrit Component only, but provide
-        yourself the required  Signal& signalClosed()  method 
+        yourself the required  Signal<void()>& signalClosed()  method 
      */
     inline void push (Window* window)
     {
@@ -62,7 +62,7 @@ public:
         window->addToDesktop();
         window->setVisible (true);
         window->signalClosed().connect (
-                    boost::bind (&WindowManager::onWindowClosed, this, window));
+            std::bind (&WindowManager::onWindowClosed, this, window));
     }
 
     /** Show and manage a dialog window */

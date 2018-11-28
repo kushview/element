@@ -135,7 +135,7 @@ private:
 
     Array<NoteClipItem*> notes;
 
-    //Signal changedSignal;
+    //Signal<void()> changedSignal;
     OptionalScopedPointer<NoteSequence> sequence;
 
     ValueTree props;

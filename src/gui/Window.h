@@ -52,10 +52,10 @@ namespace Element {
     public:
         WindowHook() { }
         virtual ~WindowHook() { Logger::writeToLog("~WindowHook()"); }
-        inline Signal& signalClosed() { return closedSignal; }
+        inline Signal<void()>& signalClosed() { return closedSignal; }
 
     protected:
-        Signal  closedSignal;
+        Signal<void()> closedSignal;
     };
 
     /** A juce DialogWindow that emits a closed signal */

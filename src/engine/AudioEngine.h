@@ -114,7 +114,7 @@ private:
 class AudioEngine : public Engine
 {
 public:
-    Signal sampleLatencyChanged;
+    Signal<void()> sampleLatencyChanged;
 
     AudioEngine (Globals&);
     virtual ~AudioEngine() noexcept;

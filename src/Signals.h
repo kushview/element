@@ -5,12 +5,10 @@
 
 #pragma once
 
-#include "JuceHeader.h"
 #include <boost/signals2.hpp>
 
-namespace Element {
-
-using Signal       = boost::signals2::signal<void()>;
-using FloatSignal  = boost::signals2::signal<void(float)>;
-
+namespace Element
+{
+    template<typename T> using Signal = boost::signals2::signal<T>;
+    using SharedConnectionBlock = boost::signals2::shared_connection_block;
 }

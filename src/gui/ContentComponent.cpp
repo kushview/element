@@ -78,7 +78,7 @@ private:
 class SmartLayoutResizeBar : public StretchableLayoutResizerBar
 {
 public:
-    Signal mousePressed, mouseReleased;
+    Signal<void()> mousePressed, mouseReleased;
     SmartLayoutResizeBar (StretchableLayoutManager* layoutToUse,
                           int itemIndexInLayout, bool isBarVertical)
     : StretchableLayoutResizerBar (layoutToUse, itemIndexInLayout, isBarVertical),

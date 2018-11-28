@@ -108,7 +108,7 @@ public:
         stopThread (1500);
     }
 
-    Signal refreshed;
+    Signal<void()> refreshed;
 
 private:
     friend class Thread;

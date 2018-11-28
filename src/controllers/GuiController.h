@@ -25,7 +25,7 @@ namespace Element {
                           public Timer
     {
     public:
-        Signal nodeSelected;
+        Signal<void()> nodeSelected;
         GuiController (Globals& w, AppController& a);
         ~GuiController();
         
