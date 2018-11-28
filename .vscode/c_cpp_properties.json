@@ -2,7 +2,7 @@
     "version": 4,
     "configurations": [
         {
-            "name": "Standalone (OSX)",
+            "name": "Mac",
             "includePath": [
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../include/c++/v1",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/../lib/clang/8.1.0/include",
@@ -16,7 +16,8 @@
                 "/opt/kushview/include"
             ],
             "defines": [
-                "JUCE_PLUGINHOST_VST=1"
+                "JUCE_PLUGINHOST_VST=1",
+                "VSCODE=1"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {
@@ -43,7 +44,7 @@
             ],
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++17"
+            "cppStandard": "c++14"
         },
         {
             "name": "Linux",
