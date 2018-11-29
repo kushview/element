@@ -847,8 +847,6 @@ ContentComponent::ContentComponent (AppController& ctl_)
     toolBar->setSession (getGlobals().getSession());
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
-//    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
-
 
    #ifdef EL_FREE
     setNodeChannelStripVisible (false);
