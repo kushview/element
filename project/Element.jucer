@@ -223,6 +223,10 @@
               file="../src/gui/NodeChannelStripView.cpp"/>
         <FILE id="OgVW4P" name="NodeChannelStripView.h" compile="0" resource="0"
               file="../src/gui/NodeChannelStripView.h"/>
+        <FILE id="VqCzbV" name="NodeContentView.cpp" compile="1" resource="0"
+              file="../src/gui/NodeContentView.cpp"/>
+        <FILE id="dHbXMm" name="NodeContentView.h" compile="0" resource="0"
+              file="../src/gui/NodeContentView.h"/>
         <FILE id="vcZQ4S" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../src/gui/NodeIOConfiguration.cpp"/>
         <FILE id="O0M4gV" name="NodeIOConfiguration.h" compile="0" resource="0"
