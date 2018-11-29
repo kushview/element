@@ -6,6 +6,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
+#include "engine/MidiTranspose.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -229,6 +230,40 @@ public:
         for (int i = numAudioIns; --i >= 0;)
             node->setInputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
 
+       #ifndef EL_FREE
+        // Begin MIDI filters
+        jassert (tempMidi.getNumEvents() == 0);
+        transpose.setNoteOffset (node->getTransposeOffset());
+        const auto keyRange (node->getKeyRange());
+        if (keyRange.getLength() > 0)
+        {
+            auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
+            MidiBuffer::Iterator iter (midi);
+            int frame = 0; MidiMessage msg;
+            while (iter.getNextEvent (msg, frame))
+            {
+                if (msg.isNoteOnOrOff() && 
+                       (msg.getNoteNumber() < keyRange.getStart() ||
+                        msg.getNoteNumber() > keyRange.getEnd()))
+                {
+                    continue;
+                }
+
+                transpose.process (msg);
+                tempMidi.addEvent (msg, frame);
+            }
+
+            midi.swapWith (tempMidi);
+        }
+        else
+        {
+            transpose.process (*sharedMidiBuffers.getUnchecked (midiBufferToUse), numSamples);
+        }
+
+        tempMidi.clear();
+        // End MIDI filters
+       #endif
+       
         if (! processor->isSuspended ())
         {
             processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
@@ -258,7 +293,8 @@ private:
     HeapBlock <float*> channels;
     int totalChans, numAudioIns, numAudioOuts;
     int midiBufferToUse;
-
+    MidiTranspose transpose;
+    MidiBuffer tempMidi;
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)
 };
 

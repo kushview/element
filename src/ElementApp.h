@@ -83,6 +83,10 @@ namespace Tags
     const Identifier uuid               = "uuid";
     const Identifier parameter          = "parameter";
     const Identifier offline            = "offline";
+
+    const Identifier transpose          = "transpose";
+    const Identifier keyStart           = "keyStart";
+    const Identifier keyEnd             = "keyEnd";
 }
 
 struct Alert

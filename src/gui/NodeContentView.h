@@ -34,6 +34,7 @@ private:
     Slider transposeSlider;
 
     void layoutComponent (Rectangle<int>&, Label&, Component&);
+    void updateSliders();
 };
 
 }
