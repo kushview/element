@@ -551,6 +551,14 @@ namespace Element {
                 obj->setGain (getProperty ("gain"));
             if (hasProperty ("inputGain"))
                 obj->setInputGain (getProperty ("inputGain"));
+            if (hasProperty ("keyRangeStart") && hasProperty ("keyRangeEnd"))
+            {
+                Range<int> range (getProperty ("keyRangeStart", 0),
+                                  getProperty ("keyRangeEnd", 127));
+                obj->setKeyRange (range);
+            }
+            if (hasProperty ("transposeOffset"))
+                obj->setTransposeOffset (getProperty ("transposeOffset"));
         }
 
         // this was originally here to help reduce memory usage
