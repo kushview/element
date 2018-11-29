@@ -849,6 +849,11 @@ ContentComponent::ContentComponent (AppController& ctl_)
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 //    nav->setPanelSize (nav->getUserDataPathPanel(), 60, false);
 
+
+   #ifdef EL_FREE
+    setNodeChannelStripVisible (false);
+    setShowAccessoryView (false);
+   #endif
     resized();
 }
 
