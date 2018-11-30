@@ -66,8 +66,11 @@ public:
         const uint8* data = nullptr; int bytes = 0, frame = 0;
         while (iter.getNextEvent (data, frame, bytes))
         {
-            if (Midi::getChannel (data) > 0)
-                Midi::setChannel (data, outChan);
+            // TODO: optimize
+            MidiMessage msg (data, bytes, frame);
+            if (msg.getChannel() > 0)
+                msg.setChannel (outChan);
+            tempMidi.addEvent (msg, frame);
         }
 
         midiMessages.swapWith (tempMidi);
