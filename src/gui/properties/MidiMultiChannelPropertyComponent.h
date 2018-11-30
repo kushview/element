@@ -16,7 +16,7 @@ public:
             layout (*this)
     {
         addAndMakeVisible (layout);
-        resized();
+        refresh();
     }
     
     virtual ~MidiMultiChannelPropertyComponent() noexcept { }
@@ -29,8 +29,9 @@ public:
     /** @internal */
     inline void resized() override
     {
-        layout.updateMatrix();
+        setPreferredHeight (getWidth() <= 600 ? 18 * 3 : 18 * 2);
         PropertyComponent::resized();
+        layout.updateMatrix();
     }
 
     Signal<void()> changed;
@@ -49,21 +50,6 @@ public:
 private:
     BigInteger channels;
     Value channelsValue;
-
-    void copyChannelsFrom (kv::MatrixState& state)
-    {
-        for (int r = 0; r < state.getNumRows(); ++r)
-            for (int c = 0; c < state.getNumColumns(); ++c)
-                state.set (r, c, channels [state.getIndexForCell (r, c)]);
-    }
-    
-    void copyChannelsTo (const kv::MatrixState& state)
-    {
-        channels = BigInteger();
-        channels.setBit (0, layout.omni.getToggleState());
-        for (int i = 0; i < state.getNumRows() * state.getNumColumns(); ++i)
-            channels.setBit (i, state.connectedAtIndex (i));
-    }
     
     void updateMatrixState (kv::MatrixState& state)
     {
@@ -191,13 +177,11 @@ private:
             {
                 matrix28.setVisible (true);
                 matrix28.setMatrixCellSize (jmax (10, getWidth() / 8), 18);
-                owner.setPreferredHeight (3 * 18);
-            } 
+            }
             else 
             {
                 matrix116.setVisible (true);
                 matrix116.setMatrixCellSize (jmax (10, getWidth() / 16), 18);
-                owner.setPreferredHeight (2 * 18);
             }
 
             resized();

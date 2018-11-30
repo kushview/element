@@ -131,8 +131,10 @@ namespace Element {
     class RootGraphMidiChannels : public MidiMultiChannelPropertyComponent
     {
     public:
-        RootGraphMidiChannels (const Node& g) : graph (g) 
+        RootGraphMidiChannels (const Node& g, int proposedWidth)
+            : graph (g) 
         {
+            setSize (proposedWidth, 10);
             setChannels (g.getMidiChannels().get());
             changed.connect (std::bind (&RootGraphMidiChannels::onChannelsChanged, this));
         }
@@ -266,7 +268,8 @@ namespace Element {
            #endif
 
            #ifndef EL_FREE
-            props.add (new RootGraphMidiChannels (g));
+           
+            props.add (new RootGraphMidiChannels (g, getWidth() - 100));
            #else
             props.add (new RootGraphMidiChanel (g));
            #endif
