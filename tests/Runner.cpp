@@ -8,7 +8,7 @@
 int main (int argc, char** argv)
 {
     UnitTestRunner runner;
-    runner.setAssertOnFailure (false);
+    runner.setAssertOnFailure (true);
 
     if (argc <= 1)
         runner.runAllTests();

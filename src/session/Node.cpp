@@ -135,7 +135,8 @@ namespace Element {
                 ports.addChild (port, -1, 0);
             }
 
-            nodes.addChild (ioNode, -1, 0);
+            Node finalNode (ioNode, true);
+            nodes.addChild (finalNode.getValueTree(), -1, 0);
         }
 
         return graph;

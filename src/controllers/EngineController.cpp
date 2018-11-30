@@ -317,8 +317,7 @@ void EngineController::addGraph()
     auto session = world.getSession();
     
     Node node (Node::createDefaultGraph ("Graph " + String(session->getNumGraphs() + 1)));
-    // Node node (Node::parse (File ("/Users/mfisher/Desktop/DefaultGraph.elg")));
-    addGraph (node);    
+    addGraph (node);
     
     findSibling<GuiController>()->stabilizeContent();
 }
