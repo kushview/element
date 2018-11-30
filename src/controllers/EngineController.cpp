@@ -304,7 +304,8 @@ void EngineController::addConnection (const uint32 s, const uint32 sp, const uin
 }
 
 void EngineController::addConnection (const uint32 s, const uint32 sp, 
-                                      const uint32 d, const uint32 dp, const Node& graph)
+                                      const uint32 d, const uint32 dp, 
+                                      const Node& graph)
 {
     if (auto* controller = graphs->findGraphControllerFor (graph))
         controller->addConnection (s, sp, d, dp);
