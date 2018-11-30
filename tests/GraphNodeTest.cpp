@@ -7,7 +7,8 @@
 
 namespace Element {
 
-class GraphProcessorTest : public UnitTestBase {
+class GraphProcessorTest : public UnitTestBase
+{
 public:
     GraphProcessorTest() : UnitTestBase ("Graph Processor", "graphs", "processor") { }
 
