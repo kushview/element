@@ -28,6 +28,7 @@ public:
     */
     NamedValueSet properties;
 
+    /** Create a node suitable for binding to a root graph */
     static GraphNode* createForRoot (GraphProcessor*);
     
     /** Returns the processor as an AudioProcessor */
@@ -39,7 +40,10 @@ public:
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const;
 
+    /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
+
+    /** Returns the total number of audio ouputs */
     int getNumAudioOutputs() const;
     
     PortType getPortType (const uint32 port) const;
@@ -89,7 +93,7 @@ public:
     inline float getGain() const { return gain.get(); }
     inline float getLastGain() const { return lastGain.get(); }
     inline float getLastInputGain() const { return lastInputGain.get(); }
-    inline void updateGain() 
+    inline void updateGain()
     {
         if (lastGain.get() != gain.get())
             lastGain = gain;
@@ -136,7 +140,18 @@ public:
         jassert (value >= -24 && value <= 24);
         transposeOffset.set (value);
     }
+
     inline int getTransposeOffset() const { return transposeOffset.get(); }
+
+    CriticalSection& getPropertyLock() { return propertyLock; }
+
+    inline void setMidiChannels (const BigInteger& ch)
+    { 
+        ScopedLock sl (propertyLock);
+        midiChannels.setChannels (ch);
+    }
+
+    inline const MidiChannels& getMidiChannels() const { return midiChannels; }
 
     Signal<void(GraphNode*)> enablementChanged;
 
@@ -151,6 +166,7 @@ private:
     ScopedPointer<AudioProcessor> proc;
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
+
     GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
 
     void setParentGraph (GraphProcessor*);
@@ -163,12 +179,13 @@ private:
     
     ChannelConfig channels;
     ValueTree metadata, node;
-    GraphProcessor* parent;
-    
+    GraphProcessor* parent; 
     Atomic<int> keyRangeLow { 0 };
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
+    MidiChannels midiChannels;
 
+    CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
     {
         EnablementUpdater (GraphNode& g) : graph (g) { }

@@ -549,15 +549,28 @@ namespace Element {
             }
 
             if (hasProperty ("gain"))
+            {
                 obj->setGain (getProperty ("gain"));
+            }
+
             if (hasProperty ("inputGain"))
+            {
                 obj->setInputGain (getProperty ("inputGain"));
+            }
+
             if (hasProperty (Tags::keyStart) && hasProperty (Tags::keyEnd))
             {
                 Range<int> range (getProperty (Tags::keyStart, 0),
                                   getProperty (Tags::keyEnd, 127));
                 obj->setKeyRange (range);
             }
+
+            if (hasProperty (Tags::midiChannels))
+            {
+                const MidiChannels channels (getMidiChannels());
+                obj->setMidiChannels (channels.get());
+            }
+
             if (hasProperty (Tags::transpose))
                 obj->setTransposeOffset (getProperty (Tags::transpose));
         }

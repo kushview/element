@@ -66,6 +66,37 @@ namespace Element {
         keyHiSlider.setTextBoxIsEditable (false);
         keyHiSlider.setValue (127);
 
+        addAndMakeVisible (midiChannelLabel);
+        midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
+        midiChannelLabel.setFont (font);
+        midiChannelLabel.onDoubleClicked = [this](const MouseEvent&) {
+            BigInteger chans;
+            chans.setRange (0, 17, false);
+            chans.setBit (0, true);
+            midiChannel.setChannels (chans);
+        };
+
+        addAndMakeVisible (midiChannel);
+        midiChannel.onChanged = [this]()
+        {
+            if (auto* o = node.getGraphNode())
+            {
+                o->setMidiChannels (midiChannel.getChannels());
+                node.setProperty (Tags::midiChannels, midiChannel.getChannels().toMemoryBlock());
+
+                if (auto* mb = node.getValueTree().getProperty(Tags::midiChannels).getBinaryData())
+                {
+                        BigInteger chans; 
+                        chans.loadFromMemoryBlock (*mb);
+                        DBG(node.getName());
+                        for (int i = 0; i <= 16; ++i)
+                            DBG("ch: " << i << " = " << (int) chans [i]);
+                        // obj->setMidiChannels (chans);
+                    
+                }
+            }
+        };
+
         keyLowSlider.addListener (this);
         keyHiSlider.addListener (this);
         transposeSlider.addListener (this);
@@ -90,17 +121,20 @@ namespace Element {
         r.removeFromTop (4);
         r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
+        layoutComponent (r, midiChannelLabel, midiChannel, 
+                         midiChannel.getSuggestedHeight (r.getWidth()));
         layoutComponent (r, keyLowLabel, keyLowSlider);
         layoutComponent (r, keyHiLabel, keyHiSlider);
         layoutComponent (r, transposeLabel, transposeSlider);
     }
 
-    void NodeContentView::layoutComponent (Rectangle<int>& r, Label& l, Component& c)
+    void NodeContentView::layoutComponent (Rectangle<int>& r, Label& l, Component& c,
+                                           int preferedHeight)
     {
         static const int settingHeight = 20;
         static const int labelWidth = 64;
         static const int spacing = 6;
-        auto r2 = r.removeFromTop (settingHeight);
+        auto r2 = r.removeFromTop (preferedHeight > 0 ? preferedHeight : settingHeight);
         l.setBounds (r2.removeFromLeft (labelWidth));
         c.setBounds (r2);
         r.removeFromTop (spacing);
@@ -121,6 +155,7 @@ namespace Element {
         {
             setEnabled (true);
             nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+            updateMidiChannels();
             updateSliders();
         }
         else
@@ -179,6 +214,20 @@ namespace Element {
             keyLowSlider.setValue ((double) range.getStart(), dontSendNotification);
             keyHiSlider.setValue ((double) range.getEnd(), dontSendNotification);
             transposeSlider.setValue ((double) object->getTransposeOffset(), dontSendNotification);
+        }
+    }
+
+    void NodeContentView::updateMidiChannels()
+    {
+        if (GraphNodePtr object = node.getGraphNode())
+        {
+            BigInteger chans;
+            {
+                ScopedLock sl (object->getPropertyLock());
+                chans = object->getMidiChannels().get();
+            }
+
+            midiChannel.setChannels (chans, false);
         }
     }
 }

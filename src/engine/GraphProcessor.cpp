@@ -232,34 +232,41 @@ public:
 
        #ifndef EL_FREE
         // Begin MIDI filters
-        jassert (tempMidi.getNumEvents() == 0);
-        transpose.setNoteOffset (node->getTransposeOffset());
-        const auto keyRange (node->getKeyRange());
-        if (keyRange.getLength() > 0)
         {
-            auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
-            MidiBuffer::Iterator iter (midi);
-            int frame = 0; MidiMessage msg;
-            while (iter.getNextEvent (msg, frame))
+            jassert (tempMidi.getNumEvents() == 0);
+            ScopedLock spl (node->getPropertyLock());
+            transpose.setNoteOffset (node->getTransposeOffset());
+            const auto keyRange (node->getKeyRange());
+            const auto midiChans (node->getMidiChannels());
+
+            if (keyRange.getLength() > 0 || !midiChans.isOmni())
             {
-                if (msg.isNoteOnOrOff() && 
-                       (msg.getNoteNumber() < keyRange.getStart() ||
-                        msg.getNoteNumber() > keyRange.getEnd()))
+                auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
+                MidiBuffer::Iterator iter (midi);
+                int frame = 0; MidiMessage msg;
+                while (iter.getNextEvent (msg, frame))
                 {
-                    continue;
+                    if (msg.isNoteOnOrOff())
+                    {
+                        // out of range 
+                        if (keyRange.getLength() > 0 && (msg.getNoteNumber() < keyRange.getStart() || msg.getNoteNumber() > keyRange.getEnd()))
+                            continue;
+                    }
+
+                    if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
+                        continue;
+
+                    transpose.process (msg);
+                    tempMidi.addEvent (msg, frame);
                 }
 
-                transpose.process (msg);
-                tempMidi.addEvent (msg, frame);
+                midi.swapWith (tempMidi);
             }
-
-            midi.swapWith (tempMidi);
+            else
+            {
+                transpose.process (*sharedMidiBuffers.getUnchecked (midiBufferToUse), numSamples);
+            }
         }
-        else
-        {
-            transpose.process (*sharedMidiBuffers.getUnchecked (midiBufferToUse), numSamples);
-        }
-
         tempMidi.clear();
         // End MIDI filters
        #endif

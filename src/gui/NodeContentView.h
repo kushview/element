@@ -2,6 +2,7 @@
 #pragma once
 
 #include "gui/ContentComponent.h"
+#include "gui/widgets/MidiChannelSelectComponent.h"
 
 namespace Element {
 
@@ -49,8 +50,12 @@ private:
     SignalLabel transposeLabel;
     Slider transposeSlider;
 
-    void layoutComponent (Rectangle<int>&, Label&, Component&);
+    SignalLabel midiChannelLabel;
+    MidiChannelSelectComponent midiChannel;
+
+    void layoutComponent (Rectangle<int>&, Label&, Component&, int preferedHeight = 0);
     void updateSliders();
+    void updateMidiChannels();
 };
 
 }
