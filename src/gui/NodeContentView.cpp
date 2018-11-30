@@ -17,24 +17,33 @@ namespace Element {
         const Font font (12.f);
         setWantsKeyboardFocus (false);
         setMouseClickGrabsKeyboardFocus (false);
+        setInterceptsMouseClicks (true, true);
 
         addAndMakeVisible (nameLabel);
         nameLabel.setText ("Name", dontSendNotification);
         nameLabel.setFont (font);
         addAndMakeVisible (nameEditor);
         
+
         addAndMakeVisible (transposeLabel);
         transposeLabel.setText ("Transpose", dontSendNotification);
         transposeLabel.setFont (font);
+        transposeLabel.onDoubleClicked = [this](const MouseEvent&) { 
+            transposeSlider.setValue (0.0, sendNotificationAsync);
+        };
         addAndMakeVisible (transposeSlider);
         transposeSlider.setRange (-24, 24, 1);
         transposeSlider.setValue (0);
         transposeSlider.setSliderStyle (Slider::LinearHorizontal);
         transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
 
+
         addAndMakeVisible (keyLowLabel);
         keyLowLabel.setText ("Key Start", dontSendNotification);
         keyLowLabel.setFont (font);
+        keyLowLabel.onDoubleClicked = [this](const MouseEvent&) {
+            keyLowSlider.setValue (0.0, sendNotificationAsync);
+        };
         addAndMakeVisible (keyLowSlider);
         keyLowSlider.textFromValueFunction = noteValueToString;
         keyLowSlider.setRange (0, 127, 1.0);
@@ -46,6 +55,9 @@ namespace Element {
         addAndMakeVisible (keyHiLabel);
         keyHiLabel.setText ("Key End", dontSendNotification);
         keyHiLabel.setFont (font);
+        keyHiLabel.onDoubleClicked = [this](const MouseEvent&) { 
+            keyHiSlider.setValue (127.0, sendNotificationAsync); 
+        };
         addAndMakeVisible (keyHiSlider);
         keyHiSlider.textFromValueFunction = noteValueToString;
         keyHiSlider.setRange (0, 127, 1.0);
