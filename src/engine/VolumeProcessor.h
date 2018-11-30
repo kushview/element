@@ -53,7 +53,6 @@ namespace Element {
         {
             setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1,
                                   sampleRate, maximumExpectedSamplesPerBlock);
-            setLatencySamples (512);
         }
         
         void releaseResources() override
