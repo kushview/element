@@ -10,7 +10,12 @@ class PlaceholderProcessor : public BaseProcessor
 {    
 public:
     PlaceholderProcessor() { }
-    PlaceholderProcessor (const Node& node) { setupFor (node, 44100.0, 1024); }
+    PlaceholderProcessor (const Node& node, double sampleRate = 44100.0, 
+                          int blockSize = 1024)
+    { 
+        setupFor (node, sampleRate, blockSize);
+    }
+    
     PlaceholderProcessor (const int numAudioIns, const int numAudioOuts,
                           const bool hasMidiIn, const bool hasMidiOut)
         : numInputs (numAudioIns), numOutputs (numAudioOuts),
@@ -35,6 +40,13 @@ public:
         acceptMidi      = ins.size() > 0;
         produceMidi     = outs.size() > 0;
         
+        for (int i = 0; i < node.getPortsValueTree().getNumChildren(); ++i)
+        {
+            const auto port = node.getPort (i);
+            if (port.isA (PortType::Control, true))
+                addParameter (new AudioParameterFloat (port.getName(), port.getName(), 0, 1, 0));
+        }
+
         setPlayConfigDetails (numInputs, numOutputs, sampleRate, bufferSize);
     }
     

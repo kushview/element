@@ -410,33 +410,7 @@ void GraphController::removeConnection (const int index)
 void GraphController::removeConnection (uint32 sourceNode, uint32 sourcePort,
                                         uint32 destNode, uint32 destPort)
 {
-    bool removedMissing = false;
-   #if 0
-    // Testing missing connection removal. Connections should still work for placeholders
-    // so audio/midi can pass through 
-    const auto srcMissing = (bool) getNodeModelForId(sourceNode).getProperty(Tags::missing, false);
-    const auto dstMissing = (bool) getNodeModelForId(destNode).getProperty(Tags::missing, false);
-
-    if (srcMissing || dstMissing)
-    {
-        for (int i = 0; i < arcs.getNumChildren(); ++i)
-        {
-            const auto arc (arcs.getChild (i));
-            if (sourceNode == (uint32)(int) arc.getProperty(Tags::sourceNode) &&
-                sourcePort == (uint32)(int) arc.getProperty(Tags::sourcePort) &&
-                destNode == (uint32)(int) arc.getProperty(Tags::destNode) &&
-                destPort == (uint32)(int) arc.getProperty(Tags::destPort) &&
-                arc.hasProperty(Tags::missing) && true == (bool) arc.getProperty (Tags::missing))
-            {
-                arcs.removeChild (i, nullptr);
-                removedMissing = true;
-                break;
-            }
-        }
-    }
-   #endif
-
-    if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort) || removedMissing)
+    if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
         processorArcsChanged();
 }
 
@@ -465,10 +439,15 @@ void GraphController::setNodeModel (const Node& node)
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
             node.getValueTree().setProperty (Tags::missing, true, nullptr);
+           #define EL_DEBUG_PLACEHOLDER 0
+           #if EL_DEBUG_PLACEHOLDER
+            DBG("PH nodeId : " << (int) ph->nodeId);
+            DBG("PH nprts : " << (int) ph->getNumPorts());
             DBG("PH ins   : " << ph->getNumAudioInputs());
             DBG("PH outs  : " << ph->getNumAudioOutputs());
             DBG("PH mins  : " << ph->getNumPorts (PortType::Midi, true));
-            DBG("PH mouts : " << ph->getNumPorts (PortType::Midi, true));
+            DBG("PH mouts : " << ph->getNumPorts (PortType::Midi, false));
+           #endif
         }
         else
         {
