@@ -2,6 +2,8 @@
 
 #include "JuceHeader.h"
 
+#define EL_INTERNAL_ID_CHANNELIZE       "element.channelize"
+
 namespace Element {
     
     class BaseProcessor : public AudioPluginInstance

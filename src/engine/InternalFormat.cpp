@@ -10,6 +10,7 @@
 
 #include "engine/AllPassFilterProcessor.h"
 #include "engine/AudioMixerProcessor.h"
+#include "engine/ChannelizeProcessor.h"
 #include "engine/CombFilterProcessor.h"
 #include "engine/MidiDeviceProcessor.h"
 #include "engine/MidiSequenceProcessor.h"
@@ -141,8 +142,7 @@ namespace Element {
     // MARK: Element Format
     
     ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
-        : world (g)
-    { }
+        : world (g) { }
     
     void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
     {
@@ -240,6 +240,11 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             PlaceholderProcessor().fillInPluginDescription (*desc);
         }
+        else if (fileOrId == EL_INTERNAL_ID_CHANNELIZE)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            ChannelizeProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -252,7 +257,7 @@ namespace Element {
         results.add ("element.wetDry");
         results.add ("element.reverb");
         results.add ("element.placeholder");
-
+        results.add (EL_INTERNAL_ID_CHANNELIZE);
        #if EL_USE_MIDI_SEQUENCER
         results.add ("element.midiSequencer");
        #endif
@@ -305,7 +310,10 @@ namespace Element {
 
         else if (desc.fileOrIdentifier == "element.placeholder")
             base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
-        
+
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
+            base = (world.getUnlockStatus().isFullVersion() ? new ChannelizeProcessor() : nullptr);
+
         return base != nullptr ? base.release() : nullptr;
     }
     

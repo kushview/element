@@ -13,7 +13,7 @@ inline static int getChannel (const uint8 *data)
     return 0;
 }
 
-inline static int setChannel (uint8 *data, const int channel)
+inline static void setChannel (uint8 *data, const int channel)
 {
     jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
     if ((data[0] & 0xf0) != (uint8) 0xf0)
@@ -30,6 +30,7 @@ public:
     
     ChannelizeProcessor()
     {
+        setPlayConfigDetails (0, 0, 44100.0, 512);
         addParameter (channel = new AudioParameterInt ("channel", "Out Channel", 0, 16, 0));
     }
 
@@ -38,11 +39,11 @@ public:
         channel = nullptr;
     }
 
-    const String getName() const override { return "MIDI Chanellize"; }
-    void fillInPluginDescription (PluginDescription& desc) const override
+    inline const String getName() const override { return "MIDI Channelize"; }
+    inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = "Channelize";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_CHANNELIZE;
         desc.descriptiveName    = "MIDI Channelize";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;
@@ -53,10 +54,15 @@ public:
         desc.version            = "1.0.0";
     }
     
-    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override { }
-    void releaseResources() override { }
+    inline AudioProcessorEditor* createEditor() override { return nullptr; }
+    inline bool hasEditor() const override { return false; }
 
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
+    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override { 
+        setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
+    }
+    inline void releaseResources() override { }
+
+    inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
     {
         const int outChan = *channel;
         if (outChan <= 0)
@@ -64,7 +70,7 @@ public:
         
         MidiBuffer::Iterator iter (midiMessages);
         const uint8* data = nullptr; int bytes = 0, frame = 0;
-        while (iter.getNextEvent (data, frame, bytes))
+        while (iter.getNextEvent (data, bytes, frame))
         {
             // TODO: optimize
             MidiMessage msg (data, bytes, frame);
@@ -77,20 +83,20 @@ public:
         tempMidi.clear();
     }
 
-    double getTailLengthSeconds() { return 0; }
-    bool acceptsMidi() const { return true; }
-    bool producesMidi() const { return true; }
-    bool supportsMPE() const override   { return false; }
-    bool isMidiEffect() const override  { return true; }
+    inline double getTailLengthSeconds() const override { return 0; }
+    inline bool acceptsMidi() const override { return true; }
+    inline bool producesMidi() const override { return true; }
+    inline bool supportsMPE() const override { return false; }
+    inline bool isMidiEffect() const override  { return true; }
 
-    void getStateInformation (juce::MemoryBlock& destData) override
-    {
+    inline void getStateInformation (juce::MemoryBlock& destData) override { }
+    inline void setStateInformation (const void* data, int sizeInBytes) override { }
 
-    }
-
-    void setStateInformation (const void* data, int sizeInBytes) override {
-
-    }
+    inline int getNumPrograms() override { return 1; }
+    inline int getCurrentProgram() override { return 0; }
+    inline void setCurrentProgram (int index) override { ignoreUnused (index); }
+    inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
+    inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
 #if 0
     // Audio Processor Template
@@ -109,14 +115,6 @@ public:
     virtual void reset();
     virtual void setNonRealtime (bool isNonRealtime) noexcept;
     
-    virtual AudioProcessorEditor* createEditor() = 0;
-    virtual bool hasEditor() const = 0;
-    
-    virtual int getNumPrograms()        { return 1; };
-    virtual int getCurrentProgram()     { return 1; };
-    virtual void setCurrentProgram (int index) { ignoreUnused (index); };
-    virtual const String getProgramName (int index) { ignoreUnused (index); }
-    virtual void changeProgramName (int index, const String& newName) { ignoreUnused (index, newName); }
     virtual void getCurrentProgramStateInformation (juce::MemoryBlock& destData);
     
     virtual void setCurrentProgramStateInformation (const void* data, int sizeInBytes);

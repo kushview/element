@@ -99,6 +99,7 @@ private:
             }
             
             g.fillRect (1, 1, width - 2, height - 2);
+            g.setFont (12.f);
             g.setColour (Colours::black);
             g.drawText (var(state.getIndexForCell(row, col) + 1).toString(), 0, 0, width, height, Justification::centred);
         }
