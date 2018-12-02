@@ -89,8 +89,23 @@ public:
     inline bool supportsMPE() const override { return false; }
     inline bool isMidiEffect() const override  { return true; }
 
-    inline void getStateInformation (juce::MemoryBlock& destData) override { }
-    inline void setStateInformation (const void* data, int sizeInBytes) override { }
+    inline void getStateInformation (juce::MemoryBlock& destData) override
+    {
+        int chtoWrite = 1;
+        {
+            ScopedLock sl (getCallbackLock());
+            chtoWrite = *channel;
+        }
+
+        destData.append (&chtoWrite, sizeof (int));
+    }
+    
+    inline void setStateInformation (const void* data, int sizeInBytes) override
+    { 
+        MemoryBlock block (data, sizeInBytes);
+        ScopedLock sl (getCallbackLock());
+        *channel = *reinterpret_cast<int*> (block.getData());
+    }
 
     inline int getNumPrograms() override { return 1; }
     inline int getCurrentProgram() override { return 0; }

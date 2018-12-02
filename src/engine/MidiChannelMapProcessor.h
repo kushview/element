@@ -80,8 +80,46 @@ public:
     inline bool supportsMPE() const override { return false; }
     inline bool isMidiEffect() const override  { return true; }
 
-    inline void getStateInformation (juce::MemoryBlock& destData) override { }
-    inline void setStateInformation (const void* data, int sizeInBytes) override { }
+    inline void getStateInformation (juce::MemoryBlock& destData) override
+    { 
+        ValueTree state ("state");
+        int chans[16] = { 0 };
+
+        {
+            ScopedLock sl (getCallbackLock());
+            for (int ch = 0; ch < 16; ++ch)
+                chans[ch] = *params.getUnchecked (ch);
+        }
+
+        for (int ch = 0; ch < 16; ++ch)
+        {
+            String key = "channel-"; key << ch;
+            state.setProperty (key, chans [ch], 0);
+        }
+        
+        MemoryOutputStream stream (destData, false);
+        state.writeToStream (stream);
+    }
+
+    inline void setStateInformation (const void* data, int sizeInBytes) override
+    {
+        const auto state = ValueTree::readFromData (data, (size_t) sizeInBytes);
+        if (! state.hasType ("state"))
+            return;
+
+        int chans[16] = { 0 };
+        for (int ch = 0; ch < 16; ++ch)
+        {
+            String key = "channel-"; key << ch;
+            chans[ch] = (int) state.getProperty (key, ch + 1);
+        }
+
+        {
+            ScopedLock sl (getCallbackLock());
+            for (int ch = 0; ch < 16; ++ch)
+                *params.getUnchecked(ch) = chans[ch];
+        }
+    }
 
     inline int getNumPrograms() override { return 1; }
     inline int getCurrentProgram() override { return 0; }
