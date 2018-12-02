@@ -24,33 +24,30 @@ public:
             channelMap.getReference(ch) = ch;
     }
 
-    inline void set (const int inputChan, const int outputChan) noexcept
-    {
-        jassert (inputChan >= 0 && inputChan <= 16 &&
-                 outputChan >= 0 && outputChan <= 16);
-        channelMap.getReference (inputChan) = outputChan;
-    }
-
     inline void set (const int outputChan) noexcept
     {
-        set (0, outputChan);
+        jassert (outputChan >= 1 && outputChan <= 16);
+        for (int ch = 1; ch <= 16; ++ch)
+            channelMap.getReference (ch) = outputChan;
+    }
+
+    inline void set (const int inputChan, const int outputChan) noexcept
+    {
+        jassert (inputChan >= 1 && inputChan <= 16 &&
+                 outputChan >= 1 && outputChan <= 16);
+        channelMap.getReference (inputChan) = outputChan;
     }
 
     inline int get (const int channel) const
     {
-        const auto omni = channelMap.getUnchecked (0);
-        jassert (channel >= 0 && channel <= 16);
-        jassert (omni >= 0 && omni <= 16);
-        return channelMap.getUnchecked (omni > 0 ? omni : channel);
+        jassert (channel >= 1 && channel <= 16);
+        return channelMap.getUnchecked (channel);
     }
 
     inline void process (MidiMessage& message) const
     {
-        const auto channel = message.getChannel();
-        const auto omni = channelMap.getUnchecked (0);
-        jassert (channel >= 0 && channel <= 16);
-        if (channel > 0)
-            message.setChannel (channelMap.getUnchecked (omni > 0 ? omni : channel));
+        if (message.getChannel() > 0)
+            message.setChannel (channelMap.getUnchecked (message.getChannel()));
     }
 
     inline void render (MidiBuffer& midi)
@@ -71,7 +68,9 @@ public:
     const Array<int>& getMap() const { return channelMap; }
 
 private:
+    // TODO: optimize: use plain C array
     Array<int> channelMap;
+    int channels [17];
     MidiBuffer tempMidi;
 };
 

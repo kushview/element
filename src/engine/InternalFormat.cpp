@@ -14,6 +14,7 @@
 #include "engine/CombFilterProcessor.h"
 #include "engine/MidiDeviceProcessor.h"
 #include "engine/MidiSequenceProcessor.h"
+#include "engine/MidiChannelMapProcessor.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/ReverbProcessor.h"
 #include "engine/SubGraphProcessor.h"
@@ -90,7 +91,7 @@ namespace Element {
         {
             return new MidiDeviceProcessor (false);
         }
-        else if (desc.fileOrIdentifier == "element.placeholder")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
         {
             return new PlaceholderProcessor();
         }
@@ -146,18 +147,7 @@ namespace Element {
     
     void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescription>& ds, const String& fileOrId)
     {
-        if (fileOrId == "element.reverb")
-        {
-            auto* const desc = ds.add (new PluginDescription());
-            desc->pluginFormatName = getName();
-            desc->name = "eVerb";
-            desc->manufacturerName = "Element";
-            desc->category = "Effect";
-            desc->fileOrIdentifier = fileOrId;
-            desc->numInputChannels = 2;
-            desc->numInputChannels = 2;
-        }
-        else if (fileOrId == "element.comb")
+        if (fileOrId == "element.comb")
         {
             auto* desc = ds.add (new PluginDescription());
             desc->pluginFormatName = getName();
@@ -208,34 +198,33 @@ namespace Element {
             desc->numInputChannels = 2;
             desc->numOutputChannels = 2;
         }
-        else if (fileOrId == "element.wetDry")
+        else if (fileOrId == EL_INTERNAL_ID_WET_DRY)
         {
             auto* desc = ds.add (new PluginDescription());
             WetDryProcessor wetDry;
             wetDry.fillInPluginDescription (*desc);
         }
-        else if (fileOrId == "element.reverb")
+        else if (fileOrId == EL_INTERNAL_ID_REVERB)
         {
             auto* desc = ds.add (new PluginDescription());
-            ReverbProcessor reverb;
-            reverb.fillInPluginDescription (*desc);
+            ReverbProcessor().fillInPluginDescription (*desc);
         }
-        else if (fileOrId == "element.graph")
+        else if (fileOrId == EL_INTERNAL_ID_GRAPH)
         {
             auto* const desc = ds.add (new PluginDescription());
             SubGraphProcessor().fillInPluginDescription (*desc);
         }
-        else if (fileOrId == "element.midiSequencer")
+        else if (fileOrId == EL_INTERNAL_ID_MIDI_SEQUENCER)
         {
             auto* const desc = ds.add (new PluginDescription());
             MidiSequenceProcessor().fillInPluginDescription (*desc);
         }
-        else if (fileOrId == "element.audioMixer")
+        else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
         {
             auto* const desc = ds.add (new PluginDescription());
             AudioMixerProcessor(4).fillInPluginDescription (*desc);
         }
-        else if (fileOrId == "element.placeholder")
+        else if (fileOrId == EL_INTERNAL_ID_PLACEHOLDER)
         {
             auto* const desc = ds.add (new PluginDescription());
             PlaceholderProcessor().fillInPluginDescription (*desc);
@@ -245,28 +234,31 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             ChannelizeProcessor().fillInPluginDescription (*desc);
         }
+        else if (fileOrId == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            MidiChannelMapProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
     {
         StringArray results;
-        results.add ("element.reverb");
         results.add ("element.comb");
         results.add ("element.allPass");
         results.add ("element.volume");
-        results.add ("element.wetDry");
-        results.add ("element.reverb");
-        results.add ("element.placeholder");
+        results.add (EL_INTERNAL_ID_WET_DRY);
+        results.add (EL_INTERNAL_ID_REVERB);
+        results.add (EL_INTERNAL_ID_PLACEHOLDER);
         results.add (EL_INTERNAL_ID_CHANNELIZE);
+        results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
+        results.add (EL_INTERNAL_ID_GRAPH);
+        results.add (EL_INTERNAL_ID_AUDIO_MIXER);
+
        #if EL_USE_MIDI_SEQUENCER
-        results.add ("element.midiSequencer");
-       #endif
-       
-       #if EL_USE_SUBGRAPHS
-        results.add ("element.graph");
+        results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
 
-        results.add ("element.audioMixer");
         return results;
     }
     
@@ -293,26 +285,29 @@ namespace Element {
         else if (desc.fileOrIdentifier == "element.volume.stereo")
             base = new VolumeProcessor (-30.0, 12.0, true);
         
-        else if (desc.fileOrIdentifier == "element.wetDry")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_WET_DRY)
             base = new WetDryProcessor();
         
-        else if (desc.fileOrIdentifier == "element.reverb")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
             base = new ReverbProcessor();
         
-        else if (desc.fileOrIdentifier == "element.graph")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
         
-        else if (desc.fileOrIdentifier == "element.midiSequencer")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_SEQUENCER)
             base = (world.getUnlockStatus().isFullVersion() ? new MidiSequenceProcessor() : nullptr);
         
-        else if (desc.fileOrIdentifier == "element.audioMixer")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
             base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
 
-        else if (desc.fileOrIdentifier == "element.placeholder")
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
             base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
 
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
             base = (world.getUnlockStatus().isFullVersion() ? new ChannelizeProcessor() : nullptr);
+
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
+            base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
 
         return base != nullptr ? base.release() : nullptr;
     }

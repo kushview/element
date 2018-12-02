@@ -2,10 +2,18 @@
 
 #include "JuceHeader.h"
 
-#define EL_INTERNAL_ID_CHANNELIZE       "element.channelize"
+#define EL_INTERNAL_ID_AUDIO_MIXER          "element.audioMixer"
+#define EL_INTERNAL_ID_COMB_FILTER          "element.comb"
+#define EL_INTERNAL_ID_CHANNELIZE           "element.channelize"
+#define EL_INTERNAL_ID_GRAPH                "element.graph"
+#define EL_INTERNAL_ID_MIDI_CHANNEL_MAP     "element.midiChannelMap"
+#define EL_INTERNAL_ID_MIDI_SEQUENCER       "element.midiSequencer"
+#define EL_INTERNAL_ID_REVERB               "element.reverb"
+#define EL_INTERNAL_ID_PLACEHOLDER          "element.placeholder"
+#define EL_INTERNAL_ID_WET_DRY              "element.wetDry"
 
-namespace Element {
-    
+namespace Element
+{
     class BaseProcessor : public AudioPluginInstance
     {
     public:
@@ -74,5 +82,4 @@ namespace Element {
     private:
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BaseProcessor)
     };
-
 }

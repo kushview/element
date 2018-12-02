@@ -31,7 +31,7 @@ public:
     void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = "element.wetDry";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_WET_DRY;
         desc.version            = "1.0.0";
         desc.descriptiveName    = "Combines stereo wet/dry signals in to a single stereo output.";
         desc.numInputChannels   = 4;

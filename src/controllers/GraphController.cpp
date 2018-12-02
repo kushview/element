@@ -8,14 +8,20 @@
 
 namespace Element {
 
-static StringArray getFullVesrionPluginIdentifiers() {
-return { "element.audioMixer",
-         "element.graph",
-         "element.placeholder",
-         "element." };
+static StringArray getFullVesrionPluginIdentifiers()
+{
+    return {
+        EL_INTERNAL_ID_AUDIO_MIXER,
+        EL_INTERNAL_ID_CHANNELIZE,
+        EL_INTERNAL_ID_GRAPH,
+        EL_INTERNAL_ID_MIDI_CHANNEL_MAP,
+        EL_INTERNAL_ID_MIDI_SEQUENCER,
+        EL_INTERNAL_ID_PLACEHOLDER
+    };
 }
 
-static bool isFullVersionPlugin (const PluginDescription& desc) {
+static bool isFullVersionPlugin (const PluginDescription& desc)
+{
     return getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
 }
 

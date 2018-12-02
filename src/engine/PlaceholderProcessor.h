@@ -56,7 +56,7 @@ public:
         d.version = "1.0.0";
         d.pluginFormatName = "Element";
         d.manufacturerName = "Element";
-        d.fileOrIdentifier = "element.placeholder";
+        d.fileOrIdentifier = EL_INTERNAL_ID_PLACEHOLDER;
         d.numInputChannels = numInputs;
         d.numOutputChannels = numOutputs;
     }

@@ -1,50 +1,54 @@
 #pragma once
 
 #include "engine/BaseProcessor.h"
+#include "engine/MidiChannelMap.h"
 
 namespace Element {
 
-namespace Midi {
-
-inline static int getChannel (const uint8 *data)
+class MidiChannelMapProcessor : public BaseProcessor,
+                                public AudioProcessorParameter::Listener
 {
-    if ((data[0] & 0xf0) != 0xf0)
-        return (data[0] & 0xf) + 1;
-    return 0;
-}
+    Array<AudioParameterInt*> params;
+    MidiChannelMap channels;
 
-inline static void setChannel (uint8 *data, const int channel)
-{
-    jassert (channel > 0 && channel <= 16); // valid channels are numbered 1 to 16
-    if ((data[0] & 0xf0) != (uint8) 0xf0)
-        data[0] = (uint8) ((data[0] & (uint8) 0xf0)
-                            | (uint8)(channel - 1));
-}
-
-}
-
-class ChannelizeProcessor : public BaseProcessor
-{
-    AudioParameterInt* channel = nullptr;
 public:
-    
-    ChannelizeProcessor()
+    MidiChannelMapProcessor()
     {
         setPlayConfigDetails (0, 0, 44100.0, 512);
-        addParameter (channel = new AudioParameterInt ("channel", "Out Channel", 1, 16, 1));
+        for (int i = 0; i < 16; ++i)
+        {
+            String identifier = "channel-"; identifier << String (i + 1);
+            String name = "Channel "; name << String (i + 1);
+            auto param = new AudioParameterInt (identifier, name, 1, 16, i + 1);
+            addParameter (param);
+            params.add (param);
+            param->addListener (this);
+        }
     }
 
-    ~ChannelizeProcessor()
+    ~MidiChannelMapProcessor()
     {
-        channel = nullptr;
+        for (auto* param : params)
+            param->removeListener (this);
+        params.clear();
     }
 
-    inline const String getName() const override { return "MIDI Channelize"; }
+    void parameterValueChanged (int parameterIndex, float newValue) override
+    {
+        jassert (isPositiveAndBelow (parameterIndex, params.size()));
+        ScopedLock sl (getCallbackLock());
+        channels.set (parameterIndex + 1, *params.getUnchecked (parameterIndex));
+    }
+
+    void parameterGestureChanged (int, bool) override { }
+
+    inline const String getName() const override { return "MIDI Channel Map"; }
+
     inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_CHANNELIZE;
-        desc.descriptiveName    = "MIDI Channelize";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_MAP;
+        desc.descriptiveName    = "MIDI Channel Map";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;
         desc.hasSharedContainer = false;
@@ -57,30 +61,17 @@ public:
     inline AudioProcessorEditor* createEditor() override { return nullptr; }
     inline bool hasEditor() const override { return false; }
 
-    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override { 
+    inline void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
+    { 
         setPlayConfigDetails (0, 0, sampleRate, maximumExpectedSamplesPerBlock);
     }
+
     inline void releaseResources() override { }
 
-    inline void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override
+    inline void processBlock (AudioBuffer<float>&, MidiBuffer& midiMessages) override
     {
-        const int outChan = *channel;
-        if (outChan <= 0)
-            return;
-        
-        MidiBuffer::Iterator iter (midiMessages);
-        const uint8* data = nullptr; int bytes = 0, frame = 0;
-        while (iter.getNextEvent (data, bytes, frame))
-        {
-            // TODO: optimize
-            MidiMessage msg (data, bytes, frame);
-            if (msg.getChannel() > 0)
-                msg.setChannel (outChan);
-            tempMidi.addEvent (msg, frame);
-        }
-
-        midiMessages.swapWith (tempMidi);
-        tempMidi.clear();
+        ScopedLock sl (getCallbackLock());
+        channels.render (midiMessages);
     }
 
     inline double getTailLengthSeconds() const override { return 0; }
