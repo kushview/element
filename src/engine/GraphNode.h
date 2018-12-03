@@ -7,10 +7,6 @@ namespace Element {
 
 class GraphProcessor;
 
-/** Represents one of the nodes, or processors, in an AudioProcessorGraph.
-
-    To create a node, call ProcessorGraph::addNode().
-*/
 class GraphNode : public ReferenceCountedObject
 {
 public:
@@ -39,12 +35,13 @@ public:
     PortType getPortType (const uint32 port) const;
     uint32 getNumPorts() const;
     int getNumPorts (const PortType type, const bool isInput) const;
-    uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
+    
     uint32 getMidiInputPort() const;
     uint32 getMidiOutputPort() const;
 
     int getChannelPort (const uint32 port) const;
-    
+    uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
+
     int getNthPort (const PortType portType, const int inputChan, bool, bool) const;
     
     /** Returns true if an input port */
@@ -67,9 +64,9 @@ public:
     /** If an audio plugin instance, fill the details */
     void getPluginDescription (PluginDescription& desc);
     
-    /** The actual processor object dynamic_cast'd to ProcType */
-    template<class ProcType>
-    inline ProcType* processor() const { return dynamic_cast<ProcType*> (proc.get()); }
+    /** The actual processor object dynamic_cast'd to T */
+    template<class T>
+    inline T* processor() const { return dynamic_cast<T*> (proc.get()); }
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
@@ -87,7 +84,8 @@ public:
     inline float getGain() const { return gain.get(); }
     inline float getLastGain() const { return lastGain.get(); }
     inline float getLastInputGain() const { return lastInputGain.get(); }
-    inline void updateGain()
+
+    inline void updateGain() noexcept
     {
         if (lastGain.get() != gain.get())
             lastGain = gain;
@@ -187,6 +185,10 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& graph;
     } enablement;
+
+    kv::PortList ports;
+
+    void createPorts();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };

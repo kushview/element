@@ -151,7 +151,7 @@ public:
         {
             if (GraphNodePtr node = parent->getNode (i))
             {
-                if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+                if (auto* sub = node->processor<SubGraphProcessor>())
                 {
                     if (sub->getController().isControlling (n))
                         return &sub->getController();
@@ -160,6 +160,7 @@ public:
                 }
             }
         }
+        
         return nullptr;
     }
 

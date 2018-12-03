@@ -145,10 +145,13 @@ public:
     virtual void updateTrackProperties (const TrackProperties& properties);
     
 protected:
-    virtual bool isBusesLayoutSupported (const BusesLayout&) const          { return true; }
     virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 #endif
+
+protected:
+    inline bool isBusesLayoutSupported (const BusesLayout&) const override { return false; }
+
 private:
     MidiBuffer tempMidi;
 };

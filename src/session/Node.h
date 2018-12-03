@@ -44,13 +44,8 @@ namespace Element {
         }
         
         const String getName() const { return getProperty (Tags::name, "Port"); }
-        const PortType getType() const {
-            return PortType (getProperty (Slugs::type, "unknown"));
-        }
-        
-        bool isA (const PortType type, const bool isInputFlow) const {
-            return getType() == type && isInputFlow == isInput();
-        }
+        const PortType getType() const { return PortType (getProperty (Slugs::type, "unknown").toString()); }
+        bool isA (const PortType type, const bool isInputFlow) const { return getType() == type && isInputFlow == isInput(); }
         
         uint32 getIndex() const
         {

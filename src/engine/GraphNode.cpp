@@ -98,11 +98,12 @@ void GraphNode::connectAudioTo (const GraphNode* other)
 
     const int totalChans = jmin (getNumAudioOutputs(), other->getNumAudioInputs());
     int failed = 0;
+
     for (int chan = 0; chan < totalChans; ++chan)
     {
         if (! graph.addConnection (
-            this->nodeId, Processor::getPortForAudioChannel(src, chan, false),
-            other->nodeId, Processor::getPortForAudioChannel(dst, chan, true)))
+            this->nodeId, getPortForChannel (PortType::Audio, chan, false),
+            other->nodeId, other->getPortForChannel (PortType::Audio, chan, true)))
         {
             ++failed;
         }
@@ -117,7 +118,7 @@ void GraphNode::connectAudioTo (const GraphNode* other)
 bool GraphNode::isAudioIONode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
-    if (IOP* iop = dynamic_cast<IOP*> (proc.get()))
+    if (IOP* iop = processor<IOP>())
     {
         return iop->getType() == IOP::audioInputNode ||
                iop->getType() == IOP::audioOutputNode;
@@ -163,81 +164,25 @@ bool GraphNode::isRootGraph() const noexcept { return (nullptr != dynamic_cast<R
 
 PortType GraphNode::getPortType (const uint32 port) const
 {
-    return Processor::getPortType (proc.get(), port);
+    const PortType t (ports.getType (static_cast<int> (port)));
+    return t;
 }
 
-int GraphNode::getNumPorts (const PortType type, const bool isInput) const
-{
-    return static_cast<int> (Processor::getNumPorts (proc.get(), type, isInput));
-}
-    
-uint32 GraphNode::getNumPorts() const
-{
-    return Processor::getNumPorts (proc.get());
-}
-
-bool GraphNode::isPortInput (const uint32 port) const
-{
-    return Processor::isPortInput (proc.get(), port);
-}
-
-bool GraphNode::isPortOutput (const uint32 port) const
-{
-    return ! Processor::isPortInput (proc.get(), port);
-}
+int GraphNode::getNumPorts (const PortType type, const bool isInput) const { return ports.size (type, isInput); }
+uint32 GraphNode::getNumPorts() const { return (uint32) ports.size(); }
+bool GraphNode::isPortInput (const uint32 port)  const { return ports.isInput (port, false); }
+bool GraphNode::isPortOutput (const uint32 port) const { return ports.isOutput (port, true); }
 
 uint32 GraphNode::getPortForChannel (const PortType type, const int channel, const bool isInput) const
 {
-    uint32 port = KV_INVALID_PORT;
-    
-    switch (type)
-    {
-        case PortType::Audio:
-        {
-            port = Processor::getPortForAudioChannel (proc.get(), channel, isInput);
-        }
-        break;
-        
-        case PortType::Midi:
-        {
-            port = (uint32)channel + static_cast<uint32> (getNumAudioInputs() + getNumAudioOutputs() + proc->getNumParameters());
-            if (! isInput)
-                port += getNumPorts (PortType::Midi, true);
-        }
-        break;
-            
-        default:
-            jassertfalse;
-            break;
-    }
-    
-    return port;
+    return static_cast<uint32> (ports.getPortForChannel (type, channel, isInput));
 }
-    
+
 int GraphNode::getChannelPort (const uint32 port) const
 {
-    jassert (port < getNumPorts());
-    
-    int channel = 0;
-    const bool isInput  = isPortInput (port);
-    const PortType type = getPortType (port);
-    
-    for (uint32 p = 0; p < (uint32) getNumPorts(); ++p)
-    {
-        const PortType thisPortType = getPortType (p);
-        const bool thisPortIsInput = isPortInput (p);
-        
-        if (type == thisPortType && p == port)
-            return channel;
-        
-        // tally the channel only if type and flow match
-        if (type == thisPortType && isInput == thisPortIsInput)
-            ++channel;
-    }
-    
-    return -1;
+    return ports.getChannelForPort (static_cast<int> (port));
 }
-    
+
 int GraphNode::getNthPort (const PortType type, const int index, bool isInput, bool oneBased) const
 {
     int count = oneBased ? 0 : -1;
@@ -266,7 +211,7 @@ uint32 GraphNode::getMidiInputPort() const
 
 uint32 GraphNode::getMidiOutputPort() const
 {
-    return getPortForChannel (PortType::Midi, 0, false);;
+    return getPortForChannel (PortType::Midi, 0, false);
 }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,
@@ -429,7 +374,7 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
 
 void GraphNode::resetPorts()
 {
-    jassert(proc);
+    jassert (proc);
     
     ValueTree ports (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
     ValueTree nodes (metadata.getOrCreateChildWithName (Tags::nodes, nullptr));
@@ -450,6 +395,7 @@ void GraphNode::resetPorts()
     {
         addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*>(proc.get()), ports);
         metadata.addChild (ports, 0, nullptr);
+        createPorts();
         return;
     }
     
@@ -513,6 +459,54 @@ void GraphNode::resetPorts()
     
     metadata.addChild (nodes, 0, nullptr);
     metadata.addChild (ports, 1, nullptr);
+    createPorts(); // TODO: should be a standalone operation
+}
+
+void GraphNode::createPorts()
+{
+    kv::PortList newPorts;
+
+    int index = 0;
+
+    for (int channel = 0; channel < getNumAudioInputs(); ++channel)
+    {
+        String symbol = "audio_in_"; symbol << channel;
+        newPorts.add (PortType::Audio, index, channel, symbol,
+                      proc->getInputChannelName (channel), true);
+        ++index;
+    }
+    
+    for (int channel = 0; channel < getNumAudioOutputs(); ++channel)
+    {
+        String symbol = "audio_out_"; symbol << channel;
+        newPorts.add (PortType::Audio, index, channel, symbol,
+                      proc->getOutputChannelName (channel), false);
+        ++index;
+    }
+    
+    for (int i = 0; i < proc->getParameters().size(); ++i)
+    {
+        String symbol = "control_"; symbol << i;
+        newPorts.add (PortType::Control, index, i, symbol,
+                      proc->getParameterName(i), true);
+        ++index;
+    }
+    
+    if (proc->acceptsMidi())
+    {
+        newPorts.add (PortType::Midi, index, 0, "midi_in_0", "MIDI", true);
+        ++index;
+    }
+    
+    if (proc->producesMidi())
+    {
+        newPorts.add (PortType::Midi, index, 0, "midi_out_0", "MIDI", false);
+        ++index;
+    }
+
+    jassert (index == newPorts.size());
+    jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == newPorts.size());
+    ports.swapWith (newPorts);
 }
 
 AudioPluginInstance* GraphNode::getAudioPluginInstance() const

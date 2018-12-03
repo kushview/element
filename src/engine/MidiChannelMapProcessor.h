@@ -79,7 +79,7 @@ public:
     inline bool producesMidi() const override { return true; }
     inline bool supportsMPE() const override { return false; }
     inline bool isMidiEffect() const override  { return true; }
-
+    
     inline void getStateInformation (juce::MemoryBlock& destData) override
     { 
         ValueTree state ("state");
@@ -127,6 +127,9 @@ public:
     inline const String getProgramName (int index) override { ignoreUnused (index); return ""; }
     inline void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
+protected:
+    inline bool isBusesLayoutSupported (const BusesLayout&) const override { return false; }
+
 #if 0
     // Audio Processor Template
     virtual StringArray getAlternateDisplayNames() const;
@@ -159,7 +162,6 @@ public:
     virtual void updateTrackProperties (const TrackProperties& properties);
     
 protected:
-    virtual bool isBusesLayoutSupported (const BusesLayout&) const          { return true; }
     virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 #endif

@@ -4,7 +4,7 @@
 #include "ElementApp.h"
 
 #ifndef EL_DEBUG_LICENSE
- #define EL_DEBUG_LICENSE 1
+ #define EL_DEBUG_LICENSE 0
 #endif
 
 #ifndef EL_DISABLE_UNLOCKING

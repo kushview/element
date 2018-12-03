@@ -57,6 +57,7 @@ public:
             
             GraphNodePtr node1 = graph.addNode (plugin1);
             GraphNodePtr node2 = graph.addNode (plugin2);
+
             node1->connectAudioTo (node2);
             MessageManager::getInstance()->runDispatchLoopUntil (15);
 

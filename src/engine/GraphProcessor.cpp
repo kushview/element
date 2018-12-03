@@ -904,9 +904,9 @@ bool GraphProcessor::canConnect (const uint32 sourceNode, const uint32 sourcePor
     {
         return false;
     }
-
+    
     const GraphNode* const dest = getNodeForId (destNode);
-
+    
     if (dest == nullptr
          || (destPort >= dest->getNumPorts())
          || (! dest->isPortInput (destPort)))
