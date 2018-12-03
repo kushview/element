@@ -375,13 +375,23 @@ static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcess
 void GraphNode::resetPorts()
 {
     jassert (proc);
-    
-    ValueTree ports (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
-    ValueTree nodes (metadata.getOrCreateChildWithName (Tags::nodes, nullptr));
-    metadata.removeChild (ports, nullptr);
-    metadata.removeChild (nodes, nullptr);
-    ports.removeAllChildren (nullptr);
-    
+    createPorts(); // TODO: should be a standalone operation
+
+    ValueTree portList (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
+    ValueTree nodeList (metadata.getOrCreateChildWithName (Tags::nodes, nullptr));
+    metadata.removeChild (portList, nullptr);
+    metadata.removeChild (nodeList, nullptr);
+    portList.removeAllChildren (nullptr);
+
+    for (int i = 0; i < ports.size(); ++i)
+    {
+        ValueTree port = ports.createValueTree (i);
+        port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
+        port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
+        portList.addChild (port, -1, 0);
+    }
+
+#if 0
     if (nullptr != dynamic_cast<SubGraphProcessor*> (proc.get()))
     {
         auto* sub = dynamic_cast<SubGraphProcessor*> (proc.get());
@@ -456,10 +466,11 @@ void GraphNode::resetPorts()
         ports.addChild (port, index, nullptr);
         index++;
     }
-    
-    metadata.addChild (nodes, 0, nullptr);
-    metadata.addChild (ports, 1, nullptr);
-    createPorts(); // TODO: should be a standalone operation
+#endif
+
+    metadata.addChild (nodeList, 0, nullptr);
+    metadata.addChild (portList, 1, nullptr);
+    jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
 }
 
 void GraphNode::createPorts()
@@ -505,7 +516,7 @@ void GraphNode::createPorts()
     }
 
     jassert (index == newPorts.size());
-    jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == newPorts.size());
+    
     ports.swapWith (newPorts);
 }
 
