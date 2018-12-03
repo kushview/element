@@ -9,7 +9,13 @@ namespace Element {
 class PlaceholderProcessor : public BaseProcessor
 {    
 public:
-    PlaceholderProcessor() { }
+    PlaceholderProcessor()
+    { 
+        numInputs = numOutputs = 0;
+        acceptMidi = produceMidi = true;
+        setPlayConfigDetails (numInputs, numOutputs, 44100.0, 1024);
+    }
+
     PlaceholderProcessor (const Node& node, double sampleRate = 44100.0, 
                           int blockSize = 1024)
     { 

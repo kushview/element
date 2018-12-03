@@ -147,6 +147,11 @@ public:
 
     Signal<void(GraphNode*)> enablementChanged;
 
+protected:
+    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
+    virtual void createPorts();
+    kv::PortList ports;
+
 private:
     friend class GraphProcessor;
     friend class GraphController;
@@ -186,15 +191,44 @@ private:
         GraphNode& graph;
     } enablement;
 
-    kv::PortList ports;
-
-    void createPorts();
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
 
 /** A convenient typedef for referring to a pointer to a node object. */
 typedef ReferenceCountedObjectPtr<GraphNode> GraphNodePtr;
+
+
+class MidiFilterNode : public GraphNode
+{
+public:
+    ~MidiFilterNode() { }
+
+protected:
+    MidiFilterNode (uint32 nodeId)
+        : GraphNode (nodeId, new PlaceholderProcessor (0, 0, true, true)) { }
+};
+
+class MidiChannelSplitterNode : public MidiFilterNode
+{
+protected:
+    void createPorts() override
+    {
+        if (ports.size() > 0)
+            return;
+
+        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+        for (int ch = 1; ch <= 16; ++ch)
+        {
+            String symbol = "midi_out_"; symbol << ch;
+            String name = "Ch. "; name << ch;
+            ports.add (PortType::Midi, ch, ch - 1, symbol, name, false);
+        }
+    }
+
+    void render (AudioBuffer<float>&, OwnedArray<MidiBuffer>&) {
+        
+    }
+};
 
 }
 
