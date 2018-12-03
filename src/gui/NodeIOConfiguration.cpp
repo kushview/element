@@ -521,7 +521,7 @@ int32 NodeAudioBusesComponent::getNodeId() const
 
         for (int i = 0; i < n; ++i)
             if (auto* node = graph->getNode (i))
-                if (node->getProcessor() == getAudioProcessor())
+                if (node->getAudioProcessor() == getAudioProcessor())
                     return static_cast<int32> (node->nodeId);
     }
 

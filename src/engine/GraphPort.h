@@ -3,12 +3,10 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
-#ifndef ELEMENT_PORTPROCESSOR_H
-#define ELEMENT_PORTPROCESSOR_H
+#pragma once
 
-    class GraphProcessor;
+class GraphProcessor;
 
-//==============================================================================
 /** A special type of Processor that can live inside an ProcessorGraph
     in order to use the audio that comes into and out of the graph itself.
 
@@ -22,20 +20,17 @@
 
     @see AudioProcessorGraph
 */
-class JUCE_API  GraphPort     : public Processor
+class JUCE_API  GraphPort : public Processor
 {
 public:
-
-    //==============================================================================
     /** Returns the mode of this processor. */
-
     PortType type() const { return portType; }
 
     /** Returns the parent graph to which this processor belongs, or nullptr if it
-        hasn't yet been added to one. */
+        hasn't yet been added to one.
+      */
     GraphProcessor* parent() const { return graph; }
 
-    /** */
     uint32 getNumPorts();
     PortType getPortType (uint32 port) const;
 

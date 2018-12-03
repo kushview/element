@@ -1301,18 +1301,18 @@ Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* 
 
 AudioProcessorEditor* GraphEditorComponent::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
 {
-    ScopedPointer<AudioProcessorEditor> ui = nullptr;
+    std::unique_ptr<AudioProcessorEditor> ui = nullptr;
     
     if (! useGenericEditor)
-    {
-        ui = node->getProcessor()->createEditorIfNeeded();
-        
+    {   
+        if (auto* proc = node->getAudioProcessor())
+            ui.reset (proc->createEditorIfNeeded());
         if (ui == nullptr)
             useGenericEditor = true;
     }
     
     if (useGenericEditor)
-        ui = new GenericAudioProcessorEditor (node->getProcessor());
+        ui.reset (new GenericAudioProcessorEditor (node->getAudioProcessor()));
     
     return (nullptr != ui) ? ui.release() : nullptr;
 }

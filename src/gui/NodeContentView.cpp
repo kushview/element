@@ -24,26 +24,18 @@ namespace Element {
         nameLabel.setFont (font);
         addAndMakeVisible (nameEditor);
         
-
         addAndMakeVisible (transposeLabel);
         transposeLabel.setText ("Transpose", dontSendNotification);
         transposeLabel.setFont (font);
-        transposeLabel.onDoubleClicked = [this](const MouseEvent&) { 
-            transposeSlider.setValue (0.0, sendNotificationAsync);
-        };
         addAndMakeVisible (transposeSlider);
         transposeSlider.setRange (-24, 24, 1);
         transposeSlider.setValue (0);
         transposeSlider.setSliderStyle (Slider::LinearHorizontal);
         transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
 
-
         addAndMakeVisible (keyLowLabel);
         keyLowLabel.setText ("Key Start", dontSendNotification);
         keyLowLabel.setFont (font);
-        keyLowLabel.onDoubleClicked = [this](const MouseEvent&) {
-            keyLowSlider.setValue (0.0, sendNotificationAsync);
-        };
         addAndMakeVisible (keyLowSlider);
         keyLowSlider.textFromValueFunction = noteValueToString;
         keyLowSlider.setRange (0, 127, 1.0);
@@ -55,9 +47,6 @@ namespace Element {
         addAndMakeVisible (keyHiLabel);
         keyHiLabel.setText ("Key End", dontSendNotification);
         keyHiLabel.setFont (font);
-        keyHiLabel.onDoubleClicked = [this](const MouseEvent&) { 
-            keyHiSlider.setValue (127.0, sendNotificationAsync); 
-        };
         addAndMakeVisible (keyHiSlider);
         keyHiSlider.textFromValueFunction = noteValueToString;
         keyHiSlider.setRange (0, 127, 1.0);
@@ -69,6 +58,21 @@ namespace Element {
         addAndMakeVisible (midiChannelLabel);
         midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
         midiChannelLabel.setFont (font);
+        
+        addAndMakeVisible (midiChannel);
+
+        transposeLabel.onDoubleClicked = [this](const MouseEvent&) {
+            transposeSlider.setValue (0.0, sendNotificationAsync);
+        };
+
+        keyLowLabel.onDoubleClicked = [this](const MouseEvent&) {
+            keyLowSlider.setValue (0.0, sendNotificationAsync);
+        };
+
+        keyHiLabel.onDoubleClicked = [this](const MouseEvent&) {
+            keyHiSlider.setValue (127.0, sendNotificationAsync); 
+        };
+
         midiChannelLabel.onDoubleClicked = [this](const MouseEvent&) {
             BigInteger chans;
             chans.setRange (0, 17, false);
@@ -76,24 +80,11 @@ namespace Element {
             midiChannel.setChannels (chans);
         };
 
-        addAndMakeVisible (midiChannel);
-        midiChannel.onChanged = [this]()
-        {
+        midiChannel.onChanged = [this]()  {
             if (auto* o = node.getGraphNode())
             {
                 o->setMidiChannels (midiChannel.getChannels());
                 node.setProperty (Tags::midiChannels, midiChannel.getChannels().toMemoryBlock());
-
-                if (auto* mb = node.getValueTree().getProperty(Tags::midiChannels).getBinaryData())
-                {
-                        BigInteger chans; 
-                        chans.loadFromMemoryBlock (*mb);
-                        DBG(node.getName());
-                        for (int i = 0; i <= 16; ++i)
-                            DBG("ch: " << i << " = " << (int) chans [i]);
-                        // obj->setMidiChannels (chans);
-                    
-                }
             }
         };
 
@@ -104,10 +95,15 @@ namespace Element {
 
     NodeContentView::~NodeContentView()
     {
+        selectedNodeConnection.disconnect();
+        transposeLabel.onDoubleClicked = nullptr;
+        keyLowLabel.onDoubleClicked = nullptr;
+        keyHiLabel.onDoubleClicked = nullptr;
+        midiChannelLabel.onDoubleClicked = nullptr;
+        midiChannel.onChanged = nullptr;
         keyLowSlider.removeListener (this);
         keyHiSlider.removeListener (this);
         transposeSlider.removeListener (this);
-        selectedNodeConnection.disconnect();
     }
 
     void NodeContentView::paint (Graphics& g)

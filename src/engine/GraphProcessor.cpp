@@ -1198,8 +1198,9 @@ void GraphProcessor::releaseResources()
 void GraphProcessor::reset()
 {
     const ScopedLock sl (getCallbackLock());
-    for (int i = 0; i < nodes.size(); ++i)
-        nodes.getUnchecked(i)->getProcessor()->reset();
+    for (auto node : nodes)
+        if (auto* const proc = node->getAudioProcessor())
+            proc->reset();
 }
 
 // MARK: Process Graph

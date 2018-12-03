@@ -106,10 +106,8 @@ public:
     /** Searches for a connection between some specified channels.
         If no such connection is found, this returns nullptr.
     */
-    const Connection* getConnectionBetween (uint32 sourceNode,
-                                            uint32 sourcePort,
-                                            uint32 destNode,
-                                            uint32 destPort) const;
+    const Connection* getConnectionBetween (uint32 sourceNode, uint32 sourcePort,
+                                            uint32 destNode, uint32 destPort) const;
 
     /** Returns true if there is a connection between any of the channels of
         two specified nodes.
@@ -128,7 +126,7 @@ public:
     bool addConnection (uint32 sourceNode, uint32 sourcePort,
                         uint32 destNode, uint32 destPort);
 
-
+    /** Connect two ports by channel number */
     bool connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
                           uint32 destNode, int32 destChannel);
 

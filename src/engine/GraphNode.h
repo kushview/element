@@ -15,28 +15,18 @@ class GraphNode : public ReferenceCountedObject
 {
 public:
     /** The ID number assigned to this node.
-        This is assigned by the graph that owns it, and can't be changed. */
+        This is assigned by the graph that owns it, and can't be changed.
+      */
     const uint32 nodeId;
 
     virtual ~GraphNode();
     
-    /** A set of user-definable properties that are associated with this node.
-
-        This can be used to attach values to the node for whatever purpose seems
-        useful. For example, you might store an x and y position if your application
-        is displaying the nodes on-screen.
-    */
-    NamedValueSet properties;
-
     /** Create a node suitable for binding to a root graph */
     static GraphNode* createForRoot (GraphProcessor*);
     
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept { return proc; }
-    
-    /** Returns the actual processor object that this node represents. */
-    Processor* getProcessor() const noexcept { return dynamic_cast<Processor*> (proc.get()); }
-
+   
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const;
 
@@ -50,7 +40,9 @@ public:
     uint32 getNumPorts() const;
     int getNumPorts (const PortType type, const bool isInput) const;
     uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
-    
+    uint32 getMidiInputPort() const;
+    uint32 getMidiOutputPort() const;
+
     int getChannelPort (const uint32 port) const;
     
     int getNthPort (const PortType portType, const int inputChan, bool, bool) const;
@@ -61,15 +53,17 @@ public:
     /** Returns true if an output port */
     bool isPortOutput (const uint32 port) const;
     
+    /** Returns true if the underyling processor is a SubGraph or Graph */
     bool isGraph() const noexcept;
+
+    /** Returns true if the processor is a root graph */
     bool isRootGraph() const noexcept;
+
+    /** Returns true if the processor is a subgraph */
     bool isSubGraph() const noexcept;
     
     const String& getTypeString() const;
 
-    uint32 getMidiInputPort() const;
-    uint32 getMidiOutputPort() const;
-    
     /** If an audio plugin instance, fill the details */
     void getPluginDescription (PluginDescription& desc);
     
@@ -143,7 +137,7 @@ public:
 
     inline int getTransposeOffset() const { return transposeOffset.get(); }
 
-    CriticalSection& getPropertyLock() { return propertyLock; }
+    const CriticalSection& getPropertyLock() const { return propertyLock; }
 
     inline void setMidiChannels (const BigInteger& ch)
     { 
