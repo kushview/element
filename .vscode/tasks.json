@@ -28,6 +28,12 @@
             }
         },
         {
+            "label": "Waf Check",
+            "type": "shell",
+            "command": "python waf check",
+            "problemMatcher": []
+        },
+        {
             "label": "Waf Clean",
             "type": "shell",
             "command": "python waf clean"
@@ -51,7 +57,6 @@
                 "waf",
                 "configure",
                 "--debug"
-                
             ],
             "options": {
                 "env": {
@@ -118,7 +123,6 @@
             "args": [
                 "tools/build-osx.sh"
             ],
-            
             "problemMatcher": []
         },
         {
@@ -134,7 +138,7 @@
             "label": "OSX Deploy",
             "type": "shell",
             "command": "tools/build-osx.sh && tools/build-free-osx.sh",
-            "problemMatcher": [ ]
+            "problemMatcher": []
         }
     ]
 }
