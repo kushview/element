@@ -25,7 +25,9 @@
             },
             "osx": {
                 "MIMode": "lldb",
-                "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element",
+                "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element"
+                // "program": "${workspaceRoot}/build/bin/test-element",
+                // "args": ["midiChannelMap"]
             },
             "windows": {
                 "MIMode": "gdb",
