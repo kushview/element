@@ -391,86 +391,13 @@ void GraphNode::resetPorts()
         portList.addChild (port, -1, 0);
     }
 
-#if 0
-    if (nullptr != dynamic_cast<SubGraphProcessor*> (proc.get()))
-    {
-        auto* sub = dynamic_cast<SubGraphProcessor*> (proc.get());
-        for (int i = 0; i < sub->getNumNodes(); ++i)
-        {
-            sub->getNode(i)->resetPorts();
-            nodes.addChild (sub->getNode(i)->getMetadata().createCopy(), i, 0);
-        }
-    }
-    else if (isAudioIONode() || isMidiIONode())
-    {
-        addPortsIONode (this, dynamic_cast<GraphProcessor::AudioGraphIOProcessor*>(proc.get()), ports);
-        metadata.addChild (ports, 0, nullptr);
-        createPorts();
-        return;
-    }
-    
-    int index = 0;
-    for (int channel = 0; channel < getNumAudioInputs(); ++channel)
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  proc->getInputChannelName (channel), nullptr);
-        
-        ports.addChild (port, index, nullptr);
-        ++index;
-    }
-    
-    for (int channel = 0; channel < getNumAudioOutputs(); ++channel)
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
-            .setProperty (Slugs::name,  proc->getOutputChannelName (channel), nullptr);
-        
-        ports.addChild (port, index, nullptr);
-        ++index;
-    }
-    
-    for (int i = 0; i < proc->getNumParameters(); ++i)
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Control).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  "Param", nullptr);
-        ports.addChild (port, index, nullptr);
-        index++;
-    }
-    
-    if (proc->acceptsMidi())
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  "MIDI Input", nullptr);
-        ports.addChild (port, index, nullptr);
-        index++;
-    }
-    
-    if (proc->producesMidi())
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
-            .setProperty (Slugs::name,  "MIDI Output", nullptr);
-        ports.addChild (port, index, nullptr);
-        index++;
-    }
-#endif
-
     metadata.addChild (nodeList, 0, nullptr);
     metadata.addChild (portList, 1, nullptr);
     jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
+
+    if (auto* sub = dynamic_cast<SubGraphProcessor*> (proc.get()))
+        for (int i = 0; i < sub->getNumNodes(); ++i)
+            sub->getNode(i)->resetPorts();
 }
 
 void GraphNode::createPorts()
