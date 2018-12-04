@@ -1,7 +1,10 @@
 
 #include "controllers/GraphController.h"
+
+#include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
+
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"

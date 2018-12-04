@@ -4,10 +4,11 @@
 */
 
 #include "ElementApp.h"
+
+#include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
-
 #include "engine/AllPassFilterProcessor.h"
 #include "engine/AudioMixerProcessor.h"
 #include "engine/ChannelizeProcessor.h"

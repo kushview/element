@@ -470,7 +470,4 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
     }
 }
 
-MidiFilterNode::MidiFilterNode (uint32 nodeId)
-    : GraphNode (nodeId, new PlaceholderProcessor (0, 0, true, true)) { }
-
 }
