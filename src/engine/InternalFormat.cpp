@@ -1,15 +1,16 @@
 /*
     InternalFormat.cpp - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016-2018 Kushview, LLC.  All rights reserved.
 */
 
 #include "ElementApp.h"
 
+#include "engine/nodes/AllPassFilterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
+
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
-#include "engine/AllPassFilterProcessor.h"
 #include "engine/AudioMixerProcessor.h"
 #include "engine/ChannelizeProcessor.h"
 #include "engine/CombFilterProcessor.h"

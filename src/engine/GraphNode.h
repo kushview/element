@@ -1,5 +1,4 @@
-#ifndef EL_GRAPH_NODE_H
-#define EL_GRAPH_NODE_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -174,7 +173,7 @@ private:
     
     ChannelConfig channels;
     ValueTree metadata, node;
-    GraphProcessor* parent; 
+    GraphProcessor* parent;
     Atomic<int> keyRangeLow { 0 };
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
@@ -196,5 +195,3 @@ private:
 typedef ReferenceCountedObjectPtr<GraphNode> GraphNodePtr;
 
 }
-
-#endif // EL_GRAPH_NODE_H
