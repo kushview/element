@@ -239,6 +239,20 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MidiChannelMapProcessor().fillInPluginDescription (*desc);
         }
+        else if (fileOrId == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER;
+            desc->name               = "MIDI Channel Splitter";
+            desc->descriptiveName    = "MIDI Channel Splitter";
+            desc->numInputChannels   = 0;
+            desc->numOutputChannels  = 0;
+            desc->hasSharedContainer = false;
+            desc->isInstrument       = false;
+            desc->manufacturerName   = "Element";
+            desc->pluginFormatName   = "Element";
+            desc->version            = "1.0.0";
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -254,6 +268,7 @@ namespace Element {
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
         results.add (EL_INTERNAL_ID_GRAPH);
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
+        results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
 
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);

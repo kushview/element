@@ -835,6 +835,47 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     
     return nullptr;
 }
+
+GraphNode* GraphProcessor::addNode (GraphNode* newNode)
+{
+    if (newNode == nullptr || (void*)newNode->getAudioProcessor() == (void*)this)
+    {
+        jassertfalse;
+        return nullptr;
+    }
+
+    for (int i = nodes.size(); --i >= 0;)
+    {
+        if (nodes.getUnchecked(i) == newNode)
+        {
+            jassertfalse; // Cannot add the same object to the graph twice!
+            return nullptr;
+        }
+    }
+
+    if (newNode->nodeId == 0 || newNode->nodeId == KV_INVALID_NODE)
+    {
+        const_cast<uint32&>(newNode->nodeId) = ++lastNodeId;
+    }
+    else
+    {
+        // you can't add a node with an id that already exists in the graph..
+        jassert (getNodeForId (newNode->nodeId) == nullptr);
+        removeNode (newNode->nodeId);
+
+        if (newNode->nodeId > lastNodeId)
+            lastNodeId = newNode->nodeId;
+    }
+
+    // TODO: playhead in Graph Node base
+    // newNode->setPlayHead (getPlayHead());
+    
+    newNode->setParentGraph (this);
+    newNode->prepare (getSampleRate(), getBlockSize(), this);
+    triggerAsyncUpdate();
+    return nodes.add (newNode);
+}
+
 bool GraphProcessor::removeNode (const uint32 nodeId)
 {
     disconnectNode (nodeId);

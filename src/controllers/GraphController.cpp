@@ -172,6 +172,11 @@ const GraphNodePtr GraphController::getNodeForId (const uint32 uid) const noexce
 
 GraphNode* GraphController::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
+    if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
+    {
+        return processor.addNode (new MidiChannelSplitterNode());
+    }
+
     String errorMessage;
     auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
     GraphNode* node = nullptr;

@@ -18,7 +18,6 @@ namespace Element {
     class InternalFormat   : public AudioPluginFormat
     {
     public:
-
         enum ID
         {
             audioInputDevice = 0,

@@ -2,6 +2,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
+#include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
 #include "session/Node.h"
 
@@ -468,5 +469,8 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
         resetPorts();
     }
 }
+
+MidiFilterNode::MidiFilterNode (uint32 nodeId)
+    : GraphNode (nodeId, new PlaceholderProcessor (0, 0, true, true)) { }
 
 }

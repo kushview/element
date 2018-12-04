@@ -88,6 +88,8 @@ public:
     */
     GraphNode* addNode (AudioProcessor* newProcessor, uint32 nodeId = 0);
 
+    GraphNode* addNode (GraphNode* newNode);
+
     /** Deletes a node within the graph which has the specified ID.
 
         This will also delete any connections that are attached to this node.

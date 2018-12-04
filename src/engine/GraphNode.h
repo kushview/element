@@ -164,8 +164,6 @@ private:
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
 
-    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
-
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
@@ -201,17 +199,19 @@ typedef ReferenceCountedObjectPtr<GraphNode> GraphNodePtr;
 class MidiFilterNode : public GraphNode
 {
 public:
-    ~MidiFilterNode() { }
-
+    virtual ~MidiFilterNode() { }
 protected:
-    MidiFilterNode (uint32 nodeId)
-        : GraphNode (nodeId, new PlaceholderProcessor (0, 0, true, true)) { }
+    MidiFilterNode (uint32 nodeId);
 };
 
 class MidiChannelSplitterNode : public MidiFilterNode
 {
+public:
+    MidiChannelSplitterNode() : MidiFilterNode (KV_INVALID_NODE) { }
+    ~MidiChannelSplitterNode() { }
+
 protected:
-    void createPorts() override
+    inline void createPorts() override
     {
         if (ports.size() > 0)
             return;
