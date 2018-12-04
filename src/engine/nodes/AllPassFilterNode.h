@@ -133,9 +133,9 @@ public:
     bool producesMidi() const override              { return false; }
     
     int getNumPrograms() override                                      { return 1; };
-    int getCurrentProgram() override                                   { return 1; };
+    int getCurrentProgram() override                                   { return 0; };
     void setCurrentProgram (int index) override                        { ignoreUnused (index); };
-    const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
+    const String getProgramName (int index) override                   { ignoreUnused (index); return getName(); }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
     
     void getStateInformation (juce::MemoryBlock& destData) override
@@ -162,4 +162,3 @@ private:
 };
 
 }
-
