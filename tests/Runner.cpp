@@ -20,7 +20,8 @@ int main (int argc, char** argv)
     }
     else
     {
-        DBG("category not found: " << String::fromUTF8 (argv[1]));
+        String notfound ("category not found: "); notfound << String::fromUTF8 (argv[1]);
+        Logger::writeToLog (notfound);
     }
 
     int totalFails, totalPass;
@@ -32,6 +33,9 @@ int main (int argc, char** argv)
     }
 
     juce::shutdownJuce_GUI();
-    DBG("pass: " << totalPass << " fail: " << totalFails);
+    Logger::writeToLog ("-----------------------------------------------------------------");
+    Logger::writeToLog ("Test Results");
+    String message = "pass: "; message << totalPass << " fail: " << totalFails;
+    Logger::writeToLog (message);
     return totalFails;
 }
