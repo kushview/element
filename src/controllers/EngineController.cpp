@@ -857,6 +857,11 @@ Node EngineController::addPlugin (GraphController& c, const PluginDescription& d
         const Node node (c.getNodeModelForId (nodeId));
         if (getWorld().getSettings().showPluginWindowsWhenAdded())
             findSibling<GuiController>()->presentPluginWindow (node);
+        if (!node.isValid())
+        {
+            jassertfalse; // fatal, but continue
+        }
+
         if (node.getUuid().isNull())
         {
             jassertfalse;
