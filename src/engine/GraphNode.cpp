@@ -159,9 +159,9 @@ void GraphNode::suspendProcessing (const bool shouldBeSuspended)
         proc->suspendProcessing (shouldBeSuspended);
 }
 
-bool GraphNode::isGraph() const noexcept { return (nullptr != dynamic_cast<GraphProcessor*> (proc.get())); }
-bool GraphNode::isSubGraph() const noexcept { return (nullptr != dynamic_cast<SubGraphProcessor*> (proc.get())); }
-bool GraphNode::isRootGraph() const noexcept { return (nullptr != dynamic_cast<RootGraph*> (proc.get())); }
+bool GraphNode::isGraph() const noexcept        { return nullptr != dynamic_cast<GraphProcessor*> (getAudioProcessor()); }
+bool GraphNode::isSubGraph() const noexcept     { return nullptr != dynamic_cast<SubGraphProcessor*> (getAudioProcessor()); }
+bool GraphNode::isRootGraph() const noexcept    { return nullptr != dynamic_cast<RootGraph*> (getAudioProcessor()); }
 
 PortType GraphNode::getPortType (const uint32 port) const
 {
@@ -446,11 +446,6 @@ void GraphNode::createPorts()
     jassert (index == newPorts.size());
     
     ports.swapWith (newPorts);
-}
-
-AudioPluginInstance* GraphNode::getAudioPluginInstance() const
-{
-    return dynamic_cast<AudioPluginInstance*> (proc.get());
 }
 
 GraphProcessor* GraphNode::getParentGraph() const

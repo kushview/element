@@ -6,6 +6,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
+#include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
 #include "session/Node.h"
 
@@ -192,9 +193,10 @@ public:
         : node (node_),
           processor (node_->getAudioPluginInstance()),
           audioChannelsToUse (audioChannelsToUse_),
+          midiChannelsToUse (chans[PortType::Midi]),
           totalChans (jmax (1, totalChans_)),
-          numAudioIns (node_->getAudioPluginInstance()->getTotalNumInputChannels()),
-          numAudioOuts (node_->getAudioPluginInstance()->getTotalNumOutputChannels()),
+          numAudioIns (node_->getNumPorts (PortType::Audio, true)),
+          numAudioOuts (node_->getNumPorts (PortType::Audio, false)),
           midiBufferToUse (midiBufferToUse_)
     {
         channels.calloc ((size_t) totalChans);
@@ -270,15 +272,24 @@ public:
         tempMidi.clear();
         // End MIDI filters
        #endif
-       
-        if (! processor->isSuspended ())
+        
+        if (node->wantsMidiPipe())
         {
-            processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+            MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
+            node->render (buffer, midiPipe);
         }
         else
         {
-            processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+            if (! processor->isSuspended ())
+            {
+                processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+            }
+            else
+            {
+                processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+            }
         }
+        
         
         if (node->getGain() != node->getLastGain()) {
             buffer.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
@@ -297,6 +308,7 @@ public:
 
 private:
     Array <int> audioChannelsToUse;
+    Array <int> midiChannelsToUse;
     HeapBlock <float*> channels;
     int totalChans, numAudioIns, numAudioOuts;
     int midiBufferToUse;
@@ -635,9 +647,9 @@ private:
             }
         } /* foreach port */
 
-        setNodeDelay (node->nodeId, maxLatency + proc->getLatencySamples());
+        setNodeDelay (node->nodeId, maxLatency + node->getLatencySamples());
         
-        if (node->isAudioIONode() && proc->getTotalNumOutputChannels() == 0)
+        if (node->isAudioIONode() && node->getNumPorts (PortType::Audio, false) == 0)
             totalLatency = maxLatency;
 
         int totalChans = jmax (node->getNumPorts (PortType::Audio, true),

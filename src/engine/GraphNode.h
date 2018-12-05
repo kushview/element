@@ -5,13 +5,13 @@
 namespace Element {
 
 class GraphProcessor;
+class MidiPipe;
 
 class GraphNode : public ReferenceCountedObject
 {
 public:
-    /** The ID number assigned to this node.
-        This is assigned by the graph that owns it, and can't be changed.
-      */
+    /** The ID number assigned to this node. This is assigned by the graph
+        that owns it, and can't be changed. */
     const uint32 nodeId;
 
     virtual ~GraphNode();
@@ -19,11 +19,14 @@ public:
     /** Create a node suitable for binding to a root graph */
     static GraphNode* createForRoot (GraphProcessor*);
     
-    /** Returns the processor as an AudioProcessor */
-    AudioProcessor* getAudioProcessor() const noexcept { return proc; }
+    /** Returns an audio processor if available */
+    virtual AudioProcessor* getAudioProcessor() const noexcept { return nullptr; }
    
+    /** The actual processor object dynamic_cast'd to T */
+    template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
+
     /** Returns the processor as an Audio Plugin Instance */
-    AudioPluginInstance* getAudioPluginInstance() const;
+    AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
@@ -58,20 +61,23 @@ public:
     /** Returns true if the processor is a subgraph */
     bool isSubGraph() const noexcept;
     
+    /** Get the type string for this Node */
     const String& getTypeString() const;
 
     /** If an audio plugin instance, fill the details */
     void getPluginDescription (PluginDescription& desc);
-    
-    /** The actual processor object dynamic_cast'd to T */
-    template<class T>
-    inline T* processor() const { return dynamic_cast<T*> (proc.get()); }
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
-    
+  
     /** Suspend processing */
     void suspendProcessing (const bool);
+
+    /** Get latency audio samples */
+    int getLatencySamples() const { return latencySamples; }
+
+    /** Set latency samples */
+    void setLatencySamples (int latency) { if (latencySamples != latency) latencySamples = latency; }
 
     /** Set the Input Gain of this Node */
     void setInputGain (const float f);
@@ -83,6 +89,9 @@ public:
     inline float getGain() const { return gain.get(); }
     inline float getLastGain() const { return lastGain.get(); }
     inline float getLastInputGain() const { return lastInputGain.get(); }
+
+    inline virtual bool wantsMidiPipe() const { return false; }
+    inline virtual void render (AudioSampleBuffer&, MidiPipe&) { }
 
     inline void updateGain() noexcept
     {
@@ -137,7 +146,7 @@ public:
     const CriticalSection& getPropertyLock() const { return propertyLock; }
 
     inline void setMidiChannels (const BigInteger& ch)
-    { 
+    {
         ScopedLock sl (propertyLock);
         midiChannels.setChannels (ch);
     }
@@ -150,6 +159,7 @@ protected:
     GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
     virtual void createPorts();
     kv::PortList ports;
+    ValueTree metadata;
 
 private:
     friend class GraphProcessor;
@@ -162,6 +172,7 @@ private:
     ScopedPointer<AudioProcessor> proc;
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
+    int latencySamples = 0;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
@@ -172,7 +183,7 @@ private:
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
     
     ChannelConfig channels;
-    ValueTree metadata, node;
+    
     GraphProcessor* parent;
     Atomic<int> keyRangeLow { 0 };
     Atomic<int> keyRangeHigh { 127 };
