@@ -1,9 +1,12 @@
 #include "ElementApp.h"
+
+#include "engine/nodes/AudioProcessorNode.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
+
 #include "session/Node.h"
 
 namespace Element {
@@ -30,50 +33,38 @@ static void setNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
 #endif
 }
 
-GraphNode::GraphNode (const uint32 nodeId_, AudioProcessor* const processor_) noexcept
+GraphNode::GraphNode (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
       isPrepared (false),
       metadata (Tags::node),
       enablement (*this)
 {
     parent = nullptr;
-    proc = processor_;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
-    jassert (proc != nullptr);
-    
-    PluginDescription desc;
-    getPluginDescription (desc);
-    
-    setNodePropertiesFrom (desc, metadata);
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Slugs::name, proc->getName(), nullptr)
-            .setProperty (Slugs::type, getTypeString(), nullptr)
-            .setProperty ("numAudioIns", getNumAudioInputs(), nullptr)
-            .setProperty ("numAudioOuts", getNumAudioOutputs(), nullptr);
+            .setProperty (Slugs::type, getTypeString(), nullptr);
     resetPorts();
 }
 
 GraphNode::~GraphNode()
 {
     enablement.cancelPendingUpdate();
-    pluginState.reset();
     parent = nullptr;
-    proc = nullptr;
 }
 
 const String& GraphNode::getTypeString() const
 { 
-    return (nullptr == dynamic_cast<GraphProcessor*> (proc.get()))
+    return (nullptr == processor<GraphProcessor>())
         ? Tags::plugin.toString() : Tags::graph.toString();
 }
 
 GraphNode* GraphNode::createForRoot (GraphProcessor* g)
 {
-    auto* node = new GraphNode (0, g);
+    auto* node = new AudioProcessorNode (0, g);
     return node;
 }
-    
+
 void GraphNode::setInputGain (const float f) {
     inputGain.set(f);
 }
@@ -131,13 +122,13 @@ bool GraphNode::isAudioIONode() const
 bool GraphNode::isMidiIONode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
-    if (IOP* iop = dynamic_cast<IOP*> (proc.get()))
+    if (IOP* iop = dynamic_cast<IOP*> (getAudioProcessor()))
         return iop->getType() == IOP::midiInputNode || iop->getType() == IOP::midiOutputNode;
     return false;
 }
 
-int GraphNode::getNumAudioInputs() const { return proc ? proc->getTotalNumInputChannels() : 0; }
-int GraphNode::getNumAudioOutputs() const { return proc ? proc->getTotalNumOutputChannels() : 0; }
+int GraphNode::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
+int GraphNode::getNumAudioOutputs()     const { return ports.size (PortType::Audio, false); }
 
 void GraphNode::setInputRMS (int chan, float val)
 {
@@ -151,12 +142,18 @@ void GraphNode::setOutputRMS (int chan, float val)
         outRMS.getUnchecked(chan)->set(val);
 }
 
-bool GraphNode::isSuspended() const { return (proc) ? proc->isSuspended() : false; }
+bool GraphNode::isSuspended() const
+{
+    if (auto* proc = getAudioProcessor())
+        return  proc->isSuspended();
+    return false;
+}
 
 void GraphNode::suspendProcessing (const bool shouldBeSuspended)
 {
-    if (proc && proc->isSuspended() != shouldBeSuspended)
-        proc->suspendProcessing (shouldBeSuspended);
+    if (auto* proc = getAudioProcessor())
+        if (proc->isSuspended() != shouldBeSuspended)
+            proc->suspendProcessing (shouldBeSuspended);
 }
 
 bool GraphNode::isGraph() const noexcept        { return nullptr != dynamic_cast<GraphProcessor*> (getAudioProcessor()); }
@@ -220,38 +217,41 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
                          bool willBeEnabled)
 {
     parent = parentGraph;
-    AudioProcessor* instance = proc.get();
+    AudioProcessor* instance = getAudioProcessor();
     
     if ((willBeEnabled || enabled.get() == 1) && !isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph);
         
-        instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
-        instance->prepareToPlay (sampleRate, blockSize);
-        
-        // TODO: move model code out of engine code
-        if (nullptr != dynamic_cast<IOProcessor*> (instance))
-            resetPorts();
-        
-        inRMS.clearQuick (true);
-        for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
+        if (instance != nullptr)
         {
-            AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set(0);
-            inRMS.add (avf);
-        }
+            instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
+            instance->prepareToPlay (sampleRate, blockSize);
+            
+            // TODO: move model code out of engine code
+            if (nullptr != dynamic_cast<IOProcessor*> (instance))
+                resetPorts();
+            
+            inRMS.clearQuick (true);
+            for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
+            {
+                AtomicValue<float>* avf = new AtomicValue<float>();
+                avf->set(0);
+                inRMS.add (avf);
+            }
 
-        outRMS.clearQuick (true);
-        for (int i = 0; i < instance->getTotalNumOutputChannels(); ++i)
-        {
-            AtomicValue<float>* avf = new AtomicValue<float>();
-            avf->set(0);
-            outRMS.add(avf);
+            outRMS.clearQuick (true);
+            for (int i = 0; i < instance->getTotalNumOutputChannels(); ++i)
+            {
+                AtomicValue<float>* avf = new AtomicValue<float>();
+                avf->set(0);
+                outRMS.add(avf);
+            }
+            
+            if (metadata.getProperty (Tags::bypass, false))
+                instance->suspendProcessing (true);
         }
-        
-        if (metadata.getProperty (Tags::bypass, false))
-            instance->suspendProcessing (true);
     }
 }
 
@@ -262,12 +262,13 @@ void GraphNode::unprepare()
         isPrepared = false;
         inRMS.clear (true);
         outRMS.clear (true);
-        proc->releaseResources();
+        //FIXME: proc->releaseResources();
     }
 }
 
 void GraphNode::setEnabled (const bool shouldBeEnabled)
 {
+#if 0
     if (shouldBeEnabled == isEnabled())
         return;
 
@@ -309,7 +310,7 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
 
         unprepare();
     }
-
+#endif
     enablementChanged (this);
 }
 
@@ -319,63 +320,8 @@ void GraphNode::EnablementUpdater::handleAsyncUpdate()
     graph.setEnabled (! graph.isEnabled());
 }
 
-static void addPortsIONode (GraphNode* node, GraphProcessor::AudioGraphIOProcessor* proc, ValueTree& ports)
-{
-    int index = 0;
-    auto* graph = proc->getParentGraph();
-    if (graph == nullptr || proc == nullptr)
-        return;
-    
-    for (int channel = 0; channel < node->getNumAudioInputs(); ++channel)
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  graph->getOutputChannelName (channel), nullptr);
-        
-        ports.addChild (port, index, nullptr);
-        ++index;
-    }
-    
-    for (int channel = 0; channel < node->getNumAudioOutputs(); ++channel)
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Audio).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
-            .setProperty (Slugs::name,  graph->getInputChannelName (channel), nullptr);
-        
-        ports.addChild (port, index, nullptr);
-        ++index;
-    }
-    
-    if (proc->acceptsMidi())
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::input.toString(), nullptr)
-            .setProperty (Slugs::name,  "MIDI", nullptr);
-        ports.addChild (port, index, nullptr);
-        index++;
-    }
-    
-    if (proc->producesMidi())
-    {
-        ValueTree port (Tags::port);
-        port.setProperty (Slugs::index, index, nullptr)
-            .setProperty (Slugs::type,  PortType(PortType::Midi).getSlug(), nullptr)
-            .setProperty (Tags::flow,   Tags::output.toString(), nullptr)
-            .setProperty (Slugs::name,  "MIDI", nullptr);
-        ports.addChild (port, index, nullptr);
-        index++;
-    }
-}
-
 void GraphNode::resetPorts()
 {
-    jassert (proc);
     createPorts(); // TODO: should be a standalone operation
 
     ValueTree portList (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
@@ -396,68 +342,20 @@ void GraphNode::resetPorts()
     metadata.addChild (portList, 1, nullptr);
     jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
 
-    if (auto* sub = dynamic_cast<SubGraphProcessor*> (proc.get()))
+    if (auto* sub = dynamic_cast<SubGraphProcessor*> (getAudioProcessor()))
         for (int i = 0; i < sub->getNumNodes(); ++i)
             sub->getNode(i)->resetPorts();
 }
 
-void GraphNode::createPorts()
-{
-    kv::PortList newPorts;
+void GraphNode::createPorts() { /* noop */ }
 
-    int index = 0;
-
-    for (int channel = 0; channel < getNumAudioInputs(); ++channel)
-    {
-        String symbol = "audio_in_"; symbol << channel;
-        newPorts.add (PortType::Audio, index, channel, symbol,
-                      proc->getInputChannelName (channel), true);
-        ++index;
-    }
-    
-    for (int channel = 0; channel < getNumAudioOutputs(); ++channel)
-    {
-        String symbol = "audio_out_"; symbol << channel;
-        newPorts.add (PortType::Audio, index, channel, symbol,
-                      proc->getOutputChannelName (channel), false);
-        ++index;
-    }
-    
-    for (int i = 0; i < proc->getParameters().size(); ++i)
-    {
-        String symbol = "control_"; symbol << i;
-        newPorts.add (PortType::Control, index, i, symbol,
-                      proc->getParameterName(i), true);
-        ++index;
-    }
-    
-    if (proc->acceptsMidi())
-    {
-        newPorts.add (PortType::Midi, index, 0, "midi_in_0", "MIDI", true);
-        ++index;
-    }
-    
-    if (proc->producesMidi())
-    {
-        newPorts.add (PortType::Midi, index, 0, "midi_out_0", "MIDI", false);
-        ++index;
-    }
-
-    jassert (index == newPorts.size());
-    
-    ports.swapWith (newPorts);
-}
-
-GraphProcessor* GraphNode::getParentGraph() const
-{
-    return parent;
-}
+GraphProcessor* GraphNode::getParentGraph() const { return parent; }
 
 void GraphNode::setParentGraph (GraphProcessor* const graph)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     parent = graph;
-    if (IOP* const iop = dynamic_cast<IOP*> (proc.get()))
+    if (IOP* const iop = dynamic_cast<IOP*> (getAudioProcessor()))
     {
         iop->setParentGraph (parent);
         metadata.setProperty (Slugs::name, iop->getName(), nullptr);

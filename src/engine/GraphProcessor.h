@@ -313,7 +313,7 @@ public:
     virtual void fillInPluginDescription (PluginDescription& d) const override;
 
 protected:
-    virtual GraphNode* createNode (uint32 nodeId, AudioProcessor* proc) { return new GraphNode (nodeId, proc); }
+    virtual GraphNode* createNode (uint32, AudioProcessor*);
     virtual void preRenderNodes() { }
     virtual void postRenderNodes() { }
 

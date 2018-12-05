@@ -1,13 +1,14 @@
 /*
    This file is part of Element
-   Copyright (c) 2014-2017 Kushview, LLC.  All rights reserved.
-*/
+   Copyright (c) 2014-2018 Kushview, LLC.  All rights reserved.
+ */
 
+#include "engine/nodes/AudioProcessorNode.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
-#include "engine/SubGraphProcessor.h"
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
+#include "engine/SubGraphProcessor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -800,6 +801,11 @@ GraphNode* GraphProcessor::getNodeForId (const uint32 nodeId) const
     return nullptr;
 }
 
+GraphNode* GraphProcessor::createNode (uint32 nodeId, AudioProcessor* proc)
+{
+    return new AudioProcessorNode (nodeId, proc);
+}
+
 GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 nodeId)
 {
     if (newProcessor == nullptr || (void*)newProcessor == (void*)this)
@@ -838,10 +844,10 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     if (GraphNode* node = createNode (nodeId, newProcessor))
     {
         node->setParentGraph (this);
+        node->resetPorts();
         node->prepare (getSampleRate(), getBlockSize(), this);
         nodes.add (node);
         triggerAsyncUpdate();
-        
         return node;
     }
     
@@ -868,6 +874,7 @@ GraphNode* GraphProcessor::addNode (GraphNode* newNode)
     if (newNode->nodeId == 0 || newNode->nodeId == KV_INVALID_NODE)
     {
         const_cast<uint32&>(newNode->nodeId) = ++lastNodeId;
+        jassert (newNode->nodeId == lastNodeId);
     }
     else
     {
@@ -883,6 +890,7 @@ GraphNode* GraphProcessor::addNode (GraphNode* newNode)
     // newNode->setPlayHead (getPlayHead());
     
     newNode->setParentGraph (this);
+    newNode->resetPorts();
     newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
     return nodes.add (newNode);
@@ -996,8 +1004,8 @@ bool GraphProcessor::connectChannels (PortType type, uint32 sourceNode, int32 so
     GraphNode* dst = getNodeForId (destNode);
     if (! src && ! dst)
         return false;
-    return addConnection (sourceNode, src->getPortForChannel (type, sourceChannel, false),
-                          destNode,   dst->getPortForChannel (type, destChannel, true));
+    return addConnection (src->nodeId, src->getPortForChannel (type, sourceChannel, false),
+                          dst->nodeId, dst->getPortForChannel (type, destChannel, true));
 }
 
 void GraphProcessor::removeConnection (const int index)

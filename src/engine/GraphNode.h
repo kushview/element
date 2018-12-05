@@ -153,10 +153,35 @@ public:
 
     inline const MidiChannels& getMidiChannels() const { return midiChannels; }
 
+
+    inline virtual int getNumPrograms() const
+    { 
+        if (auto* const proc = getAudioProcessor())
+            return proc->getNumPrograms();
+        return 1; 
+    }
+
+
+    inline virtual int getCurrentProgram() const
+    {
+        if (auto* const proc = getAudioProcessor())
+            return proc->getCurrentProgram();
+        return 0;
+    }
+
+
+    inline virtual const String getProgramName (int index) const
+    {
+        if (auto* const proc = getAudioProcessor())
+            return proc->getProgramName (index);
+        return String();
+    }
+
+
     Signal<void(GraphNode*)> enablementChanged;
 
 protected:
-    GraphNode (uint32 nodeId, AudioProcessor*) noexcept;
+    GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts();
     kv::PortList ports;
     ValueTree metadata;
@@ -166,25 +191,15 @@ private:
     friend class GraphController;
     friend class EngineController;
     friend class Node;
-
-    MemoryBlock pluginState;
-
-    ScopedPointer<AudioProcessor> proc;
+    
+    GraphProcessor* parent = nullptr;
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
     int latencySamples = 0;
 
-    void setParentGraph (GraphProcessor*);
-    void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
-    void unprepare();
-    void resetPorts();
-    
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
     
-    ChannelConfig channels;
-    
-    GraphProcessor* parent;
     Atomic<int> keyRangeLow { 0 };
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
@@ -198,6 +213,11 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& graph;
     } enablement;
+
+    void setParentGraph (GraphProcessor*);
+    void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
+    void unprepare();
+    void resetPorts();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };

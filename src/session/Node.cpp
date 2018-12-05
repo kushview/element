@@ -635,23 +635,21 @@ namespace Element {
     int Node::getCurrentProgram() const
     {
         if (auto* obj = getGraphNode())
-            return (const_cast<AudioProcessor*>(obj->getAudioProcessor()))->getCurrentProgram();
+            return obj->getCurrentProgram();
         return -1;
     }
     
     String Node::getProgramName (const int index) const
     {
         if (auto* obj = getGraphNode())
-            return obj->getAudioProcessor()->getProgramName (index);
-        
+            return obj->getProgramName (index);
         return String();
     }
     
     int Node::getNumPrograms() const
     {
         if (auto* obj = getGraphNode())
-            if (auto* proc = obj->getAudioProcessor())
-                return proc->getNumPrograms();
+            return obj->getNumPrograms();
         return 0;
     }
 

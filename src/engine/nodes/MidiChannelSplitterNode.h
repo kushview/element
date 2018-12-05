@@ -8,7 +8,8 @@ namespace Element {
 class MidiChannelSplitterNode : public MidiFilterNode
 {
 public:
-    MidiChannelSplitterNode() : MidiFilterNode (KV_INVALID_NODE) { }
+    MidiChannelSplitterNode() : MidiFilterNode(0) { }
+
     ~MidiChannelSplitterNode() { }
 
     inline void render (AudioSampleBuffer& audio, MidiPipe& midi) override
@@ -35,11 +36,12 @@ public:
         MidiBuffer& input (*midi.getWriteBuffer (0));
         MidiBuffer::Iterator iter (input);
         MidiMessage msg; int frame = 0;
+
         while (iter.getNextEvent (msg, frame))
         {
             if (msg.getChannel() <= 0)
                 continue;
-            buffers[msg.getChannel()]->addEvent (msg, frame);
+            buffers[msg.getChannel() - 1]->addEvent (msg, frame);
         }
 
         input.swapWith (tempMidi);
