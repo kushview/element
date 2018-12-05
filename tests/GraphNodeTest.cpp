@@ -76,19 +76,33 @@ public:
             GraphProcessor graph;
             graph.setPlayConfigDetails (0, 2, 44100.0, 512);
             graph.prepareToPlay (44100.0, 512);
-            
-            beginTest ("midi filter connectivity");
            
             GraphNodePtr midiIn = graph.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
                 GraphProcessor::AudioGraphIOProcessor::midiInputNode));
             GraphNodePtr midiOut = graph.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
-                GraphProcessor::AudioGraphIOProcessor::midiInputNode)); 
+                GraphProcessor::AudioGraphIOProcessor::midiOutputNode));
             GraphNodePtr filter = graph.addNode (new MidiChannelSplitterNode());
             for (int i = 0; i < 2; ++i)
                 MessageManager::getInstance()->runDispatchLoopUntil (10);
 
-            expect (graph.connectChannels (PortType::Midi, midiIn->nodeId, 0, filter->nodeId, 0));
+            beginTest ("port/channel mappings");
+            expect (filter->getNumPorts() == 17);
+            expect (filter->getNumPorts (PortType::Midi, true) == 1);
             expect (filter->getNumPorts (PortType::Midi, false) == 16);
+            expect (filter->getPortForChannel (PortType::Midi, 0, true) == 0);
+            expect (filter->getPortForChannel (PortType::Midi, 0, false) == 1);
+            expect (filter->getPortForChannel (PortType::Midi, 8, false) == 9);
+            expect (filter->getChannelPort(0) == 0);
+            expect (filter->getChannelPort(1) == 0);
+            expect (filter->getChannelPort(9) == 8);
+
+            expect (midiOut->getNumPorts() == 1);
+            expect (midiOut->getPortForChannel (PortType::Midi, 0, true) == 0);
+            expect (midiOut->getChannelPort(0) == 0);
+            
+            beginTest ("midi filter connectivity");
+            expect (graph.connectChannels (PortType::Midi, midiIn->nodeId, 0, filter->nodeId, 0));
+            
             for (int ch = 0; ch < 16; ++ch)
                 expect (graph.connectChannels (PortType::Midi, filter->nodeId, ch, midiOut->nodeId, 0));
             

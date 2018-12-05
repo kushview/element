@@ -1,5 +1,6 @@
 
 #include "engine/nodes/AudioProcessorNode.h"
+#include "engine/GraphProcessor.h"
 
 namespace Element {
 
@@ -38,19 +39,6 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     proc = processor;
     jassert (proc != nullptr);
     setLatencySamples (proc->getLatencySamples());
-
-   #if 0
-    PluginDescription desc;
-    getPluginDescription (desc);
-
-    metadata = ValueTree (Tags::node);
-    setAudioProcessorNodePropertiesFrom (desc, metadata);
-    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Slugs::name, proc->getName(), nullptr)
-            .setProperty (Slugs::type, getTypeString(), nullptr)
-            .setProperty ("numAudioIns", proc->getTotalNumInputChannels(), nullptr)
-            .setProperty ("numAudioOuts", proc->getTotalNumOutputChannels(), nullptr);
-   #endif
 }
 
 AudioProcessorNode::~AudioProcessorNode()
@@ -65,9 +53,6 @@ void AudioProcessorNode::createPorts()
     kv::PortList newPorts;
 
     int index = 0, channel = 0, busIdx = 0;
-
-    DBG("Plugin: " << proc->getName());
-#if 1
     for (busIdx = 0; busIdx < proc->getBusCount(true); ++busIdx)
     {
         auto* const bus = proc->getBus (true, busIdx);
@@ -76,7 +61,6 @@ void AudioProcessorNode::createPorts()
             String name = bus->getName(); name << " " << int (channel + 1);
             String symbol = "audio_in_"; symbol << int (channel + 1);
             newPorts.add (PortType::Audio, index, channel, symbol, name, true);
-            DBG("symbol=" << symbol << " index=" << index << " channel=" << channel);
             ++index; ++channel;
         }
     }
@@ -91,30 +75,10 @@ void AudioProcessorNode::createPorts()
             String name = bus->getName(); name << " " << int (channel + 1);
             String symbol = "audio_out_"; symbol << int (channel + 1);
             newPorts.add (PortType::Audio, index, channel, symbol, name, false);
-            DBG("symbol=" << symbol << " index=" << index << " channel=" << channel);
             ++index; ++channel;
         }
     }
     jassert (channel == proc->getTotalNumOutputChannels());
-
-#else
-    for (channel = 0; channel < proc->getTotalNumInputChannels(); ++channel)
-    {
-        String symbol = "audio_in_"; symbol << channel;
-        newPorts.add (PortType::Audio, index, channel, symbol,
-                      proc->getInputChannelName (channel), true);
-        ++index;
-    }
-
-
-    for (channel = 0; channel < getNumAudioOutputs(); ++channel)
-    {
-        String symbol = "audio_out_"; symbol << channel;
-        newPorts.add (PortType::Audio, index, channel, symbol,
-                      proc->getOutputChannelName (channel), false);
-        ++index;
-    }
-#endif
 
     const auto& params = proc->getParameters();
     for (int i = 0; i < params.size(); ++i)

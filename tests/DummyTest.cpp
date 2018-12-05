@@ -24,7 +24,6 @@ private:
     void testUuid()
     {
         beginTest ("UUID handling");
-        DBG(Uuid().toDashedString().toUpperCase());
     }
 
     void testName()
@@ -41,8 +40,6 @@ private:
         object->setMethod ("log", std::bind (&DummyTest::testLog, std::placeholders::_1));
         engine.registerNativeObject (Identifier ("test"), object);
         auto result = engine.execute ("var console = { log: test.log }; console.log(\"Hello World\", 123);");
-        if (result.failed())
-            DBG(result.getErrorMessage());
         expect (! result.failed());
     }
 

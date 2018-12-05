@@ -12,7 +12,7 @@ public:
     
 protected:
     MidiFilterNode (uint32 nodeId);
-    bool wantsMidiPipe() const override { return true; }
+    inline bool wantsMidiPipe() const override { return true; }
 };
 
 }

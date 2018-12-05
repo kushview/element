@@ -11,11 +11,17 @@ int main (int argc, char** argv)
     runner.setAssertOnFailure (true);
 
     if (argc <= 1)
+    {
         runner.runAllTests();
+    }
     else if (UnitTest::getAllCategories().contains (String::fromUTF8 (argv[1])))
+    {
         runner.runTestsInCategory (String::fromUTF8 (argv[1]));
+    }
     else
+    {
         DBG("category not found: " << String::fromUTF8 (argv[1]));
+    }
 
     int totalFails, totalPass;
     for (int i = 0; i < runner.getNumResults(); ++i)

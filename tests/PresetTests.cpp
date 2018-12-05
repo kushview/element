@@ -24,7 +24,6 @@ public:
         DataPath path;
         NodeArray nodes;
         path.findPresetsFor ("AudioUnit", "AudioUnit:Synths/aumu,samp,appl", nodes);
-        DBG("size: " << nodes.size());
     }
 
 private:

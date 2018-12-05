@@ -202,15 +202,8 @@ int GraphNode::getNthPort (const PortType type, const int index, bool isInput, b
     return KV_INVALID_PORT;
 }
 
-uint32 GraphNode::getMidiInputPort() const
-{
-    return getPortForChannel (PortType::Midi, 0, true);
-}
-
-uint32 GraphNode::getMidiOutputPort() const
-{
-    return getPortForChannel (PortType::Midi, 0, false);
-}
+uint32 GraphNode::getMidiInputPort()  const { return getPortForChannel (PortType::Midi, 0, true); }
+uint32 GraphNode::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
 
 void GraphNode::prepare (const double sampleRate, const int blockSize,
                          GraphProcessor* const parentGraph,
@@ -336,6 +329,7 @@ void GraphNode::resetPorts()
         port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
         port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
         portList.addChild (port, -1, 0);
+        jassert (isPositiveAndBelow ((int)port.getProperty(Tags::index), ports.size()));
     }
 
     metadata.addChild (nodeList, 0, nullptr);
