@@ -262,11 +262,11 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
 
     if (auto* node = createFilter (desc, rx, ry, nodeId))
     {
-        auto* const proc = node->getAudioProcessor();
-
         nodeId = node->nodeId;
         ValueTree model = node->getMetadata().createCopy();
-        model.setProperty (Tags::object, node, nullptr)
+        model.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
+             .setProperty (Tags::name,   desc->name, nullptr)
+             .setProperty (Tags::object, node, nullptr)
              .setProperty (Tags::relativeX, rx, nullptr)
              .setProperty (Tags::relativeY, ry, nullptr)
              .setProperty (Tags::pluginIdentifierString, 
@@ -274,12 +274,13 @@ uint32 GraphController::addFilter (const PluginDescription* desc, double rx, dou
         
         Node n (model, true);
 
-        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
+        if (auto* sub = node->processor<SubGraphProcessor>())
         {
             sub->getController().setNodeModel (n);
             IONodeEnforcer enforceIONodes (sub->getController());
         }
         
+        if (auto* const proc = node->getAudioProcessor())
         {
             // try to use stereo by default on newly added plugins
             AudioProcessor::BusesLayout stereoInOut;
