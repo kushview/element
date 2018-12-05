@@ -20,7 +20,7 @@ public:
     static GraphNode* createForRoot (GraphProcessor*);
     
     /** Returns an audio processor if available */
-    virtual AudioProcessor* getAudioProcessor() const noexcept { return nullptr; }
+    JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
    
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
@@ -28,6 +28,10 @@ public:
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
+    virtual void render (AudioSampleBuffer&, MidiPipe&) { }
+
+    virtual bool wantsMidiPipe() const { return false; }
+    
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
 
@@ -90,8 +94,7 @@ public:
     inline float getLastGain() const { return lastGain.get(); }
     inline float getLastInputGain() const { return lastInputGain.get(); }
 
-    inline virtual bool wantsMidiPipe() const { return false; }
-    inline virtual void render (AudioSampleBuffer&, MidiPipe&) { }
+    
 
     inline void updateGain() noexcept
     {
@@ -161,7 +164,6 @@ public:
         return 1; 
     }
 
-
     inline virtual int getCurrentProgram() const
     {
         if (auto* const proc = getAudioProcessor())
@@ -169,14 +171,12 @@ public:
         return 0;
     }
 
-
     inline virtual const String getProgramName (int index) const
     {
         if (auto* const proc = getAudioProcessor())
             return proc->getProgramName (index);
         return String();
     }
-
 
     Signal<void(GraphNode*)> enablementChanged;
 

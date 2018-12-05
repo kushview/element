@@ -340,24 +340,18 @@ namespace Element {
         {
             // workaround to keep IO node names correct. note that
             // setParentGraph may or may not call reset ports
-            if (auto* parent = ptr->getParentGraph()) {
+            if (auto* parent = ptr->getParentGraph())
+            {
                 ptr->setParentGraph (parent);
                 if (ptr->isMidiIONode() || ptr->isAudioIONode())
                     setProperty (Tags::name, ptr->getAudioProcessor()->getName());
             }
             
-            // if (isAudioIONode() || isMidiIONode())
-            // {
-            //     // need to keep IONode ports
-            // }
-            // else
-            {
-                ptr->resetPorts();
-                ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
-                ValueTree ports = getPortsValueTree();
-                objectData.removeChild (ports, nullptr);
-                objectData.addChild (newPorts, -1, nullptr);
-            }
+            ptr->resetPorts();
+            ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
+            ValueTree ports = getPortsValueTree();
+            objectData.removeChild (ports, nullptr);
+            objectData.addChild (newPorts, -1, nullptr);
         }
     }
     
