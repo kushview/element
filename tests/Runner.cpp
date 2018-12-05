@@ -7,6 +7,8 @@
 
 int main (int argc, char** argv)
 {
+    MessageManager::getInstance();
+    juce::initialiseJuce_GUI();
     UnitTestRunner runner;
     runner.setAssertOnFailure (true);
 

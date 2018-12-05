@@ -255,13 +255,13 @@ void GraphNode::unprepare()
         isPrepared = false;
         inRMS.clear (true);
         outRMS.clear (true);
-        //FIXME: proc->releaseResources();
+        if (auto* const proc = getAudioProcessor())
+            proc->releaseResources();
     }
 }
 
 void GraphNode::setEnabled (const bool shouldBeEnabled)
 {
-#if 0
     if (shouldBeEnabled == isEnabled())
         return;
 
@@ -277,12 +277,6 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
         if (parent)
         {
             prepare (parent->getSampleRate(), parent->getBlockSize(), parent, true);
-            if (pluginState.getSize() > 0)
-            {
-                proc->setStateInformation (pluginState.getData(), (int) pluginState.getSize());
-                pluginState.reset();
-                jassert (pluginState.getSize() == 0);
-            }
             enabled.set (1);
         }
         else
@@ -293,17 +287,9 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     else
     {
         enabled.set (0);
-
-        if (proc)
-        {
-            if (pluginState.getSize() > 0)
-                pluginState.reset();
-            proc->getStateInformation (pluginState);
-        }
-
         unprepare();
     }
-#endif
+
     enablementChanged (this);
 }
 

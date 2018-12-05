@@ -39,6 +39,14 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     proc = processor;
     jassert (proc != nullptr);
     setLatencySamples (proc->getLatencySamples());
+    if (auto* instance = dynamic_cast<AudioPluginInstance*> (proc.get()))
+    {
+        setAudioProcessorNodePropertiesFrom (instance->getPluginDescription(), metadata);
+    }
+    else
+    {
+        jassertfalse; // need a way to identify normal audio processors
+    }
 }
 
 AudioProcessorNode::~AudioProcessorNode()

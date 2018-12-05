@@ -583,31 +583,34 @@ void GraphController::setupNode (const ValueTree& data, GraphNodePtr obj)
     jassert (obj && data.hasType (Tags::node));
     Node node (data, false);
     node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
-    auto* const proc = obj->getAudioProcessor();
+    
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
 
-    // try to match ports
-    if (proc->getTotalNumInputChannels() != ins.size() ||
-        proc->getTotalNumOutputChannels() != outs.size())
+    if (auto* const proc = obj->getAudioProcessor())
     {
-        AudioProcessor::BusesLayout layout;
-        layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
-        layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
-        
-        if (proc->checkBusesLayoutSupported (layout))
+        // try to match ports
+        if (proc->getTotalNumInputChannels() != ins.size() ||
+            proc->getTotalNumOutputChannels() != outs.size())
         {
-            proc->suspendProcessing (true);
-            proc->releaseResources();
-            proc->setBusesLayoutWithoutEnabling (layout);
-            proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-            proc->suspendProcessing (false);
+            AudioProcessor::BusesLayout layout;
+            layout.inputBuses.add (AudioChannelSet::namedChannelSet (ins.size()));
+            layout.outputBuses.add (AudioChannelSet::namedChannelSet (outs.size()));
+            
+            if (proc->checkBusesLayoutSupported (layout))
+            {
+                proc->suspendProcessing (true);
+                proc->releaseResources();
+                proc->setBusesLayoutWithoutEnabling (layout);
+                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->suspendProcessing (false);
+            }
+            
+            node.resetPorts();
         }
-        
-        node.resetPorts();
     }
     
-    if (auto* sub = dynamic_cast<SubGraphProcessor*> (proc))
+    if (auto* sub = obj->processor<SubGraphProcessor>())
     {
         sub->getController().setNodeModel (node);
         node.resetPorts();

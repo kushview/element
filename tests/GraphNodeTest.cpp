@@ -129,31 +129,83 @@ private:
 static GraphProcessorTest sGraphProcessorTest;
 
 
-class GraphNodeTest : public UnitTestBase {
+class GraphNodeTest : public UnitTestBase
+{
 public:
-    GraphNodeTest() : UnitTestBase ("Graph Node", "graphs", "node") { }
+    GraphNodeTest (const String& name, 
+                   const String& slug = String(),
+                   const String& category = "GraphNode")
+        : UnitTestBase (name, category, slug) { }
 
-    void initialise() override { }
-    void shutdown() override { }
+    void initialise() override
+    {
+        graph.reset (new GraphProcessor());
+        graph->prepareToPlay (44100.f, 1024);
+    }
 
+    void shutdown() override
+    { 
+        graph->releaseResources();
+        graph.reset (nullptr);
+    }
+
+protected:
+    std::unique_ptr<GraphProcessor> graph;
+};
+
+#if 1
+namespace GraphNodeTests {
+
+class GetMidiInputPort : public GraphNodeTest
+{
+public:
+    GetMidiInputPort() : GraphNodeTest ("Node Midi Ports", "midiPorts") { }
     void runTest() override
     {
+       #if JUCE_MAC
         AudioPluginFormatManager plugins;
         plugins.addDefaultFormats();
         PluginDescription desc;
         desc.pluginFormatName = "AudioUnit";
         desc.fileOrIdentifier = "AudioUnit:Synths/aumu,samp,appl";
         String msg;
+
         if (auto* plugin = plugins.createPluginInstance (desc, 44100.0, 1024, msg))
         {
             beginTest ("finds MIDI port");
-            GraphProcessor graph;
-            GraphNodePtr node = graph.addNode (plugin);
+            GraphNodePtr node = graph->addNode (plugin);
             expect (13 == node->getMidiInputPort());
         }
+       #endif
     }
 };
 
-static GraphNodeTest sGraphNodeTest;
+static GetMidiInputPort sGetMidiInputPort;
+
+
+class EnablementTest : public GraphNodeTest
+{
+public:
+    EnablementTest() : GraphNodeTest ("Node Enablement") { }
+    void runTest() override
+    {
+        checkNode ("audio processor", graph->addNode (new PlaceholderProcessor (2, 2, false, false)));
+    }
+
+    void checkNode (const String& testName, GraphNodePtr node)
+    {
+        beginTest (testName);
+        expect (node->isEnabled());
+        node->setEnabled (false);
+        expect (! node->isEnabled());
+        node->setEnabled (true);
+        expect (node->isEnabled());
+    }
+};
+
+static EnablementTest sEnablementTest;
+
+}
+#endif
 
 }
