@@ -25,9 +25,9 @@
             },
             "osx": {
                 "MIMode": "lldb",
-                // "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element"
-                "program": "${workspaceRoot}/build/bin/test-element",
-                "args": ["graphs"]
+                "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element"
+                // "program": "${workspaceRoot}/build/bin/test-element",
+                // "args": ["graphProc1"]
             },
             "windows": {
                 "MIMode": "gdb",
