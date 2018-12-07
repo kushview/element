@@ -2,6 +2,8 @@
 
 #include "JuceHeader.h"
 #include "ElementApp.h"
+#include "controllers/AppController.h"
+#include "controllers/SessionController.h"
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MappingEngine.h"
@@ -11,6 +13,7 @@
 #include "engine/VelocityCurve.h"
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
+#include "session/Session.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 

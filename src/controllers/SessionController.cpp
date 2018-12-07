@@ -113,15 +113,12 @@ void SessionController::closeSession()
 void SessionController::saveSession (const bool saveAs)
 {
     jassert (document && currentSession);
-    DBG("getFile(): " << document->getFile().getFullPathName());
-    DBG("getLastDocumentOpened(): " << document->getLastDocumentOpened().getFullPathName());
-    DBG("hasChangedSinceSaved(): " << (int) document->hasChangedSinceSaved());
-    
     if (saveAs) {
         document->saveAs (File(), true, true, true);
     } else {
         document->save (true, true);
     }
+    jassert (! hasSessionChanged());
 }
 
 void SessionController::newSession()
