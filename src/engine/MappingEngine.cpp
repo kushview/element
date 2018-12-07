@@ -68,16 +68,23 @@ private:
     const int noteNumber;
 };
 
-struct MidiCCControllerMapHandler : public ControllerMapHandler
+struct MidiCCControllerMapHandler : public ControllerMapHandler,
+                                    public AsyncUpdater
 {
     MidiCCControllerMapHandler (const MidiMessage& message, const Node& _node, const int _parameter)
-        : node (_node.getGraphNode()),
+        : model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           controllerNumber (message.getControllerNumber()),
-          parameter (processor->getParameters()[_parameter])
+          parameterIndex (_parameter),
+          parameter (nullptr)
     {
         jassert (message.isController());
-        jassert (node && processor && parameter);
+        jassert (node && processor);
+        if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
+        {
+            parameter = processor->getParameters()[parameterIndex];
+            jassert (nullptr != parameter);
+        }
     }
 
     bool wants (const MidiMessage& message) const override
@@ -88,12 +95,27 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler
 
     void perform (const MidiMessage& message) override
     {
-        parameter->setValue (static_cast<float> (message.getControllerValue()) / 127.f);
+        if (nullptr != parameter)
+        {
+            parameter->setValue (static_cast<float> (message.getControllerValue()) / 127.f);
+        }
+        else if (parameterIndex == -2)
+        {
+            triggerAsyncUpdate();
+        }
+    }
+
+    void handleAsyncUpdate() override
+    {
+        node->setEnabled (! node->isEnabled());
+        model.setProperty (Tags::enabled, node->isEnabled());
     }
 
 private:
+    Node model;
     GraphNodePtr node;
     AudioProcessor* processor;
+    const int parameterIndex;
     AudioProcessorParameter* parameter;
     const int controllerNumber;
 };

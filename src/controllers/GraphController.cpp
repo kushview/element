@@ -356,7 +356,7 @@ void GraphController::removeFilter (const uint32 uid)
 
 void GraphController::disconnectFilter (const uint32 nodeId, const bool inputs, const bool outputs)
 {
-    jassert(inputs || outputs);
+    jassert (inputs || outputs);
     bool doneAnything = false;
 
     for (int i = getNumConnections(); --i >= 0;)
