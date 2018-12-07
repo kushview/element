@@ -99,6 +99,8 @@ namespace Element {
         /** Returns true if this node should be enabled */
         inline const bool isEnabled() const { return (bool) getProperty (Tags::enabled, true); }
 
+        static ValueTree resetIds (const ValueTree& data);
+        
         /** Load a node from file */
         static ValueTree parse (const File& file);
         

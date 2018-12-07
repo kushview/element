@@ -1062,7 +1062,6 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         else if (file.hasFileExtension ("elpreset"))
         {
             const auto data = Node::parse (file);
-            
             if (data.hasType (Tags::node))
             {
                 const Node node (data, false);

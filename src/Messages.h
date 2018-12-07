@@ -131,7 +131,7 @@ class AddNodeMessage : public Message
 {
 public:
     AddNodeMessage (const Node& n, const Node& t = Node())
-        : node (n.getValueTree().createCopy()),
+        : node (Node::resetIds (n.getValueTree().createCopy()), false),
           target (t)
     { }
     

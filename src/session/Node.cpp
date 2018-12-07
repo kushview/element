@@ -148,6 +148,18 @@ namespace Element {
             Tags::graph.toString() == data.getProperty(Tags::type).toString();
     }
     
+    ValueTree Node::resetIds (const ValueTree& data)
+    {
+        ValueTree result = data;
+        jassert (result.hasType (Tags::node));      // must be a node
+        jassert (! result.getParent().isValid());   // cannot be part of another object tree
+        if (result.getParent().isValid())
+            return result;
+        result.setProperty (Tags::id, (int64)0, nullptr);
+        result.setProperty (Tags::uuid, Uuid().toString(), nullptr);
+        return result;
+    }
+
     ValueTree Node::parse (const File& file)
     {
         ValueTree data;
