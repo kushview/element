@@ -2,19 +2,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C++ Launch",
+            "name": "Element",
             "type": "cppdbg",
             "request": "launch",
             "args": [],
-            
+            "program": "${workspaceRoot}/build/bin/element",
             "cwd": "${workspaceRoot}/build",
             "environment": [{ "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }],
             "externalConsole": false,
             "stopAtEntry": false,
+            "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
                 "program": "${workspaceRoot}/build/bin/element",
-                
                 "setupCommands": [
                     {
                         "description": "Enable pretty-printing for gdb",
@@ -25,9 +25,11 @@
             },
             "osx": {
                 "MIMode": "lldb",
-                "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element"
-                // "program": "${workspaceRoot}/build/bin/test-element",
-                // "args": ["graphProc1"]
+                "program": "${workspaceRoot}/build/Applications/Element.app/Contents/MacOS/Element",
+                "logging": {
+                    "moduleLoad": false,
+                    "exceptions": false,
+                }
             },
             "windows": {
                 "MIMode": "gdb",
@@ -42,11 +44,11 @@
             },
         },
         {
-            "name": "C++ Attach",
+            "name": "Test Suite",
             "type": "cppdbg",
-            "request": "attach",
-            "program": "enter program name, for example ${workspaceRoot}/a.out",
-            "processId": "${command:pickProcess}",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/bin/test-element",
+            "cwd": "${workspaceRoot}/build",
             "linux": {
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -58,7 +60,11 @@
                 ]
             },
             "osx": {
-                "MIMode": "lldb"
+                "MIMode": "lldb",
+                "logging": {
+                    "moduleLoad": false,
+                    "exceptions": false,
+                }
             },
             "windows": {
                 "MIMode": "gdb",
