@@ -454,15 +454,6 @@ void GraphController::setNodeModel (const Node& node)
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
             node.getValueTree().setProperty (Tags::missing, true, nullptr);
-           #define EL_DEBUG_PLACEHOLDER 0
-           #if EL_DEBUG_PLACEHOLDER
-            DBG("PH nodeId : " << (int) ph->nodeId);
-            DBG("PH nprts : " << (int) ph->getNumPorts());
-            DBG("PH ins   : " << ph->getNumAudioInputs());
-            DBG("PH outs  : " << ph->getNumAudioOutputs());
-            DBG("PH mins  : " << ph->getNumPorts (PortType::Midi, true));
-            DBG("PH mouts : " << ph->getNumPorts (PortType::Midi, false));
-           #endif
         }
         else
         {
