@@ -28,6 +28,7 @@ protected:
     {
         if (world) return;
         world.reset (new Globals ());
+        world->setEngine (new AudioEngine (*world));
         app.reset (new AppController (*world));
         app->activate();
     }
@@ -37,6 +38,7 @@ protected:
         if (! world) return;
         app->deactivate();
         app.reset (nullptr);
+        world->setEngine (nullptr);
         world.reset (nullptr);
     }
 
