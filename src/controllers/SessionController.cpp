@@ -113,12 +113,24 @@ void SessionController::closeSession()
 void SessionController::saveSession (const bool saveAs)
 {
     jassert (document && currentSession);
+    auto result = FileBasedDocument::userCancelledSave;
+
     if (saveAs) {
-        document->saveAs (File(), true, true, true);
+        result = document->saveAs (File(), true, true, true);
     } else {
-        document->save (true, true);
+        result = document->save (true, true);
     }
-    jassert (! hasSessionChanged());
+
+    if (result == FileBasedDocument::userCancelledSave)
+        return;
+    
+    if (result == FileBasedDocument::savedOk)
+    {
+        // ensure change messages are flushed so the changed flag doesn't reset
+        currentSession->dispatchPendingMessages();
+        document->setChangedFlag (false);
+        jassert (! hasSessionChanged());
+    }
 }
 
 void SessionController::newSession()
