@@ -49,6 +49,7 @@
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/test-element",
             "cwd": "${workspaceRoot}/build",
+            "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
                 "setupCommands": [
