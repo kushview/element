@@ -45,7 +45,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
     {
         if (parameter != nullptr)
         {
-            parameter->setValue (parameter->getValue() < 0.5 ? 1.f : 0.f);
+            parameter->beginChangeGesture();
+            parameter->setValueNotifyingHost (parameter->getValue() < 0.5 ? 1.f : 0.f);
+            parameter->endChangeGesture();
         }
         else if (parameterIndex == -2)
         {
@@ -97,7 +99,9 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
     {
         if (nullptr != parameter)
         {
-            parameter->setValue (static_cast<float> (message.getControllerValue()) / 127.f);
+            parameter->beginChangeGesture();
+            parameter->setValueNotifyingHost (static_cast<float> (message.getControllerValue()) / 127.f);
+            parameter->endChangeGesture();
         }
         else if (parameterIndex == -2)
         {
