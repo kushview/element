@@ -229,7 +229,7 @@ void AppController::handleMessage (const Message& msg)
         {
             devs->add (file);
         }
-        if (device.getValueTree().isValid())
+        else if (device.getValueTree().isValid())
         {
             devs->add (device);
         }

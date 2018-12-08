@@ -48,7 +48,10 @@ void DevicesController::add (const ControllerDevice& device)
     if (! session) return;
     auto controllers = session->getValueTree().getChildWithName (Tags::controllers);
     if (controllers.indexOf (device.getValueTree()) < 0)
+    {
         controllers.addChild (device.getValueTree(), -1, nullptr);
+        refresh (device);
+    }
 }
 
 void DevicesController::add (const ControllerDevice& device, const ControllerDevice::Control& control)
@@ -69,9 +72,11 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
 
 void DevicesController::add (const File& file)
 {
+    returnIfNotFullVersion
     ValueTree data;
     if (ScopedXml xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
+    
     if (data.isValid() && data.hasType (Tags::controller))
     {
         // Avoid UUID conflicts by replacing all
@@ -80,8 +85,11 @@ void DevicesController::add (const File& file)
             data.getChild(i).setProperty (Tags::uuid, Uuid().toString(), 0);
 
         if (auto s = getWorld().getSession())
+        {
             s->getValueTree().getChildWithName (Tags::controllers)
                 .addChild (data, -1, 0);
+            refresh();
+        }
     }
     else
     {
