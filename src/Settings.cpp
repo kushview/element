@@ -18,6 +18,7 @@ const char* Settings::openLastUsedSessionKey    = "openLastUsedSession";
 const char* Settings::askToSaveSessionKey       = "askToSaveSession";
 const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
 const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
+const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
 
 enum OptionsMenuItemId
 {
@@ -201,6 +202,20 @@ void Settings::setAskToSaveSession (const bool value)
 {
     if (auto* props = getProps())
         props->setValue (askToSaveSessionKey, value);
+}
+
+
+bool Settings::sendMidiClockToInput() const
+{
+    if (auto* props = getProps())
+        return props->getBoolValue (sendMidiClockToInputKey, false);
+    return false;
+}
+
+void Settings::setSendMidiClockToInput (const bool value)
+{
+    if (auto* props = getProps())
+        props->setValue (sendMidiClockToInputKey, value);
 }
 
 void Settings::setPluginWindowsOnTop (const bool onTop)

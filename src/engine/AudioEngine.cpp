@@ -455,7 +455,7 @@ public:
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
            #ifndef EL_FREE
-            if (generateMidiClock.get() == 1)
+            if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
             {
                 midiClockMaster.setTempo (transport.getTempo());
                 midiClockMaster.render (incomingMidi, numSamples);
@@ -481,6 +481,14 @@ public:
 
         if (shouldProcess)
         {
+           #ifndef EL_FREE
+            if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
+            {
+                midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
+                midiClockMaster.render (midi, numSamples);
+            }
+           #endif
+
             if (currentGraph.get() != graphs.getCurrentGraphIndex())
                 graphs.setCurrentGraph (currentGraph.get());
             graphs.renderGraphs (buffer, midi);  // user requested index can be cancelled by program changed
@@ -700,6 +708,8 @@ private:
     Atomic<int> sessionWantsExternalClock;
     Atomic<int> processMidiClock;
     Atomic<int> generateMidiClock { 0 };
+    Atomic<int> sendMidiClockToInput { 0 };
+
     MidiClock midiClock;
     MidiClockMaster midiClockMaster;
     
@@ -777,6 +787,7 @@ void AudioEngine::applySettings (Settings& settings)
         priv->resetMidiClock();
     priv->processMidiClock.set (useMidiClock ? 1 : 0);
     priv->generateMidiClock.set (settings.generateMidiClock() ? 1 : 0);
+    priv->sendMidiClockToInput.set (settings.sendMidiClockToInput() ? 1 : 0);
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

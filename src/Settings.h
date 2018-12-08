@@ -28,6 +28,7 @@ public:
     static const char* askToSaveSessionKey;
     static const char* defaultNewSessionFile;
     static const char* generateMidiClockKey;
+    static const char* sendMidiClockToInputKey;
     
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -68,6 +69,9 @@ public:
     void setGenerateMidiClock (const bool);
     bool generateMidiClock() const;
 
+    void setSendMidiClockToInput (const bool);
+    bool sendMidiClockToInput() const;
+    
 private:
     PropertiesFile* getProps() const;
 };

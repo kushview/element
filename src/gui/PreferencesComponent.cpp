@@ -551,6 +551,15 @@ namespace Element {
             generateClock.setClickingTogglesState (true);
             generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
             generateClock.addListener (this);
+
+            addAndMakeVisible (sendClockToInputLabel);
+            sendClockToInputLabel.setFont (Font (12.0, Font::bold));
+            sendClockToInputLabel.setText ("Send Clock to MIDI Input?", dontSendNotification);
+            addAndMakeVisible (sendClockToInput);
+            sendClockToInput.setYesNoText ("Yes", "No");
+            sendClockToInput.setClickingTogglesState (true);
+            sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
+            sendClockToInput.addListener (this);
            #endif
             
             addAndMakeVisible(midiInputHeader);
@@ -584,6 +593,7 @@ namespace Element {
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
             layoutSetting (r, generateClockLabel, generateClock);
+            layoutSetting (r, sendClockToInputLabel, sendClockToInput);
 
             r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
@@ -598,6 +608,13 @@ namespace Element {
             {
                 settings.setGenerateMidiClock (generateClock.getToggleState());
                 generateClock.setToggleState (settings.generateMidiClock(), dontSendNotification);
+                if (auto engine = world.getAudioEngine())
+                    engine->applySettings (settings);
+            }
+            else if (button == &sendClockToInput)
+            {
+                settings.setSendMidiClockToInput (sendClockToInput.getToggleState());
+                sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
                 if (auto engine = world.getAudioEngine())
                     engine->applySettings (settings);
             }
@@ -627,6 +644,8 @@ namespace Element {
         ComboBox midiOutput;
         Label generateClockLabel;
         SettingButton generateClock;
+        Label sendClockToInputLabel;
+        SettingButton sendClockToInput;
         Label midiInputHeader;
         StringArray outputs;
 
