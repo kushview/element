@@ -167,8 +167,9 @@ inline static bool canConnectToWebsite (const URL& url, const int timeout = 2000
 
 inline static bool areMajorWebsitesAvailable()
 {
-    const char* urlsToTry[] = { "http://google.com",  "http://bing.com",  "http://amazon.com",
-                                "https://google.com", "https://bing.com", "https://amazon.com", nullptr};
+    const char* urlsToTry[] = {
+        "http://google.com",  "http://bing.com",  "http://amazon.com",
+        "https://google.com", "https://bing.com", "https://amazon.com", nullptr};
 
     for (const char** url = urlsToTry; *url != nullptr; ++url)
         if (canConnectToWebsite (URL (*url)))
