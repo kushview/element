@@ -51,8 +51,22 @@
               file="../src/controllers/SessionController.h"/>
       </GROUP>
       <GROUP id="{FD43C823-B104-6EF9-29A9-3DD7240FCDA5}" name="engine">
-        <FILE id="mrVjkP" name="AllPassFilterProcessor.h" compile="0" resource="0"
-              file="../src/engine/AllPassFilterProcessor.h"/>
+        <GROUP id="{DCDE9DCF-EE70-71A3-08C7-411C4369FC84}" name="nodes">
+          <FILE id="lOYk1C" name="AllPassFilterNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/AllPassFilterNode.h"/>
+          <FILE id="rHYhV5" name="AudioProcessorNode.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/AudioProcessorNode.cpp"/>
+          <FILE id="KdzkAZ" name="AudioProcessorNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/AudioProcessorNode.h"/>
+          <FILE id="CXy4LY" name="MidiChannelSplitter.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/MidiChannelSplitter.cpp"/>
+          <FILE id="tiqVm6" name="MidiChannelSplitterNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/MidiChannelSplitterNode.h"/>
+          <FILE id="C4XVqA" name="MidiFilterNode.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/MidiFilterNode.cpp"/>
+          <FILE id="qarPR0" name="MidiFilterNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/MidiFilterNode.h"/>
+        </GROUP>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="../src/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="../src/engine/AudioEngine.h"/>
         <FILE id="PyJVYH" name="AudioMixerProcessor.cpp" compile="1" resource="0"
@@ -65,6 +79,8 @@
         <FILE id="vT7kmd" name="BufferFactory.cpp" compile="0" resource="0"
               file="../src/engine/BufferFactory.cpp"/>
         <FILE id="U8cCtg" name="BufferFactory.h" compile="0" resource="0" file="../src/engine/BufferFactory.h"/>
+        <FILE id="qm4i7r" name="ChannelizeProcessor.h" compile="0" resource="0"
+              file="../src/engine/ChannelizeProcessor.h"/>
         <FILE id="t21hS7" name="ClipFactory.cpp" compile="1" resource="0" file="../src/engine/ClipFactory.cpp"/>
         <FILE id="xp1iJH" name="ClipFactory.h" compile="0" resource="0" file="../src/engine/ClipFactory.h"/>
         <FILE id="fZkHE0" name="ClipSource.cpp" compile="1" resource="0" file="../src/engine/ClipSource.cpp"/>
@@ -88,6 +104,10 @@
         <FILE id="f4ZaUt" name="MappingEngine.cpp" compile="1" resource="0"
               file="../src/engine/MappingEngine.cpp"/>
         <FILE id="aakXuR" name="MappingEngine.h" compile="0" resource="0" file="../src/engine/MappingEngine.h"/>
+        <FILE id="rlcpV8" name="MidiChannelMap.h" compile="0" resource="0"
+              file="../src/engine/MidiChannelMap.h"/>
+        <FILE id="oHIMhy" name="MidiChannelMapProcessor.h" compile="0" resource="0"
+              file="../src/engine/MidiChannelMapProcessor.h"/>
         <FILE id="LAe9tF" name="MidiClipSource.cpp" compile="1" resource="0"
               file="../src/engine/MidiClipSource.cpp"/>
         <FILE id="MVLD5m" name="MidiClipSource.h" compile="0" resource="0"
@@ -101,10 +121,13 @@
               file="../src/engine/MidiDeviceProcessor.cpp"/>
         <FILE id="L6YkjB" name="MidiDeviceProcessor.h" compile="0" resource="0"
               file="../src/engine/MidiDeviceProcessor.h"/>
+        <FILE id="hAXXMl" name="MidiPipe.cpp" compile="1" resource="0" file="../src/engine/MidiPipe.cpp"/>
+        <FILE id="hgigdJ" name="MidiPipe.h" compile="0" resource="0" file="../src/engine/MidiPipe.h"/>
         <FILE id="aMLMSs" name="MidiSequenceProcessor.cpp" compile="1" resource="0"
               file="../src/engine/MidiSequenceProcessor.cpp"/>
         <FILE id="gzsdxx" name="MidiSequenceProcessor.h" compile="0" resource="0"
               file="../src/engine/MidiSequenceProcessor.h"/>
+        <FILE id="wp2a8r" name="MidiTranspose.h" compile="0" resource="0" file="../src/engine/MidiTranspose.h"/>
         <FILE id="MMMOIT" name="PlaceholderProcessor.h" compile="0" resource="0"
               file="../src/engine/PlaceholderProcessor.h"/>
         <FILE id="zzHAl7" name="ReverbProcessor.h" compile="0" resource="0"
@@ -125,6 +148,7 @@
               file="../src/engine/SubGraphProcessor.h"/>
         <FILE id="NCc172" name="Transport.cpp" compile="1" resource="0" file="../src/engine/Transport.cpp"/>
         <FILE id="gEA8Kx" name="Transport.h" compile="0" resource="0" file="../src/engine/Transport.h"/>
+        <FILE id="Fv28TP" name="VelocityCurve.h" compile="0" resource="0" file="../src/engine/VelocityCurve.h"/>
         <FILE id="U2vAXo" name="VolumeProcessor.h" compile="0" resource="0"
               file="../src/engine/VolumeProcessor.h"/>
         <FILE id="DZxm7q" name="WetDryProcessor.h" compile="0" resource="0"
