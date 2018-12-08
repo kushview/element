@@ -137,9 +137,9 @@ public:
     
     inline PluginWindow* getPluginWindowFor (GraphNode* node)
     {
-        for (int i = activePluginWindows.size(); --i >= 0;)
-            if (activePluginWindows.getUnchecked(i)->owner == node)
-               return activePluginWindows.getUnchecked(i);
+        for (auto* const window : activePluginWindows)
+            if (window->owner == node)
+               return window;
         return nullptr;
     }
     
@@ -156,11 +156,10 @@ public:
             return nullptr;
         if (! proc->hasEditor())
             return createPluginWindowFor (node, new GenericAudioProcessorEditor (proc));
-        
         auto* editor = proc->createEditorIfNeeded();
         return (editor != nullptr) ? createPluginWindowFor (node, editor) : nullptr;
     }
-    
+
 private:
     GuiController& gui;
     OwnedArray<PluginWindow> activePluginWindows;
