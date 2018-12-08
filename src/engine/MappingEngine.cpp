@@ -87,6 +87,10 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter = processor->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
+        else if (parameterIndex == -2)
+        {
+            lastControllerValue = model.isEnabled() ? 127 : 0;
+        }
     }
 
     bool wants (const MidiMessage& message) const override
@@ -97,22 +101,37 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 
     void perform (const MidiMessage& message) override
     {
+        const auto ccValue = message.getControllerValue();
+
         if (nullptr != parameter)
         {
             parameter->beginChangeGesture();
-            parameter->setValueNotifyingHost (static_cast<float> (message.getControllerValue()) / 127.f);
+            parameter->setValueNotifyingHost (static_cast<float> (ccValue) / 127.f);
             parameter->endChangeGesture();
         }
         else if (parameterIndex == -2)
         {
-            triggerAsyncUpdate();
+            if (lastControllerValue < 64 && ccValue >= 64 && desiredToggleState.get() != 1)
+            {
+                desiredToggleState.set (1);
+            }
+            else if (lastControllerValue >= 64 && ccValue < 64 && desiredToggleState.get() != 0)
+            {
+                desiredToggleState.set (0);
+            }
+
+            if (node->isEnabled() != (bool)desiredToggleState.get())
+                triggerAsyncUpdate();
         }
+
+        lastControllerValue = ccValue;
     }
 
     void handleAsyncUpdate() override
     {
-        node->setEnabled (! node->isEnabled());
-        model.setProperty (Tags::enabled, node->isEnabled());
+        node->setEnabled (desiredToggleState.get() == 1);
+        if (model.isEnabled() != node->isEnabled())
+            model.setProperty (Tags::enabled, node->isEnabled());
     }
 
 private:
@@ -122,6 +141,8 @@ private:
     const int parameterIndex;
     AudioProcessorParameter* parameter;
     const int controllerNumber;
+    int lastControllerValue = 0;
+    Atomic<int> desiredToggleState { 1 };
 };
 
 class ControllerMapInput : public MidiInputCallback
