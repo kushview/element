@@ -1,5 +1,6 @@
 
 #include "engine/nodes/AudioProcessorNode.h"
+#include "engine/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 
 namespace Element {
@@ -8,22 +9,8 @@ static void setAudioProcessorNodePropertiesFrom (const PluginDescription& pd, Va
 {
     p.setProperty (Tags::format,        pd.pluginFormatName, nullptr);
     p.setProperty (Tags::identifier,    pd.fileOrIdentifier, nullptr);
-#if 0
-    p.setProperty (Slugs::name, pd.name, nullptr);
-    if (pd.descriptiveName != pd.name)
-        p.setProperty("descriptiveName", pd.descriptiveName, nullptr);
-    
-    p.setProperty ("uid",          String::toHexString (pd.uid), nullptr);
-    p.setProperty ("isInstrument", pd.isInstrument, nullptr);
-    p.setProperty ("fileTime",     String::toHexString (pd.lastFileModTime.toMilliseconds()), nullptr);
-    
-    p.setProperty ("numInputs",    pd.numInputChannels, nullptr);
-    p.setProperty ("numOutputs",   pd.numOutputChannels, nullptr);
-    p.setProperty ("isShell",      pd.hasSharedContainer, nullptr);
-    p.setProperty ("category",     pd.category, nullptr);
-    p.setProperty ("manufacturer", pd.manufacturerName, nullptr);
-    p.setProperty ("version",      pd.version, nullptr);
-#endif
+    if (pd.pluginFormatName == "Element" && pd.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
+        p.setProperty (Tags::type, Tags::graph.toString(), nullptr);
 }
 
 void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()

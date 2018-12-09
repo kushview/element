@@ -153,7 +153,6 @@ protected:
     std::unique_ptr<GraphProcessor> graph;
 };
 
-#if 1
 namespace GraphNodeTests {
 
 class GetMidiInputPort : public GraphNodeTest
@@ -183,6 +182,7 @@ public:
 static GetMidiInputPort sGetMidiInputPort;
 
 
+/** Test nodes can be enabled and disabled */
 class EnablementTest : public GraphNodeTest
 {
 public:
@@ -205,7 +205,28 @@ public:
 
 static EnablementTest sEnablementTest;
 
+/** Test nodes get the correct type property */
+class GetTypeStringTest : public GraphNodeTest
+{
+public:
+    GetTypeStringTest() : GraphNodeTest ("Node Type") { }
+    void runTest() override
+    {
+        checkNode ("plugin", graph->addNode (new PlaceholderProcessor (2, 2, false, false)), Tags::plugin);
+        checkNode ("graph", graph->addNode (new SubGraphProcessor()), Tags::graph);
+    }
+
+    void checkNode (const String& testName, GraphNodePtr node, const Identifier& expectedType)
+    {
+        beginTest (testName);
+        expect (node->getTypeString() == expectedType.toString());
+        const Node model (node->getMetadata(), false);
+        expect (model.getNodeType() == expectedType);
+    }
+};
+
+static GetTypeStringTest sGetTypeStringTest;
+
 }
-#endif
 
 }

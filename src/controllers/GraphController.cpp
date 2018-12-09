@@ -573,8 +573,9 @@ void GraphController::setupNode (const ValueTree& data, GraphNodePtr obj)
 {
     jassert (obj && data.hasType (Tags::node));
     Node node (data, false);
+    node.getValueTree().setProperty (Tags::type, obj->getTypeString(), nullptr);
     node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
-    
+
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
 
