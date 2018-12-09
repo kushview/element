@@ -592,9 +592,10 @@ namespace Element {
             auto r2 = r.removeFromTop (settingHeight);
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+           #ifndef EL_FREE
             layoutSetting (r, generateClockLabel, generateClock);
             layoutSetting (r, sendClockToInputLabel, sendClockToInput);
-
+           #endif
             r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
 

@@ -538,13 +538,13 @@ public:
         numInputChans   = numChansIn;
         numOutputChans  = numChansOut;
         
+        updateUnlockStatus();
+
         midiClock.reset (sampleRate, blockSize);
-       
         messageCollector.reset (sampleRate);
         keyboardState.addListener (&messageCollector);
         channels.calloc ((size_t) jmax (numChansIn, numChansOut) + 2);
         
-        graphs.setLocked (!(bool) engine.getWorld().getUnlockStatus().isFullVersion());
         graphs.prepareBuffers (numInputChans, numOutputChans, blockSize);
 
         if (isPrepared)
@@ -716,6 +716,17 @@ private:
     AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
     
     int latencySamples = 0;
+
+    Atomic<int> shouldBeLocked { 0 };
+
+    void updateUnlockStatus()
+    {
+        auto& status (engine.getWorld().getUnlockStatus());
+        int newValue = (bool) status.isFullVersion() ? 0 : 1;
+        int compareValue = newValue == 0 ? 1 : 0;
+        if (shouldBeLocked.compareAndSetBool (newValue, compareValue))
+            graphs.setLocked ((bool) status.isFullVersion());
+    }
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -944,6 +955,12 @@ void AudioEngine::updateExternalLatencySamples()
 int AudioEngine::getExternalLatencySamples() const
 {
     return priv != nullptr ? priv->latencySamples : 0;
+}
+
+void AudioEngine::updateUnlockStatus()
+{
+    if (auto* impl = priv.get())
+        impl->updateUnlockStatus();
 }
 
 }

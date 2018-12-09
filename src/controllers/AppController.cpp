@@ -483,7 +483,9 @@ void AppController::licenseRefreshed()
 {
     findChild<Element::DevicesController>()->refresh();
     findChild<Element::MappingController>()->learn (false);
-        
+    if (auto engine = getWorld().getAudioEngine())
+        engine->updateUnlockStatus();
+
    #if EL_RUNNING_AS_PLUGIN
     // FIXME: this came from UnlockForm.cpp
     // typedef ElementPluginAudioProcessorEditor EdType;

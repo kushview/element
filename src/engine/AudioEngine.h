@@ -168,6 +168,8 @@ public:
 
     Globals& getWorld() const;
 
+    void updateUnlockStatus();
+
 private:
     class Private;
     ScopedPointer<Private> priv;
