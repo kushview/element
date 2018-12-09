@@ -335,7 +335,7 @@ void GuiController::presentPluginWindow (const Node& node)
     if (! windowManager)
         return;
 
-    if (node.isIONode())
+    if (node.isIONode() || node.isGraph())
     {
         DBG("[EL] not showing pugin window for: " << node.getName());
         return;
