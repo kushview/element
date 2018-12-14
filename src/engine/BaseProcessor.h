@@ -12,7 +12,7 @@
 #define EL_INTERNAL_ID_PLACEHOLDER          "element.placeholder"
 #define EL_INTERNAL_ID_WET_DRY              "element.wetDry"
 #define EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER  "element.midiChannelSplitter"
-
+#define EL_INTERNAL_ID_MEDIA_PLAYER         "element.mediaPlayer"
 
 namespace Element
 {

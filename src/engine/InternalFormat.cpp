@@ -6,6 +6,7 @@
 #include "ElementApp.h"
 
 #include "engine/nodes/AllPassFilterNode.h"
+#include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 
 #include "engine/AudioEngine.h"
@@ -255,6 +256,11 @@ namespace Element {
             desc->pluginFormatName   = "Element";
             desc->version            = "1.0.0";
         }
+        else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            MediaPlayerProcessor().fillInPluginDescription (*desc);
+        }
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -271,6 +277,7 @@ namespace Element {
         results.add (EL_INTERNAL_ID_GRAPH);
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
+        results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
 
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
@@ -325,6 +332,9 @@ namespace Element {
 
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
             base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
+
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
+            base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
 
         return base != nullptr ? base.release() : nullptr;
     }
