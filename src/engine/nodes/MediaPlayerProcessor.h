@@ -10,6 +10,8 @@ public:
     MediaPlayerProcessor ();
     virtual ~MediaPlayerProcessor();
 
+    void openFile (const File& file);
+
     void fillInPluginDescription (PluginDescription& desc) const override;
 
     const String getName() const override { return "Media Player"; }
@@ -70,8 +72,14 @@ protected:
 #endif
 
 private:
+    TimeSliceThread thread { "MediaPlayer" };
     std::unique_ptr<AudioFormatReaderSource> reader;
+    AudioFormatManager formats;
     AudioTransportSource player;
+
+    AudioParameterBool* playing { nullptr };
+
+    void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MediaPlayerProcessor)
 };
 

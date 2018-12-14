@@ -5,9 +5,15 @@ namespace Element {
 MediaPlayerProcessor::MediaPlayerProcessor()
     : BaseProcessor (BusesProperties()
         .withOutput  ("Main",  AudioChannelSet::stereo(), true))
-{ }
+{
+    addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
+}
 
-MediaPlayerProcessor::~MediaPlayerProcessor() { }
+MediaPlayerProcessor::~MediaPlayerProcessor()
+{ 
+    clearPlayer();
+    playing = nullptr;
+}
 
 void MediaPlayerProcessor::fillInPluginDescription (PluginDescription& desc) const
 {
@@ -23,20 +29,45 @@ void MediaPlayerProcessor::fillInPluginDescription (PluginDescription& desc) con
     desc.version            = "1.0.0";
 }
 
+void MediaPlayerProcessor::clearPlayer()
+{
+    player.setSource (nullptr);
+    if (reader)
+        reader = nullptr;
+}
+
+void MediaPlayerProcessor::openFile (const File& file)
+{
+    if (auto* newReader = formats.createReaderFor (file))
+    {
+        clearPlayer();
+        reader.reset (new AudioFormatReaderSource (newReader, true));
+        player.setSource (reader.get(), 4096, &thread, getSampleRate(), 2);
+    }
+}
+
 void MediaPlayerProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
 {
-    
+    formats.registerBasicFormats();
+    player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
+    player.setLooping (true);
+    player.start();
 }
 
 void MediaPlayerProcessor::releaseResources()
 {
-    
+    player.stop();
+    player.releaseResources();
+    formats.clearFormats();
 }
 
-void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
+void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
-    buffer.clear();
-    midiMessages.clear();
+    buffer.clear (0, 0, buffer.getNumSamples());
+    buffer.clear (1, 0, buffer.getNumSamples());
+    const AudioSourceChannelInfo info (buffer);
+    player.getNextAudioBlock (info);
+    midi.clear();
 }
 
 AudioProcessorEditor* MediaPlayerProcessor::createEditor()
