@@ -4,7 +4,8 @@
 
 namespace Element {
 
-class MediaPlayerProcessor : public BaseProcessor
+class MediaPlayerProcessor : public BaseProcessor,
+                             public AudioProcessorParameter::Listener
 {
 public:
     MediaPlayerProcessor ();
@@ -36,6 +37,9 @@ public:
 
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
+
+    void parameterValueChanged (int parameterIndex, float newValue) override;
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
 #if 0
     // Audio Processor Template

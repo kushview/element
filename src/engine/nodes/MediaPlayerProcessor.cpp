@@ -7,10 +7,14 @@ MediaPlayerProcessor::MediaPlayerProcessor()
         .withOutput  ("Main",  AudioChannelSet::stereo(), true))
 {
     addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
+    for (auto* const param : getParameters())
+        param->addListener (this);
 }
 
 MediaPlayerProcessor::~MediaPlayerProcessor()
 { 
+    for (auto* const param : getParameters())
+        param->removeListener (this);
     clearPlayer();
     playing = nullptr;
 }
@@ -42,14 +46,16 @@ void MediaPlayerProcessor::openFile (const File& file)
     {
         clearPlayer();
         reader.reset (new AudioFormatReaderSource (newReader, true));
-        player.setSource (reader.get(), 4096, &thread, getSampleRate(), 2);
+        player.setSource (reader.get(), 1024 * 8, &thread, getSampleRate(), 2);
     }
 }
 
 void MediaPlayerProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
 {
+    thread.startThread();
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
+    openFile (File ("/Users/mfisher/Desktop/Music/Jackson 5-Ill Be There.wav"));
     player.setLooping (true);
     player.start();
 }
@@ -59,6 +65,7 @@ void MediaPlayerProcessor::releaseResources()
     player.stop();
     player.releaseResources();
     formats.clearFormats();
+    thread.stopThread (50);
 }
 
 void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
@@ -83,6 +90,22 @@ void MediaPlayerProcessor::getStateInformation (juce::MemoryBlock& destData)
 void MediaPlayerProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     ignoreUnused (data, sizeInBytes);
+}
+
+void MediaPlayerProcessor::parameterValueChanged (int parameterIndex, float newValue)
+{
+    if (parameterIndex == 0)
+    {
+        if (*playing)
+            player.start();
+        else
+            player.stop();
+    }
+}
+
+void MediaPlayerProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
+{
+    ignoreUnused (parameterIndex, gestureIsStarting);
 }
 
 }
