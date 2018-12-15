@@ -41,6 +41,8 @@ public:
     void parameterValueChanged (int parameterIndex, float newValue) override;
     void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
 
+    AudioTransportSource& getPlayer() { return player; }
+    
 #if 0
     // Audio Processor Template
     
@@ -81,7 +83,8 @@ private:
     AudioFormatManager formats;
     AudioTransportSource player;
 
-    AudioParameterBool* playing { nullptr };
+    AudioParameterBool* slave       { nullptr };
+    AudioParameterBool* playing     { nullptr };
 
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MediaPlayerProcessor)
