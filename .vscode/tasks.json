@@ -36,7 +36,8 @@
         {
             "label": "Waf Clean",
             "type": "shell",
-            "command": "python waf clean"
+            "command": "python waf clean",
+            "problemMatcher": []
         },
         {
             "label": "Waf Rebuild",
