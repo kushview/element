@@ -1,5 +1,6 @@
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "gui/LookAndFeel.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -18,11 +19,11 @@ public:
                                               false, false, false,
                                               o.getWildcard(), String(),
                                               TRANS("Select Audio File")));
-        chooser->addListener (this);
         addAndMakeVisible (chooser.get());
 
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
+
         addAndMakeVisible (position);
         position.setSliderStyle (Slider::LinearBar);
         position.setRange (0.0, 1.0, 0.001);
@@ -34,51 +35,16 @@ public:
         volume.setTextBoxIsEditable (false);
 
         stabilizeComponents();
-        
-        processor.getPlayer().addChangeListener (this);
-
-        playButton.onClick = [this]() {
-            if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[0]))
-            {
-                *playing = !*playing;
-                stabilizeComponents();
-            }
-        };
-
-        volume.onValueChange = [this]() {
-            processor.getPlayer().setGain (
-                Decibels::decibelsToGain (volume.getValue(), volume.getMinimum()));
-        };
-
-        position.onDragStart = [this]() { draggingPos = true; };
-        position.onDragEnd = [this]() {
-            const auto newPos = position.getValue() * processor.getPlayer().getLengthInSeconds();
-            processor.getPlayer().setPosition (newPos);
-            draggingPos = false;
-            stabilizeComponents();
-        };
-
-        position.textFromValueFunction = [this](double value) -> String {
-            const double pos = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
-            double minutes = 0, seconds = 60.0 * modf (pos, &minutes);
-            String ms (roundToInt (floor (minutes)));
-            String mm (roundToInt (floor (seconds)));
-            return ms.paddedLeft('0', 2) + ":" + mm.paddedLeft('0', 2);
-        };
+        bindHandlers();
 
         setSize (360, 100);
-
         startTimer (1001);
     }
 
     ~MediaPlayerEditor() noexcept
     {
         stopTimer();
-        processor.getPlayer().removeChangeListener (this);
-        playButton.onClick = nullptr;
-        position.onDragEnd = nullptr;
-        volume.onValueChange = nullptr;
-        chooser->removeListener (this);
+        unbindHandlers();
         chooser = nullptr;
     }
 
@@ -140,6 +106,54 @@ private:
     Slider volume;
     TextButton playButton;
     bool draggingPos = false;
+
+    void bindHandlers()
+    {
+        chooser->addListener (this);
+        processor.getPlayer().addChangeListener (this);
+
+        playButton.onClick = [this]() {
+            int index = MediaPlayerProcessor::Playing;
+            if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[index]))
+            {
+                *playing = !*playing;
+                stabilizeComponents();
+            }
+        };
+
+        volume.onValueChange = [this]() {
+            int index = MediaPlayerProcessor::Volume;
+            if (auto* const param = dynamic_cast<AudioParameterFloat*> (processor.getParameters()[index]))
+            {
+                *param = static_cast<float> (volume.getValue());
+                stabilizeComponents();
+            }
+        };
+
+        position.onDragStart = [this]() { draggingPos = true; };
+        position.onDragEnd = [this]() {
+            const auto newPos = position.getValue() * processor.getPlayer().getLengthInSeconds();
+            processor.getPlayer().setPosition (newPos);
+            draggingPos = false;
+            stabilizeComponents();
+        };
+
+        position.textFromValueFunction = [this](double value) -> String {
+            const double posInMinutes = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
+            return Element::minutesToString (posInMinutes);
+        };
+    }
+
+    void unbindHandlers()
+    {
+        playButton.onClick = nullptr;
+        position.onDragStart = nullptr;
+        position.onDragEnd = nullptr;
+        position.textFromValueFunction = nullptr;
+        volume.onValueChange = nullptr;
+        processor.getPlayer().removeChangeListener (this);
+        chooser->removeListener (this);
+    }
 };
 
 MediaPlayerProcessor::MediaPlayerProcessor()
@@ -148,7 +162,7 @@ MediaPlayerProcessor::MediaPlayerProcessor()
 {
     addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
     addParameter (slave = new AudioParameterBool ("slave", "Slave", false));
-    addParameter (new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
     for (auto* const param : getParameters())
         param->addListener (this);
 }
@@ -180,10 +194,13 @@ void MediaPlayerProcessor::clearPlayer()
     player.setSource (nullptr);
     if (reader)
         reader = nullptr;
+    *playing = player.isPlaying();
 }
 
 void MediaPlayerProcessor::openFile (const File& file)
 {
+    if (file == audioFile)
+        return;
     if (auto* newReader = formats.createReaderFor (file))
     {
         clearPlayer();
@@ -199,8 +216,6 @@ void MediaPlayerProcessor::prepareToPlay (double sampleRate, int maximumExpected
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
     player.setLooping (true);
-    if (*playing)
-        player.start();
 }
 
 void MediaPlayerProcessor::releaseResources()
@@ -257,14 +272,26 @@ void MediaPlayerProcessor::setStateInformation (const void* data, int sizeInByte
     }
 }
 
-void MediaPlayerProcessor::parameterValueChanged (int parameterIndex, float newValue)
+void MediaPlayerProcessor::parameterValueChanged (int parameter, float newValue)
 {
-    if (parameterIndex == 0)
+    ignoreUnused (newValue);
+
+    switch (parameter)
     {
-        if (*playing)
-            player.start();
-        else
-            player.stop();
+        case Playing: {
+            if (*playing)
+                player.start();
+            else
+                player.stop();
+        } break;
+        
+        case Slave: {
+            // noop
+        } break;
+
+        case Volume: {
+            player.setGain (Decibels::decibelsToGain (volume->get(), volume->range.start));
+        } break;
     }
 }
 

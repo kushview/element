@@ -8,13 +8,15 @@ class MediaPlayerProcessor : public BaseProcessor,
                              public AudioProcessorParameter::Listener
 {
 public:
+    enum Parameters { Playing = 0, Slave, Volume };
+
     MediaPlayerProcessor ();
     virtual ~MediaPlayerProcessor();
 
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
     String getWildcard() const { return formats.getWildcardForAllFormats(); }
-    
+
     void fillInPluginDescription (PluginDescription& desc) const override;
 
     const String getName() const override { return "Media Player"; }
@@ -87,6 +89,7 @@ private:
 
     AudioParameterBool* slave       { nullptr };
     AudioParameterBool* playing     { nullptr };
+    AudioParameterFloat* volume     { nullptr };
 
     File audioFile;
 
