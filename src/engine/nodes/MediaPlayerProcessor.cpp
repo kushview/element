@@ -15,13 +15,12 @@ public:
     {
         setOpaque (true);
         chooser.reset (new FilenameComponent ("Audio File", File(), 
-                                              false, false, false, 
-                                              "*.wav;*.aif;*.aiff", 
-                                              String(),
-                                              "Select Audio File"));
+                                              false, false, false,
+                                              o.getWildcard(), String(),
+                                              TRANS("Select Audio File")));
         chooser->addListener (this);
         addAndMakeVisible (chooser.get());
-        
+
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
         addAndMakeVisible (position);
@@ -41,8 +40,7 @@ public:
         playButton.onClick = [this]() {
             if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[0]))
             {
-                *playing = ! playButton.getToggleState();
-                playButton.setToggleState (*playing, dontSendNotification);
+                *playing = !*playing;
                 stabilizeComponents();
             }
         };
@@ -68,9 +66,9 @@ public:
             return ms.paddedLeft('0', 2) + ":" + mm.paddedLeft('0', 2);
         };
 
-        setSize (360, 180);
+        setSize (360, 100);
 
-        startTimer (500);
+        startTimer (1001);
     }
 
     ~MediaPlayerEditor() noexcept
@@ -88,11 +86,11 @@ public:
     void changeListenerCallback (ChangeBroadcaster*) override { stabilizeComponents(); }
     void stabilizeComponents()
     {
-        if (auto* playing = dynamic_cast<AudioParameterBool*> (processor.getParameters()[0]))
-        {
-            playButton.setToggleState (*playing || processor.getPlayer().isPlaying(), dontSendNotification);
-            playButton.setButtonText (playButton.getToggleState() ? "Pause" : "Play");
-        }
+        if (chooser->getCurrentFile() != processor.getAudioFile())
+            chooser->setCurrentFile (processor.getAudioFile(), dontSendNotification);
+
+        playButton.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
+        playButton.setButtonText (playButton.getToggleState() ? "Pause" : "Play");
 
         if (! draggingPos)
         {
@@ -190,6 +188,7 @@ void MediaPlayerProcessor::openFile (const File& file)
     {
         clearPlayer();
         reader.reset (new AudioFormatReaderSource (newReader, true));
+        audioFile = file;
         player.setSource (reader.get(), 1024 * 8, &thread, getSampleRate(), 2);
     }
 }
@@ -200,6 +199,8 @@ void MediaPlayerProcessor::prepareToPlay (double sampleRate, int maximumExpected
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
     player.setLooping (true);
+    if (*playing)
+        player.start();
 }
 
 void MediaPlayerProcessor::releaseResources()
@@ -207,7 +208,7 @@ void MediaPlayerProcessor::releaseResources()
     player.stop();
     player.releaseResources();
     formats.clearFormats();
-    thread.stopThread (50);
+    thread.stopThread (14);
 }
 
 void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
@@ -215,7 +216,7 @@ void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&
     buffer.clear (0, 0, buffer.getNumSamples());
     buffer.clear (1, 0, buffer.getNumSamples());
 
-    if (*sync)
+    if (*slave)
     {
         if (auto* const playhead = getPlayHead())
         {
@@ -236,12 +237,24 @@ AudioProcessorEditor* MediaPlayerProcessor::createEditor()
 
 void MediaPlayerProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    ignoreUnused (destData);
+    ValueTree state (Tags::state);
+    state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
+         .setProperty ("playing", (bool)*playing, nullptr)
+         .setProperty ("slave", (bool)*sync, nullptr);
+    MemoryOutputStream stream (destData, false);
+    state.writeToStream (stream);
 }
 
 void MediaPlayerProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    ignoreUnused (data, sizeInBytes);
+    const auto state = ValueTree::readFromData (data, (size_t) sizeInBytes);
+    if (state.isValid())
+    {
+        if (File::isAbsolutePath (state["audioFile"].toString()))
+            openFile (File (state["audioFile"].toString()));
+        *playing = (bool) state.getProperty ("playing", false);
+        *slave = (bool) state.getProperty ("slave", false);
+    }
 }
 
 void MediaPlayerProcessor::parameterValueChanged (int parameterIndex, float newValue)

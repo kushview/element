@@ -12,7 +12,9 @@ public:
     virtual ~MediaPlayerProcessor();
 
     void openFile (const File& file);
-
+    const File& getAudioFile() const { return audioFile; }
+    String getWildcard() const { return formats.getWildcardForAllFormats(); }
+    
     void fillInPluginDescription (PluginDescription& desc) const override;
 
     const String getName() const override { return "Media Player"; }
@@ -85,6 +87,8 @@ private:
 
     AudioParameterBool* slave       { nullptr };
     AudioParameterBool* playing     { nullptr };
+
+    File audioFile;
 
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MediaPlayerProcessor)
