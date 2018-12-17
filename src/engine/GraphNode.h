@@ -10,6 +10,14 @@ class MidiPipe;
 class GraphNode : public ReferenceCountedObject
 {
 public:
+    /** Special parameter indexes when mapping universal node settings */
+    enum SpecialParameter
+    {
+        NoParameter         = -1,
+        EnabledParameter    = -2,
+        BypassParameter     = -3
+    };
+
     /** The ID number assigned to this node. This is assigned by the graph
         that owns it, and can't be changed. */
     const uint32 nodeId;
@@ -38,17 +46,39 @@ public:
     /** Returns the total number of audio ouputs */
     int getNumAudioOutputs() const;
     
+    /** Returns the type of port
+        
+        @param port The port to check
+     */
     PortType getPortType (const uint32 port) const;
+
+    /** Returns the total number of ports on this node */
     uint32 getNumPorts() const;
+
+    /** Returns the number of ports for a given type and flow */
     int getNumPorts (const PortType type, const bool isInput) const;
     
+    /** Returns the default MIDI input port */
     uint32 getMidiInputPort() const;
+
+    /** Returns the default MIDI output port */
     uint32 getMidiOutputPort() const;
 
+    /** Returns a channel index for a port
+     
+        @param port The port to find.
+    */
     int getChannelPort (const uint32 port) const;
+
+    /** Returns a port index for a channel of given type
+     
+        @param type The port type to find
+        @param channel The channel to find
+        @param isInput True if for an input port
+    */
     uint32 getPortForChannel (const PortType type, const int channel, const bool isInput) const;
 
-    int getNthPort (const PortType portType, const int inputChan, bool, bool) const;
+    int getNthPort (const PortType type, const int channel, bool, bool) const;
     
     /** Returns true if an input port */
     bool isPortInput (const uint32 port) const;
@@ -95,7 +125,6 @@ public:
     inline float getLastInputGain() const { return lastInputGain.get(); }
 
     
-
     inline void updateGain() noexcept
     {
         if (lastGain.get() != gain.get())
