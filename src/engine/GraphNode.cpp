@@ -130,9 +130,20 @@ bool GraphNode::isSuspended() const
 
 void GraphNode::suspendProcessing (const bool shouldBeSuspended)
 {
+    const bool wasSuspeneded = isSuspended();
+
     if (auto* proc = getAudioProcessor())
-        if (proc->isSuspended() != shouldBeSuspended)
+    {
+        if (wasSuspeneded != shouldBeSuspended)
             proc->suspendProcessing (shouldBeSuspended);
+    }
+    else
+    {
+        jassertfalse; // subclass without AudioProc MUST implement this!
+    }
+
+    if (isSuspended() != wasSuspeneded)
+        bypassChanged (this);
 }
 
 bool GraphNode::isGraph() const noexcept        { return nullptr != dynamic_cast<GraphProcessor*> (getAudioProcessor()); }

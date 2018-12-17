@@ -113,11 +113,10 @@ public:
 
     void buttonClicked (Button* button) override
     {
-        auto* const proc = getProcessor();
         if (button == &powerButton)
         {
-            if (proc && proc->isSuspended() != node.isBypassed())
-                proc->suspendProcessing (node.isBypassed());
+            if (object && object->isSuspended() != node.isBypassed())
+                object->suspendProcessing (node.isBypassed());
         }
         else if (button == &nodeButton)
         {

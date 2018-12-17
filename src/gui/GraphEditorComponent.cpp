@@ -281,8 +281,8 @@ public:
         }
         else if (b == &powerButton)
         {
-            if (proc->isSuspended() != node.isBypassed())
-                proc->suspendProcessing (node.isBypassed());
+            if (obj->isSuspended() != node.isBypassed())
+                obj->suspendProcessing (node.isBypassed());
         }
     }
 

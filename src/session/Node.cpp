@@ -550,8 +550,11 @@ namespace Element {
 							(int) state.getSize());
 					}
 				}
+            }
 
-                proc->suspendProcessing (isBypassed());
+            if (hasProperty (Tags::bypass))
+            {
+                obj->suspendProcessing (isBypassed());
             }
 
             if (hasProperty ("gain"))

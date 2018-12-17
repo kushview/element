@@ -42,21 +42,30 @@ public:
     void handleAsyncUpdate() override 
     {
         AudioProcessor* capturedProcessor = nullptr;
-        int capturedParameter = -1;
+        int capturedParameter = GraphNode::NoParameter;
 
         {
             ScopedLock sl (lock);
             capturedProcessor = processor;
             capturedParameter = parameter;
             processor = nullptr;
-            parameter = -1;
+            parameter = GraphNode::NoParameter;
         }
 
         const auto captured (nodeMap2 [capturedProcessor]);
         if (auto* node = captured.getGraphNode())
+        {
             if (auto* proc = node->getAudioProcessor())
-                if (proc == capturedProcessor && (capturedParameter == -2 || isPositiveAndBelow (capturedParameter, proc->getParameters().size())))
+            {
+                if (proc == capturedProcessor && 
+                        (capturedParameter == GraphNode::EnabledParameter || 
+                         capturedParameter == GraphNode::BypassParameter ||
+                         isPositiveAndBelow (capturedParameter, proc->getParameters().size())))
+                {
                     callback (captured, capturedParameter);
+                }
+            }
+        }
 
         clear();
     }
@@ -109,7 +118,19 @@ private:
         capture.set (false);
         ScopedLock sl (lock);
         processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
-        parameter = -2;
+        parameter = GraphNode::EnabledParameter;
+        triggerAsyncUpdate();
+    }
+
+    void onBypassChanged (GraphNode* ptr)
+    {
+        GraphNodePtr ref = ptr;
+        if (capture.get() == false)
+            return;
+        capture.set (false);
+        ScopedLock sl (lock);
+        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
+        parameter = GraphNode::BypassParameter;
         triggerAsyncUpdate();
     }
 
@@ -125,6 +146,9 @@ private:
                     nodeMap2.set (proc, n);
                     nodeConnections.add (object->enablementChanged.connect (std::bind (
                         &AudioProcessorParameterCapture::onEnablementChanged, this, 
+                        std::placeholders::_1)));
+                    nodeConnections.add (object->bypassChanged.connect (std::bind (
+                        &AudioProcessorParameterCapture::onBypassChanged, this, 
                         std::placeholders::_1)));
                     proc->addListener (this);
                 }

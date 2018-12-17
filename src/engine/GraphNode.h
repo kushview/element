@@ -207,7 +207,11 @@ public:
         return String();
     }
 
+    /** Triggered when the enabled state changes */
     Signal<void(GraphNode*)> enablementChanged;
+
+    /** Triggered when the bypass state changes */
+    Signal<void(GraphNode*)> bypassChanged;
 
 protected:
     GraphNode (uint32 nodeId) noexcept;

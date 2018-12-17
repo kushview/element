@@ -926,7 +926,7 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
         if (auto* gp = dynamic_cast<GraphProcessor*> (ptr2->getAudioProcessor()))
         {
             if (proc->checkBusesLayoutSupported (layout))
-            {   
+            {
                 gp->suspendProcessing (true);
                 gp->releaseResources();
                 
