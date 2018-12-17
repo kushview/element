@@ -164,12 +164,12 @@ namespace Element {
         const var trial (EL_TRIAL_PRICE_ID); 
         const var zero (0);
 
-        if (full == getProperty (priceIdKey) || zero == getProperty (priceIdKey))
+        if (full.equals (getProperty (priceIdKey)) || zero.equals (getProperty (priceIdKey)))
         {
             props.setProperty (fullKey, 1, nullptr);
             props.removeProperty (trialKey, nullptr);
         }
-        else if (trial == getProperty (priceIdKey))
+        else if (trial.equals (getProperty (priceIdKey)))
         {
             props.removeProperty (fullKey, nullptr);
             props.setProperty (trialKey, 1, nullptr);
@@ -184,7 +184,5 @@ namespace Element {
         props.removeProperty (fullKey, nullptr);
         props.removeProperty (trialKey, nullptr);
        #endif
-
-        dump();
     }
 }
