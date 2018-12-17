@@ -93,16 +93,17 @@ public:
     }
 
     CriticalSection lock;
-    boost::signals2::signal<void(const Node&, int)> callback;
+    Signal<void(const Node&, int)> callback;
     Atomic<bool> capture        = false;
     AudioProcessor* processor   = nullptr;
     int parameter               = -1;
     HashMap<AudioProcessor*, Node> nodeMap2;
 
 private:
-    Array<boost::signals2::connection> nodeConnections;
+    Array<SignalConnection> nodeConnections;
 
-    void onEnablementChanged (GraphNode* ptr) {
+    void onEnablementChanged (GraphNode* ptr)
+    {
         if (capture.get() == false)
             return;
         capture.set (false);
