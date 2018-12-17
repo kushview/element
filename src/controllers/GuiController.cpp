@@ -388,6 +388,8 @@ void GuiController::run()
     sSystemTray->addToDesktop (0);
    #endif
 
+    stabilizeViews();
+    
     if (getWorld().getUnlockStatus().isTrial() &&
         getWorld().getUnlockStatus().getExpiryTime() > Time() &&
         getWorld().getUnlockStatus().getExpiryTime() < Time::getCurrentTime())
@@ -812,7 +814,12 @@ void GuiController::stabilizeContent()
 void GuiController::stabilizeViews()
 {
     if (auto* cc = content.get())
+    {
+        const auto shouldBeEnabled = (bool) getWorld().getUnlockStatus().isFullVersion();
+        if (cc->isEnabled() != shouldBeEnabled)
+            cc->setEnabled (shouldBeEnabled);
         cc->stabilizeViews();
+    }
 }
 
 void GuiController::refreshMainMenu()

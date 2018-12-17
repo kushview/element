@@ -476,7 +476,7 @@ public:
         messageCollector.removeNextBlockOfMessages (midi, numSamples);
         
         const ScopedLock sl (lock);
-        const bool shouldProcess = true;
+        const bool shouldProcess = shouldBeLocked.get() == 0;
         transport.preProcess (numSamples);
 
         if (shouldProcess)
