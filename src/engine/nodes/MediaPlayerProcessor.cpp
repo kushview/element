@@ -173,6 +173,8 @@ MediaPlayerProcessor::~MediaPlayerProcessor()
         param->removeListener (this);
     clearPlayer();
     playing = nullptr;
+    slave = nullptr;
+    volume = nullptr;
 }
 
 void MediaPlayerProcessor::fillInPluginDescription (PluginDescription& desc) const
