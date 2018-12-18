@@ -49,7 +49,8 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             parameter->setValueNotifyingHost (parameter->getValue() < 0.5 ? 1.f : 0.f);
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == -2)
+        else if (parameterIndex == GraphNode::EnabledParameter ||
+                 parameterIndex == GraphNode::BypassParameter)
         {
             triggerAsyncUpdate();
         }
@@ -57,8 +58,16 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
     void handleAsyncUpdate() override
     {
-        node->setEnabled (! node->isEnabled());
-        model.setProperty (Tags::enabled, node->isEnabled());
+        if (parameterIndex == GraphNode::EnabledParameter)
+        {
+            node->setEnabled (! node->isEnabled());
+            model.setProperty (Tags::enabled, node->isEnabled());
+        }
+        else if (parameterIndex == GraphNode::BypassParameter)
+        {
+            node->suspendProcessing (! node->isSuspended());
+            model.setProperty (Tags::bypass, node->isSuspended());
+        }
     }
 
 private:
@@ -109,8 +118,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter->setValueNotifyingHost (static_cast<float> (ccValue) / 127.f);
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == -2)
+        else if (parameterIndex == GraphNode::EnabledParameter ||
+                 parameterIndex == GraphNode::BypassParameter)
         {
+            const auto wantedToggle = desiredToggleState.get();
+
             if (lastControllerValue < 64 && ccValue >= 64 && desiredToggleState.get() != 1)
             {
                 desiredToggleState.set (1);
@@ -120,7 +132,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                 desiredToggleState.set (0);
             }
 
-            if (node->isEnabled() != (bool)desiredToggleState.get())
+            if (wantedToggle != desiredToggleState.get())
                 triggerAsyncUpdate();
         }
 
@@ -129,9 +141,18 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 
     void handleAsyncUpdate() override
     {
-        node->setEnabled (desiredToggleState.get() == 1);
-        if (model.isEnabled() != node->isEnabled())
-            model.setProperty (Tags::enabled, node->isEnabled());
+        if (parameterIndex == GraphNode::EnabledParameter)
+        {
+            node->setEnabled (desiredToggleState.get() == 1);
+            if (model.isEnabled() != node->isEnabled())
+                model.setProperty (Tags::enabled, node->isEnabled());
+        }
+        else if (parameterIndex == GraphNode::BypassParameter)
+        {
+            node->suspendProcessing (desiredToggleState.get() == 1);
+            if (model.isBypassed() != node->isSuspended())
+                model.setProperty (Tags::bypass, node->isSuspended());
+        }
     }
 
 private:
@@ -374,7 +395,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     auto* const proc   = object == nullptr ? nullptr : object->getAudioProcessor();
     if (nullptr == object || nullptr == proc)
         return false;
-    if (parameter == -2 || isPositiveAndBelow (parameter, proc->getParameters().size()))
+    if (object->containsParameter (parameter))
     {
         if (auto* input = inputs->findInput (control.getControllerDevice()))
         {

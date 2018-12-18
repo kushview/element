@@ -14,7 +14,8 @@ class GraphNode;
 class MappingEngine
 {
 public:
-    typedef boost::signals2::signal<void()> CapturedEventSignal;
+    using CapturedEventSignal = Signal<void()>;
+    
     MappingEngine();
     ~MappingEngine();
 

@@ -10,12 +10,15 @@ class MidiPipe;
 class GraphNode : public ReferenceCountedObject
 {
 public:
+
     /** Special parameter indexes when mapping universal node settings */
     enum SpecialParameter
     {
-        NoParameter         = -1,
-        EnabledParameter    = -2,
-        BypassParameter     = -3
+        NoParameter             = -1,
+        EnabledParameter        = -2,
+        BypassParameter         = -3,
+        SpecialParameterBegin   = BypassParameter,
+        SpecialParameterEnd     = NoParameter
     };
 
     /** The ID number assigned to this node. This is assigned by the graph
@@ -97,6 +100,12 @@ public:
     
     /** Get the type string for this Node */
     const String& getTypeString() const;
+
+    /** Returns true if the parameter is valid.
+        Valid = special param index or positive and below
+                the number of params provided by the implementation
+     */
+    bool containsParameter (const int index) const;
 
     /** If an audio plugin instance, fill the details */
     void getPluginDescription (PluginDescription& desc);

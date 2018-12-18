@@ -173,7 +173,7 @@ public:
         GraphNodePtr object = node.getGraphNode();
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         return object && proc && 
-            (parameter == -2 || isPositiveAndBelow (parameter, proc->getParameters().size())) &&
+            (parameter == GraphNode::EnabledParameter || parameter == GraphNode::BypassParameter || isPositiveAndBelow (parameter, proc->getParameters().size())) &&
             (message.isController() || message.isNoteOn()) && 
             control.getValueTree().isValid();
     }

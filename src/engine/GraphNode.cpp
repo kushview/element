@@ -38,6 +38,13 @@ const String& GraphNode::getTypeString() const
         ? Tags::plugin.toString() : Tags::graph.toString();
 }
 
+bool GraphNode::containsParameter (const int index) const
+{
+    const auto numParams = getNumPorts (PortType::Control, true);
+    return (index >= SpecialParameterBegin && index < SpecialParameterEnd) ||
+        (isPositiveAndBelow (index, numParams));
+}
+
 GraphNode* GraphNode::createForRoot (GraphProcessor* g)
 {
     auto* node = new AudioProcessorNode (0, g);
