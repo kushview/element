@@ -17,7 +17,11 @@
             ],
             "defines": [
                 "JUCE_PLUGINHOST_VST=1",
-                "VSCODE=1"
+                "VSCODE=1",
+                "EL_DOCKING=1"
+            ],
+            "forcedInclude": [
+                "${workspaceRoot}/.vscode/vscode.h"
             ],
             "intelliSenseMode": "clang-x64",
             "browse": {

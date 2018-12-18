@@ -68,6 +68,24 @@
             "problemMatcher": []
         },
         {
+            "label": "Waf Configure w/ Docking",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-docking"
+            ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Waf Configure FREE w/ CCache",
             "type": "shell",
             "command": "python",

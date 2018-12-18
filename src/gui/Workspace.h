@@ -27,7 +27,7 @@ public:
     Dock& getDock();
 
 private:
-    ScopedPointer<Dock> dock;
+    Dock dock;
 };
 
 class WorkspaceWindow : public DocumentWindow
@@ -35,8 +35,9 @@ class WorkspaceWindow : public DocumentWindow
 public:
     WorkspaceWindow() : DocumentWindow ("Workspace", Colours::black, DocumentWindow::allButtons, true)
     {
+        setUsingNativeTitleBar (true);
         setContentOwned (new Workspace(), true);
-        centreWithSize (1280, 640);
+        centreWithSize (getWidth(), getHeight());
     }
 };
 
