@@ -475,10 +475,10 @@ void GraphController::setNodeModel (const Node& node)
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         ValueTree arc (arcs.getChild (i));
-        bool worked = processor.addConnection ((uint32)(int) arc.getProperty (Tags::sourceNode),
-                                               (uint32)(int) arc.getProperty (Tags::sourcePort),
-                                               (uint32)(int) arc.getProperty (Tags::destNode),
-                                               (uint32)(int) arc.getProperty (Tags::destPort));
+        const auto sourceNode = (uint32)(int) arc.getProperty (Tags::sourceNode);
+        const auto destNode = (uint32)(int) arc.getProperty (Tags::destNode);
+        bool worked = processor.addConnection (sourceNode, (uint32)(int) arc.getProperty (Tags::sourcePort),
+                                               destNode, (uint32)(int) arc.getProperty (Tags::destPort));
         if (worked)
         {
             arc.removeProperty (Tags::missing, 0);
@@ -486,23 +486,28 @@ void GraphController::setNodeModel (const Node& node)
         else
         {
             DBG("[EL] failed creating connection");
-            arc.setProperty (Tags::missing, true, 0);
-            failed.add (arc);
+            const Node graphObject (graph, false);
+
+            if (graphObject.getNodeById(sourceNode).isValid() &&
+                graphObject.getNodeById(destNode).isValid())
+            {
+                // if the nodes are valid then preserve it
+                arc.setProperty (Tags::missing, true, 0);
+            }
+            else
+            {
+                failed.add (arc);
+            }
         }
     }
 
-    const bool discardFailedConnections = false;
+    const bool discardFailedConnections = true;
     if (discardFailedConnections)
-    {
         for (const auto& n : failed)
-        {
             arcs.removeChild (n, nullptr);
-            Node::sanitizeRuntimeProperties (n);
-        }
-    }
 
     loaded = true;
-    jassert (arcs.getNumChildren() - failed.size() == processor.getNumConnections());
+    jassert (arcs.getNumChildren() == processor.getNumConnections());
     failed.clearQuick();
 
     IONodeEnforcer enforceIONodes (*this);
