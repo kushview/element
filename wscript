@@ -222,7 +222,8 @@ def build_mac (bld):
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
+                        os.path.expanduser('~') + '/SDKs/VST_SDK/VST2_SDK' ],
         target      = 'lib/kv',
         name        = 'KV',
         env         = libEnv,

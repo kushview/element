@@ -864,7 +864,7 @@ GraphNode* GraphProcessor::addNode (GraphNode* newNode)
 
     for (int i = nodes.size(); --i >= 0;)
     {
-        if (nodes.getUnchecked(i) == newNode)
+        if (nodes.getUnchecked(i).get() == newNode)
         {
             jassertfalse; // Cannot add the same object to the graph twice!
             return nullptr;
