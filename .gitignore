@@ -33,3 +33,4 @@ build/
 !/.vscode/tasks.json
 !/.vscode/launch.json
 !/.vscode/c_cpp_properties.json
+!/.vscode/vscode.h
