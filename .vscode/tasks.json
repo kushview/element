@@ -176,7 +176,24 @@
             "problemMatcher": []
         },
         {
-            "label": "Clean Docking Example",
+            "label": "Docking Example: Rebuild",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "clean",
+                "build",
+                "-project",
+                "Docking.xcodeproj",
+                "-configuration",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/libs/kv/extras/Docking/Builds/MacOSX"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docking Example: Clean",
             "type": "shell",
             "command": "xcodebuild",
             "args": [
