@@ -158,6 +158,23 @@
             "type": "shell",
             "command": "tools/build-osx.sh && tools/build-free-osx.sh",
             "problemMatcher": []
+        },
+        {
+            "label": "Build Docking Example",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "build",
+                "-project",
+                "Docking.xcodeproj",
+                "-configuration",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/libs/kv/extras/Docking/Builds/MacOSX"
+            },
+            "problemMatcher": []
         }
     ]
 }
+
