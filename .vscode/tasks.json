@@ -174,6 +174,22 @@
                 "cwd": "${workspaceFolder}/libs/kv/extras/Docking/Builds/MacOSX"
             },
             "problemMatcher": []
+        },
+        {
+            "label": "Clean Docking Example",
+            "type": "shell",
+            "command": "xcodebuild",
+            "args": [
+                "clean",
+                "-project",
+                "Docking.xcodeproj",
+                "-configuration",
+                "Debug"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/libs/kv/extras/Docking/Builds/MacOSX"
+            },
+            "problemMatcher": []
         }
     ]
 }
