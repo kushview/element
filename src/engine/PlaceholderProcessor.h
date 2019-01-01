@@ -46,11 +46,15 @@ public:
         acceptMidi      = ins.size() > 0;
         produceMidi     = outs.size() > 0;
         
+        int controlIdx = 0;
         for (int i = 0; i < node.getPortsValueTree().getNumChildren(); ++i)
         {
             const auto port = node.getPort (i);
-            if (port.isA (PortType::Control, true))
-                addParameter (new AudioParameterFloat (port.getName(), port.getName(), 0, 1, 0));
+            if (port.isA(PortType::Control, true))
+            {
+                String controlId = "control-"; controlId << controlIdx++;
+                addParameter (new AudioParameterFloat (controlId, port.getName(), 0, 1, 0));
+            }
         }
 
         setPlayConfigDetails (numInputs, numOutputs, sampleRate, bufferSize);

@@ -58,8 +58,12 @@
                 file="../src/engine/nodes/AudioProcessorNode.cpp"/>
           <FILE id="KdzkAZ" name="AudioProcessorNode.h" compile="0" resource="0"
                 file="../src/engine/nodes/AudioProcessorNode.h"/>
-          <FILE id="CXy4LY" name="MidiChannelSplitter.cpp" compile="1" resource="0"
-                file="../src/engine/nodes/MidiChannelSplitter.cpp"/>
+          <FILE id="zvV0bL" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/MediaPlayerProcessor.cpp"/>
+          <FILE id="frcoSy" name="MediaPlayerProcessor.h" compile="0" resource="0"
+                file="../src/engine/nodes/MediaPlayerProcessor.h"/>
+          <FILE id="a1TSKK" name="MidiChannelSplitterNode.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/MidiChannelSplitterNode.cpp"/>
           <FILE id="tiqVm6" name="MidiChannelSplitterNode.h" compile="0" resource="0"
                 file="../src/engine/nodes/MidiChannelSplitterNode.h"/>
           <FILE id="C4XVqA" name="MidiFilterNode.cpp" compile="1" resource="0"

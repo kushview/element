@@ -184,7 +184,7 @@ struct UnlockForm::OverlayComp  : public Component,
     OnlineUnlockStatus::UnlockResult result;
     String email, password, license;
     
-    friend class LicenseInfo;
+    friend struct LicenseInfo;
     JUCE_LEAK_DETECTOR (UnlockForm::OverlayComp)
 };
 

@@ -257,7 +257,7 @@ void MediaPlayerProcessor::getStateInformation (juce::MemoryBlock& destData)
     ValueTree state (Tags::state);
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
          .setProperty ("playing", (bool)*playing, nullptr)
-         .setProperty ("slave", (bool)*sync, nullptr);
+         .setProperty ("slave", (bool)*slave, nullptr);
     MemoryOutputStream stream (destData, false);
     state.writeToStream (stream);
 }
