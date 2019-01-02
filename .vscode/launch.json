@@ -53,6 +53,11 @@
             "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
+                "logging": {
+                    "moduleLoad": false,
+                    "exceptions": false
+                },
+                "environment": [ { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" } ],
                 "setupCommands": [
                     {
                         "description": "Enable pretty-printing for gdb",
