@@ -244,27 +244,27 @@
 #endif
 
 #ifndef    JUCE_USE_XRANDR
- //#define JUCE_USE_XRANDR 1
+ #define   JUCE_USE_XRANDR 1
 #endif
 
 #ifndef    JUCE_USE_XINERAMA
- //#define JUCE_USE_XINERAMA 1
+ #define   JUCE_USE_XINERAMA 1
 #endif
 
 #ifndef    JUCE_USE_XSHM
- //#define JUCE_USE_XSHM 1
+ #define   JUCE_USE_XSHM 1
 #endif
 
 #ifndef    JUCE_USE_XRENDER
- //#define JUCE_USE_XRENDER 0
+ #define   JUCE_USE_XRENDER 1
 #endif
 
 #ifndef    JUCE_USE_XCURSOR
- //#define JUCE_USE_XCURSOR 1
+ #define   JUCE_USE_XCURSOR 1
 #endif
 
 #ifndef    JUCE_WIN_PER_MONITOR_DPI_AWARE
- //#define JUCE_WIN_PER_MONITOR_DPI_AWARE 1
+ #define   JUCE_WIN_PER_MONITOR_DPI_AWARE 0
 #endif
 
 //==============================================================================

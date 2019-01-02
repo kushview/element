@@ -186,7 +186,7 @@ def build_linux (bld):
         target      = 'lib/kv',
         name        = 'KV',
         env         = libEnv,
-        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT' ]
+        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
     )
 
     appEnv = bld.env.derive()
