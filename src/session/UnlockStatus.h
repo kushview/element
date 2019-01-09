@@ -105,7 +105,8 @@ public:
     {
         stopTimer();
         cancelled.set (1);
-        stopThread (1500);
+        if (isThreadRunning())
+            stopThread (1500);
     }
 
     Signal<void()> refreshed;
