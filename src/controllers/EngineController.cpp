@@ -934,6 +934,7 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
                 proc->suspendProcessing (true);
                 proc->releaseResources();
                 proc->setBusesLayoutWithoutEnabling (layout);
+                node.resetPorts();
                 if (wasNotSuspended)
                     proc->suspendProcessing (false);
                 
@@ -942,7 +943,6 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
 
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();
-                node.resetPorts();
             }
         }
     }
