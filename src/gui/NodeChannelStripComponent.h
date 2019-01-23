@@ -125,6 +125,7 @@ public:
         if (node.isValid())
         {
             nodeName.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
+            nodeName.setTooltip (node.getName());
         }
 
         updateChannelStrip();
