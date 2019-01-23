@@ -1,6 +1,6 @@
 /*
     GraphEditorComponent.cpp - This file is part of Element
-    Copyright (C) 2016  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016-2019  Kushview, LLC.  All rights reserved.
 */
 
 #include "ElementApp.h"
