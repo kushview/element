@@ -190,16 +190,23 @@ namespace Element {
             : SliderPropertyComponent ("MIDI Program", -1.0, 127.0, 1.0, 1.0, false),
               node (n)
         {
-            slider.textFromValueFunction = [](double value) -> String
-            {
-                if (value < 0.0) return "None";
-                return String (static_cast<int> (value));
+            slider.textFromValueFunction = [](double value) -> String {
+                const int iValue = static_cast<int> (value);
+                if (iValue < 0) return "None";
+                return String (1 + iValue);
+            };
+
+            slider.valueFromTextFunction = [](const String& text) -> double {
+                if (text == "None")
+                    return -1.0;
+                return static_cast<double> (text.getIntValue()) - 1.0;
             };
         }
 
         virtual ~MidiProgramPropertyComponent()
         {
             slider.textFromValueFunction = nullptr;
+            slider.valueFromTextFunction = nullptr;
         }
 
         void setLocked (const var& isLocked) override

@@ -348,7 +348,7 @@ public:
         const auto h = area.getHeight(); const auto w = h;
         const int p = (int) node.getProperty (Tags::midiProgram, -1);
         if (p >= 0)
-            g.drawText (String (p), area.getWidth() - h, 0, w, h, Justification::centred);
+            g.drawText (String (1 + p), area.getWidth() - h, 0, w, h, Justification::centred);
        #endif
     }
 
