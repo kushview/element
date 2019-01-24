@@ -187,9 +187,19 @@ namespace Element {
     {
     public:
         MidiProgramPropertyComponent (const Node& n)
-            : SliderPropertyComponent ("MIDI Program", 0.0, 128.0, 1.0, 1.0,false),
+            : SliderPropertyComponent ("MIDI Program", -1.0, 127.0, 1.0, 1.0, false),
               node (n)
         {
+            slider.textFromValueFunction = [](double value) -> String
+            {
+                if (value < 0.0) return "None";
+                return String (static_cast<int> (value));
+            };
+        }
+
+        virtual ~MidiProgramPropertyComponent()
+        {
+            slider.textFromValueFunction = nullptr;
         }
 
         void setLocked (const var& isLocked) override
@@ -202,7 +212,7 @@ namespace Element {
         {
             if (! locked)
             {
-                node.setProperty (Tags::midiProgram, roundToInt(v) - 1);
+                node.setProperty (Tags::midiProgram, roundToInt (v));
                 if (GraphNodePtr ptr = node.getGraphNode())
                     if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                         root->setMidiProgram ((int) node.getProperty (Tags::midiProgram));
@@ -215,8 +225,8 @@ namespace Element {
         }
         
         double getValue() const override 
-        { 
-            return 1.0 + (double)node.getProperty (Tags::midiProgram, -1);
+        {
+            return (double)node.getProperty (Tags::midiProgram, -1);
         }
         
         Node node;

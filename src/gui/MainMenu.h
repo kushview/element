@@ -135,7 +135,7 @@ public:
         else if (index == 1111)
         {
             auto msg = MidiMessage::programChange (1, 10);
-            msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
+            msg.setTimeStamp (1.f + Time::getMillisecondCounterHiRes());
             engine->addMidiMessage (msg);
         }
         else if (index == 2222)
@@ -327,7 +327,7 @@ private:
     void buildDebugMenu (PopupMenu& menu)
     {
         menu.addItem (1000, "Dump session to console");
-        menu.addItem (1111, "Report bug");
+        menu.addItem (1111, "Send MIDI Program 10 ch 1");
         menu.addItem (2222, "Show changed status");
         menu.addItem (3333, "Quick Map");
         menu.addItem (4444, "Refresh Mapping Engine");

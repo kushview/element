@@ -167,6 +167,9 @@ public:
     /** Set the allowed MIDI channels of this Graph */
     void setMidiChannels (const kv::MidiChannels channels) noexcept;
 
+    /** returns true if this graph is processing the given channel */
+    bool acceptsMidiChannel (const int channel) const noexcept;
+
     /** Set the MIDI curve of this graph */
     void setVelocityCurveMode (const VelocityCurve::Mode) noexcept;
 

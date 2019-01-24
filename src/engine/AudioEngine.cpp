@@ -120,6 +120,9 @@ struct RootGraphRender
         audioTemp.setSize (1, 1);
         audioOut.setSize (1, 1);
     }
+    void dumpGraphs() {
+        
+    }
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
@@ -129,7 +132,6 @@ struct RootGraphRender
             if (! locked)
             {
                 const int nextGraph = findGraphForProgram (program);
-                
                 if (nextGraph != currentGraph)
                 {
                     DBG("[EL] changing graph: " << currentGraph << " > " << nextGraph);
@@ -325,7 +327,7 @@ struct RootGraphRender
 
 private:
     Array<RootGraph*> graphs;
-    bool locked             = true;
+    bool locked             = false;
     int currentGraph        = -1;
     int lastGraph           = -1;
 
@@ -356,12 +358,16 @@ private:
 
     int findGraphForProgram (const ProgramRequest& r) const
     {
-        if (isPositiveAndBelow (program.program, 127))
-            for (const auto* g : graphs)
-                if (g->midiChannel == 0 || g->midiChannel == r.channel)
-                    if (g->midiProgram == r.program)
-                        return g->engineIndex;
-                
+        if (isPositiveAndBelow (program.program, 128))
+        {
+            for (int i = 0; i < graphs.size(); ++i)
+            {
+                auto* const g = graphs.getUnchecked (i);
+                if (g->midiProgram == r.program && g->acceptsMidiChannel (program.channel))
+                    return g->engineIndex;
+            }
+        }
+
         return currentGraph;
     }
 };
@@ -717,15 +723,16 @@ private:
     
     int latencySamples = 0;
 
+    // GraphRender::locked must match this default value
     Atomic<int> shouldBeLocked { 0 };
 
     void updateUnlockStatus()
     {
         auto& status (engine.getWorld().getUnlockStatus());
-        int newValue = (bool) status.isFullVersion() ? 0 : 1;
+        int newValue = ((bool) status.isFullVersion()) ? 0 : 1;
         int compareValue = newValue == 0 ? 1 : 0;
         if (shouldBeLocked.compareAndSetBool (newValue, compareValue))
-            graphs.setLocked ((bool) status.isFullVersion());
+            graphs.setLocked (! (bool)status.isFullVersion());
     }
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)

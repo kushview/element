@@ -1105,6 +1105,12 @@ void GraphProcessor::setMidiChannels (const kv::MidiChannels channels) noexcept
     midiChannels = channels;
 }
 
+bool GraphProcessor::acceptsMidiChannel (const int channel) const noexcept
+{
+    ScopedLock sl (getCallbackLock());
+    return midiChannels.isOn (channel);
+}
+
 void GraphProcessor::setVelocityCurveMode (const VelocityCurve::Mode mode) noexcept
 {
     ScopedLock sl (getCallbackLock());
