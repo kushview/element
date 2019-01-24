@@ -134,7 +134,7 @@ public:
         }
         else if (index == 1111)
         {
-            auto msg = MidiMessage::programChange (1, 9); // Program 10 in GUI, channel 9 in MIDI
+            auto msg = MidiMessage::programChange (1, 9); // Program 10 in GUI equals Program 9 in MIDI
             msg.setTimeStamp (1.f + Time::getMillisecondCounterHiRes());
             engine->addMidiMessage (msg);
         }
