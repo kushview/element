@@ -4,13 +4,13 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
+#include "engine/MidiPipe.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
 
 #include "session/Node.h"
 
 namespace Element {
-
 
 GraphNode::GraphNode (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
@@ -130,23 +130,25 @@ void GraphNode::setOutputRMS (int chan, float val)
 
 bool GraphNode::isSuspended() const
 {
-    if (auto* proc = getAudioProcessor())
-        return  proc->isSuspended();
-    return false;
+    return bypassed.get() == 1;
 }
 
 void GraphNode::suspendProcessing (const bool shouldBeSuspended)
 {
     const bool wasSuspeneded = isSuspended();
+    const int iShouldBeSuspended = static_cast<int> (shouldBeSuspended);
 
     if (auto* proc = getAudioProcessor())
     {
         if (wasSuspeneded != shouldBeSuspended)
+        {
             proc->suspendProcessing (shouldBeSuspended);
+            bypassed.set (proc->isSuspended() ? 1 : 0);
+        }
     }
-    else
+    else if (bypassed.get() != iShouldBeSuspended)
     {
-        jassertfalse; // subclass without AudioProc MUST implement this!
+        bypassed.set (iShouldBeSuspended);
     }
 
     if (isSuspended() != wasSuspeneded)
@@ -292,8 +294,13 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
 
 void GraphNode::EnablementUpdater::handleAsyncUpdate()
 {
-    DBG("[EL] Async node enabled changed");
     graph.setEnabled (! graph.isEnabled());
+}
+
+void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
+{
+    audio.clear (0, audio.getNumSamples());
+    midi.clear();
 }
 
 void GraphNode::resetPorts()

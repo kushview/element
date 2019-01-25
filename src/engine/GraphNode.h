@@ -39,9 +39,9 @@ public:
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
-    virtual void render (AudioSampleBuffer&, MidiPipe&) { }
-
     virtual bool wantsMidiPipe() const { return false; }
+    virtual void render (AudioSampleBuffer&, MidiPipe&) { }
+    virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&);
     
     /** Returns the total number of audio inputs */
     int getNumAudioInputs() const;
@@ -133,7 +133,6 @@ public:
     inline float getLastGain() const { return lastGain.get(); }
     inline float getLastInputGain() const { return lastInputGain.get(); }
 
-    
     inline void updateGain() noexcept
     {
         if (lastGain.get() != gain.get())
@@ -199,7 +198,7 @@ public:
     { 
         if (auto* const proc = getAudioProcessor())
             return proc->getNumPrograms();
-        return 1; 
+        return 1;
     }
 
     inline virtual int getCurrentProgram() const
@@ -237,6 +236,7 @@ private:
     GraphProcessor* parent = nullptr;
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
+    Atomic<int> bypassed { 0 };
     int latencySamples = 0;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;

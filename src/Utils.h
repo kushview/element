@@ -11,7 +11,7 @@ inline static String minutesToString (const double input)
     double minutes = 0, seconds = 60.0 * modf (input, &minutes);
     String ms (roundToInt (floor (minutes)));
     String mm (roundToInt (floor (seconds)));
-    return ms.paddedLeft('0', 2) + ":" + mm.paddedLeft('0', 2);
+    return ms.paddedLeft('0', 2) + ":" + mm.paddedLeft ('0', 2);
 }
 
 /** Display seconds in decimal as min:sec */

@@ -277,7 +277,10 @@ public:
         if (node->wantsMidiPipe())
         {
             MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
-            node->render (buffer, midiPipe);
+            if (! node->isSuspended())
+                node->render (buffer, midiPipe);
+            else
+                node->renderBypassed (buffer, midiPipe);
         }
         else
         {
@@ -291,11 +294,10 @@ public:
             }
         }
         
-        
         if (node->getGain() != node->getLastGain()) {
             buffer.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
         } else {
-            buffer.applyGain(0, numSamples, node->getGain());
+            buffer.applyGain (0, numSamples, node->getGain());
         }
 
         node->updateGain();
