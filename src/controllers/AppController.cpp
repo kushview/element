@@ -10,6 +10,7 @@
 
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
+#include "gui/MainWindow.h"
 #include "gui/UnlockForm.h"
 #include "gui/GuiCommon.h"
 
@@ -477,6 +478,45 @@ bool AppController::perform (const InvocationInfo& info)
         default: res = false; break;
     }
     return res;
+}
+
+void AppController::checkForegroundStatus()
+{
+   #if ! EL_RUNNING_AS_PLUGIN
+    class CheckForeground : public CallbackMessage
+    {
+    public:
+        CheckForeground (AppController& a) : app (a) { }
+        void messageCallback() override
+        {
+            static bool sIsForeground = true;
+            const auto foreground = Process::isForegroundProcess();
+            if (sIsForeground == foreground)
+                return;
+            
+            auto session  = app.getWorld().getSession();
+            auto& gui     = *app.findChild<GuiController>();
+            const Node graph (session->getCurrentGraph());
+            jassert (session);
+            if (foreground)
+            {
+                gui.showPluginWindowsFor (graph, true, false);
+                gui.getMainWindow()->toFront (true);
+            }
+            else if (! foreground)
+            {
+                gui.closeAllPluginWindows();
+            }
+            
+            sIsForeground = foreground;
+        }
+
+    private:
+        AppController& app;
+    };
+
+    (new CheckForeground(*this))->post();
+   #endif
 }
 
 void AppController::licenseRefreshed()

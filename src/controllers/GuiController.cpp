@@ -358,6 +358,16 @@ void GuiController::presentPluginWindow (const Node& node)
     }
 }
 
+bool GuiController::haveActiveWindows() const
+{
+    if (mainWindow && mainWindow->isActiveWindow())
+        return true;
+    for (int i = 0; i < getNumPluginWindows(); ++i)
+        if (getPluginWindow(i)->isActiveWindow())
+            return true;
+    return false;
+}
+
 void GuiController::run()
 {
     mainWindow = new MainWindow (world);

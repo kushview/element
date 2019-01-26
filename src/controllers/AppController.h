@@ -33,6 +33,8 @@ public:
     
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
 
+    void checkForegroundStatus();
+    
 protected:
     friend class ApplicationCommandTarget;
     ApplicationCommandTarget* getNextCommandTarget() override;

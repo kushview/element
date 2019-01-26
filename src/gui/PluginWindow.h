@@ -6,9 +6,8 @@
 namespace Element {
 
 class ContentComponent;
-class GraphNode;
 class GuiController;
-class Node;
+class GraphNode;
 
 /** A desktop window containing a plugin's UI. */
 class PluginWindow : public DocumentWindow
@@ -26,12 +25,16 @@ public:
     
     Toolbar* getToolbar() const;
     void updateGraphNode (GraphNode* newNode, Component* newEditor);
-    
+    Node getNode() const { return node; }
+    void restoreAlwaysOnTopState();
     void moved() override;
     void closeButtonPressed() override;
     void resized() override;
 
-	int getDesktopWindowStyleFlags() const override {
+    void activeWindowStatusChanged() override;
+
+	int getDesktopWindowStyleFlags() const override
+    {
 		return ComponentPeer::windowHasCloseButton |
 			   ComponentPeer::windowHasTitleBar;
 	}

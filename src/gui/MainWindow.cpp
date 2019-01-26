@@ -1,8 +1,9 @@
 /*
     MainWindow.cpp - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016-2019 Kushview, LLC.  All rights reserved.
 */
 
+#include "controllers/AppController.h"
 #include "controllers/AppController.h"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
@@ -62,6 +63,14 @@ void MainWindow::closeButtonPressed()
 {
     JUCEApplication* app (JUCEApplication::getInstance());
     app->systemRequestedQuit();
+}
+
+void MainWindow::activeWindowStatusChanged()
+{
+    if (nullptr == getContentComponent())
+        return;
+    auto& app (getAppController());
+    app.checkForegroundStatus();
 }
 
 void MainWindow::refreshMenu()

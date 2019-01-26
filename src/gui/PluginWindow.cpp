@@ -248,9 +248,27 @@ Toolbar* PluginWindow::getToolbar() const
     return nullptr;
 }
 
+void PluginWindow::restoreAlwaysOnTopState()
+{
+    if (node.isValid())
+    {
+        const auto shouldBeOnTop = (bool) node.getProperty (Tags::windowOnTop);
+        setAlwaysOnTop (shouldBeOnTop);
+        if (shouldBeOnTop) toFront (false);
+    }
+}
+
 void PluginWindow::resized()
 {
     DocumentWindow::resized();
+}
+
+void PluginWindow::activeWindowStatusChanged()
+{
+    if (nullptr == getContentComponent() || isActiveWindow())
+        return;
+    if (auto* app = dynamic_cast<AppController*> (gui.getRoot()))
+        app->checkForegroundStatus();
 }
 
 void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)

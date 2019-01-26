@@ -26,8 +26,9 @@ public:
     AppController& getAppController();
 
     void changeListenerCallback (ChangeBroadcaster* source) override;
-
+    void activeWindowStatusChanged() override;
     void refreshName();
+
 private:
     Globals& world;
     ScopedPointer<MainMenu> mainMenu;

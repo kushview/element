@@ -65,6 +65,8 @@ namespace Element {
         /** Stabilize Views Only */
         void stabilizeViews();
 
+        bool haveActiveWindows() const;
+        
         /* Command manager... */
         ApplicationCommandTarget* getNextCommandTarget() override;
         void getAllCommands (Array <CommandID>& commands) override;
