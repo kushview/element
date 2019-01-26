@@ -62,7 +62,7 @@ public:
         else
         {
             uniqueName = String ((int64) node.getNodeId());
-        }        
+        }
     }
     
     String getUniqueName() const override { return uniqueName; }
@@ -339,7 +339,6 @@ public:
     void paintContent (Graphics& g, const Rectangle<int>& area) override
     {
         TreeItemBase::paintContent (g, area);
-
         if (! node.isRootGraph())
             return;
        
@@ -553,7 +552,12 @@ SessionPtr SessionTreePanel::getSession() const
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    
+    if (tree.hasType (Tags::node))
+    {
+        const Node graph (tree, false);
+        if (property == Tags::name || (graph.isRootGraph() && property == Tags::midiProgram))
+            repaint();
+    }
 }
 
 static bool couldBeSessionObjects (ValueTree& parent, ValueTree& child)
