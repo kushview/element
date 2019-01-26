@@ -17,6 +17,10 @@ public:
         addAndMakeVisible (configButton);
         configButton.setTooltip ("Show graph settings");
         configButton.addListener (this);
+
+        addAndMakeVisible (sessionConfigButton);
+        sessionConfigButton.setTooltip ("Show session settings");
+        sessionConfigButton.addListener (this);
     }
 
     virtual ~GraphDisplayView()
@@ -28,8 +32,13 @@ public:
     {
         auto* const world = ViewHelpers::getGlobals(this);
         if (! world) return;
-        if (b == &configButton) {
+        if (b == &configButton)
+        {
             world->getCommandManager().invokeDirectly (Commands::showGraphConfig, true);
+        }
+        else if (b == &sessionConfigButton)
+        {
+            world->getCommandManager().invokeDirectly (Commands::showSessionConfig, true);
         }
     }
 
@@ -80,8 +89,11 @@ public:
         graphDisplayResized (r);
 
         const int configButtonSize = 14;
-        configButton.setBounds (getWidth() - configButtonSize - 4, 4, 
-                                configButtonSize, configButtonSize);
+        r = getLocalBounds().reduced(4);
+        r = r.removeFromTop (configButtonSize);
+        sessionConfigButton.setBounds (r.removeFromRight (configButtonSize));
+        r.removeFromRight (2);
+        configButton.setBounds (r.removeFromRight (configButtonSize));        
     }
 
     Node getGraph() const { return graph; }
@@ -94,7 +106,7 @@ protected:
 private:
     Node graph, node;
     BreadCrumbComponent breadcrumb;
-    ConfigButton configButton;
+    ConfigButton configButton, sessionConfigButton;
 };
 
 }

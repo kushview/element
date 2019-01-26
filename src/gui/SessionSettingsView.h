@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
 
 namespace Element {
@@ -17,6 +18,7 @@ public:
 
 private:
     ScopedPointer<SessionPropertyPanel> props;
+    GraphButton graphButton;
 };
     
 }

@@ -43,11 +43,17 @@ namespace Element {
         setName ("SessionSettings");
         addAndMakeVisible (props = new SessionPropertyPanel());
         setEscapeTriggersClose (true);
+        addAndMakeVisible (graphButton);
+        graphButton.setTooltip ("Show graph editor");
+        graphButton.onClick = [this]() {
+            if (auto* g = ViewHelpers::getGlobals(this))
+                g->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+        };
     }
     
     SessionContentView::~SessionContentView()
     {
-        
+        graphButton.onClick = nullptr;
     }
     
     void SessionContentView::didBecomeActive()
@@ -64,5 +70,8 @@ namespace Element {
     void SessionContentView::resized()
     {
         props->setBounds (getLocalBounds().reduced(2));
+        const int configButtonSize = 14;
+        graphButton.setBounds (getWidth() - configButtonSize - 4, 4, 
+                                configButtonSize, configButtonSize);
     }
 }
