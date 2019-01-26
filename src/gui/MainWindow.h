@@ -31,9 +31,8 @@ public:
 
 private:
     Globals& world;
-    ScopedPointer<MainMenu> mainMenu;
-    String sessionName;
-    void nameChanged (const String& value);
+    std::unique_ptr<MainMenu> mainMenu;
+    void nameChanged();
 };
 
 }

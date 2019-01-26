@@ -17,9 +17,9 @@ MainWindow::MainWindow (Globals& g)
     : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
-    mainMenu = new MainMenu (*this, g.getCommandManager());
+    mainMenu.reset (new MainMenu (*this, g.getCommandManager()));
     mainMenu->setupMenu();
-    nameChanged (g.getSession()->getName());
+    nameChanged();
     g.getSession()->addChangeListener (this);
     addKeyListener (g.getCommandManager().getKeyMappings());
     setUsingNativeTitleBar (true);
@@ -29,7 +29,7 @@ MainWindow::MainWindow (Globals& g)
 MainWindow::~MainWindow()
 {
     world.getSession()->removeChangeListener (this);
-    mainMenu = nullptr;
+    mainMenu.reset();
 }
 
 void MainWindow::changeListenerCallback (ChangeBroadcaster*)
@@ -40,22 +40,26 @@ void MainWindow::changeListenerCallback (ChangeBroadcaster*)
 
 void MainWindow::refreshName()
 {
-    nameChanged (world.getSession()->getName());
+    nameChanged();
 }
 
-void MainWindow::nameChanged (const String& value)
+void MainWindow::nameChanged()
 {
-    const auto newName = value.trim();
-    if (newName != sessionName)
-       sessionName = newName;
-
     String title = "Element";
    #ifdef EL_FREE
     title << " FREE";
    #endif
-    if (sessionName.isNotEmpty())
-        title << " - " << sessionName;
-    
+
+    if (auto session = world.getSession())
+    {
+        const auto sessName = session->getName().trim();
+        const auto graphName = session->getCurrentGraph().getName();
+        if (sessName.isNotEmpty())
+            title << " - " << sessName;
+        if (graphName.isNotEmpty())
+            title << ": " << graphName;
+    }
+
     setName (title);
 }
 
