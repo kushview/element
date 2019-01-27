@@ -76,6 +76,8 @@ private:
     SessionPtr session;
     ValueTree data;
 
+    void selectActiveRootGraph();
+    
     friend class ValueTree;
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
     void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override;

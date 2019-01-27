@@ -541,6 +541,7 @@ void SessionTreePanel::setSession (SessionPtr s)
     
     data = (session != nullptr) ? session->getValueTree() : ValueTree();
     refresh();
+    selectActiveRootGraph();
 }
 
 SessionPtr SessionTreePanel::getSession() const
@@ -548,11 +549,36 @@ SessionPtr SessionTreePanel::getSession() const
     return session;
 }
 
-
+void SessionTreePanel::selectActiveRootGraph()
+{
+    if (! session || nullptr == rootItem)
+        return;
+    const auto activeGraph = session->getActiveGraph();
+    for (int i = 0; i < rootItem->getNumSubItems(); ++i)
+    {
+        if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (rootItem->getSubItem (i)))
+        {
+            if (activeGraph == item->node)
+            {
+                if (! item->isSelected())
+                {
+                    item->setSelected (true, true, sendNotificationAsync);
+                    item->treeHasChanged();
+                    repaint();
+                }
+                break;
+            }
+        }
+    }
+}
 
 void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    if (tree.hasType (Tags::node))
+    if (tree.hasType (Tags::graphs) && property == Tags::active)
+    {
+        selectActiveRootGraph();
+    }
+    else if (tree.hasType (Tags::node))
     {
         const Node graph (tree, false);
         if (property == Tags::name || (graph.isRootGraph() && property == Tags::midiProgram))
