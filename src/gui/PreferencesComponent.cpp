@@ -503,7 +503,7 @@ namespace Element {
         AudioSettingsComponent (DeviceManager& d)
             : devs (d, 0, DeviceManager::maxAudioChannels, 0, 
                           DeviceManager::maxAudioChannels, 
-                          false, false, true, false),
+                          false, false, false, false),
               devices (d)
         {
             addAndMakeVisible (devs);

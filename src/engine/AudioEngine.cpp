@@ -81,11 +81,19 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
             audioOutputNames.add(namesOut[i]);
 }
 
-struct RootGraphRender
+struct RootGraphRender : public AsyncUpdater
 {
+    std::function<void()> onActiveGraphChanged;
+
     RootGraphRender()
     {
         graphs.ensureStorageAllocated (32);
+    }
+
+    void handleAsyncUpdate() override
+    {
+        if (onActiveGraphChanged)
+            onActiveGraphChanged();
     }
 
     const int setCurrentGraph (const int index)
@@ -93,6 +101,7 @@ struct RootGraphRender
         if (index == currentGraph)
             return currentGraph;
         currentGraph = index;
+        triggerAsyncUpdate();
         return currentGraph;
     }
 
@@ -315,6 +324,7 @@ struct RootGraphRender
     int size() const { return graphs.size(); }
 
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
+    int getGraphIndex() const { return currentGraph; }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
     
     /** passing in true turns off all rendering features in the paid version */
@@ -389,10 +399,12 @@ public:
         processMidiClock.set (0);
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
+        graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onCurrentGraphChanged, this);
     }
 
     ~Private()
     {
+        graphs.onActiveGraphChanged = nullptr;
         midiClock.removeListener (this);
         tempoValue.removeListener (this);
         externalClockValue.removeListener (this);
@@ -407,8 +419,25 @@ public:
     
     RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
     
-    
+    void onCurrentGraphChanged()
+    {
+        int currentGraph = -1;
+        {
+            ScopedLock sl (lock);
+            currentGraph = graphs.getGraphIndex();
+        }
 
+        auto session = engine.getWorld().getSession();
+        if (currentGraph >= 0 && currentGraph != session->getActiveGraphIndex())
+        {
+            // NOTE: this is a cheap way to refresh the GUI, in the future this
+            // will need to be smarter by determining whether or not EC needs to
+            // handle the change at the model layer.
+            auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
+            graphs.setProperty (Tags::active, currentGraph, nullptr);
+        }
+    }
+    
     void audioDeviceIOCallback (const float** const inputChannelData, const int numInputChannels,
                                 float** const outputChannelData, const int numOutputChannels,
                                 const int numSamples) override
