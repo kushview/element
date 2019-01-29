@@ -191,8 +191,10 @@ namespace Element {
               node (n)
         {
             slider.textFromValueFunction = [](double value) -> String {
+                DBG("textFromValueFunction");
                 const int iValue = static_cast<int> (value);
-                if (iValue < 0) return "None";
+                if (iValue < 0) 
+                    return "None";
                 return String (1 + iValue);
             };
 
@@ -201,6 +203,9 @@ namespace Element {
                     return -1.0;
                 return static_cast<double> (text.getIntValue()) - 1.0;
             };
+
+            // needed to ensure proper display when first loaded
+            slider.updateText();
         }
 
         virtual ~MidiProgramPropertyComponent()
@@ -233,7 +238,7 @@ namespace Element {
         
         double getValue() const override 
         {
-            return (double)node.getProperty (Tags::midiProgram, -1);
+            return (double) node.getProperty (Tags::midiProgram, -1);
         }
         
         Node node;
