@@ -137,13 +137,11 @@ struct RootGraphRender : public AsyncUpdater
     {
         if (program.wasRequested())
         {
-            DBG("[EL] program was requested: " << program.program << " channel: " << program.channel);
             if (! locked)
             {
                 const int nextGraph = findGraphForProgram (program);
                 if (nextGraph != currentGraph)
                 {
-                    DBG("[EL] changing graph: " << currentGraph << " > " << nextGraph);
                     setCurrentGraph (nextGraph);
                 }
             }
