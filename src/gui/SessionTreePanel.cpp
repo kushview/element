@@ -563,8 +563,7 @@ void SessionTreePanel::selectActiveRootGraph()
                 if (! item->isSelected())
                 {
                     item->setSelected (true, true, sendNotificationAsync);
-                    item->treeHasChanged();
-                    repaint();
+                    item->repaintItem();
                 }
                 break;
             }
