@@ -191,7 +191,6 @@ namespace Element {
               node (n)
         {
             slider.textFromValueFunction = [](double value) -> String {
-                DBG("textFromValueFunction");
                 const int iValue = static_cast<int> (value);
                 if (iValue < 0) 
                     return "None";
