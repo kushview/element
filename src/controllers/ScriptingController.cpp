@@ -1,7 +1,8 @@
 
-#if HAVE_PYTHON
+
 #include "controllers/ScriptingController.h"
 
+#if HAVE_PYTHON
 #include <pybind11/embed.h>
 namespace py = pybind11;
 
@@ -10,6 +11,7 @@ PYBIND11_EMBEDDED_MODULE(element, module) {
         return i + j;
     });
 }
+#endif
 
 namespace Element {
 
@@ -17,6 +19,7 @@ struct PythonTest
 {
     void run()
     {
+       #if HAVE_PYTHON
         py::scoped_interpreter guard{};
         try {
             py::exec(R"(
@@ -26,6 +29,7 @@ struct PythonTest
         }  catch (std::exception& e) {
             std::cout << e.what();
         }
+       #endif
     }
 };
 
@@ -43,4 +47,3 @@ void ScriptingController::deactivate()
 }
 
 }
-#endif
