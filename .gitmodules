@@ -6,3 +6,6 @@
 	path = libs/JUCE
 	url = https://github.com/WeAreRoli/JUCE.git
 	branch = master
+[submodule "libs/pybind11"]
+	path = libs/pybind11
+	url = https://github.com/pybind/pybind11

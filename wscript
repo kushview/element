@@ -195,7 +195,8 @@ def build_linux (bld):
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'libs/kv/modules', 'libs/pybind11/include', \
+                        'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'lib/element',
         name        = 'EL',
@@ -228,7 +229,7 @@ def build_mac (bld):
         name        = 'KV',
         env         = libEnv,
         use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
-                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE'
+                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE PYTHON'
     )
 
     appEnv = bld.env.derive()
@@ -237,12 +238,14 @@ def build_mac (bld):
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+                        'libs/kv/modules', 'libs/pybind11/include', \
+                        'project/JuceLibraryCode', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
+                        '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7' ],
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = [ 'KV' ]
+        use         = [ 'KV', 'PYTHON' ]
     )
 
     bld.add_group()
@@ -255,7 +258,8 @@ def build_mac (bld):
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
-        use         = [ 'KV', 'EL' ],
+        use         = [ 'KV', 'EL', 'PYTHON' ],
+        linkflags   = [ '-framework', 'Python' ],
         mac_app     = True,
         mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]

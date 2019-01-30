@@ -4,7 +4,7 @@
          beatsPerBar="4" beatDivisor="2">
   <graphs active="0">
     <node type="graph" name="Graph 1" bypass="0" persistent="1" renderMode="single"
-          program="0" uuid="d7c9eb442ed04ad4aff636cfd83910d0">
+          program="0" uuid="d7c9eb442ed04ad4aff636cfd83910d0" midiProgram="-1">
       <nodes>
         <node id="3" type="plugin" format="Internal" identifier="midi.input"
               name="MIDI In" relativeX="0.75000000000000000000" relativeY="0.25000000000000000000"
@@ -20,6 +20,57 @@
               name="MIDI Out" relativeX="0.75000000000000000000" relativeY="0.75000000000000000000"
               numAudioIns="0" numAudioOuts="0" bypass="0" program="0" persistent="1"
               renderMode="single" uuid="d15ee96886eb4ceb8322dda44bf1355f" enabled="1">
+          <nodes/>
+          <ports>
+            <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_in_0"
+                  flow="input"/>
+          </ports>
+        </node>
+      </nodes>
+      <ports/>
+      <arcs/>
+    </node>
+    <node type="graph" uuid="f1d29ba3540141f5aa22e8ec8fad982e" name="Graph 2"
+          bypass="0" persistent="1" renderMode="single" midiProgram="9">
+      <nodes>
+        <node id="1" type="plugin" format="Internal" identifier="audio.input"
+              name="Soundflower (2ch)" relativeX="0.25" relativeY="0.25" numAudioIns="0"
+              numAudioOuts="2" uuid="1af0d8c9a8bc432887c3bb962d67c541" bypass="0"
+              persistent="1" renderMode="single" enabled="1" program="0">
+          <nodes/>
+          <ports>
+            <port index="0" channel="0" type="audio" name="Output 1" symbol="audio_out_1"
+                  flow="output"/>
+            <port index="1" channel="1" type="audio" name="Output 2" symbol="audio_out_2"
+                  flow="output"/>
+          </ports>
+        </node>
+        <node id="2" type="plugin" format="Internal" identifier="audio.output"
+              name="Built-in Output" relativeX="0.25" relativeY="0.75" numAudioIns="2"
+              numAudioOuts="0" uuid="f59e29be79e64953834a2882ee1e5353" bypass="0"
+              persistent="1" renderMode="single" enabled="1" program="0">
+          <nodes/>
+          <ports>
+            <port index="0" channel="0" type="audio" name="Input 1" symbol="audio_in_1"
+                  flow="input"/>
+            <port index="1" channel="1" type="audio" name="Input 2" symbol="audio_in_2"
+                  flow="input"/>
+          </ports>
+        </node>
+        <node id="3" type="plugin" format="Internal" identifier="midi.input"
+              name="MIDI In" relativeX="0.75" relativeY="0.25" numAudioIns="0"
+              numAudioOuts="0" uuid="15dffbcd9f9f4472b08ae0c0f67a591f" bypass="0"
+              persistent="1" renderMode="single" enabled="1" program="0">
+          <nodes/>
+          <ports>
+            <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_out_0"
+                  flow="output"/>
+          </ports>
+        </node>
+        <node id="4" type="plugin" format="Internal" identifier="midi.output"
+              name="MIDI Out" relativeX="0.75" relativeY="0.75" numAudioIns="0"
+              numAudioOuts="0" uuid="a693cb125f7240a297a791a2e873d90a" bypass="0"
+              persistent="1" renderMode="single" enabled="1" program="0">
           <nodes/>
           <ports>
             <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_in_0"

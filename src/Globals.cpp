@@ -16,7 +16,23 @@
 #include "session/CommandManager.h"
 #include "Globals.h"
 
+#include <pybind11/embed.h>
+namespace py = pybind11;
+
 namespace Element {
+
+struct PythonTest
+{
+    void run()
+    {
+        py::scoped_interpreter guard{};
+        py::exec(R"(
+            kwargs = dict(name="World", number=42)
+            message = "Hello, {name}! The answer is {number}".format(**kwargs)
+            print(message)
+        )");
+    }
+};
 
 static void buildCommandLine (CommandLine& cli, const String& c)
 {
@@ -76,6 +92,9 @@ private:
         session  = new Session();
         mapping.reset (new MappingEngine());
         presets.reset (new PresetCollection());
+
+        PythonTest testpy;
+        testpy.run();
     }
     
     void freeAll()

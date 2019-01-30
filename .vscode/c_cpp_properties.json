@@ -13,6 +13,7 @@
                 "${workspaceRoot}/libs/kv/modules",
                 "${workspaceRoot}/libs/lv2",
                 "${workspaceRoot}/libs/JUCE/modules",
+                "${workspaceRoot}/libs/pybind11/include",
                 "/opt/kushview/include"
             ],
             "defines": [
@@ -36,7 +37,8 @@
                     "${workspaceRoot}/libs/kv/modules/*",
                     "${workspaceRoot}/libs/lv2/*",
                     "${workspaceRoot}/libs/JUCE/modules/*",
-                    "/opt/kushview/include/*"
+                    "/opt/kushview/include/*",
+                    "${workspaceRoot}/libs/pybind11/include",
                 ],
                 "limitSymbolsToIncludedHeaders": false,
                 "databaseFilename": "",
