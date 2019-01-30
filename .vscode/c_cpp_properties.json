@@ -38,7 +38,7 @@
                     "${workspaceRoot}/libs/lv2/*",
                     "${workspaceRoot}/libs/JUCE/modules/*",
                     "/opt/kushview/include/*",
-                    "${workspaceRoot}/libs/pybind11/include",
+                    "${workspaceRoot}/libs/pybind11/include"
                 ],
                 "limitSymbolsToIncludedHeaders": false,
                 "databaseFilename": "",
