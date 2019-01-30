@@ -943,6 +943,8 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
 
                 controller->removeIllegalConnections();
                 controller->syncArcsModel();
+
+                findSibling<GuiController>()->stabilizeViews();
             }
         }
     }

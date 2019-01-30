@@ -23,7 +23,8 @@ public:
     void activate() override;
     void deactivate() override;
 
-    class Child : public Controller {
+    class Child : public Controller
+    {
     public:
         Child() { }
         virtual ~Child() { }

@@ -147,9 +147,6 @@ public:
 
     inline void setNode (const Node& newNode)
     {
-        if (node.getValueTree() == newNode.getValueTree())
-            return;
-        
         stopTimer();
         node = newNode;
         isAudioOutNode = node.isAudioOutputNode();
