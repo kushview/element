@@ -12,12 +12,12 @@ namespace Element {
 class GraphMixerListBoxModel : public ListBoxModel
 {
 public:
-    GraphMixerListBoxModel (GuiController& g) : gui (g) { }
+    GraphMixerListBoxModel (GuiController& g) : gui (g) { refreshNodes(); }
     ~GraphMixerListBoxModel() { }
 
     int getNumRows() override
     {
-        return gui.getWorld().getSession()->getActiveGraph().getNumNodes();
+        return nodes.size();
     }
 
     void paintListBoxItem (int rowNumber, Graphics& g,
@@ -27,8 +27,9 @@ public:
         ignoreUnused (rowNumber, g, width, height, rowIsSelected);
     }
 
-    Node getNode (int r) {
-        return gui.getWorld().getSession()->getActiveGraph().getNode (r);
+    Node getNode (int r)
+    {
+        return nodes [r];
     }
 
     Component* refreshComponentForRow (int rowNumber, bool isRowSelected, 
@@ -41,6 +42,18 @@ public:
         return strip;
     }
 
+    void refreshNodes()
+    {
+        nodes.clearQuick();
+        const auto graph = gui.getWorld().getSession()->getActiveGraph();
+        for (int i = 0; i < graph.getNumNodes(); ++i)
+        {
+            const auto node = graph.getNode (i);
+            if (node.isMidiIONode())
+                continue;
+            nodes.add (node);
+        }
+    }
    #if 0
     virtual void listBoxItemClicked (int row, const MouseEvent&);
     virtual void listBoxItemDoubleClicked (int row, const MouseEvent&);
@@ -55,6 +68,7 @@ public:
    #endif
 private:
     GuiController& gui;
+    NodeArray nodes;
 };
 
 class GraphMixerView::Content : public Component 
@@ -87,7 +101,9 @@ public:
         g.fillAll();
     }
 
-    void stabilize() {
+    void stabilize()
+    {
+        model->refreshNodes();
         box.updateContent();
     }
 

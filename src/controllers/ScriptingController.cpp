@@ -24,7 +24,8 @@ struct PythonTest
         try {
             py::exec(R"(
                 import element
-                print(element.add(4, 5))
+                answer = element.add(4, 5)
+                print("[EL] Hello from Python! The answer is %s" % answer)
             )");
         }  catch (std::exception& e) {
             std::cout << e.what();
