@@ -57,9 +57,11 @@
             "args": [
                 "waf",
                 "configure",
-                "--debug"
+                "--debug",
+                "--enable-python"
             ],
             "options": {
+                
                 "env": {
                     "CC": "ccache clang",
                     "CXX": "ccache clang++"
