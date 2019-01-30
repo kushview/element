@@ -45,6 +45,10 @@
               file="../src/controllers/PresetsController.cpp"/>
         <FILE id="AADoei" name="PresetsController.h" compile="0" resource="0"
               file="../src/controllers/PresetsController.h"/>
+        <FILE id="sSexU8" name="ScriptingController.cpp" compile="1" resource="0"
+              file="../src/controllers/ScriptingController.cpp"/>
+        <FILE id="PoD0CQ" name="ScriptingController.h" compile="0" resource="0"
+              file="../src/controllers/ScriptingController.h"/>
         <FILE id="fdOpQ6" name="SessionController.cpp" compile="1" resource="0"
               file="../src/controllers/SessionController.cpp"/>
         <FILE id="BaCFvB" name="SessionController.h" compile="0" resource="0"
