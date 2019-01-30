@@ -42,6 +42,9 @@ public:
     void removeFilter (const uint32 filterUID);
     void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true);
 
+    /** Returns the number of connections on the graph
+        DOES NOT include connections tagged as "missing"
+      */
     int getNumConnections() const noexcept;
     const GraphProcessor::Connection* getConnection (const int index) const noexcept;
 

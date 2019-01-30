@@ -383,7 +383,7 @@ void GraphController::removeIllegalConnections()
 int GraphController::getNumConnections() const noexcept
 {
     jassert(arcs.getNumChildren() == processor.getNumConnections());
-    return arcs.getNumChildren();
+    return processor.getNumConnections();
 }
 
 const GraphProcessor::Connection* GraphController::getConnection (const int index) const noexcept
@@ -491,11 +491,13 @@ void GraphController::setNodeModel (const Node& node)
             if (graphObject.getNodeById(sourceNode).isValid() &&
                 graphObject.getNodeById(destNode).isValid())
             {
+                DBG("[EL] set missing connection");
                 // if the nodes are valid then preserve it
                 arc.setProperty (Tags::missing, true, 0);
             }
             else
             {
+                DBG("[EL] purge failed arc");
                 failed.add (arc);
             }
         }
