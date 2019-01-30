@@ -7,6 +7,7 @@
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
 #include "controllers/PresetsController.h"
+#include "controllers/ScriptingController.h"
 
 #include "engine/GraphProcessor.h"
 #include "engine/SubGraphProcessor.h"
@@ -41,6 +42,9 @@ AppController::AppController (Globals& g)
     addChild (new MappingController ());
     addChild (new PresetsController ());
     addChild (new SessionController ());
+   #if HAVE_PYTHON
+    addChild (new ScriptingController ());
+   #endif
     
     g.getCommandManager().registerAllCommandsForTarget (this);
     g.getCommandManager().setFirstCommandTarget (this);

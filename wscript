@@ -6,7 +6,7 @@ import os, sys
 sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
-VERSION='0.24.1'
+VERSION='0.25.0'
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
@@ -20,8 +20,10 @@ def options (opt):
         help="Build with docking window support")
     opt.add_option ('--enable-local-auth', default=False, action='store_true', dest='enable_local_auth', \
         help="Authenticate locally")
+    opt.add_option ('--enable-python', default=False, action='store_true', dest='enable_python', \
+        help="Enable Python scripting support")
 
-def silence_warnings(conf):
+def silence_warnings (conf):
     '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
@@ -87,6 +89,7 @@ def configure (conf):
     juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
     juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
     juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)
+    juce.display_msg (conf, "Python", conf.options.enable_python)
 
     print
     juce.display_header ("Compiler")
@@ -240,9 +243,8 @@ def build_mac (bld):
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'libs/pybind11/include', \
                         'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
-                        '/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7' ],
-        target      = 'lib/element',
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK'],
+                                target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
         use         = [ 'KV', 'PYTHON' ]

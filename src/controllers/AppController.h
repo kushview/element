@@ -27,7 +27,6 @@ public:
     public:
         Child() { }
         virtual ~Child() { }
-        
         Globals& getWorld();
     };
     

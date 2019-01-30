@@ -65,7 +65,7 @@
                     "CXX": "ccache clang++"
                 }
             },
-            "problemMatcher": []
+            "problemMatcher": [ ]
         },
         {
             "label": "Waf Configure w/ Docking",
