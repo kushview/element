@@ -72,7 +72,8 @@ void RootGraph::updateChannelNames (AudioIODevice* device)
     auto namesIn   = device->getInputChannelNames();
     auto activeOut = device->getActiveOutputChannels();
     auto namesOut  = device->getOutputChannelNames();
-    audioOutputNames.clear(); audioInputNames.clear();
+    audioOutputNames.clear();
+    audioInputNames.clear();
     for (int i = 0; i < namesIn.size(); ++i)
         if (activeIn[i] == true)
             audioInputNames.add(namesIn[i]);

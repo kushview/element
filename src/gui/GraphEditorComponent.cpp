@@ -108,18 +108,20 @@ public:
             const Port p (node.getPort ((int) port));
             String tip = p.getName();
             
-            if (node.isAudioInputNode())
-            {
-                tip = "Input " + String (index_ + 1);
-            }
-            else if (node.isAudioOutputNode())
-            {
-                tip = "Output " + String (index_ + 1);
-            }
-            
             if (tip.isEmpty())
             {
-                tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
+                if (node.isAudioInputNode())
+                {
+                    tip = "Input " + String (index_ + 1);
+                }
+                else if (node.isAudioOutputNode())
+                {
+                    tip = "Output " + String (index_ + 1);
+                }
+                else
+                {
+                    tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
+                }
             }
 
             setTooltip (tip);

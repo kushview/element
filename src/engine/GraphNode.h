@@ -144,6 +144,8 @@ public:
     ValueTree getMetadata() const { return metadata; }
 
     bool isAudioIONode() const;
+    bool isAudioInputNode() const;
+    bool isAudioOutputNode() const;
     bool isMidiIONode() const;
 
     /* returns the parent graph. If one has not been set, then

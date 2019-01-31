@@ -93,16 +93,25 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     }
 }
 
-bool GraphNode::isAudioIONode() const
+bool GraphNode::isAudioInputNode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     if (IOP* iop = processor<IOP>())
-    {
-        return iop->getType() == IOP::audioInputNode ||
-               iop->getType() == IOP::audioOutputNode;
-    }
-
+        return iop->getType() == IOP::audioInputNode;
     return false;
+}
+
+bool GraphNode::isAudioOutputNode() const
+{
+    typedef GraphProcessor::AudioGraphIOProcessor IOP;
+    if (IOP* iop = processor<IOP>())
+        return iop->getType() == IOP::audioOutputNode;
+    return false;
+}
+
+bool GraphNode::isAudioIONode() const
+{
+    return isAudioInputNode() || isAudioOutputNode();
 }
 
 bool GraphNode::isMidiIONode() const
@@ -318,6 +327,19 @@ void GraphNode::resetPorts()
         ValueTree port = ports.createValueTree (i);
         port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
         port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
+        
+        if (auto* root = dynamic_cast<RootGraph*> (getParentGraph()))
+        {
+            if (isAudioInputNode() && ports.getType(i) == PortType::Audio && ports.isOutput (i))
+            {
+                port.setProperty (Tags::name, root->getInputChannelName (ports.getChannelForPort (i)), nullptr);
+            }
+            else if (isAudioOutputNode() && ports.getType(i) == PortType::Audio && ports.isInput (i))
+            {
+                port.setProperty (Tags::name, root->getOutputChannelName (ports.getChannelForPort (i)), nullptr);
+            }
+        }
+
         portList.addChild (port, -1, 0);
         jassert (isPositiveAndBelow ((int)port.getProperty(Tags::index), ports.size()));
     }
