@@ -64,6 +64,7 @@ public:
     {
         auto r (getLocalBounds());
         nodeName.setBounds (r.removeFromTop(22).reduced (2));
+        r.removeFromTop (10); // padding between strip title and IO boxes
 
         auto r2 = r.removeFromBottom (jmin (268, r.getHeight()));
         int boxSize = r2.getWidth() - 8;
@@ -158,6 +159,8 @@ public:
         startTimer (meterSpeedMillis);
     }
 
+    inline Node getNode() const { return node; }
+    
     /** @internal */
     inline void comboBoxChanged (ComboBox* box) override
     {    

@@ -316,21 +316,21 @@ PluginWindow* GuiController::getPluginWindow (const int window) const
 }
 
 void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
-                                          const bool force)
+                                          const bool force, const bool focus)
 {
     if (! node.isGraph())
     {
         if (force || (bool) node.getProperty ("windowVisible", false))
-            presentPluginWindow (node);
+            presentPluginWindow (node, force);
         return;
     }
 
     if (node.isGraph() && recursive)
         for (int i = 0; i < node.getNumNodes(); ++i)
-            showPluginWindowsFor (node.getNode (i), recursive, force);
+            showPluginWindowsFor (node.getNode (i), recursive, force, focus);
 }
 
-void GuiController::presentPluginWindow (const Node& node)
+void GuiController::presentPluginWindow (const Node& node, const bool focus)
 {
     if (! windowManager)
         return;
@@ -354,7 +354,7 @@ void GuiController::presentPluginWindow (const Node& node)
         window->setAlwaysOnTop (true);
        #endif
         window->setVisible (true);
-        window->toFront (false);
+        window->toFront (focus);
     }
 }
 

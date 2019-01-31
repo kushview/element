@@ -9,10 +9,115 @@
 #include "Globals.h"
 namespace Element {
 
+class GraphMixerChannelStrip : public NodeChannelStripComponent,
+                               public DragAndDropTarget
+{
+public:
+std::function<void()> onReordered;
+
+GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
+{
+
+}
+
+~GraphMixerChannelStrip() { }
+
+void mouseDown (const MouseEvent& ev) override
+{
+    down = true; 
+    dragging = false;
+}
+
+void mouseDrag (const MouseEvent& ev) override
+{
+    if (down && ! dragging)
+    {
+        dragging = true;
+        auto* dnd = findParentComponentOfClass<DragAndDropContainer>();
+        Image image (Image::ARGB, 1, 1, true);
+        dnd->startDragging (var("graphMixerStrip"), this, image);
+    }
+}
+
+void mouseMove (const MouseEvent& ev) override
+{
+    // noop
+}
+
+void mouseUp (const MouseEvent& ev) override
+{
+    dragging = down = hover = false;
+}
+
+bool shouldDrawDragImageWhenOver() override
+{
+    return false;
+}
+
+void itemDragEnter (const SourceDetails&) override
+{
+    hover = true;
+    repaint();
+}
+
+void itemDragExit (const SourceDetails&) override
+{
+    hover = false;
+    repaint();
+}
+
+void paintOverChildren (Graphics& g) override
+{
+    if (hover && ! dragging && ! down) {
+        g.setColour (Colors::toggleBlue);
+        g.drawRect(0, 0, getWidth(), getHeight(), 1);
+    }
+}
+
+bool isInterestedInDragSource (const SourceDetails& details) override
+{
+   return details.description == "graphMixerStrip";
+}
+
+void itemDropped (const SourceDetails& details) override
+{
+    if (details.description == "graphMixerStrip")
+    {
+        auto* strip = dynamic_cast<GraphMixerChannelStrip*> (details.sourceComponent.get());
+        auto myNode = getNode().getValueTree();
+        auto dNode  = strip->getNode().getValueTree();
+        ValueTree parent = dNode.getParent();
+
+        int myIndex = parent.indexOf (myNode);
+        int dIndex  = parent.indexOf (dNode);
+        if (myIndex >= 0 && dIndex >= 0)
+        {
+            parent.moveChild (dIndex, myIndex, nullptr);
+            if (onReordered)
+                onReordered();
+        }    
+    }
+
+    hover = false;
+    repaint();
+}
+
+private:
+    bool dragging = false;
+    bool down = false;
+    bool hover = false;
+
+#if 0
+    virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
+    virtual void itemDragMove (const SourceDetails& dragSourceDetails);
+    virtual void itemDragExit (const SourceDetails& dragSourceDetails);
+#endif
+};
+
 class GraphMixerListBoxModel : public ListBoxModel
 {
 public:
-    GraphMixerListBoxModel (GuiController& g) : gui (g) { refreshNodes(); }
+    GraphMixerListBoxModel (GuiController& g, HorizontalListBox& b) : gui (g), box(b) { refreshNodes(); }
     ~GraphMixerListBoxModel() { }
 
     int getNumRows() override
@@ -35,11 +140,17 @@ public:
     Component* refreshComponentForRow (int rowNumber, bool isRowSelected, 
                                        Component* existing) override
     {
-        NodeChannelStripComponent* const strip = existing == nullptr
-            ? new NodeChannelStripComponent (gui, false) 
-            : dynamic_cast<NodeChannelStripComponent*> (existing);
+        GraphMixerChannelStrip* const strip = existing == nullptr
+            ? new GraphMixerChannelStrip (gui) 
+            : dynamic_cast<GraphMixerChannelStrip*> (existing);
+        strip->onReordered = std::bind(&GraphMixerListBoxModel::onReordered, this);
         strip->setNode (getNode (rowNumber));
         return strip;
+    }
+
+    void onReordered() {
+        refreshNodes();
+        box.updateContent();
     }
 
     void refreshNodes()
@@ -68,10 +179,12 @@ public:
    #endif
 private:
     GuiController& gui;
+    HorizontalListBox& box;
     NodeArray nodes;
+    bool dragging = false;
 };
 
-class GraphMixerView::Content : public Component 
+class GraphMixerView::Content : public Component, public DragAndDropContainer
 {
 public:
     Content (GraphMixerView& v, GuiController& gui, Session* sess)
@@ -79,7 +192,7 @@ public:
     {
         addAndMakeVisible (box);
         box.setRowHeight (80);
-        model.reset (new GraphMixerListBoxModel (gui));
+        model.reset (new GraphMixerListBoxModel (gui, box));
         box.setModel (model.get());
         box.updateContent();
     }

@@ -3,6 +3,7 @@
 
 #include "controllers/AppController.h"
 #include "gui/LookAndFeel.h"
+#include "gui/MainWindow.h"
 #include "gui/PreferencesComponent.h"
 #include "gui/WindowManager.h"
 #include "session/CommandManager.h"
@@ -54,10 +55,11 @@ namespace Element {
         /** Show plugin windows for a node */
         void showPluginWindowsFor (const Node& node, 
                                    const bool recursive = true,
-                                   const bool force = false);
+                                   const bool force = false,
+                                   const bool focus = false);
         
         /** present a plugin window */
-        void presentPluginWindow (const Node& node);
+        void presentPluginWindow (const Node& node, const bool focus = false);
         
         /** Sync all UI elements with application/plugin */
         void stabilizeContent();
