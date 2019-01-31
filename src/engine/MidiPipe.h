@@ -5,6 +5,7 @@
 
 namespace Element {
 
+/** A glorified array of MidiBuffers used in rendering graph nodes */
 class MidiPipe
 {
 public:
