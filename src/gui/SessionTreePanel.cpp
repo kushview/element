@@ -112,6 +112,8 @@ public:
         auto session = ViewHelpers::getSession (getOwnerView());
         auto* cc = ViewHelpers::findContentComponent (getOwnerView());
         auto* gui = cc->getAppController().findChild<GuiController>();
+        auto* const view = getOwnerView();
+        const bool hadFocus = view && view->hasKeyboardFocus (true);
 
         jassert(session != nullptr && cc != nullptr && gui != nullptr);
         
@@ -128,7 +130,9 @@ public:
             auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
             app.findChild<EngineController>()->setRootNode (root);
             if (auto* g = app.findChild<GuiController>())
-                g->showPluginWindowsFor (root, true);
+            {
+                g->showPluginWindowsFor (root, true, false, false);
+            }
         }
         
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
@@ -144,6 +148,9 @@ public:
         
         gui->refreshMainMenu();
         gui->stabilizeViews();
+
+        if (hadFocus)
+            view->grabKeyboardFocus();
     }
 
     bool mightContainSubItems() override            { return node.isGraph(); }
