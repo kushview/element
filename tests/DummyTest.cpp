@@ -39,7 +39,10 @@ private:
         auto* object = new DynamicObject();
         object->setMethod ("log", std::bind (&DummyTest::testLog, std::placeholders::_1));
         engine.registerNativeObject (Identifier ("test"), object);
-        auto result = engine.execute ("var console = { log: test.log }; console.log(\"Hello World\", 123);");
+        auto result = engine.execute (R"(
+            var console = { log: test.log };
+            console.log("Hello World", 123);
+        )");
         expect (! result.failed());
     }
 

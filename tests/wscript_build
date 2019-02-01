@@ -5,6 +5,6 @@ bld.program (
     includes = ['.', '../project/Source', '../project/JuceLibraryCode', '../src',
                  '../libs/JUCE/modules', '../libs/kv/modules' ],
     target = '../bin/test-element',
-    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL' ],
+    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
     install_path = None
 )

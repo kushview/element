@@ -60,7 +60,7 @@ public:
             GraphNodePtr node2 = graph.addNode (plugin2);
             node1->connectAudioTo (node2);
             for (int i = 0; i < 3; ++i)
-                MessageManager::getInstance()->runDispatchLoopUntil (15);
+                runDispatchLoop (15);
 
             auto nc = graph.getNumConnections();
             auto ls = graph.getLatencySamples();
