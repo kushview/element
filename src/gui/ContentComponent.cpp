@@ -1154,9 +1154,9 @@ void ContentComponent::restoreState (PropertiesFile* props)
 void ContentComponent::setCurrentNode (const Node& node)
 {
     if ((nullptr != dynamic_cast<EmptyContentView*> (container->content1.get()) ||
-        getMainViewName() == "SessionSettings" || 
+        getMainViewName() == "SessionSettings" ||
         getMainViewName() == "PluginManager" ||
-        getMainViewName() == "ControllerDevicesView") && 
+        getMainViewName() == "ControllerDevicesView") &&
         getSession()->getNumGraphs() > 0)
     {
         setMainView ("GraphEditor");

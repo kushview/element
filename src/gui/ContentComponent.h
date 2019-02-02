@@ -120,6 +120,7 @@ public:
 
     void setShowAccessoryView (const bool show);
     bool showAccessoryView() const;
+
 private:
     AppController& controller;
     
