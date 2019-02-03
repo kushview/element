@@ -1,6 +1,6 @@
 /*
     ContentComponent.cpp - This file is part of Element
-    Copyright (C) 2015-2017  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2015-2019  Kushview, LLC.  All rights reserved.
 */
 
 #include "controllers/AppController.h"

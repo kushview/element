@@ -1,6 +1,6 @@
 /*
     ContentComponent.h - This file is part of Element
-    Copyright (c) 2016-2018 Kushview, LLC.  All rights reserved.
+    Copyright (c) 2016-2019 Kushview, LLC.  All rights reserved.
 */
 
 #pragma once
