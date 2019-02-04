@@ -12,6 +12,7 @@ class NodeChannelStripComponent : public Component,
                                   public ComboBox::Listener
 {
 public:
+    std::function<void()> onNodeChanged;
     NodeChannelStripComponent (GuiController& g, bool handleNodeSelected = true)
         : gui (g), listenForNodeSelected (handleNodeSelected)
     {
@@ -146,6 +147,11 @@ public:
         }
     }
 
+    inline void setNodeNameEditable (const bool isEditable)
+    {
+        nodeName.setEditable (false, isEditable, false);
+    }
+
     inline void setNode (const Node& newNode)
     {
         stopTimer();
@@ -157,6 +163,9 @@ public:
 
         stabilizeContent();
         startTimer (meterSpeedMillis);
+
+        if (onNodeChanged)
+            onNodeChanged();
     }
 
     inline Node getNode() const { return node; }

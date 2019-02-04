@@ -688,7 +688,7 @@ void EngineController::setRootNode (const Node& newRootNode)
     {
         proc->setMidiChannels (newRootNode.getMidiChannels().get());
         proc->setVelocityCurveMode ((VelocityCurve::Mode)(int) newRootNode.getProperty (
-            "velocityCurveMode", (int) VelocityCurve::Linear));
+            Tags::velocityCurveMode, (int) VelocityCurve::Linear));
     }
     else
     {

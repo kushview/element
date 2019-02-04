@@ -87,6 +87,8 @@ namespace Tags
     const Identifier transpose          = "transpose";
     const Identifier keyStart           = "keyStart";
     const Identifier keyEnd             = "keyEnd";
+
+    const Identifier velocityCurveMode  = "velocityCurveMode";
 }
 
 struct Alert
@@ -143,6 +145,11 @@ inline static void traceMidi (const MidiMessage& msg, const int frame = -1)
     {
         msg.isControllerOfType (0);
         DBG("MIDI CC: " << msg.getControllerNumber() << ":" << msg.getControllerValue());
+    }
+    
+    if (msg.isProgramChange())
+    {
+        DBG("program change: " << msg.getProgramChangeNumber() << " ch: " << msg.getChannel());
     }
 
     if (frame >= 0 && (msg.isAllNotesOff() || msg.isAllSoundOff()))

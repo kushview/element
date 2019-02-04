@@ -498,7 +498,9 @@ public:
 
             const double delayMs = 6.0;
             if (! incomingMidi.isEmpty())
+            {
                 midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
+            }
         }
         
         incomingMidi.clear();

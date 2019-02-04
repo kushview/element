@@ -17,7 +17,7 @@ std::function<void()> onReordered;
 
 GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
 {
-
+    onNodeChanged = [this]() { setNodeNameEditable (! (getNode().isIONode())); };
 }
 
 ~GraphMixerChannelStrip() { }
