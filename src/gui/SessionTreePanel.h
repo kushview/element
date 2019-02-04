@@ -73,9 +73,12 @@ public:
     bool keyPressed (const KeyPress&) override;
     
 private:
+    friend class SessionNodeTreeItem;
+
     SessionPtr session;
     ValueTree data;
 
+    bool ignoreActiveRootGraphSelectionHandler = false;
     void selectActiveRootGraph();
     
     friend class ValueTree;

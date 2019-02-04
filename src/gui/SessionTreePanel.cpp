@@ -113,6 +113,7 @@ public:
         auto* cc = ViewHelpers::findContentComponent (getOwnerView());
         auto* gui = cc->getAppController().findChild<GuiController>();
         auto* const view = getOwnerView();
+        auto* const tree = dynamic_cast<SessionTreePanel*> (view->getParentComponent());
         const bool hadFocus = view && view->hasKeyboardFocus (true);
 
         jassert(session != nullptr && cc != nullptr && gui != nullptr);
@@ -125,8 +126,11 @@ public:
         {
             gui->closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
-
+            
+            tree->ignoreActiveRootGraphSelectionHandler = true;
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
+            tree->ignoreActiveRootGraphSelectionHandler = false;
+
             auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
             app.findChild<EngineController>()->setRootNode (root);
             if (auto* g = app.findChild<GuiController>())
@@ -558,7 +562,7 @@ SessionPtr SessionTreePanel::getSession() const
 
 void SessionTreePanel::selectActiveRootGraph()
 {
-    if (! session || nullptr == rootItem)
+    if (ignoreActiveRootGraphSelectionHandler || ! session || nullptr == rootItem)
         return;
     const auto activeGraph = session->getActiveGraph();
     for (int i = 0; i < rootItem->getNumSubItems(); ++i)
