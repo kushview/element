@@ -40,7 +40,8 @@ public:
                       uint32 nodeId = 0);
 
     void removeFilter (const uint32 filterUID);
-    void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true);
+    void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true,
+                                                   const bool audio = true, const bool midi = true);
 
     /** Returns the number of connections on the graph
         DOES NOT include connections tagged as "missing"

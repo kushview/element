@@ -114,6 +114,7 @@ public:
         Disconnect,
         DisconnectInputs,
         DisconnectOutputs,
+        DisconnectMidi,
         LastItem
     };
     
@@ -257,6 +258,8 @@ public:
             return new DisconnectNodeMessage (node, true, false);
         else if (result == DisconnectOutputs)
             return new DisconnectNodeMessage (node, false, true);
+        else if (result == DisconnectMidi)
+            return new DisconnectNodeMessage (node, true, true, false, true);
         else if (auto* op = resultMap [result])
         {
             if (auto* const msg = op->createMessage())
@@ -468,6 +471,7 @@ private:
         {
             PopupMenu disconnect;
             disconnect.addItem (Disconnect, "All Ports");
+            disconnect.addItem (DisconnectMidi, "MIDI Ports");
             disconnect.addSeparator();
             disconnect.addItem (DisconnectInputs, "Input Ports");
             disconnect.addItem (DisconnectOutputs, "Output Ports");

@@ -583,11 +583,12 @@ void EngineController::removeNode (const uint32 nodeId)
     root->removeFilter (nodeId);
 }
 
-void EngineController::disconnectNode (const Node& node, const bool inputs, const bool outputs)
+void EngineController::disconnectNode (const Node& node, const bool inputs, const bool outputs,
+                                                         const bool audio, const bool midi)
 {
     const auto graph (node.getParentGraph());
     if (auto* controller = graphs->findGraphControllerFor (graph))
-        controller->disconnectFilter (node.getNodeId(), inputs, outputs);
+        controller->disconnectFilter (node.getNodeId(), inputs, outputs, audio, midi);
 }
 
 void EngineController::activate()

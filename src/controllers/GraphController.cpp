@@ -354,7 +354,8 @@ void GraphController::removeFilter (const uint32 uid)
     processorArcsChanged();
 }
 
-void GraphController::disconnectFilter (const uint32 nodeId, const bool inputs, const bool outputs)
+void GraphController::disconnectFilter (const uint32 nodeId, const bool inputs, const bool outputs,
+                                                             const bool audio, const bool midi)
 {
     jassert (inputs || outputs);
     bool doneAnything = false;
@@ -365,8 +366,15 @@ void GraphController::disconnectFilter (const uint32 nodeId, const bool inputs, 
         if ((outputs && c->sourceNode == nodeId) || 
             (inputs && c->destNode == nodeId))
         {
-            removeConnection (i);
-            doneAnything = true;
+            GraphNodePtr src = processor.getNodeForId (c->sourceNode);
+            GraphNodePtr dst = processor.getNodeForId (c->destNode);
+
+            if ((audio && src->getPortType(c->sourcePort) == PortType::Audio && dst->getPortType(c->destPort) == PortType::Audio) ||
+                (midi && src->getPortType(c->sourcePort) == PortType::Midi && dst->getPortType(c->destPort) == PortType::Midi))
+            {
+                removeConnection (i);
+                doneAnything = true;
+            }
         }
     }
 

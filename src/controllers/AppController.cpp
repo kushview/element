@@ -173,7 +173,8 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* dnm2 = dynamic_cast<const DisconnectNodeMessage*> (&msg))
     {
-        ec->disconnectNode (dnm2->node, dnm2->inputs, dnm2->outputs);
+        ec->disconnectNode (dnm2->node, dnm2->inputs, dnm2->outputs,
+                                        dnm2->audio, dnm2->midi);
     }
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {

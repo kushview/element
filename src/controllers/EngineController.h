@@ -83,7 +83,8 @@ public:
     void removeConnection (const uint32, const uint32, const uint32, const uint32, const Node& target);
 
     /** Disconnect the provided node */
-    void disconnectNode (const Node& node, const bool inputs = true, const bool outputs = true);
+    void disconnectNode (const Node& node, const bool inputs = true, const bool outputs = true,
+                                           const bool audio = true, const bool midi = true);
 
     /** Clear the root graph */
     void clear();
