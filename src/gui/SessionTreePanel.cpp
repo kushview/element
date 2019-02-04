@@ -16,6 +16,7 @@
 
 #include "gui/ViewHelpers.h"
 #include "session/Node.h"
+#include "ScopedFlag.h"
 
 namespace Element {
 
@@ -124,19 +125,15 @@ public:
 
         if (root.isRootGraph() && root != session->getCurrentGraph())
         {
+            ScopedFlag scopedFlag (tree->ignoreActiveRootGraphSelectionHandler, true);
+            
             gui->closeAllPluginWindows (true);
             auto graphs = session->getValueTree().getChildWithName (Tags::graphs);
-            
-            tree->ignoreActiveRootGraphSelectionHandler = true;
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
-            tree->ignoreActiveRootGraphSelectionHandler = false;
-
             auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
             app.findChild<EngineController>()->setRootNode (root);
             if (auto* g = app.findChild<GuiController>())
-            {
                 g->showPluginWindowsFor (root, true, false, false);
-            }
         }
         
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
