@@ -2,6 +2,9 @@
 
 namespace Element {
 
+/** Utility class that will set a boolean to a a new value, then
+    reset it back when this class goes out of scope 
+  */
 class ScopedFlag
 {
 public:
