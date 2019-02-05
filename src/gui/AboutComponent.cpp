@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.1.2
+  Created with Projucer version: 5.4.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -35,23 +35,27 @@ AboutComponent::AboutComponent ()
     //[/Constructor_pre]
 
     setName ("AboutComponent");
-    addAndMakeVisible (label = new Label ("new label",
-                                          TRANS("Element")));
-    label->setFont (Font ("Arial Black", 86.50f, Font::bold));
+    label.reset (new Label ("new label",
+                            TRANS("Element")));
+    addAndMakeVisible (label.get());
+    label->setFont (Font ("Arial Black", 86.5f, Font::bold));
     label->setJustificationType (Justification::centred);
     label->setEditable (false, false, false);
     label->setColour (Label::textColourId, Colours::whitesmoke);
     label->setColour (TextEditor::textColourId, Colours::black);
     label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (label2 = new Label ("new label",
-                                           TRANS("Element v0.1.1 (build 1)")));
-    label2->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label2.reset (new Label ("new label",
+                             TRANS("Element v0.1.1 (build 1)")));
+    addAndMakeVisible (label2.get());
+    label2->setFont (Font (14.0f, Font::plain).withTypefaceStyle ("Regular"));
     label2->setJustificationType (Justification::centredLeft);
     label2->setEditable (false, false, false);
     label2->setColour (Label::textColourId, Colour (0xffe6e6e6));
     label2->setColour (TextEditor::textColourId, Colours::black);
     label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    label2->setBounds (8, 208, 224, 24);
 
 
     //[UserPreSize]
@@ -109,7 +113,6 @@ void AboutComponent::resized()
     //[/UserPreResize]
 
     label->setBounds ((getWidth() / 2) - (302 / 2), 40, 302, 72);
-    label2->setBounds (8, 208, 224, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -139,7 +142,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AboutComponent" componentName="AboutComponent"
                  parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
                  fixedSize="1" initialWidth="524" initialHeight="460">
   <METHODS>
     <METHOD name="mouseDown (const MouseEvent&amp; e)"/>
@@ -151,14 +154,14 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="0Cc 40 302 72" textCol="fff5f5f5"
          edTextCol="ff000000" edBkgCol="0" labelText="Element" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Arial Black"
-         fontsize="86.5" kerning="0" bold="1" italic="0" justification="36"
+         fontsize="86.5" kerning="0.0" bold="1" italic="0" justification="36"
          typefaceStyle="Bold"/>
   <LABEL name="new label" id="8a84133becd36d77" memberName="label2" virtualName=""
          explicitFocusOrder="0" pos="8 208 224 24" textCol="ffe6e6e6"
          edTextCol="ff000000" edBkgCol="0" labelText="Element v0.1.1 (build 1)"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="14.0" kerning="0.0" bold="0"
+         italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
