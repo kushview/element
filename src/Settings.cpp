@@ -26,6 +26,7 @@ enum OptionsMenuItemId
     CheckForUpdatesOnStart = 1000000,
     ScanFormPluginsOnStart,
     AutomaticallyShowPluginWindows,
+    HidePluginWindowsWhenFocusLost,
     PluginWindowsOnTop,
     OpenLastUsedSession,
     AskToSaveSessions,
@@ -279,6 +280,8 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
         true, showPluginWindowsWhenAdded());
     sub.addItem (PluginWindowsOnTop, "Plugins On Top By Default", 
         true, pluginWindowsOnTop());
+    sub.addItem (HidePluginWindowsWhenFocusLost, "Hide Plugin Windows When App Inactive", 
+        true, hidePluginWindowsWhenFocusLost());
     
     sub.addSeparator(); // session items
     
@@ -353,6 +356,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
         case ScanFormPluginsOnStart: setScanForPluginsOnStartup (! scanForPluginsOnStartup()); break;
         case AutomaticallyShowPluginWindows: setShowPluginWindowsWhenAdded (! showPluginWindowsWhenAdded()); break;
         case PluginWindowsOnTop: setPluginWindowsOnTop (! pluginWindowsOnTop()); break;
+        case HidePluginWindowsWhenFocusLost: setHidePluginWindowsWhenFocusLost (! hidePluginWindowsWhenFocusLost()); break;
         case OpenLastUsedSession: setOpenLastUsedSession (! openLastUsedSession()); break;
         case AskToSaveSessions: setAskToSaveSession (! askToSaveSession()); break;
         default: handled = false; break;

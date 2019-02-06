@@ -497,6 +497,9 @@ void AppController::checkForegroundStatus()
             if (sIsForeground == foreground)
                 return;
             
+            if (! app.getWorld().getSettings().hidePluginWindowsWhenFocusLost())
+                return;
+
             auto session  = app.getWorld().getSession();
             auto& gui     = *app.findChild<GuiController>();
             const Node graph (session->getCurrentGraph());

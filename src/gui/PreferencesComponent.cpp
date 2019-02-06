@@ -309,6 +309,14 @@ namespace Element {
             pluginWindowsOnTop.setToggleState (settings.pluginWindowsOnTop(), dontSendNotification);
             pluginWindowsOnTop.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible (hidePluginWindowsLabel);
+            hidePluginWindowsLabel.setText ("Hide plugin windows when app inactive", dontSendNotification);
+            hidePluginWindowsLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (hidePluginWindows);
+            hidePluginWindows.setClickingTogglesState (true);
+            hidePluginWindows.setToggleState (settings.hidePluginWindowsWhenFocusLost(), dontSendNotification);
+            hidePluginWindows.getToggleStateValue().addListener (this);
+
             addAndMakeVisible (openLastSessionLabel);
             openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
             openLastSessionLabel.setFont (Font (12.0, Font::bold));
@@ -401,6 +409,7 @@ namespace Element {
 
             layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
             layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
+            layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
             layoutSetting (r, openLastSessionLabel, openLastSession);
             layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
@@ -454,6 +463,10 @@ namespace Element {
             {
                 settings.setAskToSaveSession (askToSaveSession.getToggleState());
             }
+            else if (value.refersToSameSourceAs (hidePluginWindows.getToggleStateValue()))
+            {
+                settings.setHidePluginWindowsWhenFocusLost (hidePluginWindows.getToggleState());
+            }
 
             settings.saveIfNeeded();
             gui.stabilizeViews();
@@ -478,6 +491,9 @@ namespace Element {
         
         Label pluginWindowsOnTopLabel;
         SettingButton pluginWindowsOnTop;
+
+        Label hidePluginWindowsLabel;
+        SettingButton hidePluginWindows;
 
         Label openLastSessionLabel;
         SettingButton openLastSession;
