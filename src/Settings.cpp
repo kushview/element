@@ -19,6 +19,7 @@ const char* Settings::askToSaveSessionKey       = "askToSaveSession";
 const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
 const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
 const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
+const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
 
 enum OptionsMenuItemId
 {
@@ -244,6 +245,23 @@ void Settings::setDefaultNewSessionFile (const File& file)
         p->setValue (defaultNewSessionFile, 
             file.existsAsFile() ? file.getFullPathName() : "");
 }
+
+
+bool Settings::hidePluginWindowsWhenFocusLost() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (hidePluginWindowsWhenFocusLostKey, true);
+    return true;
+}
+
+void Settings::setHidePluginWindowsWhenFocusLost (const bool hideThem)
+{
+    if (hideThem == hidePluginWindowsWhenFocusLost())
+        return;
+    if (auto* p = getProps())
+        p->setValue (hidePluginWindowsWhenFocusLostKey, hideThem);
+}
+
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 {

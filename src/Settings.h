@@ -29,6 +29,7 @@ public:
     static const char* defaultNewSessionFile;
     static const char* generateMidiClockKey;
     static const char* sendMidiClockToInputKey;
+    static const char* hidePluginWindowsWhenFocusLostKey;
 
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -71,6 +72,9 @@ public:
 
     void setSendMidiClockToInput (const bool);
     bool sendMidiClockToInput() const;
+
+    void setHidePluginWindowsWhenFocusLost (const bool);
+    bool hidePluginWindowsWhenFocusLost() const;
 
 private:
     PropertiesFile* getProps() const;
