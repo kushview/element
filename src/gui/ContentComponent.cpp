@@ -18,6 +18,7 @@
 #include "gui/NodeChannelStripView.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
+#include "gui/widgets/MidiBlinker.h"
 #include "gui/NavigationView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/ViewHelpers.h"
@@ -177,15 +178,32 @@ public:
         mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
+        addAndMakeVisible (midiBlinker);
     }
     
-    ~Toolbar() { }
-    
+    ~Toolbar()
+    { 
+        for (const auto& conn : connections)
+            conn.disconnect();
+        connections.clear();
+    }
+
     void setSession (SessionPtr s)
     {
         session = s;
         auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
         auto& settings (ViewHelpers::getGlobals(this)->getSettings());
+        auto engine (ViewHelpers::getGlobals(this)->getAudioEngine());
+
+        if (midiIOMonitor == nullptr)
+        {
+            midiIOMonitor = engine->getMidiIOMonitor();
+            connections.add (midiIOMonitor->midiSent.connect (
+                std::bind (&MidiBlinker::triggerSent, &midiBlinker)));
+            connections.add (midiIOMonitor->midiReceived.connect (
+                std::bind (&MidiBlinker::triggerReceived, &midiBlinker)));
+        }
+
         auto* props = settings.getUserSettings();
         
        #if ! EL_RUNNING_AS_PLUGIN
@@ -234,6 +252,13 @@ public:
             r.removeFromRight (4);
         }
         
+        if (midiBlinker.isVisible())
+        {
+            const int blinkerW = 8;
+            midiBlinker.setBounds (r.removeFromRight(blinkerW).withSizeKeepingCentre (blinkerW, tempoBarHeight));
+            r.removeFromRight (4);
+        }
+
         if (viewBtn.isVisible())
         {
             viewBtn.setBounds (r.removeFromRight(tempoBarHeight * 2)
@@ -313,12 +338,15 @@ public:
 private:
     ContentComponent& owner;
     SessionPtr session;
+    MidiIOMonitorPtr midiIOMonitor;
     SettingButton menuBtn;
     SettingButton viewBtn;
     SettingButton mapButton;
     PanicButton panicBtn;
     TempoAndMeterBar tempoBar;
     TransportBar     transport;
+    MidiBlinker      midiBlinker;
+    Array<SignalConnection> connections;
 };
 
 class ContentComponent::StatusBar : public Component,

@@ -1,6 +1,7 @@
 
 #include "LookAndFeel.h"
 #include "gui/Buttons.h"
+#include "gui/widgets/MidiBlinker.h"
 
 namespace Element {
 
@@ -18,8 +19,6 @@ LookAndFeel::LookAndFeel()
     // Property Component
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
-    
-
     
     // Text Editor
     setColour (TextEditor::textColourId,            textColor);
@@ -39,13 +38,17 @@ LookAndFeel::LookAndFeel()
     // Boolean property comp
     setColour (BooleanPropertyComponent::backgroundColourId,    findColour (TextEditor::backgroundColourId));
     setColour (BooleanPropertyComponent::outlineColourId,       Colours::black);
-               
+
     // Setting Button
     setColour (SettingButton::backgroundColourId, widgetBackgroundColor.brighter());
     setColour (SettingButton::backgroundOnColourId, Colors::toggleOrange);
     setColour (SettingButton::textColourId, Colours::black);
     setColour (SettingButton::textDisabledColourId, Colours::darkgrey);
     
+    // MIDI Blinkers
+    setColour (MidiBlinker::backgroundColourId, findColour (SettingButton::backgroundColourId));
+    setColour (MidiBlinker::outlineColourId, LookAndFeel::widgetBackgroundColor.brighter().brighter());
+
     // Tree View
     setColour (TreeView::selectedItemBackgroundColourId, Colors::elemental.darker (0.6000006f));
     setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);

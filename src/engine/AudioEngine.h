@@ -8,6 +8,7 @@
 #include "ElementApp.h"
 #include "engine/Engine.h"
 #include "engine/GraphProcessor.h"
+#include "engine/MidiIOMonitor.h"
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
@@ -170,6 +171,7 @@ public:
 
     void updateUnlockStatus();
 
+    MidiIOMonitorPtr getMidiIOMonitor() const;
 private:
     class Private;
     ScopedPointer<Private> priv;

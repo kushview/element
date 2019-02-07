@@ -384,7 +384,8 @@ private:
 class AudioEngine::Private : public AudioIODeviceCallback,
                              public MidiInputCallback,
                              public Value::Listener,
-                             public MidiClock::Listener
+                             public MidiClock::Listener,
+                             public Timer
 {
 public:
     Private (AudioEngine& e)
@@ -399,6 +400,8 @@ public:
         sessionWantsExternalClock.set (0);
         midiClock.addListener (this);
         graphs.onActiveGraphChanged = std::bind (&AudioEngine::Private::onCurrentGraphChanged, this);
+        midiIOMonitor = new MidiIOMonitor();
+        startTimerHz (90);
     }
 
     ~Private()
@@ -416,6 +419,11 @@ public:
         }
     }
     
+    void timerCallback() override
+    {
+        midiIOMonitor->notify();
+    }
+
     RootGraph* getCurrentGraph() const { return graphs.getCurrentGraph(); }
     
     void onCurrentGraphChanged()
@@ -499,6 +507,7 @@ public:
             const double delayMs = 6.0;
             if (! incomingMidi.isEmpty())
             {
+                midiIOMonitor->sent();
                 midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
             }
         }
@@ -615,6 +624,7 @@ public:
     
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
+        midiIOMonitor->received();
         messageCollector.addMessageToQueue (message);
         if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
             midiClock.process (message);
@@ -755,6 +765,8 @@ private:
 
     // GraphRender::locked must match this default value
     Atomic<int> shouldBeLocked { 0 };
+
+    MidiIOMonitorPtr midiIOMonitor;
 
     void updateUnlockStatus()
     {
@@ -998,6 +1010,11 @@ void AudioEngine::updateUnlockStatus()
 {
     if (auto* impl = priv.get())
         impl->updateUnlockStatus();
+}
+
+MidiIOMonitorPtr AudioEngine::getMidiIOMonitor() const
+{
+    return priv != nullptr ? priv->midiIOMonitor : nullptr;
 }
 
 }
