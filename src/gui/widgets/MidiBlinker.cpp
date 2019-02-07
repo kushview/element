@@ -43,7 +43,7 @@ void MidiBlinker::triggerSent()
     repaint();
     startTimer (holdMillis);
 }
-    
+
 
 void MidiBlinker::resized()
 {
