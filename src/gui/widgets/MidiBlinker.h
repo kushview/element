@@ -30,7 +30,6 @@ private:
     bool haveOutput = false;
     friend class Timer;
     void timerCallback() override;
-
 };
 
 }
