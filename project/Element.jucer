@@ -129,6 +129,7 @@
               file="../src/engine/MidiDeviceProcessor.cpp"/>
         <FILE id="L6YkjB" name="MidiDeviceProcessor.h" compile="0" resource="0"
               file="../src/engine/MidiDeviceProcessor.h"/>
+        <FILE id="ayzFfj" name="MidiIOMonitor.h" compile="0" resource="0" file="../src/engine/MidiIOMonitor.h"/>
         <FILE id="hAXXMl" name="MidiPipe.cpp" compile="1" resource="0" file="../src/engine/MidiPipe.cpp"/>
         <FILE id="hgigdJ" name="MidiPipe.h" compile="0" resource="0" file="../src/engine/MidiPipe.h"/>
         <FILE id="aMLMSs" name="MidiSequenceProcessor.cpp" compile="1" resource="0"
@@ -163,6 +164,12 @@
               file="../src/engine/WetDryProcessor.h"/>
       </GROUP>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
+        <GROUP id="{AD572BA4-C81C-6D18-A669-55B35AAD76EB}" name="widgets">
+          <FILE id="Erf0gn" name="MidiBlinker.cpp" compile="1" resource="0" file="../src/gui/widgets/MidiBlinker.cpp"/>
+          <FILE id="xUyVtP" name="MidiBlinker.h" compile="0" resource="0" file="../src/gui/widgets/MidiBlinker.h"/>
+          <FILE id="NdgNU3" name="MidiChannelSelectComponent.h" compile="0" resource="0"
+                file="../src/gui/widgets/MidiChannelSelectComponent.h"/>
+        </GROUP>
         <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
               file="../src/gui/AboutComponent.cpp"/>
         <FILE id="rBDuhD" name="AboutComponent.h" compile="0" resource="0"
