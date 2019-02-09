@@ -57,6 +57,13 @@ void SessionController::openFile (const File& file)
         if (Node::isProbablyGraphNode (node))
         {
             const Node model (node, true);
+            model.forEach ([](const ValueTree& tree)
+            {
+                if (! tree.hasType (Tags::node))
+                    return;
+                auto nodeRef = tree;
+                nodeRef.setProperty (Tags::uuid, Uuid().toString(), nullptr);
+            });
             if (auto* ec = findSibling<EngineController>())
                 ec->addGraph (model);
         }
