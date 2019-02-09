@@ -350,8 +350,11 @@ namespace Element {
         const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
         const bool operator!=(const Node& o) const { return this->objectData != o.objectData; }
 
+        void forEach (std::function<void(const ValueTree& tree)>) const;
+
     private:
         void setMissingProperties();
+        void forEach (const ValueTree tree, std::function<void(const ValueTree& tree)>) const;
     };
     
     typedef Node NodeModel;

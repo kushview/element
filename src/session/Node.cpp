@@ -155,7 +155,7 @@ namespace Element {
         jassert (! result.getParent().isValid());   // cannot be part of another object tree
         if (result.getParent().isValid())
             return result;
-        result.setProperty (Tags::id, (int64)0, nullptr);
+        result.removeProperty (Tags::id, nullptr);
         result.setProperty (Tags::uuid, Uuid().toString(), nullptr);
         return result;
     }
@@ -718,5 +718,17 @@ namespace Element {
             if (arc->sourceNode == getNodeId() || arc->destNode == getNodeId())
                 results.add (arc.release());
         }
+    }
+
+    void Node::forEach (std::function<void(const ValueTree& tree)> handler) const
+    {
+        forEach (objectData, handler);
+    }
+
+    void Node::forEach (const ValueTree tree, std::function<void(const ValueTree& tree)> handler) const
+    {
+        handler (tree);
+        for (int i = 0; i < tree.getNumChildren(); ++i)
+            forEach (tree.getChild (i), handler);
     }
 }

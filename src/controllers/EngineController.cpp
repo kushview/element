@@ -370,6 +370,15 @@ void EngineController::duplicateGraph (const Node& graph)
     Node duplicate (graph.getValueTree().createCopy());
     duplicate.savePluginState(); // need objects present to update processor states
     Node::sanitizeRuntimeProperties (duplicate.getValueTree());
+    // reset UUIDs to avoid compilcations with undoable actions
+    duplicate.forEach ([](const ValueTree& tree)
+    {
+        if (! tree.hasType (Tags::node))
+            return;
+        auto nodeRef = tree;
+        nodeRef.setProperty (Tags::uuid, Uuid().toString(), nullptr);
+    });
+
     duplicate.setProperty (Tags::name, duplicate.getName().replace("(copy)","").trim() + String(" (copy)"));
     addGraph (duplicate);
 }
