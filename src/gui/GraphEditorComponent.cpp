@@ -1184,8 +1184,9 @@ void GraphEditorComponent::updateConnectorComponents()
         ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
         if (cc != nullptr && cc != draggingConnector)
         {
-            if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel,
-                                                cc->destFilterID, (uint32) cc->destFilterChannel))
+            if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel, 
+                                                cc->destFilterID, (uint32) cc->destFilterChannel,
+                                                true))
             {
                 delete cc;
             }

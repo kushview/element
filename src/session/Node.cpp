@@ -418,7 +418,8 @@ namespace Element {
     
     bool Node::connectionExists (const ValueTree& arcs,
                                  const uint32 sourceNode, const uint32 sourcePort,
-                                 const uint32 destNode, const uint32 destPort)
+                                 const uint32 destNode, const uint32 destPort,
+                                 const bool checkMissing)
     {
         for (int i = arcs.getNumChildren(); --i >= 0;)
         {
@@ -428,7 +429,7 @@ namespace Element {
                 static_cast<int> (destNode) == (int) arc.getProperty (Tags::destNode) &&
                 static_cast<int> (destPort) == (int) arc.getProperty (Tags::destPort))
             {
-                return true;
+                return (checkMissing) ? !arc.getProperty (Tags::missing, false) : true;
             }
         }
         

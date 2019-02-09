@@ -85,8 +85,12 @@ namespace Element {
         
         ~Node() noexcept { }
         
+        /** Returns true if the connection exists in the provided ValueTree
+         
+            @param checkMissing  If true, will return false if found but has the missing property
+          */
         static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
-                                      const uint32 destNode, const uint32 destPort);
+                                      const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
         
         static Node createDefaultGraph (const String& name = "Graph");
 
