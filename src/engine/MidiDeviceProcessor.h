@@ -67,19 +67,27 @@ public:
                                     int numBytesSoFar,
                                     double timestamp) override;
 
+    inline bool canAddBus (bool isInput) const override { ignoreUnused (isInput); return false; }
+    inline bool canRemoveBus (bool isInput) const override { ignoreUnused (isInput); return false; }
+
+protected:
+    inline bool isBusesLayoutSupported (const BusesLayout&) const override         { return false; }
+    inline bool canApplyBusesLayout (const BusesLayout& layouts) const override    { return isBusesLayoutSupported (layouts); }
+    inline bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties) override 
+    {
+        ignoreUnused (isInput, isAddingBuses, outNewBusProperties);
+        return false;
+    }
+
 #if 0
     // Audio Processor Template
-    
     virtual StringArray getAlternateDisplayNames() const;
     virtual void processBlock (AudioBuffer<double>& buffer, idiBuffer& midiMessages);
     virtual void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midiMessages);
     virtual void processBlockBypassed (AudioBuffer<double>& buffer, MidiBuffer& midiMessages);
     
-    virtual bool canAddBus (bool isInput) const                     { ignoreUnused (isInput); return false; }
-    virtual bool canRemoveBus (bool isInput) const                  { ignoreUnused (isInput); return false; }
     virtual bool supportsDoublePrecisionProcessing() const;
     
-
     virtual void reset();
     virtual void setNonRealtime (bool isNonRealtime) noexcept;
     
@@ -95,11 +103,6 @@ public:
     virtual void setPlayHead (AudioPlayHead* newPlayHead);
     
     virtual void updateTrackProperties (const TrackProperties& properties);
-        
-protected:
-    virtual bool isBusesLayoutSupported (const BusesLayout&) const          { return true; }
-    virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
-    virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 #endif
     
 private:

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<node type="graph" name="Graph 1" bypass="0" persistent="1" renderMode="single"
+      program="0" uuid="d7c9eb442ed04ad4aff636cfd83910d0" midiProgram="-1">
+  <nodes>
+    <node id="4" type="plugin" format="Internal" identifier="midi.output"
+          name="MIDI Out" relativeX="0.32241379310344825404" relativeY="0.73111782477341391573"
+          numAudioIns="0" numAudioOuts="0" bypass="0" program="0" persistent="1"
+          renderMode="single" uuid="d15ee96886eb4ceb8322dda44bf1355f" enabled="1">
+      <nodes/>
+      <ports>
+        <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_in_0"
+              flow="input"/>
+      </ports>
+    </node>
+    <node id="5" type="plugin" format="Internal" identifier="element.midiInputDevice"
+          name="IAC Driver Bus 1" relativeX="0.52758620689655177927" relativeY="0.15105740181268881295"
+          pluginIdentifierString="Internal--be855ded-0" uuid="a03e476c5ac1467ea6026fdbb92cc0a7"
+          bypass="0" persistent="1" renderMode="single" state="63.VMjLgXC....OyQWXzUFHo4Fb0QGQkYWZiUVOhDiHfPVY1k1Xk4TXsUVOhjTPCABQxklckIGHBU2bfDiHu3C."
+          programState="63.VMjLgXC....OyQWXzUFHo4Fb0QGQkYWZiUVOhDiHfPVY1k1Xk4TXsUVOhjTPCABQxklckIGHBU2bfDiHu3C."
+          program="1">
+      <nodes/>
+      <ports>
+        <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_out_0"
+              flow="output"/>
+      </ports>
+    </node>
+  </nodes>
+  <ports/>
+  <arcs>
+    <arc sourceNode="5" sourcePort="0" destNode="4" destPort="0"/>
+  </arcs>
+</node>

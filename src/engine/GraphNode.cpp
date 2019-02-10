@@ -176,8 +176,18 @@ PortType GraphNode::getPortType (const uint32 port) const
 
 int GraphNode::getNumPorts (const PortType type, const bool isInput) const { return ports.size (type, isInput); }
 uint32 GraphNode::getNumPorts() const { return (uint32) ports.size(); }
-bool GraphNode::isPortInput (const uint32 port)  const { return ports.isInput (port, false); }
-bool GraphNode::isPortOutput (const uint32 port) const { return ports.isOutput (port, true); }
+
+bool GraphNode::isPortInput (const uint32 port)  const 
+{
+    jassert (port < getNumPorts());
+    return ports.isInput (static_cast<int> (port), false); 
+}
+
+bool GraphNode::isPortOutput (const uint32 port) const
+{
+    jassert (port < getNumPorts());
+    return ports.isOutput (static_cast<int> (port), true); 
+}
 
 uint32 GraphNode::getPortForChannel (const PortType type, const int channel, const bool isInput) const
 {

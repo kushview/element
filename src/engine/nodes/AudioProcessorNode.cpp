@@ -2,6 +2,7 @@
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
+#include "engine/MidiDeviceProcessor.h"
 
 namespace Element {
 
@@ -47,6 +48,11 @@ void AudioProcessorNode::createPorts()
 {
     kv::PortList newPorts;
 
+    auto* const midiDevice  = dynamic_cast<MidiDeviceProcessor*> (proc.get());
+    const bool isMidiDevice = nullptr != midiDevice;
+    const bool isMidiDeviceInput  = isMidiDevice && midiDevice->isInputDevice();
+    const bool isMidiDeviceOutput = isMidiDevice && midiDevice->isOutputDevice();
+
     int index = 0, channel = 0, busIdx = 0;
     for (busIdx = 0; busIdx < proc->getBusCount(true); ++busIdx)
     {
@@ -57,6 +63,7 @@ void AudioProcessorNode::createPorts()
             String symbol = "audio_in_"; symbol << int (channel + 1);
             newPorts.add (PortType::Audio, index, channel, symbol, name, true);
             ++index; ++channel;
+            jassert (! isMidiDevice);
         }
     }
     jassert (channel == proc->getTotalNumInputChannels());
@@ -71,6 +78,7 @@ void AudioProcessorNode::createPorts()
             String symbol = "audio_out_"; symbol << int (channel + 1);
             newPorts.add (PortType::Audio, index, channel, symbol, name, false);
             ++index; ++channel;
+            jassert(! isMidiDevice);
         }
     }
     jassert (channel == proc->getTotalNumOutputChannels());
@@ -85,7 +93,7 @@ void AudioProcessorNode::createPorts()
                       true);
         ++index;
     }
-    
+
     if (proc->acceptsMidi())
     {
         newPorts.add (PortType::Midi, index, 0, "midi_in_0", "MIDI", true);
@@ -94,6 +102,10 @@ void AudioProcessorNode::createPorts()
     
     if (proc->producesMidi())
     {
+        if (isMidiDevice)
+        {
+            jassert (isMidiDeviceInput);
+        }
         newPorts.add (PortType::Midi, index, 0, "midi_out_0", "MIDI", false);
         ++index;
     }

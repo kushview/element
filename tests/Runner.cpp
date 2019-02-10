@@ -16,9 +16,27 @@ int main (int argc, char** argv)
     {
         runner.runAllTests();
     }
-    else if (UnitTest::getAllCategories().contains (String::fromUTF8 (argv[1])))
+    else if (argc == 2 && UnitTest::getAllCategories().contains (String::fromUTF8 (argv[1])))
     {
         runner.runTestsInCategory (String::fromUTF8 (argv[1]));
+    }
+    else if (argc == 3)
+    {
+        const String category (String::fromUTF8 (argv[1]));
+        const String slug (String::fromUTF8 (argv[2]));
+        Array<UnitTest*> testsToRun;
+        for (auto* const unitTest : UnitTest::getAllTests())
+            if (auto* const test = dynamic_cast<Element::UnitTestBase*> (unitTest))
+                if (category == test->getCategory() && slug == test->getSlug())
+                    testsToRun.add (unitTest);
+        if (testsToRun.isEmpty())
+        {
+            Logger::writeToLog ("test(s) not found");
+        }
+        else
+        {
+            runner.runTests (testsToRun);
+        }
     }
     else
     {

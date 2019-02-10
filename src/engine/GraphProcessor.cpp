@@ -961,10 +961,23 @@ bool GraphProcessor::canConnect (const uint32 sourceNode, const uint32 sourcePor
         return false;
 
     const GraphNode* const source = getNodeForId (sourceNode);
-    if (source == nullptr
-         || (sourcePort >= source->getNumPorts())
-         || (! source->isPortOutput (sourcePort)))
+    if (source == nullptr)
     {
+        DBG("[EL] source is nullptr");
+        return false;
+    }
+
+    if (sourcePort >= source->getNumPorts())
+    {
+        DBG("[EL] source port greater than total: port: " 
+            << (int) sourcePort << " total: " 
+            << (int) source->getNumPorts());
+        return false;
+    }
+
+    if (! source->isPortOutput (sourcePort))
+    {
+        DBG("[EL] " << source->getAudioProcessor()->getName() << " source port is not an output port: total: " << (int) source->getNumPorts());
         return false;
     }
     
