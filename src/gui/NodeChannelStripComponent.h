@@ -117,7 +117,6 @@ public:
         }
 
         meter.refresh();
-        meter.repaint();
     }
 
     inline void stabilizeContent()
@@ -162,7 +161,7 @@ public:
         node.getPorts (audioIns, audioOuts, PortType::Audio);
 
         stabilizeContent();
-        startTimer (meterSpeedMillis);
+        startTimerHz (meterSpeedHz);
 
         if (onNodeChanged)
             onNodeChanged();
@@ -190,7 +189,7 @@ private:
     ChannelStripComponent channelStrip;
     bool listenForNodeSelected;
     
-    int meterSpeedMillis = 60;
+    int meterSpeedHz    = 15;
     bool isAudioOutNode = false;
     bool isAudioInNode  = false;
     bool monoMeter      = false;
