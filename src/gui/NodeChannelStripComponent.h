@@ -292,8 +292,7 @@ private:
         if (node.isValid())
             node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
         if (auto* obj = node.getGraphNode())
-            if (auto* proc = obj->getAudioProcessor())
-                proc->suspendProcessing (! channelStrip.isPowerOn());
+            obj->suspendProcessing (! channelStrip.isPowerOn());
     }
 
     void setUnityGain()
