@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.2
 
   ------------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ AboutComponent::AboutComponent ()
     label.reset (new Label ("new label",
                             TRANS("Element")));
     addAndMakeVisible (label.get());
-    label->setFont (Font ("Arial Black", 86.5f, Font::bold));
+    label->setFont (Font ("Arial Black", 86.50f, Font::bold));
     label->setJustificationType (Justification::centred);
     label->setEditable (false, false, false);
     label->setColour (Label::textColourId, Colours::whitesmoke);
@@ -48,7 +48,7 @@ AboutComponent::AboutComponent ()
     label2.reset (new Label ("new label",
                              TRANS("Element v0.1.1 (build 1)")));
     addAndMakeVisible (label2.get());
-    label2->setFont (Font (14.0f, Font::plain).withTypefaceStyle ("Regular"));
+    label2->setFont (Font (14.00f, Font::plain).withTypefaceStyle ("Regular"));
     label2->setJustificationType (Justification::centredLeft);
     label2->setEditable (false, false, false);
     label2->setColour (Label::textColourId, Colour (0xffe6e6e6));
@@ -142,7 +142,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AboutComponent" componentName="AboutComponent"
                  parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="524" initialHeight="460">
   <METHODS>
     <METHOD name="mouseDown (const MouseEvent&amp; e)"/>
@@ -172,3 +172,4 @@ END_JUCER_METADATA
 //[EndFile] You can add extra defines here...
 } /* namespace Element */
 //[/EndFile]
+
