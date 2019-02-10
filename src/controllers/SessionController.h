@@ -22,12 +22,7 @@ public:
     void newSession();
     bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
 
-    inline void resetChanges()
-    {
-        jassert (document);
-        document->setChangedFlag (false);
-        jassert (! document->hasChangedSinceSaved());
-    }
+    void resetChanges (const bool clearDocumentFile = false);
     
     void exportGraph (const Node& node, const File& targetFile);
     void importGraph (const File& file);

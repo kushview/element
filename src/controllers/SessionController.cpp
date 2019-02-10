@@ -110,6 +110,15 @@ void SessionController::closeSession()
     DBG("[SC] close session");
 }
 
+void SessionController::resetChanges (const bool resetDocumentFile)
+{
+    jassert (document);
+    if (resetDocumentFile)
+        document->setFile ({});
+    document->setChangedFlag (false);
+    jassert (! document->hasChangedSinceSaved());
+}
+
 void SessionController::saveSession (const bool saveAs)
 {
     jassert (document && currentSession);
@@ -153,7 +162,7 @@ void SessionController::newSession()
         loadNewSessionData();
         refreshOtherControllers();
         findSibling<GuiController>()->stabilizeContent();
-        resetChanges();
+        resetChanges (true);
     }
 }
 
