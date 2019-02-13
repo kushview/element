@@ -21,7 +21,6 @@ plugins/ElementFX/JuceLibraryCode/BinaryData*.*
 data/*.ai
 
 dst
-libs/vst*
 .waf-*
 .lock*
 build/
