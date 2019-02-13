@@ -137,7 +137,7 @@ def build_mingw (bld):
         source      = mingwSrc,
         includes    =  [ '/opt/kushview/include', 'libs/JUCE/modules', \
                          'libs/kv/modules', 'project/JuceLibraryCode', \
-                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
+                         'src', 'libs/vst3sdk', \
                          os.path.expanduser('~') + '/SDKs/ASIOSDK/common' ],
         cxxflags    = '',
         target      = '%s/Element' % (mingwEnv.CROSS),
@@ -226,8 +226,7 @@ def build_mac (bld):
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK', \
-                        os.path.expanduser('~') + '/SDKs/VST_SDK/VST2_SDK' ],
+                        'libs/vst3sdk', 'libs/vstsdk2.4', 'src' ],
         target      = 'lib/kv',
         name        = 'KV',
         env         = libEnv,
