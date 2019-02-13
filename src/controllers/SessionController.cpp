@@ -70,7 +70,6 @@ void SessionController::openFile (const File& file)
     }
     else if (file.hasFileExtension ("els"))
     {
-        DBG("[El] opening session " << file.getFullPathName());
         document->saveIfNeededAndUserAgrees();
         Session::ScopedFrozenLock freeze (*currentSession);
         Result result = document->loadFrom (file, true);
@@ -82,7 +81,6 @@ void SessionController::openFile (const File& file)
             refreshOtherControllers();
             findSibling<GuiController>()->stabilizeContent();
             resetChanges();
-            DBG("[EL] opened: " << document->getFile().getFullPathName());
         }
     }
     else
