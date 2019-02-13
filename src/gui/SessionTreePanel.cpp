@@ -200,14 +200,13 @@ public:
         ViewHelpers::postMessageFor (getOwnerView(), new AddPluginMessage (node, desc));
     }
     
-    void getSelectedNodes (NodeArray& nodes)
+    void getSelectedNodes (NodeArray& nodes, bool includeRootGraphs = true)
     {
         const auto numSelected = getOwnerView()->getNumSelectedItems();
         for (int i = 0; i < numSelected; ++i)
             if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (getOwnerView()->getSelectedItem (i)))
                 nodes.add (item->node);
     }
-
 
     virtual void handlePopupMenuResult (int result) override
     {
@@ -220,8 +219,16 @@ public:
 
             case 10: {
                 NodeArray selected; getSelectedNodes (selected);
-                ViewHelpers::postMessageFor (getOwnerView(), 
-                    new RemoveNodeMessage (selected));
+                NodeArray nodes, rootGraphs;
+                for (const auto& node : selected)
+                {
+                    if (node.isRootGraph())
+                        rootGraphs.add (node);
+                    else
+                        nodes.add (node);
+                }
+                selected.clearQuick();
+                ViewHelpers::postMessageFor (getOwnerView(), new RemoveNodeMessage (nodes));
             } break;
 
             default: break;
@@ -237,7 +244,8 @@ public:
             menu.addSeparator();
         }
         
-        menu.addItem (10, "Delete Selected");
+        if (! node.isRootGraph())
+            menu.addItem (10, "Delete Selected");
         
         launchPopupMenu (menu);
     }
