@@ -707,10 +707,8 @@ void EngineController::setRootNode (const Node& newRootNode)
     
     if (auto* const r = holder->getController())
     {
-        DBG("[EL] setting root: " << holder->model.getName());
         if (! r->isLoaded())
         {
-            DBG("[EL] loading...");
             r->getRootGraph().setPlayConfigFor (devices);
             r->setNodeModel (newRootNode);
         }
@@ -838,14 +836,11 @@ void EngineController::sessionReloaded()
         for (int i = 0; i < session->getNumGraphs(); ++i)
         {
             Node rootGraph (session->getGraph (i));
-
-            DBG("[EL] adding holder: " << rootGraph.getName());
             if (auto* holder = graphs->add (new RootGraphHolder (rootGraph, getWorld())))
             {
                 holder->attach (engine);
                 if (auto* const controller = holder->getController())
                 {
-                    DBG("[EL] plugin was attached: " << i);
                     // noop: saving this logical block
                 }
             }

@@ -513,7 +513,6 @@ private:
         }
 
         cancelFlag.set (0);
-        DBG("[EL] unverified plugin scan finished");
     }
 };
 
