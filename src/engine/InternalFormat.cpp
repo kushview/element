@@ -261,6 +261,20 @@ namespace Element {
             desc->pluginFormatName   = "Element";
             desc->version            = "1.0.0";
         }
+        else if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->fileOrIdentifier   = EL_INTERNAL_ID_PROGRAM_CHANGE_MAP;
+            desc->name               = "Program Change Map";
+            desc->descriptiveName    = "Program Change Map";
+            desc->numInputChannels   = 0;
+            desc->numOutputChannels  = 0;
+            desc->hasSharedContainer = false;
+            desc->isInstrument       = false;
+            desc->manufacturerName   = "Element";
+            desc->pluginFormatName   = "Element";
+            desc->version            = "1.0.0";
+        }
         else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
         {
             auto* const desc = ds.add (new PluginDescription());
@@ -286,6 +300,7 @@ namespace Element {
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
         results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
+        results.add (EL_INTERNAL_ID_PROGRAM_CHANGE_MAP);
 
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);

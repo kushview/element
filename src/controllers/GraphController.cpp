@@ -2,6 +2,7 @@
 #include "controllers/GraphController.h"
 
 #include "engine/nodes/MidiChannelSplitterNode.h"
+#include "engine/nodes/ProgramChangeMapNode.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/SubGraphProcessor.h"
 
@@ -19,7 +20,8 @@ static StringArray getFullVesrionPluginIdentifiers()
         EL_INTERNAL_ID_GRAPH,
         EL_INTERNAL_ID_MIDI_CHANNEL_MAP,
         EL_INTERNAL_ID_MIDI_SEQUENCER,
-        EL_INTERNAL_ID_PLACEHOLDER
+        EL_INTERNAL_ID_PLACEHOLDER,
+        EL_INTERNAL_ID_PROGRAM_CHANGE_MAP
     };
 }
 
@@ -192,6 +194,10 @@ GraphNode* GraphController::createFilter (const PluginDescription* desc, double 
     if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
     {
         return processor.addNode (new MidiChannelSplitterNode());
+    }
+    else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+    {
+        return processor.addNode (new ProgramChangeMapNode());
     }
 
     String errorMessage;
