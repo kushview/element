@@ -7,10 +7,12 @@
 
 #include "ElementApp.h"
 #include "Commands.h"
+#include "engine/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 #include "engine/GraphNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
+#include "gui/nodes/ProgramChangeMapEditor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -150,6 +152,11 @@ public:
 
     inline PluginWindow* createPluginWindowFor (const Node& node)
     {
+        if (node.getIdentifier().toString() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+        {
+            return createPluginWindowFor (node, new ProgramChangeMapEditor());
+        }
+
         GraphNodePtr object = node.getGraphNode();
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (! proc)

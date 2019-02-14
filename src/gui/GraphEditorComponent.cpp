@@ -5,6 +5,7 @@
 
 #include "ElementApp.h"
 #include "controllers/GraphController.h"
+
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/ContextMenus.h"
@@ -15,11 +16,13 @@
 #include "gui/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
 #include "gui/NodeIOConfiguration.h"
-
 #include "engine/SubGraphProcessor.h"
+#include "engine/BaseProcessor.h"
+
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Node.h"
+
 #include "gui/GraphEditorComponent.h"
 
 #ifndef EL_USE_PIG_WHIP
@@ -424,7 +427,21 @@ public:
         }
         else if (node.isValid())
         {
-            ViewHelpers::presentPluginWindow (this, node);
+            // DBG("gui: " << node.getIdentifier().toString());
+            // if (node.getIdentifier().toString() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+            // {
+            //     auto* window = new DocumentWindow ("window", Colours::black,
+            //         DocumentWindow::allButtons, false);
+            //     auto* editor = new ProgramChangeMapEditor();
+            //     window->setContentOwned (editor, true);
+            //     window->setSize (editor->getWidth(), editor->getHeight());
+            //     window->addToDesktop();
+            //     window->setVisible (true);
+            // }
+            // else
+            {
+                ViewHelpers::presentPluginWindow (this, node);
+            }
         }
     }
     
