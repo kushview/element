@@ -8,7 +8,7 @@ namespace Element
     {
         StringArray getSubDirs()
         {
-            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates" });
+            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates", "Sessions" });
         }
         
         void initializeUserLibrary (const File& path)

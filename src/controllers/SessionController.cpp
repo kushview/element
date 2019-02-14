@@ -17,6 +17,7 @@ void SessionController::activate()
     auto* app = dynamic_cast<AppController*> (getRoot());
     currentSession = app->getWorld().getSession();
     document = new SessionDocument (currentSession);
+    document->setLastDocumentOpened (DataPath::defaultSessionDir().getChildFile ("Untitled.els"));
 }
 
 void SessionController::deactivate()
