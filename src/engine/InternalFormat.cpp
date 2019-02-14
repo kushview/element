@@ -54,7 +54,7 @@ namespace Element {
             IOP p (IOP::midiInputNode);
             p.fillInPluginDescription (midiInDesc);
         }
-        
+       #ifndef EL_FREE
         {
             PlaceholderProcessor p;
             p.fillInPluginDescription (placeholderDesc);
@@ -66,6 +66,7 @@ namespace Element {
             MidiDeviceProcessor out (false);
             out.fillInPluginDescription (midiOutputDeviceDesc);
         }
+       #endif
     }
 
     AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
@@ -86,6 +87,8 @@ namespace Element {
         {
             return new IOP (IOP::midiOutputNode);
         }
+
+       #ifndef EL_FREE
         else if (desc.fileOrIdentifier == "element.midiInputDevice")
         {
             return new MidiDeviceProcessor (true);
@@ -98,6 +101,7 @@ namespace Element {
         {
             return new PlaceholderProcessor();
         }
+       #endif // EL_FREE
 
         return nullptr;
     }
@@ -212,6 +216,7 @@ namespace Element {
             auto* desc = ds.add (new PluginDescription());
             ReverbProcessor().fillInPluginDescription (*desc);
         }
+       #ifndef EL_FREE
         else if (fileOrId == EL_INTERNAL_ID_GRAPH)
         {
             auto* const desc = ds.add (new PluginDescription());
@@ -261,6 +266,7 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
+       #endif
     }
     
     StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -271,6 +277,8 @@ namespace Element {
         results.add ("element.volume");
         results.add (EL_INTERNAL_ID_WET_DRY);
         results.add (EL_INTERNAL_ID_REVERB);
+
+       #ifndef EL_FREE
         results.add (EL_INTERNAL_ID_PLACEHOLDER);
         results.add (EL_INTERNAL_ID_CHANNELIZE);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
@@ -282,6 +290,7 @@ namespace Element {
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
+       #endif // EL_FREE
 
         return results;
     }
@@ -314,7 +323,7 @@ namespace Element {
         
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
             base = new ReverbProcessor();
-        
+       #ifndef EL_FREE
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
         
@@ -335,6 +344,7 @@ namespace Element {
 
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
             base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
+       #endif // EL_FREE
 
         return base != nullptr ? base.release() : nullptr;
     }

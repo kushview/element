@@ -28,14 +28,28 @@ static bool isFullVersionPlugin (const PluginDescription& desc)
     return getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
 }
 
+static String denyPluginMessage (const PluginDescription& desc)
+{
+    String message;
+    if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
+        message << "Nested Graphs are available in the paid version only.";
+    return message;
+}
+
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
 {
     String header = "Plugin Instantiation Failed";
     String message;
     if (isFullVersionPlugin (desc))
-        message << desc.name << " is available in the paid version.";
+    {
+        message = denyPluginMessage (desc);
+        if (message.isEmpty())
+            message << desc.name << " is available in the paid version.";
+    }
     else
+    {
         message << desc.name << " could not be instantiated";
+    }
 
     if (async)
         AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, header, message);

@@ -136,6 +136,7 @@ struct RootGraphRender : public AsyncUpdater
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
+       #ifndef EL_FREE
         if (program.wasRequested())
         {
             if (! locked)
@@ -153,7 +154,8 @@ struct RootGraphRender : public AsyncUpdater
 
             program.reset();
         }
-        
+       #endif
+
         auto* const current  = getCurrentGraph();
         auto* const last     = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph(lastGraph) : nullptr;
         
@@ -176,7 +178,7 @@ struct RootGraphRender : public AsyncUpdater
 			audioOut.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
 							  false, false, true);
 			audioTemp.setSize (buffer.getNumChannels(), buffer.getNumSamples(),
-							   false, false, true);
+							  false, false, true);
 
             // clear the mixing area
             for (int i = numChans; --i >= 0;)
@@ -269,6 +271,7 @@ struct RootGraphRender : public AsyncUpdater
             MidiMessage msg; int frame = 0;
             
             // setup a program change if present
+           #ifndef EL_FREE
             while (iter.getNextEvent (msg, frame) && frame < numSamples)
             {
                 if (! msg.isProgramChange())
@@ -276,6 +279,7 @@ struct RootGraphRender : public AsyncUpdater
                 program.program = msg.getProgramChangeNumber();
                 program.channel = msg.getChannel();
             }
+           #endif // EL_FREE
 
             // done with input, swap it with the rendered output
             midi.swapWith (midiOut);
