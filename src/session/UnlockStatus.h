@@ -73,7 +73,11 @@ public:
         return props [fullKey];
        #endif
        
+      #ifdef EL_FREE
+       var r1 (false); var r2 (true);
+      #else
        var r1 (false); var r2 (false);
+      #endif
        r2.swapWith (r1);
        return r1;
     }

@@ -95,7 +95,8 @@
                 "waf",
                 "configure",
                 "--debug",
-                "--enable-free"
+                "--enable-free",
+                "--disable-unlocking"
             ],
             "options": {
                 "env": {
