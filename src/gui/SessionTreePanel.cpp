@@ -100,7 +100,17 @@ public:
     {
         if (ev.x < roundToInt (1.f + getIconSize()))
         {
-            // icon double clicked
+            // icon area clicked
+            if (auto* const cc = ViewHelpers::findContentComponent (getOwnerView()))
+            {
+                if (auto* const gui = cc->getAppController().findChild<GuiController>())
+                {
+                    if (auto* const window = gui->getPluginWindow (node))
+                        gui->closePluginWindow (window);
+                    else
+                        gui->presentPluginWindow (node, true);
+                }
+            }
         }
         else if (! ev.mods.isPopupMenu())
         {

@@ -315,6 +315,15 @@ PluginWindow* GuiController::getPluginWindow (const int window) const
                                       : nullptr;
 }
 
+PluginWindow* GuiController::getPluginWindow (const Node& node) const
+{
+    for (int i = 0; i < getNumPluginWindows(); ++i)
+        if (auto* const window = getPluginWindow (i))
+            if (window->getNode() == node)
+                return window;
+    return nullptr;
+}
+
 void GuiController::showPluginWindowsFor (const Node& node, const bool recursive,
                                           const bool force, const bool focus)
 {

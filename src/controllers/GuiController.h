@@ -80,6 +80,7 @@ namespace Element {
         
         int getNumPluginWindows() const;
         PluginWindow* getPluginWindow (const int window) const;
+        PluginWindow* getPluginWindow (const Node& node) const;
         
         /** Close all plugin windows housed by this controller */
         void closeAllPluginWindows (const bool windowVisible = true);
