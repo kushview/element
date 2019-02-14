@@ -240,7 +240,7 @@ public:
         PopupMenu menu;
         if (node.isGraph())
         {
-            menu.addItem (5, "Add New Graph");
+            menu.addItem (5, "Add Nested Graph");
             menu.addSeparator();
         }
         
@@ -255,7 +255,7 @@ public:
         PopupMenu menu;
         if (node.isGraph())
         {
-            menu.addItem (5, "Add New Graph");
+            menu.addItem (5, "Add Nested Graph");
             menu.addSeparator();
         }
         
@@ -420,7 +420,7 @@ public:
     void showPopupMenu() override
     {   
         PopupMenu menu;
-        menu.addItem (5, "Add New Graph");
+        menu.addItem (5, "Add Nested Graph");
         menu.addItem (4, "Edit Graph...");
         menu.addItem (3, "View Settings...");
         menu.addSeparator();
@@ -542,20 +542,10 @@ void SessionTreePanel::mouseDown (const MouseEvent &ev)
 
 void SessionTreePanel::setSession (SessionPtr s)
 {
-    if (session == s)
-    {
-        refresh();
-        return;
-    }
-    
-    if (auto old = session)
-    {
-        // de-init for old
-    }
-
     session = s;
-    
+    data.removeListener (this);
     data = (session != nullptr) ? session->getValueTree() : ValueTree();
+    data.addListener (this);
     refresh();
     selectActiveRootGraph();
 }

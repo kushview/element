@@ -132,9 +132,10 @@ public:
             Node::sanitizeProperties (data, true);
             DBG(data.toXmlString());
         }
-        else if (index == 1111)
+        else if (index >= 1111 && index <= 1114)
         {
-            auto msg = MidiMessage::programChange (1, 9); // Program 10 in GUI equals Program 9 in MIDI
+            const int program = index - 1111;
+            auto msg = MidiMessage::programChange (1, program); // Program 10 in GUI equals Program 9 in MIDI
             msg.setTimeStamp (1.f + Time::getMillisecondCounterHiRes());
             engine->addMidiMessage (msg);
         }
@@ -327,7 +328,10 @@ private:
     void buildDebugMenu (PopupMenu& menu)
     {
         menu.addItem (1000, "Dump session to console");
-        menu.addItem (1111, "Send MIDI Program 10 ch 1");
+        menu.addItem (1111, "Send MIDI Program 1 ch 1");
+        menu.addItem (1112, "Send MIDI Program 2 ch 1");
+        menu.addItem (1113, "Send MIDI Program 3 ch 1");
+        menu.addItem (1114, "Send MIDI Program 4 ch 1");
         menu.addItem (2222, "Show changed status");
         menu.addItem (3333, "Quick Map");
         menu.addItem (4444, "Refresh Mapping Engine");
