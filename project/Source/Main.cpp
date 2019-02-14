@@ -333,8 +333,10 @@ public:
         
         controller->run();
 
+       #ifndef EL_FREE
         if (world->getSettings().checkForUpdates())
             CurrentVersion::checkAfterDelay (12 * 1000, false);
+       #endif
 
         world->getUnlockStatus().checkLicenseInBackground();
         
