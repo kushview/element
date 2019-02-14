@@ -628,7 +628,8 @@ public:
     
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message) override
     {
-        midiIOMonitor->received();
+        if (! message.isActiveSense() && ! message.isMidiClock())
+            midiIOMonitor->received();
         messageCollector.addMessageToQueue (message);
         if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
             midiClock.process (message);
