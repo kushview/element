@@ -74,6 +74,10 @@
                 file="../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="qarPR0" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../src/engine/nodes/MidiFilterNode.h"/>
+          <FILE id="r7MLe9" name="ProgramChangeMapNode.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/ProgramChangeMapNode.cpp"/>
+          <FILE id="YOAp7M" name="ProgramChangeMapNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/ProgramChangeMapNode.h"/>
         </GROUP>
         <FILE id="ILVmnf" name="AudioEngine.cpp" compile="1" resource="0" file="../src/engine/AudioEngine.cpp"/>
         <FILE id="ry3K1L" name="AudioEngine.h" compile="0" resource="0" file="../src/engine/AudioEngine.h"/>
