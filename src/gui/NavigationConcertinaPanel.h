@@ -547,6 +547,7 @@ private:
         {
             addAndMakeVisible (addButton);
             addButton.setButtonText ("+");
+            addButton.setTriggeredOnMouseDown (true);
             addButton.addListener (this);
             setInterceptsMouseClicks (false, true);
         }
@@ -559,13 +560,27 @@ private:
                                  padding, buttonSize, buttonSize);
         }
         
+        static void menuInvocationCallback (int chosenItemID, ElementsHeader* header)
+        {
+            header->menuCallback (chosenItemID);
+        }
+
+        void menuCallback (int menuId)
+        {
+            if (1 == menuId)
+            {
+                ViewHelpers::invokeDirectly (this, Commands::sessionAddGraph, false);
+                if (auto* p = dynamic_cast<SessionTreePanel*> (&panel))
+                    p->refresh();
+            }
+        }
+
         void buttonClicked (Button*) override
         {
-            ViewHelpers::invokeDirectly (this, Commands::sessionAddGraph, false);
-            if (auto* p = dynamic_cast<SessionTreePanel*> (&panel))
-            {
-                p->refresh();
-            }
+            PopupMenu menu;
+            menu.addItem (1, "Add Graph");
+            menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&addButton),
+                ModalCallbackFunction::forComponent (menuInvocationCallback, this));
         }
         
     private:
