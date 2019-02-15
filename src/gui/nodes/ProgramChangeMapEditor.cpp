@@ -68,7 +68,7 @@ ProgramChangeMapEditor::ProgramChangeMapEditor()
     auto& header = table.getHeader();
     const int flags = TableHeaderComponent::visible;
     header.addColumn ("Name", TableModel::Name, 100, 100, -1, 
-        flags | TableHeaderComponent::resizable, -1);
+        flags, -1);
     header.addColumn ("Input", TableModel::InProgram, 50, 50, -1, 
         flags, -1);
     header.addColumn ("Output", TableModel::OutProgram, 50, 50, -1, 
@@ -76,6 +76,14 @@ ProgramChangeMapEditor::ProgramChangeMapEditor()
     model.reset (new TableModel ());
     table.setModel (model.get());
     table.updateContent();
+
+    addAndMakeVisible (addButton);
+    addButton.setButtonText ("+");
+    addButton.onClick = std::bind (&ProgramChangeMapEditor::addProgram, this);
+    addAndMakeVisible (delButton);
+    delButton.setButtonText ("-");
+    delButton.onClick = std::bind (&ProgramChangeMapEditor::removeSelectedProgram, this);
+
     setSize (640, 360);
 }
 
@@ -83,6 +91,18 @@ ProgramChangeMapEditor::~ProgramChangeMapEditor()
 {
     table.setModel (nullptr);
     model.reset();
+}
+void ProgramChangeMapEditor::addProgram()
+{
+    DBG("add new");
+}
+
+void ProgramChangeMapEditor::removeSelectedProgram()
+{
+    DBG("remove selected");
+    const int selected = table.getSelectedRow();
+    if (! isPositiveAndBelow (selected, table.getNumRows()))
+        return;
 }
 
 void ProgramChangeMapEditor::paint (Graphics& g) 
@@ -92,7 +112,20 @@ void ProgramChangeMapEditor::paint (Graphics& g)
 
 void ProgramChangeMapEditor::resized()
 {
-    table.setBounds (getLocalBounds());
+    auto r = getLocalBounds();
+    r.removeFromBottom (2);
+    auto r2 = r.removeFromBottom (18);
+    r2.removeFromRight (2);
+    delButton.setBounds (r2.removeFromRight (20));
+    r2.removeFromRight (2);
+    addButton.setBounds (r2.removeFromRight (20));
+
+    table.setBounds (r.reduced (2));
+    auto& header = table.getHeader();
+
+    header.setColumnWidth (TableModel::Name,
+        table.getWidth() - (header.getColumnWidth (TableModel::InProgram) + 
+                             header.getColumnWidth (TableModel::OutProgram)));
 }
 
 }
