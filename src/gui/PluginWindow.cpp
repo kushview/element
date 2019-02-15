@@ -32,6 +32,9 @@ public:
     PluginWindowContent (Component* const _editor, const Node& _node)
         : editor (_editor), object(_node.getGraphNode()), node(_node)
     {
+        nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) &&
+            nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
+
         addAndMakeVisible (toolbar = new PluginWindowToolbar());
         toolbar->setBounds (0, 0, getWidth(), 24);
         
@@ -79,7 +82,7 @@ public:
     void updateSize()
     {
         const int height = jmax (editor->getHeight(), 100) + toolbar->getHeight();
-        setSize (editor->getWidth(), height);
+        setSize (editor->getWidth(), height + 4);
         resized();
     }
     
@@ -107,7 +110,15 @@ public:
             r3.removeFromRight (4);
         }
         
-        editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        if (nativeEditor)
+        {
+            editor->setBounds (0, r.getY(), editor->getWidth(), editor->getHeight());
+        }
+        else
+        {
+            editor->setBounds (0, r.getY(), getWidth(), getHeight() - r.getY());
+        }
+        
         editor->addComponentListener (this);
     }
 
@@ -172,7 +183,7 @@ private:
     PowerButton powerButton;
     SettingButton onTopButton;
     Value bypassValue;
-
+    bool nativeEditor = false;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
     GraphNodePtr object;
     Node node;
@@ -199,14 +210,12 @@ private:
 
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
-                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, true),
+                      DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
       gui (g), owner (n.getGraphNode()), node (n)
 {
     setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);
     setSize (400, 300);
-    auto* const content = new PluginWindowContent (ui, node);
-    setContentOwned (content, true);
     
     if (node.isValid())
     {
@@ -217,17 +226,25 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     
 	if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
 	{
-		setResizable (true, true);
+		setResizable (false, true);
 	}
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         setResizable (ed->isResizable(), false);
     }
-
+    else
+    {
+        setResizable (true, false);
+    }
+    
     const bool defaultOnTop = g.getWorld().getSettings().pluginWindowsOnTop();
     setAlwaysOnTop ((bool) node.getProperty (Tags::windowOnTop, defaultOnTop));
 
+    auto* const content = new PluginWindowContent (ui, node);
+    setContentOwned (content, true);
     content->stabilizeComponents();
+
+    addToDesktop();
 }
 
 PluginWindow::~PluginWindow()

@@ -35,8 +35,10 @@ public:
 
 	int getDesktopWindowStyleFlags() const override
     {
-		return ComponentPeer::windowHasCloseButton |
-			   ComponentPeer::windowHasTitleBar;
+		return DocumentWindow::getDesktopWindowStyleFlags() |
+               ComponentPeer::windowHasCloseButton |
+			   ComponentPeer::windowHasTitleBar |
+               ComponentPeer::windowHasDropShadow;
 	}
 protected:
     PluginWindow (GuiController&, Component* const uiComp, const Node& node);
