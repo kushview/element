@@ -55,7 +55,7 @@ int main (int argc, char** argv)
     juce::shutdownJuce_GUI();
     Logger::writeToLog ("-----------------------------------------------------------------");
     Logger::writeToLog ("Test Results");
-    String message = "pass: "; message << totalPass << " fail: " << totalFails;
+    String message = "pass: "; message << totalPass << " fail: " << totalFails << newLine;
     Logger::writeToLog (message);
     return totalFails;
 }
