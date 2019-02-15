@@ -1,4 +1,5 @@
 #include "gui/nodes/ProgramChangeMapEditor.h"
+#include "gui/ViewHelpers.h"
 
 namespace Element {
 
@@ -7,6 +8,11 @@ typedef ProgramChangeMapEditor PGCME;
 class PGCME::TableModel : public TableListBoxModel
 {
 public:
+    enum ColumnId {
+        Name = 1,
+        InProgram,
+        OutProgram
+    };
     TableModel()
     {
     }
@@ -27,8 +33,7 @@ public:
     void paintCell (Graphics& g, int rowNumber, int columnId,
                     int width, int height, bool rowIsSelected) override
     {
-        g.setColour (Colours::white);
-        g.drawText ("Cell", 0, 0, width, height, Justification::centredLeft);
+        ViewHelpers::drawBasicTextRow ("Cell", g, width, height, rowIsSelected);
     }
 
     Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
@@ -55,18 +60,29 @@ public:
 ProgramChangeMapEditor::ProgramChangeMapEditor()
 {
     addAndMakeVisible (table);
+    table.setHeaderHeight (22);
+    table.setRowHeight (20);
     auto& header = table.getHeader();
-    header.addColumn ("In Program", 1, 100);
-    header.addColumn ("Out Program", 2, 100);
+    const int flags = TableHeaderComponent::notSortable;
+    header.addColumn ("Name", TableModel::Name, 100, 100, -1, flags, -1);
+    header.addColumn ("Program In", TableModel::InProgram, 100, 50, -1, flags, -1);
+    header.addColumn ("Program Out", TableModel::OutProgram, 100, 50, -1, flags, -1);
+    model.reset (new TableModel());
+    table.setModel (model.get());
+    table.updateContent();
     setSize (640, 360);
 }
 
 ProgramChangeMapEditor::~ProgramChangeMapEditor()
 {
-
+    table.setModel (nullptr);
+    model.reset();
 }
 
-void ProgramChangeMapEditor::paint(Graphics& g) {}
+void ProgramChangeMapEditor::paint (Graphics& g) 
+{
+    
+}
 
 void ProgramChangeMapEditor::resized()
 {
