@@ -39,12 +39,10 @@ ScriptingController::~ScriptingController() {}
 
 void ScriptingController::activate()
 {
-    PythonTest().run();
 }
 
 void ScriptingController::deactivate()
 {
-
 }
 
 }

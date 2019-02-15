@@ -76,7 +76,6 @@ namespace Element {
         session->saveGraphState();
         if (ScopedPointer<XmlElement> e = session->createXml())
         {
-            DBG("[EL] saving session to " << file.getFullPathName());
             Result res (e->writeToFile (file, String())
                     ? Result::ok() : Result::fail ("Error writing session file"));
             return res;
