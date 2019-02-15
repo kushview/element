@@ -225,7 +225,7 @@ public:
 
 protected:
     GraphNode (uint32 nodeId) noexcept;
-    virtual void createPorts();
+    virtual void createPorts() = 0;
     kv::PortList ports;
     ValueTree metadata;
 
