@@ -168,6 +168,12 @@
               file="../src/engine/WetDryProcessor.h"/>
       </GROUP>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
+        <GROUP id="{88B84499-2C7C-37F9-A90A-04483DB55F85}" name="nodes">
+          <FILE id="ZqeQdy" name="ProgramChangeMapEditor.cpp" compile="1" resource="0"
+                file="../src/gui/nodes/ProgramChangeMapEditor.cpp"/>
+          <FILE id="ISVEfY" name="ProgramChangeMapEditor.h" compile="0" resource="0"
+                file="../src/gui/nodes/ProgramChangeMapEditor.h"/>
+        </GROUP>
         <GROUP id="{AD572BA4-C81C-6D18-A669-55B35AAD76EB}" name="widgets">
           <FILE id="Erf0gn" name="MidiBlinker.cpp" compile="1" resource="0" file="../src/gui/widgets/MidiBlinker.cpp"/>
           <FILE id="xUyVtP" name="MidiBlinker.h" compile="0" resource="0" file="../src/gui/widgets/MidiBlinker.h"/>
