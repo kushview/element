@@ -33,7 +33,10 @@ public:
     void paintCell (Graphics& g, int rowNumber, int columnId,
                     int width, int height, bool rowIsSelected) override
     {
-        ViewHelpers::drawBasicTextRow ("Cell", g, width, height, rowIsSelected);
+        Justification alignment = columnId == TableModel::Name 
+            ? Justification::centredLeft : Justification::centred;
+        int padding = columnId == TableModel::Name ? 4 : 0;
+        ViewHelpers::drawBasicTextRow ("Cell", g, width, height, rowIsSelected, padding, alignment);
     }
 
     Component* refreshComponentForCell (int rowNumber, int columnId, bool isRowSelected,
@@ -63,11 +66,14 @@ ProgramChangeMapEditor::ProgramChangeMapEditor()
     table.setHeaderHeight (22);
     table.setRowHeight (20);
     auto& header = table.getHeader();
-    const int flags = TableHeaderComponent::notSortable;
-    header.addColumn ("Name", TableModel::Name, 100, 100, -1, flags, -1);
-    header.addColumn ("Program In", TableModel::InProgram, 100, 50, -1, flags, -1);
-    header.addColumn ("Program Out", TableModel::OutProgram, 100, 50, -1, flags, -1);
-    model.reset (new TableModel());
+    const int flags = TableHeaderComponent::visible;
+    header.addColumn ("Name", TableModel::Name, 100, 100, -1, 
+        flags | TableHeaderComponent::resizable, -1);
+    header.addColumn ("Input", TableModel::InProgram, 50, 50, -1, 
+        flags, -1);
+    header.addColumn ("Output", TableModel::OutProgram, 50, 50, -1, 
+        flags, -1);
+    model.reset (new TableModel ());
     table.setModel (model.get());
     table.updateContent();
     setSize (640, 360);

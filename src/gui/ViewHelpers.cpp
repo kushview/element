@@ -25,7 +25,8 @@ namespace ViewHelpers {
 
 typedef LookAndFeel_KV1 LF;
 
-void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding)
+void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, 
+                       int padding, Justification alignment)
 {
     g.saveState();
     
@@ -38,7 +39,7 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
 
     g.setColour ((selected) ? LF::textColor.brighter(0.2f) : LF::textColor);
     if (text.isNotEmpty())
-        g.drawText (text, padding, 0, w - padding - 2, h, Justification::centredLeft);
+        g.drawText (text, padding, 0, w - padding - 2, h, alignment);
 
     g.restoreState();
 }

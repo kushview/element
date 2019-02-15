@@ -16,7 +16,9 @@ class NavigationConcertinaPanel;
 namespace ViewHelpers {
 
 /** Draws a common text row in a normal list box */
-void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, int padding = 10);
+void drawBasicTextRow (const String& text, Graphics& g, int w, int h, 
+                       bool selected, int padding = 10, 
+                       Justification alignment = Justification::centredLeft);
 
 /** Draws a common text row in a horizontal list box */
 void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool selected);
