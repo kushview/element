@@ -154,7 +154,7 @@ public:
     {
         if (node.getIdentifier().toString() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
-            return createPluginWindowFor (node, new ProgramChangeMapEditor());
+            return createPluginWindowFor (node, new ProgramChangeMapEditor (node));
         }
 
         GraphNodePtr object = node.getGraphNode();

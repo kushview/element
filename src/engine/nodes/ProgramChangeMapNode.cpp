@@ -38,15 +38,23 @@ void ProgramChangeMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     ScopedLock sl (lock);
     MidiMessage msg; int frame = 0;
-    MidiBuffer::Iterator iter1 (toSendMidi);
-    while (iter1.getNextEvent (msg, frame))
-        midiIn->addEvent (msg, frame);
+
+    if (! toSendMidi.isEmpty())
+    {
+        MidiBuffer::Iterator iter1 (toSendMidi);
+        while (iter1.getNextEvent (msg, frame))
+            midiIn->addEvent (msg, frame);
+        toSendMidi.clear();
+    }
 
     MidiBuffer::Iterator iter2 (*midiIn);
+    int program = -1;
+
     while (iter2.getNextEvent (msg, frame))
     {
         if (msg.isProgramChange() && programMap [msg.getProgramChangeNumber()] >= 0)
         {
+            program = msg.getProgramChangeNumber();
             tempMidi.addEvent (MidiMessage::programChange (
                 msg.getChannel(), programMap [msg.getProgramChangeNumber()]),
                 frame);
@@ -57,7 +65,14 @@ void ProgramChangeMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         }
     }
 
+    if (program >= 0 && program != lastProgram)
+    {
+        lastProgram = program;
+        triggerAsyncUpdate();
+    }
+
     midiIn->swapWith (tempMidi);
+    tempMidi.clear();
 }
 
 void ProgramChangeMapNode::sendProgramChange (int program, int channel)

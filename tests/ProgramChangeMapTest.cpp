@@ -31,9 +31,14 @@ public:
         expect (entry.in == 5 && entry.out == 5);
 
         beginTest ("does not duplicate");
-        pgc->addProgramEntry ("Program Edit", 3, 6);
+        pgc->addProgramEntry ("Program Edit 1", 3, 6);
         entry = pgc->getProgramEntry (0);
         expect (entry.in = 3 && entry.out == 6);
+        expect (pgc->getNumProgramEntries() == 2);
+
+        beginTest ("edit program");
+        pgc->editProgramEntry (0, "Program Edit 2", 10, 6);
+        expect (entry.in = 10 && entry.out == 6);
         expect (pgc->getNumProgramEntries() == 2);
 
         beginTest ("renders mappings");
@@ -47,7 +52,7 @@ public:
         audio.setSize (2, 1024, false, true, false);
 
         auto* midi = pipe.getWriteBuffer (0);
-        midi->addEvent (MidiMessage::programChange (1, 3), 100);
+        midi->addEvent (MidiMessage::programChange (1, 10), 100);
         midi->addEvent (MidiMessage::programChange (1, 5), 200);
         midi->addEvent (MidiMessage::noteOn (1, 12, static_cast<uint8> (50)), 300);
         midi->addEvent (MidiMessage::noteOff (1, 12), 300);
