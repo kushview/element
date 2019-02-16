@@ -2,7 +2,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
-#include "gui/NodeContentView.h"
+#include "gui/NodeMidiContentView.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {
@@ -12,7 +12,7 @@ namespace Element {
         return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
     }
 
-    NodeContentView::NodeContentView()
+    NodeMidiContentView::NodeMidiContentView()
     {
         const Font font (12.f);
         setWantsKeyboardFocus (false);
@@ -93,7 +93,7 @@ namespace Element {
         transposeSlider.addListener (this);
     }
 
-    NodeContentView::~NodeContentView()
+    NodeMidiContentView::~NodeMidiContentView()
     {
         selectedNodeConnection.disconnect();
         transposeLabel.onDoubleClicked = nullptr;
@@ -106,12 +106,12 @@ namespace Element {
         transposeSlider.removeListener (this);
     }
 
-    void NodeContentView::paint (Graphics& g)
+    void NodeMidiContentView::paint (Graphics& g)
     {
         g.fillAll (Element::LookAndFeel::backgroundColor);
     }
 
-    void NodeContentView::resized()
+    void NodeMidiContentView::resized()
     {
         auto r (getLocalBounds().reduced (2));
         r.removeFromTop (4);
@@ -124,7 +124,7 @@ namespace Element {
         layoutComponent (r, transposeLabel, transposeSlider);
     }
 
-    void NodeContentView::layoutComponent (Rectangle<int>& r, Label& l, Component& c,
+    void NodeMidiContentView::layoutComponent (Rectangle<int>& r, Label& l, Component& c,
                                            int preferedHeight)
     {
         static const int settingHeight = 20;
@@ -136,14 +136,14 @@ namespace Element {
         r.removeFromTop (spacing);
     }
 
-    void NodeContentView::stabilizeContent()
+    void NodeMidiContentView::stabilizeContent()
     {
         auto *cc = ViewHelpers::findContentComponent(this);
         jassert(cc);
         auto& gui = *cc->getAppController().findChild<GuiController>();
         if (! selectedNodeConnection.connected())
             selectedNodeConnection = gui.nodeSelected.connect (std::bind (
-                &NodeContentView::stabilizeContent, this));
+                &NodeMidiContentView::stabilizeContent, this));
 
         node = gui.getSelectedNode();
 
@@ -170,7 +170,7 @@ namespace Element {
         }
     }
 
-    void NodeContentView::sliderValueChanged (Slider* slider)
+    void NodeMidiContentView::sliderValueChanged (Slider* slider)
     {
         GraphNodePtr object = node.getGraphNode();
         if (object == nullptr || ! node.isValid())
@@ -202,7 +202,7 @@ namespace Element {
         updateSliders(); // in case graph node changes requested values
     }
 
-    void NodeContentView::updateSliders()
+    void NodeMidiContentView::updateSliders()
     {
         if (GraphNodePtr object = node.getGraphNode())
         {
@@ -213,7 +213,7 @@ namespace Element {
         }
     }
 
-    void NodeContentView::updateMidiChannels()
+    void NodeMidiContentView::updateMidiChannels()
     {
         if (GraphNodePtr object = node.getGraphNode())
         {

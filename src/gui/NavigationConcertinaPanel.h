@@ -4,7 +4,8 @@
 #include "gui/GuiCommon.h"
 #include "gui/ControllerDevicesView.h"
 #include "gui/ControllerMapsView.h"
-#include "gui/NodeContentView.h"
+#include "gui/NodeMidiContentView.h"
+#include "gui/NodeUIContentView.h"
 #include "DataPath.h"
 
 namespace Element {
@@ -448,10 +449,15 @@ public:
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
 
        #ifndef EL_FREE
-        auto* nv = new NodeContentView();
+        auto* nv = new NodeUIContentView();
         nv->setName ("Node");
         nv->setComponentID ("Node");
         addPanelInternal (-1, nv, "Node", nullptr);
+
+        auto* mv = new NodeMidiContentView();
+        mv->setName ("MIDI");
+        mv->setComponentID ("MIDI");
+        addPanelInternal (-1, mv, "MIDI", nullptr);
        #endif
        
         auto* pv = new PluginsPanelView (ViewHelpers::getGlobals(this)->getPluginManager());

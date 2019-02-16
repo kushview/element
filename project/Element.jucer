@@ -276,14 +276,18 @@
               file="../src/gui/NodeChannelStripView.cpp"/>
         <FILE id="OgVW4P" name="NodeChannelStripView.h" compile="0" resource="0"
               file="../src/gui/NodeChannelStripView.h"/>
-        <FILE id="VqCzbV" name="NodeContentView.cpp" compile="1" resource="0"
-              file="../src/gui/NodeContentView.cpp"/>
-        <FILE id="dHbXMm" name="NodeContentView.h" compile="0" resource="0"
-              file="../src/gui/NodeContentView.h"/>
         <FILE id="vcZQ4S" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../src/gui/NodeIOConfiguration.cpp"/>
         <FILE id="O0M4gV" name="NodeIOConfiguration.h" compile="0" resource="0"
               file="../src/gui/NodeIOConfiguration.h"/>
+        <FILE id="Ug5HXY" name="NodeMidiContentView.cpp" compile="1" resource="0"
+              file="../src/gui/NodeMidiContentView.cpp"/>
+        <FILE id="qtQuqu" name="NodeMidiContentView.h" compile="0" resource="0"
+              file="../src/gui/NodeMidiContentView.h"/>
+        <FILE id="jj7AdR" name="NodeUIContentView.cpp" compile="1" resource="0"
+              file="../src/gui/NodeUIContentView.cpp"/>
+        <FILE id="p2DkCc" name="NodeUIContentView.h" compile="0" resource="0"
+              file="../src/gui/NodeUIContentView.h"/>
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="../src/gui/NoteClipItem.h"/>
         <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="../src/gui/PluginManagerComponent.cpp"/>

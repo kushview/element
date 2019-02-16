@@ -6,12 +6,12 @@
 
 namespace Element {
 
-class NodeContentView : public ContentView,
+class NodeMidiContentView : public ContentView,
                         public Slider::Listener
 {
 public:
-    NodeContentView();
-    ~NodeContentView();
+    NodeMidiContentView();
+    ~NodeMidiContentView();
 
     void stabilizeContent() override;
 

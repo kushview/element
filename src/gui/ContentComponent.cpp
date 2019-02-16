@@ -1135,9 +1135,11 @@ void ContentComponent::stabilize (const bool refreshDataPathTrees)
         sp->setSession (session);
     if (auto* ss = nav->findPanel<SessionTreePanel>())
         ss->setSession (session);
-    if (auto* ncv = nav->findPanel<NodeContentView>())
+    if (auto* mcv = nav->findPanel<NodeMidiContentView>())
+        mcv->stabilizeContent();
+    if (auto* ncv = nav->findPanel<NodeUIContentView>())
         ncv->stabilizeContent();
-        
+    
     toolBar->setSession (session);
     
     stabilizeViews();
