@@ -73,6 +73,9 @@ public:
             ++index;
         }
 
+        MemoryBlock block;
+        pgc->getState (block);
+        pgc->setState (block.getData(), (int) block.getSize());
         pgc = nullptr;
         node = nullptr;
         graph.clear();

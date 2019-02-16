@@ -17,6 +17,9 @@ public:
 
     ~MidiChannelSplitterNode() { }
 
+    void setState (const void* data, int size) override { ignoreUnused (data, size); }
+    void getState (MemoryBlock& block) override { ignoreUnused (block); }
+
     inline void render (AudioSampleBuffer& audio, MidiPipe& midi) override
     {
         if (midi.getNumBuffers() < 16)

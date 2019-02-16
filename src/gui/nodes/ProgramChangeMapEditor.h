@@ -5,7 +5,8 @@
 
 namespace Element {
 
-class ProgramChangeMapEditor : public NodeEditorComponent
+class ProgramChangeMapEditor : public NodeEditorComponent,
+                               public ChangeListener
 {
 public:
     ProgramChangeMapEditor (const Node& node);
@@ -24,6 +25,8 @@ public:
     void selectRow (int row);
     void setStoreSize (const bool storeSize);
 
+    inline void changeListenerCallback (ChangeBroadcaster*) override { table.updateContent(); }
+    
 private:
     Node node;
     class TableModel; friend class TableModel;

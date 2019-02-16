@@ -8,7 +8,8 @@
 namespace Element {
 
 class ProgramChangeMapNode : public MidiFilterNode,
-                             public AsyncUpdater
+                             public AsyncUpdater,
+                             public ChangeBroadcaster
 {
 public:
     struct ProgramEntry
@@ -43,6 +44,49 @@ public:
     {
         ScopedLock sl (lock);
         return lastProgram;
+    }
+
+    void setState (const void* data, int size) override
+    {
+        const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
+        if (! tree.isValid())
+            return;
+
+        clear();
+
+        for (int i = 0; i < tree.getNumChildren(); ++i)
+        {
+            const auto e = tree.getChild (i);
+            auto* const entry = entries.add (new ProgramEntry());
+            entry->name = e["name"].toString();
+            entry->in   = (int) e ["in"];
+            entry->out  = (int) e ["out"];
+        }
+        
+        {
+            ScopedLock sl (lock);
+            for (const auto* const entry : entries)
+                programMap[entry->in] = entry->out;
+        }
+
+        sendChangeMessage();
+    }
+
+    void getState (MemoryBlock& block) override
+    {
+        ValueTree tree ("state");
+        for (const auto* const entry : entries)
+        {
+            ValueTree e ("entry");
+            e.setProperty ("name", entry->name, nullptr)
+             .setProperty ("in",   entry->in,   nullptr)
+             .setProperty ("out",  entry->out,  nullptr);
+            tree.appendChild (e, nullptr);
+        }
+
+        MemoryOutputStream stream (block, false);
+        GZIPCompressorOutputStream gzip (stream);
+        tree.writeToStream (gzip);
     }
 
     inline void handleAsyncUpdate() override { lastProgramChanged(); }

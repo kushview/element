@@ -44,6 +44,18 @@ AudioProcessorNode::~AudioProcessorNode()
     proc = nullptr;
 }
 
+void AudioProcessorNode::getState (MemoryBlock& block)
+{
+    if (proc)
+        proc->getStateInformation (block);
+}
+
+void AudioProcessorNode::setState (const void* data, int size)
+{
+    if (proc)
+        proc->setStateInformation (data, size);
+}
+
 void AudioProcessorNode::createPorts()
 {
     kv::PortList newPorts;

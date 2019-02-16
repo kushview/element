@@ -534,10 +534,11 @@ namespace Element {
                 auto data = getProperty(Tags::state).toString().trim();
                 if (data.isNotEmpty())
                 {
-                    MemoryBlock state; state.fromBase64Encoding (data);
+                    MemoryBlock state;
+                    state.fromBase64Encoding (data);
                     if (state.getSize() > 0)
                     {
-                        proc->setStateInformation (state.getData(), (int)state.getSize());
+                        proc->setStateInformation (state.getData(), (int) state.getSize());
                     }
                 }
 			    
@@ -551,6 +552,17 @@ namespace Element {
 							(int) state.getSize());
 					}
 				}
+            }
+            else
+            {
+                auto data = getProperty(Tags::state).toString().trim();
+                if (data.isNotEmpty())
+                {
+                    MemoryBlock state;
+                    state.fromBase64Encoding (data);
+                    if (state.getSize() > 0)
+                        obj->setState (state.getData(), (int) state.getSize());
+                }
             }
 
             if (hasProperty (Tags::bypass))
@@ -629,6 +641,12 @@ namespace Element {
 
                 setProperty (Tags::bypass, proc->isSuspended());
 				setProperty (Tags::program, proc->getCurrentProgram());
+            }
+            else
+            {
+                obj->getState (state);
+                if (state.getSize() > 0)
+                    objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
             }
         }
 

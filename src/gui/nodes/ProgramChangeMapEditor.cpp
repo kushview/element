@@ -226,6 +226,7 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
         setSize (node->getWidth(), node->getHeight());
         lastProgramChangeConnection = node->lastProgramChanged.connect (
             std::bind (&ProgramChangeMapEditor::selectLastProgram, this));
+        node->addChangeListener (this);
     }
     else
     {
@@ -235,6 +236,8 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
 
 ProgramChangeMapEditor::~ProgramChangeMapEditor()
 {
+    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+        node->removeChangeListener (this);
     lastProgramChangeConnection.disconnect();
     addButton.onClick = nullptr;
     delButton.onClick = nullptr;

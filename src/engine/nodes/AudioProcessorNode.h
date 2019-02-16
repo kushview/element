@@ -17,6 +17,9 @@ public:
     /** Returns the processor as an AudioProcessor */
     AudioProcessor* getAudioProcessor() const noexcept override { return proc; }
     
+    void getState (MemoryBlock&) override;
+    void setState (const void*, int) override;
+    
 protected:
     void createPorts() override;
 

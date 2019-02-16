@@ -217,6 +217,9 @@ public:
         return String();
     }
 
+    virtual void getState (MemoryBlock&) = 0;
+    virtual void setState (const void*, int sizeInBytes) = 0;
+
     /** Triggered when the enabled state changes */
     Signal<void(GraphNode*)> enablementChanged;
 
