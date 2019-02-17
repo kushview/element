@@ -1256,6 +1256,12 @@ void GraphProcessor::prepareToPlay (double sampleRate, int estimatedSamplesPerBl
     currentMidiInputBuffer = nullptr;
     currentMidiOutputBuffer.clear();
     clearRenderingSequence();
+    
+    if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
+    {
+        setPlayConfigDetails (getTotalNumInputChannels(), getTotalNumOutputChannels(),
+            sampleRate, estimatedSamplesPerBlock);
+    }
 
     for (int i = 0; i < nodes.size(); ++i)
         nodes.getUnchecked(i)->prepare (sampleRate, estimatedSamplesPerBlock, this);
