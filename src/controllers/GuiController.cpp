@@ -296,7 +296,7 @@ ContentComponent* GuiController::getContentComponent()
 {
     if (! content)
     {
-        content = new ContentComponent (controller);
+        content = ContentComponent::create (controller);
         content->setSize (760, 480);
     }
     

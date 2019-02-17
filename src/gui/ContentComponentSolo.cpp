@@ -4,9 +4,12 @@
 */
 
 #include "controllers/AppController.h"
+#include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
 
 #include "engine/GraphProcessor.h"
+
+#include "gui/views/EmptyContentView.h"
 
 #include "gui/AudioIOPanelView.h"
 #include "gui/PluginsPanelView.h"
@@ -108,398 +111,6 @@ public:
     
 private:
     SmartLayoutManager* layout;
-};
-
-// MARK: Content View
-
-ContentView::ContentView()
-{
-    addKeyListener (this);
-}
-    
-ContentView::~ContentView()
-{
-    removeKeyListener (this);
-}
-
-void ContentView::paint (Graphics& g) { g.fillAll (LookAndFeel::contentBackgroundColor); }
-    
-bool ContentView::keyPressed (const KeyPress& k, Component*)
-{
-    if (escapeTriggersClose && k == KeyPress::escapeKey)
-    {
-        ViewHelpers::invokeDirectly (this, Commands::showLastContentView, true);
-        return true;
-    }
-    
-    return false;
-}
-
-void ContentView::disableIfNotUnlocked()
-{
-    if (auto* w = ViewHelpers::getGlobals (this))
-    {
-        setEnabled (w->getUnlockStatus().isFullVersion());
-    }
-    else
-    {
-        jassertfalse;
-        setEnabled (false);
-    }
-
-    setInterceptsMouseClicks (isEnabled(), isEnabled());
-}
-
-// MARK: Toolbar
-    
-class ContentComponentSolo::Toolbar : public Component,
-                                  public Button::Listener,
-                                  public Timer
-{
-public:
-    Toolbar (ContentComponentSolo& o)
-        : owner(o), viewBtn ("e")
-    {
-        addAndMakeVisible (viewBtn);
-        viewBtn.setButtonText ("view");
-       #if EL_USE_ACCESSORY_BUTTONS
-        
-        addAndMakeVisible (panicBtn);
-       #endif
-       #if EL_RUNNING_AS_PLUGIN
-        addAndMakeVisible (menuBtn);
-       #endif
-        for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
-            b->addListener (this);
-        addAndMakeVisible (tempoBar);
-        addAndMakeVisible (transport);
-
-        mapButton.setButtonText ("map");
-        mapButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleBlue);
-        mapButton.addListener (this);
-        addAndMakeVisible (mapButton);
-        addAndMakeVisible (midiBlinker);
-    }
-    
-    ~Toolbar()
-    { 
-        for (const auto& conn : connections)
-            conn.disconnect();
-        connections.clear();
-    }
-
-    void setSession (SessionPtr s)
-    {
-        session = s;
-        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
-        auto& settings (ViewHelpers::getGlobals(this)->getSettings());
-        auto engine (ViewHelpers::getGlobals(this)->getAudioEngine());
-
-        if (midiIOMonitor == nullptr)
-        {
-            midiIOMonitor = engine->getMidiIOMonitor();
-            connections.add (midiIOMonitor->midiSent.connect (
-                std::bind (&MidiBlinker::triggerSent, &midiBlinker)));
-            connections.add (midiIOMonitor->midiReceived.connect (
-                std::bind (&MidiBlinker::triggerReceived, &midiBlinker)));
-        }
-
-        auto* props = settings.getUserSettings();
-        
-       #if ! EL_RUNNING_AS_PLUGIN
-        const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
-       #else
-        // Plugin always has host sync option
-        const bool showExt = true;
-        ignoreUnused (props, status);
-       #endif
-       
-        if (session)
-        {
-            tempoBar.setUseExtButton (showExt);
-            tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
-            tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
-            tempoBar.stabilizeWithSession (false);
-        }
-        
-        mapButton.setEnabled ((bool) status.isFullVersion());
-
-        resized();
-    }
-    
-    void resized() override
-    {
-        Rectangle<int> r (getLocalBounds());
-        
-        const int tempoBarWidth = jmax (120, tempoBar.getWidth());
-        const int tempoBarHeight = getHeight() - 16;
-        
-        tempoBar.setBounds (10, 8, tempoBarWidth, tempoBarHeight);
-        
-        r.removeFromRight (10);
-        
-        if (menuBtn.isVisible())
-        {
-            menuBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                   .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
-            r.removeFromRight (4);
-        }
-        
-        if (panicBtn.isVisible())
-        {
-            panicBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                    .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
-            r.removeFromRight (4);
-        }
-        
-        if (midiBlinker.isVisible())
-        {
-            const int blinkerW = 8;
-            midiBlinker.setBounds (r.removeFromRight(blinkerW).withSizeKeepingCentre (blinkerW, tempoBarHeight));
-            r.removeFromRight (4);
-        }
-
-        if (viewBtn.isVisible())
-        {
-            viewBtn.setBounds (r.removeFromRight(tempoBarHeight * 2)
-                                .withSizeKeepingCentre(tempoBarHeight * 2, tempoBarHeight));
-        }
-        
-        if (mapButton.isVisible())
-        {
-            r.removeFromRight (4);
-            mapButton.setBounds (r.removeFromRight (tempoBarHeight * 2)
-                                  .withSizeKeepingCentre (tempoBarHeight * 2, tempoBarHeight));
-        }
-
-        if (transport.isVisible())
-        {
-            r = getLocalBounds().withX ((getWidth() / 2) - (transport.getWidth() / 2));
-            r.setWidth (transport.getWidth());
-            transport.setBounds (r.withSizeKeepingCentre (r.getWidth(), tempoBarHeight));
-        }
-    }
-    
-    void paint (Graphics& g) override
-    {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter (0.1));
-        g.fillRect (getLocalBounds());
-    }
-    
-    void buttonClicked (Button* btn) override
-    {
-        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
-        if (btn == &viewBtn)
-        {
-            const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
-                              ? Commands::rotateContentView : Commands::showLastContentView;
-            ViewHelpers::invokeDirectly (this, command, true);
-        }
-        else  if (btn == &panicBtn)
-        {
-            ViewHelpers::invokeDirectly (this, Commands::panic, true);
-        }
-        else if (btn == &menuBtn)
-        {
-            PopupMenu menu;
-            if (auto* cc = ViewHelpers::findContentComponent (this))
-                MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
-            if (99999 == menu.show())
-                ViewHelpers::closePluginWindows (this, false);
-        }
-        else if (btn == &mapButton)
-        {
-            if ((bool) status.isFullVersion())
-            {
-                if (auto* mapping = owner.getAppController().findChild<MappingController>())
-                {
-                    mapping->learn (! mapButton.getToggleState());
-                    mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                    if (mapping->isLearning()) {
-                        startTimer (600);
-                    }
-                }
-            }
-        }
-    }
-
-    void timerCallback() override
-    {
-        if (auto* mapping = owner.getAppController().findChild<MappingController>())
-        {
-            if (! mapping->isLearning())
-            {
-                mapButton.setToggleState (false, dontSendNotification);
-                stopTimer();
-            }
-        }
-    }
-
-private:
-    ContentComponentSolo& owner;
-    SessionPtr session;
-    MidiIOMonitorPtr midiIOMonitor;
-    SettingButton menuBtn;
-    SettingButton viewBtn;
-    SettingButton mapButton;
-    PanicButton panicBtn;
-    TempoAndMeterBar tempoBar;
-    TransportBar     transport;
-    MidiBlinker      midiBlinker;
-    Array<SignalConnection> connections;
-};
-
-class ContentComponentSolo::StatusBar : public Component,
-                                    public Value::Listener,
-                                    private Timer
-{
-public:
-    StatusBar (Globals& g)
-        : world (g),
-          devices (world.getDeviceManager()),
-          plugins (world.getPluginManager())
-    {
-        sampleRate.addListener (this);
-        streamingStatus.addListener (this);
-        status.addListener (this);
-        
-        addAndMakeVisible (sampleRateLabel);
-        addAndMakeVisible (streamingStatusLabel);
-        addAndMakeVisible (statusLabel);
-        
-        const Colour labelColor (0xffaaaaaa);
-        const Font font (12.0f);
-        
-        for (int i = 0; i < getNumChildComponents(); ++i)
-        {
-            if (Label* label = dynamic_cast<Label*> (getChildComponent (i)))
-            {
-                label->setFont (font);
-                label->setColour (Label::textColourId, labelColor);
-                label->setJustificationType (Justification::centredLeft);
-            }
-        }
-        
-        startTimer (2000);
-        updateLabels();
-    }
-    
-    ~StatusBar()
-    {
-        sampleRate.removeListener (this);
-        streamingStatus.removeListener (this);
-        status.removeListener (this);
-    }
-    
-    void paint (Graphics& g) override
-    {
-        g.setColour (LookAndFeel_KV1::contentBackgroundColor.brighter(0.1));
-        g.fillRect (getLocalBounds());
-        
-        const Colour lineColor (0xff545454);
-        g.setColour (lineColor);
-        
-        g.drawLine(streamingStatusLabel.getX(), 0, streamingStatusLabel.getX(), getHeight());
-        g.drawLine(sampleRateLabel.getX(), 0, sampleRateLabel.getX(), getHeight());
-        g.setColour (lineColor.darker());
-        g.drawLine (0, 0, getWidth(), 0);
-        g.setColour (lineColor);
-        g.drawLine (0, 1, getWidth(), 1);
-    }
-    
-    void resized() override
-    {
-        Rectangle<int> r (getLocalBounds());
-        statusLabel.setBounds (r.removeFromLeft (getWidth() / 5));
-        streamingStatusLabel.setBounds (r.removeFromLeft (r.getWidth() / 2));
-        sampleRateLabel.setBounds(r);
-    }
-    
-    void valueChanged (Value&) override
-    {
-        updateLabels();
-    }
-    
-    void updateLabels()
-    {
-        auto engine = world.getAudioEngine();
-       #if EL_RUNNING_AS_PLUGIN
-        String text = "Latency: ";
-        const int latencySamples = (engine != nullptr) ? engine->getExternalLatencySamples() : 0;
-        text << latencySamples << " samples";
-        sampleRateLabel.setText (text, dontSendNotification);
-        streamingStatusLabel.setText ("", dontSendNotification);
-        statusLabel.setText ("Plugin", dontSendNotification);
-        
-       #else
-        if (auto* dev = devices.getCurrentAudioDevice())
-        {
-            String text = "Sample Rate: ";
-            text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
-            text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
-            sampleRateLabel.setText (text, dontSendNotification);
-            
-            text.clear();
-            String strText = streamingStatus.getValue().toString();
-            if (strText.isEmpty())
-                strText = "Running";
-            text << "Engine: " << strText << ":  CPU: " << String(devices.getCpuUsage() * 100.f, 1) << "%";
-            streamingStatusLabel.setText (text, dontSendNotification);
-            
-            statusLabel.setText (String("Device: ") + dev->getName(), dontSendNotification);
-        }
-        else
-        {
-            sampleRateLabel.setText ("", dontSendNotification);
-            streamingStatusLabel.setText ("", dontSendNotification);
-            statusLabel.setText ("No Device", dontSendNotification);
-        }
-
-		if (plugins.isScanningAudioPlugins())
-		{
-			auto text = streamingStatusLabel.getText();
-			auto name = plugins.getCurrentlyScannedPluginName();
-			name = File::createFileWithoutCheckingPath(name).getFileName();
-
-			text << " - Scanning: " << name;
-			if (name.isNotEmpty())
-				streamingStatusLabel.setText(text, dontSendNotification);
-		}
-       #endif
-    }
-    
-private:
-    Globals& world;
-    DeviceManager& devices;
-    PluginManager& plugins;
-    
-    Label sampleRateLabel, streamingStatusLabel, statusLabel;
-    ValueTree node;
-    Value sampleRate, streamingStatus, status;
-    
-    friend class Timer;
-    void timerCallback() override {
-        updateLabels();
-    }
-};
-
-class EmptyContentView : public ContentView
-{
-public:
-    void paint (Graphics& g) override
-    {
-        setName ("EmptyView");
-        g.fillAll (LookAndFeel::contentBackgroundColor);
-        g.setColour (LookAndFeel::textColor);
-        g.setFont (16.f);
-        
-       #if JUCE_MAC
-        const String msg ("Session is empty.\nPress Shift+Cmd+N to add a graph.");
-       #else
-        const String msg ("Session is empty.\nPress Shift+Ctl+N to add a graph.");
-       #endif
-        g.drawFittedText (msg, 0, 0, getWidth(), getHeight(), Justification::centred, 2);
-    }
 };
 
 // MARK: Content container
@@ -816,25 +427,17 @@ static void windowSizeProperty (Settings& settings, const String& property, int&
     }
 }
 
-struct ContentComponentSolo::Tooltips
-{
-    Tooltips() { tooltipWindow = new TooltipWindow(); }
-    ScopedPointer<TooltipWindow> tooltipWindow;
-};
-
 ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
-    : controller (ctl_)
+    : ContentComponent (ctl_)
 {
-    auto& settings (controller.getGlobals().getSettings());
+    auto& settings (getGlobals().getSettings());
 
     setOpaque (true);
     
     addAndMakeVisible (nav = new NavigationConcertinaPanel (ctl_.getWorld()));
     nav->updateContent();
     addAndMakeVisible (bar1 = new Resizer (*this, &layout, 1, true));
-    addAndMakeVisible (container = new ContentContainer (*this, controller));
-    addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
-    addAndMakeVisible (toolBar = new Toolbar (*this));
+    addAndMakeVisible (container = new ContentContainer (*this, getAppController()));
     
     {
         int w, h;
@@ -867,12 +470,11 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     statusBarSize = 22;
     
     {
-        int navSize = controller.getGlobals().getSettings().getUserSettings()->getIntValue ("navSize", 220);
+        int navSize = settings.getUserSettings()->getIntValue ("navSize", 220);
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
     
-    toolBar->setSession (getGlobals().getSession());
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 
@@ -886,9 +488,6 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
 ContentComponentSolo::~ContentComponentSolo() noexcept
 {
 }
-
-Globals& ContentComponentSolo::getGlobals() { return controller.getGlobals(); }
-SessionPtr ContentComponentSolo::getSession() { return getGlobals().getSession(); }
 
 String ContentComponentSolo::getMainViewName() const
 {
@@ -909,9 +508,6 @@ int ContentComponentSolo::getNavSize()
     return nav != nullptr ? nav->getWidth() : 220;
 }
 
-void ContentComponentSolo::childBoundsChanged (Component* child) { }
-void ContentComponentSolo::mouseDown (const MouseEvent& ev) { Component::mouseDown (ev); }
-
 void ContentComponentSolo::setMainView (const String& name)
 {
     if (name == "PatchBay") {
@@ -931,7 +527,7 @@ void ContentComponentSolo::setMainView (const String& name)
     }
     else
     {
-        if (auto s = controller.getWorld().getSession())
+        if (auto s = getGlobals().getSession())
         {
             if (s->getNumGraphs() > 0)
                 setContentView (new GraphEditorView());
@@ -985,19 +581,10 @@ void ContentComponentSolo::setAccessoryView (const String& name)
     container->setShowAccessoryView (true);
 }
 
-void ContentComponentSolo::paint (Graphics &g)
+void ContentComponentSolo::resizeContent (const Rectangle<int>& area)
 {
-    g.fillAll (LookAndFeel::backgroundColor);
-}
-
-void ContentComponentSolo::resized()
-{
-    Rectangle<int> r (getLocalBounds());
+    Rectangle<int> r (area);
     
-    if (toolBarVisible && toolBar)
-        toolBar->setBounds (r.removeFromTop (toolBarSize));
-    if (statusBarVisible && statusBar)
-        statusBar->setBounds (r.removeFromBottom (statusBarSize));
     if (virtualKeyboardVisible && keyboard)
         keyboard->setBounds (r.removeFromBottom (virtualKeyboardSize));
     if (nodeStrip && nodeStrip->isVisible())
@@ -1055,7 +642,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
         const File file (path);
         if (file.hasFileExtension ("elc"))
         {
-            auto& unlock (controller.getGlobals().getUnlockStatus());
+            auto& unlock (getGlobals().getUnlockStatus());
             FileInputStream src (file);
             if (unlock.applyKeyFile (src.readString()))
             {
@@ -1079,7 +666,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
         {
             if (getGlobals().getUnlockStatus().isFullVersion())
             {
-                if (auto* sess = controller.findChild<SessionController>())
+                if (auto* sess = getAppController().findChild<SessionController>())
                     sess->importGraph (file);
             }
             else
@@ -1111,11 +698,6 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
     }
 }
 
-void ContentComponentSolo::post (Message* message)
-{
-    controller.postMessage (message);
-}
-
 void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
 {
     auto session = getGlobals().getSession();
@@ -1140,8 +722,6 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
     if (auto* ncv = nav->findPanel<NodeEditorContentView>())
         ncv->stabilizeContent();
     
-    toolBar->setSession (session);
-    
     stabilizeViews();
     
     if (auto* main = findParentComponentOfClass<MainWindow>())
@@ -1150,6 +730,9 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
     if (refreshDataPathTrees)
         if (auto* data = nav->findPanel<DataPathTreeComponent>())
             data->refresh();
+    
+    refreshToolbar();
+    refreshStatusBar();
 }
 
 void ContentComponentSolo::stabilizeViews()

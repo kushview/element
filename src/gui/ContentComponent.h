@@ -66,96 +66,103 @@ class ContentComponent :  public Component,
                           public DragAndDropTarget,
                           public ApplicationCommandTarget
 {
-public:
+protected:
     ContentComponent (AppController& app);
-    ~ContentComponent() noexcept;
 
-    NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nav.get(); }
+public:
+    virtual ~ContentComponent() noexcept;
 
-    void childBoundsChanged (Component* child) override;
-    void mouseDown (const MouseEvent&) override;
-    void paint (Graphics &g) override;
-    void resized() override;
-    
-    void setMainView (const String& name);
-    void setAccessoryView (const String& name);
-    String getMainViewName() const;
-    String getAccessoryViewName() const;
+    /** Creates an appropriate content component based on the product that is running */
+    static ContentComponent* create (AppController&);
 
-    void nextMainView();
-    void backMainView();
-    
-    void saveState (PropertiesFile*);
-    void restoreState (PropertiesFile*);
-    
-    int getNavSize();
-    
-    bool isVirtualKeyboardVisible() const { return virtualKeyboardVisible; }
-    void setVirtualKeyboardVisible (const bool isVisible);
-    void toggleVirtualKeyboard();
-    VirtualKeyboardView* getVirtualKeyboardView() const { return keyboard.get(); }
-    
-    void setNodeChannelStripVisible (const bool isVisible);
-    bool isNodeChannelStripVisible() const;
-
-    void setCurrentNode (const Node& node);
-    void stabilize (const bool refreshDataPathTrees = false);
-    void stabilizeViews();
-
+    /** Post a message to the app controller */
     void post (Message*);
+
+    /** Access to the app controller */
     AppController& getAppController() { return controller; }
+
+    /** Access to global objects */
     Globals& getGlobals();
+
+    /** Access to the currently opened session */
     SessionPtr getSession();
+
+    /** Manually refresh the toolbar */
+    void refreshToolbar();
     
+    /** Manually refresh the status bar */
+    void refreshStatusBar();
+
+    /** Override this to resize the main content */
+    virtual void resizeContent (const Rectangle<int>& area) { ignoreUnused (area); }
+
+    virtual NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nullptr; }
+    
+    virtual void setMainView (const String& name);
+    virtual void setAccessoryView (const String& name);
+    virtual String getMainViewName() const;
+    virtual String getAccessoryViewName() const;
+
+    virtual void nextMainView();
+    virtual void backMainView();
+    
+    virtual void saveState (PropertiesFile*);
+    virtual void restoreState (PropertiesFile*);
+    
+    virtual int getNavSize();
+    
+    virtual bool isVirtualKeyboardVisible() const { return false; }
+    virtual void setVirtualKeyboardVisible (const bool isVisible);
+    virtual void toggleVirtualKeyboard();
+    virtual VirtualKeyboardView* getVirtualKeyboardView() const { return nullptr; }
+    
+    virtual void setNodeChannelStripVisible (const bool isVisible);
+    virtual bool isNodeChannelStripVisible() const;
+
+    virtual void setCurrentNode (const Node& node);
+    virtual void stabilize (const bool refreshDataPathTrees = false);
+    virtual void stabilizeViews();
+
+    virtual void setShowAccessoryView (const bool show);
+    virtual bool showAccessoryView() const;
+
+    /** @internal */
+    void paint (Graphics &g) override;
+    /** @internal */
+    void resized() override;
+    /** @internal */
     bool isInterestedInFileDrag (const StringArray &files) override;
+    /** @internal */
     void filesDropped (const StringArray &files, int x, int y) override;
-    
+    /** @internal */
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
+    /** @internal */
     void itemDropped (const SourceDetails& dragSourceDetails) override;
-
+    /** @internal */
     void getAllCommands (Array<CommandID>&) override { }
+    /** @internal */
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
+    /** @internal */
     bool perform (const InvocationInfo&) override { return false; }
+    /** @internal */
     ApplicationCommandTarget* getNextCommandTarget() override;
-
-    void setShowAccessoryView (const bool show);
-    bool showAccessoryView() const;
 
 private:
     AppController& controller;
     
     struct Tooltips;
     SharedResourcePointer<Tooltips> tips;
-    ScopedPointer<NavigationConcertinaPanel> nav;
-    ScopedPointer<ContentContainer> container;
-    StretchableLayoutManager layout;
-    
-    class Resizer; friend class Resizer;
-    ScopedPointer<Resizer> bar1;
     
     class Toolbar; friend class Toolbar;
     ScopedPointer<Toolbar> toolBar;
     
     class StatusBar; friend class StatusBar;
     ScopedPointer<StatusBar> statusBar;
-    
-    ScopedPointer<VirtualKeyboardView> keyboard;
-    ScopedPointer<NodeChannelStripView> nodeStrip;
 
     bool statusBarVisible;
     int statusBarSize;
     bool toolBarVisible;
     int toolBarSize;
-    bool virtualKeyboardVisible = false;
-    int virtualKeyboardSize = 80;
-    int nodeStripSize = 90;
-    
-    String lastMainView;
-    
-    void resizerMouseDown();
-    void resizerMouseUp();
-    void updateLayout();
-    void setContentView (ContentView* view, const bool accessory = false);
 };
 
 }
