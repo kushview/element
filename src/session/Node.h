@@ -138,6 +138,7 @@ namespace Element {
         static Arc arcFromValueTree (const ValueTree& data);
 
         Node getParentGraph() const;
+        bool isChildOfRootGraph() const;
         String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
         Uuid getUuid() const { return Uuid (getUuidString()); }
         
@@ -248,6 +249,18 @@ namespace Element {
                  objectData.getProperty(Tags::identifier) == "midi.output");
         }
         
+        inline bool isMidiInputNode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                objectData.getProperty(Tags::identifier) == "midi.input";
+        }
+
+        inline bool isMidiOutputNode() const
+        {
+            return objectData.getProperty(Tags::format) == "Internal" &&
+                objectData.getProperty(Tags::identifier) == "midi.output";
+        }
+
         /** Returns the format of this node */
         inline const var& getFormat() const        { return objectData.getProperty(Tags::format); }
 

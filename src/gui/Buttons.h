@@ -8,6 +8,20 @@
 
 namespace Element {
 
+class IconButton : public Button
+{
+public:
+    IconButton (const String& buttonName = String());
+    virtual ~IconButton();
+    void setIcon (Icon newIcon);
+
+protected:
+    void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override;
+
+private:
+    Icon icon;
+};
+
 class SettingButton : public Button
 {
 public:

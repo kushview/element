@@ -3,6 +3,27 @@
 
 namespace Element {
 
+IconButton::IconButton (const String& buttonName) 
+    : Button (buttonName) { }
+IconButton::~IconButton() {}
+
+void IconButton::setIcon (Icon newIcon)
+{
+    icon = newIcon;
+    repaint();
+}
+
+void IconButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
+{
+    getLookAndFeel().drawButtonBackground (g, *this,
+        findColour (getToggleState() ? TextButton::buttonOnColourId : TextButton::buttonColourId),
+        isMouseOverButton, isButtonDown);
+    Rectangle<float> bounds (0.f, 0.f, (float) jmin (getWidth(), getHeight()), 
+                                       (float) jmin (getWidth(), getHeight()));
+    icon.colour = LookAndFeel::textColor;
+    icon.draw (g, bounds.reduced (4.f), false);
+}
+
 void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)
 {
     const bool isOn = getToggleState();

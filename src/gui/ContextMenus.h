@@ -122,9 +122,14 @@ public:
     
     explicit NodePopupMenu() { }
     
-    NodePopupMenu (const Node& n)
+    NodePopupMenu (const Node& n, std::function<void (NodePopupMenu&)> beforeMainItems = nullptr)
         : node (n)
     {
+        if (beforeMainItems)
+        {
+            beforeMainItems (*this);
+            addSeparator();
+        }
         addMainItems (false);
     }
     

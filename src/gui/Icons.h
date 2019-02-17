@@ -42,8 +42,6 @@ struct Icon
     Colour colour;
 };
 
-
-
 class Icons : public DeletedAtShutdown
 {
 public:
@@ -52,7 +50,8 @@ public:
     Path folder, document, imageDoc,
          config, exporter, juceLogo,
          graph, jigsaw, info, warning,
-         bug, mainJuceLogo;
+         bug, mainJuceLogo, faBars,
+         faBarsOutline;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Icons)

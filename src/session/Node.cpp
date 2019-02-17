@@ -516,6 +516,12 @@ namespace Element {
                                             : Node();
     }
     
+    bool Node::isChildOfRootGraph() const
+    {
+        const auto graph (getParentGraph());
+        return graph.isRootGraph();
+    }
+
     void Node::restorePluginState()
     {
         if (! isValid())
