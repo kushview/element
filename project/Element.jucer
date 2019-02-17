@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.27.1"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.28.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               jucerVersion="5.4.2" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
@@ -169,6 +169,10 @@
       </GROUP>
       <GROUP id="{FAAC6683-1064-CA2B-A33E-96A66CDA9588}" name="gui">
         <GROUP id="{88B84499-2C7C-37F9-A90A-04483DB55F85}" name="nodes">
+          <FILE id="b5oytG" name="GenericNodeEditor.cpp" compile="1" resource="0"
+                file="../src/gui/nodes/GenericNodeEditor.cpp"/>
+          <FILE id="HTEd4D" name="GenericNodeEditor.h" compile="0" resource="0"
+                file="../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="r9kPUh" name="NodeEditorComponent.cpp" compile="1" resource="0"
                 file="../src/gui/nodes/NodeEditorComponent.cpp"/>
           <FILE id="Lcm4qV" name="NodeEditorComponent.h" compile="0" resource="0"
@@ -178,11 +182,21 @@
           <FILE id="ISVEfY" name="ProgramChangeMapEditor.h" compile="0" resource="0"
                 file="../src/gui/nodes/ProgramChangeMapEditor.h"/>
         </GROUP>
+        <GROUP id="{4262D266-11EE-9FCA-321D-F6CB032DC908}" name="properties">
+          <FILE id="Pyreyt" name="MidiMultiChannelPropertyComponent.h" compile="0"
+                resource="0" file="../src/gui/properties/MidiMultiChannelPropertyComponent.h"/>
+        </GROUP>
+        <GROUP id="{2792A213-E580-3CD7-6362-354886396A9A}" name="views">
+          <FILE id="WLdQHV" name="EmptyContentView.h" compile="0" resource="0"
+                file="../src/gui/views/EmptyContentView.h"/>
+        </GROUP>
         <GROUP id="{AD572BA4-C81C-6D18-A669-55B35AAD76EB}" name="widgets">
           <FILE id="Erf0gn" name="MidiBlinker.cpp" compile="1" resource="0" file="../src/gui/widgets/MidiBlinker.cpp"/>
           <FILE id="xUyVtP" name="MidiBlinker.h" compile="0" resource="0" file="../src/gui/widgets/MidiBlinker.h"/>
           <FILE id="NdgNU3" name="MidiChannelSelectComponent.h" compile="0" resource="0"
                 file="../src/gui/widgets/MidiChannelSelectComponent.h"/>
+          <FILE id="W6rQ27" name="NodeListComboBox.h" compile="0" resource="0"
+                file="../src/gui/widgets/NodeListComboBox.h"/>
         </GROUP>
         <FILE id="sbYTe0" name="AboutComponent.cpp" compile="1" resource="0"
               file="../src/gui/AboutComponent.cpp"/>
@@ -211,6 +225,14 @@
               file="../src/gui/ContentComponent.cpp"/>
         <FILE id="cBgvVY" name="ContentComponent.h" compile="0" resource="0"
               file="../src/gui/ContentComponent.h"/>
+        <FILE id="ILblbp" name="ContentComponentPro.cpp" compile="1" resource="0"
+              file="../src/gui/ContentComponentPro.cpp"/>
+        <FILE id="XRJvGg" name="ContentComponentPro.h" compile="0" resource="0"
+              file="../src/gui/ContentComponentPro.h"/>
+        <FILE id="QyIUIb" name="ContentComponentSolo.cpp" compile="1" resource="0"
+              file="../src/gui/ContentComponentSolo.cpp"/>
+        <FILE id="goefKw" name="ContentComponentSolo.h" compile="0" resource="0"
+              file="../src/gui/ContentComponentSolo.h"/>
         <FILE id="pGrB1K" name="ContentView.cpp" compile="1" resource="0" file="../src/gui/ContentView.cpp"/>
         <FILE id="lrVf1u" name="ContentView.h" compile="0" resource="0" file="../src/gui/ContentView.h"/>
         <FILE id="sKIHTU" name="ContextMenus.cpp" compile="1" resource="0"
@@ -255,6 +277,7 @@
               file="../src/gui/KeymapEditorView.h"/>
         <FILE id="Twc6WL" name="LookAndFeel.cpp" compile="1" resource="0" file="../src/gui/LookAndFeel.cpp"/>
         <FILE id="ysuQQn" name="LookAndFeel.h" compile="0" resource="0" file="../src/gui/LookAndFeel.h"/>
+        <FILE id="iOkNHq" name="MainMenu.cpp" compile="1" resource="0" file="../src/gui/MainMenu.cpp"/>
         <FILE id="OOhs6A" name="MainMenu.h" compile="0" resource="0" file="../src/gui/MainMenu.h"/>
         <FILE id="zYxSCT" name="MainWindow.cpp" compile="1" resource="0" file="../src/gui/MainWindow.cpp"/>
         <FILE id="yMQnmd" name="MainWindow.h" compile="0" resource="0" file="../src/gui/MainWindow.h"/>
@@ -276,6 +299,10 @@
               file="../src/gui/NodeChannelStripView.cpp"/>
         <FILE id="OgVW4P" name="NodeChannelStripView.h" compile="0" resource="0"
               file="../src/gui/NodeChannelStripView.h"/>
+        <FILE id="TqH1hl" name="NodeEditorContentView.cpp" compile="1" resource="0"
+              file="../src/gui/NodeEditorContentView.cpp"/>
+        <FILE id="PFI9on" name="NodeEditorContentView.h" compile="0" resource="0"
+              file="../src/gui/NodeEditorContentView.h"/>
         <FILE id="vcZQ4S" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../src/gui/NodeIOConfiguration.cpp"/>
         <FILE id="O0M4gV" name="NodeIOConfiguration.h" compile="0" resource="0"
@@ -284,10 +311,6 @@
               file="../src/gui/NodeMidiContentView.cpp"/>
         <FILE id="qtQuqu" name="NodeMidiContentView.h" compile="0" resource="0"
               file="../src/gui/NodeMidiContentView.h"/>
-        <FILE id="jj7AdR" name="NodeUIContentView.cpp" compile="1" resource="0"
-              file="../src/gui/NodeUIContentView.cpp"/>
-        <FILE id="p2DkCc" name="NodeUIContentView.h" compile="0" resource="0"
-              file="../src/gui/NodeUIContentView.h"/>
         <FILE id="vBP60N" name="NoteClipItem.h" compile="0" resource="0" file="../src/gui/NoteClipItem.h"/>
         <FILE id="Lcqahw" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="../src/gui/PluginManagerComponent.cpp"/>
