@@ -17,7 +17,8 @@ enum SystemTrayMouseAction
     ShowWindow
 };
 
-enum SystemTrayMenuResult {
+enum SystemTrayMenuResult
+{
     ShowHideToggle = 1,
     ExitApplication
 };
