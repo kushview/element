@@ -555,7 +555,12 @@ void EngineController::removeNode (const Node& node)
     if (auto* controller = graphs->findGraphControllerFor (graph))
     {
         if (auto* gui = findSibling<GuiController>())
+        {
             gui->closePluginWindowsFor (node, true);
+            if (gui->getSelectedNode() == node)
+                gui->selectNode (Node());
+        }
+
         controller->removeFilter (node.getNodeId());
     }
 }

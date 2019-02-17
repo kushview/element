@@ -76,6 +76,11 @@ namespace Element {
 
     Component* NodeUIContentView::createEmbededEditor()
     {
+        if (node.isIONode())
+        {
+            return nullptr;
+        }
+
         GraphNodePtr object = node.getGraphNode();
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (proc != nullptr)
