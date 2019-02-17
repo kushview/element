@@ -3,9 +3,10 @@
 
 namespace Element {
 
-class SystemTray : public SystemTrayIconComponent {
+class SystemTray : public SystemTrayIconComponent
+{
 public:
-    SystemTray() { }
+    SystemTray();
     ~SystemTray() { }
 
     void mouseDown (const MouseEvent&) override;
@@ -13,6 +14,7 @@ public:
 
 private:
     int mouseUpAction = -1;
+    void runMenu();
 };
 
 }

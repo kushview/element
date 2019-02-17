@@ -23,10 +23,10 @@ class VirtualKeyboardView;
 class NodeChannelStripView;
 
 class ContentComponentSolo :  public Component, 
-                          public DragAndDropContainer,
-                          public FileDragAndDropTarget,
-                          public DragAndDropTarget,
-                          public ApplicationCommandTarget
+                              public DragAndDropContainer,
+                              public FileDragAndDropTarget,
+                              public DragAndDropTarget,
+                              public ApplicationCommandTarget
 {
 public:
     ContentComponentSolo (AppController& app);

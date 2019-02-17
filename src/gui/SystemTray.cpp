@@ -30,6 +30,11 @@ static MainWindow* getMainWindow()
     return nullptr;
 }
 
+SystemTray::SystemTray()
+{
+    Path path;
+}
+
 void SystemTray::mouseUp (const MouseEvent& ev)
 {
     auto* window = getMainWindow();
@@ -60,8 +65,31 @@ void SystemTray::mouseUp (const MouseEvent& ev)
     mouseUpAction = -1;
 }
 
+void SystemTray::runMenu()
+{
+    auto* window = getMainWindow();
+    if (! window)
+        return;
+    auto* const cmd = &window->getWorld().getCommandManager();
+
+    PopupMenu menu;
+    menu.addCommandItem (cmd, Commands::toggleUserInterface, "Show/Hide");
+    menu.addSeparator();
+    menu.addCommandItem (cmd, Commands::quit, "Exit");
+   #if JUCE_MAC
+    showDropdownMenu (menu);
+   #else
+    menu.show();
+   #endif
+}
+
 void SystemTray::mouseDown (const MouseEvent& ev)
 {
+   #if JUCE_MAC
+    ignoreUnused (ev);
+    mouseUpAction = -1;
+    runMenu();
+   #else
     if (ev.mods.isPopupMenu())
     {
         mouseUpAction = ShowMenu;
@@ -70,6 +98,7 @@ void SystemTray::mouseDown (const MouseEvent& ev)
     {
         mouseUpAction = ShowWindow;
     }
+   #endif
 }
 
 }

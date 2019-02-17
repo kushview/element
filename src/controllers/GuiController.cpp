@@ -399,11 +399,22 @@ void GuiController::run()
     
     findSibling<SessionController>()->resetChanges();
 
-   #if !EL_RUNNING_AS_PLUGIN
+   #if ! EL_RUNNING_AS_PLUGIN
     sSystemTray.reset (new SystemTray());
+   #if JUCE_MAC
+    {
+        const auto traySize = 22.f * 4;
+        const float padding = 8.f;
+        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
+        Graphics g (image);
+        Icon icon (getIcons().falAtomAlt, Colours::black);
+        icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
+        sSystemTray->setIconImage (image);
+    }
+   #else
     sSystemTray->setIconImage (
-        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize)    
-    );
+        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize));
+   #endif
     sSystemTray->addToDesktop (0);
    #endif
 
@@ -798,11 +809,18 @@ bool GuiController::perform (const InvocationInfo& info)
             auto session = getWorld().getSession();
             if (auto* const window = mainWindow.get())
             {
-                window->setVisible (! window->isVisible());
-                if (window->isVisible() && session)
-                    showPluginWindowsFor (session->getActiveGraph(), true, false);
-                else
+                if (window->isOnDesktop())
+                {
+                    window->removeFromDesktop();
                     closeAllPluginWindows (true);
+                }
+                else
+                {
+                    window->addToDesktop();
+                    window->toFront (true);
+                    if (session)
+                        showPluginWindowsFor (session->getActiveGraph(), true, false);
+                }   
             }
         } break;
         case Commands::quit:

@@ -27,7 +27,7 @@ namespace Element {
         nodesCombo.addListener (this);
 
         addAndMakeVisible (menuButton);
-        menuButton.setIcon (Icon (getIcons().faBarsOutline, 
+        menuButton.setIcon (Icon (getIcons().falBarsOutline, 
             findColour (TextButton::textColourOffId)));
         menuButton.setTriggeredOnMouseDown (true);
         menuButton.onClick = [this]()
