@@ -9,7 +9,7 @@ namespace Element {
 class NodeEditorComponent : public Component
 {
 protected:
-    NodeEditorComponent (const Node& _node) noexcept;
+    NodeEditorComponent (const Node&) noexcept;
 
 public:
     virtual ~NodeEditorComponent() override;

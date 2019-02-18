@@ -224,7 +224,9 @@ namespace Element {
         }
         else if (node.getIdentifier() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
-            return new ProgramChangeMapEditor (node);
+            auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
+            programChangeMapEditor->setStoreSize (false);
+            return programChangeMapEditor;
         }
 
         return nullptr;

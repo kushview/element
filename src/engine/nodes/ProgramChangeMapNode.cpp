@@ -27,7 +27,7 @@ void ProgramChangeMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         if (! assertedLowChannels)
         {
-            DBG("num bufs: " << midi.getNumBuffers());
+            DBG("[EL] PGC map: num bufs: " << midi.getNumBuffers());
             assertedLowChannels = true;
         }
 
@@ -109,6 +109,7 @@ void ProgramChangeMapNode::addProgramEntry (const String& name, int programIn, i
     entry->name = name;
     entry->in   = programIn;
     entry->out  = programOut;
+    sendChangeMessage();
 
     ScopedLock sl (lock);
     programMap [entry->in] = entry->out;
@@ -123,6 +124,7 @@ void ProgramChangeMapNode::editProgramEntry (int index, const String& name, int 
         entry->out      = outProgram;
         ScopedLock sl (lock);
         programMap[entry->in] = entry->out;
+        sendChangeMessage();
     }
 }
 
@@ -135,6 +137,7 @@ void ProgramChangeMapNode::removeProgramEntry (int index)
         deleter.reset (entry);
         ScopedLock sl (lock);
         programMap[entry->in] = -1;
+        sendChangeMessage();
     }
 }
 
