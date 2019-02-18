@@ -58,7 +58,7 @@
 #endif
 
 #define EL_NAV_MIN_WIDTH 100
-#define EL_NAV_MAX_WIDTH 360
+#define EL_NAV_MAX_WIDTH 440
 
 namespace Element {
 
