@@ -1,6 +1,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "gui/nodes/GenericNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
 #include "gui/NodeEditorContentView.h"
@@ -220,7 +221,7 @@ namespace Element {
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (proc != nullptr)
         {
-            return new GenericAudioProcessorEditor (proc);
+            return new GenericNodeEditor (node);
         }
         else if (node.getIdentifier() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
