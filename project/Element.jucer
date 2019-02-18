@@ -251,6 +251,9 @@
               file="../src/gui/ControllerMapsView.h"/>
         <FILE id="IlpPf7" name="GraphDisplayView.h" compile="0" resource="0"
               file="../src/gui/GraphDisplayView.h"/>
+        <FILE id="DWkfqX" name="GraphDocument.cpp" compile="1" resource="0"
+              file="../src/gui/GraphDocument.cpp"/>
+        <FILE id="ar79ib" name="GraphDocument.h" compile="0" resource="0" file="../src/gui/GraphDocument.h"/>
         <FILE id="N6IdK1" name="GraphEditorComponent.cpp" compile="1" resource="0"
               file="../src/gui/GraphEditorComponent.cpp"/>
         <FILE id="RZD4Q9" name="GraphEditorComponent.h" compile="0" resource="0"
