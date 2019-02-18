@@ -8,7 +8,8 @@
 namespace Element {
 
 class NodeEditorContentView : public ContentView,
-                              public ComboBox::Listener
+                              public ComboBox::Listener,
+                              public Value::Listener
 {
 public:
     NodeEditorContentView();
@@ -21,8 +22,11 @@ public:
     void paint (Graphics& g) override;
 
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void valueChanged (Value& value) override;
+
 private:
     Node graph, node;
+    Value nodeObjectValue;
     SignalConnection selectedNodeConnection;
     std::unique_ptr<Component> editor;
     NodeListComboBox nodesCombo;
@@ -32,6 +36,8 @@ private:
     Component* createEmbededEditor();
     void setNode (const Node&);
     static void nodeMenuCallback (int, NodeEditorContentView*);
+
+    class NodeWatcher; std::unique_ptr<NodeWatcher> watcher;
 };
 
 }

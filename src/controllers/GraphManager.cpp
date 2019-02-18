@@ -353,7 +353,6 @@ void GraphManager::removeFilter (const uint32 uid)
 {
     if (! processor.removeNode (uid))
         return;
-    
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
         const Node node (nodes.getChild(i), false);

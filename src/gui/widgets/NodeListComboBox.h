@@ -7,7 +7,12 @@ namespace Element {
 class NodeListComboBox : public ComboBox
 {
 public:
-    NodeListComboBox() { }
+    NodeListComboBox()
+    { 
+        setTextWhenNoChoicesAvailable ("Empty graph");
+        setTextWhenNothingSelected ("Select node");
+    }
+
     virtual ~NodeListComboBox() { }
 
     void addNodes (const Node& parent)
@@ -21,7 +26,7 @@ public:
             addItem (node.getName(), i + 1);
         }
 
-        if (isPositiveAndBelow (lastIndex, getNumItems()))
+        if (isPositiveAndBelow (jmin (lastIndex, getNumItems() - 1), getNumItems()))
             setSelectedItemIndex (lastIndex);
     }
 

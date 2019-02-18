@@ -1,4 +1,5 @@
 
+#include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/nodes/GenericNodeEditor.h"
@@ -11,6 +12,72 @@
 #include "Globals.h"
 
 namespace Element {
+
+    class NodeEditorContentView::NodeWatcher : private ValueTree::Listener
+    {
+    public:
+        NodeWatcher()
+        {
+            data.addListener (this);
+        }
+        virtual ~NodeWatcher() noexcept
+        {
+            data.removeListener (this);
+        }
+
+        void setNodeToWatch (const Node& newNode)
+        {
+            if (node == newNode)
+                return;
+            node = newNode;
+            data = node.getValueTree().getParent().getParent();
+        }
+
+        Node getWatchedNode() const { return node; }
+
+        std::function<void()> onSiblingNodeAdded;
+        std::function<void()> onSiblingNodeRemoved;
+
+    private:
+        Node node;
+        ValueTree data;
+
+        friend class juce::ValueTree;
+        void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
+        {
+            ignoreUnused (tree, property);
+        }
+
+        void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
+        {
+            if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
+            {
+                if (onSiblingNodeAdded)
+                    onSiblingNodeAdded();
+            }
+        }
+
+        void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
+        {
+            if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
+            {
+                if (onSiblingNodeRemoved)
+                    onSiblingNodeRemoved();
+            }
+        }
+
+        void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
+        {
+            ignoreUnused (parent, oldIndex, newIndex);
+        }
+
+        void valueTreeParentChanged (ValueTree& tree) override
+        {
+            ignoreUnused (tree);
+        }
+
+        void valueTreeRedirected (ValueTree&) override { }
+    };
 
     static String noteValueToString (double value)
     {
@@ -40,10 +107,16 @@ namespace Element {
             menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
                 ModalCallbackFunction::forComponent (nodeMenuCallback, this));
         };
+
+        watcher.reset (new NodeWatcher());
+        watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = [this]() {
+            nodesCombo.addNodes (graph);
+        };
     }
 
     NodeEditorContentView::~NodeEditorContentView()
     {
+        watcher.reset();
         menuButton.onClick = nullptr;
         nodesCombo.removeListener (this);
         selectedNodeConnection.disconnect();
@@ -123,26 +196,48 @@ namespace Element {
     void NodeEditorContentView::setNode (const Node& newNode)
     {
         auto newGraph = newNode.getParentGraph();
-        
+        bool graphChanged = false;
         if (newGraph != graph)
-        {
+        {   
+            graphChanged = true;
             graph = newGraph;
-            nodesCombo.addNodes (graph);
         }
-
+        
+        if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
+            nodesCombo.addNodes (graph);
+        
         if (newNode != node)
         {
+            nodeObjectValue.removeListener (this);
             clearEditor();
-            node = newNode;
+            watcher->setNodeToWatch (newNode);
+            node = watcher->getWatchedNode();
 
+            nodeObjectValue = node.getPropertyAsValue (Tags::object);
             editor.reset (createEmbededEditor());
             if (editor)
                 addAndMakeVisible (editor.get());
-            nodesCombo.selectNode (node);
+            
+            nodeObjectValue.addListener (this);
 
             resized();
         }
+
+        nodesCombo.selectNode (node);
     }
+
+    void NodeEditorContentView::valueChanged (Value& value)
+    {
+        if (! nodeObjectValue.refersToSameSourceAs (value))
+            return;
+        if (nodeObjectValue.getValue().getObject() == nullptr)
+        {
+            // node was probably removed and going to be deleted
+            clearEditor();
+            nodesCombo.addNodes (graph);
+        }
+    }
+
     void NodeEditorContentView::clearEditor()
     {
         if (editor == nullptr)

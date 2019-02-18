@@ -382,6 +382,12 @@ public:
             item.setProperty ("index", i, 0)
                 .setProperty ("name", panel->getName(), 0)
                 .setProperty ("h",  panel->getHeight(), 0);
+
+            if (auto* ned = dynamic_cast<NodeEditorContentView*> (panel))
+            {
+                item.setProperty ("sticky", ned->isSticky(), nullptr);
+            }
+
             state.addChild (item, -1, 0);
         }
 
@@ -406,7 +412,13 @@ public:
             {
                 auto item (state.getChild (i));
                 if (auto* c = findPanelByName (item["name"].toString().trim()))
+                {
                     setPanelSize (c, jmax (10, (int)item["h"]), false);
+                    if (auto* ned = dynamic_cast<NodeEditorContentView*> (c))
+                    {
+                        ned->setSticky ((bool) item.getProperty ("sticky", true));
+                    }
+                }
             }
 
             deleteAndZero (xml);

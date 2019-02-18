@@ -31,14 +31,13 @@ public:
         : processor (proc), parameter (param)
     {
         parameter.addListener (this);
-        processor.addListener (this);
         startTimer (100);
     }
 
     ~ParameterListener() override
     {
+        stopTimer();
         parameter.removeListener (this);
-        processor.removeListener (this);
     }
 
     AudioProcessorParameter& getParameter() noexcept
