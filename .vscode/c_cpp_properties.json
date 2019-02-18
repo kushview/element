@@ -44,7 +44,7 @@
                     "/opt/kushview/include",
                     "${workspaceRoot}/libs/pybind11/include"
                 ],
-                "limitSymbolsToIncludedHeaders": false,
+                "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": "",
                 "defines": [
                     "JUCE_PLUGINHOST_VST=1",
