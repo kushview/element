@@ -164,31 +164,41 @@ void MainMenu::menuItemSelected (int index, int menu)
         owner.getAppController().findChild<SessionController>()->openFile (f);
     }
 }
-
-void MainMenu::buildFileMenu (PopupMenu& menu)
+void MainMenu::addRecentFiles (PopupMenu& menu)
 {
-    menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
-    menu.addSeparator();
-
-    menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
-
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
     {
         PopupMenu recents;
         auto& app (cc->getAppController());
         auto& list (app.getRecentlyOpenedFilesList());
-        list.createPopupMenuItems (recents, recentMenuOffset, true, true);
+        list.createPopupMenuItems (recents, recentMenuOffset, false, true);
         menu.addSubMenu ("Open Recent", recents);
         menu.addSeparator();
     }
-    
+}
+
+void MainMenu::buildFileMenu (PopupMenu& menu)
+{
+   #if defined (EL_SOLO)
+    menu.addCommandItem (&cmd, Commands::graphNew, "New Graph");
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
+    addRecentFiles (menu);
+    menu.addCommandItem (&cmd, Commands::graphSave, "Save Graph");
+    menu.addCommandItem (&cmd, Commands::graphSaveAs, "Save Graph As...");
+
+   #else
+    menu.addCommandItem (&cmd, Commands::sessionNew, "New Session");
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::sessionOpen, "Open Session...");
+    addRecentFiles (menu);
     menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
-
    #ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
+   #endif
    #endif
 
    #if ! JUCE_MAC
@@ -257,10 +267,12 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
     
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
 {
+   #if EL_PRO
     menu.addCommandItem (&cmd, Commands::sessionAddGraph, "New graph");
     menu.addCommandItem (&cmd, Commands::sessionDuplicateGraph, "Duplicate current graph");
     menu.addCommandItem (&cmd, Commands::sessionDeleteGraph, "Delete current graph");
     menu.addSeparator();
+   #endif
     menu.addCommandItem (&cmd, Commands::undo, "Undo");
     menu.addCommandItem (&cmd, Commands::redo, "Redo");
     menu.addSeparator();

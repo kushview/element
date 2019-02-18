@@ -28,3 +28,11 @@
  #pragma warning(disable: 4458) // declaration of 'xxx' hides class member
  #pragma warning(disable: 4389) // signed/unsigned mismatch
 #endif
+
+#if defined(EL_FREE) && defined(EL_SOLO)
+ #pragma error "Cannot enable EL_FREE and EL_SOLO at the same time"
+#endif
+
+#if !defined(EL_FREE) && !defined(EL_SOLO)
+ #define EL_PRO 1
+#endif

@@ -61,6 +61,8 @@ private:
     void buildOptionsMenu (PopupMenu& menu);
     void buildDebugMenu (PopupMenu& menu);
     void buildHelpMenu (PopupMenu& menu);
+
+    void addRecentFiles (PopupMenu& menu);
 };
 
 }

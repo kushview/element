@@ -443,10 +443,12 @@ public:
     {
         clearPanels();
 
+       #ifdef EL_PRO
         auto* sess = new SessionTreePanel();
         sess->setName ("Session");
         sess->setComponentID ("Session");
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
+       #endif
 
        #ifndef EL_FREE
         auto* nv = new NodeEditorContentView();

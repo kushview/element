@@ -78,6 +78,11 @@ namespace Commands {
         transportPlay,
         transportRecord,
         transportSeekZero,
-        transportStop
+        transportStop,
+
+        graphNew               = 0x0700,
+        graphOpen,
+        graphSave,
+        graphSaveAs
     };
 }}

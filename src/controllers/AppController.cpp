@@ -318,7 +318,12 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::checkNewerVersion,
         
-        Commands::transportPlay
+        Commands::transportPlay,
+
+        Commands::graphNew,
+        Commands::graphOpen,
+        Commands::graphSave,
+        Commands::graphSaveAs
     });
     cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
@@ -477,8 +482,29 @@ bool AppController::perform (const InvocationInfo& info)
             CurrentVersion::checkAfterDelay (20, true);
             break;
         
+        case Commands::graphNew:
+        {
+            DBG("new graph");
+        } break;
+
+        case Commands::graphOpen:
+        {
+            DBG("open graph");
+        } break;
+        
+        case Commands::graphSave: 
+        {
+            DBG("graph save");
+        } break;
+        
+        case Commands::graphSaveAs: 
+        {
+            DBG("save graph as");
+        } break;
+        
         default: res = false; break;
     }
+
     return res;
 }
 

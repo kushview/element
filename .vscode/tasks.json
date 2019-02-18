@@ -51,7 +51,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure w/ CCache",
+            "label": "Waf Configure Element Pro",
             "type": "shell",
             "command": "python",
             "args": [
@@ -88,15 +88,32 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure FREE w/ CCache",
+            "label": "Waf Configure Element Lite",
             "type": "shell",
             "command": "python",
             "args": [
                 "waf",
                 "configure",
                 "--debug",
-                "--enable-free",
-                "--disable-unlocking"
+                "--enable-free"
+            ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Waf Configure Element Solo",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-solo"
             ],
             "options": {
                 "env": {

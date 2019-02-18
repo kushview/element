@@ -46,8 +46,10 @@ void MainWindow::refreshName()
 void MainWindow::nameChanged()
 {
     String title = "Element";
-   #ifdef EL_FREE
-    title << " FREE";
+   #if defined(EL_FREE)
+    title << " Lite";
+   #elif defined(EL_SOLO)
+    title << " Solo";
    #endif
 
     if (auto session = world.getSession())

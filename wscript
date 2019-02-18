@@ -15,7 +15,9 @@ def options (opt):
     opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
         help="Build without license protection [ Default: False ]")
     opt.add_option ('--enable-free', default=False, action='store_true', dest='enable_free', \
-        help="Build the free version")
+        help="Build Element Lite")
+    opt.add_option ('--enable-solo', default=False, action='store_true', dest='enable_solo', \
+        help="Build Element Solo")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
     opt.add_option ('--enable-local-auth', default=False, action='store_true', dest='enable_local_auth', \
@@ -55,7 +57,12 @@ def configure (conf):
     conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
     conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
 
+    if conf.options.enable_free and conf.options.enable_solo:
+        print ("Cannot enable Lite and Solo At the Same Time")
+        exit(1)
     if conf.options.enable_free: conf.define ('EL_FREE', 1)
+    if conf.options.enable_solo: conf.define ('EL_SOLO', 1)
+
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1 if conf.options.enable_docking else 0)
@@ -85,7 +92,8 @@ def configure (conf):
     juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
     juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
 
-    juce.display_msg (conf, "Element Free", conf.options.enable_free)
+    juce.display_msg (conf, "Element Lite", conf.options.enable_free)
+    juce.display_msg (conf, "Element Solo", conf.options.enable_solo)
     juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
     juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
     juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)

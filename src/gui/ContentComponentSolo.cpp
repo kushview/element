@@ -474,8 +474,9 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
-    
+   #if EL_PRO
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
+   #endif
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 
    #ifdef EL_FREE

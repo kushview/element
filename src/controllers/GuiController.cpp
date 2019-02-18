@@ -99,38 +99,6 @@ GuiController::GuiController (Globals& w, AppController& a)
 
 GuiController::~GuiController()
 {
-#if 0
-    nodeSelected.disconnect_all_slots();
-
-    if (sSystemTray != nullptr)
-    {
-        sSystemTray->removeFromDesktop();
-        sSystemTray.reset (nullptr);
-    }
-
-    closeAllPluginWindows (true);
-
-    if (mainWindow)
-    {
-        mainWindow->removeKeyListener (keys);
-        keys = nullptr;
-
-        closeAllWindows();
-        mainWindow->setVisible (false);
-        mainWindow->removeFromDesktop();
-        mainWindow = nullptr;
-    }
-    
-    if (windowManager)
-    {
-        windowManager = nullptr;
-    }
-    
-    if (content)
-    {
-        content = nullptr;
-    }
-#endif
     guiInstances.removeFirstMatchingValue (this);
     if (guiInstances.size() <= 0)
         sGlobalLookAndFeel = nullptr;
@@ -494,7 +462,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
             
-            // MARK: Session Commands
+        // MARK: Session Commands
         case Commands::sessionClose:
             result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
             break;
@@ -508,13 +476,31 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case Commands::sessionSave:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
-            result.setInfo ("Save Session", "Save the current session", 
-                            Commands::Categories::Session, 0);
+            result.setInfo ("Save Session", "Save the current session", Commands::Categories::Session, 0);
             break;
         case Commands::sessionSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Session As", "Save the current session with a new name", Commands::Categories::Session, 0);
             break;
+
+        // MARK: Graph Commands
+        case Commands::graphNew:
+            result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
+            result.setInfo ("New Graph", "Create a new session", Commands::Categories::Session, 0);
+            break;
+        case Commands::graphOpen:
+            result.addDefaultKeypress ('o', ModifierKeys::commandModifier);
+            result.setInfo ("Open Graph", "Open an existing session", Commands::Categories::Session, 0);
+            break;
+        case Commands::graphSave:
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier);
+            result.setInfo ("Save Graph", "Save the current session", Commands::Categories::Session, 0);
+            break;
+        case Commands::graphSaveAs:
+            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Save Graph As", "Save the current session with a new name", Commands::Categories::Session, 0);
+            break;
+
         case Commands::sessionAddGraph:
             result.addDefaultKeypress ('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
             result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::Session, 0);
