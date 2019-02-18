@@ -9,7 +9,7 @@
 #include "engine/GraphNode.h"
 
 namespace Element {
-    class GraphController;
+    class GraphManager;
     class NodeArray;
     class PortArray;
     
@@ -444,7 +444,7 @@ namespace Element {
             }
         }
 
-        void addConnections (GraphController& controller, const uint32 targetNodeId) const;
+        void addConnections (GraphManager& controller, const uint32 targetNodeId) const;
 
         String getError() const { return lastError; }
 

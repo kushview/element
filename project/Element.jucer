@@ -30,10 +30,13 @@
               file="../src/controllers/EngineController.cpp"/>
         <FILE id="zhBGLF" name="EngineController.h" compile="0" resource="0"
               file="../src/controllers/EngineController.h"/>
-        <FILE id="v3pZuF" name="GraphController.cpp" compile="1" resource="0"
+        <FILE id="guPXc8" name="GraphController.cpp" compile="1" resource="0"
               file="../src/controllers/GraphController.cpp"/>
-        <FILE id="oF4cif" name="GraphController.h" compile="0" resource="0"
+        <FILE id="ybpagC" name="GraphController.h" compile="0" resource="0"
               file="../src/controllers/GraphController.h"/>
+        <FILE id="v3pZuF" name="GraphManager.cpp" compile="1" resource="0"
+              file="../src/controllers/GraphManager.cpp"/>
+        <FILE id="oF4cif" name="GraphManager.h" compile="0" resource="0" file="../src/controllers/GraphManager.h"/>
         <FILE id="cSUiJ4" name="GuiController.cpp" compile="1" resource="0"
               file="../src/controllers/GuiController.cpp"/>
         <FILE id="Tyum0W" name="GuiController.h" compile="0" resource="0" file="../src/controllers/GuiController.h"/>

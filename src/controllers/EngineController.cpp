@@ -2,7 +2,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphController.h"
+#include "controllers/GraphManager.h"
 #include "engine/MidiDeviceProcessor.h"
 #include "engine/SubGraphProcessor.h"
 #include "session/DeviceManager.h"
@@ -65,7 +65,7 @@ struct RootGraphHolder
 
             if (engine->addGraph (root))
             {
-                controller = new RootGraphController (*root, plugins);
+                controller = new RootGraphManager (*root, plugins);
                 model.setProperty (Tags::object, node.get());
                 controller->setNodeModel (model);
                 resetIONodePorts();
@@ -96,7 +96,7 @@ struct RootGraphHolder
         return wasRemoved;
     }
     
-    RootGraphController* getController() const { return controller; }
+    RootGraphManager* getController() const { return controller; }
     RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node->getAudioProcessor() : nullptr); }
     
     bool hasController()    const { return nullptr != controller; }
@@ -119,7 +119,7 @@ private:
     PluginManager&                      plugins;
     DeviceManager&                      devices;
     UnlockStatus&                       status;
-    ScopedPointer<RootGraphController>  controller;
+    ScopedPointer<RootGraphManager>  controller;
     Node                                model;
     GraphNodePtr                        node;
 
@@ -145,7 +145,7 @@ public:
     }
     
     /** This is recursive! */
-    GraphController* findSubGraphController (GraphController* parent, const Node& n)
+    GraphManager* findSubGraphManager (GraphManager* parent, const Node& n)
     {
         for (int i = parent->getNumFilters(); --i >= 0;)
         {
@@ -155,7 +155,7 @@ public:
                 {
                     if (sub->getController().isControlling (n))
                         return &sub->getController();
-                    else if (auto* sub2 = findSubGraphController (&sub->getController(), n))
+                    else if (auto* sub2 = findSubGraphManager (&sub->getController(), n))
                         return sub2;
                 }
             }
@@ -164,7 +164,7 @@ public:
         return nullptr;
     }
 
-    GraphController* findSubGraphController (const Node& n)
+    GraphManager* findSubGraphManager (const Node& n)
     {
         if (n.isRootGraph() || !n.isGraph())
             return nullptr;
@@ -228,12 +228,12 @@ public:
         return 0;
     }
 
-    /** This returns a GraphController for the provided node. The
+    /** This returns a GraphManager for the provided node. The
         passed in node is expected to have type="graph" 
         
         NOTE: this is a recursive operation
      */
-    GraphController* findGraphControllerFor (const Node& graph)
+    GraphManager* findGraphManagerFor (const Node& graph)
     {
         for (const auto* h : graphs)
         {
@@ -241,7 +241,7 @@ public:
             {
                 if (controller->isControlling (graph))
                     return controller;
-                else if (auto* subController = findSubGraphController (controller, graph))
+                else if (auto* subController = findSubGraphManager (controller, graph))
                     return subController;
             }
         }
@@ -249,7 +249,7 @@ public:
         return nullptr;
     }
 
-    RootGraphController* findActiveRootGraphController() const
+    RootGraphManager* findActiveRootGraphManager() const
     {
         if (auto* h = findActive())
             return h->controller.get();
@@ -308,7 +308,7 @@ void EngineController::addConnection (const uint32 s, const uint32 sp,
                                       const uint32 d, const uint32 dp, 
                                       const Node& graph)
 {
-    if (auto* controller = graphs->findGraphControllerFor (graph))
+    if (auto* controller = graphs->findGraphManagerFor (graph))
         controller->addConnection (s, sp, d, dp);
 }
 
@@ -450,7 +450,7 @@ void EngineController::removeGraph (int index)
 
 void EngineController::connectChannels (const uint32 s, const int sc, const uint32 d, const int dc)
 {
-    if (auto* root = graphs->findActiveRootGraphController ())
+    if (auto* root = graphs->findActiveRootGraphManager ())
     {
         auto src = root->getNodeForId (s);
         auto dst = root->getNodeForId (d);
@@ -463,20 +463,20 @@ void EngineController::connectChannels (const uint32 s, const int sc, const uint
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp)
 {
-    if (auto* root = graphs->findActiveRootGraphController())
+    if (auto* root = graphs->findActiveRootGraphManager())
         root->removeConnection (s, sp, d, dp);
 }
 
 void EngineController::removeConnection (const uint32 s, const uint32 sp, const uint32 d, const uint32 dp, const Node& target)
 {
-    if (auto* controller = graphs->findGraphControllerFor (target))
+    if (auto* controller = graphs->findGraphManagerFor (target))
         controller->removeConnection (s, sp, d, dp);
 }
 
 Node EngineController::addNode (const Node& node, const Node& target,
                                 const ConnectionBuilder& builder)
 {
-    if (auto* controller = graphs->findGraphControllerFor (target))
+    if (auto* controller = graphs->findGraphManagerFor (target))
     {
         const uint32 nodeId = controller->addNode (node);
         Node referencedNode (controller->getNodeModelForId (nodeId));
@@ -492,7 +492,7 @@ Node EngineController::addNode (const Node& node, const Node& target,
 
 void EngineController::addNode (const Node& node)
 {
-    auto* root = graphs->findActiveRootGraphController();
+    auto* root = graphs->findActiveRootGraphManager();
     const uint32 nodeId = (root != nullptr) ? root->addNode (node) : KV_INVALID_NODE;
     if (KV_INVALID_NODE != nodeId)
     {
@@ -509,7 +509,7 @@ void EngineController::addNode (const Node& node)
 
 void EngineController::addPlugin (const PluginDescription& desc, const bool verified, const float rx, const float ry)
 {
-    auto* root = graphs->findActiveRootGraphController();
+    auto* root = graphs->findActiveRootGraphManager();
     if (! root)
         return;
 
@@ -552,7 +552,7 @@ void EngineController::removeNode (const Node& node)
     if (! graph.isGraph())
         return;
     
-    if (auto* controller = graphs->findGraphControllerFor (graph))
+    if (auto* controller = graphs->findGraphManagerFor (graph))
     {
         if (auto* gui = findSibling<GuiController>())
         {
@@ -589,7 +589,7 @@ void EngineController::removeNode (const Uuid& uuid)
 
 void EngineController::removeNode (const uint32 nodeId)
 {
-    auto* root = graphs->findActiveRootGraphController();
+    auto* root = graphs->findActiveRootGraphManager();
     if (! root)
         return;
     if (auto* gui = findSibling<GuiController>())
@@ -601,7 +601,7 @@ void EngineController::disconnectNode (const Node& node, const bool inputs, cons
                                                          const bool audio, const bool midi)
 {
     const auto graph (node.getParentGraph());
-    if (auto* controller = graphs->findGraphControllerFor (graph))
+    if (auto* controller = graphs->findGraphManagerFor (graph))
         controller->disconnectFilter (node.getNodeId(), inputs, outputs, audio, midi);
 }
 
@@ -732,7 +732,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     auto session = getWorld().getSession();
-    auto* const root = graphs->findActiveRootGraphController();
+    auto* const root = graphs->findActiveRootGraphManager();
     auto& devices (getWorld().getDeviceManager());
     
    #if ! EL_RUNNING_AS_PLUGIN
@@ -785,7 +785,7 @@ void EngineController::addPlugin (const Node& graph, const PluginDescription& de
     if (! graph.isGraph())
         return;
     
-    if (auto* controller = graphs->findGraphControllerFor (graph))
+    if (auto* controller = graphs->findGraphManagerFor (graph))
     {
         const Node node (addPlugin (*controller, desc));
     }
@@ -815,7 +815,7 @@ Node EngineController::addPlugin (const Node& graph, const PluginDescription& de
     
     const PluginDescription descToLoad = (plugs.size() > 0) ? *plugs.getFirst() : desc;
 
-    if (auto* controller = graphs->findGraphControllerFor (graph))
+    if (auto* controller = graphs->findGraphManagerFor (graph))
     {
         const Node node (addPlugin (*controller, descToLoad));
         if (node.isValid())
@@ -855,7 +855,7 @@ void EngineController::sessionReloaded()
     }
 }
 
-Node EngineController::addPlugin (GraphController& c, const PluginDescription& desc)
+Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc)
 {
     auto& plugins (getWorld().getPluginManager());
     const auto nodeId = c.addFilter (&desc, 0.5f, 0.5f, 0);
@@ -890,7 +890,7 @@ void EngineController::addMidiDeviceNode (const String& device, const bool isInp
     Node graph;
     if (auto s = getWorld().getSession())
         graph = s->getActiveGraph();
-    if (auto* const root = graphs->findActiveRootGraphController())
+    if (auto* const root = graphs->findActiveRootGraphManager())
     {
         PluginDescription desc;
         desc.pluginFormatName = "Internal";
@@ -926,7 +926,7 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
     Node node  = n;
     Node graph = node.getParentGraph();
     GraphNodePtr ptr = node.getGraphNode();
-    auto* controller = graphs->findGraphControllerFor (graph);
+    auto* controller = graphs->findGraphManagerFor (graph);
     if (! controller)
         return;
     
@@ -966,7 +966,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
     if (! graph.isGraph())
         return;
 
-    if (auto* ctl = graphs->findGraphControllerFor (graph))
+    if (auto* ctl = graphs->findGraphManagerFor (graph))
     {
         double x = 0.0, y = 0.0;
         node.getRelativePosition (x, y);
@@ -1011,7 +1011,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
             }
 
             auto newNode (ctl->getNodeModelForId (nodeId));
-            newNode.setRelativePosition (x, y); // TODO: GraphController should handle these
+            newNode.setRelativePosition (x, y); // TODO: GraphManager should handle these
             newNode.setProperty ("windowX", (int) node.getProperty ("windowX"))
                    .setProperty ("windowY", (int) node.getProperty ("windowY"));
 

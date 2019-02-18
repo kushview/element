@@ -4,8 +4,8 @@
 namespace Element {
 
 struct ConnectionBuilder;
-class GraphController;
-class RootGraphController;
+class GraphManager;
+class RootGraphManager;
     
 class EngineController : public AppController::Child,
                          private ChangeListener
@@ -107,7 +107,7 @@ private:
     
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
-    Node addPlugin (GraphController& controller, const PluginDescription& desc);
+    Node addPlugin (GraphManager& controller, const PluginDescription& desc);
 };
     
 }

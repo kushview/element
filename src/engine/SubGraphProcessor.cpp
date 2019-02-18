@@ -1,5 +1,5 @@
 
-#include "controllers/GraphController.h"
+#include "controllers/GraphManager.h"
 #include "engine/SubGraphProcessor.h"
 #include "Globals.h"
 
@@ -21,7 +21,7 @@ void SubGraphProcessor::initController (PluginManager& plugins)
 {
     if (controller != nullptr)
         return;
-    controller = new GraphController (*this, plugins);
+    controller = new GraphManager (*this, plugins);
 }
 
 void SubGraphProcessor::createAllIONodes() { }

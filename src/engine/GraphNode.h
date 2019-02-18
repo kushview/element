@@ -234,7 +234,7 @@ protected:
 
 private:
     friend class GraphProcessor;
-    friend class GraphController;
+    friend class GraphManager;
     friend class EngineController;
     friend class Node;
     

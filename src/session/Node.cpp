@@ -1,6 +1,6 @@
 
 #include "session/Node.h"
-#include "controllers/GraphController.h"
+#include "controllers/GraphManager.h"
 
 namespace Element {
 
@@ -696,7 +696,7 @@ namespace Element {
         return false;
     }
 
-    void ConnectionBuilder::addConnections (GraphController& controller, const uint32 targetNodeId) const
+    void ConnectionBuilder::addConnections (GraphManager& controller, const uint32 targetNodeId) const
     {
         GraphNodePtr tgt = controller.getNodeForId (targetNodeId);
         if (tgt)

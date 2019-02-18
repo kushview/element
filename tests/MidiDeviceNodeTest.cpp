@@ -4,7 +4,7 @@
 */
 
 #include "Tests.h"
-#include "controllers/GraphController.h"
+#include "controllers/GraphManager.h"
 #include "engine/MidiDeviceProcessor.h"
 #include "engine/nodes/AudioProcessorNode.h"
 
@@ -47,8 +47,8 @@ public:
 
         beginTest ("Add to Graph Controller");
         initializeWorld();
-        std::unique_ptr<GraphController> controller;
-        controller.reset (new GraphController (*graph, getWorld().getPluginManager()));
+        std::unique_ptr<GraphManager> controller;
+        controller.reset (new GraphManager (*graph, getWorld().getPluginManager()));
         const auto graphFile = getDataDir().getChildFile ("Graphs/IAC Bus 1 Graph.elg");
         jassert(graphFile.existsAsFile());
         Node model (Node::parse (graphFile), false);

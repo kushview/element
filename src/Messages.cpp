@@ -74,7 +74,7 @@ public:
 
         const Node newNode (nodeData, false);
         auto createdNode (ec.addNode (newNode, targetGraph, builder));
-        createdNode.setRelativePosition (x, y); // TODO: GraphController should handle this
+        createdNode.setRelativePosition (x, y); // TODO: GraphManager should handle this
 
         for (const auto* arc : arcs)
             ec.addConnection (arc->sourceNode, arc->sourcePort,

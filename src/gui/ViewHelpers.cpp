@@ -1,7 +1,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "controllers/GraphController.h"
+#include "controllers/GraphManager.h"
 
 #include "engine/AudioEngine.h"
 #include "engine/SubGraphProcessor.h"

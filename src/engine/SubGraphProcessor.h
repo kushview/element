@@ -7,7 +7,7 @@
 namespace Element {
 
 class AppController;
-class GraphController;
+class GraphManager;
 class PluginManager;
 
 class SubGraphProcessor : public GraphProcessor
@@ -16,13 +16,13 @@ public:
     SubGraphProcessor();
     virtual ~SubGraphProcessor();
     void fillInPluginDescription (PluginDescription& d) const override;
-    GraphController& getController() const { jassert(controller); return* controller; }
+    GraphManager& getController() const { jassert(controller); return* controller; }
     
 private:
     typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
     GraphNodePtr ioNodes [PortType::Unknown];
-    friend class GraphController;
-    ScopedPointer<GraphController> controller;
+    friend class GraphManager;
+    ScopedPointer<GraphManager> controller;
     void createAllIONodes();
     void initController (PluginManager& plugins);
 

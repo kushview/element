@@ -3,6 +3,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/EngineController.h"
 #include "controllers/GuiController.h"
+#include "controllers/GraphManager.h"
 #include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
@@ -42,6 +43,7 @@ AppController::AppController (Globals& g)
     addChild (new MappingController ());
     addChild (new PresetsController ());
     addChild (new SessionController ());
+    addChild (new GraphController());
     addChild (new ScriptingController ());
     
     g.getCommandManager().registerAllCommandsForTarget (this);
@@ -483,24 +485,23 @@ bool AppController::perform (const InvocationInfo& info)
             break;
         
         case Commands::graphNew:
-        {
-            DBG("new graph");
-        } break;
-
+            findChild<GraphController>()->newGraph();
+            break;
         case Commands::graphOpen:
         {
-            DBG("open graph");
+            FileChooser chooser ("Open Graph", lastSavedFile, "*.elg", true, false);
+            if (chooser.browseForFileToOpen())
+            {
+                findChild<GraphController>()->openGraph (chooser.getResult());
+                recentFiles.addFile (chooser.getResult());
+            }
         } break;
-        
-        case Commands::graphSave: 
-        {
-            DBG("graph save");
-        } break;
-        
+        case Commands::graphSave:
+            findChild<GraphController>()->saveGraph (false);
+            break;
         case Commands::graphSaveAs: 
-        {
-            DBG("save graph as");
-        } break;
+            findChild<GraphController>()->saveGraph (true);
+            break;
         
         default: res = false; break;
     }
