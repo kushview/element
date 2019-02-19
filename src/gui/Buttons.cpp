@@ -47,7 +47,7 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
     
     if (! path.isEmpty())
     {
-        Icon i (path, getTextColour());
+        Icon i (path, getTextColour().brighter(0.184));
         Rectangle<float> r { 0.0, 0.0, (float)getWidth(), (float)getHeight() };
         i.draw (g, r.reduced (pathReduction), false);
     }

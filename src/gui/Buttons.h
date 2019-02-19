@@ -43,10 +43,10 @@ public:
     }
     
     inline void setIcon (const Image& image) { icon = image; }
-    inline void setPath (const Path& p, int reduceby = 2)
+    inline void setPath (const Path& p, float reduceby = 2.f)
     {
         path = p;
-        pathReduction = jmax (2, reduceby);
+        pathReduction = jmax (2.f, reduceby);
     }
 
 protected:
@@ -86,7 +86,7 @@ public:
 class ConfigButton : public SettingButton
 {
 public:
-    ConfigButton() { setPath (getIcons().config); }
+    ConfigButton() { setPath (getIcons().fasCog, 2); }
     ~ConfigButton() { }
 };
 

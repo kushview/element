@@ -52,9 +52,9 @@ public:
          graph, jigsaw, info, warning,
          bug, mainJuceLogo, 
          
-         falBars, falBarsOutline, falAtomAlt,
+         falBars, falCog, falBarsOutline, falAtomAlt,
 
-         fasPlay, fasStop, fasCircle;
+         fasPlay, fasStop, fasCog, fasCircle;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Icons)
