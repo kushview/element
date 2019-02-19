@@ -151,9 +151,11 @@ namespace Element {
     void NodeEditorContentView::resized()
     {
         auto r1 = getLocalBounds().reduced (2);
+        if (r1.getHeight() < 44)
+            r1.setHeight (44);
+
         r1.removeFromTop (4);
         auto r2 = r1.removeFromTop (20);
-        
         nodesCombo.setBounds (r2.removeFromLeft (jmax (100, r2.getWidth() - 24)));
         menuButton.setBounds (r2.withWidth(22).withX (r2.getX() + 2));
         

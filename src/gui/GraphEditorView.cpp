@@ -8,17 +8,34 @@
 #include "Globals.h"
 #include "session/UnlockStatus.h"
 
+#ifndef EL_GRAPH_EDITOR_VIEWPORT
+ #define EL_GRAPH_EDITOR_VIEWPORT 0
+#endif
+
 namespace Element
 {
 
 GraphEditorView::GraphEditorView()
 {
     setName ("GraphEditor");
+   #if EL_GRAPH_EDITOR_VIEWPORT
+    addAndMakeVisible (view);
+    view.setViewedComponent (&graph, false);
+    view.setScrollBarsShown (true, true, true, true);
+    graph.setSize (1920, 1080);
+   #else
     addAndMakeVisible (graph);
+   #endif
+
     setWantsKeyboardFocus (true);
 }
 
-GraphEditorView::~GraphEditorView() { }
+GraphEditorView::~GraphEditorView()
+{
+   #if EL_GRAPH_EDITOR_VIEWPORT
+    view.setViewedComponent (nullptr, false);
+   #endif
+}
 
 void GraphEditorView::willBeRemoved()
 {
@@ -76,7 +93,11 @@ void GraphEditorView::paint (Graphics& g)
 
 void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 {
+   #if EL_GRAPH_EDITOR_VIEWPORT
+    view.setBounds (area);
+   #else
     graph.setBounds (area);
+   #endif
 }
 
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)

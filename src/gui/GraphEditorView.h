@@ -31,6 +31,7 @@ protected:
 private:
     Node node;
     GraphEditorComponent graph;
+    Viewport view;
 };
 
 }
