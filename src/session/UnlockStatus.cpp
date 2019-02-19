@@ -12,13 +12,13 @@
  #define EL_PRO_PRICE_ID 1
  
  #define EL_BASE_URL "http://local.kushview.net"
- #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
- #define EL_PUBKEY "3,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
- #define EL_PRIVKEY "4e290ea703612261cb143aaaad7e2be03282bec968eea82b7d064226e66321ab,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
- #define EL_LICENSE_1 "2de310c8ef18a6f6da40270399cc13f6" // Trial
- #define EL_LICENSE_2 ""
- #define EL_LICENSE_3 ""
- #define EL_LICENSE_4 ""
+  #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
+  #define EL_PUBKEY "3,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
+  #define EL_PRIVKEY "4e290ea703612261cb143aaaad7e2be03282bec968eea82b7d064226e66321ab,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
+  #define EL_LICENSE_1 "2de310c8ef18a6f6da40270399cc13f6" // Trial
+  #define EL_LICENSE_2 ""
+  #define EL_LICENSE_3 ""
+  #define EL_LICENSE_4 ""
 
 #elif EL_USE_CI_AUTH
  #define EL_PRODUCT_ID "12"

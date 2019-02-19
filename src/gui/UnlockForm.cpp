@@ -35,8 +35,8 @@ struct UnlockForm::OverlayComp  : public Component,
         Activate, Deactivate, Check
     };
     
-    OverlayComp (UnlockForm& f, Element::Globals& w, Action a)
-        : Thread (String()), action(a), form (f), world(w)
+    OverlayComp (UnlockForm& f, Element::Globals& w, Action a, bool da)
+        : Thread (String()), action(a), form (f), world(w), deactivateOthers (da)
     {
         result.succeeded = false;
         email       = form.emailBox.getText();
@@ -78,14 +78,19 @@ struct UnlockForm::OverlayComp  : public Component,
     void run() override
     {
         clearLicense();
+        StringPairArray params;
         switch (action)
         {
             case Deactivate:
                 result = form.status.deactivateLicense (license);
                 break;
             case Activate:
-                result = form.status.activateLicense (license);
-                break;
+            {
+                if (deactivateOthers)
+                    params.set ("deactivate_others", "1");
+                result = form.status.activateLicense (license, {}, {}, params);
+                
+            } break;
             case Check:
                 result = form.status.checkLicense (license);
                 break;
@@ -180,6 +185,7 @@ struct UnlockForm::OverlayComp  : public Component,
     const Action action;
     UnlockForm& form;
     Element::Globals& world;
+    bool deactivateOthers = false;
     Spinner spinner;
     OnlineUnlockStatus::UnlockResult result;
     String email, password, license;
@@ -277,7 +283,7 @@ private:
     {
         if (overlay)
             return;
-        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Deactivate));
+        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Deactivate, false));
         resized();
     }
     
@@ -285,7 +291,7 @@ private:
     {
         if (overlay)
             return;
-        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Check));
+        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Check, false));
         resized();
     }
     
@@ -362,6 +368,10 @@ UnlockForm::UnlockForm (Globals& s, GuiController& g,
     activateButton.addListener (this);
     cancelButton.addListener (this);
     
+    addAndMakeVisible (deactivateOthers);
+    deactivateOthers.setButtonText ("Deactivate other machines?");
+    deactivateOthers.setTooltip ("Checking this will force all other Machine IDs to be cleared from the server before activating this one. If deactivating, then this will force deactivate all machines along with this one.");
+    
     if (status.isFullVersion() || (status.isExpiring() && Time::getCurrentTime() > status.getExpiryTime())) {
         addAndMakeVisible (info = new Element::LicenseInfo (*this));
     }
@@ -394,6 +404,7 @@ void UnlockForm::resized()
     
     Rectangle<int> r (getLocalBounds().reduced (10, 20));
     
+    r.removeFromBottom (6);
     Rectangle<int> buttonArea (r.removeFromBottom (buttonHeight));
     activateButton.changeWidthToFitText (buttonHeight);
     cancelButton.changeWidthToFitText (buttonHeight);
@@ -405,7 +416,12 @@ void UnlockForm::resized()
     activateButton.setBounds (buttonArea.removeFromLeft (activateButton.getWidth()));
     buttonArea.removeFromLeft (gap);
     cancelButton.setBounds (buttonArea);
-    
+
+    const auto activateBtnX = activateButton.getBoundsInParent().getX();
+    deactivateOthers.setBounds ({ 
+        activateBtnX, activateButton.getBottom() + 2,
+        cancelButton.getRight() - activateBtnX, 20 });
+
     r.removeFromBottom (20);
     message.setBounds (r);
 
@@ -490,7 +506,8 @@ void UnlockForm::attemptRegistration()
         if (useLicense)
             status.setLicenseKey (licenseBox.getText().trim());
 
-        addAndMakeVisible (unlockingOverlay = new OverlayComp (*this, world, OverlayComp::Activate));
+        addAndMakeVisible (unlockingOverlay = new OverlayComp (
+            *this, world, OverlayComp::Activate, deactivateOthers.getToggleState()));
         resized();
         unlockingOverlay->enterModalState();
     }

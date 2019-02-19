@@ -47,7 +47,8 @@ public:
     Label message;
     TextEditor emailBox, passwordBox, licenseBox;
     TextButton activateButton, cancelButton, deactivateButton, refreshButton;
-   
+    ToggleButton deactivateOthers;
+     
 private:
     Element::Globals& world;
     Element::UnlockStatus& status;
