@@ -226,7 +226,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     
 	if (auto* ge = dynamic_cast<GenericAudioProcessorEditor*> (ui))
 	{
-		setResizable (false, true);
+		setResizable (false, false);
 	}
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
