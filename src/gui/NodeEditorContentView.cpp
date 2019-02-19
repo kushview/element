@@ -212,8 +212,7 @@ namespace Element {
             clearEditor();
             watcher->setNodeToWatch (newNode);
             node = watcher->getWatchedNode();
-
-            nodeObjectValue = node.getPropertyAsValue (Tags::object);
+            nodeObjectValue = node.getPropertyAsValue (Tags::object, true);
             editor.reset (createEmbededEditor());
             if (editor)
                 addAndMakeVisible (editor.get());
