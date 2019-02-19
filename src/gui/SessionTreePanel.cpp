@@ -178,7 +178,7 @@ public:
     
     Icon getIcon() const override
     {
-        return Icon (node.isGraph() ? getIcons().fasThLarge : getIcons().document,
+        return Icon (node.isGraph() ? getIcons().fasThLarge : getIcons().fasRectangleLandscape,
                      Colors::elemental.withAlpha (0.9f));
     }
     

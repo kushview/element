@@ -16,7 +16,7 @@ TreePanelBase::TreePanelBase (const String& treeviewID)
     tree.setDefaultOpenness (true);
     tree.setColour (TreeView::backgroundColourId, LookAndFeel_KV1::backgroundColor);
     tree.setIndentSize (16);
-    tree.setOpenCloseButtonsVisible (false);
+    tree.setOpenCloseButtonsVisible (true);
     tree.getViewport()->setScrollBarThickness (12);
 }
 
