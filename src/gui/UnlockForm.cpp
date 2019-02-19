@@ -214,6 +214,11 @@ struct LicenseInfo : public Component,
         deactivateButton.setButtonText ("Deactivate");
         deactivateButton.addListener (this);
 
+        // not supported
+        // addAndMakeVisible (forceDeactivate);
+        // forceDeactivate.setButtonText ("Force deactivation?");
+        // forceDeactivate.setTooltip ("Checking this, if deactivating, will force deactivate all Machine IDs on the server.");
+
         if (f.status.isExpiring() && Time::getCurrentTime() > f.status.getExpiryTime())
         {
             addAndMakeVisible (expiredNotice);
@@ -245,9 +250,13 @@ struct LicenseInfo : public Component,
             expiredNotice.setBounds (r.removeFromBottom (14));
         licenseKey.setBounds (r);
         
-        refreshButton.setBounds ((getWidth() / 2) - 92, getHeight() - 40, 90, 30);
-        deactivateButton.setBounds ((getWidth() / 2) + 2, getHeight() - 40, 90, 30);
-        
+        refreshButton.setBounds ((getWidth() / 2) - 92, getHeight() - 50, 90, 24);
+        deactivateButton.setBounds ((getWidth() / 2) + 2, getHeight() - 50, 90, 24);
+        // not supported yet
+        // const auto refreshX = refreshButton.getBoundsInParent().getX();
+        // forceDeactivate.setBounds (refreshX, refreshButton.getBottom() + 2,
+        //                            deactivateButton.getRight() - refreshX, 20);
+
         if (overlay)
             overlay->setBounds (getLocalBounds());
     }
@@ -276,6 +285,7 @@ private:
     Label email;
     Label licenseKey;
     Label expiredNotice;
+    ToggleButton forceDeactivate;
     UnlockForm& form;
     Component::SafePointer<Component> overlay;
     
@@ -283,7 +293,8 @@ private:
     {
         if (overlay)
             return;
-        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Deactivate, false));
+        addAndMakeVisible (overlay = new Overlay (form, form.world, Overlay::Deactivate,
+                           false));
         resized();
     }
     
@@ -370,7 +381,7 @@ UnlockForm::UnlockForm (Globals& s, GuiController& g,
     
     addAndMakeVisible (deactivateOthers);
     deactivateOthers.setButtonText ("Deactivate other machines?");
-    deactivateOthers.setTooltip ("Checking this will force all other Machine IDs to be cleared from the server before activating this one. If deactivating, then this will force deactivate all machines along with this one.");
+    deactivateOthers.setTooltip ("Checking this will force all other Machine IDs to be cleared from the server before activating this one.");
     
     if (status.isFullVersion() || (status.isExpiring() && Time::getCurrentTime() > status.getExpiryTime())) {
         addAndMakeVisible (info = new Element::LicenseInfo (*this));
@@ -417,6 +428,7 @@ void UnlockForm::resized()
     buttonArea.removeFromLeft (gap);
     cancelButton.setBounds (buttonArea);
 
+    // not yet supported
     const auto activateBtnX = activateButton.getBoundsInParent().getX();
     deactivateOthers.setBounds ({ 
         activateBtnX, activateButton.getBottom() + 2,
