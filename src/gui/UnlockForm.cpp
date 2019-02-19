@@ -214,6 +214,9 @@ struct LicenseInfo : public Component,
         deactivateButton.setButtonText ("Deactivate");
         deactivateButton.addListener (this);
 
+        addAndMakeVisible (clearButton);
+        clearButton.setButtonText ("Clear");
+        clearButton.addListener (this);
         // not supported
         // addAndMakeVisible (forceDeactivate);
         // forceDeactivate.setButtonText ("Force deactivation?");
@@ -250,8 +253,10 @@ struct LicenseInfo : public Component,
             expiredNotice.setBounds (r.removeFromBottom (14));
         licenseKey.setBounds (r);
         
-        refreshButton.setBounds ((getWidth() / 2) - 92, getHeight() - 50, 90, 24);
-        deactivateButton.setBounds ((getWidth() / 2) + 2, getHeight() - 50, 90, 24);
+        refreshButton.setBounds ((getWidth() / 2) - 92 - 23, getHeight() - 50, 90, 24);
+        deactivateButton.setBounds ((getWidth() / 2) + 2 - 23, getHeight() - 50, 90, 24);
+        clearButton.setBounds (deactivateButton.getRight() + 4, getHeight() - 50, 46, 24);
+
         // not supported yet
         // const auto refreshX = refreshButton.getBoundsInParent().getX();
         // forceDeactivate.setBounds (refreshX, refreshButton.getBottom() + 2,
@@ -263,7 +268,8 @@ struct LicenseInfo : public Component,
     
     void buttonClicked (Button* b) override
     {
-        if (b == &deactivateButton && form.status.isExpiring() && Time::getCurrentTime() > form.status.getExpiryTime())
+        if (b == &clearButton ||
+            (b == &deactivateButton && form.status.isExpiring() && Time::getCurrentTime() > form.status.getExpiryTime()))
         {
             // server won't allow deactivating an expired license, so clear it
             auto& f (form);
@@ -281,7 +287,7 @@ struct LicenseInfo : public Component,
     
 private:
     typedef UnlockForm::OverlayComp Overlay;
-    TextButton deactivateButton, refreshButton;
+    TextButton deactivateButton, refreshButton, clearButton;
     Label email;
     Label licenseKey;
     Label expiredNotice;
