@@ -43,7 +43,11 @@ public:
     }
     
     inline void setIcon (const Image& image) { icon = image; }
-    inline void setPath (const Path& p) { path = p; }
+    inline void setPath (const Path& p, int reduceby = 2)
+    {
+        path = p;
+        pathReduction = jmax (2, reduceby);
+    }
 
 protected:
     virtual Colour getTextColour()
@@ -59,6 +63,7 @@ private:
     String no  = "No";
     Image icon;
     Path path;
+    int pathReduction = 2;
 };
 
 class PanicButton : public SettingButton {

@@ -50,8 +50,11 @@ public:
     Path folder, document, imageDoc,
          config, exporter, juceLogo,
          graph, jigsaw, info, warning,
-         bug, mainJuceLogo, falBars,
-         falBarsOutline, falAtomAlt;
+         bug, mainJuceLogo, 
+         
+         falBars, falBarsOutline, falAtomAlt,
+
+         fasPlay, fasStop, fasCircle;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Icons)

@@ -40,20 +40,20 @@ public:
     
 TransportBar::TransportBar ()
 {
-    addAndMakeVisible (play = new SettingButton ("play"));
-    play->setButtonText (TRANS("Play"));
+    addAndMakeVisible (play = new SettingButton ());
+    play->setPath (getIcons().fasPlay, 4);
     play->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     play->addListener (this);
     play->setColour (TextButton::buttonOnColourId, Colours::chartreuse);
     play->setColour (SettingButton::backgroundOnColourId, Colors::toggleGreen);
 
-    addAndMakeVisible (stop = new SettingButton ("stop"));
-    stop->setButtonText (TRANS("Stop"));
+    addAndMakeVisible (stop = new SettingButton ());
+    stop->setPath (getIcons().fasStop, 4);
     stop->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     stop->addListener (this);
 
-    addAndMakeVisible (record = new SettingButton ("record"));
-    record->setButtonText (TRANS("Rec"));
+    addAndMakeVisible (record = new SettingButton ());
+    record->setPath (getIcons().fasCircle, 4);
     record->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight | Button::ConnectedOnTop | Button::ConnectedOnBottom);
     record->addListener (this);
     record->setColour (SettingButton::backgroundOnColourId, Colours::red);
@@ -119,9 +119,9 @@ void TransportBar::paint (Graphics& g)
 
 void TransportBar::resized()
 {
-    play->setBounds (80, 0, 32, 16);
-    stop->setBounds (115, 0, 32, 16);
-    record->setBounds (150, 0, 32, 16);
+    play->setBounds (80, 0, 20, 16);
+    stop->setBounds (102, 0, 20, 16);
+    record->setBounds (124, 0, 20, 16);
     
     barLabel->setBounds (0, 0, 24, 16);
     beatLabel->setBounds (26, 0, 24, 16);

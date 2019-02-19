@@ -6,7 +6,9 @@
 
 namespace Element {
 
-class GraphController : public AppController::Child
+/** Responsible for creating new, opening, and saving graph files in
+    Element Lite and Solo */
+class GraphController final : public AppController::Child
 {
 public:
     GraphController() = default;
