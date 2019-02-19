@@ -45,9 +45,11 @@ public:
 
     void itemSelectionChanged (bool isNowSelected) override;
     void paintItem (Graphics& g, int width, int height) override;
+    #if 0
     void paintOpenCloseButton (Graphics&, const Rectangle<float>& area, 
                                Colour backgroundColour, bool isMouseOver) override;
-
+    #endif
+    
     struct WholeTreeOpennessRestorer : public OpennessRestorer
     {
     WholeTreeOpennessRestorer (TreeViewItem& item)  : OpennessRestorer (getTopLevelItem (item)) { }

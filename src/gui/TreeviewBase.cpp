@@ -1,6 +1,6 @@
 /*
     TreeviewBase.cpp - This file is part of Element
-    Copyright (C) 2016 Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019 Kushview, LLC.  All rights reserved.
 */
 
 #include "gui/TreeviewBase.h"
@@ -24,7 +24,7 @@ TreePanelBase::~TreePanelBase()
 {
     tree.setRootItem (nullptr);
 }
-    
+
 void TreePanelBase::setRoot (TreeItemBase* root)
 {
     tree.setRootItem (nullptr);
@@ -86,6 +86,7 @@ float TreeItemBase::getIconSize() const
     return jmin (getItemHeight() - 4.0f, 18.0f);
 }
 
+#if 0
 void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& r, Colour c, bool o)
 {
     getOwnerView()->getLookAndFeel().drawTreeviewPlusMinusBox (g, r, c, o, false);
@@ -105,6 +106,7 @@ void TreeItemBase::paintOpenCloseButton (Graphics& g, const Rectangle<float>& r,
     g.fillPath (p);
 #endif
 }
+#endif
 
 Colour TreeItemBase::getBackgroundColour() const
 {
