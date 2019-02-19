@@ -429,8 +429,6 @@ struct ContentComponent::Tooltips
 ContentComponent::ContentComponent (AppController& ctl_)
     : controller (ctl_)
 {
-    auto& settings (controller.getGlobals().getSettings());
-
     setOpaque (true);
     
     addAndMakeVisible (statusBar = new StatusBar (getGlobals()));
