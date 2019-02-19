@@ -83,7 +83,7 @@ void TreeItemBase::paintItem (Graphics& g, int w, int h)
 
 float TreeItemBase::getIconSize() const
 {
-    return jmin (getItemHeight() - 4.0f, 18.0f);
+    return jmin (getItemHeight() - 4.0f, 10.0f);
 }
 
 #if 0

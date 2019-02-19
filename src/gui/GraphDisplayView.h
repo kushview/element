@@ -21,6 +21,7 @@ public:
         addAndMakeVisible (sessionConfigButton);
         sessionConfigButton.setTooltip ("Show session settings");
         sessionConfigButton.addListener (this);
+        sessionConfigButton.setVisible (false);
     }
 
     virtual ~GraphDisplayView()
@@ -91,8 +92,13 @@ public:
         const int configButtonSize = 14;
         r = getLocalBounds().reduced(4);
         r = r.removeFromTop (configButtonSize);
-        sessionConfigButton.setBounds (r.removeFromRight (configButtonSize));
-        r.removeFromRight (2);
+        
+        if (sessionConfigButton.isVisible())
+        {
+            sessionConfigButton.setBounds (r.removeFromRight (configButtonSize));
+            r.removeFromRight (2);
+        }
+
         configButton.setBounds (r.removeFromRight (configButtonSize));        
     }
 

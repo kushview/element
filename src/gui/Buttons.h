@@ -93,7 +93,7 @@ public:
 class GraphButton : public SettingButton
 {
 public:
-    GraphButton() { setPath (getIcons().graph); }
+    GraphButton() { setPath (getIcons().fasThLarge, 2.2); }
     ~GraphButton() { }
 };
 

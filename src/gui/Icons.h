@@ -56,7 +56,7 @@ public:
 
          fasPlay, fasStop, fasCog, fasCircle,
          fasChevronDown, fasChevronRight, fasSave,
-         fasFolderOpen, fasPowerOff;
+         fasFolderOpen, fasPowerOff, fasThLarge;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Icons)
