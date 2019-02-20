@@ -34,6 +34,25 @@ def silence_warnings (conf):
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
 
+def configure_product (conf):
+    if conf.options.enable_free and conf.options.enable_solo:
+        print ("Cannot enable Lite and Solo At the Same Time")
+        exit(1)
+    if conf.options.enable_free: 
+        conf.define ('EL_FREE', 1)
+        conf.env.EL_FREE = True
+        conf.env.EL_SOLO = False
+        conf.env.EL_PRO  = False
+    if conf.options.enable_solo: 
+        conf.define ('EL_SOLO', 1)
+        conf.env.EL_SOLO = True
+        conf.env.EL_FREE = False
+        conf.env.EL_PRO  = False
+    if not conf.options.enable_free and not conf.options.enable_solo:
+        conf.env.EL_SOLO = False
+        conf.env.EL_FREE = False
+        conf.env.EL_PRO  = True
+
 def configure (conf):
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     
@@ -57,11 +76,7 @@ def configure (conf):
     conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
     conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
 
-    if conf.options.enable_free and conf.options.enable_solo:
-        print ("Cannot enable Lite and Solo At the Same Time")
-        exit(1)
-    if conf.options.enable_free: conf.define ('EL_FREE', 1)
-    if conf.options.enable_solo: conf.define ('EL_SOLO', 1)
+    configure_product (conf)
 
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
@@ -92,8 +107,9 @@ def configure (conf):
     juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
     juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
 
-    juce.display_msg (conf, "Element Lite", conf.options.enable_free)
-    juce.display_msg (conf, "Element Solo", conf.options.enable_solo)
+    juce.display_msg (conf, "Element Lite", conf.env.EL_FREE)
+    juce.display_msg (conf, "Element Solo", conf.env.EL_SOLO)
+    juce.display_msg (conf, "Element Pro",  conf.env.EL_PRO)
     juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
     juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
     juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)
@@ -259,7 +275,7 @@ def build_mac (bld):
 
     bld.add_group()
     
-    bld.program (
+    app = bld.program (
         source      = [ 'project/Source/Main.cpp' ],
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
@@ -270,10 +286,15 @@ def build_mac (bld):
         use         = [ 'KV', 'EL', 'PYTHON' ],
         linkflags   = [ '-framework', 'Python' ],
         mac_app     = True,
-        mac_plist   = 'data/MacDeploy/Info-Standalone.plist',
+        mac_plist   = 'tools/macdeploy/InfoPro.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
     )
 
+    if bld.env.EL_FREE:
+        app.mac_plist = 'tools/macdeploy/InfoLite.plist'
+    elif bld.env.EL_SOLO:
+        app.mac_plist = 'tools/macdeploy/InfoSolo.plist'
+    
 def build (bld):
     if cross.is_windows (bld):
         build_mingw (bld)
