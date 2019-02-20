@@ -19,6 +19,7 @@ public:
 
     bool hasGraphChanged() const { return document.hasChangedSinceSaved(); }
 
+    void openDefaultGraph();
     void openGraph (const File& file);
     void newGraph();
     void saveGraph (const bool saveAs);

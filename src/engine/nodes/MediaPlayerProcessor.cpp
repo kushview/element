@@ -140,7 +140,7 @@ private:
 
         position.textFromValueFunction = [this](double value) -> String {
             const double posInMinutes = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
-            return Element::minutesToString (posInMinutes);
+            return Util::minutesToString (posInMinutes);
         };
     }
 

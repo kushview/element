@@ -5,7 +5,9 @@
 #include "controllers/GuiController.h"
 #include "controllers/MappingController.h"
 #include "controllers/PresetsController.h"
+#include "session/Session.h"
 #include "DataPath.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -20,6 +22,19 @@ void GraphController::deactivate()
 
 }
 
+void GraphController::openDefaultGraph()
+{
+    if (auto* gc = findSibling<GuiController>())
+        gc->closeAllPluginWindows();
+        
+    getWorld().getSession()->clear();
+    auto newGraph = Node::createDefaultGraph();
+    document.setGraph (newGraph);
+    getWorld().getSession()->addGraph (document.getGraph(), true);
+    refreshOtherControllers();
+    findSibling<GuiController>()->stabilizeContent();
+}
+
 void GraphController::openGraph (const File& file)
 {
     document.saveIfNeededAndUserAgrees();
@@ -28,8 +43,10 @@ void GraphController::openGraph (const File& file)
     if (result.wasOk())
     {
         findSibling<GuiController>()->closeAllPluginWindows();
+        getWorld().getSession()->clear();
+        getWorld().getSession()->addGraph (document.getGraph(), true);
         refreshOtherControllers();
-        findSibling<GuiController>()->stabilizeContent();
+        document.setChangedFlag (false);
     }
 }
 
@@ -49,6 +66,10 @@ void GraphController::newGraph()
     if (res == 1 || res == 2)
     {
         findSibling<GuiController>()->closeAllPluginWindows();
+        getWorld().getSession()->clear();
+        auto newGraph = Node::createDefaultGraph();
+        document.setGraph (newGraph);
+        getWorld().getSession()->addGraph (document.getGraph(), true);
         refreshOtherControllers();
         findSibling<GuiController>()->stabilizeContent();
     }

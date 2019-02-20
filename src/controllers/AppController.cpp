@@ -96,6 +96,7 @@ void AppController::run()
     if (auto* gui = findChild<GuiController>())
         gui->run();
     
+   #if EL_PRO
     if (auto* sc = findChild<SessionController>())
     {
         bool loadDefault = true;
@@ -113,6 +114,14 @@ void AppController::run()
         if (loadDefault)
             sc->openDefaultSession();
     }
+   #else
+    if (auto* gc = findChild<GraphController>())
+    {
+        bool loadDefaultGraph = true;
+        if (loadDefaultGraph)
+            gc->openDefaultGraph();
+    }
+   #endif
 
     if (auto* gui = findChild<GuiController>())
     {

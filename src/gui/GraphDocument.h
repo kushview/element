@@ -17,6 +17,11 @@ public:
     ~GraphDocument();
 
     inline Node getGraph() const { return graph; }
+    inline void setGraph (const Node& newGraph)
+    {
+        graph = newGraph; 
+        setChangedFlag (false);
+    }
 
     String getDocumentTitle() override;
     Result loadDocument (const File& file) override;

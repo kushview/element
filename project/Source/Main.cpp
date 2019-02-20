@@ -5,6 +5,7 @@
 
 #include "ElementApp.h"
 #include "controllers/AppController.h"
+#include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
 #include "engine/InternalFormat.h"
 #include "engine/GraphProcessor.h"
@@ -18,6 +19,7 @@
 #include "Messages.h"
 #include "Version.h"
 #include "Settings.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -196,7 +198,7 @@ public:
     Application() { }
     virtual ~Application() { }
 
-    const String getApplicationName()    override      { return ProjectInfo::projectName; }
+    const String getApplicationName()    override      { return Util::appName(); }
     const String getApplicationVersion() override      { return ProjectInfo::versionString; }
     bool moreThanOneInstanceAllowed()    override      { return true; }
 
@@ -216,8 +218,10 @@ public:
             return;
         }
         
-        Logger::writeToLog ("Element v" + getApplicationVersion());
-        Logger::writeToLog ("Copyright (c) 2017-2018 Kushview, LLC.  All rights reserved.\n");
+        String appName = Util::appName();
+        appName << " v" << getApplicationVersion();
+        Logger::writeToLog (appName);
+        Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
 
         launchApplication();
     }
@@ -268,6 +272,7 @@ public:
             return;
         }
         
+       #if defined (EL_PRO)
         auto* sc = controller->findChild<SessionController>();
         
         if (world->getSettings().askToSaveSession())
@@ -290,6 +295,21 @@ public:
             sc->saveSession();
             Application::quit();
         }
+
+       #else // lite and solo
+        auto* gc = controller->findChild<GraphController>();
+        // - 0 if the third button was pressed ('cancel')
+        // - 1 if the first button was pressed ('yes')
+        // - 2 if the middle button was pressed ('no')
+        const int res = ! gc->hasGraphChanged() ? 2
+            : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph",
+                                               "This graph may have changes. Would you like to save before exiting?");
+        if (res == 1)
+            gc->saveGraph (false);
+        
+        if (res != 0)
+            Application::quit();
+       #endif
     }
 
     void anotherInstanceStarted (const String& commandLine) override
@@ -297,6 +317,7 @@ public:
         if (! controller)
             return;
         
+       #if EL_PRO
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
@@ -309,6 +330,7 @@ public:
                     sc->importGraph (file);
             }
         }
+       #endif
     }
 
     void resumed() override
@@ -338,7 +360,7 @@ public:
        #endif
 
         world->getUnlockStatus().checkLicenseInBackground();
-        
+       #if EL_PRO
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = world->cli.commandLine.unquoted().trim();
@@ -349,6 +371,7 @@ public:
                     sc->openFile (File (path));
             }
         }
+       #endif
     }
     
 private:

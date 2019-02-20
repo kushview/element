@@ -10,6 +10,7 @@
 #include "gui/MainWindow.h"
 #include "session/CommandManager.h"
 #include "Globals.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -45,21 +46,21 @@ void MainWindow::refreshName()
 
 void MainWindow::nameChanged()
 {
-    String title = "Element";
-   #if defined(EL_FREE)
-    title << " Lite";
-   #elif defined(EL_SOLO)
-    title << " Solo";
-   #endif
+    String title = Util::appName();
 
     if (auto session = world.getSession())
     {
         const auto sessName = session->getName().trim();
         const auto graphName = session->getCurrentGraph().getName();
+       #if defined (EL_PRO)
         if (sessName.isNotEmpty())
             title << " - " << sessName;
         if (graphName.isNotEmpty())
             title << ": " << graphName;
+       #else
+        if (graphName.isNotEmpty())
+            title << " - " << graphName;
+       #endif
     }
 
     setName (title);
