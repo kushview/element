@@ -263,11 +263,19 @@ namespace Element {
               engine (world.getAudioEngine()),
               status (world.getUnlockStatus()),
               gui (g),
+             #ifdef EL_PRO
               defaultSessionFile ("Default Session", File(), true, false,
-                  false,         // bool isForSaving,
+                  false,        // bool isForSaving,
                   "*.els",      //const String& fileBrowserWildcard,
                   "",           //const String& enforcedSuffix,
                   "None")       //const String& textWhenNothingSelected)
+             #else
+              defaultSessionFile ("Default Graph", File(), true, false,
+                  false,         // bool isForSaving,
+                  "*.elg",       //const String& fileBrowserWildcard,
+                  "",            //const String& enforcedSuffix,
+                  "None")        //const String& textWhenNothingSelected)
+             #endif
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -318,7 +326,11 @@ namespace Element {
             hidePluginWindows.getToggleStateValue().addListener (this);
 
             addAndMakeVisible (openLastSessionLabel);
+           #ifdef EL_PRO
             openLastSessionLabel.setText ("Open last used Session", dontSendNotification);
+           #else
+            openLastSessionLabel.setText ("Open last used Graph", dontSendNotification);
+           #endif
             openLastSessionLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (openLastSession);
             openLastSession.setClickingTogglesState (true);
@@ -326,13 +338,18 @@ namespace Element {
             openLastSession.getToggleStateValue().addListener (this);
 
             addAndMakeVisible (askToSaveSessionLabel);
+           #ifdef EL_PRO
             askToSaveSessionLabel.setText ("Ask to save sessions", dontSendNotification);
+           #else
+            askToSaveSessionLabel.setText ("Ask to save graphs", dontSendNotification);
+           #endif
             askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (askToSaveSession);
             askToSaveSession.setClickingTogglesState (true);
             askToSaveSession.setToggleState (settings.askToSaveSession(), dontSendNotification);
             askToSaveSession.getToggleStateValue().addListener (this);
 
+           #ifdef EL_PRO
             addAndMakeVisible (defaultSessionFileLabel);
             defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
             defaultSessionFileLabel.setFont (Font (12.0, Font::bold));
@@ -342,6 +359,7 @@ namespace Element {
             addAndMakeVisible (defaultSessionClearButton);
             defaultSessionClearButton.setButtonText ("X");
             defaultSessionClearButton.addListener (this);
+           #endif
 
             if (status.isFullVersion())
             {
@@ -355,8 +373,6 @@ namespace Element {
                 clockSource.setValue ((int) ClockSourceInternal);
                 clockSourceBox.setEnabled (false);
             }
-
-            // addAndMakeVisible (pluginSettings);
         }
 
         virtual ~GeneralSettingsPage() noexcept
@@ -412,11 +428,13 @@ namespace Element {
             layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
             layoutSetting (r, openLastSessionLabel, openLastSession);
             layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
+            
+           #ifdef EL_PRO
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
             defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                                  defaultSessionFile.getY(),
                                                  settingHeight - 2, defaultSessionFile.getHeight());
-
+           #endif
             if (pluginSettings.isVisible())
             {
                 r.removeFromTop (spacingBetweenSections * 2);

@@ -285,7 +285,7 @@ void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)
     
 void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
 {
-    #ifndef EL_FREE
+   #ifdef EL_PRO
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
@@ -302,20 +302,22 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
     menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");
-    #else
+   #else
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
     menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-    menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");       
-    #endif
+    menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");  
+    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");     
+   #endif
 }
 
 void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)

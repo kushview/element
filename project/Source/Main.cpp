@@ -283,7 +283,7 @@ public:
 
             const int res = !sc->hasSessionChanged() ? 2
                 : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Session",
-                                                   "This session may have changes. Would you like to save before exiting?");
+                    "This session may have changes. Would you like to save before exiting?");
             if (res == 1)
                 sc->saveSession();
             
@@ -298,17 +298,25 @@ public:
 
        #else // lite and solo
         auto* gc = controller->findChild<GraphController>();
-        // - 0 if the third button was pressed ('cancel')
-        // - 1 if the first button was pressed ('yes')
-        // - 2 if the middle button was pressed ('no')
-        const int res = ! gc->hasGraphChanged() ? 2
-            : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph",
-                                               "This graph may have changes. Would you like to save before exiting?");
-        if (res == 1)
+        if (world->getSettings().askToSaveSession())
+        {
+            // - 0 if the third button was pressed ('cancel')
+            // - 1 if the first button was pressed ('yes')
+            // - 2 if the middle button was pressed ('no')
+            const int res = ! gc->hasGraphChanged() ? 2
+                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Graph",
+                    "This graph may have changes. Would you like to save before exiting?");
+            if (res == 1)
+                gc->saveGraph (false);
+            
+            if (res != 0)
+                Application::quit();
+        }
+        else
+        {
             gc->saveGraph (false);
-        
-        if (res != 0)
             Application::quit();
+        }
        #endif
     }
 
