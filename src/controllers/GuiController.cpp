@@ -418,10 +418,12 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 void GuiController::getAllCommands (Array <CommandID>& commands)
 {
     commands.addArray ({
+       #ifdef EL_PRO
+        Commands::showSessionConfig,
+       #endif
         Commands::showAbout,
 		Commands::showPluginManager,
 		Commands::showPreferences,
-        Commands::showSessionConfig,
         Commands::showGraphConfig,
         Commands::showPatchBay,
         Commands::showGraphEditor,
@@ -499,6 +501,12 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
             result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::Session, Info::isDisabled);
             break;
+        case Commands::showSessionConfig:
+        {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
+            result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
+        } break;
        #endif
 
        #ifndef EL_PRO
@@ -559,12 +567,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case Commands::showLastContentView:
             result.setInfo ("Last View", "Shows the last content view", Commands::Categories::UserInterface, 0);
             break;
-        case Commands::showSessionConfig:
-        {
-            int flags = (content != nullptr) ? 0 : Info::isDisabled;
-            if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
-            result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
-        } break;
+
         case Commands::showGraphConfig:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;

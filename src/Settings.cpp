@@ -285,11 +285,18 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
     
     sub.addSeparator(); // session items
     
+   #if EL_PRO
     sub.addItem (OpenLastUsedSession, "Open Last Saved Session", 
         true, openLastUsedSession());
     sub.addItem (AskToSaveSessions, "Ask To Save Session", 
         true, askToSaveSession());
-    
+   #else
+    sub.addItem (OpenLastUsedSession, "Open Last Saved Graph", 
+        true, openLastUsedSession());
+    sub.addItem (AskToSaveSessions, "Ask To Save Graph", 
+        true, askToSaveSession());
+   #endif
+   
     menu.addSubMenu ("General", sub);
 
     menu.addSeparator();
