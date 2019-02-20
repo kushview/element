@@ -20,7 +20,7 @@ const char* Settings::defaultNewSessionFile     = "defaultNewSessionFile";
 const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
 const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
 const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
-
+const char* Settings::lastGraphKey              = "lastGraph";
 enum OptionsMenuItemId
 {
     CheckForUpdatesOnStart = 1000000,

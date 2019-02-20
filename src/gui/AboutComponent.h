@@ -7,6 +7,7 @@
 #include "session/CommandManager.h"
 #include "Commands.h"
 #include "Globals.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -19,18 +20,19 @@ public:
 
         addAndMakeVisible (titleLabel);
         titleLabel.setJustificationType (Justification::centred);
-        titleLabel.setFont (Font (35.0f, Font::FontStyleFlags::bold));
+        titleLabel.setFont (Font (32.0f, Font::FontStyleFlags::bold));
 
         auto buildDate = Time::getCompilationDate();
         addAndMakeVisible (versionLabel);
-        versionLabel.setText ("Element v" + JUCEApplication::getInstance()->getApplicationVersion()
+        versionLabel.setText (Util::appName() + String(" v") + JUCEApplication::getInstance()->getApplicationVersion()
                               + "\nBuild date: " + String (buildDate.getDayOfMonth())
                                                  + " " + Time::getMonthName (buildDate.getMonth(), true)
                                                  + " " + String (buildDate.getYear()),
                               dontSendNotification);
 
         versionLabel.setJustificationType (Justification::centred);
-        
+        versionLabel.setFont (Font (12.f));
+
         addAndMakeVisible (copyrightLabel);
         copyrightLabel.setJustificationType (Justification::centred);
         copyrightLabel.setFont (Font (11.f));
@@ -49,7 +51,7 @@ public:
             };
         }
 
-        setSize (500, 280);
+        setSize (500, 240);
     }
 
     void resized() override
@@ -62,8 +64,8 @@ public:
         auto centreSlice = bounds;
 
         rightSlice.removeFromRight (20);
-        auto iconSlice = rightSlice.removeFromRight (100);
-        huckleberryLogoBounds = iconSlice.removeFromBottom (100).toFloat();
+        auto iconSlice = rightSlice.removeFromRight (64);
+        huckleberryLogoBounds = iconSlice.removeFromBottom (64).toFloat();
 
         elementLogoBounds = leftSlice.removeFromTop (150).toFloat();
         elementLogoBounds.setWidth (elementLogoBounds.getWidth() + 100);
@@ -73,7 +75,7 @@ public:
 
         auto titleHeight = 40;
 
-        centreSlice.removeFromTop ((centreSlice.getHeight() / 2) - (titleHeight / 2));
+        centreSlice.removeFromTop ((centreSlice.getHeight() / 2) - (titleHeight));
 
         titleLabel.setBounds (centreSlice.removeFromTop (titleHeight));
 
@@ -100,7 +102,7 @@ public:
     }
 
 private:
-    Label titleLabel { "title", "ELEMENT" },
+    Label titleLabel { "title", Util::appName().toUpperCase() },
           versionLabel { "version" },
           copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2019 Kushview, LLC.") };
 

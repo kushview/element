@@ -8,6 +8,7 @@
 #include "session/Session.h"
 #include "DataPath.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -19,14 +20,16 @@ void GraphController::activate()
 
 void GraphController::deactivate()
 {
-
+    if (auto* const props = getWorld().getSettings().getUserSettings())
+        if (document.getFile().existsAsFile())
+            props->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
 }
 
 void GraphController::openDefaultGraph()
 {
+    GraphDocument::ScopedChangeStopper freeze (document, false);
     if (auto* gc = findSibling<GuiController>())
-        gc->closeAllPluginWindows();
-        
+        gc->closeAllPluginWindows();        
     getWorld().getSession()->clear();
     auto newGraph = Node::createDefaultGraph();
     document.setGraph (newGraph);
@@ -42,11 +45,12 @@ void GraphController::openGraph (const File& file)
     
     if (result.wasOk())
     {
+        GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
         getWorld().getSession()->clear();
         getWorld().getSession()->addGraph (document.getGraph(), true);
         refreshOtherControllers();
-        document.setChangedFlag (false);
+        findSibling<GuiController>()->stabilizeContent();
     }
 }
 
@@ -65,6 +69,7 @@ void GraphController::newGraph()
     
     if (res == 1 || res == 2)
     {
+        GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
         getWorld().getSession()->clear();
         auto newGraph = Node::createDefaultGraph();

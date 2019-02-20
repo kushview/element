@@ -2,6 +2,7 @@
 #include "controllers/DevicesController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
+#include "controllers/GraphController.h"
 #include "controllers/GuiController.h"
 #include "gui/ContentComponent.h"
 #include "gui/MainWindow.h"
@@ -162,7 +163,11 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         const int fileIdx = index - recentMenuOffset;
         class File f = owner.getAppController().getRecentlyOpenedFilesList().getFile (fileIdx);
+       #if EL_PRO
         owner.getAppController().findChild<SessionController>()->openFile (f);
+       #else
+        owner.getAppController().findChild<GraphController>()->openGraph (f);
+       #endif
     }
 }
 void MainMenu::addRecentFiles (PopupMenu& menu)
@@ -307,10 +312,9 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showPatchBay, "Patch Bay");
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
-    menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");

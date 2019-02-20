@@ -420,6 +420,7 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
     commands.addArray ({
        #ifdef EL_PRO
         Commands::showSessionConfig,
+        Commands::showGraphMixer,
        #endif
         Commands::showAbout,
 		Commands::showPluginManager,
@@ -435,8 +436,7 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
         Commands::toggleUserInterface,
-        Commands::toggleChannelStrip,
-        Commands::showGraphMixer
+        Commands::toggleChannelStrip
     });
     
     commands.add (Commands::quit);
@@ -590,6 +590,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
                 Commands::Categories::UserInterface, flags);
         } break;
 
+       #if defined (EL_PRO)
         case Commands::showGraphMixer: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->showAccessoryView() && 
@@ -600,7 +601,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Graph Mixer", "Show/hide the graph mixer", 
                 Commands::Categories::UserInterface, flags);
         } break;
-        
+       #endif
+
         case Commands::showControllerDevices:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -874,7 +876,7 @@ void GuiController::toggleAboutScreen()
     else
     {
         about->addToDesktop();
-        about->centreWithSize (500, 280);
+        about->centreWithSize (500, 240);
         about->setVisible (true);
         about->toFront (true);
        #if EL_RUNNING_AS_PLUGIN

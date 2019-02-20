@@ -118,6 +118,15 @@ void AppController::run()
     if (auto* gc = findChild<GraphController>())
     {
         bool loadDefaultGraph = true;
+        if (world.getSettings().openLastUsedSession())
+        {
+            const auto lastGraph = getWorld().getSettings().getUserSettings()->getValue (Settings::lastGraphKey);
+            if (File::isAbsolutePath(lastGraph) && File(lastGraph).existsAsFile())
+            {
+                gc->openGraph (File (lastGraph));
+                loadDefaultGraph = false;
+            }
+        }
         if (loadDefaultGraph)
             gc->openDefaultGraph();
     }

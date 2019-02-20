@@ -30,6 +30,7 @@ public:
     static const char* generateMidiClockKey;
     static const char* sendMidiClockToInputKey;
     static const char* hidePluginWindowsWhenFocusLostKey;
+    static const char* lastGraphKey;
 
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -50,7 +51,10 @@ public:
     bool showPluginWindowsWhenAdded() const;
     void setShowPluginWindowsWhenAdded (const bool);
 
-    /** True if the last used session should be opened on launch */
+    /** True if the last used session should be opened on launch.
+        If running as Solo/Lite, then this returns true if the last
+        Graph should be opened on launch instead of a Session
+     */
     bool openLastUsedSession() const;
     void setOpenLastUsedSession (const bool);
 
@@ -58,6 +62,7 @@ public:
     bool pluginWindowsOnTop() const;
     void setPluginWindowsOnTop (const bool);
 
+    /** True if the user should be prompted to save when exiting the app */
     bool askToSaveSession();
     void setAskToSaveSession (const bool);
 

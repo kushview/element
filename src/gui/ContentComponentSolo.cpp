@@ -449,6 +449,7 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
 
     container->setMainView (createLastContentView (settings));
     
+   #if defined (EL_PRO)
     if (booleanProperty (settings, "accessoryView", false))
     {
         setAccessoryView (stringProperty (settings, "accessoryViewName", EL_VIEW_GRAPH_MIXER));
@@ -457,9 +458,15 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
     {
         setShowAccessoryView (false);
     }
-    
-    setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));    
+   #endif
+
+    setVirtualKeyboardVisible (booleanProperty (settings, "virtualKeyboard", false));
+   
+   #if defined (EL_PRO) || defined (EL_SOLO) 
     setNodeChannelStripVisible (booleanProperty (settings, "channelStrip", false));
+   #else
+    setNodeChannelStripVisible (false);
+   #endif
 
     const Node node (getGlobals().getSession()->getCurrentGraph());
     setCurrentNode (node);
@@ -474,15 +481,19 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
         nav->setSize (navSize, getHeight());
         resizerMouseUp();
     }
-   #if EL_PRO
+   #ifdef EL_PRO
     nav->setPanelSize (nav->getSessionPanel(), 20 * 6, false);
    #endif
     nav->setPanelSize (nav->getPluginsPanel(), 20 * 4, false);
 
-   #ifdef EL_FREE
-    setNodeChannelStripVisible (false);
+   #if defined (EL_SOLO) || defined (EL_FREE)
     setShowAccessoryView (false);
    #endif
+
+   #if defined (EL_FREE)
+    setNodeChannelStripVisible (false);
+   #endif
+
     resized();
 }
 

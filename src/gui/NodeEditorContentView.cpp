@@ -100,9 +100,14 @@ namespace Element {
         menuButton.setTriggeredOnMouseDown (true);
         menuButton.onClick = [this]()
         {
+           #if 0
             NodePopupMenu menu (node, [this](NodePopupMenu& nodeMenu) {
                 nodeMenu.addItem (1, "Sticky", true, isSticky());
             });
+           #else
+            PopupMenu menu;
+            menu.addItem (1, "Sticky", true, isSticky());
+           #endif
             
             menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
                 ModalCallbackFunction::forComponent (nodeMenuCallback, this));

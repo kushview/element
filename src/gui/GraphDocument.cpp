@@ -21,7 +21,7 @@ Result GraphDocument::loadDocument (const File& file)
     const auto data = Node::parse (file);
     if (! Node::isProbablyGraphNode (data))
         return Result::fail ("Invalid graph provided");
-    graph = Node (data, true);
+    setGraph (Node (data, true));
     return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
 }
 

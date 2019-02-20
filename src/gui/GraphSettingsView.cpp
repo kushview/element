@@ -283,20 +283,21 @@ namespace Element {
         {
             props.add (new TextPropertyComponent (g.getPropertyAsValue (Slugs::name),
                                                   TRANS("Name"), 256, false));
+           #if defined (EL_PRO)
             props.add (new RenderModePropertyComponent (g));
-           #ifndef EL_FREE
             props.add (new VelocityCurvePropertyComponent (g));
            #endif
 
-           #ifndef EL_FREE
-           
+           #if defined (EL_SOLO) || defined (EL_PRO)
             props.add (new RootGraphMidiChannels (g, getWidth() - 100));
            #else
             props.add (new RootGraphMidiChanel (g));
            #endif
 
+           #if defined (EL_PRO)
             props.add (new MidiProgramPropertyComponent (g));
-            
+           #endif
+
             for (auto* const p : props)
                 maybeLockObject (p, locked);
             
