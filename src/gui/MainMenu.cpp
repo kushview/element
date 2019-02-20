@@ -16,6 +16,7 @@
 #include "Commands.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "Utils.h"
 
 #include "gui/MainMenu.h"
 
@@ -38,7 +39,7 @@ void MainMenu::setupMenu()
 {
    #if JUCE_MAC
     macMenu = new PopupMenu();
-    macMenu->addCommandItem (&cmd, Commands::showAbout, "About Element");
+    macMenu->addCommandItem (&cmd, Commands::showAbout, Util::appName ("About"));
     macMenu->addCommandItem (&cmd, Commands::checkNewerVersion, "Check For Updates...");
     macMenu->addSeparator();
     macMenu->addCommandItem (&cmd, Commands::showPreferences, "Preferences...");

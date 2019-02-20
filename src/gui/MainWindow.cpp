@@ -15,7 +15,7 @@
 namespace Element {
 
 MainWindow::MainWindow (Globals& g)
-    : DocumentWindow ("Element", Colours::darkgrey, DocumentWindow::allButtons, false),
+    : DocumentWindow (Util::appName(), Colours::darkgrey, DocumentWindow::allButtons, false),
       world (g)
 {
     mainMenu.reset (new MainMenu (*this, g.getCommandManager()));
