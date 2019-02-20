@@ -461,7 +461,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('p', ModifierKeys::altModifier | ModifierKeys::commandModifier);
             result.setInfo ("Panic!", "Sends all notes off to the engine", "Engine", 0);
             break;
-            
+
+       #ifdef EL_PRO
         // MARK: Session Commands
         case Commands::sessionClose:
             result.setInfo ("Close Session", "Close the current session", Commands::Categories::Session, 0);
@@ -482,7 +483,25 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Session As", "Save the current session with a new name", Commands::Categories::Session, 0);
             break;
+        case Commands::sessionAddGraph:
+            result.addDefaultKeypress ('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
+            result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::Session, 0);
+            break;
+        case Commands::sessionDuplicateGraph:
+            result.addDefaultKeypress ('d', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
+            result.setInfo ("Duplicate current graph", "Duplicates the currently active graph", Commands::Categories::Session, 0);
+            break;
+        case Commands::sessionDeleteGraph:
+            result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
+            result.setInfo ("Delete current graph", "Deletes the current graph", Commands::Categories::Session, 0);
+            break;
+        case Commands::sessionInsertPlugin:
+            result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
+            result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::Session, Info::isDisabled);
+            break;
+       #endif
 
+       #ifndef EL_PRO
         // MARK: Graph Commands
         case Commands::graphNew:
             result.addDefaultKeypress ('n', ModifierKeys::commandModifier);
@@ -500,24 +519,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Graph As", "Save the current session with a new name", Commands::Categories::Session, 0);
             break;
+       #endif
 
-        case Commands::sessionAddGraph:
-            result.addDefaultKeypress ('n', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Add graph", "Add a new graph to the session", Commands::Categories::Session, 0);
-            break;
-        case Commands::sessionDuplicateGraph:
-            result.addDefaultKeypress ('d', ModifierKeys::shiftModifier | ModifierKeys::commandModifier);
-            result.setInfo ("Duplicate current graph", "Duplicates the currently active graph", Commands::Categories::Session, 0);
-            break;
-        case Commands::sessionDeleteGraph:
-            result.addDefaultKeypress (KeyPress::backspaceKey, ModifierKeys::commandModifier);
-            result.setInfo ("Delete current graph", "Deletes the current graph", Commands::Categories::Session, 0);
-            break;
-        case Commands::sessionInsertPlugin:
-            result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Insert plugin", "Add a plugin in the current graph", Commands::Categories::Session, Info::isDisabled);
-            break;
-            
         // MARK: Media Commands
         case Commands::mediaNew:
             result.setInfo ("New Media", "Close the current media", Commands::Categories::Session, 0);
@@ -537,7 +540,7 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Save Media As", "Saves the current object with another name", Commands::Categories::Session, 0);
             break;
             
-            // MARK: Show Commands
+        // MARK: Show Commands
         case Commands::showPreferences:
             result.setInfo ("Show Preferences", "Element Preferences", Commands::Categories::Application, 0);
             result.addDefaultKeypress (',', ModifierKeys::commandModifier);

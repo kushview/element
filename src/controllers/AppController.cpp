@@ -313,7 +313,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::signIn,
         Commands::signOut,
-        
+       #ifdef EL_PRO
         Commands::sessionNew,
         Commands::sessionSave,
         Commands::sessionSaveAs,
@@ -322,7 +322,7 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::sessionDuplicateGraph,
         Commands::sessionDeleteGraph,
         Commands::sessionInsertPlugin,
-        
+       #endif
         Commands::importGraph,
         Commands::exportGraph,
         Commands::panic,
@@ -331,10 +331,12 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         
         Commands::transportPlay,
 
+       #ifndef EL_PRO
         Commands::graphNew,
         Commands::graphOpen,
         Commands::graphSave,
         Commands::graphSaveAs
+       #endif
     });
     cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
