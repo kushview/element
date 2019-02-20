@@ -115,12 +115,14 @@ public:
 
     Signal<void()> refreshed;
 
+    void dump();
 private:
     friend class Thread;
     static const char* propsKey;
     static const char* fullKey;
     static const char* priceIdKey;
     static const char* trialKey;
+    static const char* soloKey;
     
     Atomic<int> cancelled { 0 };
     Settings& settings;
@@ -130,21 +132,6 @@ private:
     void run() override;
     void timerCallback() override;
     void loadProps();
-    
-    inline void dump()
-    {
-       #if EL_DEBUG_LICENSE
-        DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
-        DBG("[EL] isTrial(): " << ((bool)isTrial() ? "yes" : "no"));
-        DBG("[EL] getLicenseKey(): " << getLicenseKey());
-        DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
-        DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
-        DBG("[EL] getProperty('price_id')  " << (int) getProperty ("price_id"));
-        DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
-        DBG(props.toXmlString());
-       #endif
-    }
-
 };
 
 }
