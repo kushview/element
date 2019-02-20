@@ -476,7 +476,7 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
-               extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;  &lt;dict&gt;&#10;    &#10;&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;&lt;dict&gt;&#10;    &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;    &lt;true/&gt;&#10;&lt;/dict&gt;&#10;&#10;  &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
+               extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;CFBundleDisplayName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_DISPLAY_NAME)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleIdentifier&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_IDENTIFIER)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_NAME)&lt;/string&gt;&#10;        &lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                documentExtensions="elc,elg,els" vstLegacyFolder="../libs/vstsdk2.4"
                vst3Folder="../libs/vst3sdk">
       <CONFIGURATIONS>
@@ -485,26 +485,16 @@
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"
                        customXcodeFlags="ONLY_ACTIVE_ARCH=YES"/>
-        <CONFIGURATION name="Debug32" osxCompatibility="10.8 SDK" osxArchitecture="32BitUniversal"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
+        <CONFIGURATION name="DebugLite" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element Lite" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugFree" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1" enablePluginBinaryCopyStep="1"
+                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element Lite&quot;,BUNDLE_NAME=&quot;Element Lite&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLite&quot; "/>
+        <CONFIGURATION name="DebugSolo" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
+                       isDebug="1" optimisation="1" targetName="Element Solo" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_FREE=1&#10;" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugLocal" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugNoUnlocking" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" enablePluginBinaryCopyStep="1"/>
-        <CONFIGURATION name="DebugCI" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
-                       cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_CI_AUTH=1" enablePluginBinaryCopyStep="1"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SOLO=1" enablePluginBinaryCopyStep="1"
+                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element Solo&quot;,BUNDLE_NAME=&quot;Element Solo&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementSolo&quot; "/>
         <CONFIGURATION name="Release" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
@@ -516,6 +506,12 @@
                        binaryPath="../build/ReleaseFree" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_FREE=1&#10;"
+                       fastMath="0" enablePluginBinaryCopyStep="1"/>
+        <CONFIGURATION name="ReleaseSolo" osxCompatibility="10.8 SDK" osxArchitecture="64BitUniversal"
+                       isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
+                       binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
+                       libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1"
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
