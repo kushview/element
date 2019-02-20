@@ -70,6 +70,26 @@
             "problemMatcher": [ ]
         },
         {
+            "label": "Waf Configure Element Pro (Local Auth)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-python",
+                "--enable-local-auth"
+            ],
+            "options": {
+                
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": [ ]
+        },
+        {
             "label": "Waf Configure w/ Docking",
             "type": "shell",
             "command": "python",
@@ -114,6 +134,25 @@
                 "configure",
                 "--debug",
                 "--enable-solo"
+            ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Waf Configure Element Solo (Local Auth)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-solo",
+                "--enable-local-auth"
             ],
             "options": {
                 "env": {
