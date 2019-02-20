@@ -855,21 +855,22 @@ void GuiController::toggleAboutScreen()
 {
     if (! about)
     {
-        about = new AboutComponent();
-        about->centreWithSize (about->getWidth(), about->getHeight());
+        about = new AboutDialog (*this);
     }
 
     jassert (about);
 
-    if (about->isVisible())
+    if (about->isOnDesktop())
     {
-        about->setVisible (false);
         about->removeFromDesktop();
+        about->setVisible (false);
     }
     else
     {
+        about->addToDesktop();
+        about->centreWithSize (500, 280);
         about->setVisible (true);
-        about->addToDesktop (0);
+        about->toFront (true);
        #if EL_RUNNING_AS_PLUGIN
         about->setAlwaysOnTop (true);
        #endif

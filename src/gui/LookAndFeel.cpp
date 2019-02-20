@@ -72,6 +72,9 @@ LookAndFeel::LookAndFeel()
     setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
     setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
     setColour (Slider::textBoxTextColourId,         findColour (TextEditor::textColourId));
+
+    // Hyperlink button
+    setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
 }
 
 

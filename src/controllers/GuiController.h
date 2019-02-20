@@ -125,7 +125,7 @@ namespace Element {
         ScopedPointer<WindowManager>     windowManager;
         ScopedPointer<MainWindow>        mainWindow;
         ScopedPointer<ContentComponent>  content;
-        ScopedPointer<AboutComponent>    about;
+        ScopedPointer<DialogWindow>      about;
         
         Node selectedNode; // TODO: content manager
 

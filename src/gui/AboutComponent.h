@@ -1,70 +1,144 @@
-/*
-  ==============================================================================
-
-  This is an automatically generated GUI class created by the Projucer!
-
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
-
-  Created with Projucer version: 5.4.2
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
-
-  ==============================================================================
-*/
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
+#include "controllers/GuiController.h"
+#include "gui/LookAndFeel.h"
+#include "session/CommandManager.h"
+#include "Commands.h"
+#include "Globals.h"
+
 namespace Element {
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Introjucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
-class AboutComponent  : public Component
+class AboutComponent    : public Component
 {
 public:
-    //==============================================================================
-    AboutComponent ();
-    ~AboutComponent();
+    AboutComponent()
+    {
+        bool showPurchaseButton = false;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    //[/UserMethods]
+        addAndMakeVisible (titleLabel);
+        titleLabel.setJustificationType (Justification::centred);
+        titleLabel.setFont (Font (35.0f, Font::FontStyleFlags::bold));
 
-    void paint (Graphics& g) override;
-    void resized() override;
-    void mouseDown (const MouseEvent& e) override;
+        auto buildDate = Time::getCompilationDate();
+        addAndMakeVisible (versionLabel);
+        versionLabel.setText ("Element v" + JUCEApplication::getInstance()->getApplicationVersion()
+                              + "\nBuild date: " + String (buildDate.getDayOfMonth())
+                                                 + " " + Time::getMonthName (buildDate.getMonth(), true)
+                                                 + " " + String (buildDate.getYear()),
+                              dontSendNotification);
 
+        versionLabel.setJustificationType (Justification::centred);
+        
+        addAndMakeVisible (copyrightLabel);
+        copyrightLabel.setJustificationType (Justification::centred);
+        copyrightLabel.setFont (Font (11.f));
 
+        addAndMakeVisible (aboutButton);
+        aboutButton.setTooltip ({});
+        aboutButton.setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
+
+        if (showPurchaseButton)
+        {
+            addAndMakeVisible (licenseButton);
+
+            licenseButton.onClick = []
+            {
+                DBG("license button clicked");
+            };
+        }
+
+        setSize (500, 280);
+    }
+
+    void resized() override
+    {
+        auto bounds = getLocalBounds();
+        bounds.removeFromBottom (20);
+
+        auto rightSlice  = bounds.removeFromRight (150);
+        auto leftSlice   = bounds.removeFromLeft (150);
+        auto centreSlice = bounds;
+
+        rightSlice.removeFromRight (20);
+        auto iconSlice = rightSlice.removeFromRight (100);
+        huckleberryLogoBounds = iconSlice.removeFromBottom (100).toFloat();
+
+        elementLogoBounds = leftSlice.removeFromTop (150).toFloat();
+        elementLogoBounds.setWidth (elementLogoBounds.getWidth() + 100);
+        elementLogoBounds.setHeight (elementLogoBounds.getHeight() + 100);
+
+        copyrightLabel.setBounds (leftSlice.removeFromBottom (20));
+
+        auto titleHeight = 40;
+
+        centreSlice.removeFromTop ((centreSlice.getHeight() / 2) - (titleHeight / 2));
+
+        titleLabel.setBounds (centreSlice.removeFromTop (titleHeight));
+
+        centreSlice.removeFromTop (10);
+        versionLabel.setBounds (centreSlice.removeFromTop (40));
+
+        centreSlice.removeFromTop (10);
+
+        if (licenseButton.isShowing())
+            licenseButton.setBounds (centreSlice.removeFromTop (25).reduced (25, 0));
+
+        aboutButton.setBounds (centreSlice.removeFromBottom (20));
+    }
+
+    void paint (Graphics& g) override
+    {
+        g.fillAll (findColour (DocumentWindow::backgroundColourId));
+
+        // if (elementLogo != nullptr)
+        //     elementLogo->drawWithin (g, elementLogoBounds.translated (-75, -75), RectanglePlacement::centred, 1.0);
+
+        if (huckleberryLogo != nullptr)
+            huckleberryLogo->drawWithin (g, huckleberryLogoBounds, RectanglePlacement::centred, 1.0);
+    }
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-    //[/UserVariables]
+    Label titleLabel { "title", "ELEMENT" },
+          versionLabel { "version" },
+          copyrightLabel { "copyright", String (CharPointer_UTF8 ("\xc2\xa9")) + String (" 2019 Kushview, LLC.") };
 
-    //==============================================================================
-    std::unique_ptr<Label> label;
-    std::unique_ptr<Label> label2;
+    HyperlinkButton aboutButton { "About Us", URL ("https://kushview.net") };
+    TextButton licenseButton { "Purchase License" };
 
+    Rectangle<float> huckleberryLogoBounds, elementLogoBounds;
 
-    //==============================================================================
+    std::unique_ptr<Drawable> elementLogo { Drawable::createFromImageData (BinaryData::ElementIcon_png,
+                                                                           BinaryData::ElementIcon_pngSize) };
+
+    std::unique_ptr<Drawable> huckleberryLogo { Drawable::createFromImageData (BinaryData::ElementIcon_png,
+                                                                               BinaryData::ElementIcon_pngSize) };
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AboutComponent)
 };
 
-//[EndFile] You can add extra defines here...
-} /* namespace Element */
-//[/EndFile]
+class AboutDialog : public DialogWindow
+{
+public:
+    AboutDialog (GuiController& g)
+        : DialogWindow ("About Element", 
+            g.getLookAndFeel().findColour (DocumentWindow::backgroundColourId),
+            true, false),
+          gui (g)
+    {
+        setUsingNativeTitleBar (true);
+        setContentOwned (new AboutComponent(), true);
+    }
 
+    void closeButtonPressed() override
+    {
+        gui.getWorld().getCommandManager().invokeDirectly (
+            Commands::showAbout, true);
+    }
+
+private:
+    GuiController& gui;
+};
+
+}
