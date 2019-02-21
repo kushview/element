@@ -33,9 +33,9 @@ inline static String appName (const String& beforeText = String())
         name = "Element";
    
    #if defined (EL_FREE)
-    name << " Lite";
+    name << " LT";
    #elif defined (EL_SOLO)
-    name << " Solo";
+    name << " SE";
    #endif
 
     return name;
