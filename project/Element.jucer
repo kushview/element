@@ -488,7 +488,7 @@
         <CONFIGURATION name="DebugLT" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element LT" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1" enablePluginBinaryCopyStep="1"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1" enablePluginBinaryCopyStep="1"
                        customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "/>
         <CONFIGURATION name="DebugSE" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element SE" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
@@ -505,7 +505,7 @@
                        isDebug="0" optimisation="2" targetName="Element LT" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "/>
         <CONFIGURATION name="ReleaseSE" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element SE" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
@@ -565,12 +565,12 @@
         <CONFIGURATION name="DebugLT" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element LT" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2"
                        binaryPath="../build/x64/DebugLT" characterSet="MultiByte" useRuntimeLibDLL="1"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1" debugInformationFormat="ProgramDatabase"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1" debugInformationFormat="ProgramDatabase"
                        enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="ReleaseLT" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element LT" binaryPath="../build/x64/ReleaseLT"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
         <CONFIGURATION name="DebugSE" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
