@@ -16,8 +16,6 @@ class AboutComponent    : public Component
 public:
     AboutComponent()
     {
-        bool showPurchaseButton = false;
-
         addAndMakeVisible (titleLabel);
         titleLabel.setJustificationType (Justification::centred);
         titleLabel.setFont (Font (32.0f, Font::FontStyleFlags::bold));
@@ -41,13 +39,13 @@ public:
         aboutButton.setTooltip ({});
         aboutButton.setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
 
-        if (showPurchaseButton)
+        if (showPurchaseButton())
         {
             addAndMakeVisible (licenseButton);
-
-            licenseButton.onClick = []
+            licenseButton.onClick = [this]
             {
-                DBG("license button clicked");
+                const URL url (getPurchaseURL());
+                url.launchInDefaultBrowser();
             };
         }
 
@@ -84,7 +82,7 @@ public:
 
         centreSlice.removeFromTop (10);
 
-        if (licenseButton.isShowing())
+        if (licenseButton.isVisible())
             licenseButton.setBounds (centreSlice.removeFromTop (25).reduced (25, 0));
 
         aboutButton.setBounds (centreSlice.removeFromBottom (20));
@@ -99,6 +97,19 @@ public:
 
         if (huckleberryLogo != nullptr)
             huckleberryLogo->drawWithin (g, huckleberryLogoBounds, RectanglePlacement::centred, 1.0);
+    }
+
+    inline bool showPurchaseButton() const
+    {
+        #if defined (EL_FREE)
+         return true;
+        #endif
+        return false;
+    }
+
+    inline URL getPurchaseURL() const 
+    {
+        return URL ("https://kushview.net/element/purchase/");
     }
 
 private:

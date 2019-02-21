@@ -10,6 +10,8 @@
 
 namespace Element {
 
+#if ! defined (EL_FREE)
+
 class MidiInputDeviceNodeTest : public UnitTestBase
 {
 public:
@@ -80,5 +82,7 @@ protected:
 };
 
 static MidiInputDeviceNodeTest sMidiInputDeviceTest;
+
+#endif
 
 }

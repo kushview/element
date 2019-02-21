@@ -418,10 +418,15 @@ ApplicationCommandTarget* GuiController::getNextCommandTarget()
 void GuiController::getAllCommands (Array <CommandID>& commands)
 {
     commands.addArray ({
-       #ifdef EL_PRO
+       #if defined (EL_PRO)
         Commands::showSessionConfig,
         Commands::showGraphMixer,
        #endif
+       
+       #if defined (EL_SOLO) || defined (EL_PRO)
+        Commands::toggleChannelStrip,
+       #endif
+
         Commands::showAbout,
 		Commands::showPluginManager,
 		Commands::showPreferences,
@@ -435,8 +440,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
-        Commands::toggleUserInterface,
-        Commands::toggleChannelStrip
+        Commands::toggleUserInterface
+
     });
     
     commands.add (Commands::quit);
@@ -615,7 +620,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Show/Hide UI", "Toggles visibility of the user interface", 
                 Commands::Categories::UserInterface, 0);
             break;
-        
+
+       #if defined (EL_PRO) || defined (EL_SOLO)
         case Commands::toggleChannelStrip:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -623,7 +629,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Channel Strip", "Toggles the global channel strip", 
                 Commands::Categories::UserInterface, flags);
         } break;
-
+       #endif
+        
         case Commands::toggleVirtualKeyboard:
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
@@ -778,10 +785,14 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
 
         case Commands::toggleChannelStrip: {
+           #if defined (EL_PRO) || defined (EL_SOLO)
             const bool wasHidden = ! content->isNodeChannelStripVisible();
             content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
             if (wasHidden && ! (bool) getWorld().getUnlockStatus().isFullVersion())
                 Alert::showProductLockedAlertAsync (String(), "Channel Strip Unavailable");
+           #else
+            content->setNodeChannelStripVisible (false);
+           #endif
         } break;
 
         case Commands::showLastContentView:

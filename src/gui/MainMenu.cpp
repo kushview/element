@@ -185,7 +185,7 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
 
 void MainMenu::buildFileMenu (PopupMenu& menu)
 {
-   #if defined (EL_SOLO)
+   #if defined (EL_SOLO) || defined (EL_FREE)
     menu.addCommandItem (&cmd, Commands::graphNew, "New Graph");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
@@ -200,11 +200,9 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
     addRecentFiles (menu);
     menu.addCommandItem (&cmd, Commands::sessionSave, "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
-   #ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-   #endif
    #endif
 
    #if ! JUCE_MAC
@@ -314,7 +312,9 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();
+   #if defined (EL_SOLO)
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
+   #endif
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");

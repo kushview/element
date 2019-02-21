@@ -124,6 +124,13 @@ public:
         mapButton.addListener (this);
         addAndMakeVisible (mapButton);
         addAndMakeVisible (midiBlinker);
+
+       #if defined (EL_FREE)
+        mapButton.setEnabled (false);
+        mapButton.setVisible (false);
+        transport.setEnabled (false);
+        transport.setVisible (false);
+       #endif
     }
     
     ~Toolbar()
@@ -254,6 +261,7 @@ public:
         }
         else if (btn == &mapButton)
         {
+           #if defined (EL_PRO) || defined (EL_SOLO)
             if ((bool) status.isFullVersion())
             {
                 if (auto* mapping = owner.getAppController().findChild<MappingController>())
@@ -265,11 +273,13 @@ public:
                     }
                 }
             }
+           #endif
         }
     }
 
     void timerCallback() override
     {
+       #if defined (EL_PRO) || defined (EL_SOLO)
         if (auto* mapping = owner.getAppController().findChild<MappingController>())
         {
             if (! mapping->isLearning())
@@ -278,6 +288,9 @@ public:
                 stopTimer();
             }
         }
+       #else
+        stopTimer();
+       #endif
     }
 
 private:
