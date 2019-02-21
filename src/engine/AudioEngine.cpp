@@ -136,7 +136,7 @@ struct RootGraphRender : public AsyncUpdater
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
-       #ifndef EL_FREE
+       #if defined (EL_PRO)
         if (program.wasRequested())
         {
             if (! locked)
@@ -271,7 +271,7 @@ struct RootGraphRender : public AsyncUpdater
             MidiMessage msg; int frame = 0;
             
             // setup a program change if present
-           #ifndef EL_FREE
+           #if defined (EL_PRO)
             while (iter.getNextEvent (msg, frame) && frame < numSamples)
             {
                 if (! msg.isProgramChange())
@@ -500,7 +500,7 @@ public:
 
         if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
-           #ifndef EL_FREE
+           #if defined (EL_PRO)
             if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
             {
                 midiClockMaster.setTempo (transport.getTempo());
@@ -530,7 +530,7 @@ public:
 
         if (shouldProcess)
         {
-           #ifndef EL_FREE
+           #if defined (EL_PRO)
             if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
             {
                 midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));

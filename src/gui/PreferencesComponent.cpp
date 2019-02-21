@@ -282,7 +282,9 @@ namespace Element {
             clockSourceLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (clockSourceBox);
             clockSourceBox.addItem ("Internal", ClockSourceInternal);
+           #if defined (EL_PRO)
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
+           #endif
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
 
             addAndMakeVisible (checkForUpdatesLabel);
@@ -361,6 +363,7 @@ namespace Element {
             defaultSessionClearButton.addListener (this);
            #endif
 
+           #if defined (EL_PRO)
             if (status.isFullVersion())
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
@@ -369,6 +372,7 @@ namespace Element {
                 clockSource.addListener (this);
             }
             else
+           #endif
             {
                 clockSource.setValue ((int) ClockSourceInternal);
                 clockSourceBox.setEnabled (false);
@@ -576,7 +580,7 @@ namespace Element {
             addAndMakeVisible (midiOutput);
             midiOutput.addListener (this);
 
-           #ifndef EL_FREE
+           #if defined (EL_PRO)
             addAndMakeVisible (generateClockLabel);
             generateClockLabel.setFont (Font (12.0, Font::bold));
             generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
@@ -626,7 +630,7 @@ namespace Element {
             auto r2 = r.removeFromTop (settingHeight);
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
-           #ifndef EL_FREE
+           #if defined (EL_PRO)
             layoutSetting (r, generateClockLabel, generateClock);
             layoutSetting (r, sendClockToInputLabel, sendClockToInput);
            #endif
