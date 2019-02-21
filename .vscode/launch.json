@@ -83,49 +83,6 @@
                     }
                 ]
             }
-        },
-        {
-            "name": "Docking Example",
-            "type": "cppdbg",
-            "request": "launch",
-            "args": [],
-            "program": "${workspaceRoot}/libs/kv/extras/Docking/Builds/MacOSX/build/Debug",
-            "cwd": "${workspaceRoot}/libs/kv/extras/Docking/Builds/MacOSX/build/Debug",
-            "environment": [{ "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }],
-            "externalConsole": false,
-            "stopAtEntry": false,
-            "preLaunchTask": "Build Docking Example",
-            "linux": {
-                "MIMode": "gdb",
-                "program": "${workspaceRoot}/build/bin/element",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ]
-            },
-            "osx": {
-                "MIMode": "lldb",
-                "name": "Docking Example",
-                "program": "${workspaceRoot}/libs/kv/extras/Docking/Builds/MacOSX/build/Debug/Docking.app/Contents/MacOS/Docking",
-                "logging": {
-                    "moduleLoad": false,
-                    "exceptions": false,
-                }
-            },
-            "windows": {
-                "MIMode": "gdb",
-                "setupCommands": [
-                    {
-                        "description": "Enable pretty-printing for gdb",
-                        "text": "-enable-pretty-printing",
-                        "ignoreFailures": true
-                    }
-                ],
-                "program": "${workspaceRoot}/build/Element.exe",
-            },
         }
     ]
 }
