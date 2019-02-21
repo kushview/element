@@ -53,6 +53,15 @@ def configure_product (conf):
         conf.env.EL_FREE = False
         conf.env.EL_PRO  = True
 
+def configure_product_name (conf):
+    if conf.options.enable_free: 
+        return "Element LT"
+    if conf.options.enable_solo: 
+        return "Element SE"
+    if not conf.options.enable_free and not conf.options.enable_solo:
+        return "Element Pro"
+    return "Element"
+
 def configure (conf):
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     
@@ -103,18 +112,15 @@ def configure (conf):
 
     print
     juce.display_header ("Element Configuration")
-    juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
-    juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
-
-    juce.display_msg (conf, "Element Lite", conf.env.EL_FREE)
-    juce.display_msg (conf, "Element Solo", conf.env.EL_SOLO)
-    juce.display_msg (conf, "Element Pro",  conf.env.EL_PRO)
+    juce.display_msg (conf, "Product", configure_product_name (conf))
     juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
     juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
     juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)
     juce.display_msg (conf, "Python", conf.options.enable_python)
-
+    print
+    juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
+    juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
+    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
     print
     juce.display_header ("Compiler")
     juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
