@@ -108,6 +108,25 @@
             "problemMatcher": []
         },
         {
+            "label": "Waf Configure Pro Docking (LocalAuth)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--debug",
+                "--enable-docking",
+                "--enable-local-auth"
+            ],
+            "options": {
+                "env": {
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Waf Configure Element Lite",
             "type": "shell",
             "command": "python",
