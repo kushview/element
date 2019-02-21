@@ -23,7 +23,8 @@
                 "EL_DOCKING=1",
                 "KV_DOCKING_WINDOWS=1",
                 "HAVE_PYTHON=1",
-                "EL_SOLO=1"
+                "EL_PRO=1",
+                "EL_USE_LOCAL_AUTH=1"
             ],
             "forcedInclude": [
                 "${workspaceRoot}/.vscode/vscode.h"
