@@ -17,6 +17,7 @@
 #include "session/Session.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element 
 {
@@ -50,6 +51,12 @@ namespace Element
             world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine()));
             app.reset (new AppController (*world));
             app->activate();
+            auto& settings = getWorld().getSettings();
+            PropertiesFile::Options opts = settings.getStorageParameters();
+            opts.applicationName = "ElementTests";
+            settings.setStorageParameters (opts);
+            settings.setCheckForUpdates (false);
+            settings.saveIfNeeded();
         }
 
         void shutdownWorld()

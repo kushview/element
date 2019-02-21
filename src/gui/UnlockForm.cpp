@@ -79,6 +79,11 @@ struct UnlockForm::OverlayComp  : public Component,
     {
         clearLicense();
         StringPairArray params;
+        #if defined (EL_PRO)
+         params.set ("price_id", String (EL_PRO_PRICE_ID));
+        #elif defined (EL_SOLO)
+         params.set ("price_id", String (EL_SOLO_PRICE_ID));
+        #endif
         switch (action)
         {
             case Deactivate:
@@ -89,7 +94,6 @@ struct UnlockForm::OverlayComp  : public Component,
                 if (deactivateOthers)
                     params.set ("deactivate_others", "1");
                 result = form.status.activateLicense (license, {}, {}, params);
-                
             } break;
             case Check:
                 result = form.status.checkLicense (license);

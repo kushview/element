@@ -4,43 +4,8 @@
 #include "Settings.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
-#undef EL_DEBUG_LICENSE
-#define EL_DEBUG_LICENSE 1
 
-#if EL_USE_LOCAL_AUTH
- // Element Pro
- #define EL_PRODUCT_ID "19"
- #define EL_PRO_PRICE_ID 1
- #define EL_TRIAL_PRICE_ID 2
- #define EL_SOLO_PRICE_ID 3
 
- #define EL_BASE_URL "http://local.kushview.net"
-  #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
-  #define EL_PUBKEY "3,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
-  #define EL_PRIVKEY "4e290ea703612261cb143aaaad7e2be03282bec968eea82b7d064226e66321ab,753d95fa8511b392b09e5800043d41d1a7b2d330705f5714dcf2b31c8e22a7e9"
-  #define EL_LICENSE_1 "2de310c8ef18a6f6da40270399cc13f6" // Trial
-  #define EL_LICENSE_2 ""
-  #define EL_LICENSE_3 ""
-  #define EL_LICENSE_4 ""
-
-#elif EL_USE_CI_AUTH
- #define EL_PRODUCT_ID "12"
- #define EL_TRIAL_PRICE_ID 2
- #define EL_PRO_PRICE_ID 1
- #define EL_BASE_URL "https://ci.kushview.net"
- #define EL_AUTH_URL EL_BASE_URL "/edd-cp"
- #define EL_PUBKEY "5,7bc48fe0cef16975604686123c4b8c9f597b8d62b839e14f6300e632f993d613c406c068ecccd912c845ab314574ae727d55ef1ce8257e6d6dfd239a1cf5831753632a8eb9615d1033264e132edfcf537bc1e643288f45138e364fb2e2afe91c43ceaf929209d3d26428f6f276242b8505e63a923702f3990000fa043a324473"
-
-#else
- #define EL_PUBKEY_ENCODED 1
- #define EL_PRO_PRICE_ID 1
- #define EL_TRIAL_PRICE_ID 2
- #define EL_SOLO_PRICE_ID 3
-
- #define EL_PRODUCT_ID "20"
- #define EL_BASE_URL "https://kushview.net"
- #define EL_AUTH_URL EL_BASE_URL "/products/authorize"
-#endif
 
 namespace Element {
 
@@ -173,7 +138,7 @@ namespace Element {
         props = ValueTree (propsKey);
         const var full (EL_PRO_PRICE_ID); 
         const var trial (EL_TRIAL_PRICE_ID);
-        const var solo (EL_TRIAL_PRICE_ID);
+        const var solo (EL_SOLO_PRICE_ID);
         const var zero (0);
 
        #if defined (EL_PRO)
