@@ -6,10 +6,12 @@
 #include "gui/ControllerMapsView.h"
 #include "gui/NodeMidiContentView.h"
 #include "gui/NodeEditorContentView.h"
+#include "session/Node.h"
 #include "DataPath.h"
 
 namespace Element {
 
+#if 1
 class ElementsNavigationPanel : public SessionGraphsListBox
 {
 public:
@@ -195,6 +197,7 @@ public:
             bool selected = false;
         };
 };
+#endif
 
 class DataPathTreeComponent : public Component,
                               public FileBrowserListener,
@@ -371,6 +374,14 @@ public:
         setLookAndFeel (nullptr);
     }
     
+    inline Component* findPanelByName (const String& name)
+    {
+        for (int i = 0; i < getNumPanels(); ++i)
+            if (getPanel(i)->getName() == name)
+                return getPanel(i);
+        return 0;
+    }
+
     inline void saveState (PropertiesFile* props)
     {
         ValueTree state (Tags::state);
@@ -386,6 +397,7 @@ public:
             if (auto* ned = dynamic_cast<NodeEditorContentView*> (panel))
             {
                 item.setProperty ("sticky", ned->isSticky(), nullptr);
+                item.setProperty ("stickyNode", ned->getNode().getUuidString(), nullptr);
             }
 
             state.addChild (item, -1, 0);
@@ -395,14 +407,6 @@ public:
             props->setValue ("ccNavPanel", xml);
     }
     
-    Component* findPanelByName (const String& name)
-    {
-        for (int i = 0; i < getNumPanels(); ++i)
-            if (getPanel(i)->getName() == name)
-                return getPanel(i);
-        return 0;
-    }
-
     void restoreState (PropertiesFile* props)
     {
         if (auto* xml = props->getXmlValue ("ccNavPanel"))
@@ -417,6 +421,10 @@ public:
                     if (auto* ned = dynamic_cast<NodeEditorContentView*> (c))
                     {
                         ned->setSticky ((bool) item.getProperty ("sticky", true));
+                        Uuid nid (item.getProperty ("stickyNode").toString());
+                        Node node = globals.getSession()->findNodeById (nid);
+                        if (node.isValid())
+                            ned->setNode (node);
                     }
                 }
             }
@@ -486,7 +494,6 @@ public:
         addPanelInternal (-1, dp, "User Data Path", new UserDataPathHeader (*this, *dp));
     }
     
-    ElementsNavigationPanel* getGraphsPanel()       { return findPanel<ElementsNavigationPanel>(); }
     AudioIOPanelView* getAudioIOPanel()             { return findPanel<AudioIOPanelView>(); }
     PluginsPanelView* getPluginsPanel()             { return findPanel<PluginsPanelView>(); }
     DataPathTreeComponent* getUserDataPathPanel()   { return findPanel<DataPathTreeComponent>(); }

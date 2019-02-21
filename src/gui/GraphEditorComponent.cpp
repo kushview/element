@@ -4,6 +4,7 @@
 */
 
 #include "ElementApp.h"
+#include "controllers/GraphController.h"
 #include "controllers/GraphManager.h"
 
 #include "gui/GuiCommon.h"
@@ -231,6 +232,8 @@ public:
         setBufferedToImage (true);
         nodeEnabled = node.getPropertyAsValue (Tags::enabled);
         nodeEnabled.addListener (this);
+        nodeName    = node.getPropertyAsValue (Tags::name);
+        nodeName.addListener (this);
 
        #if EL_USE_PIG_WHIP
         addAndMakeVisible (pigWhip);
@@ -260,12 +263,16 @@ public:
     ~FilterComponent() noexcept
     {
         nodeEnabled.removeListener (this);
+        nodeName.removeListener (this);
         deleteAllPins();
     }
 
     void valueChanged (Value& value) override
     {
         if (nodeEnabled.refersToSameSourceAs (value)) {
+            repaint();
+        } else if (nodeName.refersToSameSourceAs (value)) {
+            setName (node.getName());
             repaint();
         }
     }
@@ -640,6 +647,8 @@ public:
 private:
     Node graph;
     Node node;
+    Value nodeName;
+
     int numInputs, numOutputs;
     double relativeX = 0.5f;
     double relativeY = 0.5f;
@@ -1452,7 +1461,20 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
                 file.hasFileExtension ("elpreset"))
             {
                 const Node node (Node::parse (file));
-                if (node.isValid())
+                bool wasHandled = false;
+
+               #if defined (EL_SOLO) || defined (EL_FREE)
+                // SE and LT Should just open graphs instead of trying to embed them
+                if (file.hasFileExtension (".elg"))
+                {
+                    if (auto* cc = ViewHelpers::findContentComponent (this))
+                        if (auto* gc = cc->getAppController().findChild<GraphController>())
+                            gc->openGraph (file);
+                    wasHandled = true;
+                }
+               #endif
+
+                if (! wasHandled && node.isValid())
                 {
                     std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph));
                     auto& builder (message->builder);

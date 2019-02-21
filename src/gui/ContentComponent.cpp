@@ -4,6 +4,7 @@
 */
 
 #include "controllers/AppController.h"
+#include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
 
@@ -567,8 +568,13 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         {
             if (getGlobals().getUnlockStatus().isFullVersion())
             {
+               #if defined (EL_PRO)
                 if (auto* sess = controller.findChild<SessionController>())
                     sess->importGraph (file);
+               #else
+                if (auto* gc = controller.findChild<GraphController>())
+                    gc->openGraph (file);
+               #endif
             }
             else
             {

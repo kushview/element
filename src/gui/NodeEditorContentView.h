@@ -17,6 +17,10 @@ public:
 
     void setSticky (bool shouldBeSticky);
     bool isSticky() const { return sticky; }
+    
+    Node getNode()  const { return node; }
+    void setNode (const Node&);
+    
     void stabilizeContent() override;
     void resized() override;
     void paint (Graphics& g) override;
@@ -34,7 +38,7 @@ private:
     bool sticky = true;
     void clearEditor();
     Component* createEmbededEditor();
-    void setNode (const Node&);
+    
     static void nodeMenuCallback (int, NodeEditorContentView*);
 
     class NodeWatcher; std::unique_ptr<NodeWatcher> watcher;

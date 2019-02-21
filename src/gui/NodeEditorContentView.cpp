@@ -37,6 +37,7 @@ namespace Element {
 
         std::function<void()> onSiblingNodeAdded;
         std::function<void()> onSiblingNodeRemoved;
+        std::function<void()> onNodeNameChanged;
 
     private:
         Node node;
@@ -45,7 +46,10 @@ namespace Element {
         friend class juce::ValueTree;
         void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
         {
-            ignoreUnused (tree, property);
+            if (tree == node.getValueTree() && property == Tags::name) {
+                if (onNodeNameChanged)
+                    onNodeNameChanged();
+            }
         }
 
         void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
@@ -115,6 +119,11 @@ namespace Element {
 
         watcher.reset (new NodeWatcher());
         watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = [this]() {
+            nodesCombo.addNodes (graph);
+        };
+
+        watcher->onNodeNameChanged = [this]()
+        {
             nodesCombo.addNodes (graph);
         };
     }

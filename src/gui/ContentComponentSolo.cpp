@@ -725,8 +725,6 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
     
     if (auto* window = findParentComponentOfClass<DocumentWindow>())
         window->setName ("Element - " + session->getName());
-    if (auto* sp = nav->getGraphsPanel())
-        sp->setSession (session);
     if (auto* ss = nav->findPanel<SessionTreePanel>())
         ss->setSession (session);
     if (auto* mcv = nav->findPanel<NodeMidiContentView>())

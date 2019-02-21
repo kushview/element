@@ -92,9 +92,6 @@ void AppController::run()
     
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
-
-    if (auto* gui = findChild<GuiController>())
-        gui->run();
     
    #if EL_PRO
     if (auto* sc = findChild<SessionController>())
@@ -134,6 +131,7 @@ void AppController::run()
 
     if (auto* gui = findChild<GuiController>())
     {
+        gui->run();
         const Node graph (session->getCurrentGraph());
         gui->stabilizeContent();
         if (graph.isValid())
@@ -198,7 +196,7 @@ void AppController::handleMessage (const Message& msg)
     else if (const auto* aps = dynamic_cast<const AddPresetMessage*> (&msg))
     {
         String name = aps->name;
-        const Node node = aps->node;
+        Node node = aps->node;
         bool canceled = false;
 
         if (name.isEmpty ())
@@ -212,7 +210,10 @@ void AppController::handleMessage (const Message& msg)
         }
 
         if (! canceled)
+        {
             presets->add (node, name);
+            node.setProperty (Tags::name, name);
+        }
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
