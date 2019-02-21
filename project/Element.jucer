@@ -508,7 +508,7 @@
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element Lite&quot;,BUNDLE_NAME=&quot;Element Lite&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLite&quot; "/>
         <CONFIGURATION name="ReleaseSolo" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
-                       isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
+                       isDebug="0" optimisation="2" targetName="Element Solo" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1"
