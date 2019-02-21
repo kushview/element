@@ -47,7 +47,7 @@ namespace Element {
     Node Node::createDefaultGraph (const String& name)
     {
         Node graph (Tags::graph);
-        graph.setProperty (Tags::name, name.isNotEmpty() ? name : "Graph");
+        graph.setProperty (Tags::name, name);
         ValueTree nodes = graph.getNodesValueTree();
 
         const auto types = StringArray ({ "audio.input", "audio.output", "midi.input", "midi.output" });
@@ -244,11 +244,11 @@ namespace Element {
         return false;
     }
     
-    Node Node::createGraph()
+    Node Node::createGraph (const String& name)
     {
         Node node (Tags::graph);
         ValueTree root = node.getValueTree();
-        root.setProperty (Tags::name, "Graph 1", nullptr);
+        root.setProperty (Tags::name, name, nullptr);
         root.getOrCreateChildWithName (Tags::nodes, nullptr);
         root.getOrCreateChildWithName (Tags::arcs, nullptr);
         return node;

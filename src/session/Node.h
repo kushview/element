@@ -92,10 +92,10 @@ namespace Element {
         static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
                                       const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
         
-        static Node createDefaultGraph (const String& name = "Graph");
+        static Node createDefaultGraph (const String& name = String());
 
         /** Creates an empty graph model */
-        static Node createGraph();
+        static Node createGraph (const String& name = String());
         
         /** Returns true if the value tree is probably a graph node */
         static bool isProbablyGraphNode (const ValueTree& data);

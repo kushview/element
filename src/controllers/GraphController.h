@@ -17,7 +17,8 @@ public:
     void activate() override;
     void deactivate() override;
 
-    bool hasGraphChanged() const { return document.hasChangedSinceSaved(); }
+    bool hasGraphChanged() const        { return document.hasChangedSinceSaved(); }
+    const File getGraphFile() const     { return document.getFile(); }
 
     void openDefaultGraph();
     void openGraph (const File& file);

@@ -74,6 +74,7 @@ void GraphController::newGraph()
         getWorld().getSession()->clear();
         auto newGraph = Node::createDefaultGraph();
         document.setGraph (newGraph);
+        document.setFile (File());
         getWorld().getSession()->addGraph (document.getGraph(), true);
         refreshOtherControllers();
         findSibling<GuiController>()->stabilizeContent();

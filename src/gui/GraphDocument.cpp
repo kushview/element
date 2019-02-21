@@ -27,13 +27,17 @@ Result GraphDocument::loadDocument (const File& file)
 
 Result GraphDocument::saveDocument (const File& file)
 {
-    if (! graph.isGraph()) {
+    if (! graph.isGraph())
+    {
         DBG(graph.getValueTree().toXmlString());
         return Result::fail ("No graph is loaded");
-    
     }
+
+    graph.savePluginState();
+    
     if (graph.writeToFile (file))
         return Result::ok();
+
     return Result::fail ("Could not write graph to file");
 }
 

@@ -3,8 +3,8 @@
     Copyright (C) 2016-2019 Kushview, LLC.  All rights reserved.
 */
 
-#include "controllers/AppController.h"
-#include "controllers/AppController.h"
+#include "controllers/GraphController.h"
+#include "controllers/SessionController.h"
 #include "gui/ContentComponent.h"
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
@@ -47,11 +47,11 @@ void MainWindow::refreshName()
 void MainWindow::nameChanged()
 {
     String title = Util::appName();
-
+    String sessionName, graphName;
     if (auto session = world.getSession())
     {
-        const auto sessName = session->getName().trim();
-        const auto graphName = session->getCurrentGraph().getName();
+        sessionName     = session->getName().trim();
+        graphName       = session->getCurrentGraph().getName().trim();
        #if defined (EL_PRO)
         if (sessName.isNotEmpty())
             title << " - " << sessName;
@@ -60,6 +60,33 @@ void MainWindow::nameChanged()
        #else
         if (graphName.isNotEmpty())
             title << " - " << graphName;
+       #endif
+    }
+
+    if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
+    {
+       #if defined (EL_PRO)
+        if (auto* const sc = getAppController().findChild<SessionController>())
+        {
+            ignoreUnused (sc); // noop
+        }
+       #else
+        if (auto* const gc = getAppController().findChild<GraphController>())
+        {
+            const auto file = gc->getGraphFile();
+
+            if (graphName.isEmpty())
+            {
+                if (file.existsAsFile())
+                    title << " - " << file.getFileNameWithoutExtension();
+            }
+            else
+            {
+                // SAVEME: Shows file name if title isn't empty and file exists
+                // if (file.existsAsFile())
+                //     title << " (" << file.getFileName() << ")";
+            }
+        }
        #endif
     }
 
