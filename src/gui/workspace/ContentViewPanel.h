@@ -2,6 +2,9 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/workspace/WorkspacePanel.h"
+#include "gui/views/SessionSettingsView.h"
+#include "gui/views/NodeChannelStripView.h"
+#include "gui/views/NodeEditorContentView.h"
 
 namespace Element {
 
@@ -27,6 +30,28 @@ public:
 
 protected:
     ViewType view;
+};
+
+
+class SessionSettingsPanel : public ContentViewPanel<SessionSettingsView>
+{
+public:
+    SessionSettingsPanel() { setName ("Session"); }
+    ~SessionSettingsPanel() = default;
+};
+
+class NodeChannelStripPanel : public ContentViewPanel<NodeChannelStripView>
+{
+public:
+    NodeChannelStripPanel() { setName ("Strip"); }
+    ~NodeChannelStripPanel() = default;
+};
+
+class NodeEditorPanel : public ContentViewPanel<NodeEditorContentView>
+{
+public:
+    NodeEditorPanel() { setName ("Node"); }
+    ~NodeEditorPanel() = default;
 };
 
 }

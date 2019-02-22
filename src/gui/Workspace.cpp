@@ -27,8 +27,12 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
     };
 
     auto* item = dock.createItem (PanelIDs::virtualKeyboard.toString(), DockPlacement::Top);
+    
     dock.createItem (PanelIDs::graphMixer.toString(), DockPlacement::Top);
-    dock.createItem (PanelIDs::graphEditor.toString(), DockPlacement::Top);
+    dock.createItem (PanelIDs::graphEditor.toString(), DockPlacement::Bottom);
+    dock.createItem (PanelIDs::nodeEditor.toString(), DockPlacement::Left);
+    dock.createItem (PanelIDs::nodeChannelStrip.toString(), DockPlacement::Right);
+
     addAndMakeVisible (dock);
     setSize (1280, 640);
 }

@@ -5,6 +5,7 @@
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/GraphEditorPanel.h"
 #include "gui/workspace/GraphMixerPanel.h"
+#include "gui/workspace/ContentViewPanel.h"
 
 namespace Element {
 
@@ -59,6 +60,10 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
         return new GraphMixerPanel();
     if (panelId == PanelIDs::graphEditor)
         return new GraphEditorPanel();
+    if (panelId == PanelIDs::nodeEditor)
+        return new NodeEditorPanel();
+    if (panelId == PanelIDs::nodeChannelStrip)
+        return new NodeChannelStripPanel();
     return nullptr;
 }
 

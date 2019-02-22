@@ -20,5 +20,6 @@ private:
     ScopedPointer<SessionPropertyPanel> props;
     GraphButton graphButton;
 };
-    
+
+typedef SessionContentView SessionSettingsView;
 }

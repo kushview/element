@@ -6,9 +6,13 @@ namespace Element {
 
 namespace PanelIDs
 {
-    static const Identifier virtualKeyboard = "virtualKeyboard";
-    static const Identifier graphMixer      = "graphMixer";
-    static const Identifier graphEditor     = "graphEditor";
+    static const Identifier virtualKeyboard     = "virtualKeyboard";
+    static const Identifier graphMixer          = "graphMixer";
+    static const Identifier graphEditor         = "graphEditor";
+    static const Identifier nodeEditor          = "nodeEditor";
+    static const Identifier sessionSettings     = "sessionSettings";
+    static const Identifier nodeChannelStrip    = "nodeChannelStrip";
+    static const Identifier controllerDevices   = "controllerDevives";
 }
 
 /** A generic panel used for testing and development */
@@ -52,6 +56,16 @@ public:
         type->identifier    = PanelIDs::graphEditor;
         type->name          = "Graph Editor";
         type->description   = "The Graph Editor";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::nodeEditor;
+        type->name          = "Node Editor";
+        type->description   = "The Node Editor";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::nodeChannelStrip;
+        type->name          = "Node Channel Strip";
+        type->description   = "Displays a single channel strip for a given node";
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;
