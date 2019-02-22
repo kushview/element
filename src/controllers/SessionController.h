@@ -17,6 +17,7 @@ public:
     
     void openDefaultSession();
     void openFile (const File& file);
+    const File getSessionFile() const { return document != nullptr ? document->getFile() : File(); }
     void closeSession();
     void saveSession (const bool saveAs = false);
     void newSession();

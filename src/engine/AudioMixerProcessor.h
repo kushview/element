@@ -111,14 +111,15 @@ public:
         while (--numTracks >= 0)
             addStereoTrack();
         setRateAndBufferSizeDetails (sampleRate, bufferSize);
-        addParameter (masterMute = new AudioParameterBool ("masterMute", "Room Size", false));
-        addParameter (masterVolume  = new AudioParameterFloat ("masterVolume",  "Damping", -120.0f, 12.0f, 0.f));
+        addParameter (masterMute = new AudioParameterBool ("masterMute", "Master Mute", false));
+        addParameter (masterVolume  = new AudioParameterFloat ("masterVolume",  "Master Volume", -120.0f, 12.0f, 0.f));
         masterMonitor = new Monitor (-1, 2);
     }
 
     ~AudioMixerProcessor();
 
     inline const String getName() const override { return "Audio Mixer"; }
+
     inline void fillInPluginDescription (PluginDescription& desc) const override
     {
         desc.name = getName();
@@ -141,7 +142,7 @@ public:
     void setTrackGain  (const int track, const float gain);
     void setTrackMuted (const int track, const bool mute);
     bool isTrackMuted  (const int track) const;
-    float getTrackGain  (const int track) const;
+    float getTrackGain (const int track) const;
 
     inline bool acceptsMidi()  const override { return false; }
     inline bool producesMidi() const override { return false; }

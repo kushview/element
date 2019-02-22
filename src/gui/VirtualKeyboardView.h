@@ -29,9 +29,11 @@ public:
     virtual ~VirtualKeyboardView();
     
     void didBecomeActive() override;
+    void stabilizeContent() override { didBecomeActive(); resized(); }
     void resized() override;
     bool keyPressed (const KeyPress&, Component*) override;
     bool keyStateChanged (bool) override;
+
 private:
     ScopedPointer<VirtualKeyboardComponent> keyboard;
     MidiKeyboardState internalState;

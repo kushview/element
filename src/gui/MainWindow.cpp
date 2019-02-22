@@ -53,8 +53,8 @@ void MainWindow::nameChanged()
         sessionName     = session->getName().trim();
         graphName       = session->getCurrentGraph().getName().trim();
        #if defined (EL_PRO)
-        if (sessName.isNotEmpty())
-            title << " - " << sessName;
+        if (sessionName.isNotEmpty())
+            title << " - " << sessionName;
         if (graphName.isNotEmpty())
             title << ": " << graphName;
        #else
@@ -68,7 +68,8 @@ void MainWindow::nameChanged()
        #if defined (EL_PRO)
         if (auto* const sc = getAppController().findChild<SessionController>())
         {
-            ignoreUnused (sc); // noop
+            const auto file = sc->getSessionFile();
+            ignoreUnused (file);
         }
        #else
         if (auto* const gc = getAppController().findChild<GraphController>())

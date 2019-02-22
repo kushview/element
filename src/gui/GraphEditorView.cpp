@@ -56,6 +56,12 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
 
 void GraphEditorView::stabilizeContent()
 {
+    if (!getGraph().isValid() || !getGraph().isGraph())
+    {
+        if (auto session = ViewHelpers::getSession (this))
+            setNode (session->getCurrentGraph());
+    }
+    
     const auto g = getGraph();
     
     if (g.isGraph() && !g.isRootGraph())

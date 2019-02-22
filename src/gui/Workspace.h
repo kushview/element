@@ -11,10 +11,14 @@
 
 namespace Element {
 
-class Workspace :  public Component
+class AppController;
+class GuiController;
+class Globals;
+
+class Workspace : public Component
 {
 public:
-    Workspace();
+    Workspace (Globals&, AppController&, GuiController&);
     virtual ~Workspace();
 
     void setMainComponent (Component* c);
@@ -28,6 +32,9 @@ public:
 
 private:
     Dock dock;
+    Globals& world;
+    AppController& app;
+    GuiController& gui;
 };
 
 class WorkspaceWindow : public DocumentWindow
@@ -36,7 +43,6 @@ public:
     WorkspaceWindow() : DocumentWindow ("Workspace", Colours::black, DocumentWindow::allButtons, true)
     {
         setUsingNativeTitleBar (true);
-        setContentOwned (new Workspace(), true);
         centreWithSize (getWidth(), getHeight());
     }
 };

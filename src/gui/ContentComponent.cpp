@@ -58,7 +58,7 @@ ContentView::~ContentView()
 ContentComponent* ContentComponent::create (AppController& controller)
 {
    #if defined (EL_PRO)
-    #if defined (EL_DOCKING)
+    #if EL_DOCKING
      return new ContentComponentPro (controller);
     #else
      return new ContentComponentSolo (controller);
