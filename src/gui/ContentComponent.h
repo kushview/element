@@ -7,7 +7,7 @@
 
 #include "engine/GraphNode.h"
 #include "session/Session.h"
-
+#include "Workspace.h"
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
 
@@ -126,8 +126,8 @@ public:
     virtual void setShowAccessoryView (const bool show);
     virtual bool showAccessoryView() const;
 
-    virtual ValueTree getWorkspaceState() { return ValueTree(); }
-    virtual void applyWorkspaceState (const ValueTree&) { }
+    virtual WorkspaceState getWorkspaceState() { return { }; }
+    virtual void applyWorkspaceState (const WorkspaceState&) { }
 
     /** @internal */
     void paint (Graphics &g) override;

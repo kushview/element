@@ -849,30 +849,21 @@ bool GuiController::perform (const InvocationInfo& info)
        #if EL_DOCKING
         case Commands::workspaceSave:
         {
-            FileChooser chooser ("Save Workspace", juce::File(), "*.xml", true, false);
+            FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
             {
                 const auto state = content->getWorkspaceState();
-                if (auto* xml = state.createXml())
-                {
-                    xml->writeToFile (chooser.getResult(), String());
-                    delete xml;
-                }
+                state.writeToFile (chooser.getResult());
             }
         } break;
 
         case Commands::workspaceOpen:
         {
-            FileChooser chooser ("Load Workspace", juce::File(), "*.xml", true, false);
+            FileChooser chooser ("Load Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToOpen())
             {
-                if (auto* xml = XmlDocument::parse (chooser.getResult()))
-                {
-                    const auto state = ValueTree::fromXml (*xml);
-                    if (state.isValid())
-                        content->applyWorkspaceState (state);
-                    delete xml;
-                }
+                const auto state = WorkspaceState::fromFile (chooser.getResult());
+                content->applyWorkspaceState (state);
             }
         } break;
        #endif // EL_DOCKING

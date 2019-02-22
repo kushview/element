@@ -79,16 +79,17 @@ void ContentComponentPro::stabilizeViews()
     impl->stabilizePanels();
 }
 
-ValueTree ContentComponentPro::getWorkspaceState()
+WorkspaceState ContentComponentPro::getWorkspaceState()
 {
-    return impl->getDock().getState();
+    WorkspaceState state (impl->workspace);
+    return state;
 }
 
-void ContentComponentPro::applyWorkspaceState (const ValueTree& state)
+void ContentComponentPro::applyWorkspaceState (const WorkspaceState& state)
 {
-    impl->getDock().applyState (state);
+    auto& workspace = impl->workspace;
+    workspace.applyState (state);
 }
-
 }
 
 #endif

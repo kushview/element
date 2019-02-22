@@ -89,6 +89,7 @@ namespace Tags
     const Identifier keyEnd             = "keyEnd";
 
     const Identifier velocityCurveMode  = "velocityCurveMode";
+    const Identifier workspace          = "workspace";
 }
 
 struct Alert

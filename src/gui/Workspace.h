@@ -15,34 +15,63 @@ class AppController;
 class GuiController;
 class Globals;
 
+class Workspace;
+
+class WorkspaceState : public ObjectModel
+{
+public:
+    WorkspaceState();
+    WorkspaceState (Workspace&, const String& name = String());
+    ~WorkspaceState() = default;
+
+    // inline Uuid getUuid() const
+    // {
+    //     const Uuid uuid (getProperty(Tags::uuid).toString());
+    //     return uuid;
+    // }
+
+    inline String getName() const { return getProperty(Tags::name).toString(); }
+    
+    inline void applyTo (Dock& dock) const
+    {
+        auto dockState = objectData.getChildWithName (Tags::dock);
+        if (dockState.isValid())
+            dock.applyState (dockState);
+    }
+
+    bool writeToFile (const File&) const;
+    
+    static WorkspaceState fromFile (const File&);
+
+    inline WorkspaceState& operator= (const WorkspaceState& o)
+    {
+        ObjectModel::operator= (o);
+        return *this;
+    }
+
+private:
+    void setMissing();
+};
+
 class Workspace : public Component
 {
 public:
     Workspace (Globals&, AppController&, GuiController&);
     virtual ~Workspace();
 
-    void paint (Graphics& g) override;
-    void mouseDown (const MouseEvent& ev) override;
-
-    void resized() override;
-
     Dock& getDock();
+
+    WorkspaceState getState();
+    void applyState (const WorkspaceState& state);
+
+    void paint (Graphics& g) override;
+    void resized() override;
 
 private:
     Dock dock;
     Globals& world;
     AppController& app;
     GuiController& gui;
-};
-
-class WorkspaceWindow : public DocumentWindow
-{
-public:
-    WorkspaceWindow() : DocumentWindow ("Workspace", Colours::black, DocumentWindow::allButtons, true)
-    {
-        setUsingNativeTitleBar (true);
-        centreWithSize (getWidth(), getHeight());
-    }
 };
 
 }

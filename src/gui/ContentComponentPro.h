@@ -6,6 +6,7 @@
 #pragma once
 
 #include "gui/ContentComponent.h"
+#include "gui/Workspace.h"
 
 namespace Element {
 
@@ -22,8 +23,8 @@ public:
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 
-    ValueTree getWorkspaceState() override;
-    void applyWorkspaceState (const ValueTree&) override;
+    WorkspaceState getWorkspaceState() override;
+    void applyWorkspaceState (const WorkspaceState&) override;
 
 private:
     class Impl; std::unique_ptr<Impl> impl;

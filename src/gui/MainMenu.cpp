@@ -152,10 +152,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 6666)
     {
-        #if EL_DOCKING
-        auto* window = new WorkspaceWindow();
-        window->setVisible (true);
-        #endif
+        DBG("no workspace debug window");
     }
    #if EL_DOCKING && defined (EL_PRO)
     else if (index == 7777)
@@ -231,6 +228,11 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::hideAllPluginWindows, "Close plugin windows...");
     menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
+   #if EL_DOCKING && defined (EL_PRO)
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::workspaceOpen, "Open Workspace File");
+    menu.addCommandItem (&cmd, Commands::workspaceSave, "Save Workspace File");
+   #endif
 }
 
 void MainMenu::buildOptionsMenu (PopupMenu& menu)
