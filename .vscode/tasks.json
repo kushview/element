@@ -108,7 +108,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure Pro Docking (LocalAuth)",
+            "label": "Waf Configure Element Pro Docking (LocalAuth)",
             "type": "shell",
             "command": "python",
             "args": [
