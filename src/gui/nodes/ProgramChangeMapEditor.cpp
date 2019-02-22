@@ -245,6 +245,24 @@ ProgramChangeMapEditor::~ProgramChangeMapEditor()
     model.reset();
 }
 
+bool ProgramChangeMapEditor::keyPressed (const KeyPress& press)
+{
+    bool handled = true;
+
+    if (press == KeyPress::rightKey)
+    {
+        auto row = table.getSelectedRow();
+        if (isPositiveAndBelow (row, table.getNumRows()))
+            this->sendProgram (row);
+    }
+    else
+    {
+        handled = false;
+    }
+
+    return handled;
+}
+
 void ProgramChangeMapEditor::selectRow (int row)
 {
     table.selectRow (row, false, true);

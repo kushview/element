@@ -27,6 +27,8 @@ public:
 
     inline void changeListenerCallback (ChangeBroadcaster*) override { table.updateContent(); }
     
+    bool keyPressed (const KeyPress&) override;
+    
 private:
     Node node;
     class TableModel; friend class TableModel;
