@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gui/GraphMixerView.h"
+#include "gui/views/GraphMixerView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
 namespace Element {

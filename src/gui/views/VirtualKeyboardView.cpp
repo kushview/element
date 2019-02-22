@@ -1,7 +1,7 @@
 
 #include "engine/AudioEngine.h"
 #include "gui/GuiCommon.h"
-#include "gui/VirtualKeyboardView.h"
+#include "gui/views/VirtualKeyboardView.h"
 
 namespace Element
 {

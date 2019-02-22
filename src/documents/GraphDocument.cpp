@@ -1,4 +1,4 @@
-#include "gui/GraphDocument.h"
+#include "documents/GraphDocument.h"
 
 namespace Element {
 

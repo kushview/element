@@ -7,7 +7,7 @@
 
 #include "ElementApp.h"
 #include "Commands.h"
-#include "engine/BaseProcessor.h"
+#include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 #include "engine/GraphNode.h"
 #include "gui/Window.h"

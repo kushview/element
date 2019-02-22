@@ -1,4 +1,4 @@
-#include "gui/ControllerMapsView.h"
+#include "gui/views/ControllerMapsView.h"
 
 namespace Element {
 

@@ -6,7 +6,7 @@
 
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
-#include "gui/GraphSettingsView.h"
+#include "gui/views/GraphSettingsView.h"
 
 #include "session/UnlockStatus.h"
 

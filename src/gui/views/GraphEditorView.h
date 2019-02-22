@@ -5,7 +5,7 @@
 
 #pragma once
 
-#include "gui/GraphDisplayView.h"
+#include "gui/views/GraphDisplayView.h"
 #include "gui/GraphEditorComponent.h"
 
 namespace Element {

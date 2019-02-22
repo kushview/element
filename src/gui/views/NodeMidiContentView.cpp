@@ -2,7 +2,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
-#include "gui/NodeMidiContentView.h"
+#include "gui/views/NodeMidiContentView.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {

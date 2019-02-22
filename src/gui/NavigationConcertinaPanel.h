@@ -2,10 +2,10 @@
 #pragma once
 
 #include "gui/GuiCommon.h"
-#include "gui/ControllerDevicesView.h"
-#include "gui/ControllerMapsView.h"
-#include "gui/NodeMidiContentView.h"
-#include "gui/NodeEditorContentView.h"
+#include "gui/views/ControllerDevicesView.h"
+#include "gui/views/ControllerMapsView.h"
+#include "gui/views/NodeMidiContentView.h"
+#include "gui/views/NodeEditorContentView.h"
 #include "session/Node.h"
 #include "DataPath.h"
 

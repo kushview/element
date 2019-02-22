@@ -1,6 +1,6 @@
 
 #include "engine/nodes/AudioProcessorNode.h"
-#include "engine/BaseProcessor.h"
+#include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiDeviceProcessor.h"
 

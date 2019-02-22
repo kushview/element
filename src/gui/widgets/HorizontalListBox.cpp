@@ -1,5 +1,5 @@
 
-#include "gui/HorizontalListBox.h"
+#include "gui/widgets/HorizontalListBox.h"
 
 class HorizontalListBox::RowComponent  : public Component,
                                          public TooltipClient

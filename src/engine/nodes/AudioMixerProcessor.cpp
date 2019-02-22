@@ -1,6 +1,6 @@
 
-#include "engine/AudioMixerProcessor.h"
-#include "gui/HorizontalListBox.h"
+#include "engine/nodes/AudioMixerProcessor.h"
+#include "gui/widgets/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
 
 #define EL_FADER_MIN_DB     -90.0

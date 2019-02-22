@@ -2,7 +2,7 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
-#include "gui/BreadCrumbComponent.h"
+#include "gui/widgets/BreadCrumbComponent.h"
 
 namespace Element {
 

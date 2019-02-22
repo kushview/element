@@ -2,7 +2,7 @@
 
 #include "engine/nodes/MidiFilterNode.h"
 #include "engine/MidiPipe.h"
-#include "engine/BaseProcessor.h"
+#include "engine/nodes/BaseProcessor.h"
 #include "Signals.h"
 
 namespace Element {

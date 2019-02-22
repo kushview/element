@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "engine/BaseProcessor.h"
+#include "engine/nodes/BaseProcessor.h"
 #include "session/Node.h"
 
 namespace Element {

@@ -6,7 +6,6 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
-#include "engine/MidiClipSource.h"
 #include "engine/MidiClock.h"
 #include "engine/MidiChannelMap.h"
 #include "engine/MidiTranspose.h"

@@ -5,7 +5,7 @@
 
 #include "controllers/GuiController.h"
 #include "gui/Buttons.h"
-#include "gui/ControllerDevicesView.h"
+#include "gui/views/ControllerDevicesView.h"
 #include "gui/ViewHelpers.h"
 #include "session/ControllerDevice.h"
 #include "Messages.h"

@@ -12,11 +12,11 @@
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
-#include "engine/AudioMixerProcessor.h"
-#include "engine/ChannelizeProcessor.h"
-#include "engine/CombFilterProcessor.h"
+#include "engine/nodes/AudioMixerProcessor.h"
+#include "engine/nodes/ChannelizeProcessor.h"
+#include "engine/nodes/CombFilterProcessor.h"
 #include "engine/MidiDeviceProcessor.h"
-#include "engine/MidiSequenceProcessor.h"
+
 #include "engine/MidiChannelMapProcessor.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/ReverbProcessor.h"
@@ -26,6 +26,8 @@
 
 #include "session/Session.h"
 #include "session/UnlockStatus.h"
+
+#include "../experimental/MidiSequenceProcessor.h"
 
 #include "Globals.h"
 
@@ -222,11 +224,13 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             SubGraphProcessor().fillInPluginDescription (*desc);
         }
+       #if 0
         else if (fileOrId == EL_INTERNAL_ID_MIDI_SEQUENCER)
         {
             auto* const desc = ds.add (new PluginDescription());
             MidiSequenceProcessor().fillInPluginDescription (*desc);
         }
+       #endif
         else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
         {
             auto* const desc = ds.add (new PluginDescription());
@@ -345,10 +349,10 @@ namespace Element {
        #if defined(EL_PRO)
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
-        
+        #if 0
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_SEQUENCER)
             base = (world.getUnlockStatus().isFullVersion() ? new MidiSequenceProcessor() : nullptr);
-        
+        #endif
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
             base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
 

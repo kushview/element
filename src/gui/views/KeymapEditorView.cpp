@@ -2,7 +2,7 @@
 #include "gui/GuiCommon.h"
 #include "session/CommandManager.h"
 #include "Globals.h"
-#include "gui/KeymapEditorView.h"
+#include "gui/views/KeymapEditorView.h"
 
 namespace Element 
 {

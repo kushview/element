@@ -4,7 +4,7 @@
 */
 
 #include "session/Session.h"
-#include "gui/SessionDocument.h"
+#include "documents/SessionDocument.h"
 
 namespace Element {
 

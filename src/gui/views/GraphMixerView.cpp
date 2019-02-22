@@ -1,9 +1,9 @@
 
 #include "controllers/AppController.h"
 #include "gui/NodeChannelStripComponent.h"
-#include "gui/GraphMixerView.h"
-#include "gui/GraphMixerView.h"
-#include "gui/HorizontalListBox.h"
+#include "gui/views/GraphMixerView.h"
+#include "gui/views/GraphMixerView.h"
+#include "gui/widgets/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
 #include "session/Session.h"
 #include "Globals.h"

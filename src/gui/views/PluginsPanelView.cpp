@@ -1,7 +1,7 @@
 
 #include "session/PluginManager.h"
 #include "gui/GuiCommon.h"
-#include "gui/PluginsPanelView.h"
+#include "gui/views/PluginsPanelView.h"
 
 namespace Element
 {

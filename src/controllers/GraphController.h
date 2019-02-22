@@ -2,7 +2,7 @@
 #pragma once
 
 #include "controllers/AppController.h"
-#include "gui/GraphDocument.h"
+#include "documents/GraphDocument.h"
 
 namespace Element {
 

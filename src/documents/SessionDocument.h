@@ -9,7 +9,6 @@
 #include "session/Session.h"
 
 namespace Element {
-
     class SessionDocument :  public FileBasedDocument,
                              public ChangeListener
     {
@@ -24,6 +23,7 @@ namespace Element {
         void setLastDocumentOpened (const File& file) override;
         
         void changeListenerCallback (ChangeBroadcaster*) override;
+
     private:
         SessionPtr session;
         File lastSession;

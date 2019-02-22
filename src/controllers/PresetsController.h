@@ -2,7 +2,7 @@
 #pragma once
 
 #include "controllers/AppController.h"
-#include "gui/SessionDocument.h"
+#include "documents/SessionDocument.h"
 #include "session/Session.h"
 
 namespace Element {

@@ -13,7 +13,7 @@
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/SystemTray.h"
-#include "gui/VirtualKeyboardView.h"
+#include "gui/views/VirtualKeyboardView.h"
 #include "CapsLock.h"
 #include "Version.h"
 

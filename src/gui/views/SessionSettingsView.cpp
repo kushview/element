@@ -1,6 +1,6 @@
 
 #include "gui/GuiCommon.h"
-#include "gui/SessionSettingsView.h"
+#include "gui/views/SessionSettingsView.h"
 
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;

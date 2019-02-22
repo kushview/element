@@ -4,7 +4,7 @@
 */
 
 #include "gui/GuiCommon.h"
-#include "gui/GraphEditorView.h"
+#include "gui/views/GraphEditorView.h"
 #include "Globals.h"
 #include "session/UnlockStatus.h"
 

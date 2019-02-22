@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gui/VirtualKeyboardView.h"
+#include "gui/views/VirtualKeyboardView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
 namespace Element {

@@ -10,7 +10,7 @@
 #include "gui/ContentComponent.h"
 
 #include "gui/AudioIOPanelView.h"
-#include "gui/PluginsPanelView.h"
+#include "gui/views/PluginsPanelView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/NavigationConcertinaPanel.h"
 

@@ -1,7 +1,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-#include "gui/NodeChannelStripView.h"
+#include "gui/views/NodeChannelStripView.h"
 #include "gui/NodeChannelStripComponent.h"
 #include "gui/LookAndFeel.h"
 #include "session/Session.h"

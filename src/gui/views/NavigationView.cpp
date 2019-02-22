@@ -2,7 +2,7 @@
 #include "engine/GraphProcessor.h"
 #include "gui/ContentComponent.h"
  
-#include "gui/NavigationView.h"
+#include "gui/views/NavigationView.h"
 #include "gui/TreeviewBase.h"
 #include "gui/ViewHelpers.h"
 #include "session/PluginManager.h"

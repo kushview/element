@@ -14,11 +14,11 @@
 
 #include "gui/AudioIOPanelView.h"
 #include "gui/SessionTreePanel.h"
-#include "gui/PluginsPanelView.h"
+#include "gui/views/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
 #include "gui/NodeIOConfiguration.h"
 #include "engine/SubGraphProcessor.h"
-#include "engine/BaseProcessor.h"
+#include "engine/nodes/BaseProcessor.h"
 
 #include "session/PluginManager.h"
 #include "session/Presets.h"

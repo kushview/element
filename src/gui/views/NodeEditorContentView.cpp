@@ -5,7 +5,7 @@
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
-#include "gui/NodeEditorContentView.h"
+#include "gui/views/NodeEditorContentView.h"
 #include "gui/ViewHelpers.h"
 
 #include "session/DeviceManager.h"
