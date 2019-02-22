@@ -1,7 +1,7 @@
 /*
     ClipSource.cpp - This file is part of Element
     Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
-*/
+ */
 
 #include "session/ClipModel.h"
 #include "engine/ClipSource.h"
