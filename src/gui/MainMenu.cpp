@@ -157,6 +157,7 @@ void MainMenu::menuItemSelected (int index, int menu)
         window->setVisible (true);
         #endif
     }
+   #if EL_DOCKING && defined (EL_PRO)
     else if (index == 7777)
     {
         cmd.invokeDirectly (Commands::workspaceSave, true);
@@ -165,7 +166,8 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         cmd.invokeDirectly (Commands::workspaceOpen, true);
     }
-    #endif
+   #endif
+   #endif
     
     if (menu == File && index >= recentMenuOffset)
     {
@@ -178,6 +180,7 @@ void MainMenu::menuItemSelected (int index, int menu)
        #endif
     }
 }
+
 void MainMenu::addRecentFiles (PopupMenu& menu)
 {
     if (auto* cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))

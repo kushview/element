@@ -1,4 +1,6 @@
 
+#if EL_DOCKING
+
 #include "controllers/AppController.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
@@ -27,3 +29,5 @@ void PluginsPanel::resized()
 }
 
 }
+
+#endif

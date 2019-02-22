@@ -845,6 +845,8 @@ bool GuiController::perform (const InvocationInfo& info)
             }
         } break;
 
+       #if defined (EL_PRO)
+       #if EL_DOCKING
         case Commands::workspaceSave:
         {
             FileChooser chooser ("Save Workspace", juce::File(), "*.xml", true, false);
@@ -873,7 +875,9 @@ bool GuiController::perform (const InvocationInfo& info)
                 }
             }
         } break;
-
+       #endif // EL_DOCKING
+       #endif // EL_PRO
+       
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
