@@ -6,13 +6,18 @@ namespace Element {
 
 namespace PanelIDs
 {
-    static const Identifier virtualKeyboard     = "virtualKeyboard";
-    static const Identifier graphMixer          = "graphMixer";
+    static const Identifier controllers         = "controllers";
+    static const Identifier maps                = "maps";
     static const Identifier graphEditor         = "graphEditor";
-    static const Identifier nodeEditor          = "nodeEditor";
-    static const Identifier sessionSettings     = "sessionSettings";
+    static const Identifier graphMixer          = "graphMixer";
+    static const Identifier graphSettings       = "graphSettings";
+    static const Identifier keymaps             = "keymaps";
     static const Identifier nodeChannelStrip    = "nodeChannelStrip";
-    static const Identifier controllerDevices   = "controllerDevives";
+    static const Identifier nodeEditor          = "nodeEditor";
+    static const Identifier nodeMidi            = "nodeMidi";
+    static const Identifier plugins             = "plugins";
+    static const Identifier sessionSettings     = "sessionSettings";
+    static const Identifier virtualKeyboard     = "virtualKeyboard";
 }
 
 /** A generic panel used for testing and development */
@@ -66,6 +71,11 @@ public:
         type->identifier    = PanelIDs::nodeChannelStrip;
         type->name          = "Node Channel Strip";
         type->description   = "Displays a single channel strip for a given node";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::nodeMidi;
+        type->name          = "MIDI";
+        type->description   = "Displays MIDI properties for a Node";
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;

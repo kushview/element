@@ -5,6 +5,7 @@
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/GraphEditorPanel.h"
 #include "gui/workspace/GraphMixerPanel.h"
+#include "gui/views/GraphSettingsView.h"
 #include "gui/workspace/ContentViewPanel.h"
 
 namespace Element {
@@ -54,16 +55,32 @@ DockPanel* GenericPanelType::createPanel (const Identifier& panelType)
 
 DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
 {
-    if (panelId == PanelIDs::virtualKeyboard)
-        return new VirtualKeyboardPanel();
+    if (panelId == PanelIDs::controllers)
+        return new ControllerDevicesPanel();
+    if (panelId == PanelIDs::maps)
+        return new ControllerMapsPanel();
+
     if (panelId == PanelIDs::graphMixer)
         return new GraphMixerPanel();
     if (panelId == PanelIDs::graphEditor)
         return new GraphEditorPanel();
-    if (panelId == PanelIDs::nodeEditor)
-        return new NodeEditorPanel();
+    if (panelId == PanelIDs::graphSettings)
+        return new GraphSettingsPanel();
+
+    if (panelId == PanelIDs::keymaps)
+        return new KeymapEditorPanel();
+
     if (panelId == PanelIDs::nodeChannelStrip)
         return new NodeChannelStripPanel();
+    if (panelId == PanelIDs::nodeEditor)
+        return new NodeEditorPanel();
+    if (panelId == PanelIDs::nodeMidi)
+        return new NodeMidiPanel();
+
+    if (panelId == PanelIDs::virtualKeyboard)
+        return new VirtualKeyboardPanel();
+    
+
     return nullptr;
 }
 

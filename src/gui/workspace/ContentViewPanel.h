@@ -2,6 +2,11 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/workspace/WorkspacePanel.h"
+#include "gui/views/ControllerDevicesView.h"
+#include "gui/views/ControllerMapsView.h"
+#include "gui/views/GraphSettingsView.h"
+#include "gui/views/KeymapEditorView.h"
+#include "gui/views/NodeMidiContentView.h"
 #include "gui/views/SessionSettingsView.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/views/NodeEditorContentView.h"
@@ -32,12 +37,32 @@ protected:
     ViewType view;
 };
 
-
-class SessionSettingsPanel : public ContentViewPanel<SessionSettingsView>
+class ControllerDevicesPanel : public ContentViewPanel<ControllerDevicesView>
 {
 public:
-    SessionSettingsPanel() { setName ("Session"); }
-    ~SessionSettingsPanel() = default;
+    ControllerDevicesPanel() { setName ("Controllers"); }
+    ~ControllerDevicesPanel() = default;
+};
+
+class ControllerMapsPanel : public ContentViewPanel<ControllerMapsView>
+{
+public:
+    ControllerMapsPanel() { setName ("Maps"); }
+    ~ControllerMapsPanel() = default;
+};
+
+class GraphSettingsPanel : public ContentViewPanel<GraphSettingsView>
+{
+public:
+    GraphSettingsPanel() { setName ("Graph Settings"); }
+    ~GraphSettingsPanel() = default;
+};
+
+class KeymapEditorPanel : public ContentViewPanel<KeymapEditorView>
+{
+public:
+    KeymapEditorPanel() { setName ("Keymappings"); }
+    ~KeymapEditorPanel() = default;
 };
 
 class NodeChannelStripPanel : public ContentViewPanel<NodeChannelStripView>
@@ -53,5 +78,21 @@ public:
     NodeEditorPanel() { setName ("Node"); }
     ~NodeEditorPanel() = default;
 };
+
+class NodeMidiPanel : public ContentViewPanel<NodeMidiContentView>
+{
+public:
+    NodeMidiPanel() { setName ("MIDI"); }
+    ~NodeMidiPanel() = default;
+};
+
+class SessionSettingsPanel : public ContentViewPanel<SessionSettingsView>
+{
+public:
+    SessionSettingsPanel() { setName ("Session Settings"); }
+    ~SessionSettingsPanel() = default;
+};
+
+
 
 }

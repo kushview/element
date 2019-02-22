@@ -32,6 +32,7 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
     dock.createItem (PanelIDs::graphEditor.toString(), DockPlacement::Bottom);
     dock.createItem (PanelIDs::nodeEditor.toString(), DockPlacement::Left);
     dock.createItem (PanelIDs::nodeChannelStrip.toString(), DockPlacement::Right);
+    dock.createItem (PanelIDs::nodeMidi.toString(), DockPlacement::Right);
 
     addAndMakeVisible (dock);
     setSize (1280, 640);
