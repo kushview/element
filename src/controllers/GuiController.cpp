@@ -421,6 +421,10 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
        #if defined (EL_PRO)
         Commands::showSessionConfig,
         Commands::showGraphMixer,
+        #if EL_DOCKING
+         Commands::workspaceSave,
+         Commands::workspaceOpen,
+        #endif
        #endif
        
        #if defined (EL_SOLO) || defined (EL_PRO)
@@ -441,7 +445,6 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
         Commands::toggleUserInterface
-
     });
     
     commands.add (Commands::quit);
@@ -512,6 +515,19 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
             result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
         } break;
+
+       #if EL_DOCKING
+        case Commands::workspaceSave:
+            // result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
+            result.setInfo ("Save Workspace", "Save the current workspace", 
+                Commands::Categories::UserInterface, 0);
+            break;
+        case Commands::workspaceOpen:
+            // result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
+            result.setInfo ("Open Workspace", "Open a saved workspace", 
+                Commands::Categories::UserInterface, 0);
+            break;
+       #endif
        #endif
 
        #ifndef EL_PRO
@@ -828,6 +844,36 @@ bool GuiController::perform (const InvocationInfo& info)
                 }   
             }
         } break;
+
+        case Commands::workspaceSave:
+        {
+            FileChooser chooser ("Save Workspace", juce::File(), "*.xml", true, false);
+            if (chooser.browseForFileToSave (true))
+            {
+                const auto state = content->getWorkspaceState();
+                if (auto* xml = state.createXml())
+                {
+                    xml->writeToFile (chooser.getResult(), String());
+                    delete xml;
+                }
+            }
+        } break;
+
+        case Commands::workspaceOpen:
+        {
+            FileChooser chooser ("Load Workspace", juce::File(), "*.xml", true, false);
+            if (chooser.browseForFileToOpen())
+            {
+                if (auto* xml = XmlDocument::parse (chooser.getResult()))
+                {
+                    const auto state = ValueTree::fromXml (*xml);
+                    if (state.isValid())
+                        content->applyWorkspaceState (state);
+                    delete xml;
+                }
+            }
+        } break;
+
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;

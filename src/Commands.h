@@ -83,6 +83,11 @@ namespace Commands {
         graphNew               = 0x0700,
         graphOpen,
         graphSave,
-        graphSaveAs
+        graphSaveAs,
+
+       #if EL_DOCKING
+        workspaceSave          = 0x0800,
+        workspaceOpen
+       #endif
     };
 }}

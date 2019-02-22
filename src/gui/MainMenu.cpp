@@ -157,6 +157,14 @@ void MainMenu::menuItemSelected (int index, int menu)
         window->setVisible (true);
         #endif
     }
+    else if (index == 7777)
+    {
+        cmd.invokeDirectly (Commands::workspaceSave, true);
+    }
+    else if (index == 7778)
+    {
+        cmd.invokeDirectly (Commands::workspaceOpen, true);
+    }
     #endif
     
     if (menu == File && index >= recentMenuOffset)
@@ -240,6 +248,9 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     menu.addItem (4444, "Refresh Mapping Engine");
     menu.addItem (5555, "Toggle Node Channel Strip");
     menu.addItem (6666, "Show Workspace Window");
+    menu.addItem (7777, "Save Workspace");
+    menu.addItem (7778, "Load Workspace");
+
     menu.addCommandItem (&cmd, Commands::panic, "Panic!");
 }
     

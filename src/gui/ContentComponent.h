@@ -126,6 +126,9 @@ public:
     virtual void setShowAccessoryView (const bool show);
     virtual bool showAccessoryView() const;
 
+    virtual ValueTree getWorkspaceState() { return ValueTree(); }
+    virtual void applyWorkspaceState (const ValueTree&) { }
+
     /** @internal */
     void paint (Graphics &g) override;
     /** @internal */

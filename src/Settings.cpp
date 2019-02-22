@@ -21,6 +21,8 @@ const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
 const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
 const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
 const char* Settings::lastGraphKey              = "lastGraph";
+const char* Settings::legacyInterfaceKey        = "legacyInterface";
+
 enum OptionsMenuItemId
 {
     CheckForUpdatesOnStart = 1000000,
@@ -263,6 +265,20 @@ void Settings::setHidePluginWindowsWhenFocusLost (const bool hideThem)
         p->setValue (hidePluginWindowsWhenFocusLostKey, hideThem);
 }
 
+bool Settings::useLegacyInterface() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (legacyInterfaceKey, false);
+    return false;
+}
+
+void Settings::setUseLegacyInterface (const bool useLegacy)
+{
+    if (useLegacy == useLegacyInterface())
+        return;
+    if (auto* p = getProps())
+        p->setValue (legacyInterfaceKey, useLegacy);
+}
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 {

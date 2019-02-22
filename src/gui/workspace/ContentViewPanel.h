@@ -93,6 +93,4 @@ public:
     ~SessionSettingsPanel() = default;
 };
 
-
-
 }

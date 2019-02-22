@@ -31,6 +31,7 @@ public:
     static const char* sendMidiClockToInputKey;
     static const char* hidePluginWindowsWhenFocusLostKey;
     static const char* lastGraphKey;
+    static const char* legacyInterfaceKey;
 
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -80,6 +81,9 @@ public:
 
     void setHidePluginWindowsWhenFocusLost (const bool);
     bool hidePluginWindowsWhenFocusLost() const;
+
+    void setUseLegacyInterface (const bool);
+    bool useLegacyInterface() const;
 
 private:
     PropertiesFile* getProps() const;

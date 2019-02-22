@@ -26,13 +26,13 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
         }
     };
 
-    auto* item = dock.createItem (PanelIDs::virtualKeyboard.toString(), DockPlacement::Top);
-    
-    dock.createItem (PanelIDs::graphMixer.toString(), DockPlacement::Top);
-    dock.createItem (PanelIDs::graphEditor.toString(), DockPlacement::Bottom);
-    dock.createItem (PanelIDs::nodeEditor.toString(), DockPlacement::Left);
-    dock.createItem (PanelIDs::nodeChannelStrip.toString(), DockPlacement::Right);
-    dock.createItem (PanelIDs::nodeMidi.toString(), DockPlacement::Right);
+    auto* item = dock.createItem (PanelIDs::virtualKeyboard, DockPlacement::Top);
+    dock.createItem (PanelIDs::graphMixer,      DockPlacement::Top);
+    dock.createItem (PanelIDs::graphEditor,     DockPlacement::Bottom);
+    dock.createItem (PanelIDs::nodeEditor,      DockPlacement::Left);
+    dock.createItem (PanelIDs::nodeChannelStrip, DockPlacement::Right);
+    dock.createItem (PanelIDs::nodeMidi,        DockPlacement::Right);
+    dock.createItem (PanelIDs::plugins,         DockPlacement::Left);
 
     addAndMakeVisible (dock);
     setSize (1280, 640);
@@ -44,13 +44,9 @@ Workspace::~Workspace()
 
 Dock& Workspace::getDock() { return dock; }
 
-void Workspace::setMainComponent (Component* c)
-{
-}
-
 void Workspace::paint (Graphics& g)
 {
-    g.fillAll (Colours::black);
+    g.fillAll (Colours::red);
 }
 
 void Workspace::mouseDown (const MouseEvent& /*ev*/)

@@ -5,8 +5,8 @@
 #include "gui/workspace/VirtualKeyboardPanel.h"
 #include "gui/workspace/GraphEditorPanel.h"
 #include "gui/workspace/GraphMixerPanel.h"
-#include "gui/views/GraphSettingsView.h"
 #include "gui/workspace/ContentViewPanel.h"
+#include "gui/workspace/PluginsPanel.h"
 
 namespace Element {
 
@@ -80,7 +80,8 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
     if (panelId == PanelIDs::virtualKeyboard)
         return new VirtualKeyboardPanel();
     
-
+    if (panelId == PanelIDs::plugins)
+        return new PluginsPanel();
     return nullptr;
 }
 

@@ -33,7 +33,7 @@ public:
 
     void resized (const Rectangle<int>& area)
     {
-        workspace.setBounds (area.reduced (2, 0));
+        workspace.setBounds (area);
     }
 
     void stabilizePanels()
@@ -77,6 +77,16 @@ void ContentComponentPro::stabilize (const bool refreshDataPathTrees)
 void ContentComponentPro::stabilizeViews()
 {
     impl->stabilizePanels();
+}
+
+ValueTree ContentComponentPro::getWorkspaceState()
+{
+    return impl->getDock().getState();
+}
+
+void ContentComponentPro::applyWorkspaceState (const ValueTree& state)
+{
+    impl->getDock().applyState (state);
 }
 
 }

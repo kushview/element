@@ -22,6 +22,9 @@ public:
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 
+    ValueTree getWorkspaceState() override;
+    void applyWorkspaceState (const ValueTree&) override;
+
 private:
     class Impl; std::unique_ptr<Impl> impl;
 };

@@ -76,6 +76,36 @@ public:
         type->identifier    = PanelIDs::nodeMidi;
         type->name          = "MIDI";
         type->description   = "Displays MIDI properties for a Node";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::plugins;
+        type->name          = "Plugins";
+        type->description   = "Available plugins";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::sessionSettings;
+        type->name          = "Session Settings";
+        type->description   = "Session Settings";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::graphSettings;
+        type->name          = "Graph Settings";
+        type->description   = "Graph Settings";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::keymaps;
+        type->name          = "Keymaps";
+        type->description   = "Key Mappings";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::maps;
+        type->name          = "Maps";
+        type->description   = "MIDI Mappings";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::controllers;
+        type->name          = "Controllers";
+        type->description   = "Controller Device Management";
     }
 
     DockPanel* createPanel (const Identifier& panelType) override;

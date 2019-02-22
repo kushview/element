@@ -21,8 +21,6 @@ public:
     Workspace (Globals&, AppController&, GuiController&);
     virtual ~Workspace();
 
-    void setMainComponent (Component* c);
-
     void paint (Graphics& g) override;
     void mouseDown (const MouseEvent& ev) override;
 
