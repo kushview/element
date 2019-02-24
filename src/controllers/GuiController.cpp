@@ -146,20 +146,26 @@ void GuiController::activate()
 void GuiController::deactivate()
 {
     stopTimer();
+    auto& settings = getWorld().getSettings();
     saveProperties (getWorld().getSettings().getUserSettings());
     nodeSelected.disconnect_all_slots();
 
+    if (content)
+    {
+        saveCurrentWorkspace();
+    }
+    
     if (sSystemTray != nullptr)
     {
         sSystemTray->removeFromDesktop();
         sSystemTray.reset(nullptr);
     }
 
-    closeAllPluginWindows(true);
+    closeAllPluginWindows (true);
 
     if (mainWindow)
     {
-        mainWindow->removeKeyListener(keys);
+        mainWindow->removeKeyListener (keys);
         keys = nullptr;
 
         closeAllWindows();
@@ -347,15 +353,25 @@ bool GuiController::haveActiveWindows() const
 
 void GuiController::run()
 {
+    auto& settings = getWorld().getSettings();
+    PropertiesFile* const pf = settings.getUserSettings();
+
     mainWindow = new MainWindow (world);
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
-    PropertiesFile* pf = getWorld().getSettings().getUserSettings();
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
     mainWindow->addKeyListener (keys);
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
-    
+
+    {
+        const auto stateName = settings.getWorkspace();
+        WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
+        if (! state.isValid())
+            state = WorkspaceState::loadByName ("Classic");
+        getContentComponent()->applyWorkspaceState (state);
+    }
+
     mainWindow->addToDesktop();
 
     if (pf->getBoolValue ("mainWindowVisible", true))
@@ -424,6 +440,9 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         #if EL_DOCKING
          Commands::workspaceSave,
          Commands::workspaceOpen,
+         Commands::workspaceResetActive,
+         Commands::workspaceClassic,
+         Commands::workspaceEditing,
         #endif
        #endif
        
@@ -527,6 +546,25 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             result.setInfo ("Open Workspace", "Open a saved workspace", 
                 Commands::Categories::UserInterface, 0);
             break;
+        case Commands::workspaceResetActive:
+        {
+            result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", 
+                Commands::Categories::UserInterface, 0);
+        } break;
+        case Commands::workspaceClassic:
+        {
+            result.setInfo ("Classic Workspace", "Open the classic workspace", 
+                Commands::Categories::UserInterface, 0);
+            if (content)
+                result.setTicked (content->getWorkspaceName() == "Classic");
+        } break;
+        case Commands::workspaceEditing: 
+        {
+            result.setInfo ("Editing Workspace", "Open the editing workspace", 
+                Commands::Categories::UserInterface, 0);
+            if (content)
+                result.setTicked (content->getWorkspaceName() == "Editing");
+        } break;
        #endif
        #endif
 
@@ -866,8 +904,29 @@ bool GuiController::perform (const InvocationInfo& info)
             if (chooser.browseForFileToOpen())
             {
                 getAppController().postMessage (
-                new WorkspaceOpenFileMessage (chooser.getResult()));
+                    new WorkspaceOpenFileMessage (chooser.getResult()));
             }
+        } break;
+
+        case Commands::workspaceResetActive:
+        {
+            auto state = WorkspaceState::loadByName (content->getWorkspaceName());
+            if (state.isValid())
+                content->applyWorkspaceState (state);
+        } break;
+
+        case Commands::workspaceClassic:
+        {
+            saveCurrentWorkspace();
+            auto state = WorkspaceState::loadByFileOrName ("Classic");
+            content->applyWorkspaceState (state);
+        } break;
+
+        case Commands::workspaceEditing:
+        {
+            saveCurrentWorkspace();
+            auto state = WorkspaceState::loadByFileOrName ("Editing");
+            content->applyWorkspaceState (state);
         } break;
        #endif // EL_DOCKING
        #endif // EL_PRO
@@ -942,11 +1001,24 @@ void GuiController::toggleAboutScreen()
 
 KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 
+void GuiController::saveCurrentWorkspace()
+{
+    auto state = content->getWorkspaceState();
+    if (state.isValid())
+    {
+        auto name = content->getWorkspaceName();
+        getWorld().getSettings().setWorkspace (name);
+        name << ".elw";
+        state.writeToXmlFile (DataPath::workspacesDir().getChildFile (name));
+    }
+}
+
 bool GuiController::handleMessage (const AppMessage& msg)
 {
     bool handled = true;
     if (const auto* wofm = dynamic_cast<const WorkspaceOpenFileMessage*> (&msg))
     {
+        saveCurrentWorkspace();
         const auto state = WorkspaceState::fromFile (wofm->file, true);
         content->applyWorkspaceState (state);
     }

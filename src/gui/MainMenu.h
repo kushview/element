@@ -24,9 +24,6 @@ public:
          View, 
          Window,
          Options,
-        #if defined (EL_PRO) && EL_DOCKING
-         Workspace,
-        #endif
         #if JUCE_DEBUG
          DebugItem,
         #endif

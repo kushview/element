@@ -32,6 +32,7 @@ public:
     static const char* hidePluginWindowsWhenFocusLostKey;
     static const char* lastGraphKey;
     static const char* legacyInterfaceKey;
+    static const char* workspaceKey;
 
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -84,6 +85,10 @@ public:
 
     void setUseLegacyInterface (const bool);
     bool useLegacyInterface() const;
+
+    void setWorkspace (const String& name);
+    String getWorkspace() const;
+    File getWorkspaceFile() const;
 
 private:
     PropertiesFile* getProps() const;

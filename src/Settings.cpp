@@ -3,6 +3,7 @@
     Copyright (C) 2014  Kushview, LLC.  All rights reserved.
 */
 
+#include "gui/Workspace.h"
 #include "session/DeviceManager.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -22,6 +23,7 @@ const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
 const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
 const char* Settings::lastGraphKey              = "lastGraph";
 const char* Settings::legacyInterfaceKey        = "legacyInterface";
+const char* Settings::workspaceKey              = "workspace";
 
 enum OptionsMenuItemId
 {
@@ -278,6 +280,29 @@ void Settings::setUseLegacyInterface (const bool useLegacy)
         return;
     if (auto* p = getProps())
         p->setValue (legacyInterfaceKey, useLegacy);
+}
+
+void Settings::setWorkspace (const String& name)
+{
+    if (getWorkspace() == name)
+        return;
+    if (auto* p = getProps())
+        p->setValue (workspaceKey, name);
+}
+
+String Settings::getWorkspace() const
+{
+    if (auto* p = getProps())
+        return p->getValue (workspaceKey, EL_WORKSPACE_CLASSIC);
+    return EL_WORKSPACE_CLASSIC;
+}
+
+File Settings::getWorkspaceFile() const
+{
+    auto name = getWorkspace();
+    if (name.isNotEmpty()) name << ".elw";
+    return name.isNotEmpty() ? DataPath::workspacesDir().getChildFile (name)
+                             : File();
 }
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)

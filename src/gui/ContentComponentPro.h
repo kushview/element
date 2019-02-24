@@ -23,6 +23,7 @@ public:
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 
+    String getWorkspaceName() const override;
     WorkspaceState getWorkspaceState() override;
     void applyWorkspaceState (const WorkspaceState&) override;
     void addWorkspaceItemsToMenu (PopupMenu&) override;

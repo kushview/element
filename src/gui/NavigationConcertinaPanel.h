@@ -6,6 +6,7 @@
 #include "gui/views/ControllerMapsView.h"
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/NodeEditorContentView.h"
+#include "gui/widgets/SessionGraphsListBox.h"
 #include "session/Node.h"
 #include "DataPath.h"
 

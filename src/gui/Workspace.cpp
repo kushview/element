@@ -12,10 +12,10 @@
 
 namespace Element {
 
-WorkspaceState::WorkspaceState ()
-    : ObjectModel (Tags::workspace)
+WorkspaceState::WorkspaceState()
+    : ObjectModel()
 {
-    setMissing();
+
 }
 
 WorkspaceState::WorkspaceState (Workspace& w, const String& name)
@@ -24,6 +24,8 @@ WorkspaceState::WorkspaceState (Workspace& w, const String& name)
     setMissing();
     if (name.isNotEmpty())
         objectData.setProperty (Tags::name, name, nullptr);
+    else
+        objectData.setProperty (Tags::name, w.getName(), nullptr);
     objectData.appendChild (w.getDock().getState(), nullptr);
 }
 
@@ -63,21 +65,28 @@ bool WorkspaceState::writeToXmlFile (const File& file) const
 WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 {
     WorkspaceState state;
-    
+    jassert(! state.isValid());
+    DBG("[EL] workspace loading: " << file.getFileName());
+
     if (tryXml)
     {
         if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
-        {
             state.objectData = ValueTree::fromXml (*xml);
-            if (state.objectData.hasType (Tags::workspace))
-                return state;
+    }
+
+    if (! state.isValid())
+    {
+        if (auto in = std::unique_ptr<FileInputStream> (file.createInputStream()))
+        {
+            GZIPDecompressorInputStream gzip (*in);
+            state.objectData = ValueTree::readFromStream (gzip);
         }
     }
 
-    if (auto in = std::unique_ptr<FileInputStream> (file.createInputStream()))
+    if (state.isValid())
     {
-        GZIPDecompressorInputStream gzip (*in);
-        state.objectData = ValueTree::readFromStream (gzip);
+        state.objectData.setProperty (
+            Tags::name, file.getFileNameWithoutExtension(), nullptr);
     }
 
     return state;
@@ -86,9 +95,55 @@ WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
 WorkspaceState WorkspaceState::fromXmlFile (const File& file)
 {
     WorkspaceState state;
+    DBG("[EL] workspace loading: " << file.getFileName());
+
     if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
         state.objectData = ValueTree::fromXml (*xml);
+    
+    if (state.isValid())
+    {
+        state.objectData.setProperty (
+            Tags::name, file.getFileNameWithoutExtension(), nullptr);
+    }
+
     return state;
+}
+
+WorkspaceState WorkspaceState::loadByName (const String& name)
+{
+    WorkspaceState state;
+    DBG("[EL] workspace loading: " << name);
+    if (name == "Classic")
+    {
+        if (auto* xml = XmlDocument::parse (String::fromUTF8 (
+            BinaryData::Classic_elw, BinaryData::Classic_elwSize)))
+        {
+            state.objectData = ValueTree::fromXml (*xml);
+            delete xml;
+        }
+    }
+    else if (name == "Editing")
+    {
+        if (auto* xml = XmlDocument::parse (String::fromUTF8 (
+            BinaryData::Editing_elw, BinaryData::Editing_elwSize)))
+        {
+            state.objectData = ValueTree::fromXml (*xml);
+            delete xml;
+        }
+    }
+    
+    if (state.isValid())
+        state.objectData.setProperty (Tags::name, name, nullptr);
+
+    return state;
+}
+
+WorkspaceState WorkspaceState::loadByFileOrName (const String& name)
+{
+    const auto file = DataPath::workspacesDir().getChildFile (name + ".elw");
+    if (file.existsAsFile())
+        return fromFile (file, true);
+    return loadByName (name);
 }
 
 void WorkspaceState::setMissing()
@@ -124,13 +179,20 @@ Dock& Workspace::getDock() { return dock; }
 
 WorkspaceState Workspace::getState()
 {
+    jassert (getName().isNotEmpty());
     WorkspaceState state (*this);
+    jassert (state.getName() == getName());
     return state;
 }
 
 void Workspace::applyState (const WorkspaceState& state)
 {
-    state.applyTo (dock);
+    if (state.isValid())
+    {
+        state.applyTo (dock);
+        setName (state.getName());
+        DBG("[EL] workspace loaded: " << getName());
+    }
 }
 
 void Workspace::paint (Graphics& g)

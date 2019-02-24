@@ -137,5 +137,7 @@ namespace Element {
         void toggleAboutScreen();
 
         void saveProperties (PropertiesFile* props);
+        void saveCurrentWorkspace();
+        void saveCurrentAndLoadWorkspace (const String& name);
     };
 }

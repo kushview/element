@@ -12,6 +12,10 @@
         <FILE id="xMy9dk" name="PowerButton_48x48.png" compile="0" resource="1"
               file="../data/Assets/PowerButton_48x48.png"/>
       </GROUP>
+      <GROUP id="{3F30744F-6323-812D-6BD7-D681180EFBAA}" name="Workspaces">
+        <FILE id="tM8rcR" name="Classic.elw" compile="0" resource="1" file="../data/Workspaces/Classic.elw"/>
+        <FILE id="ap2Ngx" name="Editing.elw" compile="0" resource="1" file="../data/Workspaces/Editing.elw"/>
+      </GROUP>
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="1" file="../data/ElementIcon.png"/>
       <FILE id="xX315d" name="test_icon.png" compile="0" resource="0" file="../data/test_icon.png"/>
     </GROUP>

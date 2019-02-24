@@ -11,6 +11,7 @@
 #include "gui/workspace/WorkspacePanel.h"
 #include "gui/Workspace.h"
 #include "Globals.h"
+#include "BinaryData.h"
 
 namespace Element {
 
@@ -77,6 +78,11 @@ void ContentComponentPro::stabilize (const bool refreshDataPathTrees)
 void ContentComponentPro::stabilizeViews()
 {
     impl->stabilizePanels();
+}
+
+String ContentComponentPro::getWorkspaceName() const
+{
+    return impl->workspace.getName();
 }
 
 WorkspaceState ContentComponentPro::getWorkspaceState()

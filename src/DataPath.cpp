@@ -100,4 +100,14 @@ namespace Element
         while (iter.next())
             results.add (iter.getFile().getFullPathName());
     }
+
+    const File DataPath::workspacesDir()
+    {
+        const auto dir = applicationDataDir().getChildFile("Workspaces");
+        if (dir.existsAsFile())
+            dir.deleteFile();
+        if (! dir.exists())
+            dir.createDirectory();
+        return dir;
+    }
 }

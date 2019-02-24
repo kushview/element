@@ -9,6 +9,9 @@
 
 #include "ElementApp.h"
 
+#define EL_WORKSPACE_CLASSIC "Classic"
+#define EL_WORKSPACE_EDITING "Editing"
+
 namespace Element {
 
 class AppController;
@@ -25,7 +28,7 @@ public:
     ~WorkspaceState() = default;
 
     inline String getName() const { return getProperty(Tags::name).toString(); }
-    
+    inline bool isValid() const { return objectData.isValid() && objectData.hasType (Tags::workspace); }
     inline void applyTo (Dock& dock) const
     {
         auto dockState = objectData.getChildWithName (Tags::dock);
@@ -44,6 +47,10 @@ public:
 
     /** Load explicitly from an xml file. Doesn't check binary format */
     static WorkspaceState fromXmlFile (const File&);
+
+    static WorkspaceState loadByName (const String& name);
+
+    static WorkspaceState loadByFileOrName (const String& name);
 
     inline WorkspaceState& operator= (const WorkspaceState& o)
     {

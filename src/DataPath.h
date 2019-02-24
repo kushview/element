@@ -9,33 +9,36 @@
 
 #define EL_PRESET_FILE_EXTENSIONS "*.elp;*.elpreset"
 
-namespace Element
+namespace Element {
+
+class Node;
+class NodeArray;
+
+class DataPath
 {
-    class Node;
-    class NodeArray;
+public:
+    DataPath();
+    ~DataPath();
     
-    class DataPath
-    {
-    public:
-        DataPath();
-        ~DataPath();
-        
-        static const File applicationDataDir();
+    /** Returns the app data dir.
+        For example, on OSX this is ~/Library/Application Support/Element */
+    static const File applicationDataDir();
 
-        static const File defaultSettingsFile();
-        static const File defaultLocation();
-        static const File defaultSessionDir();
-        static const File defaultGraphDir();
-        static const File defaultControllersDir();
+    static const File defaultSettingsFile();
+    static const File defaultLocation();
+    static const File defaultSessionDir();
+    static const File defaultGraphDir();
+    static const File defaultControllersDir();
+    static const File workspacesDir();
 
-        const File& getRootDir() const { return root; }
-        File createNewPresetFile (const Node& node, const String& name = String()) const;
-        void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
-        void findPresetFiles (StringArray& results) const;
-        
-    private:
-        File root;
-    };
+    const File& getRootDir() const { return root; }
+    File createNewPresetFile (const Node& node, const String& name = String()) const;
+    void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
+    void findPresetFiles (StringArray& results) const;
     
-    class DataSearchPath { };
+private:
+    File root;
+};
+
+class DataSearchPath { };
 }

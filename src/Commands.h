@@ -87,7 +87,12 @@ namespace Commands {
 
        #if EL_DOCKING
         workspaceSave          = 0x0800,
-        workspaceOpen
+        workspaceOpen,
+        workspaceResetActive,
+        workspaceSaveActive,
+
+        workspaceClassic       = 0x0900,
+        workspaceEditing,
        #endif
     };
 }}
