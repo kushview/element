@@ -1,7 +1,5 @@
 #pragma once
 
-#if EL_DOCKING
-
 #include "ElementApp.h"
 
 namespace Element {
@@ -43,5 +41,3 @@ public:
 };
 
 }
-
-#endif

@@ -2,8 +2,6 @@
     Workspace.cpp - This file is part of Element
  */
 
-#if EL_DOCKING
-
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "gui/workspace/PanelTypes.h"
@@ -14,9 +12,7 @@ namespace Element {
 
 WorkspaceState::WorkspaceState()
     : ObjectModel()
-{
-
-}
+{ }
 
 WorkspaceState::WorkspaceState (Workspace& w, const String& name)
     : ObjectModel (Tags::workspace)
@@ -206,5 +202,3 @@ void Workspace::resized()
 }
 
 }
-
-#endif

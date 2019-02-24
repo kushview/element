@@ -3,14 +3,13 @@
     Copyright (C) 2016-2018 Kushview, LLC.  All rights reserved.
 */
 
-#if EL_DOCKING
-
 #pragma once
 
 #include "ElementApp.h"
 
-#define EL_WORKSPACE_CLASSIC "Classic"
-#define EL_WORKSPACE_EDITING "Editing"
+#define EL_WORKSPACE_CLASSIC    "Classic"
+#define EL_WORKSPACE_EDITING    "Editing"
+#define EL_WORKSPACE_MIXING     "Mixing"
 
 namespace Element {
 
@@ -84,5 +83,3 @@ private:
 };
 
 }
-
-#endif
