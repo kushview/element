@@ -42,17 +42,53 @@ bool WorkspaceState::writeToFile (const File& file) const
     return succeded;
 }
 
-WorkspaceState WorkspaceState::fromFile (const File& file)
+bool WorkspaceState::writeToXmlFile (const File& file) const
 {
+    TemporaryFile tempFile (file);
+    bool succeded = false;
+
+    if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
+    {
+        if (auto xml = std::unique_ptr<XmlElement> (createXml()))
+        {
+            xml->writeToStream (*out, String());
+            out.reset();
+            succeded = tempFile.overwriteTargetFileWithTemporary();
+        }
+    }
+
+    return succeded;
+}
+
+WorkspaceState WorkspaceState::fromFile (const File& file, bool tryXml)
+{
+    WorkspaceState state;
+    
+    if (tryXml)
+    {
+        if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
+        {
+            state.objectData = ValueTree::fromXml (*xml);
+            if (state.objectData.hasType (Tags::workspace))
+                return state;
+        }
+    }
+
     if (auto in = std::unique_ptr<FileInputStream> (file.createInputStream()))
     {
         GZIPDecompressorInputStream gzip (*in);
-        WorkspaceState state;
         state.objectData = ValueTree::readFromStream (gzip);
-        return state;
     }
 
-    return {};
+    return state;
+}
+
+WorkspaceState WorkspaceState::fromXmlFile (const File& file)
+{
+    WorkspaceState state;
+    if (auto xml = std::unique_ptr<XmlElement> (XmlDocument::parse (file)))
+        state.objectData = ValueTree::fromXml (*xml);
+    return state;
 }
 
 void WorkspaceState::setMissing()
@@ -75,14 +111,6 @@ Workspace::Workspace (Globals& w, AppController& a, GuiController& g)
             wp->didBecomeActive();
         }
     };
-
-    auto* item = dock.createItem (PanelIDs::virtualKeyboard, DockPlacement::Top);
-    dock.createItem (PanelIDs::graphMixer,      DockPlacement::Top);
-    dock.createItem (PanelIDs::graphEditor,     DockPlacement::Bottom);
-    dock.createItem (PanelIDs::nodeEditor,      DockPlacement::Left);
-    dock.createItem (PanelIDs::nodeChannelStrip, DockPlacement::Right);
-    dock.createItem (PanelIDs::nodeMidi,        DockPlacement::Right);
-    dock.createItem (PanelIDs::plugins,         DockPlacement::Left);
 
     addAndMakeVisible (dock);
     setSize (1280, 640);

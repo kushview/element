@@ -20,6 +20,10 @@ protected:
 
 struct AppMessage : public Message
 {
+    enum ID {
+        
+    };
+    
     inline virtual void createActions (AppController&, OwnedArray<UndoableAction>&) const { }
 };
 
@@ -29,6 +33,7 @@ struct AddMidiDeviceMessage : public AppMessage
         : device (name), inputDevice (isInput) { }
     const String device;
     const bool inputDevice;
+    
     inline PluginDescription getPluginDescription() const
     {
         PluginDescription desc;
@@ -231,3 +236,4 @@ struct OpenSessionMessage : public AppMessage
 }
 
 #include "messages/ControllerDeviceMessages.h"
+#include "messages/GuiMessages.h"

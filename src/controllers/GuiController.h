@@ -32,6 +32,7 @@ namespace Element {
         
         void activate() override;
         void deactivate() override;
+        bool handleMessage (const AppMessage&) override;
         
         void run();
         void timerCallback() override;

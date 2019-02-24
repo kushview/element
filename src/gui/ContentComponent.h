@@ -128,6 +128,8 @@ public:
 
     virtual WorkspaceState getWorkspaceState() { return { }; }
     virtual void applyWorkspaceState (const WorkspaceState&) { }
+    virtual void addWorkspaceItemsToMenu (PopupMenu&) {}
+    virtual void handleWorkspaceMenuResult (int) {}
 
     /** @internal */
     void paint (Graphics &g) override;

@@ -75,6 +75,9 @@ LookAndFeel::LookAndFeel()
 
     // Hyperlink button
     setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
+
+    // DockItem
+    setColour (DockItem::selectedHighlightColourId, Colors::toggleBlue);
 }
 
 

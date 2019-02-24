@@ -90,6 +90,40 @@ void ContentComponentPro::applyWorkspaceState (const WorkspaceState& state)
     auto& workspace = impl->workspace;
     workspace.applyState (state);
 }
+
+void ContentComponentPro::addWorkspaceItemsToMenu (PopupMenu& menu)
+{
+    auto& dock = impl->getDock();
+    const int offset = 100000;
+    int index = 0;
+    for (const auto* const desc : dock.getPanelDescriptions())
+    {
+        menu.addItem (offset + index++, desc->name);
+    }
+}
+
+void ContentComponentPro::handleWorkspaceMenuResult (int result)
+{
+    auto& dock = impl->getDock();
+    const int index = result - 100000;
+    const auto& descs = dock.getPanelDescriptions();
+    
+    if (isPositiveAndBelow (index, descs.size()))
+    {
+        const auto panelId = descs[index]->identifier;
+
+        if (auto* const selected = dock.getSelectedItem())
+        {
+            if (auto* const item = dock.createItem (panelId))
+                item->dockTo (selected, DockPlacement::Center);
+        }
+        else
+        {
+            dock.createItem (panelId, DockPlacement::Top);
+        }
+    }
+}
+
 }
 
 #endif

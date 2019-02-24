@@ -24,12 +24,6 @@ public:
     WorkspaceState (Workspace&, const String& name = String());
     ~WorkspaceState() = default;
 
-    // inline Uuid getUuid() const
-    // {
-    //     const Uuid uuid (getProperty(Tags::uuid).toString());
-    //     return uuid;
-    // }
-
     inline String getName() const { return getProperty(Tags::name).toString(); }
     
     inline void applyTo (Dock& dock) const
@@ -39,9 +33,17 @@ public:
             dock.applyState (dockState);
     }
 
+    /** Write to binary file */
     bool writeToFile (const File&) const;
-    
-    static WorkspaceState fromFile (const File&);
+
+    /** Write to human readable XML file */
+    bool writeToXmlFile (const File&) const;
+
+    /** Load from binary formatted file. tryXml will try to load from xml first */
+    static WorkspaceState fromFile (const File&, bool tryXml = false);
+
+    /** Load explicitly from an xml file. Doesn't check binary format */
+    static WorkspaceState fromXmlFile (const File&);
 
     inline WorkspaceState& operator= (const WorkspaceState& o)
     {

@@ -149,6 +149,8 @@ void AppController::handleMessage (const Message& msg)
     auto* presets   = findChild<PresetsController>();
 	jassert(ec && gui && sess && devs && maps && presets);
 
+    bool handled = false; // final else condition will set false
+    
     if (const auto* message = dynamic_cast<const AppMessage*> (&msg))
     {
         OwnedArray<UndoableAction> actions;
@@ -162,9 +164,16 @@ void AppController::handleMessage (const Message& msg)
             gui->stabilizeViews();
             return;
         }
+
+        for (auto* const child : getChildren())
+            if (auto* const acc = dynamic_cast<AppController::Child*> (child))
+                { handled |= acc->handleMessage (*message); break; }
+
+        if (handled)
+            return;
     }
 
-    bool handled = true; // final else condition will set false
+    handled = true; // final else condition will set false
     if (const auto* lpm = dynamic_cast<const LoadPluginMessage*> (&msg))
     {
         ec->addPlugin (lpm->description, lpm->verified, lpm->relativeX, lpm->relativeY);

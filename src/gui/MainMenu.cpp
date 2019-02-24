@@ -52,11 +52,22 @@ void MainMenu::setupMenu()
 
 StringArray MainMenu::getMenuBarNames()
 {
-   #if JUCE_DEBUG
-    const char* const names[] = { "File", "Edit", "View", "Window", "Options", "Debug", "Help", nullptr };
-   #else
-    const char* const names[] = { "File", "Edit", "View", "Window", "Options", "Help", nullptr };
-   #endif
+    const char* const names[] = { 
+        "File", 
+        "Edit", 
+        "View", 
+        "Window", 
+        "Options",
+       #if defined (EL_PRO) && EL_DOCKING
+        "Workspace",
+       #endif
+       #if JUCE_DEBUG
+        "Debug",
+       #endif
+        "Help", 
+        nullptr 
+    };
+  
     return StringArray (names, MainMenu::NumMenus);
 }
 
@@ -77,10 +88,14 @@ PopupMenu MainMenu::getMenuForIndex (int index, const String& name)
         buildOptionsMenu (menu);
     else if (name == "Help")
         buildHelpMenu (menu);
-    #if JUCE_DEBUG
+   #if defined (EL_PRO) && EL_DOCKING
+    else if (name == "Workspace")
+        buildWorkspaceMenu (menu);
+   #endif
+   #if JUCE_DEBUG
     else if (name == "Debug")
         buildDebugMenu (menu);
-    #endif
+   #endif
 
     return menu;
 }
@@ -107,6 +122,15 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         world.getSettings().performMenuResult (world, index);
         owner.refreshMenu();
+    }
+
+    if (menu == Workspace)
+    {
+        if (index >= 100000)
+        {
+            if (auto* const cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
+                cc->handleWorkspaceMenuResult (index);
+        }
     }
 
     #if JUCE_DEBUG
@@ -228,7 +252,13 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
     menu.addCommandItem (&cmd, Commands::hideAllPluginWindows, "Close plugin windows...");
     menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
+}
+
+void MainMenu::buildWorkspaceMenu (PopupMenu& menu)
+{
    #if EL_DOCKING && defined (EL_PRO)
+    if (auto* const cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
+        cc->addWorkspaceItemsToMenu (menu);
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::workspaceOpen, "Open Workspace File");
     menu.addCommandItem (&cmd, Commands::workspaceSave, "Save Workspace File");

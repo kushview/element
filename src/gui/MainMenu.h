@@ -19,11 +19,19 @@ class MainMenu : public MenuBarModel,
 public:
     enum RootNames
     {
-       #if JUCE_DEBUG
-        File, Edit, View, Window, Options, DebugItem, Help, NumMenus
-       #else
-        File, Edit, View, Window, Options, Help, NumMenus
-       #endif
+         File, 
+         Edit, 
+         View, 
+         Window,
+         Options,
+        #if defined (EL_PRO) && EL_DOCKING
+         Workspace,
+        #endif
+        #if JUCE_DEBUG
+         DebugItem,
+        #endif
+         Help, 
+         NumMenus
     };
 
     MainMenu (MainWindow& parent, CommandManager& c);
@@ -59,6 +67,7 @@ private:
     void buildViewMenu (PopupMenu& menu);
     void buildWindowMenu (PopupMenu& menu);
     void buildOptionsMenu (PopupMenu& menu);
+    void buildWorkspaceMenu (PopupMenu& menu);
     void buildDebugMenu (PopupMenu& menu);
     void buildHelpMenu (PopupMenu& menu);
 

@@ -25,6 +25,8 @@ public:
 
     WorkspaceState getWorkspaceState() override;
     void applyWorkspaceState (const WorkspaceState&) override;
+    void addWorkspaceItemsToMenu (PopupMenu&) override;
+    void handleWorkspaceMenuResult (int) override;
 
 private:
     class Impl; std::unique_ptr<Impl> impl;

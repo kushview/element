@@ -5,6 +5,8 @@
 #include "session/CommandManager.h"
 
 namespace Element {
+
+class AppMessage;
 class Globals;
 
 class AppController :  public Controller,
@@ -14,12 +16,12 @@ class AppController :  public Controller,
 public:
     AppController (Globals&);
     ~AppController();
-    
+
     inline CommandManager& getCommandManager() { return commands; }
     inline Globals& getWorld() { return getGlobals(); }
     inline Globals& getGlobals() { return world; }
     inline UndoManager& getUndoManager() { return undo; }
-    
+
     void activate() override;
     void deactivate() override;
 
@@ -29,6 +31,7 @@ public:
         Child() { }
         virtual ~Child() { }
         Globals& getWorld();
+        virtual bool handleMessage (const AppMessage&) { return false; }
     };
     
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }

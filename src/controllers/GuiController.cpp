@@ -849,11 +849,14 @@ bool GuiController::perform (const InvocationInfo& info)
        #if EL_DOCKING
         case Commands::workspaceSave:
         {
+            const auto state = content->getWorkspaceState();
+            DBG(state.getValueTree().toXmlString());
+
             FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
             {
                 const auto state = content->getWorkspaceState();
-                state.writeToFile (chooser.getResult());
+                state.writeToXmlFile (chooser.getResult());
             }
         } break;
 
@@ -862,8 +865,8 @@ bool GuiController::perform (const InvocationInfo& info)
             FileChooser chooser ("Load Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToOpen())
             {
-                const auto state = WorkspaceState::fromFile (chooser.getResult());
-                content->applyWorkspaceState (state);
+                getAppController().postMessage (
+                new WorkspaceOpenFileMessage (chooser.getResult()));
             }
         } break;
        #endif // EL_DOCKING
@@ -938,6 +941,22 @@ void GuiController::toggleAboutScreen()
 }
 
 KeyListener* GuiController::getKeyListener() const { return keys.get(); }
+
+bool GuiController::handleMessage (const AppMessage& msg)
+{
+    bool handled = true;
+    if (const auto* wofm = dynamic_cast<const WorkspaceOpenFileMessage*> (&msg))
+    {
+        const auto state = WorkspaceState::fromFile (wofm->file, true);
+        content->applyWorkspaceState (state);
+    }
+    else
+    {
+        handled = false;
+    }
+
+    return handled;
+}
 
 #if EL_RUNNING_AS_PLUGIN
 void GuiController::clearContentComponent()
