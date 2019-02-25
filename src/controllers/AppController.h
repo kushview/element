@@ -8,6 +8,8 @@ namespace Element {
 
 class AppMessage;
 class Globals;
+class Settings;
+class UnlockStatus;
 
 class AppController :  public Controller,
                        protected ApplicationCommandTarget,
@@ -25,13 +27,34 @@ public:
     void activate() override;
     void deactivate() override;
 
-    class Child : public Controller
+    class Child : public Controller,
+                  protected ApplicationCommandTarget
     {
     public:
         Child() { }
         virtual ~Child() { }
+        
+        inline AppController& getAppController()
+        {
+            auto* const app = dynamic_cast<AppController*> (getRoot());
+            jassert (app); // if you hit this then you're probably calling 
+                           // this before controller initialization
+            return *app;
+        }
+
+        Settings& getSettings();
+        UnlockStatus& getUnlockStatus();
         Globals& getWorld();
+
+    protected:
+        friend class AppController;
         virtual bool handleMessage (const AppMessage&) { return false; }
+    
+        friend class ApplicationCommandTarget;
+        virtual ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
+        virtual void getAllCommands (Array<CommandID>&) override {}
+        virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override {}
+        virtual bool perform (const InvocationInfo&) override { return false; }
     };
     
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }

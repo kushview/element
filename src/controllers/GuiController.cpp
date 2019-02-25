@@ -6,7 +6,10 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/SessionController.h"
+#include "controllers/WorkspacesController.h"
+
 #include "engine/AudioEngine.h"
+
 #include "gui/AboutComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
@@ -14,6 +17,7 @@
 #include "gui/PluginWindow.h"
 #include "gui/SystemTray.h"
 #include "gui/views/VirtualKeyboardView.h"
+
 #include "CapsLock.h"
 #include "Version.h"
 
@@ -80,7 +84,7 @@ private:
 };
 
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
-static Array<GuiController*> guiInstances;
+static Array<GuiController*> sGuiControllerInstances;
 static std::unique_ptr<SystemTray> sSystemTray;
 
 GuiController::GuiController (Globals& w, AppController& a)
@@ -90,17 +94,17 @@ GuiController::GuiController (Globals& w, AppController& a)
       mainWindow (nullptr)
 {
     keys = new KeyPressManager (*this);
-    if (guiInstances.size() <= 0)
+    if (sGuiControllerInstances.size() <= 0)
         sGlobalLookAndFeel = new GlobalLookAndFeel();
-    guiInstances.add (this);
+    sGuiControllerInstances.add (this);
     windowManager = new WindowManager (*this);
     commander().registerAllCommandsForTarget (this);
 }
 
 GuiController::~GuiController()
 {
-    guiInstances.removeFirstMatchingValue (this);
-    if (guiInstances.size() <= 0)
+    sGuiControllerInstances.removeFirstMatchingValue (this);
+    if (sGuiControllerInstances.size() <= 0)
         sGlobalLookAndFeel = nullptr;
 }
 
@@ -108,11 +112,6 @@ Element::LookAndFeel& GuiController::getLookAndFeel()
 { 
     jassert (sGlobalLookAndFeel);
     return sGlobalLookAndFeel->look;
-}
-
-void GuiController::timerCallback()
-{
-    
 }
 
 void GuiController::saveProperties (PropertiesFile* props)
@@ -140,28 +139,22 @@ void GuiController::saveProperties (PropertiesFile* props)
 void GuiController::activate()
 {
     Controller::activate();
-    startTimer (1000);
 }
 
 void GuiController::deactivate()
 {
-    stopTimer();
-    auto& settings = getWorld().getSettings();
-    saveProperties (getWorld().getSettings().getUserSettings());
     nodeSelected.disconnect_all_slots();
 
-    if (content)
-    {
-        saveCurrentWorkspace();
-    }
+    auto& settings = getSettings();
+    saveProperties (settings.getUserSettings());
     
+    closeAllPluginWindows (true);
+
     if (sSystemTray != nullptr)
     {
         sSystemTray->removeFromDesktop();
         sSystemTray.reset(nullptr);
     }
-
-    closeAllPluginWindows (true);
 
     if (mainWindow)
     {
@@ -194,24 +187,7 @@ void GuiController::closeAllWindows()
     windowManager->closeAll();
 }
 
-CommandManager& GuiController::commander() {
-    return world.getCommandManager();
-}
-
-void GuiController::openWindow (Component* c)
-{
-    if (windowManager)
-    {
-        Window* win = new Window (c->getName());
-        win->setContentOwned (c, true);
-        windowManager->push (win);
-    }
-    else
-    {
-        jassertfalse;
-        deleteAndZero (c);
-    }
-}
+CommandManager& GuiController::commander() { return world.getCommandManager(); }
 
 void GuiController::runDialog (const String& uri)
 {
@@ -428,7 +404,7 @@ SessionRef GuiController::session()
 
 ApplicationCommandTarget* GuiController::getNextCommandTarget()
 {
-    return content.get();
+    return findSibling<WorkspacesController>();
 }
 
 void GuiController::getAllCommands (Array <CommandID>& commands)
@@ -437,19 +413,10 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
        #if defined (EL_PRO)
         Commands::showSessionConfig,
         Commands::showGraphMixer,
-        #if EL_DOCKING
-         Commands::workspaceSave,
-         Commands::workspaceOpen,
-         Commands::workspaceResetActive,
-         Commands::workspaceClassic,
-         Commands::workspaceEditing,
-        #endif
        #endif
-       
        #if defined (EL_SOLO) || defined (EL_PRO)
         Commands::toggleChannelStrip,
        #endif
-
         Commands::showAbout,
 		Commands::showPluginManager,
 		Commands::showPreferences,
@@ -534,38 +501,6 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             if (content && content->getMainViewName() == "SessionSettings") flags |= Info::isTicked;
             result.setInfo ("Session Settings", "Session Settings", Commands::Categories::Session, flags);
         } break;
-
-       #if EL_DOCKING
-        case Commands::workspaceSave:
-            // result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Save Workspace", "Save the current workspace", 
-                Commands::Categories::UserInterface, 0);
-            break;
-        case Commands::workspaceOpen:
-            // result.addDefaultKeypress ('p', ModifierKeys::commandModifier);
-            result.setInfo ("Open Workspace", "Open a saved workspace", 
-                Commands::Categories::UserInterface, 0);
-            break;
-        case Commands::workspaceResetActive:
-        {
-            result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", 
-                Commands::Categories::UserInterface, 0);
-        } break;
-        case Commands::workspaceClassic:
-        {
-            result.setInfo ("Classic Workspace", "Open the classic workspace", 
-                Commands::Categories::UserInterface, 0);
-            if (content)
-                result.setTicked (content->getWorkspaceName() == "Classic");
-        } break;
-        case Commands::workspaceEditing: 
-        {
-            result.setInfo ("Editing Workspace", "Open the editing workspace", 
-                Commands::Categories::UserInterface, 0);
-            if (content)
-                result.setTicked (content->getWorkspaceName() == "Editing");
-        } break;
-       #endif
        #endif
 
        #ifndef EL_PRO
@@ -883,54 +818,6 @@ bool GuiController::perform (const InvocationInfo& info)
             }
         } break;
 
-       #if defined (EL_PRO)
-       #if EL_DOCKING
-        case Commands::workspaceSave:
-        {
-            const auto state = content->getWorkspaceState();
-            DBG(state.getValueTree().toXmlString());
-
-            FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
-            if (chooser.browseForFileToSave (true))
-            {
-                const auto state = content->getWorkspaceState();
-                state.writeToXmlFile (chooser.getResult());
-            }
-        } break;
-
-        case Commands::workspaceOpen:
-        {
-            FileChooser chooser ("Load Workspace", juce::File(), "*.elw", true, false);
-            if (chooser.browseForFileToOpen())
-            {
-                getAppController().postMessage (
-                    new WorkspaceOpenFileMessage (chooser.getResult()));
-            }
-        } break;
-
-        case Commands::workspaceResetActive:
-        {
-            auto state = WorkspaceState::loadByName (content->getWorkspaceName());
-            if (state.isValid())
-                content->applyWorkspaceState (state);
-        } break;
-
-        case Commands::workspaceClassic:
-        {
-            saveCurrentWorkspace();
-            auto state = WorkspaceState::loadByFileOrName ("Classic");
-            content->applyWorkspaceState (state);
-        } break;
-
-        case Commands::workspaceEditing:
-        {
-            saveCurrentWorkspace();
-            auto state = WorkspaceState::loadByFileOrName ("Editing");
-            content->applyWorkspaceState (state);
-        } break;
-       #endif // EL_DOCKING
-       #endif // EL_PRO
-       
         case Commands::quit:
             JUCEApplication::getInstance()->systemRequestedQuit();
             break;
@@ -1001,33 +888,9 @@ void GuiController::toggleAboutScreen()
 
 KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 
-void GuiController::saveCurrentWorkspace()
-{
-    auto state = content->getWorkspaceState();
-    if (state.isValid())
-    {
-        auto name = content->getWorkspaceName();
-        getWorld().getSettings().setWorkspace (name);
-        name << ".elw";
-        state.writeToXmlFile (DataPath::workspacesDir().getChildFile (name));
-    }
-}
-
 bool GuiController::handleMessage (const AppMessage& msg)
 {
-    bool handled = true;
-    if (const auto* wofm = dynamic_cast<const WorkspaceOpenFileMessage*> (&msg))
-    {
-        saveCurrentWorkspace();
-        const auto state = WorkspaceState::fromFile (wofm->file, true);
-        content->applyWorkspaceState (state);
-    }
-    else
-    {
-        handled = false;
-    }
-
-    return handled;
+    return false;
 }
 
 #if EL_RUNNING_AS_PLUGIN

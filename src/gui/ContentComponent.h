@@ -144,6 +144,7 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     /** @internal */
     void itemDropped (const SourceDetails& dragSourceDetails) override;
+
     /** @internal */
     void getAllCommands (Array<CommandID>&) override { }
     /** @internal */

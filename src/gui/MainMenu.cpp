@@ -249,7 +249,7 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
     workspace.addCommandItem (&cmd, Commands::workspaceEditing, "Editing");
     workspace.addSeparator();
     workspace.addCommandItem (&cmd, Commands::workspaceResetActive, "Reset to Saved Layout");
-    workspace.addItem (80000, "Save Changes to this Workspace", false);
+    workspace.addCommandItem (&cmd, Commands::workspaceSaveActive, "Save Changes to this Workspace");
     workspace.addItem (80001, "Save as new Workspace", false);
     workspace.addSeparator();
     workspace.addItem (80002, "Edit Workspaces...", false);

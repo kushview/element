@@ -9,9 +9,8 @@
 #include "controllers/SessionController.h"
 #include "controllers/PresetsController.h"
 #include "controllers/ScriptingController.h"
+#include "controllers/WorkspacesController.h"
 
-#include "engine/GraphProcessor.h"
-#include "engine/SubGraphProcessor.h"
 #include "gui/MainWindow.h"
 #include "gui/UnlockForm.h"
 #include "gui/GuiCommon.h"
@@ -26,28 +25,31 @@
 
 namespace Element {
 
-Globals& AppController::Child::getWorld()
-{
-    auto* app = dynamic_cast<AppController*> (getRoot());
-    jassert (app);
-    return app->getWorld();
-}
+Globals& AppController::Child::getWorld()               { return getAppController().getWorld(); }
+Settings& AppController::Child::getSettings()           { return getWorld().getSettings(); }
+UnlockStatus& AppController::Child::getUnlockStatus()   { return getWorld().getUnlockStatus(); }
 
 AppController::AppController (Globals& g)
     : world (g)
 {
-    lastExportedGraph = DataPath::defaultGraphDir();
     addChild (new GuiController (g, *this));
-    addChild (new DevicesController ());
-    addChild (new EngineController ());
-    addChild (new MappingController ());
-    addChild (new PresetsController ());
-    addChild (new SessionController ());
+    addChild (new DevicesController());
+    addChild (new EngineController());
+    addChild (new MappingController());
+    addChild (new PresetsController());
+    addChild (new SessionController());
     addChild (new GraphController());
-    addChild (new ScriptingController ());
-    
-    g.getCommandManager().registerAllCommandsForTarget (this);
-    g.getCommandManager().setFirstCommandTarget (this);
+    addChild (new ScriptingController());
+    addChild (new WorkspacesController());
+
+    lastExportedGraph = DataPath::defaultGraphDir();
+
+    auto& commands = g.getCommandManager();
+    commands.registerAllCommandsForTarget (this);
+    for (auto* ctl : getChildren())
+        if (auto* child = dynamic_cast<AppController::Child*> (ctl))
+            commands.registerAllCommandsForTarget (child);
+    commands.setFirstCommandTarget (this);
 }
 
 AppController::~AppController() {}
@@ -363,6 +365,9 @@ void AppController::getAllCommands (Array<CommandID>& cids)
 void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
     findChild<GuiController>()->getCommandInfo (commandID, result);
+    // for (auto* const child : getChildren())
+    //     if (auto* const appChild = dynamic_cast<AppController::Child*> (child))
+    //         appChild->getCommandInfo (commandID, result);
 }
 
 bool AppController::perform (const InvocationInfo& info)
