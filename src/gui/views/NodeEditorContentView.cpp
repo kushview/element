@@ -1,13 +1,16 @@
 
 #include "ElementApp.h"
+
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
+
+#include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
-#include "gui/LookAndFeel.h"
-#include "gui/ContextMenus.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/ViewHelpers.h"
+#include "gui/LookAndFeel.h"
+#include "gui/ContextMenus.h"
 
 #include "session/DeviceManager.h"
 #include "Globals.h"
@@ -347,6 +350,11 @@ namespace Element {
             auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
             programChangeMapEditor->setStoreSize (false);
             return programChangeMapEditor;
+        }
+        else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
+        {
+            auto* const audioRouterEditor = new AudioRouterEditor (node);
+            return audioRouterEditor;
         }
 
         return nullptr;

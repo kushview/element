@@ -6,7 +6,8 @@
 
 namespace Element {
 
-class AudioRouterNode : public GraphNode
+class AudioRouterNode : public GraphNode,
+                        public ChangeBroadcaster
 {
 public:
     explicit AudioRouterNode (int ins = 4, int outs = 4);
@@ -16,6 +17,10 @@ public:
     void render (AudioSampleBuffer&, MidiPipe&) override;
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
+
+    MatrixState getMatrixState() const;
+    void setWithoutLocking (int src, int dst, bool set);
+    CriticalSection& getLock() { return lock; }
 
 protected:
     inline void createPorts() override
@@ -38,6 +43,7 @@ protected:
     }
 
 private:
+    CriticalSection lock;
     const int numSources;
     const int numDestinations;
     bool** patches { nullptr };

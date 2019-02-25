@@ -1,6 +1,7 @@
 #pragma once
 
 #include "gui/Icons.h"
+#include "gui/LookAndFeel.h"
 
 namespace Element {
 
@@ -132,7 +133,7 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.fillAll (LookAndFeel_KV1::backgroundColor);
+        g.fillAll (LookAndFeel::contentBackgroundColor);
         if (! emptyTreeMessage.getValue().isUndefined() && (rootItem == nullptr || rootItem->getNumSubItems() == 0))
             drawEmptyPanelMessage (*this, g, emptyTreeMessage.getValue());
     }
