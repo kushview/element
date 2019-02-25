@@ -4,8 +4,7 @@
 #include "Globals.h"
 #include "gui/views/KeymapEditorView.h"
 
-namespace Element 
-{
+namespace Element  {
 
 class KeymapEditor : public KeyMappingEditorComponent
 {
@@ -17,7 +16,10 @@ public:
             Commands::mediaClose, Commands::mediaNew, Commands::mediaOpen, 
             Commands::mediaSave, Commands::mediaSaveAs,
             Commands::sessionInsertPlugin,
-            Commands::signIn, Commands::signOut
+            Commands::signIn, Commands::signOut,
+            Commands::workspaceClassic, Commands::workspaceEditing,
+            Commands::workspaceOpen, Commands::workspaceResetActive,
+            Commands::workspaceSave, Commands::workspaceSaveActive
         });
 
         readOnly.addArray ({

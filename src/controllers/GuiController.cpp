@@ -98,7 +98,6 @@ GuiController::GuiController (Globals& w, AppController& a)
         sGlobalLookAndFeel = new GlobalLookAndFeel();
     sGuiControllerInstances.add (this);
     windowManager = new WindowManager (*this);
-    commander().registerAllCommandsForTarget (this);
 }
 
 GuiController::~GuiController()
@@ -538,7 +537,6 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         
         case Commands::mediaSaveAs:
-            result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Media As", "Saves the current object with another name", Commands::Categories::Session, 0);
             break;
             
@@ -824,6 +822,7 @@ bool GuiController::perform (const InvocationInfo& info)
         
         default:
             result = false;
+            break;
     }
     
     if (result && mainWindow)

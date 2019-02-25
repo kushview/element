@@ -32,7 +32,7 @@ bool WorkspacesController::handleMessage (const AppMessage& msg)
     return handled;
 }
 
-ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return nullptr; }
+ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return findFirstTargetParentComponent(); }
 
 void WorkspacesController::getAllCommands (Array<CommandID>& commands)
 {
@@ -54,17 +54,16 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
     switch (command)
     {
         case Commands::workspaceSave:
-            result.setInfo ("Save Workspace", "Save the current workspace", 
-                Commands::Categories::UserInterface, 0);
+            result.setInfo ("Save Workspace", "Save the current workspace", Commands::Categories::UserInterface, 0);
             break;
         case Commands::workspaceOpen:
-            result.setInfo ("Open Workspace", "Open a saved workspace", 
-                Commands::Categories::UserInterface, 0);
+            result.setInfo ("Open Workspace", "Open a saved workspace", Commands::Categories::UserInterface, 0);
             break;
         case Commands::workspaceResetActive:
         {
-            result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", 
-                Commands::Categories::UserInterface, 0);
+            result.addDefaultKeypress ('0', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress (')', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Reset Workspace", "Reset the active workspace to it's default state.", Commands::Categories::UserInterface, 0);
         } break;
         case Commands::workspaceSaveActive:
         {
@@ -77,6 +76,8 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
                 Commands::Categories::UserInterface, 0);
             if (content)
                 result.setTicked (content->getWorkspaceName() == "Classic");
+            result.addDefaultKeypress ('1', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress ('!', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
         } break;
         case Commands::workspaceEditing: 
         {
@@ -84,6 +85,8 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
                 Commands::Categories::UserInterface, 0);
             if (content)
                 result.setTicked (content->getWorkspaceName() == "Editing");
+            result.addDefaultKeypress ('2', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
+            result.addDefaultKeypress ('@', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
         } break;
     }
    #endif
@@ -98,8 +101,6 @@ bool WorkspacesController::perform (const InvocationInfo& info)
         case Commands::workspaceSave:
         {
             const auto state = content->getWorkspaceState();
-            DBG(state.getValueTree().toXmlString());
-
             FileChooser chooser ("Save Workspace", juce::File(), "*.elw", true, false);
             if (chooser.browseForFileToSave (true))
             {
@@ -144,8 +145,9 @@ bool WorkspacesController::perform (const InvocationInfo& info)
         } break;
        #endif // PRO and DOCKING
 
-       default: handled = false;
-        break;
+        default: 
+            handled = false;
+            break;
     }
 
     if (handled)
