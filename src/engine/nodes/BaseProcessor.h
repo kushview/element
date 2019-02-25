@@ -14,6 +14,7 @@
 #define EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER  "element.midiChannelSplitter"
 #define EL_INTERNAL_ID_MEDIA_PLAYER         "element.mediaPlayer"
 #define EL_INTERNAL_ID_PROGRAM_CHANGE_MAP   "element.programChangeMap"
+#define EL_INTERNAL_ID_AUDIO_ROUTER         "element.audioRouter"
 
 namespace Element
 {

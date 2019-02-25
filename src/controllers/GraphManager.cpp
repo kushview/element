@@ -1,6 +1,7 @@
 
 #include "controllers/GraphManager.h"
 
+#include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/ProgramChangeMapNode.h"
 #include "engine/PlaceholderProcessor.h"
@@ -198,6 +199,10 @@ GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, 
     else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
     {
         return processor.addNode (new ProgramChangeMapNode());
+    }
+    else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
+    {
+        return processor.addNode (new AudioRouterNode());
     }
 
     String errorMessage;

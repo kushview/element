@@ -265,7 +265,20 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
-       
+        else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
+            desc->name               = "Audio Router";
+            desc->descriptiveName    = "An Audio Patch Grid";
+            desc->numInputChannels   = 4;
+            desc->numOutputChannels  = 4;
+            desc->hasSharedContainer = false;
+            desc->isInstrument       = false;
+            desc->manufacturerName   = "Element";
+            desc->pluginFormatName   = "Element";
+            desc->version            = "1.0.0";
+        }
        #elif defined (EL_SOLO) || defined (EL_PRO)
         if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
@@ -305,6 +318,7 @@ namespace Element {
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
         results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
+        results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
