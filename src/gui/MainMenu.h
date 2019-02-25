@@ -10,6 +10,7 @@
 namespace Element {
 
 class CommandManager;
+class ContentComponent;
 class Globals;
 class MainWindow;
 
@@ -22,8 +23,8 @@ public:
          File, 
          Edit, 
          View, 
-         Window,
          Options,
+         Window,
         #if JUCE_DEBUG
          DebugItem,
         #endif
@@ -40,6 +41,8 @@ public:
     static void buildEditMenu (CommandManager& cmd, PopupMenu& menu);
     static void buildViewMenu (CommandManager& cmd, PopupMenu& menu);
     static void buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu);
+
+    ContentComponent* getContentComponent();
 
     // Menu Bar
     StringArray getMenuBarNames() override;

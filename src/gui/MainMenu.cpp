@@ -52,19 +52,19 @@ void MainMenu::setupMenu()
 
 StringArray MainMenu::getMenuBarNames()
 {
-    const char* const names[] = { 
+    const char* const names[] = {
         "File", 
         "Edit", 
-        "View", 
-        "Window", 
+        "View",
         "Options",
+        "Window", 
        #if JUCE_DEBUG
         "Debug",
        #endif
         "Help", 
         nullptr 
     };
-  
+
     return StringArray (names, MainMenu::NumMenus);
 }
 
@@ -93,6 +93,11 @@ PopupMenu MainMenu::getMenuForIndex (int index, const String& name)
     return menu;
 }
 
+ContentComponent* MainMenu::getContentComponent() 
+{
+    return dynamic_cast<ContentComponent*> (owner.getContentComponent());
+}
+
 void MainMenu::menuItemSelected (int index, int menu)
 {
     auto session = world.getSession();
@@ -100,7 +105,7 @@ void MainMenu::menuItemSelected (int index, int menu)
 
     if (index == 6000 && menu == Help)
     {
-        URL ("http://help.kushview.net/collection/10-element").launchInDefaultBrowser();
+        URL ("https://help.kushview.net/collection/10-element").launchInDefaultBrowser();
     }
     else if (index == 7000 && menu == Help)
     {
@@ -121,7 +126,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         if (index >= 100000)
         {
-            if (auto* const cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
+            if (auto* const cc = getContentComponent())
                 cc->handleWorkspaceMenuResult (index);
         }
     }
@@ -164,8 +169,8 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 5555)
     {
-        auto *cc = ViewHelpers::findContentComponent (&owner);
-        cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
+        if (auto *cc = getContentComponent())
+            cc->setNodeChannelStripVisible (! cc->isNodeChannelStripVisible());
     }
     else if (index == 6666)
     {
