@@ -2,6 +2,7 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "controllers/GraphController.h"
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
@@ -90,11 +91,6 @@ namespace Element {
 
     NodeEditorContentView::NodeEditorContentView()
     {
-        // const Font font (12.f);
-        // setWantsKeyboardFocus (false);
-        // setMouseClickGrabsKeyboardFocus (false);
-        // setInterceptsMouseClicks (true, true);
-
         addAndMakeVisible (nodesCombo);
         nodesCombo.addListener (this);
 
@@ -134,6 +130,7 @@ namespace Element {
         menuButton.onClick = nullptr;
         nodesCombo.removeListener (this);
         selectedNodeConnection.disconnect();
+        graphChangedConnection.disconnect();
     }
 
     void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
@@ -188,16 +185,28 @@ namespace Element {
         resized();
     }
 
+    void NodeEditorContentView::onGraphChanged()
+    {
+        auto *cc = ViewHelpers::findContentComponent (this);
+        jassert (cc);
+        auto& graphs = *cc->getAppController().findChild<GraphController>();
+        setNode (graphs.getGraph().getNode (0));
+    }
+
     void NodeEditorContentView::stabilizeContent()
     {
         auto *cc = ViewHelpers::findContentComponent (this);
         auto session = ViewHelpers::getSession (this);
         jassert (cc && session);
         auto& gui = *cc->getAppController().findChild<GuiController>();
+        auto& graphs = *cc->getAppController().findChild<GraphController>();
+
         if (! selectedNodeConnection.connected())
             selectedNodeConnection = gui.nodeSelected.connect (std::bind (
                 &NodeEditorContentView::stabilizeContent, this));
-
+        if (! graphChangedConnection.connected())
+            graphChangedConnection = graphs.graphChanged.connect (std::bind (
+                &NodeEditorContentView::onGraphChanged, this));
         if (! sticky || ! node.isValid())
         {
             setNode (gui.getSelectedNode());

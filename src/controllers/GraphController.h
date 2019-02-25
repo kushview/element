@@ -3,6 +3,7 @@
 
 #include "controllers/AppController.h"
 #include "documents/GraphDocument.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -19,11 +20,14 @@ public:
 
     bool hasGraphChanged() const        { return document.hasChangedSinceSaved(); }
     const File getGraphFile() const     { return document.getFile(); }
+    Node getGraph() const               { return document.getGraph(); }
 
     void openDefaultGraph();
     void openGraph (const File& file);
     void newGraph();
     void saveGraph (const bool saveAs);
+
+    Signal<void()> graphChanged;
 
 private:
     GraphDocument document;

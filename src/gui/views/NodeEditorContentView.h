@@ -32,6 +32,8 @@ private:
     Node graph, node;
     Value nodeObjectValue;
     SignalConnection selectedNodeConnection;
+    SignalConnection graphChangedConnection;
+
     std::unique_ptr<Component> editor;
     NodeListComboBox nodesCombo;
     IconButton menuButton;
@@ -40,7 +42,8 @@ private:
     Component* createEmbededEditor();
     
     static void nodeMenuCallback (int, NodeEditorContentView*);
-
+    void onGraphChanged();
+    
     class NodeWatcher; std::unique_ptr<NodeWatcher> watcher;
 };
 
