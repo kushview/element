@@ -60,7 +60,7 @@ AppController::AppController (Globals& g)
     commands.setFirstCommandTarget (this);
 }
 
-AppController::~AppController() {}
+AppController::~AppController() { }
 
 void AppController::activate()
 {

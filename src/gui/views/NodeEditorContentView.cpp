@@ -211,7 +211,7 @@ namespace Element {
         {
             setNode (gui.getSelectedNode());
         }
-        
+
         if (! node.isValid())
         {
             setNode (session->getActiveGraph().getNode (0));
