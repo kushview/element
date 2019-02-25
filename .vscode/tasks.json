@@ -127,7 +127,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure Element Lite",
+            "label": "Waf Configure Element LT",
             "type": "shell",
             "command": "python",
             "args": [
@@ -145,7 +145,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure Element Solo",
+            "label": "Waf Configure Element SE",
             "type": "shell",
             "command": "python",
             "args": [
@@ -163,7 +163,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure Element Solo (Local Auth)",
+            "label": "Waf Configure Element SE (Local Auth)",
             "type": "shell",
             "command": "python",
             "args": [
