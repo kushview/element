@@ -76,6 +76,11 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
     if (panelId == PanelIDs::nodeMidi)
         return new NodeMidiPanel();
 
+    if (panelId == PanelIDs::session)
+        return new SessionPanel();
+    if (panelId == PanelIDs::sessionSettings)
+        return new SessionSettingsPanel();
+
     if (panelId == PanelIDs::virtualKeyboard)
         return new VirtualKeyboardPanel();
     

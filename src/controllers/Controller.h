@@ -71,6 +71,17 @@ public:
             added->parent = this;
     }
 
+    virtual void initialize()
+    {
+        for (auto* child : children)
+            child->initialize();
+    }
+
+    virtual void saveSettings () {
+        for (auto* child : children)
+            saveSettings();
+    }
+
     virtual void activate()
     {
         for (auto* child : children)
@@ -83,6 +94,12 @@ public:
             child->deactivate();
     }
     
+    virtual void shutdown()
+    {
+        for (auto* child : children)
+            child->shutdown();
+    }
+
     inline const OwnedArray<Controller>& getChildren() const { return children; }
     
 private:

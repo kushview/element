@@ -1,3 +1,4 @@
+
 #pragma once
 
 #include "gui/ContentComponent.h"
@@ -7,6 +8,7 @@
 #include "gui/views/GraphSettingsView.h"
 #include "gui/views/KeymapEditorView.h"
 #include "gui/views/NodeMidiContentView.h"
+#include "gui/views/SessionTreeContentView.h"
 #include "gui/views/SessionSettingsView.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/views/NodeEditorContentView.h"
@@ -84,6 +86,13 @@ class NodeMidiPanel : public ContentViewPanel<NodeMidiContentView>
 public:
     NodeMidiPanel() { setName ("MIDI"); }
     ~NodeMidiPanel() = default;
+};
+
+class SessionPanel : public ContentViewPanel<SessionTreeContentView>
+{
+public:
+    SessionPanel() { setName ("Session"); }
+    ~SessionPanel() = default;
 };
 
 class SessionSettingsPanel : public ContentViewPanel<SessionSettingsView>

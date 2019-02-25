@@ -16,6 +16,7 @@ namespace PanelIDs
     static const Identifier nodeEditor          = "nodeEditor";
     static const Identifier nodeMidi            = "nodeMidi";
     static const Identifier plugins             = "plugins";
+    static const Identifier session             = "session";
     static const Identifier sessionSettings     = "sessionSettings";
     static const Identifier virtualKeyboard     = "virtualKeyboard";
 }
@@ -81,6 +82,11 @@ public:
         type->identifier    = PanelIDs::plugins;
         type->name          = "Plugins";
         type->description   = "Available plugins";
+
+        type = types.add (new DockPanelInfo());
+        type->identifier    = PanelIDs::session;
+        type->name          = "Session";
+        type->description   = "Displays all objects in the Session";
 
         type = types.add (new DockPanelInfo());
         type->identifier    = PanelIDs::sessionSettings;

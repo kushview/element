@@ -12,7 +12,11 @@ void WorkspacesController::activate()
 
 void WorkspacesController::deactivate()
 {
-
+    saveCurrentWorkspace();
+    if (content)
+    {
+        getSettings().setWorkspace (content->getWorkspaceName());
+    }
 }
 
 bool WorkspacesController::handleMessage (const AppMessage& msg)
@@ -36,16 +40,17 @@ ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return 
 
 void WorkspacesController::getAllCommands (Array<CommandID>& commands)
 {
+   #if defined (EL_PRO) && EL_DOCKING
     commands.addArray ({
-      #if defined (EL_PRO) && EL_DOCKING
+      
         Commands::workspaceSave,
         Commands::workspaceOpen,
         Commands::workspaceResetActive,
         Commands::workspaceSaveActive,
         Commands::workspaceClassic,
         Commands::workspaceEditing
-        #endif
     });
+   #endif
 }
 
 void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
@@ -94,8 +99,8 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
 
 bool WorkspacesController::perform (const InvocationInfo& info)
 {
-    bool handled = true;
    #if defined (EL_PRO) && EL_DOCKING
+    bool handled = true;
     switch (info.commandID)
     {
         case Commands::workspaceSave:
@@ -143,7 +148,6 @@ bool WorkspacesController::perform (const InvocationInfo& info)
             if (state.isValid() && content)
                 content->applyWorkspaceState (state);
         } break;
-       #endif // PRO and DOCKING
 
         default: 
             handled = false;
@@ -154,6 +158,9 @@ bool WorkspacesController::perform (const InvocationInfo& info)
         findSibling<GuiController>()->refreshMainMenu();
 
     return handled;
+   #else
+    return false;
+   #endif
 }
 
 void WorkspacesController::saveCurrentWorkspace()

@@ -1,3 +1,6 @@
+
+#pragma once 
+
 #include "controllers/AppController.h"
 #include "session/Node.h"
 

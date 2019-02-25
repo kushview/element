@@ -19,4 +19,5 @@
 #include "Messages.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "Utils.h"
 #include "Version.h"

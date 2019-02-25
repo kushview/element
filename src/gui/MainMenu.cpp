@@ -254,8 +254,8 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
     workspace.addSeparator();
     workspace.addItem (80002, "Edit Workspaces...", false);
     workspace.addSeparator();
-    workspace.addCommandItem (&cmd, Commands::workspaceOpen, "Open File");
-    workspace.addCommandItem (&cmd, Commands::workspaceSave, "Save File");
+    workspace.addCommandItem (&cmd, Commands::workspaceOpen, "Open Workspace File");
+    workspace.addCommandItem (&cmd, Commands::workspaceSave, "Save Workspace File");
     menu.addSubMenu ("Workspaces", workspace);
     menu.addSeparator();
     buildWorkspaceMenu (menu);

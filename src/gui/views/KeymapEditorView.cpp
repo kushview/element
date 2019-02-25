@@ -10,16 +10,18 @@ class KeymapEditor : public KeyMappingEditorComponent
 {
 public:
     KeymapEditor (KeyPressMappingSet& s) : KeyMappingEditorComponent (s, true)
-    { 
+    {
         disallow.addArray ({
             Commands::exportAudio, Commands::exportMidi,
             Commands::mediaClose, Commands::mediaNew, Commands::mediaOpen, 
             Commands::mediaSave, Commands::mediaSaveAs,
             Commands::sessionInsertPlugin,
             Commands::signIn, Commands::signOut,
+           #if defined (EL_PRO) && EL_DOCKING
             Commands::workspaceClassic, Commands::workspaceEditing,
             Commands::workspaceOpen, Commands::workspaceResetActive,
             Commands::workspaceSave, Commands::workspaceSaveActive
+           #endif
         });
 
         readOnly.addArray ({
