@@ -100,6 +100,11 @@ void AppController::run()
     
     activate();
     
+    // need content component parented for the following init routines
+    // TODO: better controlled startup procedure
+    if (auto* gui = findChild<GuiController>())
+        gui->run();
+
     auto session = getWorld().getSession();
     Session::ScopedFrozenLock freeze (*session);
     
@@ -141,7 +146,6 @@ void AppController::run()
 
     if (auto* gui = findChild<GuiController>())
     {
-        gui->run();
         const Node graph (session->getCurrentGraph());
         gui->stabilizeContent();
         if (graph.isValid())
