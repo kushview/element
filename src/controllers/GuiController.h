@@ -124,7 +124,7 @@ private:
     ScopedPointer<MainWindow>        mainWindow;
     ScopedPointer<ContentComponent>  content;
     ScopedPointer<DialogWindow>      about;
-    
+    std::unique_ptr<Component>       activation;
     Node selectedNode; // TODO: content manager
 
     struct KeyPressManager;

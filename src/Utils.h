@@ -6,6 +6,15 @@
 namespace Element {
 namespace Util {
 
+static juce_wchar defaultPasswordChar() noexcept
+{
+#if JUCE_LINUX
+    return 0x2022;
+#else
+    return 0x25cf;
+#endif
+}
+
 /** Display minutes in decimal as min:sec */
 inline static String minutesToString (const double input)
 {
@@ -39,6 +48,23 @@ inline static String appName (const String& beforeText = String())
    #endif
 
     return name;
+}
+
+inline static bool isGmailExtended (const String& email)
+{
+    if (! URL::isProbablyAnEmailAddress (email))
+        return false;
+    if (! email.toLowerCase().contains ("gmail.com"))
+        return false;
+    if (! email.toLowerCase().upToFirstOccurrenceOf("gmail.com", false, true).containsAnyOf(".+"))
+        return false;
+    
+    return email.fromFirstOccurrenceOf ("+", true, true)
+                .upToFirstOccurrenceOf ("@gmail.com", false, true)
+                .length() >= 1  ||
+            email.fromFirstOccurrenceOf (".", true, true)
+                .upToFirstOccurrenceOf ("@gmail.com", false, true)
+                .length() >= 1; 
 }
 
 }

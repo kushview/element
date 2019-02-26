@@ -22,6 +22,11 @@ public:
     
     int getDefaultScrollbarWidth() override;
 
+    void drawLinearProgressBar (Graphics& g, ProgressBar& progressBar,
+                                             int width, int height,
+                                             double progress, const String& textToShow);
+    void drawProgressBar (Graphics& g, ProgressBar& progressBar,
+                          int width, int height, double progress, const String& textToShow) override;
     // MARK: Concertina Panel
     void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,

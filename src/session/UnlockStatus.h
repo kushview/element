@@ -53,6 +53,11 @@
  #define EL_USE_LOCAL_AUTH 0
 #endif
 
+// we use macros
+#define EL_IS_TRIAL_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() < Time::getCurrentTime())
+#define EL_IS_TRIAL_NOT_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() >= Time::getCurrentTime())
+#define EL_IS_NOT_ACTIVATED(status) (!(status).isUnlocked() && !(status).isFullVersion())
+
 namespace Element {
     
 class Globals;
@@ -82,6 +87,18 @@ public:
         loadProps();
     }
 
+    UnlockResult registerTrial (const String& email, const String& username,
+                                const String& password);
+
+    inline double getTrialPeriodDays() const
+    {
+       #if EL_USE_LOCAL_AUTH
+        return 14.0;
+       #else
+        return 30.0;
+       #endif
+    }
+    
     inline var isExpiring() const
     {
         var result (0);

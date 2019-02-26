@@ -264,6 +264,10 @@
               file="../src/gui/AboutComponent.cpp"/>
         <FILE id="ZCsaaj" name="AboutComponent.h" compile="0" resource="0"
               file="../src/gui/AboutComponent.h"/>
+        <FILE id="y76CmC" name="ActivationDialog.cpp" compile="1" resource="0"
+              file="../src/gui/ActivationDialog.cpp"/>
+        <FILE id="jk1PVX" name="ActivationDialog.h" compile="0" resource="0"
+              file="../src/gui/ActivationDialog.h"/>
         <FILE id="kAKqzP" name="AssetTreeView.cpp" compile="1" resource="0"
               file="../src/gui/AssetTreeView.cpp"/>
         <FILE id="DJVF81" name="AssetTreeView.h" compile="0" resource="0" file="../src/gui/AssetTreeView.h"/>

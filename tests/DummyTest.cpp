@@ -18,9 +18,21 @@ public:
         testName();
         testJavascript();
         testUuid();
+        testGmailFilter();
     }
 
 private:
+    void testGmailFilter()
+    {
+        beginTest ("Gmail Extended Addresses");
+        expect (Util::isGmailExtended ("axetota@gmail.com") == false);
+        expect (Util::isGmailExtended ("axetota+extended@gmail.com") == true);
+        expect (Util::isGmailExtended ("axetota+@gmail.com") == true);
+        expect (Util::isGmailExtended ("axe.to.ta@gmail.com") == true);
+        expect (Util::isGmailExtended ("info+yadda@yahoo.com") == false);
+        expect (Util::isGmailExtended ("info.ya.dda@yahoo.com") == false);
+    }
+
     void testUuid()
     {
         beginTest ("UUID handling");

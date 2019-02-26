@@ -18,6 +18,7 @@
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "Common.h"
 
 namespace Element 
 {

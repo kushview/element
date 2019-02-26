@@ -11,6 +11,7 @@
 #include "engine/AudioEngine.h"
 
 #include "gui/AboutComponent.h"
+#include "gui/ActivationDialog.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
@@ -379,18 +380,12 @@ void GuiController::run()
 
     stabilizeViews();
     
-    if (getWorld().getUnlockStatus().isTrial() &&
-        getWorld().getUnlockStatus().getExpiryTime() > Time() &&
-        getWorld().getUnlockStatus().getExpiryTime() < Time::getCurrentTime())
+    if ((EL_IS_TRIAL_EXPIRED (getWorld().getUnlockStatus())) ||
+        (EL_IS_TRIAL_NOT_EXPIRED (getWorld().getUnlockStatus())) ||
+        (EL_IS_NOT_ACTIVATED (getWorld().getUnlockStatus())))
     {
-        AlertWindow alert ("Trial Expired",
-            "The trial period has expired. If you like Element and would like to continue "
-            "using all features, please upgrade your license.",
-            AlertWindow::WarningIcon, mainWindow.get());
-        alert.addButton ("Buy Now", 1);
-        alert.addButton ("Continue", 0);
-        if (1 == alert.runModalLoop())
-            URL("https://kushview.net/account/licenses/").launchInDefaultBrowser();
+        jassert (activation == nullptr);
+        new ActivationDialog (*this, activation);
     }
 }
 

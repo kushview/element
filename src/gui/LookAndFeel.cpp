@@ -2,6 +2,7 @@
 #include "LookAndFeel.h"
 #include "gui/Buttons.h"
 #include "gui/widgets/MidiBlinker.h"
+#include "gui/ActivationDialog.h"
 
 namespace Element {
 
@@ -78,6 +79,11 @@ LookAndFeel::LookAndFeel()
 
     // DockItem
     setColour (DockItem::selectedHighlightColourId, Colors::toggleBlue);
+
+    // ProgressBar
+    setColour (ProgressBar::foregroundColourId, Colors::elemental);
+    setColour (ProgressBar::backgroundColourId, findColour (
+        DocumentWindow::backgroundColourId).darker());
 }
 
 
@@ -96,7 +102,90 @@ void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& 
     g.fillRect (r);
 }
 
-    
+// ProgressBar
+
+void LookAndFeel::drawLinearProgressBar (Graphics& g, ProgressBar& progressBar,
+                                         int width, int height,
+                                         double progress, const String& textToShow)
+{
+    auto background = progressBar.findColour (ProgressBar::backgroundColourId);
+    auto foreground = progressBar.findColour (ProgressBar::foregroundColourId);
+
+    auto barBounds = progressBar.getLocalBounds().toFloat();
+
+    g.setColour (background);
+    g.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
+
+    if (progress >= 0.0f && progress <= 1.0f)
+    {
+        Path p;
+        p.addRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
+        g.reduceClipRegion (p);
+
+        barBounds.setWidth (barBounds.getWidth() * (float) progress);
+        g.setColour (foreground);
+        g.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
+    }
+    else
+    {
+        // spinning bar..
+        g.setColour (background);
+
+        auto stripeWidth = height * 2;
+        auto position = static_cast<int> (Time::getMillisecondCounter() / 15) % stripeWidth;
+
+        Path p;
+
+        for (auto x = static_cast<float> (-position); x < width + stripeWidth; x += stripeWidth)
+            p.addQuadrilateral (x, 0.0f,
+                                x + stripeWidth * 0.5f, 0.0f,
+                                x, static_cast<float> (height),
+                                x - stripeWidth * 0.5f, static_cast<float> (height));
+
+        Image im (Image::ARGB, width, height, true);
+
+        {
+            Graphics g2 (im);
+            g2.setColour (foreground);
+            g2.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
+        }
+
+        g.setTiledImageFill (im, 0, 0, 0.85f);
+        g.fillPath (p);
+    }
+
+    if (textToShow.isNotEmpty())
+    {
+//        g.setColour (Colour::contrasting (background, foreground));
+        g.setColour (Colours::white);
+        g.setFont (height * 0.6f);
+
+        g.drawText (textToShow, 0, 0, width, height, Justification::centred, false);
+    }
+}
+
+//==============================================================================
+void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
+                                   int width, int height, double progress, const String& textToShow)
+{
+    String theText = textToShow;
+    if (auto* const trialBar = dynamic_cast<TrialDaysProgressBar*> (&progressBar))
+    {
+        const double elapsed = trialBar->periodDays * progress;
+        const double remains = trialBar->periodDays - elapsed;
+        if (progress >= 1.0)
+        {
+            theText = "Trial Expired";
+        }
+        else
+        {
+            theText = "Trial expires in ";
+            theText << RelativeTime::days(remains).getDescription();
+        }
+    }
+    drawLinearProgressBar (g, progressBar, width, height, progress, theText);
+}
+
 // MARK: Property Panel
 
 void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& name,

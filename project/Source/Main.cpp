@@ -207,6 +207,10 @@ public:
         world = new Globals (commandLine);
         world->getUnlockStatus().loadAll();
         world->getUnlockStatus().dump();
+
+        
+        
+
         initializeModulePath();
         
         if (maybeLaunchSlave (commandLine))
@@ -220,9 +224,19 @@ public:
         
         String appName = Util::appName();
         appName << " v" << getApplicationVersion();
+        
+        if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
+        {
+            appName << " (unauthorized)";
+        }
+        else
+        {
+            appName << " (authorized)";
+        }
+
         Logger::writeToLog (appName);
         Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
-
+        
         launchApplication();
     }
     

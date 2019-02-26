@@ -2,10 +2,10 @@
 #include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "URLs.h"
+#include "Utils.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
-
-
 
 namespace Element {
 
@@ -25,6 +25,89 @@ namespace Element {
     UnlockStatus::UnlockStatus (Globals& g) : Thread("elt"), settings (g.getSettings()) { }
     String UnlockStatus::getProductID() { return EL_PRODUCT_ID; }
 
+    UnlockStatus::UnlockResult UnlockStatus::registerTrial (const String& email,
+                                                            const String& username,
+                                                            const String& password)
+    {
+        URL regUrl (EL_URL_AUTH);
+        regUrl = regUrl.withParameter ("kv_action", "activate_trial")
+            .withParameter ("email", email.trim())
+            .withParameter ("username", username.trim())
+            .withParameter ("password", password.trim())
+            .withParameter ("url", getLocalMachineIDs()[0]);
+
+        DBG(regUrl.toString (true));
+        const var response = JSON::parse (regUrl.readEntireTextStream (true));
+        UnlockResult result;
+        result.succeeded = false;
+        result.errorMessage = "Unknown server error";
+        const bool serverSuccess = (bool) response.getProperty ("success", false);
+        if (! serverSuccess)
+        {
+            result.succeeded = false;
+            result.errorMessage = response.getProperty("message", result.errorMessage).toString();
+            result.informativeMessage.clear();
+        }
+        else if (serverSuccess && response.hasProperty ("key"))
+        {
+            MemoryOutputStream mo;
+            String keyData;
+            if (Base64::convertFromBase64 (mo, response.getProperty("key", "#").toString()))
+            {
+                MemoryBlock mb = mo.getMemoryBlock();
+                if (CharPointer_UTF8::isValidString ((const char*) mb.getData(), (int) mb.getSize()))
+                    keyData = String::fromUTF8 ((const char*) mb.getData(), (int) mb.getSize());
+            }
+            mo.flush();
+
+            if (keyData.isNotEmpty())
+            {
+                result.succeeded = applyKeyFile (keyData);
+                if (result.succeeded)
+                {
+                    save();
+                    loadAll();
+
+                    if (EL_IS_NOT_ACTIVATED (*this))
+                    {
+                        result.succeeded = false;
+                        result.informativeMessage.clear();
+                        if (EL_IS_TRIAL_EXPIRED(*this))
+                        {
+                            result.errorMessage = "The server returned an EXPIRED license key "
+                                                  "and could not activate the software.";
+                        }
+                        else
+                        {
+                            result.errorMessage = "The server returned a license key "
+                                                  "but could not activate the software.";
+                        }
+                    }
+                    else
+                    {
+                        result.succeeded = true;
+                        result.errorMessage.clear();
+                        result.informativeMessage = "The server returned a license key. Your software is authorized.";
+                    }
+                }
+                else
+                {
+                    result.succeeded = false;
+                    result.informativeMessage.clear();
+                    result.errorMessage = "The server returned a license key, but could not activate the software.";
+                }
+            }
+        }
+        else
+        {
+            result.succeeded = true;
+            result.errorMessage.clear();
+            result.informativeMessage = String("Registration sucessful. Please check your email for "
+                                        "your APPNAME trial license key and enter it below.").replace("APPNAME", Util::appName());
+        }
+
+        return result;
+    }
     bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
     {
         const StringArray pids { getProductID() };
