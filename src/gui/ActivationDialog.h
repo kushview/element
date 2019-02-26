@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
+#include "gui/UnlockOverlay.h"
 #include "session/CommandManager.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
@@ -61,7 +62,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setForTrial (bool setupForTrial);
+    void setForTrial (bool setupForTrial, bool refreshButton = false);
     void setForRegistration (bool setupRegistration);
     void visibilityChanged() override;
     void timerCallback() override;
@@ -91,6 +92,8 @@ private:
     Label passwordLabel { "Password" };
     TextEditor password;
     bool grabbedFirstFocus = false;
+
+    void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 
     //==============================================================================

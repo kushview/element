@@ -833,6 +833,7 @@ namespace Element {
         }
     };
 
+    #define EL_PREFS_NEW_UNLOCKING 0
     class LicenseSettingsPage : public SettingsPage
     {
     public:
@@ -840,25 +841,43 @@ namespace Element {
         {
             auto& status = world.getUnlockStatus();
             setName (EL_LICENSE_SETTINGS_NAME);
+           #if EL_PREFS_NEW_UNLOCKING
             activation.reset (new ActivationComponent (gui));
             activation->setBackgroundColour (LookAndFeel::widgetBackgroundColor);
             if ((EL_IS_TRIAL_EXPIRED(status)) || (EL_IS_TRIAL_NOT_EXPIRED(status)))
-                activation->setForTrial (true);
+                activation->setForTrial (true, true);
             addAndMakeVisible (activation.get());
+           #else
+            form.reset (new UnlockForm (world, gui,
+                "Enter your license key.", false, false, true, true));
+            addAndMakeVisible (form.get());
+           #endif
         }
 
         void resized() override
         {
+           #if EL_PREFS_NEW_UNLOCKING
             activation->centreWithSize (activation->getWidth(), activation->getHeight());
+           #else
+            form->setBounds (getLocalBounds().reduced (2));
+           #endif
         }
 
         ~LicenseSettingsPage()
         {
+           #if EL_PREFS_NEW_UNLOCKING
             activation.reset();
+           #else
+            form.reset();
+           #endif
         }
 
     private:
+       #if EL_PREFS_NEW_UNLOCKING
         std::unique_ptr<ActivationComponent> activation;
+       #else
+        std::unique_ptr<UnlockForm> form;
+       #endif
     };
 //[/MiscUserDefs]
 
