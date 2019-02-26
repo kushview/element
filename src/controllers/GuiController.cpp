@@ -361,7 +361,8 @@ void GuiController::run()
 
    #if ! EL_RUNNING_AS_PLUGIN
     sSystemTray.reset (new SystemTray());
-   #if JUCE_MAC
+   #define EL_USE_NEW_SYSTRAY_ICON 0
+   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
     {
         const auto traySize = 22.f * 4;
         const float padding = 8.f;
