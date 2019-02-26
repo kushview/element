@@ -340,6 +340,7 @@ ActivationComponent::ActivationComponent (GuiController& g)
 
 
     //[Constructor] You can add your own custom stuff here..
+    setBackgroundColour (findColour (DocumentWindow::backgroundColourId));
     startTimer (250);
     //[/Constructor]
 }
@@ -374,7 +375,7 @@ void ActivationComponent::paint (Graphics& g)
     g.fillAll (Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
-    g.fillAll (findColour (DocumentWindow::backgroundColourId));
+    g.fillAll (backgroundColour);
     //[/UserPaint]
 }
 

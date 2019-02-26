@@ -65,6 +65,7 @@ public:
     void setForRegistration (bool setupRegistration);
     void visibilityChanged() override;
     void timerCallback() override;
+    void setBackgroundColour (const Colour& color) { backgroundColour = color; repaint(); }
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -75,6 +76,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    Colour backgroundColour;
     GuiController& gui;
     std::unique_ptr<Component> unlock;
     double progress = 0.0;

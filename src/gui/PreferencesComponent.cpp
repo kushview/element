@@ -21,6 +21,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
+#include "gui/ActivationDialog.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/UnlockForm.h"
@@ -837,23 +838,27 @@ namespace Element {
     public:
         LicenseSettingsPage (Globals& world, GuiController& gui)
         {
+            auto& status = world.getUnlockStatus();
             setName (EL_LICENSE_SETTINGS_NAME);
-            addAndMakeVisible (form = new UnlockForm (world, gui,
-                "Enter your license key.", false, false, true, true));
+            activation.reset (new ActivationComponent (gui));
+            activation->setBackgroundColour (LookAndFeel::widgetBackgroundColor);
+            if ((EL_IS_TRIAL_EXPIRED(status)) || (EL_IS_TRIAL_NOT_EXPIRED(status)))
+                activation->setForTrial (true);
+            addAndMakeVisible (activation.get());
         }
 
         void resized() override
         {
-            form->setBounds (getLocalBounds().reduced (2));
+            activation->centreWithSize (activation->getWidth(), activation->getHeight());
         }
 
         ~LicenseSettingsPage()
         {
-            form = nullptr;
+            activation.reset();
         }
 
     private:
-        ScopedPointer<UnlockForm> form;
+        std::unique_ptr<ActivationComponent> activation;
     };
 //[/MiscUserDefs]
 
