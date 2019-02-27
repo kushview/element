@@ -31,6 +31,7 @@ public:
     void setLength (float newLength)
     {
         jassert (newLength > 0.f);
+        length = newLength;
         updateFadeRate();
     }
 
@@ -47,6 +48,8 @@ public:
 
     void startFading()
     {
+        if (state == Idle)
+            reset();
         state = State::Fading;
     }
 
@@ -55,19 +58,25 @@ public:
     float getNextEnvelopeValue()
     {
         if (state == State::Idle)
-            return fadesIn ? 0.0f : 1.0f;
+            return envelope;
 
         if (fadesIn)
         {
             envelope += fadeRate;
             if (envelope >= 1.0f)
-                reset();
+            {
+                envelope = 1.0f;
+                state = Idle;
+            };
         }
         else
         {
             envelope -= fadeRate;
             if (envelope <= 0.0f)
-                reset();
+            {
+                envelope = 0.0f;
+                state = Idle;
+            }
         }
 
         return envelope;

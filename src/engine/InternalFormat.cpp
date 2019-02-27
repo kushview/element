@@ -224,13 +224,6 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             SubGraphProcessor().fillInPluginDescription (*desc);
         }
-       #if 0
-        else if (fileOrId == EL_INTERNAL_ID_MIDI_SEQUENCER)
-        {
-            auto* const desc = ds.add (new PluginDescription());
-            MidiSequenceProcessor().fillInPluginDescription (*desc);
-        }
-       #endif
         else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
         {
             auto* const desc = ds.add (new PluginDescription());
@@ -265,9 +258,10 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
-        
-       #elif defined (EL_SOLO) || defined (EL_PRO)
-        if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
+       #endif
+
+       #if defined (EL_SOLO) || defined (EL_PRO)
+        else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             auto* const desc = ds.add (new PluginDescription());
             desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
@@ -318,13 +312,13 @@ namespace Element {
         results.add (EL_INTERNAL_ID_GRAPH);
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
-        results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
-        
+        results.add (EL_INTERNAL_ID_MEDIA_PLAYER);        
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
+       #endif
 
-       #elif defined (EL_SOLO) || defined (EL_PRO)
+       #if defined (EL_SOLO) || defined (EL_PRO)
         results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
         results.add (EL_INTERNAL_ID_PLACEHOLDER);
         results.add (EL_INTERNAL_ID_PROGRAM_CHANGE_MAP);

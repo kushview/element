@@ -19,7 +19,7 @@ private:
         beginTest ("linear fade");
         LinearFade fader;
         fader.setSampleRate (44100.0);
-        fader.setLength (1.0);
+        fader.setLength (0.02);
         fader.setFadesIn (false);
 
         expect (! fader.isActive());
@@ -36,6 +36,8 @@ private:
         
         DBG("frames processed: " << frame);
         expect (fader.isActive() == false);
+        expect (fader.getCurrentEnvelopeValue() == 0.0);
+        fader.reset();
         expect (fader.getCurrentEnvelopeValue() == 1.0);
     }
 };

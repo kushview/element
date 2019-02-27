@@ -214,7 +214,7 @@ public:
     {
         if (auto* const proc = getAudioProcessor())
             return proc->getProgramName (index);
-        return String();
+        return "Program " + String (index + 1);
     }
 
     virtual void getState (MemoryBlock&) = 0;

@@ -23,6 +23,10 @@ public:
     void setWithoutLocking (int src, int dst, bool set);
     CriticalSection& getLock() { return lock; }
 
+    int getNumPrograms() const override { return 2; }
+    int getCurrentProgram() const override { return 0; }
+    const String getProgramName (int index) const override { return "Audio Router " + String (index + 1); }
+
 protected:
     inline void createPorts() override
     {
@@ -47,7 +51,6 @@ private:
     CriticalSection lock;
     const int numSources;
     const int numDestinations;
-    bool** patches { nullptr };
     AudioSampleBuffer tempAudio { 1, 1 };
     
     struct Program
@@ -62,7 +65,10 @@ private:
     void set (int src, int dst, bool patched);
     void clearPatches();
 
-    double fadeLengthSeconds { 0.25 };
+    // used by the UI, but not the rendering
+    MatrixState state;
+
+    double fadeLengthSeconds { 0.001 }; // 1 ms
     LinearFade fadeIn;
     LinearFade fadeOut;
     ToggleGrid toggles;

@@ -2,6 +2,7 @@
 
 #include "JuceHeader.h"
 
+#define EL_INTERNAL_FORMAT_NAME             "Element"
 #define EL_INTERNAL_ID_AUDIO_MIXER          "element.audioMixer"
 #define EL_INTERNAL_ID_COMB_FILTER          "element.comb"
 #define EL_INTERNAL_ID_CHANNELIZE           "element.channelize"

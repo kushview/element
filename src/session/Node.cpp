@@ -663,7 +663,8 @@ namespace Element {
     void Node::setCurrentProgram (const int index)
     {
         if (auto* obj = getGraphNode())
-            obj->getAudioProcessor()->setCurrentProgram (index);
+            if (auto* proc = obj->getAudioProcessor())
+                proc->setCurrentProgram (index);
     }
     
     int Node::getCurrentProgram() const
