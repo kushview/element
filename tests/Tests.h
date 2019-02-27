@@ -12,6 +12,7 @@
 #include "engine/VolumeProcessor.h"
 #include "engine/VelocityCurve.h"
 #include "engine/SubGraphProcessor.h"
+#include "engine/ToggleGrid.h"
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"

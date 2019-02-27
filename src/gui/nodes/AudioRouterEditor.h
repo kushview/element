@@ -19,6 +19,7 @@ public:
     void applyMatrix();
 
     void changeListenerCallback (ChangeBroadcaster*) override;
+
 private:
     MatrixState matrix;
     class Content;

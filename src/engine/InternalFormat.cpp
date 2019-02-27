@@ -265,7 +265,9 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
-        else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
+        
+       #elif defined (EL_SOLO) || defined (EL_PRO)
+        if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             auto* const desc = ds.add (new PluginDescription());
             desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
@@ -279,8 +281,7 @@ namespace Element {
             desc->pluginFormatName   = "Element";
             desc->version            = "1.0.0";
         }
-       #elif defined (EL_SOLO) || defined (EL_PRO)
-        if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+        else if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
             auto* const desc = ds.add (new PluginDescription());
             desc->fileOrIdentifier   = EL_INTERNAL_ID_PROGRAM_CHANGE_MAP;
@@ -318,12 +319,13 @@ namespace Element {
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
         results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
-        results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
+        
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
 
        #elif defined (EL_SOLO) || defined (EL_PRO)
+        results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
         results.add (EL_INTERNAL_ID_PLACEHOLDER);
         results.add (EL_INTERNAL_ID_PROGRAM_CHANGE_MAP);
        #endif // product enablements

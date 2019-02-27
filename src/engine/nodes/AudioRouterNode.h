@@ -1,8 +1,8 @@
 #pragma once
 
 #include "engine/GraphNode.h"
-
-// https://stackoverflow.com/questions/936687/how-do-i-declare-a-2d-array-in-c-using-new
+#include "engine/LinearFade.h"
+#include "engine/ToggleGrid.h"
 
 namespace Element {
 
@@ -48,6 +48,7 @@ private:
     const int numDestinations;
     bool** patches { nullptr };
     AudioSampleBuffer tempAudio { 1, 1 };
+    
     struct Program
     {
         int program { 0 };
@@ -59,6 +60,13 @@ private:
 
     void set (int src, int dst, bool patched);
     void clearPatches();
+
+    double fadeLengthSeconds { 1.0 };
+    LinearFade fadeIn;
+    LinearFade fadeOut;
+    ToggleGrid toggles;
+    ToggleGrid nextToggles;
+    bool togglesChanged { false };
 };
 
 }

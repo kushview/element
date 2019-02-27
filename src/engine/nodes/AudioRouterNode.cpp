@@ -8,7 +8,9 @@ namespace Element {
 AudioRouterNode::AudioRouterNode (int ins, int outs)
     : GraphNode (0),
       numSources (ins),
-      numDestinations (outs)
+      numDestinations (outs),
+      toggles (ins, outs),
+      nextToggles (ins, outs)
 {
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
@@ -18,8 +20,12 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
     for (int i = 0; i < numSources; ++i)
         patches[i] = new bool [numDestinations];
 
-    clearPatches();
+    fadeIn.setFadesIn (true);
+    fadeIn.setLength (fadeLengthSeconds);
+    fadeOut.setFadesIn (false);
+    fadeOut.setLength (fadeLengthSeconds);
 
+    clearPatches();
     for (int i = 0; i < jmin (ins, outs); ++i)
         setWithoutLocking (i, i, true);
 }
@@ -95,7 +101,6 @@ void AudioRouterNode::setState (const void* data, int sizeInBytes)
             for (int r = 0; r < numSources; ++r)
                 for (int c = 0; c < numDestinations; ++c)
                     patches[r][c] = matrix.connected (r, c);
-            
         }
 
         sendChangeMessage();
