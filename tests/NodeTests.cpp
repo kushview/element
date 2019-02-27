@@ -12,7 +12,8 @@ namespace Element {
 class NodeTests : public UnitTestBase
 {
 public:
-    explicit NodeTests (const String& name = "Node Test") : UnitTestBase (name, "nodes", "nodes") { }
+    explicit NodeTests (const String& name = "Node Test")
+        : UnitTestBase (name, "nodes", "nodes") { }
     virtual ~NodeTests() { }
 
     void runTest() override

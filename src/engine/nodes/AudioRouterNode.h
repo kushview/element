@@ -18,6 +18,7 @@ public:
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 
+    void setMatrixState (const MatrixState&);
     MatrixState getMatrixState() const;
     void setWithoutLocking (int src, int dst, bool set);
     CriticalSection& getLock() { return lock; }
@@ -61,7 +62,7 @@ private:
     void set (int src, int dst, bool patched);
     void clearPatches();
 
-    double fadeLengthSeconds { 1.0 };
+    double fadeLengthSeconds { 0.25 };
     LinearFade fadeIn;
     LinearFade fadeOut;
     ToggleGrid toggles;

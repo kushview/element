@@ -10,7 +10,7 @@ class MidiChannelMapTest : public UnitTestBase
 {
 public:
     explicit MidiChannelMapTest (const String& name = "MidiChannelMap") 
-        : UnitTestBase (name, "midiChannelMap", "midiChannelMap") { }
+        : UnitTestBase (name, "engine", "midiChannelMap") { }
     virtual ~MidiChannelMapTest() { }
 
     void initialise() override {

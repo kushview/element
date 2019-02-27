@@ -1,5 +1,4 @@
 #include "Tests.h"
-#include "engine/LinearFade.h"
 
 namespace Element {
 
@@ -12,7 +11,6 @@ public:
     void runTest() override
     {
         testToggleGrid();
-        testLinearFade();
     }
 
 private:
@@ -40,31 +38,16 @@ private:
         grid1.swapWith (grid2);
         expect (grid1.get (2, 2) == false);
         expect (grid2.get (2, 2) == true);
-    }
 
-    void testLinearFade()
-    {
-        beginTest ("linear fade");
-        LinearFade fader;
-        fader.setSampleRate (44100.0);
-        fader.setLength (1.0);
-        fader.setFadesIn (false);
+        beginTest ("resize");
 
-        expect (! fader.isActive());
-        fader.startFading();
-        expect (fader.isActive());
-
-        int frame = 0;
-
-        while (fader.isActive())
-        {
-            float gain = fader.getNextEnvelopeValue();
-            frame++;
-        }
-        
-        DBG("frames processed: " << frame);
-        expect (fader.isActive() == false);
-        expect (fader.getCurrentEnvelopeValue() == 1.0);
+        beginTest ("matrix state");
+        MatrixState matrix (6, 6);
+        matrix.set (3, 3, true);
+        ToggleGrid grid4 (matrix);
+        expect (grid4.getNumInputs() == matrix.getNumRows() &&
+                grid4.getNumOutputs() == matrix.getNumColumns());
+        expect (grid4.get (3, 3) == matrix.connected (3, 3));
     }
 };
 

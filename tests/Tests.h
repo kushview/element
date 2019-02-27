@@ -4,15 +4,18 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/SessionController.h"
+
 #include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MappingEngine.h"
 #include "engine/InternalFormat.h"
+#include "engine/LinearFade.h"
 #include "engine/PlaceholderProcessor.h"
 #include "engine/VolumeProcessor.h"
 #include "engine/VelocityCurve.h"
 #include "engine/SubGraphProcessor.h"
 #include "engine/ToggleGrid.h"
+
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"

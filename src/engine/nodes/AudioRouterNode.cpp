@@ -25,9 +25,8 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
     fadeOut.setFadesIn (false);
     fadeOut.setLength (fadeLengthSeconds);
 
-    clearPatches();
     for (int i = 0; i < jmin (ins, outs); ++i)
-        setWithoutLocking (i, i, true);
+        toggles.set (i, i, true);
 }
 
 AudioRouterNode::~AudioRouterNode()
@@ -37,15 +36,26 @@ AudioRouterNode::~AudioRouterNode()
     delete [] patches;
 }
 
+void AudioRouterNode::setMatrixState (const MatrixState& matrix)
+{
+    ToggleGrid newPatches (matrix);
+
+    ScopedLock sl (getLock());
+    nextToggles.swapWith (newPatches);
+    togglesChanged = true;
+}
+
 MatrixState AudioRouterNode::getMatrixState() const
 {
     MatrixState state (numSources, numDestinations);
     
     {
         ScopedLock sl (lock);
+        const bool fading = fadeIn.isActive() || fadeOut.isActive();
+        const ToggleGrid& t = fading ? nextToggles : toggles;
         for (int r = 0; r < numSources; ++r)
             for (int c = 0; c < numDestinations; ++c)
-                state.set (r, c, patches[r][c]);
+                state.set (r, c, t.get (r, c));
     }
 
     return state;
@@ -55,24 +65,77 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     jassert (midi.getNumBuffers() == 1);
     const auto& midiBuffer = *midi.getReadBuffer (0);
+
     MidiBuffer::Iterator iter (midiBuffer);
     ignoreUnused (iter);
-    tempAudio.setSize (audio.getNumChannels(), audio.getNumSamples(),
-                       false, false, true);
-    tempAudio.clear (0, audio.getNumSamples());
 
+    const int numSamples = audio.getNumSamples();
+    const int numChannels = audio.getNumChannels();
+
+    tempAudio.setSize (numChannels, numSamples, false, false, true);
+    tempAudio.clear (0, numSamples);
+
+    if (togglesChanged)
+    {
+        fadeIn.startFading();
+        fadeOut.startFading();
+        togglesChanged = false;
+        DBG("fade start");
+    }
+
+    if (fadeIn.isActive() || fadeOut.isActive())
+    {
+        auto samplesToProcess = numSamples;
+        int frame = 0;
+        ScopedLock sl (lock);
+        while (--samplesToProcess >= 0)
+        {
+            const float fadeInGain  = fadeIn.isActive()  ? fadeIn.getNextEnvelopeValue()  : 1.0f;
+            const float fadeOutGain = fadeOut.isActive() ? fadeOut.getNextEnvelopeValue() : 0.0f;
+            for (int i = 0; i < numSources; ++i)
+            {
+                for (int j = 0; j < numDestinations; ++j)
+                {
+                    if (toggles.get (i, j) && nextToggles.get (i, j))
+                    {
+                        // no patch change and on means 1 to 1 mix
+                        tempAudio.getWritePointer(j)[frame] += 
+                            audio.getReadPointer(j)[frame];
+                    }
+                    else if (! toggles.get (i, j) && ! nextToggles.get (i, j))
+                    {
+                        // no patch change and off means no fade and zero'd
+                        tempAudio.getWritePointer(j)[frame] += 0.0f;
+                    }
+                    else if (!toggles.get (i, j) && nextToggles.get (i, j))
+                    {
+                        tempAudio.getWritePointer(j)[frame] += 
+                            (audio.getReadPointer(j)[frame] * fadeInGain);
+                    }
+                    else if (toggles.get (i, j) && !nextToggles.get (i, j))
+                    {
+                        tempAudio.getWritePointer(j)[frame] += 
+                            (audio.getReadPointer(j)[frame] * fadeOutGain);
+                    }
+                }
+            }
+
+            ++frame;
+        }
+
+        if (!fadeOut.isActive() && ! fadeIn.isActive())
+        {
+            toggles.swapWith (nextToggles);
+            DBG("fade stop");
+        }
+    }
+    else
     {
         ScopedLock sl (lock);
         for (int i = 0; i < numSources; ++i)
-        {
             for (int j = 0; j < numDestinations; ++j)
-            {
-                if (patches[i][j])
-                {
+                if (toggles.get (i, j))
                     tempAudio.addFrom (j, 0, audio, i, 0, audio.getNumSamples());
-                }
-            }
-        }
     }
 
     for (int c = 0; c < audio.getNumChannels(); ++c)

@@ -124,12 +124,7 @@ AudioRouterEditor::~AudioRouterEditor()
 void AudioRouterEditor::applyMatrix()
 {
     if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
-    {
-        ScopedLock sl (node->getLock());
-        for (int r = 0; r < matrix.getNumRows(); ++r)
-            for (int c = 0; c < matrix.getNumColumns(); ++c)
-                node->setWithoutLocking (r, c, matrix.connected (r, c));
-    }
+        node->setMatrixState (matrix);
 }
 
 void AudioRouterEditor::changeListenerCallback (ChangeBroadcaster*)

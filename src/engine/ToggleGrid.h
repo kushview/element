@@ -12,22 +12,42 @@ public:
         : numIns (ins), numOuts (outs)
     {
         jassert (ins > 0 && outs > 0);
-        toggles = new bool* [numIns];
-        for (int i = 0; i < numIns; ++i)
-            toggles[i] = new bool [numOuts];
+        resize (ins, outs);
         clear();
+    }
+
+    ToggleGrid (const MatrixState& matrix)
+    {
+        resize (matrix.getNumRows(), matrix.getNumColumns());
+        for (int i = 0; i < matrix.getNumRows(); ++i)
+            for (int o = 0; o < matrix.getNumColumns(); ++o)
+                toggles[i][o] = matrix.connected (i, o);
     }
 
     ~ToggleGrid() noexcept 
     {
+        free();
+    }
+
+    inline void resize (int ins, int outs)
+    {
+        free();
+        jassert(ins > 0 && outs > 0);
+        numIns = ins;
+        numOuts = outs;
+        toggles = new bool* [numIns];
         for (int i = 0; i < numIns; ++i)
-            delete [] toggles [i];
-        delete [] toggles;
+            toggles[i] = new bool [numOuts];
     }
 
     inline bool sameSizeAs (const ToggleGrid& other) const noexcept
     {
         return numIns == other.numIns && numOuts == other.numOuts;
+    }
+
+    inline bool sameSizeAs (const MatrixState& matrix) const noexcept
+    {
+        return numIns == matrix.getNumRows() && numOuts == matrix.getNumColumns();
     }
 
     inline void clear() noexcept
@@ -78,6 +98,18 @@ public:
 private:
     int numIns, numOuts;
     bool** toggles = nullptr;
+
+    void free()
+    {
+        if (toggles != nullptr)
+        {
+            for (int i = 0; i < numIns; ++i)
+                delete [] toggles [i];
+            delete [] toggles;
+            toggles = nullptr;
+        }
+        numIns = numOuts = 0;
+    }
 };
 
 }
