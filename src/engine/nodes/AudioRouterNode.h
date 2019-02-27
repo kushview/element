@@ -23,9 +23,15 @@ public:
     void setWithoutLocking (int src, int dst, bool set);
     CriticalSection& getLock() { return lock; }
 
-    int getNumPrograms() const override { return 2; }
-    int getCurrentProgram() const override { return 0; }
-    const String getProgramName (int index) const override { return "Audio Router " + String (index + 1); }
+    int getNumPrograms() const override { return jmax (1, programs.size()); }
+    int getCurrentProgram() const override { return currentProgram; }
+    void setCurrentProgram (int index) override;
+    const String getProgramName (int index) const override 
+    {
+        if (auto* prog = programs [index])
+            return prog->name;
+        return "Audio Router " + String (index + 1); 
+    }
 
 protected:
     inline void createPorts() override
@@ -52,15 +58,18 @@ private:
     const int numSources;
     const int numDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
-    
+
     struct Program
     {
-        int program { 0 };
-        String name { "" };
+        Program (const String& programName, int midiProgramNumber = -1)
+            : name (programName), midiProgram (midiProgramNumber) { }
+        String name { "1 to 1" };
+        int midiProgram { -1 };
         MatrixState matrix;
     };
 
     OwnedArray<Program> programs;
+    int currentProgram = 0;
 
     void set (int src, int dst, bool patched);
     void clearPatches();

@@ -217,6 +217,12 @@ public:
         return "Program " + String (index + 1);
     }
 
+    inline virtual void setCurrentProgram (int index)
+    {
+        if (auto* const proc = getAudioProcessor())
+            return proc->setCurrentProgram (index);
+    }
+
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 

@@ -25,25 +25,67 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
     fadeOut.setLength (fadeLengthSeconds);
 
     clearPatches();
+
+    auto* program = programs.add (new Program ("Linear Stereo"));
+    program->matrix.resize (ins, outs);
     for (int i = 0; i < jmin (ins, outs); ++i)
+        program->matrix.set (i, i, true);
+    setMatrixState (program->matrix);
+
+    if (ins == 4 && outs == 4)
     {
-        toggles.set (i, i, true);
-        state.set (i, i, true);
+        program = programs.add (new Program ("Inverse Stereo"));
+        program->matrix.resize (ins, outs);
+        program->matrix.set (0, 1, true);
+        program->matrix.set (1, 0, true);
+        program->matrix.set (2, 3, true);
+        program->matrix.set (3, 2, true);
+
+        program = programs.add (new Program ("1-2 to 1-2"));
+        program->matrix.resize (ins, outs);
+        program->matrix.set (0, 0, true);
+        program->matrix.set (1, 1, true);
+
+        program = programs.add (new Program ("1-2 to 3-4"));
+        program->matrix.resize (ins, outs);
+        program->matrix.set (0, 2, true);
+        program->matrix.set (1, 3, true);
+
+        program = programs.add (new Program ("3-4 to 1-2"));
+        program->matrix.resize (ins, outs);
+        program->matrix.set (2, 0, true);
+        program->matrix.set (3, 1, true);
+
+        program = programs.add (new Program ("3-4 to 3-4"));
+        program->matrix.resize (ins, outs);
+        program->matrix.set (2, 2, true);
+        program->matrix.set (3, 3, true);
     }
 }
 
 AudioRouterNode::~AudioRouterNode() { }
+
+void AudioRouterNode::setCurrentProgram (int index)
+{
+    if (auto* program = programs [index])
+    {
+        currentProgram = index;
+        setMatrixState (program->matrix);
+    }
+}
 
 void AudioRouterNode::setMatrixState (const MatrixState& matrix)
 {
     jassert (state.sameSizeAs (matrix));
     state = matrix;
     ToggleGrid newPatches (state);
+
     {
         ScopedLock sl (getLock());
         nextToggles.swapWith (newPatches);
         togglesChanged = true; // initiate the crossfade
     }
+
     sendChangeMessage();
 }
 
