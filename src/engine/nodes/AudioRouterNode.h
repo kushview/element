@@ -69,7 +69,7 @@ private:
     };
 
     OwnedArray<Program> programs;
-    int currentProgram = 0;
+    int currentProgram = -1;
 
     void set (int src, int dst, bool patched);
     void clearPatches();

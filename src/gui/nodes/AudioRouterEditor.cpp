@@ -2,7 +2,9 @@
 #include "engine/nodes/AudioRouterNode.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/LookAndFeel.h"
+#include "gui/Artist.h"
 #include "Common.h"
+
 
 namespace Element {
 
@@ -12,9 +14,9 @@ public:
     AudioRouterMatrix (AudioRouterEditor& ed)
         : editor (ed)
     {
-        
-        setMatrixCellSize (24);
-        setSize (24 * 4, 24 * 4);
+        setMatrixCellSize (48);
+        setSize (getRowThickness() * 4, 
+                 getColumnThickness() * 4);
         setRepaintsOnMouseActivity (true);
     }
 
@@ -73,6 +75,9 @@ private:
 
 class AudioRouterEditor::Content : public Component
 {
+    int padding = 10;
+    int labelWidth = 60;
+    Rectangle<int> matrixArea;
 public:
     Content (AudioRouterEditor& o)
         : owner (o)
@@ -80,17 +85,45 @@ public:
         setOpaque (true);
         matrix.reset (new AudioRouterMatrix (o));
         addAndMakeVisible (matrix.get());
-        setSize (matrix->getWidth(), matrix->getHeight());
+        setSize (padding + labelWidth + matrix->getWidth(), 
+                 padding + labelWidth + matrix->getHeight());
+        matrixArea = { labelWidth, padding, matrix->getWidth(), matrix->getHeight() };
     }
 
     void resized() override
     {
-        matrix->centreWithSize (matrix->getWidth(), matrix->getHeight());
+        auto size = jlimit (24, 44, 
+            roundToInt ((double)(getWidth() - labelWidth - 32) / (double)matrix->getNumRows()));
+        matrix->setMatrixCellSize (size, size);
+
+        matrixArea = { labelWidth, padding, 
+                matrix->getRowThickness() * matrix->getNumRows(), 
+                matrix->getColumnThickness() * matrix->getNumColumns() };
+
+        matrix->setBounds (matrixArea);
     }
 
     void paint (Graphics& g) override
     {
         g.fillAll (LookAndFeel::contentBackgroundColor);
+        Rectangle<int> box (0, padding, labelWidth - padding, matrix->getHeight());
+        auto rowThickness = matrix->getRowThickness();
+        auto colThickness = matrix->getColumnThickness();
+
+        g.setColour (LookAndFeel::textColor);
+        for (int row = 0; row < owner.getMatrixState().getNumRows(); ++row)
+            g.drawText (String("Ch. ") + String(row + 1), box.removeFromTop(rowThickness),
+                Justification::centredRight, false);
+
+        box = { matrix->getX(), matrix->getBottom() + 10, matrix->getWidth(), 50 };
+        
+        for (int col = 0; col < owner.getMatrixState().getNumColumns(); ++col)
+        {
+            auto r  = box.removeFromLeft (colThickness);
+            g.setColour(LookAndFeel::textColor);
+            Artist::drawVerticalText (g, String("Ch. ") + String(col + 1), r,
+                                         Justification::centredRight);
+        }
     }
 
 private:

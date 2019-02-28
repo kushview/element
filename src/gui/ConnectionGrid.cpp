@@ -11,6 +11,7 @@
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "gui/ConnectionGrid.h"
+#include "gui/Artist.h"
 
 #define EL_MATRIX_SIZE 30
 
@@ -263,6 +264,7 @@ namespace Element
                 text << " - " << portName;
             }
             
+            Rectangle<int> r (0, 0, width, height);
             
             const bool hover = (isSource) ? mouseIsOverRow (rowNumber) 
                                           : mouseIsOverColumn (rowNumber); 
@@ -281,8 +283,10 @@ namespace Element
             }
             else
             {
-                g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
-                g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
+                Rectangle<int> r2 = { padding, 0, height - 1 - padding, width };
+                Artist::drawVerticalText (g, text, r.withY(padding), Justification::centredRight);
+                // g.addTransform (AffineTransform().rotated (1.57079633f, 0, 0).translated(width, 0));
+                // g.drawFittedText (text, padding, 0, height - 1 - padding, width, Justification::centredLeft, 1);
             }
         }
         
