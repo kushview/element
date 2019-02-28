@@ -229,11 +229,24 @@ public:
         {
             appName << " (unauthorized)";
         }
-        else
+        else if (EL_IS_ACTIVATED (world->getUnlockStatus()))
         {
             appName << " (authorized)";
         }
-
+        else if (EL_IS_TRIAL_EXPIRED (world->getUnlockStatus()))
+        {
+            appName << " (trial expired)";
+        }
+        else if (EL_IS_TRIAL_NOT_EXPIRED (world->getUnlockStatus()))
+        {
+            appName << " (trial)";
+        }
+        else
+        {
+            jassertfalse;
+            appName << " (unkown actiation state)";
+        }
+        
         Logger::writeToLog (appName);
         Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
         
