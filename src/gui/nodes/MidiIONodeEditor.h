@@ -55,6 +55,7 @@ private:
                 addAndMakeVisible (midiOutputLabel);
                 midiOutputLabel.setText ("MIDI Output", dontSendNotification);
                 midiOutputLabel.setJustificationType (Justification::centredLeft);
+                midiOutputLabel.setFont (Font (12.f));
                 addAndMakeVisible (midiOutputs);
                 midiOutputs.onChange = [this]()
                 {
@@ -75,6 +76,7 @@ private:
                 addAndMakeVisible (midiInputLabel);
                 midiInputLabel.setText ("MIDI Inputs", dontSendNotification);
                 midiInputLabel.setJustificationType (Justification::centredLeft);
+                midiInputLabel.setFont (Font (12.f));
             }
 
             updateDevices();

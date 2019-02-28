@@ -105,6 +105,17 @@ void LookAndFeel::drawConcertinaPanelHeader (Graphics& g, const Rectangle<int>& 
     g.fillRect (r);
 }
 
+Font LookAndFeel::getComboBoxFont (ComboBox& box)
+{
+    return Font (jmin (12.0f, box.getHeight() * 0.85f));
+}
+
+// Label
+Font LookAndFeel::getLabelFont (Label& label)
+{
+    return label.getFont();
+}
+
 // ProgressBar
 
 void LookAndFeel::drawLinearProgressBar (Graphics& g, ProgressBar& progressBar,
@@ -220,7 +231,7 @@ void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
                                        bool shouldDrawButtonAsHighlighted,
                                        bool shouldDrawButtonAsDown)
 {
-    auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
+    auto fontSize = jmin (13.0f, button.getHeight() * 0.75f);
     auto tickWidth = fontSize * 1.1f;
 
     drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,

@@ -7,8 +7,12 @@ namespace Element {
 
 struct Artist
 {
-    static void drawVerticalText (Graphics& g, const String& text,
-                                  const Rectangle<int> area,
+    /** The default font size that should be used in normal situations...
+        e.g. standard Labels, Textboxes, ComboBoxes, etc etc */
+    static constexpr float fontSizeDefault = 12.0f;
+
+    /** Draws text rotated by 90 or -90 degrees */
+    static void drawVerticalText (Graphics& g, const String& text, const Rectangle<int> area,
                                   Justification justification = Justification::centredLeft)
     {
         auto r = area; 

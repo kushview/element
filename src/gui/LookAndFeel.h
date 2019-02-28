@@ -32,6 +32,14 @@ public:
                                     bool isMouseOver, bool isMouseDown,
                                     ConcertinaPanel&, Component&) override;
     
+    // MARK: ComboBox
+    Font getComboBoxFont (ComboBox& box) override;
+
+    // MARK: Labels
+    // virtual void drawLabel (Graphics&, Label&) = 0;
+    Font getLabelFont (Label&) override;
+    // virtual BorderSize<int> getLabelBorderSize (Label&) = 0;
+
     // MARK: Property Panel
     void drawPropertyPanelSectionHeader (Graphics&, const String& name, bool isOpen, int width, int height) override;
     void drawPropertyComponentBackground (Graphics&, int width, int height, PropertyComponent&) override;
