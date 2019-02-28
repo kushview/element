@@ -561,6 +561,12 @@ namespace Element {
             }
             else
             {
+                const int wantedProgram = objectData.getProperty (Tags::program, -1);
+                const bool shouldSetProgram = obj->getNumPrograms() > 0 && 
+                    isPositiveAndBelow (wantedProgram, obj->getNumPrograms());
+                if (shouldSetProgram)
+                    obj->setCurrentProgram (wantedProgram);
+
                 auto data = getProperty(Tags::state).toString().trim();
                 if (data.isNotEmpty())
                 {
