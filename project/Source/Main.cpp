@@ -208,9 +208,6 @@ public:
         world->getUnlockStatus().loadAll();
         world->getUnlockStatus().dump();
 
-        
-        
-
         initializeModulePath();
         
         if (maybeLaunchSlave (commandLine))
@@ -244,7 +241,7 @@ public:
         else
         {
             jassertfalse;
-            appName << " (unkown actiation state)";
+            appName << " (unkown activation state)";
         }
         
         Logger::writeToLog (appName);

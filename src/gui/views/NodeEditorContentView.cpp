@@ -319,8 +319,8 @@ namespace Element {
         {
             if (node.isChildOfRootGraph())
             {
-                return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    0, 0, 0, 0, true, false, false, false);
+                return new MidiIONodeEditor (node, world->getDeviceManager(), true, false);
+
             }
             else
             {
@@ -332,9 +332,7 @@ namespace Element {
         {
             if (node.isChildOfRootGraph())
             {
-                // return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                //     0, 0, 0, 0, false, true, false, false);
-                return new MidiIONodeEditor (node, world->getDeviceManager(), true, true);
+                return new MidiIONodeEditor (node, world->getDeviceManager(), false, true);
             }
             else
             {
