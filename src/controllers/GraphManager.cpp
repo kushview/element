@@ -194,15 +194,15 @@ GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, 
 {
     if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
     {
-        return processor.addNode (new MidiChannelSplitterNode());
+        return processor.addNode (new MidiChannelSplitterNode(), nodeId);
     }
     else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
     {
-        return processor.addNode (new ProgramChangeMapNode());
+        return processor.addNode (new ProgramChangeMapNode(), nodeId);
     }
     else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
     {
-        return processor.addNode (new AudioRouterNode());
+        return processor.addNode (new AudioRouterNode(), nodeId);
     }
 
     String errorMessage;
@@ -517,7 +517,7 @@ void GraphManager::setNodeModel (const Node& node)
         }
         else
         {
-            DBG("[EL] failed creating connection");
+            DBG("[EL] failed creating connection: ");
             const Node graphObject (graph, false);
 
             if (graphObject.getNodeById(sourceNode).isValid() &&

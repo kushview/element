@@ -856,7 +856,7 @@ GraphNode* GraphProcessor::addNode (AudioProcessor* const newProcessor, uint32 n
     return nullptr;
 }
 
-GraphNode* GraphProcessor::addNode (GraphNode* newNode)
+GraphNode* GraphProcessor::addNode (GraphNode* newNode, uint32 nodeId)
 {
     if (newNode == nullptr || (void*)newNode->getAudioProcessor() == (void*)this)
     {
@@ -873,19 +873,24 @@ GraphNode* GraphProcessor::addNode (GraphNode* newNode)
         }
     }
 
-    if (newNode->nodeId == 0 || newNode->nodeId == KV_INVALID_NODE)
+    if (nodeId == 0 || nodeId == KV_INVALID_NODE)
     {
         const_cast<uint32&>(newNode->nodeId) = ++lastNodeId;
         jassert (newNode->nodeId == lastNodeId);
     }
     else
     {
-        // you can't add a node with an id that already exists in the graph..
-        jassert (getNodeForId (newNode->nodeId) == nullptr);
-        removeNode (newNode->nodeId);
+        if (nullptr != getNodeForId (nodeId))
+        {
+            // you can't add a node with an id that already exists in the graph..
+            jassertfalse;
+            removeNode (nodeId);
+        }
 
-        if (newNode->nodeId > lastNodeId)
-            lastNodeId = newNode->nodeId;
+        const_cast<uint32&>(newNode->nodeId) = nodeId;
+        jassert(newNode->nodeId == nodeId);
+        if (nodeId > lastNodeId)
+            lastNodeId = nodeId;
     }
 
     // TODO: playhead in Graph Node base
