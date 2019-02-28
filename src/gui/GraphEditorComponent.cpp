@@ -135,10 +135,12 @@ public:
     }
 
     void paint (Graphics& g) override
-    {
+    {    
+        g.setColour (getColor());
+
+       #if 0
         const float w = (float) getWidth();
         const float h = (float) getHeight();
-
         Path p;
         if (verticle)
         {
@@ -157,9 +159,12 @@ public:
                             h * 0.2f);
 
         }
-        
-        g.setColour (getColor());
         g.fillPath (p);
+       #else
+        g.fillEllipse (getLocalBounds().toFloat());
+        g.setColour (Colours::black);
+        g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
+       #endif
     }
 
     Colour getColor() const
@@ -223,16 +228,16 @@ public:
           node (node_),
           numInputs (0), 
           numOutputs (0),
-          pinSize (16), 
-          font (13.0f, Font::bold),
-          numIns (0), 
+          pinSize (8),
+          font (11.0f),
+          numIns (0),
           numOuts (0), 
           vertical (vertical_)
     {
         setBufferedToImage (true);
         nodeEnabled = node.getPropertyAsValue (Tags::enabled);
         nodeEnabled.addListener (this);
-        nodeName    = node.getPropertyAsValue (Tags::name);
+        nodeName = node.getPropertyAsValue (Tags::name);
         nodeName.addListener (this);
 
        #if EL_USE_PIG_WHIP
@@ -434,21 +439,7 @@ public:
         }
         else if (node.isValid())
         {
-            // DBG("gui: " << node.getIdentifier().toString());
-            // if (node.getIdentifier().toString() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
-            // {
-            //     auto* window = new DocumentWindow ("window", Colours::black,
-            //         DocumentWindow::allButtons, false);
-            //     auto* editor = new ProgramChangeMapEditor();
-            //     window->setContentOwned (editor, true);
-            //     window->setSize (editor->getWidth(), editor->getHeight());
-            //     window->addToDesktop();
-            //     window->setVisible (true);
-            // }
-            // else
-            {
-                ViewHelpers::presentPluginWindow (this, node);
-            }
+            ViewHelpers::presentPluginWindow (this, node);
         }
     }
     
@@ -464,6 +455,8 @@ public:
 
     Rectangle<int> getBoxRectangle() const
     {
+       #if 0
+        // for pins with stems
         if (vertical)
         {
             const int x = 4;
@@ -480,41 +473,66 @@ public:
         const int h = getHeight() - y * 2;
         
         return { x, y, w, h };
+       #else
+        if (vertical)
+        {
+            return Rectangle<int> (
+                0,
+                pinSize / 2,
+                getWidth(),
+                getHeight() - pinSize
+            ).reduced (2, 0);
+        }
+
+        return Rectangle<int> (
+            pinSize / 2,
+            0,
+            getWidth() - pinSize,
+            getHeight()
+        ).reduced (0, 2);
+       #endif
     }
     
     void paint (Graphics& g) override
     {
-        g.setColour (isEnabled() && node.isEnabled() ? Colours::lightgrey : Colours::lightgrey.darker());
-        
+        const float cornerSize = 2.4f;
         const auto box (getBoxRectangle());
-        g.fillRect (box);
+
+        g.setColour (isEnabled() && node.isEnabled()
+            ? LookAndFeel::widgetBackgroundColor.brighter (0.7) 
+            : LookAndFeel::widgetBackgroundColor.brighter (0.2));
+        g.fillRoundedRectangle (box.toFloat(), cornerSize);
+
+        // getLookAndFeel().drawTreeviewPlusMinusBox (
+        //     g, { (float)box.getX(), (float)box.getY(), 16.f, 16.f }, 
+        //     LookAndFeel::widgetBackgroundColor.brighter (0.7), 
+        //     true, false); 
 
         if (node.getValueTree().hasProperty (Tags::missing))
         {
             g.setColour (Colour (0xff333333));
             g.setFont (9.f);
-            auto pr = box; pr.removeFromTop (4);
+            auto pr = box; pr.removeFromTop (6);
             g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
         }
 
         g.setColour (Colours::black);
         g.setFont (font);
-        g.drawFittedText (getName(), powerButton.getRight() + 4, box.getY() + 2,
-                                     ioButton.getX() - powerButton.getRight(),
-                                     20, Justification::centred, 2);
+        g.drawFittedText (getName(), box.getX() + 9, box.getY(), box.getWidth(),
+                                     18, Justification::centredLeft, 2);
 
         bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
-        g.setColour (selected ? Colors::toggleBlue.withAlpha(.95f) : Colours::grey);
-        g.drawRect (box, selected ? 2 : 1);
+        g.setColour (selected ? Colors::toggleBlue : Colours::grey);
+        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.4);
     }
 
     void resized() override
     {
         auto r (getBoxRectangle().reduced (5, 4));
-        r = r.removeFromTop (16);
-
-        ioButton.setBounds (r.removeFromRight (18));
-        powerButton.setBounds (r.removeFromLeft (18));
+        r = r.removeFromBottom (12);
+        powerButton.setBounds (r.removeFromRight (14));
+        r.removeFromLeft (2);
+        ioButton.setBounds (r.removeFromRight (14));
 
         int indexIn = 0, indexOut = 0;
         if (vertical)
@@ -968,7 +986,8 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
 
 void GraphEditorComponent::paint (Graphics& g)
 {
-    g.fillAll (LookAndFeel::widgetBackgroundColor.darker().darker());
+//    g.fillAll (LookAndFeel::widgetBackgroundColor.darker().darker());
+    g.fillAll (findColour (DocumentWindow::backgroundColourId));
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
