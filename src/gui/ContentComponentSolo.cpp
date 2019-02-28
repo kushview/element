@@ -792,7 +792,7 @@ void ContentComponentSolo::updateLayout()
 {
     layout.setItemLayout (0, EL_NAV_MIN_WIDTH, EL_NAV_MAX_WIDTH, nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
-    layout.setItemLayout (2, 300, -1, 400);
+    layout.setItemLayout (2, 100, -1, 400);
 }
 
 void ContentComponentSolo::resizerMouseDown()
@@ -804,7 +804,7 @@ void ContentComponentSolo::resizerMouseUp()
 {
     layout.setItemLayout (0, nav->getWidth(), nav->getWidth(), nav->getWidth());
     layout.setItemLayout (1, 2, 2, 2);
-    layout.setItemLayout (2, 300, -1, 400);
+    layout.setItemLayout (2, 100, -1, 400);
     resized();
 }
 

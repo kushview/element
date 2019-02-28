@@ -21,8 +21,9 @@ GraphEditorView::GraphEditorView()
    #if EL_GRAPH_EDITOR_VIEWPORT
     addAndMakeVisible (view);
     view.setViewedComponent (&graph, false);
-    view.setScrollBarsShown (true, true, true, true);
-    graph.setSize (1920, 1080);
+    view.setScrollBarsShown (true, true, false, false);
+    view.setScrollOnDragEnabled (false);
+    view.setBounds (graph.getLocalBounds());
    #else
     addAndMakeVisible (graph);
    #endif
@@ -101,6 +102,7 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 {
    #if EL_GRAPH_EDITOR_VIEWPORT
     view.setBounds (area);
+    graph.setBounds (area);
    #else
     graph.setBounds (area);
    #endif

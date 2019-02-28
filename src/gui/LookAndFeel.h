@@ -38,6 +38,21 @@ public:
     void drawPropertyComponentLabel (Graphics&, int width, int height, PropertyComponent&) override;
     Rectangle<int> getPropertyComponentContentPosition (PropertyComponent&) override;
     
+    // MARK: Toggle buttons
+
+    Path getTickShape (float height) override;
+    
+    Path getCrossShape (float height) override;
+
+    void drawToggleButton (Graphics&, ToggleButton&,
+                           bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+    void drawTickBox (Graphics&, Component&,
+                      float x, float y, float w, float h,
+                      bool ticked, bool isEnabled,
+                      bool shouldDrawButtonAsHighlighted, bool shouldDrawButtonAsDown) override;
+
+    void changeToggleButtonWidthToFitText (ToggleButton&) override;
+
     // MARK: Treeview
     void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
 

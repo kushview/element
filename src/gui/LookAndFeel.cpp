@@ -84,6 +84,9 @@ LookAndFeel::LookAndFeel()
     setColour (ProgressBar::foregroundColourId, Colors::elemental);
     setColour (ProgressBar::backgroundColourId, findColour (
         DocumentWindow::backgroundColourId).darker());
+
+    // ToggleButton
+    setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
 }
 
 
@@ -185,6 +188,92 @@ void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
     }
     drawLinearProgressBar (g, progressBar, width, height, progress, theText);
 }
+
+// MARK toggle button
+
+Path LookAndFeel::getTickShape (float height)
+{
+    static const unsigned char pathData[] = { 110,109,32,210,202,64,126,183,148,64,108,39,244,247,64,245,76,124,64,108,178,131,27,65,246,76,252,64,108,175,242,4,65,246,76,252,
+        64,108,236,5,68,65,0,0,160,180,108,240,150,90,65,21,136,52,63,108,48,59,16,65,0,0,32,65,108,32,210,202,64,126,183,148,64, 99,101,0,0 };
+
+    Path path;
+    path.loadPathFromData (pathData, sizeof (pathData));
+    path.scaleToFit (0, 0, height * 2.0f, height, true);
+
+    return path;
+}
+
+Path LookAndFeel::getCrossShape (float height)
+{
+    static const unsigned char pathData[] = { 110,109,51,51,255,66,0,0,0,0,108,205,204,13,67,51,51,99,65,108,0,0,170,66,205,204,141,66,108,51,179,13,67,52,51,255,66,108,0,0,255,
+        66,205,204,13,67,108,205,204,141,66,0,0,170,66,108,52,51,99,65,51,179,13,67,108,0,0,0,0,51,51,255,66,108,205,204,98,66, 204,204,141,66,108,0,0,0,0,51,51,99,65,108,51,51,
+        99,65,0,0,0,0,108,205,204,141,66,205,204,98,66,108,51,51,255,66,0,0,0,0,99,101,0,0 };
+
+    Path path;
+    path.loadPathFromData (pathData, sizeof (pathData));
+    path.scaleToFit (0, 0, height * 2.0f, height, true);
+
+    return path;
+}
+
+void LookAndFeel::drawToggleButton (Graphics& g, ToggleButton& button,
+                                       bool shouldDrawButtonAsHighlighted,
+                                       bool shouldDrawButtonAsDown)
+{
+    auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
+    auto tickWidth = fontSize * 1.1f;
+
+    drawTickBox (g, button, 4.0f, (button.getHeight() - tickWidth) * 0.5f,
+                 tickWidth, tickWidth,
+                 button.getToggleState(),
+                 button.isEnabled(),
+                 shouldDrawButtonAsHighlighted,
+                 shouldDrawButtonAsDown);
+
+    g.setColour (button.findColour (ToggleButton::textColourId));
+    g.setFont (fontSize);
+
+    if (! button.isEnabled())
+        g.setOpacity (0.5f);
+
+    g.drawFittedText (button.getButtonText(),
+                      button.getLocalBounds().withTrimmedLeft (roundToInt (tickWidth) + 10)
+                                             .withTrimmedRight (2),
+                      Justification::centredLeft, 10);
+}
+
+void LookAndFeel::drawTickBox (Graphics& g, Component& component,
+                                float x, float y, float w, float h,
+                                const bool ticked,
+                                const bool isEnabled,
+                                const bool shouldDrawButtonAsHighlighted,
+                                const bool shouldDrawButtonAsDown)
+{
+    ignoreUnused (isEnabled, shouldDrawButtonAsHighlighted, shouldDrawButtonAsDown);
+
+    Rectangle<float> tickBounds (x, y, w, h);
+
+    g.setColour (component.findColour (ToggleButton::tickDisabledColourId));
+    g.drawRoundedRectangle (tickBounds, 4.0f, 1.0f);
+
+    if (ticked)
+    {
+        g.setColour (component.findColour (ToggleButton::tickColourId));
+        auto tick = getTickShape (0.75f);
+        g.fillPath (tick, tick.getTransformToScaleToFit (tickBounds.reduced (4, 5).toFloat(), false));
+    }
+}
+
+void LookAndFeel::changeToggleButtonWidthToFitText (ToggleButton& button)
+{
+    auto fontSize = jmin (15.0f, button.getHeight() * 0.75f);
+    auto tickWidth = fontSize * 1.1f;
+
+    Font font (fontSize);
+
+    button.setSize (font.getStringWidth (button.getButtonText()) + roundToInt (tickWidth) + 14, button.getHeight());
+}
+
 
 // MARK: Property Panel
 

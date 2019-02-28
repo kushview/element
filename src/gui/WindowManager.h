@@ -12,6 +12,7 @@
 #include "engine/GraphNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
+#include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/ProgramChangeMapEditor.h"
 #include "session/Node.h"
 
@@ -156,7 +157,11 @@ public:
         {
             return createPluginWindowFor (node, new ProgramChangeMapEditor (node));
         }
-
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
+        {
+            return createPluginWindowFor (node, new AudioRouterEditor (node));
+        }
+        
         GraphNodePtr object = node.getGraphNode();
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (! proc)

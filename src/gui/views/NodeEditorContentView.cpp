@@ -7,6 +7,8 @@
 
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
+#include "gui/nodes/MidiIONodeEditor.h"
+
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
@@ -330,8 +332,9 @@ namespace Element {
         {
             if (node.isChildOfRootGraph())
             {
-                return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    0, 0, 0, 0, false, true, false, false);
+                // return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                //     0, 0, 0, 0, false, true, false, false);
+                return new MidiIONodeEditor (node, world->getDeviceManager(), true, true);
             }
             else
             {

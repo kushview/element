@@ -5,7 +5,10 @@
 
 #include "session/PluginManager.h"
 #include "session/Node.h"
-
+#include "engine/nodes/BaseProcessor.h"
+#include "engine/nodes/AudioRouterNode.h"
+#include "engine/nodes/MidiChannelSplitterNode.h"
+#include "engine/nodes/ProgramChangeMapNode.h"
 #include "DataPath.h"
 #include "Settings.h"
 
@@ -705,8 +708,35 @@ AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& 
 
 Processor* PluginManager::createPlugin (const PluginDescription &desc, String &errorMsg)
 {
+    jassertfalse; // deprecated
     if (AudioPluginInstance* instance = createAudioPlugin (desc, errorMsg))
         return dynamic_cast<Processor*> (instance);
+    return nullptr;
+}
+
+GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
+{
+    if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
+    {
+        errorMsg = "Invalid format";
+        return nullptr;
+    }
+
+    if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
+    {
+        return new MidiChannelSplitterNode();
+    }
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+    {
+        return new ProgramChangeMapNode();
+    }
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
+    {
+        return new AudioRouterNode();
+    }
+
+    errorMsg = desc.name; 
+    errorMsg << " not found.";
     return nullptr;
 }
 

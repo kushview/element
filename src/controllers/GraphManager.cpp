@@ -192,20 +192,16 @@ const GraphNodePtr GraphManager::getNodeForId (const uint32 uid) const noexcept
 
 GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
-    if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
+    String errorMessage;
+
+    if (desc->pluginFormatName == "Element")
     {
-        return processor.addNode (new MidiChannelSplitterNode(), nodeId);
-    }
-    else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
-    {
-        return processor.addNode (new ProgramChangeMapNode(), nodeId);
-    }
-    else if (desc->pluginFormatName == "Element" && desc->fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        return processor.addNode (new AudioRouterNode(), nodeId);
+        String errorMessage;
+        if (auto* const object = pluginManager.createGraphNode (*desc, errorMessage))
+            return processor.addNode (object, nodeId);
     }
 
-    String errorMessage;
+    errorMessage.clear();
     auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
     GraphNode* node = nullptr;
     
@@ -237,7 +233,7 @@ uint32 GraphManager::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
     {
-        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create filter"),
+        AlertWindow::showMessageBox (AlertWindow::WarningIcon, TRANS ("Couldn't create Node"),
                                      "Cannot instantiate node without a description");
         return KV_INVALID_NODE;
     }
