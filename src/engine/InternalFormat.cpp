@@ -253,11 +253,7 @@ namespace Element {
             desc->pluginFormatName   = "Element";
             desc->version            = "1.0.0";
         }
-        else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
-        {
-            auto* const desc = ds.add (new PluginDescription());
-            MediaPlayerProcessor().fillInPluginDescription (*desc);
-        }
+
        #endif
 
        #if defined (EL_SOLO) || defined (EL_PRO)
@@ -274,6 +270,11 @@ namespace Element {
             desc->manufacturerName   = "Element";
             desc->pluginFormatName   = "Element";
             desc->version            = "1.0.0";
+        }
+        else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
         else if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
         {
@@ -312,7 +313,6 @@ namespace Element {
         results.add (EL_INTERNAL_ID_GRAPH);
         results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
-        results.add (EL_INTERNAL_ID_MEDIA_PLAYER);        
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
@@ -320,6 +320,7 @@ namespace Element {
 
        #if defined (EL_SOLO) || defined (EL_PRO)
         results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
+        results.add (EL_INTERNAL_ID_MEDIA_PLAYER); 
         results.add (EL_INTERNAL_ID_PLACEHOLDER);
         results.add (EL_INTERNAL_ID_PROGRAM_CHANGE_MAP);
        #endif // product enablements
@@ -359,10 +360,7 @@ namespace Element {
        #if defined(EL_PRO)
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
             base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
-        #if 0
-        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_SEQUENCER)
-            base = (world.getUnlockStatus().isFullVersion() ? new MidiSequenceProcessor() : nullptr);
-        #endif
+
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
             base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
 
@@ -371,12 +369,12 @@ namespace Element {
 
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
             base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
-
+       #endif
+       #if defined (EL_PRO) || defined (EL_SOLO)
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
             base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
 
-       #elif defined (EL_PRO) || defined (EL_SOLO)
-        if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
             base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
        #endif // EL_PRO
 

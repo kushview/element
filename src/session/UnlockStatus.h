@@ -53,10 +53,17 @@
  #define EL_USE_LOCAL_AUTH 0
 #endif
 
-// we use macros
+// we use macros to make it slightly harder for crackers
+// true if this is a trial license which is expired
 #define EL_IS_TRIAL_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() < Time::getCurrentTime())
+// true if this is a trial license that is not expired
 #define EL_IS_TRIAL_NOT_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() >= Time::getCurrentTime())
+// false if not activated by any means at all
 #define EL_IS_NOT_ACTIVATED(status) (!(status).isUnlocked() && !(status).isFullVersion())
+// true if activated full version
+#define EL_IS_ACTIVATED(status) ((status).isUnlocked() && (status).isFullVersion())
+// true if full activation or trial
+#define EL_IS_ACTIVATED_OR_TRIAL(status) (EL_IS_TRIAL_NOT_EXPIRED((status)) || EL_IS_ACTIVATED((status)))
 
 namespace Element {
     
