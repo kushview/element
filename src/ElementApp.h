@@ -27,6 +27,7 @@ namespace Tags
     const Identifier control            = "control";
     const Identifier controller         = "controller";
     const Identifier controllers        = "controllers";
+    const Identifier collapsed          = "collapsed";
     const Identifier enabled            = "enabled";
     const Identifier graph              = "graph";
     const Identifier graphs             = "graphs";
