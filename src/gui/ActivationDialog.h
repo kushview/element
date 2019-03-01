@@ -31,6 +31,7 @@
 namespace Element {
 
 class ContentComponent;
+class IconButton;
 
 struct TrialDaysProgressBar : public ProgressBar
 {
@@ -46,9 +47,6 @@ struct TrialDaysProgressBar : public ProgressBar
 //==============================================================================
 /**
                                                                     //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
                                                                     //[/Comments]
 */
 class ActivationComponent  : public Component,
@@ -92,7 +90,7 @@ private:
     Label passwordLabel { "Password" };
     TextEditor password;
     bool grabbedFirstFocus = false;
-
+    std::unique_ptr<IconButton> syncButton;
     void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 

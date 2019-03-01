@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "controllers/GuiController.h"
+#include "gui/Buttons.h"
 #include "URLs.h"
 //[/Headers]
 
@@ -134,6 +135,9 @@ ActivationComponent::ActivationComponent (GuiController& g)
     registerTrialLink->setURL (URL (EL_URL_ELEMENT_GET_TRIAL));
 
     password.setPasswordCharacter (Util::defaultPasswordChar());
+
+    syncButton.reset(new IconButton ("Refresh"));
+    syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
     //[/UserPreSize]
 
     setSize (480, 346);
@@ -195,6 +199,17 @@ void ActivationComponent::resized()
     registerTrialLink->setBounds ((getWidth() / 2) - (100 / 2), 293, 100, 18);
     instructionLabel2->setBounds ((getWidth() / 2) - (280 / 2), 240, 280, 64);
     //[UserResized] Add your own custom resize handling here..
+
+    if (syncButton && syncButton->isVisible())
+    {
+        int shiftLeft = activateButton->getHeight() / 2;
+        activateButton->setBounds (activateButton->getBoundsInParent()
+            .withX (activateButton->getX() - shiftLeft));
+        quitButton->setBounds (quitButton->getBoundsInParent()
+            .withX (quitButton->getX() - shiftLeft));
+        syncButton->setBounds (quitButton->getRight() + 6, quitButton->getY(),
+                               quitButton->getHeight(), quitButton->getHeight());
+    }
 
     if (isForRegistration)
     {
