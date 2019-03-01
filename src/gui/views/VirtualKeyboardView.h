@@ -37,7 +37,7 @@ public:
 private:
     ScopedPointer<VirtualKeyboardComponent> keyboard;
     MidiKeyboardState internalState;
-    int keyWidth = 20;
+    int keyWidth = 16;
     
     void setupKeyboard (VirtualKeyboardComponent&);
 };
