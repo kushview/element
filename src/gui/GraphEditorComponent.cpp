@@ -139,6 +139,7 @@ public:
         g.setColour (getColor());
 
        #if 0
+        // stick with circle
         const float w = (float) getWidth();
         const float h = (float) getHeight();
         Path p;
@@ -160,7 +161,27 @@ public:
 
         }
         g.fillPath (p);
+       #endif
+
+       #if 0
+        // half circles
+        Path p;
+        if (isInput)
+        {
+            p.addPieSegment (getLocalBounds().toFloat(),
+                            -juce::float_Pi * 0.5, juce::float_Pi * 0.5f,
+                            0);
+        }
+        else
+        {
+            p.addPieSegment (getLocalBounds().toFloat(),
+                            juce::float_Pi * 0.5f, juce::float_Pi * 1.5f,
+                            0);
+        }
+        
+        g.fillPath (p);
        #else
+        // full circle
         g.fillEllipse (getLocalBounds().toFloat());
         g.setColour (Colours::black);
         g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
@@ -322,47 +343,60 @@ public:
 
     void mouseDown (const MouseEvent& e) override
     {
+        bool collapsedToggled = false;
+        if (! vertical && getOpenCloseBox().contains (e.x, e.y))
+        {
+            node.setProperty ("collapsed", !collapsed);
+            update (false);
+            getGraphPanel()->updateConnectorComponents();
+            collapsedToggled = true;
+            blockDrag = true;
+        }
+
         originalPos = localPointToGlobal (Point<int>());
         toFront (true);
         dragging = false;
         selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
         if (auto* cc = ViewHelpers::findContentComponent (this))
             cc->getAppController().findChild<GuiController>()->selectNode (node);
-
-        if (e.mods.isPopupMenu())
-        {
-            auto* const world = ViewHelpers::getGlobals (this);
-            auto& plugins (world->getPluginManager());
-            NodePopupMenu menu (node);
-            menu.addReplaceSubmenu (plugins);
-            menu.addSeparator();
-            menu.addProgramsMenu();
-            if (world)
-                menu.addPresetsMenu (world->getPresetCollection());
             
-            const int result = menu.show();
-            if (auto* message = menu.createMessageForResultCode (result))
+        if (! collapsedToggled)
+        {
+            if (e.mods.isPopupMenu())
             {
-                ViewHelpers::postMessageFor (this, message);
-                for (const auto& nodeId : getGraphPanel()->selectedNodes)
+                auto* const world = ViewHelpers::getGlobals (this);
+                auto& plugins (world->getPluginManager());
+                NodePopupMenu menu (node);
+                menu.addReplaceSubmenu (plugins);
+                menu.addSeparator();
+                menu.addProgramsMenu();
+                if (world)
+                    menu.addPresetsMenu (world->getPresetCollection());
+                
+                const int result = menu.show();
+                if (auto* message = menu.createMessageForResultCode (result))
                 {
-                    if (nodeId == node.getNodeId ())
-                        continue;
-                    const Node selectedNode = graph.getNodeById (nodeId);
-                    if (selectedNode.isValid())
+                    ViewHelpers::postMessageFor (this, message);
+                    for (const auto& nodeId : getGraphPanel()->selectedNodes)
                     {
-                        if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
+                        if (nodeId == node.getNodeId ())
+                            continue;
+                        const Node selectedNode = graph.getNodeById (nodeId);
+                        if (selectedNode.isValid())
                         {
-                            ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
+                            if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
+                            {
+                                ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
+                            }
                         }
                     }
                 }
-            }
-            else if (plugins.getKnownPlugins().getIndexChosenByMenu(result) >= 0)
-            {
-                const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
-                if (const auto* desc = plugins.getKnownPlugins().getType (index))
-                    ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
+                else if (plugins.getKnownPlugins().getIndexChosenByMenu(result) >= 0)
+                {
+                    const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
+                    if (const auto* desc = plugins.getKnownPlugins().getType (index))
+                        ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
+                }
             }
         }
 
@@ -386,7 +420,7 @@ public:
 
     void mouseDrag (const MouseEvent& e) override
     {
-        if (e.mods.isPopupMenu())
+        if (e.mods.isPopupMenu() || blockDrag)
             return;
         dragging = true;
         Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
@@ -405,7 +439,7 @@ public:
         if (panel)
             panel->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods,
                                                           dragging, selectionMouseDownResult);
-        dragging = selectionMouseDownResult = false;
+        dragging = selectionMouseDownResult = blockDrag = false;
 
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
         {
@@ -453,6 +487,11 @@ public:
                         : y >= 3 && y < getHeight() - 6 && x >= pinSize && x < getWidth() - pinSize;
     }
 
+    Rectangle<int> getOpenCloseBox() const
+    {
+        const auto box (getBoxRectangle());
+        return { box.getX() + 5, box.getY() + 4, 16, 16 };
+    }
     Rectangle<int> getBoxRectangle() const
     {
        #if 0
@@ -493,6 +532,11 @@ public:
        #endif
     }
     
+    void paintOverChildren (Graphics& g) override
+    {
+        ignoreUnused (g);
+    }
+
     void paint (Graphics& g) override
     {
         const float cornerSize = 2.4f;
@@ -503,10 +547,13 @@ public:
             : LookAndFeel::widgetBackgroundColor.brighter (0.2));
         g.fillRoundedRectangle (box.toFloat(), cornerSize);
 
-        // getLookAndFeel().drawTreeviewPlusMinusBox (
-        //     g, { (float)box.getX(), (float)box.getY(), 16.f, 16.f }, 
-        //     LookAndFeel::widgetBackgroundColor.brighter (0.7), 
-        //     true, false); 
+        if (! vertical)
+        {
+            getLookAndFeel().drawTreeviewPlusMinusBox (
+                g, getOpenCloseBox().toFloat(),
+                LookAndFeel::widgetBackgroundColor.brighter (0.7), 
+                ! collapsed, false); 
+        }
 
         if (node.getValueTree().hasProperty (Tags::missing))
         {
@@ -518,9 +565,18 @@ public:
 
         g.setColour (Colours::black);
         g.setFont (font);
-        g.drawFittedText (getName(), box.getX() + 9, box.getY(), box.getWidth(),
-                                     18, Justification::centredLeft, 2);
-
+        
+        if (vertical)
+        {
+            g.drawFittedText (getName(), box.getX() + 9, box.getY() + 2, box.getWidth(),
+                                         18, Justification::centredLeft, 2);
+        }
+        else
+        {
+            g.drawFittedText (getName(), box.getX() + 20, box.getY() + 2, box.getWidth(),
+                                         18, Justification::centredLeft, 2);
+        }
+        
         bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
         g.setColour (selected ? Colors::toggleBlue : Colours::grey);
         g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.4);
@@ -528,38 +584,49 @@ public:
 
     void resized() override
     {
-        auto r (getBoxRectangle().reduced (5, 4));
-        r = r.removeFromBottom (12);
+        const auto box (getBoxRectangle());
+        auto r = box.reduced(5, 4).removeFromBottom (12);
         powerButton.setBounds (r.removeFromRight (14));
         r.removeFromLeft (2);
         ioButton.setBounds (r.removeFromRight (14));
 
         int indexIn = 0, indexOut = 0;
+        const int halfPinSize = pinSize / 2;
         if (vertical)
         {
+            Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
+            Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
             for (int i = 0; i < getNumChildComponents(); ++i)
             {
                 if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
                 {
-                    const int total = pc->isInput ? numIns : numOuts;
-                    const int index = pc->isInput ? indexIn++ : indexOut++;
-                    pc->setBounds (proportionOfWidth ((1 + index) / (total + 1.0f)) - pinSize / 2,
-                                   pc->isInput ? 0 : (getHeight() - pinSize),
-                                   pinSize, pinSize);
+                    pc->setBounds (pc->isInput ? pri.removeFromLeft (pinSize) 
+                                               : pro.removeFromLeft (pinSize));
+                    pc->isInput ? pri.removeFromLeft (pinSize * 1.25)
+                                : pro.removeFromLeft (pinSize * 1.25);                  
                 }
             }
         }
         else
         {
+            Rectangle<int> pri (box.getX() - halfPinSize, 
+                                box.getY() + 9, 
+                                pinSize, 
+                                box.getHeight());
+            Rectangle<int> pro (box.getWidth(),
+                                box.getY() + 9, 
+                                pinSize, 
+                                box.getHeight());
+            float scale = collapsed ? 0.25f : 1.125f;
+            int spacing = jmax (2, int (pinSize * scale));
             for (int i = 0; i < getNumChildComponents(); ++i)
             {
                 if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
                 {
-                    const int total = pc->isInput ? numIns : numOuts;
-                    const int index = pc->isInput ? indexIn++ : indexOut++;
-                    pc->setBounds (pc->isInput ? 0 : (getWidth() - pinSize),
-                                   proportionOfHeight ((1 + index) / (total + 1.0f)) - pinSize / 2,
-                                   pinSize, pinSize);
+                    pc->setBounds (pc->isInput ? pri.removeFromTop (pinSize) 
+                                               : pro.removeFromTop (pinSize));
+                    pc->isInput ? pri.removeFromTop (spacing)
+                                : pro.removeFromTop (spacing);
                 }
             }
         }
@@ -597,7 +664,7 @@ public:
             delete this;
             return;
         }
-
+        collapsed = (bool) node.getProperty ("collapsed", false);
         numIns = numOuts = 0;
         const auto numPorts = node.getPortsValueTree().getNumChildren();
         for (int i = 0; i < numPorts; ++i)
@@ -612,16 +679,20 @@ public:
                 ++numOuts;
         }
 
-        int w = vertical ? 160 : 170;
-        int h = 68;
+        int w = 120;
+        int h = 40;
 
+        const int maxPorts = jmax (numIns, numOuts) + 1;
+        
         if (vertical)
         {
-            w = jmax (w, (jmax (numIns, numOuts) + 1) * pinSize);
+            w = jmax (w, int(maxPorts * pinSize) + int(maxPorts * pinSize * 1.25f));
         }
         else
         {
-            h = jmax (h, (jmax (numIns, numOuts) + 1) * pinSize);
+            float scale = collapsed ? 0.25f : 1.125f;
+            int endcap = collapsed ? 9 : -5;
+            h = jmax (h, int(maxPorts * pinSize) + int(maxPorts * jmax(int(pinSize * scale), 2)) + endcap);
         }
 
         setSize (w, h);
@@ -635,6 +706,7 @@ public:
         {
             // position is relative and parent might be resizing
             const auto b = getBoundsInParent();
+            DBG(b.toString());
             setNodePosition (b.getX(), b.getY());
         }
 
@@ -678,6 +750,8 @@ private:
 
     bool selectionMouseDownResult = false;
     bool dragging = false;
+    bool blockDrag = false;
+    bool collapsed = false;
 
     SettingButton ioButton;
     OptionalScopedPointer<CallOutBox> ioBox;
