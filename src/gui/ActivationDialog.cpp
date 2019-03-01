@@ -138,6 +138,7 @@ ActivationComponent::ActivationComponent (GuiController& g)
 
     syncButton.reset(new IconButton ("Refresh"));
     syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
+    syncButton->addListener (this);
     //[/UserPreSize]
 
     setSize (480, 346);
@@ -152,6 +153,8 @@ ActivationComponent::ActivationComponent (GuiController& g)
 ActivationComponent::~ActivationComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    syncButton->removeListener (this);
+    syncButton = nullptr;
     //[/Destructor_pre]
 
     appNameLabel = nullptr;
@@ -474,6 +477,17 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
+    else if (buttonThatWasClicked == syncButton.get())
+    {
+        auto* const unlockRef = new UnlockOverlay (unlock,
+            status, gui.getWorld(), UnlockOverlay::Check,
+            status.getLicenseKey());
+        unlockRef->setOpacity (0.72f);
+        unlockRef->onFinished = std::bind (&ActivationComponent::handleActivationResult, this,
+                                           std::placeholders::_1, std::placeholders::_2);
+        addAndMakeVisible (unlock.get());
+        resized();
+    }
     //[/UserbuttonClicked_Post]
 }
 
@@ -564,6 +578,7 @@ void ActivationComponent::setForTrial (bool setupForTrial, bool refreshButton)
     licenseKey->setVisible (false);
     registerTrialLink->setVisible (false);
     addAndMakeVisible (progressBar);
+    addAndMakeVisible (syncButton.get());
     progressBar.periodDays = status.getTrialPeriodDays();
 
     if (EL_IS_TRIAL_EXPIRED (status))
@@ -616,7 +631,7 @@ void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResu
         if (EL_IS_TRIAL_EXPIRED(_status) || EL_IS_TRIAL_NOT_EXPIRED(_status))
         {
             isForTrial = false;
-            setForTrial (true, quitButton->getButtonText() == "Refresh");
+            setForTrial (true);
             resized();
         }
         else if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
