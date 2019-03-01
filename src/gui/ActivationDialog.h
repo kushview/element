@@ -60,7 +60,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void setForTrial (bool setupForTrial, bool refreshButton = false);
+    void setForTrial (bool setupForTrial);
     void setForRegistration (bool setupRegistration);
     void visibilityChanged() override;
     void timerCallback() override;

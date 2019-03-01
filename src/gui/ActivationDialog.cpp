@@ -276,7 +276,6 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
         }
         else if (isForRegistration)
         {
-            #if 1
             if (email.isEmpty() || username.isEmpty() || password.isEmpty())
                 return;
 
@@ -353,56 +352,13 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
                 }
             };
             addAndMakeVisible (unlock.get());
-            #else
-            const auto result = status.registerTrial (email.getText(), username.getText(), password.getText());
-            if (result.succeeded)
-            {
-
-
-
-                bool shouldBail = false;
-                AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
-                                                  "Trial Activation",
-                                                  result.informativeMessage);
-                if (EL_IS_TRIAL_NOT_EXPIRED(status) ||
-                    EL_IS_TRIAL_EXPIRED(status))
-                {
-                    setForRegistration (false);
-                    isForTrial = false;
-                    setForTrial (true);
-                }
-                else if (EL_IS_NOT_ACTIVATED(status))
-                {
-                    setForRegistration (false);
-                }
-                else
-                {
-                    setForRegistration (false);
-                    if (auto* dialog = findParentComponentOfClass<ActivationDialog>()) {
-                        dialog->closeButtonPressed();
-                        shouldBail = true;
-                    }
-                }
-                status.refreshed();
-                if (shouldBail)
-                    return;
-            }
-            else
-            {
-                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                                  "Trial Activation",
-                                                  result.errorMessage);
-            }
-            #endif
         }
         else
         {
             if (licenseKey->isEmpty())
                 return;
             auto* unlockRef = new UnlockOverlay (unlock,
-                gui.getWorld().getUnlockStatus(),
-                gui.getWorld(),
-                UnlockOverlay::Activate,
+                status, gui.getWorld(), UnlockOverlay::Activate,
                 licenseKey->getText().trim()
             );
             unlockRef->setOpacity (0.72f);
@@ -436,20 +392,7 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_quitButton] -- add your button handler code here..
         if (isForTrial)
         {
-            if (quitButton->getButtonText() == "Refresh")
-            {
-                auto* const unlockRef = new UnlockOverlay (unlock,
-                    gui.getWorld().getUnlockStatus(), gui.getWorld(),
-                    UnlockOverlay::Check,
-                    gui.getWorld().getUnlockStatus().getLicenseKey()
-                );
-                unlockRef->setOpacity (0.72f);
-                unlockRef->onFinished = std::bind (&ActivationComponent::handleActivationResult, this,
-                                                   std::placeholders::_1, std::placeholders::_2);
-                addAndMakeVisible (unlock.get());
-                resized();
-            }
-            else if (quitButton->getButtonText() == "Quit")
+            if (quitButton->getButtonText() == "Quit")
             {
                 JUCEApplication::getInstance()->systemRequestedQuit();
             }
@@ -460,6 +403,7 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             }
             else
             {
+                jassertfalse; // unhandled quit button action
                 if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
                     dialog->closeButtonPressed();
             }
@@ -563,7 +507,7 @@ void ActivationComponent::setForRegistration (bool setupRegistration)
     repaint();
 }
 
-void ActivationComponent::setForTrial (bool setupForTrial, bool refreshButton)
+void ActivationComponent::setForTrial (bool setupForTrial)
 {
     auto& status = gui.getWorld().getUnlockStatus();
     if (! status.isTrial())
@@ -585,7 +529,7 @@ void ActivationComponent::setForTrial (bool setupForTrial, bool refreshButton)
     {
         progress = 1.0;
         activateButton->setButtonText ("Purchase");
-        quitButton->setButtonText (refreshButton ? "Refresh" : "Quit");
+        quitButton->setButtonText ("Quit");
         instructionLabel->setText (
             String("Your trial license for APPNAME has expired. Use the button "
             "below to purchase a license.").replace("APPNAME", Util::appName()),
@@ -598,7 +542,7 @@ void ActivationComponent::setForTrial (bool setupForTrial, bool refreshButton)
         progress = (period - remaining) / period;
         progress = jlimit(0.0, 0.9999, progress);
         activateButton->setButtonText ("Upgrade");
-        quitButton->setButtonText (refreshButton ? "Refresh" : "Continue");
+        quitButton->setButtonText ("Continue");
         instructionLabel->setText (
             String("We hope you're enjoying APPNAME! Upgrade your trial license before expiration "
             "for a discounted price.").replace("APPNAME", Util::appName()),
