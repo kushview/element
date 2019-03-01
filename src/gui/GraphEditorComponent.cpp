@@ -27,10 +27,6 @@
 
 #include "gui/GraphEditorComponent.h"
 
-#ifndef EL_USE_PIG_WHIP
- #define EL_USE_PIG_WHIP 0
-#endif
-
 namespace Element {
 
 static bool elNodeIsAudioMixer (const Node& node)
@@ -241,20 +237,9 @@ class FilterComponent    : public Component,
                            public AsyncUpdater,
                            public Value::Listener
 {
-    PigWhipSource pigWhip;
-    Value nodeEnabled;
 public:
     FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
-        : filterID (node_.getNodeId()),
-          graph (graph_), 
-          node (node_),
-          numInputs (0), 
-          numOutputs (0),
-          pinSize (8),
-          font (11.0f),
-          numIns (0),
-          numOuts (0), 
-          vertical (vertical_)
+        : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
     {
         setBufferedToImage (true);
         nodeEnabled = node.getPropertyAsValue (Tags::enabled);
@@ -262,9 +247,6 @@ public:
         nodeName = node.getPropertyAsValue (Tags::name);
         nodeName.addListener (this);
 
-       #if EL_USE_PIG_WHIP
-        addAndMakeVisible (pigWhip);
-       #endif
         shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
         setComponentEffect (&shadow);
         
@@ -493,6 +475,7 @@ public:
         const auto box (getBoxRectangle());
         return { box.getX() + 5, box.getY() + 4, 16, 16 };
     }
+    
     Rectangle<int> getBoxRectangle() const
     {
        #if 0
@@ -631,13 +614,6 @@ public:
                 }
             }
         }
-
-       #if EL_USE_PIG_WHIP
-        const auto ssize = pigWhip.getWidth();
-        pigWhip.setBounds (getBoxRectangle()
-            .removeFromBottom (ssize)
-            .removeFromLeft (ssize));
-       #endif
     }
 
     void getPinPos (const int index, const bool isInput, float& x, float& y)
@@ -707,7 +683,6 @@ public:
         {
             // position is relative and parent might be resizing
             const auto b = getBoundsInParent();
-            DBG(b.toString());
             setNodePosition (b.getX(), b.getY());
         }
 
@@ -738,26 +713,31 @@ public:
 private:
     Node graph;
     Node node;
+
+    Value nodeEnabled;
     Value nodeName;
 
-    int numInputs, numOutputs;
+    int numInputs = 0, numOutputs = 0;
+    int numIns = 0, numOuts = 0;
+
     double relativeX = 0.5f;
     double relativeY = 0.5f;
-    int pinSize;
-    Point<int> originalPos;
-    Font font;
-    int numIns, numOuts;
-    bool vertical = true;
 
+    int pinSize = 8;    
+    Font font;
+    
+    Point<int> originalPos;
     bool selectionMouseDownResult = false;
+    bool vertical = true;
     bool dragging = false;
     bool blockDrag = false;
     bool collapsed = false;
 
     SettingButton ioButton;
-    OptionalScopedPointer<CallOutBox> ioBox;
-
     PowerButton powerButton;
+
+    OptionalScopedPointer<CallOutBox> ioBox;
+    PigWhipSource pigWhip;
 
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
