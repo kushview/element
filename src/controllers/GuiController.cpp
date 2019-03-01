@@ -620,7 +620,8 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->isVirtualKeyboardVisible()) flags |= Info::isTicked;
-            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", Commands::Categories::Session, flags);
+            result.setInfo ("Virtual Keyboard", "Toggle the virtual keyboard", 
+                Commands::Categories::UserInterface, flags);
         } break;
         
         case Commands::rotateContentView:
