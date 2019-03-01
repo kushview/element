@@ -22,7 +22,8 @@ class MainWindow;
 class PluginWindow;
 class SessionDocument;
 
-class GuiController : public AppController::Child
+class GuiController : public AppController::Child,
+                      private ChangeListener
 {
 public:
     Signal<void()> nodeSelected;
@@ -130,6 +131,9 @@ private:
     struct KeyPressManager;
     ScopedPointer<KeyPressManager> keys;
 
+    friend class ChangeBroadcaster;
+    void changeListenerCallback (ChangeBroadcaster*) override;
+    
     void showSplash();
     void toggleAboutScreen();
 

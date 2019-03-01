@@ -138,11 +138,13 @@ void GuiController::saveProperties (PropertiesFile* props)
 
 void GuiController::activate()
 {
+    getWorld().getDeviceManager().addChangeListener (this);
     Controller::activate();
 }
 
 void GuiController::deactivate()
 {
+    getWorld().getDeviceManager().removeChangeListener (this);
     nodeSelected.disconnect_all_slots();
 
     auto& settings = getSettings();
@@ -886,6 +888,13 @@ KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 bool GuiController::handleMessage (const AppMessage& msg)
 {
     return false;
+}
+
+void GuiController::changeListenerCallback (ChangeBroadcaster* broadcaster)
+{
+    if (broadcaster == &getWorld().getDeviceManager())
+        if (auto* win = mainWindow.get())
+            win->refreshMenu();
 }
 
 #if EL_RUNNING_AS_PLUGIN
