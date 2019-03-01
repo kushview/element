@@ -92,7 +92,7 @@ public:
 
     void resized() override
     {
-        auto size = jlimit (24, 44, 
+        auto size = jlimit (24, 36, 
             roundToInt ((double)(getWidth() - labelWidth - 32) / (double)matrix->getNumRows()));
         matrix->setMatrixCellSize (size, size);
 
@@ -144,7 +144,7 @@ AudioRouterEditor::AudioRouterEditor (const Node& node)
         node->addChangeListener (this);
     }
 
-    setSize (100, 100);
+    setSize (content->getWidth(), content->getHeight());
 }
 
 AudioRouterEditor::~AudioRouterEditor()

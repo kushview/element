@@ -51,8 +51,7 @@ void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isBut
         Rectangle<float> r { 0.0, 0.0, (float)getWidth(), (float)getHeight() };
         i.draw (g, r.reduced (pathReduction), false);
     }
-
-    if (icon.isNull() || !icon.isValid())
+    else if (icon.isNull() || !icon.isValid())
     {
         String text = getButtonText();
         

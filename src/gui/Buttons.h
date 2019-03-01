@@ -76,8 +76,7 @@ class PowerButton : public SettingButton
 public:
     PowerButton()
     {
-        setIcon (ImageCache::getFromMemory (BinaryData::PowerButton_48x48_png,
-                                            BinaryData::PowerButton_48x48_pngSize));
+        setPath (getIcons().fasPowerOff);
     }
 
     ~PowerButton() { }

@@ -10,6 +10,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/ContextMenus.h"
+#include "gui/Icons.h"
 #include "gui/PluginWindow.h"
 
 #include "gui/AudioIOPanelView.h"
@@ -268,7 +269,7 @@ public:
         setComponentEffect (&shadow);
         
         addAndMakeVisible (ioButton);
-        ioButton.setButtonText ("IO");
+        ioButton.setPath (getIcons().fasCog);
         ioButton.addListener (this);
         ioButton.setVisible (elNodeCanChangeIO (node));
 
@@ -1060,8 +1061,7 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
 
 void GraphEditorComponent::paint (Graphics& g)
 {
-//    g.fillAll (LookAndFeel::widgetBackgroundColor.darker().darker());
-    g.fillAll (findColour (DocumentWindow::backgroundColourId));
+   g.fillAll (LookAndFeel::widgetBackgroundColor.darker(0.6));
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
