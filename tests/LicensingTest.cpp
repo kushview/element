@@ -95,6 +95,7 @@ public:
         beginTest ("pro locked with expired trial license");
         result = status.activateLicense (EL_LICENSE_TRIAL_EXPIRED, {}, {}, params);
         status.save(); status.loadAll();
+        DBG("response message: " << result.errorMessage);
         expect (! result.succeeded);
         expect (! (bool) status.isUnlocked());
         expect ((bool) status.isTrial());
@@ -104,6 +105,7 @@ public:
         beginTest ("pro locked with solo license");
         result = status.activateLicense (EL_LICENSE_SOLO, {}, {}, params);
         status.save(); status.loadAll();
+        DBG("response message: " << result.errorMessage);
         expect (! result.succeeded);
         expect (! (bool) status.isExpiring());
         expect (! (bool) status.isTrial());
