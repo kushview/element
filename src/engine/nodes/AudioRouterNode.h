@@ -13,6 +13,9 @@ public:
     explicit AudioRouterNode (int ins = 4, int outs = 4);
     ~AudioRouterNode();
 
+    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
+    void releaseResources() override { }
+
     inline bool wantsMidiPipe() const override { return true; }
     void render (AudioSampleBuffer&, MidiPipe&) override;
     void getState (MemoryBlock&) override;
@@ -31,6 +34,15 @@ public:
         if (auto* prog = programs [index])
             return prog->name;
         return "Audio Router " + String (index + 1); 
+    }
+
+    void setFadeLength (double seconds)
+    {
+        seconds = jlimit (0.001, 5.0, seconds);
+        ScopedLock sl (lock);
+        fadeLengthSeconds = seconds;
+        fadeIn.setLength (static_cast<float> (fadeLengthSeconds));
+        fadeOut.setLength (static_cast<float> (fadeLengthSeconds));
     }
 
 protected:
@@ -58,7 +70,7 @@ private:
     const int numSources;
     const int numDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
-
+    
     struct Program
     {
         Program (const String& programName, int midiProgramNumber = -1)

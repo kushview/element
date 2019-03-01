@@ -17,7 +17,7 @@ public:
 
     MatrixState& getMatrixState() { return matrix; }
     void applyMatrix();
-
+    void setFadeLength (double length);
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:

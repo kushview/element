@@ -108,7 +108,7 @@ public:
                     for (int c = startChannel; c < endChannel; ++c)
                         meter.setValue (c - startChannel, ptr->getOutputRMS (c));
             }
-            channelStrip.setPower (!ptr->isSuspended(), false);
+            channelStrip.setPower (! ptr->isSuspended(), false);
         }
         else
         {

@@ -8,7 +8,8 @@ namespace Element {
 class MidiChannelSplitterNode : public MidiFilterNode
 {
 public:
-    MidiChannelSplitterNode() : MidiFilterNode (0)
+    MidiChannelSplitterNode() 
+        : MidiFilterNode (0)
     {
         jassert (metadata.hasType (Tags::node));
         metadata.setProperty (Tags::format, "Element", nullptr);
@@ -19,6 +20,9 @@ public:
 
     void setState (const void* data, int size) override { ignoreUnused (data, size); }
     void getState (MemoryBlock& block) override { ignoreUnused (block); }
+
+    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
+    void releaseResources() override { }
 
     inline void render (AudioSampleBuffer& audio, MidiPipe& midi) override
     {

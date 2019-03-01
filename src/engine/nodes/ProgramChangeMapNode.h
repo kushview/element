@@ -89,6 +89,9 @@ public:
         tree.writeToStream (gzip);
     }
 
+    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
+    void releaseResources() override { }
+    
     inline void handleAsyncUpdate() override { lastProgramChanged(); }
     Signal<void()> lastProgramChanged;
 

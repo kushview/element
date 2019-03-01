@@ -439,12 +439,11 @@ public:
         if (panel)
             panel->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods,
                                                           dragging, selectionMouseDownResult);
-        dragging = selectionMouseDownResult = blockDrag = false;
 
         if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
-        {
             makeEditorActive();
-        }        
+
+        dragging = selectionMouseDownResult = blockDrag = false;   
     }
 
     void updatePosition()
@@ -544,7 +543,7 @@ public:
         const auto box (getBoxRectangle());
 
         g.setColour (isEnabled() && node.isEnabled()
-            ? LookAndFeel::widgetBackgroundColor.brighter (0.7) 
+            ? LookAndFeel::widgetBackgroundColor.brighter (0.8) 
             : LookAndFeel::widgetBackgroundColor.brighter (0.2));
         g.fillRoundedRectangle (box.toFloat(), cornerSize);
 

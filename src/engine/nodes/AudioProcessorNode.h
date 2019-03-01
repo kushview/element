@@ -20,6 +20,9 @@ public:
     void getState (MemoryBlock&) override;
     void setState (const void*, int) override;
     
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void releaseResources() override;
+
 protected:
     void createPorts() override;
 

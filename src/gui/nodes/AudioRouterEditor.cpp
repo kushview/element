@@ -85,11 +85,24 @@ public:
         setOpaque (true);
         matrix.reset (new AudioRouterMatrix (o));
         addAndMakeVisible (matrix.get());
+
+        // addAndMakeVisible (slider);
+        slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
+        slider.setTextBoxStyle (Slider::NoTextBox, true, 1, 1);
+        slider.setRange (0.001, 2.0);
+
+        slider.onValueChange = [this] { owner.setFadeLength (slider.getValue()); };
+
         setSize (padding + labelWidth + matrix->getWidth(), 
                  padding + labelWidth + matrix->getHeight());
         matrixArea = { labelWidth, padding, matrix->getWidth(), matrix->getHeight() };
     }
 
+    ~Content()
+    {
+        slider.onValueChange = nullptr;
+    }
+    
     void resized() override
     {
         auto size = jlimit (24, 36, 
@@ -101,6 +114,8 @@ public:
                 matrix->getColumnThickness() * matrix->getNumColumns() };
 
         matrix->setBounds (matrixArea);
+        if (slider.isVisible())
+            slider.setBounds (matrixArea.getX() - size + 2, matrixArea.getBottom() + 4, size - 2, size - 2);
     }
 
     void paint (Graphics& g) override
@@ -129,6 +144,7 @@ public:
 private:
     friend class AudioRouterEditor;
     AudioRouterEditor& owner;
+    Slider slider;
     std::unique_ptr<AudioRouterMatrix> matrix;
 };
 
@@ -152,6 +168,12 @@ AudioRouterEditor::~AudioRouterEditor()
     if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
         node->removeChangeListener (this);
     content.reset();
+}
+
+void AudioRouterEditor::setFadeLength (double length)
+{
+    if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
+        node->setFadeLength (length);
 }
 
 void AudioRouterEditor::applyMatrix()

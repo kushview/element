@@ -39,6 +39,9 @@ public:
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
+    virtual void prepareToRender (double sampleRate, int maxBufferSize) = 0;
+    virtual void releaseResources() = 0;
+
     virtual bool wantsMidiPipe() const { return false; }
     virtual void render (AudioSampleBuffer&, MidiPipe&) { }
     virtual void renderBypassed (AudioSampleBuffer&, MidiPipe&);

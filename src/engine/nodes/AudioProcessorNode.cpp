@@ -14,6 +14,29 @@ static void setAudioProcessorNodePropertiesFrom (const PluginDescription& pd, Va
         p.setProperty (Tags::type, Tags::graph.toString(), nullptr);
 }
 
+void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize) 
+{ 
+    if (! proc)
+    {
+        jassertfalse;
+        return;
+    }
+
+    proc->setRateAndBufferSizeDetails (sampleRate, maxBufferSize);
+    proc->prepareToPlay (sampleRate, maxBufferSize);
+}
+
+void AudioProcessorNode::releaseResources() 
+{ 
+    if (! proc)
+    {
+        jassertfalse;
+        return;
+    }
+
+    proc->releaseResources();
+}
+
 void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 {
     DBG("[EL] AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()");

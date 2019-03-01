@@ -228,40 +228,36 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
                          bool willBeEnabled)
 {
     parent = parentGraph;
-    AudioProcessor* instance = getAudioProcessor();
-
     if ((willBeEnabled || enabled.get() == 1) && !isPrepared)
     {
         isPrepared = true;
-        setParentGraph (parentGraph);
-        
-        if (instance != nullptr)
-        {
-            instance->setRateAndBufferSizeDetails (sampleRate, blockSize);
-            instance->prepareToPlay (sampleRate, blockSize);
-            
-            // TODO: move model code out of engine code
-            if (nullptr != dynamic_cast<IOProcessor*> (instance))
-                resetPorts();
-            
-            inRMS.clearQuick (true);
-            for (int i = 0; i < instance->getTotalNumInputChannels(); ++i)
-            {
-                AtomicValue<float>* avf = new AtomicValue<float>();
-                avf->set(0);
-                inRMS.add (avf);
-            }
+        setParentGraph (parentGraph); //<< ensures io nodes get setup
+        prepareToRender (sampleRate, blockSize);
 
-            outRMS.clearQuick (true);
-            for (int i = 0; i < instance->getTotalNumOutputChannels(); ++i)
-            {
-                AtomicValue<float>* avf = new AtomicValue<float>();
-                avf->set(0);
-                outRMS.add(avf);
-            }
-            
-            if (metadata.getProperty (Tags::bypass, false))
-                instance->suspendProcessing (true);
+        // TODO: move model code out of engine code
+        // VERIFY: this portion is actually needed. This was here to ensure
+        // port information is available before setting up the RMS buffers
+        if (! isAudioIONode() && ! isMidiIONode())
+            resetPorts();
+
+        // VERIFY: this is needed.  GraphManager should be setting this
+        if (metadata.getProperty (Tags::bypass, false))
+            suspendProcessing (true);
+
+        inRMS.clearQuick (true);
+        for (int i = 0; i < getNumAudioInputs(); ++i)
+        {
+            AtomicValue<float>* avf = new AtomicValue<float>();
+            avf->set(0);
+            inRMS.add (avf);
+        }
+
+        outRMS.clearQuick (true);
+        for (int i = 0; i < getNumAudioOutputs(); ++i)
+        {
+            AtomicValue<float>* avf = new AtomicValue<float>();
+            avf->set(0);
+            outRMS.add(avf);
         }
     }
 }
@@ -273,8 +269,7 @@ void GraphNode::unprepare()
         isPrepared = false;
         inRMS.clear (true);
         outRMS.clear (true);
-        if (auto* const proc = getAudioProcessor())
-            proc->releaseResources();
+        releaseResources();
     }
 }
 
