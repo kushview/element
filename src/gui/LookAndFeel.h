@@ -22,6 +22,22 @@ public:
     
     int getDefaultScrollbarWidth() override;
 
+    //==============================================================================
+   #if 0
+    AlertWindow* createAlertWindow (const String& title, const String& message,
+                                    const String& button1,
+                                    const String& button2,
+                                    const String& button3,
+                                    AlertWindow::AlertIconType iconType,
+                                    int numButtons, Component* associatedComponent) override;
+    void drawAlertBox (Graphics&, AlertWindow&, const Rectangle<int>& textArea, TextLayout&) override;
+
+    int getAlertWindowButtonHeight() override;
+    Font getAlertWindowTitleFont() override;
+    Font getAlertWindowMessageFont() override;
+    Font getAlertWindowFont() override;
+   #endif
+    //==============================================================================
     void drawLinearProgressBar (Graphics& g, ProgressBar& progressBar,
                                              int width, int height,
                                              double progress, const String& textToShow);
