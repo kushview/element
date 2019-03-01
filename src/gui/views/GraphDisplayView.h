@@ -84,7 +84,7 @@ public:
 
     inline void resized() override
     {
-        auto r = getLocalBounds().reduced (2);
+        auto r = getLocalBounds();
         if (breadcrumb.isVisible())
             breadcrumb.setBounds (r.removeFromTop (24));
         graphDisplayResized (r);

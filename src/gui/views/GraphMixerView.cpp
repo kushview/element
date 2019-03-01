@@ -190,6 +190,7 @@ public:
     Content (GraphMixerView& v, GuiController& gui, Session* sess)
         : session (sess), view (v)
     {
+        setOpaque (true);
         addAndMakeVisible (box);
         box.setRowHeight (80);
         model.reset (new GraphMixerListBoxModel (gui, box));
@@ -212,12 +213,21 @@ public:
     {
         g.setColour (LookAndFeel::widgetBackgroundColor.darker());
         g.fillAll();
+
+        if (model->getNumRows() <= 0)
+        {
+            g.setColour (LookAndFeel::textColor);
+            g.setFont (Font (15.f));
+            g.drawText (TRANS ("No channels to display"), 
+                getLocalBounds().toFloat(), Justification::centred);
+        }
     }
 
     void stabilize()
     {
         model->refreshNodes();
         box.updateContent();
+        repaint();
     }
 
 private:
