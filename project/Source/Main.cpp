@@ -240,7 +240,7 @@ public:
         }
         else
         {
-            jassertfalse;
+            jassertfalse; // this is most likely a wrong product.  e.g. SE license used for Pro
             appName << " (unkown activation state)";
         }
         
