@@ -53,6 +53,9 @@ public:
          bug, mainJuceLogo, 
          
          falBars, falCog, falBarsOutline, falAtomAlt,
+         falSyncAlt,
+
+         farSyncAlt,
 
          fasPlay, fasStop, fasCog, fasCircle,
          fasChevronDown, fasChevronRight, fasSave,
