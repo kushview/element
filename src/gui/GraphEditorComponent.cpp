@@ -199,6 +199,8 @@ public:
 
     void mouseDown (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
         getGraphPanel()->beginConnectorDrag (isInput ? 0 : filterID,
                                              port,
                                              isInput ? filterID : 0,
@@ -208,11 +210,15 @@ public:
 
     void mouseDrag (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
         getGraphPanel()->dragConnector (e);
     }
 
     void mouseUp (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
         getGraphPanel()->endDraggingConnector (e);
     }
 
@@ -293,6 +299,9 @@ public:
 
     void buttonClicked (Button* b) override 
     {
+        if (! isEnabled())
+            return;
+
         GraphNodePtr obj = node.getGraphNode();
         auto* proc = (obj) ? obj->getAudioProcessor() : 0;
         if (! proc) return;
@@ -326,6 +335,9 @@ public:
 
     void mouseDown (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
+
         bool collapsedToggled = false;
         if (! vertical && getOpenCloseBox().contains (e.x, e.y))
         {
@@ -403,6 +415,9 @@ public:
 
     void mouseDrag (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
+
         if (e.mods.isPopupMenu() || blockDrag)
             return;
         dragging = true;
@@ -417,6 +432,8 @@ public:
 
     void mouseUp (const MouseEvent& e) override
     {
+        if (! isEnabled())
+            return;
         auto* panel = getGraphPanel();
         
         if (panel)
@@ -867,11 +884,16 @@ public:
 
     void mouseDown (const MouseEvent&)
     {
+        if (! isEnabled())
+            return;
         dragging = false;
     }
 
     void mouseDrag (const MouseEvent& e)
     {
+        if (! isEnabled())
+            return;
+
         if ((! dragging) && ! e.mouseWasClicked())
         {
             dragging = true;
@@ -896,6 +918,8 @@ public:
 
     void mouseUp (const MouseEvent& e)
     {
+        if (! isEnabled())
+            return;
         if (dragging)
             getGraphPanel()->endDraggingConnector (e);
     }
@@ -1046,6 +1070,9 @@ void GraphEditorComponent::paint (Graphics& g)
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
 {
+    if (! isEnabled())
+        return;
+
     if (selectedNodes.getNumSelected() > 0) {
         selectedNodes.deselectAll();
         updateSelection();
