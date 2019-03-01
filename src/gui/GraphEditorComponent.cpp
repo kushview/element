@@ -329,7 +329,7 @@ public:
         bool collapsedToggled = false;
         if (! vertical && getOpenCloseBox().contains (e.x, e.y))
         {
-            node.setProperty ("collapsed", !collapsed);
+            node.setProperty (Tags::collapsed, !collapsed);
             update (false);
             getGraphPanel()->updateConnectorComponents();
             collapsedToggled = true;
@@ -475,7 +475,7 @@ public:
         const auto box (getBoxRectangle());
         return { box.getX() + 5, box.getY() + 4, 16, 16 };
     }
-    
+
     Rectangle<int> getBoxRectangle() const
     {
        #if 0
@@ -641,7 +641,7 @@ public:
             delete this;
             return;
         }
-        collapsed = (bool) node.getProperty ("collapsed", false);
+        collapsed = (bool) node.getProperty (Tags::collapsed, false);
         numIns = numOuts = 0;
         const auto numPorts = node.getPortsValueTree().getNumChildren();
         for (int i = 0; i < numPorts; ++i)
