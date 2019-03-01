@@ -289,9 +289,9 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
                 gui.getWorld().getUnlockStatus(),
                 gui.getWorld(),
                 UnlockOverlay::Register,
-                String(), 
-                email.getText(), 
-                username.getText(), 
+                String(),
+                email.getText(),
+                username.getText(),
                 password.getText()
             );
             unlockRef->setOpacity (0.72f);
@@ -339,9 +339,9 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             const auto result = status.registerTrial (email.getText(), username.getText(), password.getText());
             if (result.succeeded)
             {
-                
 
-                
+
+
                 bool shouldBail = false;
                 AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon,
                                                   "Trial Activation",

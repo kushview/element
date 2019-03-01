@@ -289,7 +289,7 @@
 // kv_gui flags:
 
 #ifndef    KV_DOCKING_WINDOWS
- //#define KV_DOCKING_WINDOWS 0
+ #define   KV_DOCKING_WINDOWS 1
 #endif
 
 //==============================================================================
