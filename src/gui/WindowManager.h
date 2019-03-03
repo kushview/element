@@ -153,7 +153,7 @@ public:
 
     inline PluginWindow* createPluginWindowFor (const Node& node)
     {
-        if (node.getIdentifier().toString() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+        if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
             return createPluginWindowFor (node, new ProgramChangeMapEditor (node));
         }

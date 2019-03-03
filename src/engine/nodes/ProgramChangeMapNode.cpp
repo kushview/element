@@ -7,7 +7,7 @@ ProgramChangeMapNode::ProgramChangeMapNode()
 {
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_PROGRAM_CHANGE_MAP, nullptr);
+    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_PROGRAM_MAP, nullptr);
 }
 
 ProgramChangeMapNode::~ProgramChangeMapNode() { }

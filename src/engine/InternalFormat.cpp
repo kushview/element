@@ -276,12 +276,12 @@ namespace Element {
             auto* const desc = ds.add (new PluginDescription());
             MediaPlayerProcessor().fillInPluginDescription (*desc);
         }
-        else if (fileOrId == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+        else if (fileOrId == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
             auto* const desc = ds.add (new PluginDescription());
-            desc->fileOrIdentifier   = EL_INTERNAL_ID_PROGRAM_CHANGE_MAP;
-            desc->name               = "Program Change Map";
-            desc->descriptiveName    = "Program Change Map";
+            desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
+            desc->name               = "MIDI Program Map";
+            desc->descriptiveName    = "Filter MIDI Program Changes";
             desc->numInputChannels   = 0;
             desc->numOutputChannels  = 0;
             desc->hasSharedContainer = false;
@@ -322,7 +322,7 @@ namespace Element {
         results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
         results.add (EL_INTERNAL_ID_MEDIA_PLAYER); 
         results.add (EL_INTERNAL_ID_PLACEHOLDER);
-        results.add (EL_INTERNAL_ID_PROGRAM_CHANGE_MAP);
+        results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
        #endif // product enablements
 
         return results;

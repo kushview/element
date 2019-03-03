@@ -726,7 +726,7 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     {
         return new MidiChannelSplitterNode();
     }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
     {
         return new ProgramChangeMapNode();
     }
