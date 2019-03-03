@@ -38,7 +38,7 @@ private:
     std::unique_ptr<Component> editor;
     NodeListComboBox nodesCombo;
     IconButton menuButton;
-    bool sticky = true;
+    bool sticky = false;
     void clearEditor();
     Component* createEmbededEditor();
     

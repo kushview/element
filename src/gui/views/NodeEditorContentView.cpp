@@ -359,7 +359,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     {
         return new GenericNodeEditor (node);
     }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
     {
         auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
         programChangeMapEditor->setStoreSize (false);
