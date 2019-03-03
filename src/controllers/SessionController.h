@@ -4,6 +4,7 @@
 #include "controllers/AppController.h"
 #include "documents/SessionDocument.h"
 #include "session/Session.h"
+#include "Signals.h"
 
 namespace Element {
 class SessionController : public AppController::Child
@@ -28,6 +29,7 @@ public:
     void exportGraph (const Node& node, const File& targetFile);
     void importGraph (const File& file);
     
+    Signal<void()> sessionLoaded;
 private:
     SessionPtr currentSession;
     ScopedPointer<SessionDocument> document;

@@ -33,6 +33,7 @@ private:
     Value nodeObjectValue;
     SignalConnection selectedNodeConnection;
     SignalConnection graphChangedConnection;
+    SignalConnection sessionLoadedConnection;
 
     std::unique_ptr<Component> editor;
     NodeListComboBox nodesCombo;
@@ -43,6 +44,7 @@ private:
     
     static void nodeMenuCallback (int, NodeEditorContentView*);
     void onGraphChanged();
+    void onSessionLoaded();
     
     class NodeWatcher; std::unique_ptr<NodeWatcher> watcher;
 };

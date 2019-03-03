@@ -4,6 +4,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphController.h"
+#include "controllers/SessionController.h"
 
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
@@ -19,345 +20,358 @@
 
 namespace Element {
 
-    class NodeEditorContentView::NodeWatcher : private ValueTree::Listener
+class NodeEditorContentView::NodeWatcher : private ValueTree::Listener
+{
+public:
+    NodeWatcher()
     {
-    public:
-        NodeWatcher()
-        {
-            data.addListener (this);
+        data.addListener (this);
+    }
+    virtual ~NodeWatcher() noexcept
+    {
+        data.removeListener (this);
+    }
+
+    void setNodeToWatch (const Node& newNode)
+    {
+        if (node == newNode)
+            return;
+        node = newNode;
+        data = node.getValueTree().getParent().getParent();
+    }
+
+    Node getWatchedNode() const { return node; }
+
+    std::function<void()> onSiblingNodeAdded;
+    std::function<void()> onSiblingNodeRemoved;
+    std::function<void()> onNodeNameChanged;
+
+private:
+    Node node;
+    ValueTree data;
+
+    friend class juce::ValueTree;
+    void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
+    {
+        if (tree == node.getValueTree() && property == Tags::name) {
+            if (onNodeNameChanged)
+                onNodeNameChanged();
         }
-        virtual ~NodeWatcher() noexcept
+    }
+
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
+    {
+        if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
         {
-            data.removeListener (this);
+            if (onSiblingNodeAdded)
+                onSiblingNodeAdded();
         }
+    }
 
-        void setNodeToWatch (const Node& newNode)
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
+    {
+        if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
         {
-            if (node == newNode)
-                return;
-            node = newNode;
-            data = node.getValueTree().getParent().getParent();
+            if (onSiblingNodeRemoved)
+                onSiblingNodeRemoved();
         }
+    }
 
-        Node getWatchedNode() const { return node; }
+    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
+    {
+        ignoreUnused (parent, oldIndex, newIndex);
+    }
 
-        std::function<void()> onSiblingNodeAdded;
-        std::function<void()> onSiblingNodeRemoved;
-        std::function<void()> onNodeNameChanged;
+    void valueTreeParentChanged (ValueTree& tree) override
+    {
+        ignoreUnused (tree);
+    }
 
-    private:
-        Node node;
-        ValueTree data;
+    void valueTreeRedirected (ValueTree&) override { }
+};
 
-        friend class juce::ValueTree;
-        void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
-        {
-            if (tree == node.getValueTree() && property == Tags::name) {
-                if (onNodeNameChanged)
-                    onNodeNameChanged();
-            }
-        }
+static String noteValueToString (double value)
+{
+    return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
+}
 
-        void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
-        {
-            if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
-            {
-                if (onSiblingNodeAdded)
-                    onSiblingNodeAdded();
-            }
-        }
+NodeEditorContentView::NodeEditorContentView()
+{
+    addAndMakeVisible (nodesCombo);
+    nodesCombo.addListener (this);
 
-        void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
-        {
-            if (parent.hasType (Tags::nodes) && child.hasType (Tags::node) && child != data)
-            {
-                if (onSiblingNodeRemoved)
-                    onSiblingNodeRemoved();
-            }
-        }
-
-        void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
-        {
-            ignoreUnused (parent, oldIndex, newIndex);
-        }
-
-        void valueTreeParentChanged (ValueTree& tree) override
-        {
-            ignoreUnused (tree);
-        }
-
-        void valueTreeRedirected (ValueTree&) override { }
+    addAndMakeVisible (menuButton);
+    menuButton.setIcon (Icon (getIcons().falBarsOutline, 
+        findColour (TextButton::textColourOffId)));
+    menuButton.setTriggeredOnMouseDown (true);
+    menuButton.onClick = [this]()
+    {
+        #if 0
+        NodePopupMenu menu (node, [this](NodePopupMenu& nodeMenu) {
+            nodeMenu.addItem (1, "Sticky", true, isSticky());
+        });
+        #else
+        PopupMenu menu;
+        menu.addItem (1, "Sticky", true, isSticky());
+        #endif
+        
+        menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
+            ModalCallbackFunction::forComponent (nodeMenuCallback, this));
     };
 
-    static String noteValueToString (double value)
+    watcher.reset (new NodeWatcher());
+    watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = [this]() {
+        nodesCombo.addNodes (graph);
+    };
+
+    watcher->onNodeNameChanged = [this]()
     {
-        return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
+        nodesCombo.addNodes (graph);
+    };
+}
+
+NodeEditorContentView::~NodeEditorContentView()
+{
+    watcher.reset();
+    menuButton.onClick = nullptr;
+    nodesCombo.removeListener (this);
+    selectedNodeConnection.disconnect();
+    graphChangedConnection.disconnect();
+    sessionLoadedConnection.disconnect();
+}
+
+void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
+{
+    if (result == 1)
+    {
+        view->setSticky (! view->isSticky());
+        DBG("[EL] node editor panel is now sticky: " << (int) view->isSticky());
+    }
+}
+
+void NodeEditorContentView::paint (Graphics& g)
+{
+    g.fillAll (Element::LookAndFeel::backgroundColor);
+}
+
+void NodeEditorContentView::comboBoxChanged (ComboBox*)
+{
+    const auto selectedNode = graph.getNode (nodesCombo.getSelectedItemIndex());
+    if (selectedNode.isValid())
+    {
+        if (sticky)
+            setNode (selectedNode);
+        ViewHelpers::findContentComponent(this)->getAppController()
+            .findChild<GuiController>()->selectNode (selectedNode);
+    }
+}
+
+void NodeEditorContentView::resized()
+{
+    auto r1 = getLocalBounds().reduced (2);
+    if (r1.getHeight() < 44)
+        r1.setHeight (44);
+
+    r1.removeFromTop (4);
+    auto r2 = r1.removeFromTop (20);
+    nodesCombo.setBounds (r2.removeFromLeft (jmax (100, r2.getWidth() - 24)));
+    menuButton.setBounds (r2.withWidth(22).withX (r2.getX() + 2));
+    
+    if (editor)
+    {
+        r1.removeFromTop (2);
+        editor->setBounds (r1);
+    }
+}
+
+void NodeEditorContentView::setSticky (bool shouldBeSticky)
+{
+    if (sticky == shouldBeSticky)
+        return;
+    sticky = shouldBeSticky;
+    resized();
+}
+
+void NodeEditorContentView::onGraphChanged()
+{
+    auto *cc = ViewHelpers::findContentComponent (this);
+    jassert (cc);
+    auto& graphs = *cc->getAppController().findChild<GraphController>();
+    setNode (graphs.getGraph().getNode (0));
+}
+
+void NodeEditorContentView::onSessionLoaded()
+{
+    if (auto session = ViewHelpers::getSession (this))
+        setNode (session->getActiveGraph().getNode (0));
+}
+
+void NodeEditorContentView::stabilizeContent()
+{
+    auto *cc = ViewHelpers::findContentComponent (this);
+    auto session = ViewHelpers::getSession (this);
+    jassert (cc && session);
+    auto& gui = *cc->getAppController().findChild<GuiController>();
+    auto& graphs = *cc->getAppController().findChild<GraphController>();
+    auto& sessions = *cc->getAppController().findChild<SessionController>();
+
+    if (! selectedNodeConnection.connected())
+        selectedNodeConnection = gui.nodeSelected.connect (std::bind (
+            &NodeEditorContentView::stabilizeContent, this));
+    if (! graphChangedConnection.connected())
+        graphChangedConnection = graphs.graphChanged.connect (std::bind (
+            &NodeEditorContentView::onGraphChanged, this));
+    if (! sessionLoadedConnection.connected())
+        sessionLoadedConnection = sessions.sessionLoaded.connect (std::bind (
+            &NodeEditorContentView::onSessionLoaded, this));
+
+    if (! sticky || ! node.isValid())
+    {
+        setNode (gui.getSelectedNode());
     }
 
-    NodeEditorContentView::NodeEditorContentView()
+    if (! node.isValid())
     {
-        addAndMakeVisible (nodesCombo);
-        nodesCombo.addListener (this);
-
-        addAndMakeVisible (menuButton);
-        menuButton.setIcon (Icon (getIcons().falBarsOutline, 
-            findColour (TextButton::textColourOffId)));
-        menuButton.setTriggeredOnMouseDown (true);
-        menuButton.onClick = [this]()
-        {
-           #if 0
-            NodePopupMenu menu (node, [this](NodePopupMenu& nodeMenu) {
-                nodeMenu.addItem (1, "Sticky", true, isSticky());
-            });
-           #else
-            PopupMenu menu;
-            menu.addItem (1, "Sticky", true, isSticky());
-           #endif
-            
-            menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&menuButton),
-                ModalCallbackFunction::forComponent (nodeMenuCallback, this));
-        };
-
-        watcher.reset (new NodeWatcher());
-        watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = [this]() {
-            nodesCombo.addNodes (graph);
-        };
-
-        watcher->onNodeNameChanged = [this]()
-        {
-            nodesCombo.addNodes (graph);
-        };
+        setNode (session->getActiveGraph().getNode (0));
     }
+}
 
-    NodeEditorContentView::~NodeEditorContentView()
-    {
-        watcher.reset();
-        menuButton.onClick = nullptr;
-        nodesCombo.removeListener (this);
-        selectedNodeConnection.disconnect();
-        graphChangedConnection.disconnect();
+void NodeEditorContentView::setNode (const Node& newNode)
+{
+    auto newGraph = newNode.getParentGraph();
+    bool graphChanged = false;
+    if (newGraph != graph)
+    {   
+        graphChanged = true;
+        graph = newGraph;
     }
-
-    void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
+    
+    if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
+        nodesCombo.addNodes (graph);
+    
+    if (newNode != node)
     {
-        if (result == 1)
-        {
-            view->setSticky (! view->isSticky());
-            DBG("[EL] node editor panel is now sticky: " << (int) view->isSticky());
-        }
-    }
-
-    void NodeEditorContentView::paint (Graphics& g)
-    {
-        g.fillAll (Element::LookAndFeel::backgroundColor);
-    }
-
-    void NodeEditorContentView::comboBoxChanged (ComboBox*)
-    {
-        const auto selectedNode = graph.getNode (nodesCombo.getSelectedItemIndex());
-        if (selectedNode.isValid())
-        {
-            if (sticky)
-                setNode (selectedNode);
-            ViewHelpers::findContentComponent(this)->getAppController()
-                .findChild<GuiController>()->selectNode (selectedNode);
-        }
-    }
-
-    void NodeEditorContentView::resized()
-    {
-        auto r1 = getLocalBounds().reduced (2);
-        if (r1.getHeight() < 44)
-            r1.setHeight (44);
-
-        r1.removeFromTop (4);
-        auto r2 = r1.removeFromTop (20);
-        nodesCombo.setBounds (r2.removeFromLeft (jmax (100, r2.getWidth() - 24)));
-        menuButton.setBounds (r2.withWidth(22).withX (r2.getX() + 2));
-        
+        nodeObjectValue.removeListener (this);
+        clearEditor();
+        watcher->setNodeToWatch (newNode);
+        node = watcher->getWatchedNode();
+        nodeObjectValue = node.getPropertyAsValue (Tags::object, true);
+        editor.reset (createEmbededEditor());
         if (editor)
-        {
-            r1.removeFromTop (2);
-            editor->setBounds (r1);
-        }
-    }
+            addAndMakeVisible (editor.get());
+        
+        nodeObjectValue.addListener (this);
 
-    void NodeEditorContentView::setSticky (bool shouldBeSticky)
-    {
-        if (sticky == shouldBeSticky)
-            return;
-        sticky = shouldBeSticky;
         resized();
     }
 
-    void NodeEditorContentView::onGraphChanged()
+    nodesCombo.selectNode (node);
+}
+
+void NodeEditorContentView::valueChanged (Value& value)
+{
+    if (! nodeObjectValue.refersToSameSourceAs (value))
+        return;
+    if (nodeObjectValue.getValue().getObject() == nullptr)
     {
-        auto *cc = ViewHelpers::findContentComponent (this);
-        jassert (cc);
-        auto& graphs = *cc->getAppController().findChild<GraphController>();
-        setNode (graphs.getGraph().getNode (0));
+        // node was probably removed and going to be deleted
+        clearEditor();
+        nodesCombo.addNodes (graph);
+    }
+}
+
+void NodeEditorContentView::clearEditor()
+{
+    if (editor == nullptr)
+        return;
+    GraphNodePtr object = node.getGraphNode();
+    auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    if (auto* aped = dynamic_cast<AudioProcessorEditor*> (editor.get()))
+    {
+        if (proc)
+            proc->editorBeingDeleted (aped);
     }
 
-    void NodeEditorContentView::stabilizeContent()
+    removeChildComponent (editor.get());
+    editor.reset (nullptr);
+}
+
+Component* NodeEditorContentView::createEmbededEditor()
+{
+    auto* const world = ViewHelpers::getGlobals (this);
+    
+    if (node.isAudioInputNode())
     {
-        auto *cc = ViewHelpers::findContentComponent (this);
-        auto session = ViewHelpers::getSession (this);
-        jassert (cc && session);
-        auto& gui = *cc->getAppController().findChild<GuiController>();
-        auto& graphs = *cc->getAppController().findChild<GraphController>();
-
-        if (! selectedNodeConnection.connected())
-            selectedNodeConnection = gui.nodeSelected.connect (std::bind (
-                &NodeEditorContentView::stabilizeContent, this));
-        if (! graphChangedConnection.connected())
-            graphChangedConnection = graphs.graphChanged.connect (std::bind (
-                &NodeEditorContentView::onGraphChanged, this));
-        if (! sticky || ! node.isValid())
+        if (node.isChildOfRootGraph())
         {
-            setNode (gui.getSelectedNode());
+            return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                1, DeviceManager::maxAudioChannels, 0, 0, 
+                false, false, false, false);
         }
-
-        if (! node.isValid())
+        else
         {
-            setNode (session->getActiveGraph().getNode (0));
-        }
-    }
-
-    void NodeEditorContentView::setNode (const Node& newNode)
-    {
-        auto newGraph = newNode.getParentGraph();
-        bool graphChanged = false;
-        if (newGraph != graph)
-        {   
-            graphChanged = true;
-            graph = newGraph;
-        }
-        
-        if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
-            nodesCombo.addNodes (graph);
-        
-        if (newNode != node)
-        {
-            nodeObjectValue.removeListener (this);
-            clearEditor();
-            watcher->setNodeToWatch (newNode);
-            node = watcher->getWatchedNode();
-            nodeObjectValue = node.getPropertyAsValue (Tags::object, true);
-            editor.reset (createEmbededEditor());
-            if (editor)
-                addAndMakeVisible (editor.get());
-            
-            nodeObjectValue.addListener (this);
-
-            resized();
-        }
-
-        nodesCombo.selectNode (node);
-    }
-
-    void NodeEditorContentView::valueChanged (Value& value)
-    {
-        if (! nodeObjectValue.refersToSameSourceAs (value))
-            return;
-        if (nodeObjectValue.getValue().getObject() == nullptr)
-        {
-            // node was probably removed and going to be deleted
-            clearEditor();
-            nodesCombo.addNodes (graph);
+            return nullptr;
         }
     }
 
-    void NodeEditorContentView::clearEditor()
+    if (node.isAudioOutputNode())
     {
-        if (editor == nullptr)
-            return;
-        GraphNodePtr object = node.getGraphNode();
-        auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-        if (auto* aped = dynamic_cast<AudioProcessorEditor*> (editor.get()))
+        if (node.isChildOfRootGraph())
         {
-            if (proc)
-                proc->editorBeingDeleted (aped);
+            return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                0, 0, 1, DeviceManager::maxAudioChannels, 
+                false, false, false, false);
         }
-
-        removeChildComponent (editor.get());
-        editor.reset (nullptr);
+        else
+        {
+            return nullptr;
+        }
     }
 
-    Component* NodeEditorContentView::createEmbededEditor()
+    if (node.isMidiInputNode())
     {
-        auto* const world = ViewHelpers::getGlobals (this);
-        
-        if (node.isAudioInputNode())
+        if (node.isChildOfRootGraph())
         {
-            if (node.isChildOfRootGraph())
-            {
-                return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    1, DeviceManager::maxAudioChannels, 0, 0, 
-                    false, false, false, false);
-            }
-            else
-            {
-                return nullptr;
-            }
-        }
+            return new MidiIONodeEditor (node, world->getDeviceManager(), true, false);
 
-        if (node.isAudioOutputNode())
-        {
-            if (node.isChildOfRootGraph())
-            {
-                return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                    0, 0, 1, DeviceManager::maxAudioChannels, 
-                    false, false, false, false);
-            }
-            else
-            {
-                return nullptr;
-            }
         }
-
-        if (node.isMidiInputNode())
+        else
         {
-            if (node.isChildOfRootGraph())
-            {
-                return new MidiIONodeEditor (node, world->getDeviceManager(), true, false);
-
-            }
-            else
-            {
-                return nullptr;
-            }
+            return nullptr;
         }
-
-        if (node.isMidiOutputNode())
-        {
-            if (node.isChildOfRootGraph())
-            {
-                return new MidiIONodeEditor (node, world->getDeviceManager(), false, true);
-            }
-            else
-            {
-                return nullptr;
-            }
-        }
-
-        GraphNodePtr object = node.getGraphNode();
-        auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-        if (proc != nullptr)
-        {
-            return new GenericNodeEditor (node);
-        }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
-        {
-            auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
-            programChangeMapEditor->setStoreSize (false);
-            return programChangeMapEditor;
-        }
-        else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
-        {
-            auto* const audioRouterEditor = new AudioRouterEditor (node);
-            return audioRouterEditor;
-        }
-
-        return nullptr;
     }
+
+    if (node.isMidiOutputNode())
+    {
+        if (node.isChildOfRootGraph())
+        {
+            return new MidiIONodeEditor (node, world->getDeviceManager(), false, true);
+        }
+        else
+        {
+            return nullptr;
+        }
+    }
+
+    GraphNodePtr object = node.getGraphNode();
+    auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    if (proc != nullptr)
+    {
+        return new GenericNodeEditor (node);
+    }
+    else if (node.getIdentifier() == EL_INTERNAL_ID_PROGRAM_CHANGE_MAP)
+    {
+        auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
+        programChangeMapEditor->setStoreSize (false);
+        return programChangeMapEditor;
+    }
+    else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
+    {
+        auto* const audioRouterEditor = new AudioRouterEditor (node);
+        return audioRouterEditor;
+    }
+
+    return nullptr;
+}
+
 }

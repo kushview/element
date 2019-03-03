@@ -200,6 +200,7 @@ void SessionController::refreshOtherControllers()
     findSibling<DevicesController>()->refresh();
     findSibling<MappingController>()->learn (false);
     findSibling<PresetsController>()->refresh();
+    sessionLoaded();
 }
 
 }
