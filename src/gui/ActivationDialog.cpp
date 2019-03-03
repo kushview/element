@@ -21,6 +21,10 @@
 #include "controllers/GuiController.h"
 #include "gui/Buttons.h"
 #include "URLs.h"
+
+#ifndef EL_ALLOW_TRIAL_REGISTRATION
+ #define EL_ALLOW_TRIAL_REGISTRATION 0
+#endif
 //[/Headers]
 
 #include "ActivationDialog.h"
@@ -139,6 +143,10 @@ ActivationComponent::ActivationComponent (GuiController& g)
     syncButton.reset(new IconButton ("Refresh"));
     syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
     syncButton->addListener (this);
+
+   #if ! EL_ALLOW_TRIAL_REGISTRATION
+    quitButton->setButtonText ("Quit");
+   #endif
     //[/UserPreSize]
 
     setSize (480, 346);
@@ -414,8 +422,11 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
         }
         else
         {
-            // JUCEApplication::getInstance()->systemRequestedQuit();
+           #if EL_ALLOW_TRIAL_REGISTRATION
             setForRegistration (true);
+           #else
+            JUCEApplication::getInstance()->systemRequestedQuit();
+           #endif
         }
         //[/UserButtonCode_quitButton]
     }
