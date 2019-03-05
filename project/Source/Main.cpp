@@ -246,7 +246,9 @@ public:
         
         Logger::writeToLog (appName);
         Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
-        
+       #if EL_USE_LOCAL_AUTH
+        Logger::writeToLog ("[EL] using local authentication");
+       #endif
         launchApplication();
     }
     
