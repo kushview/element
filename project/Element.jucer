@@ -489,6 +489,7 @@
       <FILE id="jUQXAR" name="Signals.h" compile="0" resource="0" file="../src/Signals.h"/>
       <FILE id="ehO6Aj" name="URIs.h" compile="0" resource="0" file="../src/URIs.h"/>
       <FILE id="neRjee" name="URLs.h" compile="0" resource="0" file="../src/URLs.h"/>
+      <FILE id="lLXFhb" name="Utils.cpp" compile="1" resource="0" file="../src/Utils.cpp"/>
       <FILE id="DY7fWW" name="Utils.h" compile="0" resource="0" file="../src/Utils.h"/>
       <FILE id="Da1uTO" name="Version.cpp" compile="1" resource="0" file="../src/Version.cpp"/>
       <FILE id="kgGB1c" name="Version.h" compile="0" resource="0" file="../src/Version.h"/>
@@ -544,7 +545,8 @@
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1"
-                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "/>
+                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "
+                       stripLocalSymbols="1"/>
         <CONFIGURATION name="ReleaseSE" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element SE" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../src&#10;"
