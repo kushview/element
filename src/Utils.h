@@ -67,5 +67,7 @@ inline static bool isGmailExtended (const String& email)
                 .length() >= 1; 
 }
 
+StringArray getFullVesrionPluginIdentifiers();
+
 }
 }

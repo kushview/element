@@ -10,25 +10,13 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
+#include "Utils.h"
 
 namespace Element {
 
-static StringArray getFullVesrionPluginIdentifiers()
-{
-    return {
-        EL_INTERNAL_ID_AUDIO_MIXER,
-        EL_INTERNAL_ID_CHANNELIZE,
-        EL_INTERNAL_ID_GRAPH,
-        EL_INTERNAL_ID_MIDI_CHANNEL_MAP,
-        EL_INTERNAL_ID_MIDI_SEQUENCER,
-        EL_INTERNAL_ID_PLACEHOLDER,
-        EL_INTERNAL_ID_MIDI_PROGRAM_MAP
-    };
-}
-
 static bool isFullVersionPlugin (const PluginDescription& desc)
 {
-    return getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
+    return Util::getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
 }
 
 static String denyPluginMessage (const PluginDescription& desc)

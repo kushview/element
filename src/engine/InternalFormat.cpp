@@ -308,11 +308,11 @@ namespace Element {
         results.add (EL_INTERNAL_ID_REVERB);
 
        #if defined EL_PRO
+        results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_CHANNELIZE);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
-        results.add (EL_INTERNAL_ID_GRAPH);
-        results.add (EL_INTERNAL_ID_AUDIO_MIXER);
         results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
+        results.add (EL_INTERNAL_ID_GRAPH);
        #if EL_USE_MIDI_SEQUENCER
         results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
        #endif
@@ -320,11 +320,10 @@ namespace Element {
 
        #if defined (EL_SOLO) || defined (EL_PRO)
         results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
-        results.add (EL_INTERNAL_ID_MEDIA_PLAYER); 
-        results.add (EL_INTERNAL_ID_PLACEHOLDER);
+        results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
         results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
+        results.add (EL_INTERNAL_ID_PLACEHOLDER);
        #endif // product enablements
-
         return results;
     }
     

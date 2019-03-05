@@ -36,8 +36,6 @@ public:
     explicit PluginScannerMaster (PluginScanner& o) : owner(o) { }
     ~PluginScannerMaster() { }
     
-	
-
     bool startScanning (const StringArray& names = StringArray())
     {
         if (isRunning())
@@ -722,6 +720,7 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
         return nullptr;
     }
 
+   #if defined (EL_PRO) || defined (EL_SOLO)
     if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
     {
         return new MidiChannelSplitterNode();
@@ -734,8 +733,9 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     {
         return new AudioRouterNode();
     }
+   #endif
 
-    errorMsg = desc.name; 
+    errorMsg = desc.name;
     errorMsg << " not found.";
     return nullptr;
 }
