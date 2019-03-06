@@ -152,7 +152,14 @@ struct UnlockForm::OverlayComp  : public Component,
         const auto a = action;
         UnlockForm& f = form;
         auto& gui = f.gui;
-        
+       
+       #if EL_RUNNING_AS_PLUGIN
+        // must happen before deleting 'this'
+        typedef ElementPluginAudioProcessorEditor EdType;
+        if (EdType* editor = f.findParentComponentOfClass<EdType>())
+            editor->triggerAsyncUpdate();
+       #endif
+
         delete this;
         
         if (worked && (a == Activate || a == Check))
@@ -183,11 +190,7 @@ struct UnlockForm::OverlayComp  : public Component,
         gui.stabilizeContent();
         gui.stabilizeViews();
         
-       #if EL_RUNNING_AS_PLUGIN
-        typedef ElementPluginAudioProcessorEditor EdType;
-        if (EdType* editor = form.findParentComponentOfClass<EdType>())
-            editor->triggerAsyncUpdate();
-       #else
+       #if ! EL_RUNNING_AS_PLUGIN
         g.getDeviceManager().restartLastAudioDevice();
        #endif
     }
