@@ -230,9 +230,10 @@ void MediaPlayerProcessor::releaseResources()
 
 void MediaPlayerProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
-    buffer.clear (0, 0, buffer.getNumSamples());
-    buffer.clear (1, 0, buffer.getNumSamples());
-
+    const auto nframes = buffer.getNumSamples();
+    for (int c = buffer.getNumChannels(); --c >= 0;)
+        buffer.clear (c, 0, nframes);
+    
     if (*slave)
     {
         if (auto* const playhead = getPlayHead())
@@ -300,6 +301,15 @@ void MediaPlayerProcessor::parameterValueChanged (int parameter, float newValue)
 void MediaPlayerProcessor::parameterGestureChanged (int parameterIndex, bool gestureIsStarting)
 {
     ignoreUnused (parameterIndex, gestureIsStarting);
+}
+
+bool MediaPlayerProcessor::isBusesLayoutSupported (const BusesLayout& layout) const
+{
+    // only one main output bus supported. stereo or mono
+    if (layout.inputBuses.size() > 0 || layout.outputBuses.size() > 1)
+        return false;
+    return layout.getMainOutputChannelSet() == AudioChannelSet::stereo() ||
+           layout.getMainOutputChannelSet() == AudioChannelSet::mono();
 }
 
 }

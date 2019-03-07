@@ -24,6 +24,9 @@ public:
     void releaseResources() override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
+    bool canAddBus (bool isInput) const                     { ignoreUnused (isInput); return false; }
+    bool canRemoveBus (bool isInput) const                  { ignoreUnused (isInput); return false; }
+
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }
 
@@ -47,6 +50,9 @@ public:
 
     AudioTransportSource& getPlayer() { return player; }
     
+protected:
+    bool isBusesLayoutSupported (const BusesLayout&) const override;
+    
 #if 0
     // Audio Processor Template
     
@@ -55,8 +61,6 @@ public:
     virtual void processBlockBypassed (AudioBuffer<float>& buffer, MidiBuffer& midiMessages);
     virtual void processBlockBypassed (AudioBuffer<double>& buffer, MidiBuffer& midiMessages);
     
-    virtual bool canAddBus (bool isInput) const                     { ignoreUnused (isInput); return false; }
-    virtual bool canRemoveBus (bool isInput) const                  { ignoreUnused (isInput); return false; }
     virtual bool supportsDoublePrecisionProcessing() const;
     
     virtual void reset();
@@ -76,7 +80,6 @@ public:
     virtual void updateTrackProperties (const TrackProperties& properties);
 
 protected:
-    virtual bool isBusesLayoutSupported (const BusesLayout&) const          { return true; }
     virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
 #endif
