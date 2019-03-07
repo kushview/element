@@ -12,29 +12,72 @@ public:
     MidiIONodeEditor (const Node& node, DeviceManager& devs, bool ins = true, bool outs = true)
         : NodeEditorComponent (node), devices (devs), showIns(ins), showOuts(outs)
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
         view.setScrollBarsShown (true, false);
         addAndMakeVisible (view);
         devices.addChangeListener (this);
+       #endif
     }
 
     ~MidiIONodeEditor()
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         devices.removeChangeListener (this);
         view.setViewedComponent (nullptr, false);
         content.reset();
+       #endif
     }
     
+    void paint (Graphics& g) override
+    {
+       #if EL_RUNNING_AS_PLUGIN
+        g.setFont (13.f);
+        g.setColour (LookAndFeel::textColor);
+        String text = "Host MIDI ";
+        if (getNode().isMidiInputNode())
+            text << "Input";
+        else if (getNode().isMidiOutputNode())
+            text << "Output";
+        g.drawText (text, getLocalBounds(), Justification::centred);
+
+        #if 0
+        String text;
+        PortArray ins, outs;
+        getNode().getPorts (ins, outs, PortType::Audio);
+        if (ins.size() > 0 && outs.size() > 0)
+        {
+            text << ins.size() << " Ins / " << outs.size() << " Outs";
+        }
+        else if (ins.size() > 0 && outs.size() <= 0)
+        {
+            text << ins.size() << " Ins";
+        }
+        else if (ins.size() <= 0 && outs.size() > 0)
+        {
+            text << ins.size() << " Outs";
+        }
+        
+        if (text.isNotEmpty())
+            g.drawText (text, getLocalBounds(), Justification::centred);
+       #endif
+       #endif
+    }
+
     void changeListenerCallback (ChangeBroadcaster*) override
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         content->updateDevices();
+       #endif
     }
 
     void resized() override
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         view.setBounds (getLocalBounds());
         content->setSize (view.getWidth(), content->getHeight());
+       #endif
     }
 
 private:
