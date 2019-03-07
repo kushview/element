@@ -87,7 +87,7 @@ private:
         
         int computeHeight()
         {
-            
+            return 100;
         }
 
         void updateDevices()
