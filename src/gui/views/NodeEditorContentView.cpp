@@ -6,6 +6,7 @@
 #include "controllers/GraphController.h"
 #include "controllers/SessionController.h"
 
+#include "gui/nodes/AudioIONodeEditor.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/nodes/MidiIONodeEditor.h"
@@ -302,6 +303,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     
     if (node.isAudioInputNode())
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         if (node.isChildOfRootGraph())
         {
             return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
@@ -312,10 +314,14 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             return nullptr;
         }
+       #else
+        return new AudioIONodeEditor (node, world->getDeviceManager(), true, false);
+       #endif
     }
 
     if (node.isAudioOutputNode())
     {
+       #if ! EL_RUNNING_AS_PLUGIN
         if (node.isChildOfRootGraph())
         {
             return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
@@ -326,6 +332,9 @@ Component* NodeEditorContentView::createEmbededEditor()
         {
             return nullptr;
         }
+       #else
+        return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
+       #endif
     }
 
     if (node.isMidiInputNode())
