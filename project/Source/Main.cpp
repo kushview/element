@@ -222,6 +222,7 @@ public:
         String appName = Util::appName();
         appName << " v" << getApplicationVersion();
         
+       #if defined (EL_PRO) || defined (EL_SOLO)
         if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
         {
             appName << " (unauthorized)";
@@ -243,7 +244,10 @@ public:
             jassertfalse; // this is most likely a wrong product.  e.g. SE license used for Pro
             appName << " (unkown activation state)";
         }
-        
+       #else
+            appName << " (lite)";
+       #endif
+       
         Logger::writeToLog (appName);
         Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
        #if EL_USE_LOCAL_AUTH

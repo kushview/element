@@ -222,8 +222,6 @@ public:
             addItemInternal (native, "Load FXB/FXP", new FXBPresetOp (node, true));
             menu.addSubMenu ("Native Presets", native);
         }
-
-        DataPath path;
         
         auto identifier = node.getProperty(Tags::identifier).toString();
         if (identifier.isEmpty())
@@ -289,6 +287,12 @@ public:
                     if (data.hasProperty (Tags::programState))
                         n.getValueTree().setProperty (Tags::programState, data.getProperty (Tags::programState), 0);
                     n.restorePluginState();
+                }
+
+                if (n.isValid() && data.isValid() && data.hasProperty (Tags::name))
+                {
+                    if (data[Tags::name].toString().isNotEmpty())
+                        n.setProperty (Tags::name, data[Tags::name]);
                 }
             }
         }
