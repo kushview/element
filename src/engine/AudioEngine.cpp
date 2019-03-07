@@ -1,6 +1,6 @@
 /*
     AudioEngine.cpp - This file is part of Element
-    Copyright (C) 2016-2017 Kushview, LLC.  All rights reserved.
+    Copyright (c) 2016-2019 Kushview, LLC.  All rights reserved.
 */
 
 #include "engine/AudioEngine.h"
@@ -20,17 +20,17 @@ RootGraph::RootGraph() { }
 
 void RootGraph::setPlayConfigFor (DeviceManager& devices)
 {
-#if EL_RUNNING_AS_PLUGIN
+   #if EL_RUNNING_AS_PLUGIN
     ignoreUnused (devices);
     graphName = "Device";
-#else
+   #else
     if (auto* device = devices.getCurrentAudioDevice())
         setPlayConfigFor (device);
     DeviceManager::AudioSettings setup;
     devices.getAudioDeviceSetup (setup);
     audioInName     = setup.inputDeviceName;
     audioOutName    = setup.outputDeviceName;
-#endif
+   #endif
 }
 
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
@@ -278,7 +278,7 @@ struct RootGraphRender : public AsyncUpdater
                 program.program = msg.getProgramChangeNumber();
                 program.channel = msg.getChannel();
             }
-           #endif // EL_FREE
+           #endif // EL_PRO
 
             // done with input, swap it with the rendered output
             midi.swapWith (midiOut);
