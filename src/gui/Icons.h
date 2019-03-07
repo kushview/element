@@ -46,7 +46,7 @@ class Icons : public DeletedAtShutdown
 {
 public:
     Icons();
-
+    ~Icons();
     Path folder, document, imageDoc,
          config, exporter, juceLogo,
          graph, jigsaw, info, warning,

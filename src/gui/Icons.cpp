@@ -6,9 +6,9 @@
 #include "gui/Icons.h"
 
 namespace Element {
+static Icons* __icons = nullptr;
 const Icons& getIcons()
 {
-    static Icons* __icons = nullptr;
     if (! __icons) {
         __icons = new Icons();
     }
@@ -1253,6 +1253,11 @@ Icons::Icons()
 
     JUCE_LOAD_PATH_DATA (fasThLarge);
     JUCE_LOAD_PATH_DATA (fasRectangleLandscape);
+}
+
+Icons::~Icons()
+{
+    __icons = nullptr;
 }
 
 }
