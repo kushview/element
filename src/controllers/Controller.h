@@ -79,7 +79,7 @@ public:
 
     virtual void saveSettings () {
         for (auto* child : children)
-            saveSettings();
+            child->saveSettings();
     }
 
     virtual void activate()
