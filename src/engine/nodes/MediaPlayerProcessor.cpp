@@ -209,6 +209,9 @@ void MediaPlayerProcessor::openFile (const File& file)
         reader.reset (new AudioFormatReaderSource (newReader, true));
         audioFile = file;
         player.setSource (reader.get(), 1024 * 8, &thread, getSampleRate(), 2);
+        ScopedLock sl (getCallbackLock());        
+        player.setLooping (true);
+        reader->setLooping (true);
     }
 }
 
@@ -218,6 +221,8 @@ void MediaPlayerProcessor::prepareToPlay (double sampleRate, int maximumExpected
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
     player.setLooping (true);
+    if (reader)
+        reader->setLooping (true);
 }
 
 void MediaPlayerProcessor::releaseResources()
