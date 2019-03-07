@@ -17,6 +17,20 @@ struct PresetDescription
 class PresetCollection
 {
 public:
+    struct SortByName
+    {
+        int compareElements (PresetDescription* first, PresetDescription* second) const
+        {
+            if (first->name < second->name)
+                return -1;
+            if (first->name == second->name)
+                return 0;
+            if (first->name > second->name)
+                return 1;
+            return 0;
+        }
+    };
+
     PresetCollection() { }
     ~PresetCollection() { }
 
@@ -27,9 +41,10 @@ public:
 
     inline void getPresetsFor (const Node& node, OwnedArray<PresetDescription>& results) const
     {
+        SortByName sorter;
         for (const auto* const preset : presets)
             if (preset->identifier == node.getIdentifier().toString() && preset->format == node.getFormat().toString())
-                results.add (new PresetDescription (*preset));
+                results.addSorted (sorter, new PresetDescription (*preset));
     }
 
     inline void addPresetFor (const Node& node, const String& name)
