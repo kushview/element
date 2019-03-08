@@ -24,8 +24,8 @@ public:
     void releaseResources() override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
 
-    bool canAddBus (bool isInput) const                     { ignoreUnused (isInput); return false; }
-    bool canRemoveBus (bool isInput) const                  { ignoreUnused (isInput); return false; }
+    bool canAddBus (bool isInput) const override                     { ignoreUnused (isInput); return false; }
+    bool canRemoveBus (bool isInput) const override                  { ignoreUnused (isInput); return false; }
 
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override { return true; }

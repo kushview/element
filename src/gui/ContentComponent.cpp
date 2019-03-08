@@ -89,7 +89,8 @@ void ContentView::disableIfNotUnlocked()
     }
     else
     {
-        jassertfalse;
+        // jassertfalse;
+        DBG("[EL] ContentView::disableIfNotUnlocked() didn't get world object");
         setEnabled (false);
     }
 
