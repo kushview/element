@@ -147,6 +147,10 @@ ActivationComponent::ActivationComponent (GuiController& g)
    #if ! EL_ALLOW_TRIAL_REGISTRATION
     quitButton->setButtonText ("Quit");
    #endif
+
+   #if EL_RUNNING_AS_PLUGIN
+    quitButton->setVisible (false);
+   #endif
     //[/UserPreSize]
 
     setSize (480, 346);
@@ -211,6 +215,13 @@ void ActivationComponent::resized()
     instructionLabel2->setBounds ((getWidth() / 2) - (280 / 2), 240, 280, 64);
     //[UserResized] Add your own custom resize handling here..
 
+   #if EL_RUNNING_AS_PLUGIN
+    if (! quitButton->isVisible())
+    {
+        activateButton->setBounds (activateButton->getBoundsInParent()
+                .withX (activateButton->getX() + (activateButton->getWidth() / 2)));
+    }
+   #endif
     if (syncButton && syncButton->isVisible())
     {
         int shiftLeft = activateButton->getHeight() / 2;
