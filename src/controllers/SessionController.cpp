@@ -190,7 +190,8 @@ void SessionController::loadNewSessionData()
     if (! wasLoaded)
     {   
         currentSession->clear();
-        currentSession->addGraph (Node::createDefaultGraph(), true);
+        currentSession->addGraph (
+            Node::createDefaultGraph ("Graph"), true);
     }
 }
 
