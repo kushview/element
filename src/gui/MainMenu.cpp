@@ -379,8 +379,10 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
-    menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");  
-    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");     
+    menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
+   #if defined (EL_SOLO)
+    menu.addCommandItem (&cmd, Commands::showControllerDevices, "Controllers");   
+   #endif 
    #endif
 }
 
