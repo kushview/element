@@ -2,8 +2,14 @@
 
 bld.program (
     source = bld.path.ant_glob("**/*.cpp"),
-    includes = ['.', '../project/Source', '../project/JuceLibraryCode', '../src',
-                 '../libs/JUCE/modules', '../libs/kv/modules' ],
+    includes = ['.', 
+                '../project/Source', 
+                '../project/JuceLibraryCode',
+                '../src',
+                '../libs/JUCE/modules', 
+                '../libs/kv/modules',
+                '../libs/SQLiteCpp/sqlite3',
+                '../libs/SQLiteCpp/include' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
     install_path = None

@@ -268,12 +268,16 @@ def build_mac (bld):
 
     bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
+                      bld.path.ant_glob ('libs/SQLiteCpp/src/*.cpp') + \
+                      [ 'libs/SQLiteCpp/sqlite3/sqlite3.c' ] + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
                         'libs/kv/modules', 'libs/pybind11/include', \
                         'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK'],
-                                target      = 'lib/element',
+                        'libs/SQLiteCpp/sqlite3', \
+                        'libs/SQLiteCpp/include', \
+                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
         use         = [ 'KV', 'PYTHON' ]
