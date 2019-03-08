@@ -3,6 +3,7 @@
 #include "gui/widgets/Spinner.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
+#include "Settings.h"
 
 namespace Element {
 
@@ -186,6 +187,8 @@ struct UnlockOverlay : public Component,
             _status.loadAll();
         }
 
+        _world.getSettings().saveIfNeeded();
+        
         if (_onFinished)
             _onFinished (_result, _action);
         
