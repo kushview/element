@@ -17,7 +17,7 @@
 #include "engine/nodes/CombFilterProcessor.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
 
-
+#include "engine/nodes/AudioFilePlayerNode.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/ReverbProcessor.h"
@@ -258,6 +258,20 @@ namespace Element {
        #endif
 
        #if defined (EL_SOLO) || defined (EL_PRO)
+       else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
+        {
+            auto* const desc = ds.add (new PluginDescription());
+            desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
+            desc->name               = "Audio File Player";
+            desc->descriptiveName    = "An Audio File Player";
+            desc->numInputChannels   = 0;
+            desc->numOutputChannels  = 2;
+            desc->hasSharedContainer = false;
+            desc->isInstrument       = false;
+            desc->manufacturerName   = "Element";
+            desc->pluginFormatName   = "Element";
+            desc->version            = "1.0.0";
+        }
         else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             auto* const desc = ds.add (new PluginDescription());
@@ -320,6 +334,7 @@ namespace Element {
        #endif
 
        #if defined (EL_SOLO) || defined (EL_PRO)
+        results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
         results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
         results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
         results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
@@ -370,7 +385,11 @@ namespace Element {
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
             base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
        #endif
+
        #if defined (EL_PRO) || defined (EL_SOLO)
+        else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
+            base = (world.getUnlockStatus().isFullVersion() ? new AudioFilePlayerNode() : nullptr);
+
         else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
             base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
 

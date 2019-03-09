@@ -35,6 +35,7 @@ public:
     void resized() override
     {
         auto r = getLocalBounds().reduced (2);
+        r.setHeight (jmax (100, r.getHeight()));
         if (masterStrip)
         {
             masterStrip->setBounds (r.removeFromRight (64));
@@ -42,6 +43,15 @@ public:
         }
 
         channels.setBounds (r);
+        
+        if (auto* hs = channels.getHorizontalScrollBar())
+        {
+            if (masterStrip && hs->isShowing())
+            {
+                masterStrip->setBounds (masterStrip->getBoundsInParent().withHeight (
+                    masterStrip->getHeight() - hs->getHeight()));
+            }
+        }
     }
 
     void rebuildTracks()

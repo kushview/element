@@ -366,6 +366,8 @@ Component* NodeEditorContentView::createEmbededEditor()
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (proc != nullptr)
     {
+        if (node.getFormat() == "Element" && proc->hasEditor())
+            return proc->createEditor();
         return new GenericNodeEditor (node);
     }
     else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
