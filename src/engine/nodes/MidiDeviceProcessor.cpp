@@ -1,5 +1,5 @@
 
-#include "engine/MidiDeviceProcessor.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
 #include "gui/LookAndFeel.h"
 
 namespace Element {

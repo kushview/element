@@ -5,7 +5,8 @@
 
 #include "Tests.h"
 #include "controllers/GraphManager.h"
-#include "engine/MidiDeviceProcessor.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
+
 #include "engine/nodes/AudioProcessorNode.h"
 
 namespace Element {

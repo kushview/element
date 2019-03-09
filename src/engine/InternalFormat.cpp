@@ -15,14 +15,15 @@
 #include "engine/nodes/AudioMixerProcessor.h"
 #include "engine/nodes/ChannelizeProcessor.h"
 #include "engine/nodes/CombFilterProcessor.h"
-#include "engine/MidiDeviceProcessor.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
 
-#include "engine/MidiChannelMapProcessor.h"
-#include "engine/PlaceholderProcessor.h"
-#include "engine/ReverbProcessor.h"
-#include "engine/SubGraphProcessor.h"
-#include "engine/VolumeProcessor.h"
-#include "engine/WetDryProcessor.h"
+
+#include "engine/nodes/MidiChannelMapProcessor.h"
+#include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/ReverbProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
+#include "engine/nodes/VolumeProcessor.h"
+#include "engine/nodes/WetDryProcessor.h"
 
 #include "session/Session.h"
 #include "session/UnlockStatus.h"

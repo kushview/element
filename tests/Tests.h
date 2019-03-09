@@ -10,11 +10,11 @@
 #include "engine/MappingEngine.h"
 #include "engine/InternalFormat.h"
 #include "engine/LinearFade.h"
-#include "engine/PlaceholderProcessor.h"
-#include "engine/VolumeProcessor.h"
 #include "engine/VelocityCurve.h"
-#include "engine/SubGraphProcessor.h"
 #include "engine/ToggleGrid.h"
+#include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
+#include "engine/nodes/VolumeProcessor.h"
 
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
@@ -24,72 +24,73 @@
 #include "Settings.h"
 #include "Common.h"
 
-namespace Element 
+namespace Element  {
+
+class UnitTestBase : public UnitTest
 {
-    class UnitTestBase : public UnitTest
+public:
+    UnitTestBase (const String& name, const String& category = String(), 
+                    const String& _slug = String())
+        : UnitTest (name, category), slug (_slug) { }
+    
+    virtual ~UnitTestBase()
     {
-    public:
-        UnitTestBase (const String& name, const String& category = String(), 
-                      const String& _slug = String())
-            : UnitTest (name, category), slug (_slug) { }
-        
-        virtual ~UnitTestBase()
+        if (world)
         {
-            if (world)
-            {
-                jassertfalse;
-                shutdownWorld();
-            }
+            jassertfalse;
+            shutdownWorld();
         }
+    }
 
-        const String getId() const { return getCategory().toLowerCase() + "." + getSlug().toLowerCase(); }
-        const String& getSlug() const { return slug; }
+    const String getId() const { return getCategory().toLowerCase() + "." + getSlug().toLowerCase(); }
+    const String& getSlug() const { return slug; }
 
-    protected:
-        void initializeWorld()
-        {
-            if (world) return;
-            world.reset (new Globals ());
-            world->setEngine (new AudioEngine (*world));
-            world->getPluginManager().addDefaultFormats();
-            world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
-            world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine()));
-            app.reset (new AppController (*world));
-            app->activate();
-            auto& settings = getWorld().getSettings();
-            PropertiesFile::Options opts = settings.getStorageParameters();
-            opts.applicationName = "ElementTests";
-            settings.setStorageParameters (opts);
-            settings.setCheckForUpdates (false);
-            settings.saveIfNeeded();
-        }
+protected:
+    void initializeWorld()
+    {
+        if (world) return;
+        world.reset (new Globals ());
+        world->setEngine (new AudioEngine (*world));
+        world->getPluginManager().addDefaultFormats();
+        world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
+        world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine()));
+        app.reset (new AppController (*world));
+        app->activate();
+        auto& settings = getWorld().getSettings();
+        PropertiesFile::Options opts = settings.getStorageParameters();
+        opts.applicationName = "ElementTests";
+        settings.setStorageParameters (opts);
+        settings.setCheckForUpdates (false);
+        settings.saveIfNeeded();
+    }
 
-        void shutdownWorld()
-        {
-            if (! world) return;
-            app->deactivate();
-            app.reset (nullptr);
-            world->setEngine (nullptr);
-            world.reset (nullptr);
-        }
+    void shutdownWorld()
+    {
+        if (! world) return;
+        app->deactivate();
+        app.reset (nullptr);
+        world->setEngine (nullptr);
+        world.reset (nullptr);
+    }
 
-        const File getDataDir() const
-        {
-            const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
-                .getParentDirectory().getParentDirectory().getParentDirectory()
-                .getChildFile("data");
-            jassert (thedir.exists());
-            return thedir;
-        }
+    const File getDataDir() const
+    {
+        const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
+            .getParentDirectory().getParentDirectory().getParentDirectory()
+            .getChildFile("data");
+        jassert (thedir.exists());
+        return thedir;
+    }
 
-        void runDispatchLoop (const int millisecondsToRunFor = 40) { MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); }
-        
-        Globals& getWorld() { initializeWorld(); return *world; }
-        AppController& getAppController() { initializeWorld(); return *app; }
+    void runDispatchLoop (const int millisecondsToRunFor = 40) { MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); }
+    
+    Globals& getWorld() { initializeWorld(); return *world; }
+    AppController& getAppController() { initializeWorld(); return *app; }
 
-    private:
-        const String slug;
-        std::unique_ptr<Globals> world;
-        std::unique_ptr<AppController> app;
-    };
+private:
+    const String slug;
+    std::unique_ptr<Globals> world;
+    std::unique_ptr<AppController> app;
+};
+
 }

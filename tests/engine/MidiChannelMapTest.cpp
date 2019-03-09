@@ -1,6 +1,6 @@
 #include "Tests.h"
 #include "engine/MidiChannelMap.h"
-#include "engine/MidiChannelMapProcessor.h"
+#include "engine/nodes/MidiChannelMapProcessor.h"
 
 using namespace Element;
 

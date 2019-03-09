@@ -4,7 +4,7 @@
 #include "controllers/GraphManager.h"
 
 #include "engine/AudioEngine.h"
-#include "engine/SubGraphProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
 
 #include "engine/GraphProcessor.h"
 #include "gui/ViewHelpers.h"

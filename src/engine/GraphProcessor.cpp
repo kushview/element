@@ -8,7 +8,7 @@
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
-#include "engine/SubGraphProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
 #include "session/Node.h"
 
 namespace Element {

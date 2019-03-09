@@ -5,8 +5,8 @@
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
-#include "engine/PlaceholderProcessor.h"
-#include "engine/SubGraphProcessor.h"
+#include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
 
 #include "session/Node.h"
 

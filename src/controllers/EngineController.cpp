@@ -3,8 +3,9 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
-#include "engine/MidiDeviceProcessor.h"
-#include "engine/SubGraphProcessor.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
+
+#include "engine/nodes/SubGraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"

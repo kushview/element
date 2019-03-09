@@ -1,6 +1,6 @@
 
 #include "controllers/GraphManager.h"
-#include "engine/SubGraphProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
 #include "Globals.h"
 
 namespace Element
