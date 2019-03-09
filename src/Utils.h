@@ -6,13 +6,13 @@
 namespace Element {
 namespace Util {
 
-static juce_wchar defaultPasswordChar() noexcept
+inline static juce_wchar defaultPasswordChar() noexcept
 {
-#if JUCE_LINUX
+   #if JUCE_LINUX
     return 0x2022;
-#else
+   #else
     return 0x25cf;
-#endif
+   #endif
 }
 
 /** Display minutes in decimal as min:sec */

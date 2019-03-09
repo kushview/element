@@ -126,5 +126,19 @@ public:
 
 static LicenseActivation sLicenseActivation;
 
-#endif
+
+class OfflineLicenseRequest : public UnitTestBase
+{
+public:
+    OfflineLicenseRequest() : UnitTestBase ("License Activation", "auth", "request") { }
+    
+    void initialise()   override  { initializeWorld(); }
+    void shutdown()     override  { shutdownWorld(); }
+
+    void runTest() override
+    {
+        beginTest ("license request");
+    }
+};
+
 }
