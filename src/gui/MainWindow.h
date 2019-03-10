@@ -33,6 +33,8 @@ private:
     Globals& world;
     std::unique_ptr<MainMenu> mainMenu;
     void nameChanged();
+    void nameChangedSession();
+    void nameChangedSingleGraph();
 };
 
 }

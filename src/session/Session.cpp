@@ -115,7 +115,7 @@ namespace Element {
             objectData.removeAllProperties (nullptr);
 
         if (! objectData.hasProperty (Tags::name))
-            setProperty (Tags::name, "Untitled");
+            setProperty (Tags::name, "");
         if (! objectData.hasProperty (Tags::tempo))
             setProperty (Tags::tempo, (double) 120.0);
         if (! objectData.hasProperty (Tags::notes))

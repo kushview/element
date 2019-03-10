@@ -46,32 +46,60 @@ void MainWindow::refreshName()
 
 void MainWindow::nameChanged()
 {
+   #if defined (EL_PRO)
+    nameChangedSession();
+   #else
+    nameChangedSingleGraph();
+   #endif
+}
+
+void MainWindow::nameChangedSession()
+{
+    String title = Util::appName();
+    
+    auto session = world.getSession();
+    SessionController* controller = nullptr;
+    if (auto* cc = dynamic_cast<ContentComponent*> (getContentComponent()))
+        controller = getAppController().findChild<SessionController>();
+
+    if (nullptr == session || nullptr == controller)
+    {
+        setName (title);
+        return;
+    }
+
+    auto sessionName     = session->getName().trim();
+    auto graphName       = session->getCurrentGraph().getName().trim();
+    if (sessionName.isEmpty())
+    {
+        const auto file = controller->getSessionFile();
+        if (file.existsAsFile())
+            sessionName = file.getFileNameWithoutExtension();
+    }
+
+    if (sessionName.isEmpty())
+        sessionName = "Untitled Session";
+    if (graphName.isEmpty())
+        graphName = "Untitled Graph";
+
+    title << " - " << sessionName << ": " << graphName;
+    setName (title);
+}
+
+void MainWindow::nameChangedSingleGraph()
+{
     String title = Util::appName();
     String sessionName, graphName;
     if (auto session = world.getSession())
     {
         sessionName     = session->getName().trim();
         graphName       = session->getCurrentGraph().getName().trim();
-       #if defined (EL_PRO)
-        if (sessionName.isNotEmpty())
-            title << " - " << sessionName;
-        if (graphName.isNotEmpty())
-            title << ": " << graphName;
-       #else
         if (graphName.isNotEmpty())
             title << " - " << graphName;
-       #endif
     }
 
     if (nullptr != dynamic_cast<ContentComponent*> (getContentComponent()))
     {
-       #if defined (EL_PRO)
-        if (auto* const sc = getAppController().findChild<SessionController>())
-        {
-            const auto file = sc->getSessionFile();
-            ignoreUnused (file);
-        }
-       #else
         if (auto* const gc = getAppController().findChild<GraphController>())
         {
             const auto file = gc->getGraphFile();
@@ -88,7 +116,6 @@ void MainWindow::nameChanged()
                 //     title << " (" << file.getFileName() << ")";
             }
         }
-       #endif
     }
 
     setName (title);
