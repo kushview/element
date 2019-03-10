@@ -89,7 +89,7 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
         return new IOP (IOP::midiOutputNode);
     }
 
-    #if defined (EL_PRO) || defined (EL_SOLO)
+   #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == "element.midiInputDevice")
     {
         return new MidiDeviceProcessor (true);
@@ -102,7 +102,7 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
     {
         return new PlaceholderProcessor();
     }
-    #endif // EL_FREE
+   #endif // EL_FREE
 
     return nullptr;
 }

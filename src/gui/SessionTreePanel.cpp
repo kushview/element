@@ -551,7 +551,7 @@ void SessionTreePanel::selectActiveRootGraph()
             {
                 if (! item->isSelected())
                 {
-                    item->setSelected (true, true, sendNotificationAsync);
+                    item->setSelected (true, true, dontSendNotification);
                     item->repaintItem();
                 }
                 break;
