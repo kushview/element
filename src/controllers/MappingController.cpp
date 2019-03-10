@@ -243,7 +243,7 @@ void MappingController::learn (const bool shouldLearn)
     {
         impl->learnState = CaptureParameter;
         capture.addNodes (getWorld().getSession());
-    } 
+    }
 }
 
 void MappingController::onParameterCaptured (const Node& node, int parameter)

@@ -13,7 +13,7 @@ class GraphManager;
 class PluginManager;
 
 class GraphManager : public ChangeBroadcaster,
-                        public Controller
+                     public Controller
 {
 public:
     static const uint32 invalidNodeId   = KV_INVALID_PORT;

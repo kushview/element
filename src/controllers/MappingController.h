@@ -21,8 +21,8 @@ public:
 private:
     class Impl; friend class Impl;
     std::unique_ptr<Impl> impl;
-    boost::signals2::connection capturedConnection;
-    boost::signals2::connection capturedParamConnection;
+    SignalConnection capturedConnection;
+    SignalConnection capturedParamConnection;
     void onControlCaptured();
     void onParameterCaptured (const Node&, int);
 };
