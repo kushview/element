@@ -99,11 +99,9 @@ public:
 
     inline double getTrialPeriodDays() const
     {
-       #if EL_USE_LOCAL_AUTH
-        return 14.0;
-       #else
-        return 30.0;
-       #endif
+        return hasProperty (trialPeriodKey)
+            ? jlimit (1.0, 30.0, (double) getProperty (trialPeriodKey))
+            : 30.0;
     }
     
     inline var isExpiring() const
@@ -195,6 +193,7 @@ private:
     static const char* priceIdKey;
     static const char* trialKey;
     static const char* soloKey;
+    static const char* trialPeriodKey;
     
     Atomic<int> cancelled { 0 };
     Settings& settings;
