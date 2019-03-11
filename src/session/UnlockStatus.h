@@ -136,7 +136,7 @@ public:
        #endif
 
         if (getExpiryTime() > Time() && Time::getCurrentTime() < getExpiryTime())
-            return !isUnlocked() && (props [trialKey] || props [productKey]);
+            return !(bool)isUnlocked() && (props [trialKey] || props [productKey]);
 
         if (! (bool) isUnlocked())
             return isUnlocked();
