@@ -207,13 +207,17 @@ namespace Element {
         sanitizeProperties (data, true);
         
        #if EL_SAVE_BINARY_FORMAT
-        FileOutputStream stream (targetFile);
-        data.writeToStream (stream);
-        return true;
+        TemporaryFile tempFile (targetFile);
+        if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
+        {
+            data.writeToStream (*out);
+            return tempFile.overwriteTargetFileWithTemporary();
+        }
        #else
         if (ScopedPointer<XmlElement> e = data.createXml())
             return e->writeToFile (targetFile, String());
        #endif
+
         return false;
     }
     
