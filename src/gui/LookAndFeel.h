@@ -1,3 +1,7 @@
+/*
+    This file is part of Element
+    Copyright (c) 2019 Kushview, LLC.  All rights reserved.
+*/
 
 #pragma once
 
