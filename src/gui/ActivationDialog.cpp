@@ -560,7 +560,8 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     else
     {
         auto remaining = static_cast<double> (status.getExpiryTime().toMilliseconds() - Time::getCurrentTime().toMilliseconds());
-        auto period = static_cast<double> (status.getExpiryTime().toMilliseconds() - status.getCreationTime().toMilliseconds());
+        //auto period = static_cast<double> (status.getExpiryTime().toMilliseconds() - status.getCreationTime().toMilliseconds());
+        auto period = static_cast<double> (RelativeTime::days(progressBar.periodDays).inMilliseconds());
         progress = (period - remaining) / period;
         progress = jlimit(0.0, 0.9999, progress);
         activateButton->setButtonText ("Upgrade");

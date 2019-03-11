@@ -551,7 +551,11 @@ void SessionTreePanel::selectActiveRootGraph()
             {
                 if (! item->isSelected())
                 {
+                   #if EL_DOCKING
                     item->setSelected (true, true, dontSendNotification);
+                   #else
+                    item->setSelected (true, true, sendNotificationAsync);
+                   #endif
                     item->repaintItem();
                 }
                 break;

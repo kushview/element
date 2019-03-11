@@ -324,6 +324,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     #if defined EL_PRO
     results.add (EL_INTERNAL_ID_AUDIO_MIXER);
     results.add (EL_INTERNAL_ID_CHANNELIZE);
+    results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
     results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
     results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
     results.add (EL_INTERNAL_ID_GRAPH);
@@ -332,13 +333,15 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     #endif
     #endif
 
-    #if defined (EL_SOLO) || defined (EL_PRO)
+   #if defined (EL_SOLO)
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
+   #endif
+
+   #if defined (EL_SOLO) || defined (EL_PRO)
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
-    results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
-    #endif // product enablements
+   #endif // product enablements
     return results;
 }
 
