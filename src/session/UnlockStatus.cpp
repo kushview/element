@@ -21,7 +21,6 @@ namespace Element {
     const char* UnlockStatus::trialKey          = "t";
     const char* UnlockStatus::soloKey           = "s";
     const char* UnlockStatus::priceIdKey        = "price_id";
-    const char* UnlockStatus::trialPeriodKey    = "trial_period";
 
     UnlockStatus::UnlockStatus (Globals& g) : Thread("elt"), settings (g.getSettings()) { }
     String UnlockStatus::getProductID() { return EL_PRODUCT_ID; }
@@ -280,16 +279,16 @@ namespace Element {
        #if EL_DEBUG_LICENSE
         DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
         DBG("[EL] isTrial(): " << ((bool)isTrial() ? "yes" : "no"));
-        DBG("[EL] getTrialPeriodDays(): " << getTrialPeriodDays());
+        DBG("[EL] getExpirationPeriodDays(): " << getExpirationPeriodDays());
         DBG("[EL] getLicenseKey(): " << getLicenseKey());
         DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
         DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
-        DBG("[EL] getProperty('price_id')  " << (int) getProperty ("price_id"));
-        DBG("[EL] getProperty('trial_period')  " << (double) getProperty ("trial_period"));
+        DBG("[EL] getProperty('price_id'):  " << (int) getProperty ("price_id"));
+        DBG("[EL] getCreationTime(): " << getCreationTime().toString (true, true));
         DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
-        DBG("[EL] full key: " << (int)props[fullKey]);
+        DBG("[EL] full key:  " << (int)props[fullKey]);
         DBG("[EL] trial key: " << (int)props[trialKey]);
-        DBG("[EL] solo key: " << (int)props[soloKey]);
+        DBG("[EL] solo key:  " << (int)props[soloKey]);
         DBG(props.toXmlString());
        #endif
     }

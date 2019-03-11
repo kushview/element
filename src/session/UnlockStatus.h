@@ -97,13 +97,33 @@ public:
     UnlockResult registerTrial (const String& email, const String& username,
                                 const String& password);
 
-    inline double getTrialPeriodDays() const
+    /** Returns the number of days the license lasts for.
+        This is expiration time minus creation time in days
+
+        NOTE: this will need modified once we switch to a subscription
+        based system and licenses can be renewed. The server should probably
+        just return a "remaining days" property that we simply read here w/
+        no math involved.
+      */
+    inline double getExpirationPeriodDays() const
     {
-        return hasProperty (trialPeriodKey)
-            ? jlimit (1.0, 30.0, (double) getProperty (trialPeriodKey))
-            : 30.0;
+        if (! hasCreationTime())
+            return 30.0;
+        auto periodMillis = getExpiryTime().toMilliseconds() - getCreationTime().toMilliseconds();
+        return RelativeTime::milliseconds(periodMillis).inDays();
     }
     
+    /** Returns the time this license was created. If the creation date wasn't
+        returned by the server this will return Time() so act accordingly */
+    inline Time getCreationTime() const
+    {
+        return hasProperty ("created")
+            ? Time (1000 * (int64) getProperty ("created"))
+            : Time();
+    }
+
+    inline bool hasCreationTime() const { return getCreationTime() > Time(); }
+
     inline var isExpiring() const
     {
         var result (0);
@@ -193,7 +213,6 @@ private:
     static const char* priceIdKey;
     static const char* trialKey;
     static const char* soloKey;
-    static const char* trialPeriodKey;
     
     Atomic<int> cancelled { 0 };
     Settings& settings;

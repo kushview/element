@@ -545,7 +545,7 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     registerTrialLink->setVisible (false);
     addAndMakeVisible (progressBar);
     addAndMakeVisible (syncButton.get());
-    progressBar.periodDays = status.getTrialPeriodDays();
+    progressBar.periodDays = status.getExpirationPeriodDays();
 
     if (EL_IS_TRIAL_EXPIRED (status))
     {
@@ -559,8 +559,8 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     }
     else
     {
-        auto remaining = (double) status.getExpiryTime().toMilliseconds() - (double) Time::getCurrentTime().toMilliseconds();
-        auto period = (double) RelativeTime::days(progressBar.periodDays).inMilliseconds();
+        auto remaining = static_cast<double> (status.getExpiryTime().toMilliseconds() - Time::getCurrentTime().toMilliseconds());
+        auto period = static_cast<double> (status.getExpiryTime().toMilliseconds() - status.getCreationTime().toMilliseconds());
         progress = (period - remaining) / period;
         progress = jlimit(0.0, 0.9999, progress);
         activateButton->setButtonText ("Upgrade");
