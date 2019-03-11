@@ -108,7 +108,7 @@ public:
     inline double getExpirationPeriodDays() const
     {
         if (! hasCreationTime())
-            return 30.0;
+            return 14.0;
         auto periodMillis = getExpiryTime().toMilliseconds() - getCreationTime().toMilliseconds();
         return RelativeTime::milliseconds(periodMillis).inDays();
     }
