@@ -10,10 +10,11 @@
 namespace Element {
 
 const char* UnlockStatus::propsKey          = "props";
-const char* UnlockStatus::fullKey           = "f";
+const char* UnlockStatus::proKey            = "f";
 const char* UnlockStatus::trialKey          = "t";
 const char* UnlockStatus::soloKey           = "s";
 const char* UnlockStatus::priceIdKey        = "price_id";
+const char* UnlockStatus::downloadIdKey     = "download_id";
 
 #include "./PublicKey.h"
 
@@ -22,8 +23,6 @@ void UnlockStatus::LockableObject::showLockedAlert()
     Alert::showProductLockedAlert();
 }
 
-
-
 UnlockStatus::UnlockStatus (Globals& g)
     : Thread("elt"), 
         settings (g.getSettings())
@@ -31,13 +30,13 @@ UnlockStatus::UnlockStatus (Globals& g)
 
 String UnlockStatus::getProductID()
 { 
-    #if defined (EL_PRO)
+   #if defined (EL_PRO)
     return EL_PRO_PRODUCT_ID;
-    #elif defined (EL_SOLO)
+   #elif defined (EL_SOLO)
     return EL_SOLO_PRODUCT_ID;
-    #else
+   #else
     return EL_LITE_PRODUCT_ID;
-    #endif
+   #endif
 }
 
 bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
@@ -68,8 +67,10 @@ RSAKey UnlockStatus::getPublicKey()
 
 void UnlockStatus::saveState (const String& data)
 {
-    if (auto* const props = settings.getUserSettings())
-        props->setValue (EL_LICENSE_SETTINGS_KEY, data);
+    if (auto* const userProps = settings.getUserSettings())
+        userProps->setValue (EL_LICENSE_SETTINGS_KEY, data);
+    if (data.isEmpty()) // clear out our custom flags if no state
+        this->props = ValueTree();
 }
 
 static URL elGetProUpgradeUrl()
@@ -234,62 +235,79 @@ void UnlockStatus::timerCallback()
 void UnlockStatus::loadProps()
 {
    #if defined (EL_FREE)
-    props.removeProperty (fullKey, nullptr);
+    props.removeProperty (proKey, nullptr);
     props.removeProperty (trialKey, nullptr);
     props.removeProperty (soloKey, nullptr);
     return;
    #endif
 
     props = ValueTree (propsKey);
-    const var full (EL_PRO_PRICE_ID); 
+    
+    const var proPID (EL_PRO_PRODUCT_ID_INT);
+   
     const var trial (EL_TRIAL_PRICE_ID);
-    const var solo (EL_SOLO_PRICE_ID);
-    const var zero (0);
-
+   
    #if defined (EL_PRO)
-    if (full.equals (getProperty (priceIdKey)) || zero.equals (getProperty (priceIdKey)))
+    const var full (EL_PRO_PRICE_ID);
+    const var monthly (EL_PRO_MONTHLY_PRICE_ID);
+    const var yearly (EL_PRO_MONTHLY_PRICE_ID);
+    const var zero (0); // pro can also have a zero price id
+
+    if (proPID.equals (getProperty (downloadIdKey, -1))
+            && (full.equals (getProperty (priceIdKey, -1))
+                || zero.equals (getProperty (priceIdKey, -1))
+                || monthly.equals (getProperty (priceIdKey, -1))
+                || yearly.equals (getProperty (priceIdKey, -1))
+            )
+        )
     {
-        props.setProperty (fullKey, 1, nullptr);
+        props.setProperty (proKey, 1, nullptr);
         props.removeProperty (trialKey, nullptr);
         props.removeProperty (soloKey, nullptr);
     }
-    else if (trial.equals (getProperty (priceIdKey)))
+    else if (proPID.equals (getProperty (downloadIdKey, -1))
+        && trial.equals (getProperty (priceIdKey, -1)))
     {
-        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (proKey, nullptr);
         props.setProperty (trialKey, 1, nullptr);
         props.removeProperty (soloKey, nullptr);
     }
     else
     {
-        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (proKey, nullptr);
         props.removeProperty (trialKey, nullptr);
         props.removeProperty (soloKey, nullptr);
     }
 
    #elif defined (EL_SOLO)
-    if (full.equals (getProperty (priceIdKey)) || zero.equals (getProperty (priceIdKey)))
+   #pragma error "Element SE licensing not yet supported"
+    const var soloPID (EL_SOLO_PRODUCT_ID_INT);
+    const var fullSolo (EL_SOLO_PRICE_ID);
+    const var monthlySolo (EL_PRO_MONTHLY_PRICE_ID);
+    const var yearlySolo (EL_PRO_MONTHLY_PRICE_ID);
+    if (full.equals (getProperty (priceIdKey, -1)) || zero.equals (getProperty (priceIdKey, -1)))
     {
-        props.setProperty (fullKey, 1, nullptr);
+        props.setProperty (proKey, 1,   nullptr);
         props.removeProperty (trialKey, nullptr);
-        props.setProperty (soloKey, 1, nullptr);
+        props.setProperty (soloKey, 1,  nullptr);
     }
-    else if (trial.equals (getProperty (priceIdKey)))
+    else if (trial.equals (getProperty (priceIdKey, -1)))
     {
-        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (proKey,   nullptr);
         props.setProperty (trialKey, 1, nullptr);
-        props.removeProperty (soloKey, nullptr);
+        props.removeProperty (soloKey,  nullptr);
     }
-    else if (solo.equals (getProperty (priceIdKey)))
+    else if (solo.equals (getProperty (priceIdKey, -1)))
     {
-        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (proKey,   nullptr);
         props.removeProperty (trialKey, nullptr);
-        props.setProperty (soloKey, 1, nullptr);
+        props.setProperty (soloKey, 1,  nullptr);
     }
     else
     {
-        props.removeProperty (fullKey, nullptr);
+        props.removeProperty (proKey,   nullptr);
         props.removeProperty (trialKey, nullptr);
-        props.removeProperty (soloKey, nullptr);
+        props.removeProperty (soloKey,  nullptr);
     }
    #else
     #pragma error "Cannot deduce which product to authorize.  Fix logic!"
@@ -298,21 +316,22 @@ void UnlockStatus::loadProps()
 
 void UnlockStatus::dump()
 {
-    #if EL_DEBUG_LICENSE
+   #if EL_DEBUG_LICENSE
     DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
     DBG("[EL] isTrial(): " << ((bool)isTrial() ? "yes" : "no"));
     DBG("[EL] getExpirationPeriodDays(): " << getExpirationPeriodDays());
     DBG("[EL] getLicenseKey(): " << getLicenseKey());
     DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
     DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
-    DBG("[EL] getProperty('price_id'):  " << (int) getProperty ("price_id"));
+    DBG("[EL] getProperty('price_id'):  " << (int) getProperty (priceIdKey, -1));
     DBG("[EL] getCreationTime(): " << getCreationTime().toString (true, true));
     DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
-    DBG("[EL] full key:  " << (int)props[fullKey]);
-    DBG("[EL] trial key: " << (int)props[trialKey]);
-    DBG("[EL] solo key:  " << (int)props[soloKey]);
+
+    DBG("[EL] Is Pro   : " << (int) props [proKey]);
+    DBG("[EL] Is Trial : " << (int) props [trialKey]);
+    DBG("[EL] Is SE    : " << (int) props [soloKey]);
     DBG(props.toXmlString());
-    #endif
+   #endif
 }
 
 }

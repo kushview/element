@@ -191,6 +191,9 @@ private:
     }
 };
 
+// uncomment to clear license on load
+// #define EL_CLEAR_LICENSE    1
+
 class Application : public JUCEApplication,
                     public ActionListener
 {
@@ -205,6 +208,11 @@ public:
     void initialise (const String& commandLine ) override
     {
         world = new Globals (commandLine);
+       #if EL_CLEAR_LICENSE
+        world->getUnlockStatus().saveState (String());
+        world->getUnlockStatus().save();
+        world->getSettings().saveIfNeeded();
+       #endif
         world->getUnlockStatus().loadAll();
         world->getUnlockStatus().dump();
 

@@ -190,6 +190,11 @@ void MainMenu::menuItemSelected (int index, int menu)
         cmd.invokeDirectly (Commands::workspaceOpen, true);
     }
    #endif
+    else if (index == 8000)
+    {
+        if (auto *cc = getContentComponent())
+            cc->getAppController().getWorld().getUnlockStatus().dump();
+    }
    #endif
     
     if (menu == File && index >= recentMenuOffset)
@@ -302,6 +307,7 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     menu.addItem (6666, "Show Workspace Window");
     menu.addItem (7777, "Save Workspace");
     menu.addItem (7778, "Load Workspace");
+    menu.addItem (8000, "Dump License");
 
     menu.addCommandItem (&cmd, Commands::panic, "Panic!");
 }
