@@ -242,22 +242,19 @@ void UnlockStatus::loadProps()
    #endif
 
     props = ValueTree (propsKey);
-    
     const var proPID (EL_PRO_PRODUCT_ID_INT);
-   
-    const var trial (EL_TRIAL_PRICE_ID);
-   
-   #if defined (EL_PRO)
-    const var full (EL_PRO_PRICE_ID);
-    const var monthly (EL_PRO_MONTHLY_PRICE_ID);
-    const var yearly (EL_PRO_MONTHLY_PRICE_ID);
     const var zero (0); // pro can also have a zero price id
+    const var trial (EL_TRIAL_PRICE_ID);
+    const var fullPro (EL_PRO_PRICE_ID);
+    const var monthlyPro (EL_PRO_MONTHLY_PRICE_ID);
+    const var yearlyPro (EL_PRO_YEARLY_PRICE_ID);
 
+   #if defined (EL_PRO)
     if (proPID.equals (getProperty (downloadIdKey, -1))
-            && (full.equals (getProperty (priceIdKey, -1))
+            && (fullPro.equals (getProperty (priceIdKey, -1))
                 || zero.equals (getProperty (priceIdKey, -1))
-                || monthly.equals (getProperty (priceIdKey, -1))
-                || yearly.equals (getProperty (priceIdKey, -1))
+                || monthlyPro.equals (getProperty (priceIdKey, -1))
+                || yearlyPro.equals (getProperty (priceIdKey, -1))
             )
         )
     {
@@ -280,28 +277,43 @@ void UnlockStatus::loadProps()
     }
 
    #elif defined (EL_SOLO)
-   #pragma error "Element SE licensing not yet supported"
     const var soloPID (EL_SOLO_PRODUCT_ID_INT);
     const var fullSolo (EL_SOLO_PRICE_ID);
-    const var monthlySolo (EL_PRO_MONTHLY_PRICE_ID);
-    const var yearlySolo (EL_PRO_MONTHLY_PRICE_ID);
-    if (full.equals (getProperty (priceIdKey, -1)) || zero.equals (getProperty (priceIdKey, -1)))
+    const var monthlySolo (EL_SOLO_MONTHLY_PRICE_ID);
+    const var yearlySolo (EL_SOLO_YEARLY_PRICE_ID);
+    
+    if (proPID.equals (getProperty (downloadIdKey, -1))
+            && (fullPro.equals (getProperty (priceIdKey, -1))
+                || zero.equals (getProperty (priceIdKey, -1))
+                || monthlyPro.equals (getProperty (priceIdKey, -1))
+                || yearlyPro.equals (getProperty (priceIdKey, -1))
+            )
+        )
     {
-        props.setProperty (proKey, 1,   nullptr);
+        // pro can unlock SE
+        props.setProperty (proKey, 1, nullptr);
         props.removeProperty (trialKey, nullptr);
-        props.setProperty (soloKey, 1,  nullptr);
+        props.setProperty (soloKey, 1, nullptr);
     }
-    else if (trial.equals (getProperty (priceIdKey, -1)))
+    else if (proPID.equals (getProperty (downloadIdKey, -1))
+        && trial.equals (getProperty (priceIdKey, -1)))
     {
-        props.removeProperty (proKey,   nullptr);
+        // pro trial can unlock SE
+        props.removeProperty (proKey, nullptr);
         props.setProperty (trialKey, 1, nullptr);
-        props.removeProperty (soloKey,  nullptr);
+        props.removeProperty (soloKey, nullptr);
     }
-    else if (solo.equals (getProperty (priceIdKey, -1)))
+    else if (soloPID.equals (getProperty (downloadIdKey, -1))
+            && (fullSolo.equals (getProperty (priceIdKey, -1))
+                || monthlySolo.equals (getProperty (priceIdKey, -1))
+                || yearlySolo.equals (getProperty (priceIdKey, -1))
+            )
+        )
     {
-        props.removeProperty (proKey,   nullptr);
+        // SE can unlock SE
+        props.removeProperty (proKey, nullptr);
         props.removeProperty (trialKey, nullptr);
-        props.setProperty (soloKey, 1,  nullptr);
+        props.setProperty (soloKey, 1, nullptr);
     }
     else
     {

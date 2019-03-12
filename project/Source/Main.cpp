@@ -192,7 +192,7 @@ private:
 };
 
 // uncomment to clear license on load
-// #define EL_CLEAR_LICENSE    1
+#define EL_CLEAR_LICENSE    1
 
 class Application : public JUCEApplication,
                     public ActionListener
