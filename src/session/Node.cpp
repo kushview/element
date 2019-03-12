@@ -211,6 +211,7 @@ namespace Element {
         if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
         {
             data.writeToStream (*out);
+            out.reset();
             return tempFile.overwriteTargetFileWithTemporary();
         }
        #else
@@ -238,9 +239,13 @@ namespace Element {
         data.setProperty (Tags::type, Tags::node.toString(), 0);
         
        #if EL_SAVE_BINARY_FORMAT
-        FileOutputStream stream (targetFile);
-        preset.writeToStream (stream);
-        return true;
+        TemporaryFile tempFile(targetFile);
+        if (auto out = std::unique_ptr<FileOutputStream>(tempFile.getFile().createOutputStream()))
+        {
+            data.writeToStream(*out);
+            out.reset();
+            return tempFile.overwriteTargetFileWithTemporary();
+        }
        #else
         if (ScopedPointer<XmlElement> e = preset.createXml())
             return e->writeToFile (targetFile, String());
