@@ -49,7 +49,12 @@
  #define EL_PRO_YEARLY_PRICE_ID 4
  #define EL_TRIAL_PRICE_ID 2
 
- #define EL_SOLO_PRICE_ID 3
+ #define EL_SOLO_PRODUCT_ID       "10365"
+ #define EL_SOLO_PRODUCT_ID_INT    10365
+ #define EL_SOLO_PRICE_ID          1
+ #define EL_SOLO_MONTHLY_PRICE_ID  2
+ #define EL_SOLO_YEARLY_PRICE_ID   3
+ 
  #define EL_LITE_PRICE_ID 999
 
  #define EL_BASE_URL "https://kushview.net"
