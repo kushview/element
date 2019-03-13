@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.2
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -631,8 +631,8 @@ BEGIN_JUCER_METADATA
   <LABEL name="AppNameLabel" id="98725c68017cae68" memberName="appNameLabel"
          virtualName="" explicitFocusOrder="7" pos="0Cc 37 320 48" edTextCol="ff000000"
          edBkgCol="0" labelText="ELEMENT" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="44.0"
-         kerning="0.0" bold="0" italic="0" justification="36"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="4.4e1"
+         kerning="0" bold="0" italic="0" justification="36"/>
   <HYPERLINKBUTTON name="OnlineActivateLink" id="1b6f6eff8e1214e9" memberName="onlineActivateLink"
                    virtualName="" explicitFocusOrder="8" pos="0Cc 94 108 18" tooltip="EL_URL_HELP_ACTIVATION"
                    buttonText="Online Activation" connectedEdges="0" needsCallback="0"
@@ -641,7 +641,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="9" pos="0Cc 124 352 39" edTextCol="ff000000"
          edBkgCol="0" labelText="APPNAME requires activation to run.  &#10;Please enter your FULL or TRIAL license key for APPNAME.  "
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.0" kerning="0.0" bold="0"
+         fontname="Default font" fontsize="1.4e1" kerning="0" bold="0"
          italic="0" justification="36"/>
   <TEXTEDITOR name="LicenseKey" id="f335e055cddf091a" memberName="licenseKey"
               virtualName="" explicitFocusOrder="1" pos="0Cc 171 260 22" initialText=""
@@ -670,7 +670,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="9" pos="0Cc 240 280 64" textCol="fff2f2f2"
          edTextCol="ff000000" edBkgCol="0" labelText="Your license key will be emailed to you upon sucessful registration. Fake credentials won't cut it."
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.0" kerning="0.0" bold="0"
+         fontname="Default font" fontsize="1.4e1" kerning="0" bold="0"
          italic="1" justification="36" typefaceStyle="Italic"/>
 </JUCER_COMPONENT>
 
