@@ -99,6 +99,7 @@ public:
         expect ((bool) status.isExpiring());
         expect ((bool) status.isTrial());
         expect (status.getExpiryTime() > Time::getCurrentTime());
+        expect (EL_IS_TRIAL_NOT_EXPIRED (status));
 
         beginTest ("pro locked with expired trial license");
         clearLicense (status);
@@ -110,6 +111,7 @@ public:
         expect ((bool) status.isTrial());
         expect (! (bool) status.isExpiring());
         expect (status.getExpiryTime() <= Time());
+        expect (EL_IS_NOT_ACTIVATED (status));
 
         beginTest ("pro locked with solo license");
         clearLicense (status);
@@ -121,6 +123,7 @@ public:
         expect (! (bool) status.isTrial());
         expect (! (bool) status.isUnlocked());
         expect (! (bool) status.isFullVersion());
+        expect (EL_IS_NOT_ACTIVATED (status));
 
         beginTest ("pro unlocks with pro license");
         clearLicense (status);
@@ -131,6 +134,7 @@ public:
         expect (! (bool) status.isTrial());
         expect ((bool) status.isUnlocked());
         expect ((bool) status.isFullVersion());
+        expect (EL_IS_ACTIVATED (status));
     }
    #endif
 };

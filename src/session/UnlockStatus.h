@@ -37,6 +37,7 @@
   #define EL_LICENSE_PRO_YEARLY_EXPIRED     "772d1ee713b558d82abf6f66411d3008"
 
   #define EL_LICENSE_TRIAL                  "3d71b8c414fa2ca5e8a0263658741c61"
+  #define EL_LICENSE_TRIAL_2                "d7cc1a6dd8d4546f8ebbe3f9f5a2e779"
   #define EL_LICENSE_TRIAL_EXPIRED          "54c67bf48e84dfdb9a63bf7e1956e80b"
 
 #else
@@ -74,14 +75,20 @@
 #endif
 
 // we use macros to make it slightly harder for crackers
+
 // true if this is a trial license which is expired
 #define EL_IS_TRIAL_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() < Time::getCurrentTime())
+
 // true if this is a trial license that is not expired
 #define EL_IS_TRIAL_NOT_EXPIRED(status) ((status).isTrial() && (status).getExpiryTime() > Time() &&  (status).getExpiryTime() >= Time::getCurrentTime())
+
 // false if not activated by any means at all
 #define EL_IS_NOT_ACTIVATED(status) (!(status).isUnlocked() && !(status).isFullVersion())
-// true if activated full version
-#define EL_IS_ACTIVATED(status) ((status).isUnlocked() && (status).isFullVersion())
+
+// true if activated perpetual or subscription license
+#define EL_IS_ACTIVATED(status) (((status).isUnlocked() && (status).isFullVersion()) \
+|| (!(status).isTrial() && (status).isFullVersion() && !(status).isUnlocked() && (status).getExpiryTime() > Time() && (status).getExpiryTime() >= Time::getCurrentTime()))
+
 // true if full activation or trial
 #define EL_IS_ACTIVATED_OR_TRIAL(status) (EL_IS_TRIAL_NOT_EXPIRED((status)) || EL_IS_ACTIVATED((status)))
 
