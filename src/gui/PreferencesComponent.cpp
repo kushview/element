@@ -771,10 +771,10 @@ namespace Element {
 
             void buttonClicked (Button* btn) override
             {
-                 if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
-                 {
-                     owner.devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
-                 }
+                if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
+                {
+                    owner.devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
+                }
             }
 
             void updateSelection()

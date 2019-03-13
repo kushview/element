@@ -45,6 +45,7 @@ public:
 
     std::function<void()> onSiblingNodeAdded;
     std::function<void()> onSiblingNodeRemoved;
+    std::function<void()> onNodesReOrdered;
     std::function<void()> onNodeNameChanged;
 
 private:
@@ -80,7 +81,10 @@ private:
 
     void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
     {
-        ignoreUnused (parent, oldIndex, newIndex);
+        ignoreUnused (oldIndex, newIndex);
+        if (parent.hasType (Tags::nodes) && parent == node.getValueTree().getParent())
+            if (onNodesReOrdered)
+                onNodesReOrdered();
     }
 
     void valueTreeParentChanged (ValueTree& tree) override
@@ -121,7 +125,7 @@ NodeEditorContentView::NodeEditorContentView()
     };
 
     watcher.reset (new NodeWatcher());
-    watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = [this]() {
+    watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = watcher->onNodesReOrdered = [this]() {
         nodesCombo.addNodes (graph);
     };
 
