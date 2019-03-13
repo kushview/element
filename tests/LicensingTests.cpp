@@ -92,6 +92,7 @@ public:
         OnlineUnlockStatus::UnlockResult result;
 
         beginTest ("pro unlocked with trial license & is expiring");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_TRIAL, {}, {}, params);
         status.save(); status.loadAll();
         expect (result.succeeded, result.errorMessage);
@@ -100,6 +101,7 @@ public:
         expect (status.getExpiryTime() > Time::getCurrentTime());
 
         beginTest ("pro locked with expired trial license");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_TRIAL_EXPIRED, {}, {}, params);
         status.save(); status.loadAll();
         DBG("response message: " << result.errorMessage);
@@ -111,7 +113,6 @@ public:
 
         beginTest ("pro locked with solo license");
         clearLicense (status);
-        status.dump();
         result = status.activateLicense (EL_LICENSE_SOLO, {}, {}, params);
         status.save(); status.loadAll();
         DBG("response message: " << result.errorMessage);
@@ -120,9 +121,9 @@ public:
         expect (! (bool) status.isTrial());
         expect (! (bool) status.isUnlocked());
         expect (! (bool) status.isFullVersion());
-        // status.dump();
 
         beginTest ("pro unlocks with pro license");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_PRO, {}, {}, params);
         status.save(); status.loadAll();
         expect (result.succeeded, result.errorMessage);
