@@ -23,7 +23,12 @@ public:
     
     void initialise()   override  { initializeWorld(); }
     void shutdown()     override  { shutdownWorld(); }
-
+    void clearLicense (UnlockStatus& status)
+    {
+        status.saveState (String());
+        getWorld().getSettings().saveIfNeeded();
+        status.loadAll();
+    }
    #if defined (EL_SOLO)
     void runTest() override
     {
@@ -103,6 +108,7 @@ public:
         expect (status.getExpiryTime() <= Time());
 
         beginTest ("pro locked with solo license");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_SOLO, {}, {}, params);
         status.save(); status.loadAll();
         DBG("response message: " << result.errorMessage);
