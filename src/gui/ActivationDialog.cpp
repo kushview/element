@@ -23,7 +23,7 @@
 #include "URLs.h"
 
 #ifndef EL_ALLOW_TRIAL_REGISTRATION
- #define EL_ALLOW_TRIAL_REGISTRATION 0
+ #define EL_ALLOW_TRIAL_REGISTRATION 1
 #endif
 //[/Headers]
 
