@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
+#include "gui/Buttons.h"
 #include "gui/UnlockOverlay.h"
 #include "session/CommandManager.h"
 #include "session/UnlockStatus.h"
@@ -105,6 +106,7 @@ private:
     bool grabbedFirstFocus = false;
     std::unique_ptr<IconButton> syncButton;
     String trialQuitButtonText = "Continue";
+    IconButton copyMachineButton;
     void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 

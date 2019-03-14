@@ -153,6 +153,12 @@ ActivationComponent::ActivationComponent (GuiController& g)
     syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
     syncButton->addListener (this);
 
+    copyMachineButton.setIcon (Icon (getIcons().falCopy, 
+        findColour (TextButton::textColourOffId)));
+    copyMachineButton.addListener (this);
+    copyMachineButton.setTooltip (TRANS ("Copy your machine ID to the clip board"));
+    addAndMakeVisible (copyMachineButton);
+
    #if ! EL_ALLOW_TRIAL_REGISTRATION
     quitButton->setButtonText ("Quit");
    #endif
@@ -233,6 +239,9 @@ void ActivationComponent::resized()
                 .withX (activateButton->getX() + (activateButton->getWidth() / 2)));
     }
    #endif
+
+    copyMachineButton.setBounds (getWidth() - 34, getHeight() - 32,
+                                 24, 22);
     if (syncButton && syncButton->isVisible())
     {
         int shiftLeft = activateButton->getHeight() / 2;
@@ -504,6 +513,11 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
+    else if (buttonThatWasClicked == &copyMachineButton)
+    {
+        const auto machine = gui.getUnlockStatus().getLocalMachineIDs()[0];
+        SystemClipboard::copyTextToClipboard (machine);
+    }
     else if (buttonThatWasClicked == syncButton.get())
     {
         auto* const unlockRef = new UnlockOverlay (unlock,
