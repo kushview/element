@@ -149,7 +149,9 @@ public:
             : Time();
     }
 
-    inline bool hasCreationTime() const { return getCreationTime() > Time(); }
+    inline bool hasCreationTime() const     { return getCreationTime() > Time(); }
+    inline var getPaymentID() const         { return getProperty ("payment_id", 0); }
+    inline var getLicenseID() const         { return getProperty ("license_id", 0); }
 
     inline var isExpiring() const
     {

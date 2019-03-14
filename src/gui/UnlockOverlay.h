@@ -54,9 +54,15 @@ struct UnlockOverlay : public Component,
         stopThread (10000);
     }
 
+    void setShowText (bool showIt)
+    {
+        showText = showIt;
+        repaint();
+    }
+
     void setOpacity (float newOpacity)
     {
-        opacity = jlimit (0.5f, 1.f, newOpacity);
+        opacity = jlimit (0.0f, 1.f, newOpacity);
         repaint();
     }
 
@@ -64,12 +70,15 @@ struct UnlockOverlay : public Component,
     {
         g.fillAll (Colours::transparentBlack.withAlpha (opacity));
 
-        g.setColour (LookAndFeel_KV1::textColor);
-        g.setFont (18.0f);
+        if (showText)
+        {
+            g.setColour (LookAndFeel_KV1::textColor);
+            g.setFont (18.0f);
 
-        g.drawFittedText (TRANS("Contacting XYZ...").replace ("XYZ", status.getWebsiteName()),
-                          getLocalBounds().reduced (20, 0).removeFromTop (proportionOfHeight (0.6f)),
-                          Justification::centred, 5);
+            g.drawFittedText (TRANS("Contacting XYZ...").replace ("XYZ", status.getWebsiteName()),
+                            getLocalBounds().reduced (20, 0).removeFromTop (proportionOfHeight (0.6f)),
+                            Justification::centred, 5);
+        }
     }
 
     void resized() override
@@ -197,6 +206,7 @@ struct UnlockOverlay : public Component,
 
     std::unique_ptr<Component>& owner;
     float opacity { 0.5f };
+    bool showText = true;
     const Action action;
     UnlockStatus& status;
     Globals& world;

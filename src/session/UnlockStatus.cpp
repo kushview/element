@@ -329,16 +329,17 @@ void UnlockStatus::loadProps()
 void UnlockStatus::dump()
 {
    #if EL_DEBUG_LICENSE
+    DBG("[EL] getLicenseKey(): " << getLicenseKey());
+    DBG("[EL] getLicenseID(): " << getLicenseID().toString());
+    DBG("[EL] getPaymentID(): " << getPaymentID().toString());
     DBG("[EL] isUnlocked(): " << ((bool) isUnlocked() ? "yes" : "no"));
     DBG("[EL] isTrial(): " << ((bool)isTrial() ? "yes" : "no"));
     DBG("[EL] getExpirationPeriodDays(): " << getExpirationPeriodDays());
-    DBG("[EL] getLicenseKey(): " << getLicenseKey());
     DBG("[EL] isExpiring(): " << ((bool) isExpiring() ? "yes" : "no"));
     DBG("[EL] isFullVersion(): " << ((bool) isFullVersion() ? "yes" : "no"));
     DBG("[EL] getProperty('price_id'):  " << (int) getProperty (priceIdKey, -1));
     DBG("[EL] getCreationTime(): " << getCreationTime().toString (true, true));
     DBG("[EL] getExpiryTime(): " << getExpiryTime().toString (true, true));
-
     DBG("[EL] Is Pro   : " << (int) props [proKey]);
     DBG("[EL] Is Trial : " << (int) props [trialKey]);
     DBG("[EL] Is SE    : " << (int) props [soloKey]);

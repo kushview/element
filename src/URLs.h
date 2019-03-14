@@ -19,4 +19,5 @@
 #define EL_URL_ELEMENT_GET_TRIAL        EL_URL_HOME "/element/trial"
 
 #define EL_URL_LICENSE_UPGRADE          EL_URL_HOME "/checkout/?edd_action=sl_license_upgrade"
+#define EL_URL_LICENSE_UPGRADES         EL_URL_HOME "/account/purchases/?view=upgrades&license_id=LICENSE_ID&action=manage_licenses&payment_id=PAYMENT_ID"
 #define EL_URL_TRIAL_ACTIVATION         EL_URL_HOME "/edd-cp/?kv_action=activate_trial"

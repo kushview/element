@@ -62,9 +62,18 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setForTrial (bool setupForTrial);
     void setForRegistration (bool setupRegistration);
+    void setForManagement (bool setupManagement);
+    void setQuitButtonTextForTrial (const String& text)
+    { 
+        trialQuitButtonText = text;
+        if (isForTrial)
+            quitButton->setButtonText (trialQuitButtonText);
+    }
     void visibilityChanged() override;
     void timerCallback() override;
     void setBackgroundColour (const Colour& color) { backgroundColour = color; repaint(); }
+    void setOverlayOpacity (float opacity) { overlayOpacity = jlimit (0.f, 1.f, opacity); }
+    void setOverlayShowText (bool showIt) { overlayShowText = showIt; }
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -75,13 +84,17 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    String activateInstructions;
     Colour backgroundColour;
     GuiController& gui;
     std::unique_ptr<Component> unlock;
     double progress = 0.0;
+    float overlayOpacity = 0.72f;
+    bool overlayShowText = true;
     TrialDaysProgressBar progressBar;
     bool isForTrial = false;
     bool isForRegistration = false;
+    bool isForManagement = false;
     String textBeforeReg;
     Label emailLabel { "Email"};
     TextEditor email;
@@ -91,6 +104,7 @@ private:
     TextEditor password;
     bool grabbedFirstFocus = false;
     std::unique_ptr<IconButton> syncButton;
+    String trialQuitButtonText = "Continue";
     void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 
@@ -105,6 +119,7 @@ private:
     std::unique_ptr<HyperlinkButton> getLicenseLink;
     std::unique_ptr<HyperlinkButton> registerTrialLink;
     std::unique_ptr<Label> instructionLabel2;
+    std::unique_ptr<ToggleButton> deactivateOthers;
 
 
     //==============================================================================

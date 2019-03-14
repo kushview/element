@@ -833,7 +833,7 @@ namespace Element {
         }
     };
 
-    #define EL_PREFS_NEW_UNLOCKING 0
+    #define EL_PREFS_NEW_UNLOCKING 1
     class LicenseSettingsPage : public SettingsPage
     {
     public:
@@ -844,8 +844,16 @@ namespace Element {
            #if EL_PREFS_NEW_UNLOCKING
             activation.reset (new ActivationComponent (gui));
             activation->setBackgroundColour (LookAndFeel::widgetBackgroundColor);
-            if ((EL_IS_TRIAL_EXPIRED(status)) || (EL_IS_TRIAL_NOT_EXPIRED(status)))
-                activation->setForTrial (true, true);
+            activation->setOverlayOpacity (0.0f);
+            activation->setOverlayShowText (false);
+            if ((EL_IS_TRIAL_EXPIRED (status)) || (EL_IS_TRIAL_NOT_EXPIRED (status))) 
+            {
+                activation->setForTrial (true);
+                activation->setQuitButtonTextForTrial ("Manage");
+            }
+            else if (EL_IS_ACTIVATED (status))
+                activation->setForManagement (true);
+            
             addAndMakeVisible (activation.get());
            #else
             form.reset (new UnlockForm (world, gui,
