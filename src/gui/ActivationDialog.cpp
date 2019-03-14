@@ -153,7 +153,7 @@ ActivationComponent::ActivationComponent (GuiController& g)
     syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
     syncButton->addListener (this);
 
-    copyMachineButton.setIcon (Icon (getIcons().falCopy, 
+    copyMachineButton.setIcon (Icon (getIcons().falCopy,
         findColour (TextButton::textColourOffId)));
     copyMachineButton.addListener (this);
     copyMachineButton.setTooltip (TRANS ("Copy your machine ID to the clip board"));
@@ -418,7 +418,7 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             if (licenseKey->isEmpty())
                 return;
             auto* unlockRef = new UnlockOverlay (unlock,
-                status, gui.getWorld(), 
+                status, gui.getWorld(),
                 UnlockOverlay::Activate,
                 licenseKey->getText().trim(),
                 String(), String(), String(),
@@ -471,6 +471,8 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             status.loadAll();
             status.refreshed();
             licenseKey->setText (String(), dontSendNotification);
+            isForTrial = false;
+            progressBar.setVisible (false);
             setForManagement (false);
         }
         else if (isForTrial)
@@ -504,7 +506,10 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
         else
         {
            #if EL_ALLOW_TRIAL_REGISTRATION
-            setForRegistration (true);
+            if (quitButton->getButtonText() == "Quit")
+                JUCEApplication::getInstance()->systemRequestedQuit();
+            else
+                setForRegistration (true);
            #else
             JUCEApplication::getInstance()->systemRequestedQuit();
            #endif
@@ -726,7 +731,6 @@ void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResu
             setForManagement (false);
             isForTrial = false;
             setForTrial (true);
-            resized();
         }
         else if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
         {
@@ -738,6 +742,51 @@ void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResu
             setForManagement (EL_IS_ACTIVATED (_status));
         }
         _status.refreshed();
+    }
+}
+
+bool ActivationComponent::isInterestedInFileDrag (const StringArray& files)
+{
+    for (const auto& name : files)
+    {
+        const File file (name);
+        if (file.hasFileExtension ("elc"))
+            return true;
+    }
+
+    return false;
+}
+
+void ActivationComponent::filesDropped (const StringArray& files, int x, int y)
+{
+    ignoreUnused (x, y);
+    auto& status = gui.getUnlockStatus();
+    for (const auto& name : files)
+    {
+        const File file (name);
+        if (file.hasFileExtension ("elc"))
+        {
+            FileInputStream src (file);
+            if (status.applyKeyFile (src.readString()))
+            {
+                status.save();
+                status.loadAll();
+                
+                if (EL_IS_TRIAL_EXPIRED(status) || EL_IS_TRIAL_NOT_EXPIRED(status))
+                {
+                    setForManagement (false);
+                    isForTrial = false;
+                    setForTrial (true);
+                }
+                else
+                {
+                    isForTrial = false;
+                    setForManagement (EL_IS_ACTIVATED (status));
+                }
+
+                status.refreshed();
+            }
+        }
     }
 }
 
@@ -755,10 +804,10 @@ void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResu
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ActivationComponent" componentName=""
-                 parentClasses="public Component, private Timer" constructorParams="GuiController&amp; g"
-                 variableInitialisers="gui(g), progressBar(progress)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="1"
-                 initialWidth="480" initialHeight="346">
+                 parentClasses="public Component, public FileDragAndDropTarget, private Timer"
+                 constructorParams="GuiController&amp; g" variableInitialisers="gui(g), progressBar(progress)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="1" initialWidth="480" initialHeight="346">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="AppNameLabel" id="98725c68017cae68" memberName="appNameLabel"
          virtualName="" explicitFocusOrder="7" pos="0Cc 37 320 48" edTextCol="ff000000"

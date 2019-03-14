@@ -51,6 +51,7 @@ struct TrialDaysProgressBar : public ProgressBar
                                                                     //[/Comments]
 */
 class ActivationComponent  : public Component,
+                             public FileDragAndDropTarget,
                              private Timer,
                              public Button::Listener
 {
@@ -65,7 +66,7 @@ public:
     void setForRegistration (bool setupRegistration);
     void setForManagement (bool setupManagement);
     void setQuitButtonTextForTrial (const String& text)
-    { 
+    {
         trialQuitButtonText = text;
         if (isForTrial)
             quitButton->setButtonText (trialQuitButtonText);
@@ -75,6 +76,9 @@ public:
     void setBackgroundColour (const Colour& color) { backgroundColour = color; repaint(); }
     void setOverlayOpacity (float opacity) { overlayOpacity = jlimit (0.f, 1.f, opacity); }
     void setOverlayShowText (bool showIt) { overlayShowText = showIt; }
+
+    bool isInterestedInFileDrag (const StringArray& files) override;
+    void filesDropped (const StringArray& files, int x, int y) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;

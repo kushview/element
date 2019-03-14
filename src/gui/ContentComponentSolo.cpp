@@ -660,6 +660,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
             {
                 unlock.save();
                 unlock.loadAll();
+                unlock.refreshed();
                 stabilizeViews();
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
                     "Your software has successfully been unlocked.");
