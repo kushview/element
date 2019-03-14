@@ -171,7 +171,11 @@ public:
         if (session)
         {
             tempoBar.setUseExtButton (showExt);
+           #if defined (EL_PRO)
             tempoBar.getTempoValue().referTo (session->getPropertyAsValue (Tags::tempo));
+           #else
+            tempoBar.getTempoValue().referTo (session->getActiveGraph().getPropertyAsValue (Tags::tempo));
+           #endif
             tempoBar.getExternalSyncValue().referTo (session->getPropertyAsValue ("externalSync"));
             tempoBar.stabilizeWithSession (false);
         }

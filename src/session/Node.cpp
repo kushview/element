@@ -308,6 +308,9 @@ namespace Element {
         stabilizeProperty (Tags::bypass, false);
         stabilizeProperty (Tags::persistent, true);
         stabilizePropertyString (Tags::renderMode, "single");
+       #if ! defined (EL_PRO)
+        stabilizeProperty (Tags::tempo, (double) 120.0);
+       #endif
         objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
         objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     }
