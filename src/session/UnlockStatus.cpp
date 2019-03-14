@@ -35,7 +35,7 @@ String UnlockStatus::getProductID()
    #elif defined (EL_SOLO)
     return EL_SOLO_PRODUCT_ID;
    #else
-    return EL_LITE_PRODUCT_ID;
+    return "lite";
    #endif
 }
 
