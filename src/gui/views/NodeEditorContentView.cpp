@@ -150,7 +150,6 @@ void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView*
     if (result == 1)
     {
         view->setSticky (! view->isSticky());
-        DBG("[EL] node editor panel is now sticky: " << (int) view->isSticky());
     }
 }
 
