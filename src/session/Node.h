@@ -354,7 +354,19 @@ namespace Element {
         String getProgramName (const int index) const;
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
-        int getMidiProgram() const { return (int) getProperty (Tags::midiProgram, -1); }
+        
+        /** True if global MIDI programs should be loaded/saved */
+        bool useGlobalMidiPrograms() const;
+        /** Change whether to load/save global programs */
+        void setUseGlobalMidiPrograms (bool);
+        /** True if MIDI program functionality is on */
+        bool areMidiProgramsEnabled() const;
+        /** Turn MIDI Programs on or off */
+        void setMidiProgramsEnabled (bool);
+        
+        int getMidiProgram() const;
+        void setMidiProgram (int program);
+
         bool hasEditor() const;
         
         void getArcs (OwnedArray<Arc>&) const;

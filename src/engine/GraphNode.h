@@ -190,16 +190,21 @@ public:
 
     const CriticalSection& getPropertyLock() const { return propertyLock; }
 
-    inline bool hasMidiProgram() const { return isPositiveAndBelow (midiProgram.get(), 128); }
-    inline int getMidiProgram() const { return midiProgram.get(); }
     File getMidiProgramFile() const;
+    inline bool hasMidiProgram() const                 { return isPositiveAndBelow (midiProgram.get(), 128); }
+    inline bool useGlobalMidiPrograms() const          { return globalMidiPrograms.get() == 1; }
+    inline void setUseGlobalMidiPrograms (bool use)    { globalMidiPrograms.set (use ? 1 : 0); }
+    inline bool areMidiProgramsEnabled() const         { return midiProgramsEnabled.get() == 1; }
+    inline void setMidiProgramsEnabled (bool enabled)  { midiProgramsEnabled.set (enabled ? 1 : 0); }
+    inline int getMidiProgram() const                  { return midiProgram.get(); }
     inline void setMidiProgram (const int program)
     {
-        if (program < -1 || program > 127) {
+        if (program < -1 || program > 127)
+        {
             jassertfalse; // out of range
             return;
         }
-        DBG("set program: " << program);
+        
         midiProgram.set (program);
     }
 
@@ -278,8 +283,11 @@ private:
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
     MidiChannels midiChannels;
+
     Atomic<int> midiProgram { -1 };
     Atomic<int> lastMidiProgram { -1 };
+    Atomic<int> midiProgramsEnabled { 1 };
+    Atomic<int> globalMidiPrograms { 1 };
 
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater

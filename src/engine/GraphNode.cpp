@@ -353,32 +353,41 @@ void GraphNode::saveMidiProgram() const
 void GraphNode::MidiProgramLoader::handleAsyncUpdate()
 {
     const File programFile = node.getMidiProgramFile();
-    if (! programFile.existsAsFile())
+    const bool globalPrograms = node.useGlobalMidiPrograms();
+    if (globalPrograms)
     {
-        DBG("[EL] midi program does not exist: " << programFile.getFileName());
-        return;
-    }
-
-    const auto requestedProgram = node.getMidiProgram();
-    if (node.lastMidiProgram.get() == requestedProgram)
-    {
-        DBG("[EL] same program, not loading.");
-        return;
-    }
-
-    const auto programData = Node::parse (programFile);
-    auto data = programData.getProperty(Tags::state).toString().trim();
-    if (data.isNotEmpty())
-    {
-        MemoryBlock state;
-        state.fromBase64Encoding (data);
-        if (state.getSize() > 0)
+        if (! programFile.existsAsFile())
         {
-            node.lastMidiProgram.set (requestedProgram);
-            node.setState (state.getData(), (int) state.getSize());
-            node.midiProgramChanged();
-            DBG("[EL] loaded program: " << requestedProgram);
+            DBG("[EL] midi program does not exist: " << programFile.getFileName());
+            return;
         }
+
+        const auto requestedProgram = node.getMidiProgram();
+        if (node.lastMidiProgram.get() == requestedProgram)
+        {
+            DBG("[EL] same program, not loading.");
+            return;
+        }
+
+        const auto programData = Node::parse (programFile);
+        auto data = programData.getProperty(Tags::state).toString().trim();
+        if (data.isNotEmpty())
+        {
+            MemoryBlock state;
+            state.fromBase64Encoding (data);
+            if (state.getSize() > 0)
+            {
+                node.lastMidiProgram.set (requestedProgram);
+                node.setState (state.getData(), (int) state.getSize());
+                node.midiProgramChanged();
+                DBG("[EL] loaded program: " << requestedProgram);
+            }
+        }
+    }
+    else
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "MIDI Program",
+            "Only global MIDI programs are supported at this time.");
     }
 }
 

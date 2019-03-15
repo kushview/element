@@ -622,6 +622,16 @@ namespace Element {
                 obj->setMidiProgram ((int) getProperty (Tags::midiProgram, -1));
             }
 
+            if (hasProperty ("midiProgramsEnabled"))
+            {
+                obj->setMidiProgramsEnabled ((bool) getProperty ("midiProgramsEnabled", true));
+            }
+            
+            if (hasProperty ("globalMidiPrograms"))
+            {
+                obj->setUseGlobalMidiPrograms ((bool) getProperty ("globalMidiPrograms", true));
+            }
+            
             if (hasProperty (Tags::transpose))
                 obj->setTransposeOffset (getProperty (Tags::transpose));
         }
@@ -781,4 +791,40 @@ namespace Element {
         for (int i = 0; i < tree.getNumChildren(); ++i)
             forEach (tree.getChild (i), handler);
     }
+
+bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty ("globalMidiPrograms", true); }
+void Node::setUseGlobalMidiPrograms (bool useGlobal)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->useGlobalMidiPrograms() == useGlobal)
+            return;
+        obj->setUseGlobalMidiPrograms (useGlobal);
+        setProperty ("globalMidiPrograms", obj->useGlobalMidiPrograms());
+    }
+}
+
+bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty ("midiProgramsEnabled", true); }
+void Node::setMidiProgramsEnabled (bool useMidiPrograms)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->areMidiProgramsEnabled() == useMidiPrograms)
+            return;
+        obj->setMidiProgramsEnabled (useMidiPrograms);
+        setProperty ("midiProgramsEnabled", obj->areMidiProgramsEnabled());
+    }
+}
+
+int Node::getMidiProgram() const            { return (int) getProperty (Tags::midiProgram, 0); }
+void Node::setMidiProgram (int program)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->getMidiProgram() == program)
+            return;
+        obj->setMidiProgram (program);
+        setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
+    }
+}
 }

@@ -58,33 +58,19 @@ namespace Element {
         addAndMakeVisible (midiProgramLabel);
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
-        midiProgram.slider.setSliderStyle (Slider::IncDecButtons);
-        midiProgram.slider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
-        midiProgram.slider.setRange (0.0, 128.0, 1.0);
+
         midiProgram.slider.textFromValueFunction = [this](double value) -> String {
-            if (value <= 0) return "Off";
+            if (! node.areMidiProgramsEnabled()) return "Off";
             return String (roundToInt (value));
         };
         midiProgram.slider.valueFromTextFunction = [this](const String& text) -> double {
-            if (text == "Off") return 0.0;
             return text.getDoubleValue();
         };
 
         midiProgram.slider.onValueChange = [this]() {
             const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
-            node.setProperty (Tags::midiProgram, program);
-            if (GraphNodePtr ptr = node.getGraphNode())
-                ptr->setMidiProgram (program);
-            if (isPositiveAndBelow (program, 128))
-            {
-                midiProgram.loadButton.setEnabled (true);
-                midiProgram.saveButton.setEnabled (true);
-            }
-            else
-            {
-                midiProgram.loadButton.setEnabled (false);
-                midiProgram.saveButton.setEnabled (false);
-            }
+            node.setMidiProgram (program);
+            updateMidiProgram();
         };
 
         midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
@@ -116,6 +102,15 @@ namespace Element {
                     stabilizeContent();
                 }
             }
+        };
+
+        midiProgram.globalButton.onClick = [this]() {
+            node.setUseGlobalMidiPrograms (midiProgram.globalButton.getToggleState());
+            updateMidiProgram();
+        };
+        midiProgram.powerButton.onClick = [this]() {
+            node.setMidiProgramsEnabled (midiProgram.powerButton.getToggleState());
+            updateMidiProgram();
         };
 
         addAndMakeVisible (midiChannelLabel);
@@ -184,7 +179,9 @@ namespace Element {
         layoutComponent (r, nameLabel, nameEditor);
         layoutComponent (r, midiChannelLabel, midiChannel, 
                          midiChannel.getSuggestedHeight (r.getWidth()));
+        r.removeFromTop (2);
         layoutComponent (r, midiProgramLabel, midiProgram);
+        r.removeFromTop (2);
         layoutComponent (r, keyLowLabel, keyLowSlider);
         layoutComponent (r, keyHiLabel, keyHiSlider);
         layoutComponent (r, transposeLabel, transposeSlider);
@@ -220,10 +217,12 @@ namespace Element {
             nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
             updateMidiChannels();
             updateSliders();
+            updateMidiProgram();
+
             if (GraphNodePtr ptr = node.getGraphNode())
             {
                 ptr->midiProgramChanged.connect (
-                    std::bind (&NodeMidiContentView::updateSliders, this));
+                    std::bind (&NodeMidiContentView::updateMidiProgram, this));
             }
         }
         else
@@ -283,18 +282,6 @@ namespace Element {
             keyHiSlider.setValue ((double) range.getEnd(), dontSendNotification);
             transposeSlider.setValue ((double) object->getTransposeOffset(), dontSendNotification);
         }
-
-        midiProgram.slider.setValue (1 + node.getMidiProgram(), dontSendNotification);
-        if (isPositiveAndBelow (roundToInt (midiProgram.slider.getValue()), 128))
-        {
-            midiProgram.loadButton.setEnabled (true);
-            midiProgram.saveButton.setEnabled (true);
-        }
-        else
-        {
-            midiProgram.loadButton.setEnabled (false);
-            midiProgram.saveButton.setEnabled (false);
-        }
     }
 
     void NodeMidiContentView::updateMidiChannels()
@@ -309,5 +296,35 @@ namespace Element {
 
             midiChannel.setChannels (chans, false);
         }
+    }
+
+    void NodeMidiContentView::updateMidiProgram()
+    {
+        const bool enabled = node.areMidiProgramsEnabled();
+
+        if (GraphNodePtr object = node.getGraphNode())
+        {
+            // use the object because there isn't a notifaction directly back to node model
+            // in all cases
+            midiProgram.slider.setValue (1 + object->getMidiProgram(), dontSendNotification);
+            if (isPositiveAndNotGreaterThan (roundToInt (midiProgram.slider.getValue()), 128))
+            {
+                midiProgram.loadButton.setEnabled (enabled);
+                midiProgram.saveButton.setEnabled (enabled);
+                midiProgram.powerButton.setToggleState (enabled, dontSendNotification);
+            }
+            else
+            {
+                midiProgram.loadButton.setEnabled (false);
+                midiProgram.saveButton.setEnabled (false);
+                midiProgram.powerButton.setToggleState (false, dontSendNotification);
+            }
+        }
+
+        midiProgram.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
+        midiProgram.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
+        midiProgram.globalButton.setEnabled (enabled);
+        midiProgram.slider.updateText();
+        midiProgram.slider.setEnabled (enabled);
     }
 }

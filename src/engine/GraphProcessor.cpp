@@ -242,8 +242,9 @@ public:
             const auto keyRange (node->getKeyRange());
             const auto midiChans (node->getMidiChannels());
             const auto midiProgram (node->getMidiProgram());
+            const auto useMidiProgram (node->areMidiProgramsEnabled());
 
-            if (keyRange.getLength() > 0 || !midiChans.isOmni() || midiProgram >= 0)
+            if (keyRange.getLength() > 0 || !midiChans.isOmni() || useMidiProgram)
             {
                 auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
                 MidiBuffer::Iterator iter (midi);
@@ -260,7 +261,7 @@ public:
                     if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
                         continue;
 
-                    if (msg.isProgramChange() && midiProgram >= 0)
+                    if (useMidiProgram && msg.isProgramChange())
                     {
                         node->setMidiProgram (msg.getProgramChangeNumber());
                         node->reloadMidiProgram();

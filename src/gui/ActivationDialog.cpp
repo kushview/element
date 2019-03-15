@@ -771,7 +771,7 @@ void ActivationComponent::filesDropped (const StringArray& files, int x, int y)
             {
                 status.save();
                 status.loadAll();
-                
+
                 if (EL_IS_TRIAL_EXPIRED(status) || EL_IS_TRIAL_NOT_EXPIRED(status))
                 {
                     setForManagement (false);
