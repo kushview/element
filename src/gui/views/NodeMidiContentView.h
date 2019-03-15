@@ -50,6 +50,9 @@ private:
     SignalLabel transposeLabel;
     Slider transposeSlider;
 
+    SignalLabel midiProgramLabel;
+    Slider midiProgram;
+    
     SignalLabel midiChannelLabel;
     MidiChannelSelectComponent midiChannel;
 

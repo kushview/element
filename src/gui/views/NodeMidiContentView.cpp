@@ -55,9 +55,27 @@ namespace Element {
         keyHiSlider.setTextBoxIsEditable (false);
         keyHiSlider.setValue (127);
 
+        addAndMakeVisible (midiProgramLabel);
+        midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
+        addAndMakeVisible (midiProgram);
+        midiProgram.setSliderStyle (Slider::IncDecButtons);
+        midiProgram.setRange (0.0, 128.0, 1.0);
+        midiProgram.textFromValueFunction = [this](double value) -> String {
+            if (value <= 0) return "Off";
+            return String (roundToInt (value));
+        };
+        midiProgram.valueFromTextFunction = [this](const String& text) -> double {
+            if (text == "Off") return 0.0;
+            return text.getDoubleValue();
+        };
+        midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
+            midiProgram.setValue (0.0);
+        };
+
         addAndMakeVisible (midiChannelLabel);
         midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
         midiChannelLabel.setFont (font);
+        
         
         addAndMakeVisible (midiChannel);
 
@@ -117,6 +135,7 @@ namespace Element {
         r.removeFromTop (4);
         r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
+        layoutComponent (r, midiProgramLabel, midiProgram);
         layoutComponent (r, midiChannelLabel, midiChannel, 
                          midiChannel.getSuggestedHeight (r.getWidth()));
         layoutComponent (r, keyLowLabel, keyLowSlider);
