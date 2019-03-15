@@ -16,7 +16,8 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
       isPrepared (false),
       metadata (Tags::node),
-      enablement (*this)
+      enablement (*this),
+      midiProgramLoader (*this)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
@@ -311,6 +312,19 @@ void GraphNode::EnablementUpdater::handleAsyncUpdate()
     graph.setEnabled (! graph.isEnabled());
 }
 
+void GraphNode::reloadMidiProgram()
+{
+    midiProgramLoader.triggerAsyncUpdate();
+}
+
+void GraphNode::MidiProgramLoader::handleAsyncUpdate()
+{
+    PluginDescription desc;
+    node.getPluginDescription (desc);
+    const auto uids = desc.createIdentifierString();
+    DBG(uids);
+}
+
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     audio.clear (0, audio.getNumSamples());
@@ -326,6 +340,11 @@ void GraphNode::resetPorts()
     metadata.removeChild (portList, nullptr);
     metadata.removeChild (nodeList, nullptr);
     portList.removeAllChildren (nullptr);
+    
+    if (ports.size (PortType::Midi, true) <= 0)
+    {
+        ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
+    }
 
     for (int i = 0; i < ports.size(); ++i)
     {

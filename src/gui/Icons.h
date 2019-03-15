@@ -52,7 +52,8 @@ public:
          graph, jigsaw, info, warning,
          bug, mainJuceLogo, 
          
-         falBars, falCog, falCopy,falBarsOutline, 
+         falBars, falCog, falCopy,
+         falBarsOutline, 
          falAtomAlt, falSyncAlt,
 
          farSyncAlt,

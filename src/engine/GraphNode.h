@@ -190,6 +190,18 @@ public:
 
     const CriticalSection& getPropertyLock() const { return propertyLock; }
 
+    inline bool hasMidiProgram() const { return isPositiveAndBelow (midiProgram.get(), 128); }
+    inline int getMidiProgram() const { return midiProgram.get(); }
+    inline void setMidiProgram (const int program)
+    {
+        if (program < -1 || program > 127) {
+            jassertfalse; // out of range
+            return;
+        }
+        midiProgram.set (program);
+    }
+    void reloadMidiProgram();
+
     inline void setMidiChannels (const BigInteger& ch)
     {
         ScopedLock sl (propertyLock);
@@ -260,6 +272,7 @@ private:
     Atomic<int> keyRangeHigh { 127 };
     Atomic<int> transposeOffset { 0 };
     MidiChannels midiChannels;
+    Atomic<int> midiProgram { -1 };
 
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
@@ -269,6 +282,14 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& graph;
     } enablement;
+
+    struct MidiProgramLoader : public AsyncUpdater
+    {
+        MidiProgramLoader (GraphNode& n) : node (n) { }
+        ~MidiProgramLoader() { cancelPendingUpdate(); }
+        void handleAsyncUpdate() override;
+        GraphNode& node;
+    } midiProgramLoader;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);

@@ -241,8 +241,9 @@ public:
             transpose.setNoteOffset (node->getTransposeOffset());
             const auto keyRange (node->getKeyRange());
             const auto midiChans (node->getMidiChannels());
+            const auto midiProgram (node->getMidiProgram());
 
-            if (keyRange.getLength() > 0 || !midiChans.isOmni())
+            if (keyRange.getLength() > 0 || !midiChans.isOmni() || midiProgram >= 0)
             {
                 auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
                 MidiBuffer::Iterator iter (midi);
@@ -258,6 +259,12 @@ public:
 
                     if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
                         continue;
+
+                    if (msg.isProgramChange() && midiProgram == msg.getProgramChangeNumber())
+                    {
+                        node->reloadMidiProgram();
+                        continue;
+                    }
 
                     transpose.process (msg);
                     tempMidi.addEvent (msg, frame);

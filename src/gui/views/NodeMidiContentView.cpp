@@ -58,19 +58,27 @@ namespace Element {
         addAndMakeVisible (midiProgramLabel);
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
-        midiProgram.setSliderStyle (Slider::IncDecButtons);
-        midiProgram.setRange (0.0, 128.0, 1.0);
-        midiProgram.textFromValueFunction = [this](double value) -> String {
+        midiProgram.slider.setSliderStyle (Slider::IncDecButtons);
+        midiProgram.slider.setTextBoxStyle (Slider::TextBoxLeft, false, 50, 20);
+        midiProgram.slider.setRange (0.0, 128.0, 1.0);
+        midiProgram.slider.textFromValueFunction = [this](double value) -> String {
             if (value <= 0) return "Off";
             return String (roundToInt (value));
         };
-        midiProgram.valueFromTextFunction = [this](const String& text) -> double {
+        midiProgram.slider.valueFromTextFunction = [this](const String& text) -> double {
             if (text == "Off") return 0.0;
             return text.getDoubleValue();
         };
-        midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
-            midiProgram.setValue (0.0);
+        midiProgram.slider.onValueChange = [this]() {
+            const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
+            node.setProperty (Tags::midiProgram, program);
+            if (GraphNodePtr ptr = node.getGraphNode())
+                ptr->setMidiProgram (program);
         };
+        midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
+            midiProgram.slider.setValue (0.0);
+        };
+        midiProgram.slider.updateText();
 
         addAndMakeVisible (midiChannelLabel);
         midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
@@ -135,9 +143,9 @@ namespace Element {
         r.removeFromTop (4);
         r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
-        layoutComponent (r, midiProgramLabel, midiProgram);
         layoutComponent (r, midiChannelLabel, midiChannel, 
                          midiChannel.getSuggestedHeight (r.getWidth()));
+        layoutComponent (r, midiProgramLabel, midiProgram);
         layoutComponent (r, keyLowLabel, keyLowSlider);
         layoutComponent (r, keyHiLabel, keyHiSlider);
         layoutComponent (r, transposeLabel, transposeSlider);

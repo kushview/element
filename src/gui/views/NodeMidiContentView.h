@@ -51,8 +51,34 @@ private:
     Slider transposeSlider;
 
     SignalLabel midiProgramLabel;
-    Slider midiProgram;
+    struct MidiProgramLayout : public Component
+    {
+        Slider slider;
+        IconButton loadButton;
+        IconButton saveButton;
+
+        MidiProgramLayout()
+        {
+            addAndMakeVisible (slider);
+            addAndMakeVisible (loadButton);
+            loadButton.setIcon (Icon (getIcons().falSyncAlt, LookAndFeel::textColor));
+            addAndMakeVisible (saveButton);
+            saveButton.setIcon (Icon (getIcons().fasSave, LookAndFeel::textColor));
+        }
+
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            r = r.withWidth (jmax (100 + 48, r.getWidth()));
+            slider.setBounds (r.removeFromLeft (100));
+            r.removeFromRight (4);
+            saveButton.setBounds (r.removeFromRight (20));
+            r.removeFromRight (2);
+            loadButton.setBounds (r.removeFromRight (20));
+        }
+    } midiProgram;
     
+
     SignalLabel midiChannelLabel;
     MidiChannelSelectComponent midiChannel;
 
