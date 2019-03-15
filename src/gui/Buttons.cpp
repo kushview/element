@@ -7,7 +7,7 @@ IconButton::IconButton (const String& buttonName)
     : Button (buttonName) { }
 IconButton::~IconButton() {}
 
-void IconButton::setIcon (Icon newIcon)
+void IconButton::setIcon (Icon newIcon, float reduceSize)
 {
     icon = newIcon;
     repaint();
@@ -20,8 +20,8 @@ void IconButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButton
         isMouseOverButton, isButtonDown);
     Rectangle<float> bounds (0.f, 0.f, (float) jmin (getWidth(), getHeight()), 
                                        (float) jmin (getWidth(), getHeight()));
-    icon.colour = LookAndFeel::textColor;
-    icon.draw (g, bounds.reduced (4.f), false);
+    icon.colour = isEnabled() ? LookAndFeel::textColor : LookAndFeel::textColor.darker();
+    icon.draw (g, bounds.reduced (iconReduceSize), false);
 }
 
 void SettingButton::paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown)

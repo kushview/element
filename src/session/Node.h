@@ -354,7 +354,7 @@ namespace Element {
         String getProgramName (const int index) const;
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
-        
+        int getMidiProgram() const { return (int) getProperty (Tags::midiProgram, -1); }
         bool hasEditor() const;
         
         void getArcs (OwnedArray<Arc>&) const;

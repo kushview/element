@@ -59,7 +59,7 @@ namespace Element {
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
         midiProgram.slider.setSliderStyle (Slider::IncDecButtons);
-        midiProgram.slider.setTextBoxStyle (Slider::TextBoxLeft, false, 50, 20);
+        midiProgram.slider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 20);
         midiProgram.slider.setRange (0.0, 128.0, 1.0);
         midiProgram.slider.textFromValueFunction = [this](double value) -> String {
             if (value <= 0) return "Off";
@@ -69,16 +69,54 @@ namespace Element {
             if (text == "Off") return 0.0;
             return text.getDoubleValue();
         };
+
         midiProgram.slider.onValueChange = [this]() {
             const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
             node.setProperty (Tags::midiProgram, program);
             if (GraphNodePtr ptr = node.getGraphNode())
                 ptr->setMidiProgram (program);
+            if (isPositiveAndBelow (program, 128))
+            {
+                midiProgram.loadButton.setEnabled (true);
+                midiProgram.saveButton.setEnabled (true);
+            }
+            else
+            {
+                midiProgram.loadButton.setEnabled (false);
+                midiProgram.saveButton.setEnabled (false);
+            }
         };
+
         midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
             midiProgram.slider.setValue (0.0);
         };
         midiProgram.slider.updateText();
+
+        midiProgram.saveButton.setTooltip ("Save MIDI program");
+        midiProgram.saveButton.onClick = [this]()
+        {
+            if (GraphNodePtr ptr = node.getGraphNode())
+            {
+                if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
+                {
+                    node.savePluginState();
+                    node.writeToFile (ptr->getMidiProgramFile());
+                }
+            }
+        };
+
+        midiProgram.loadButton.setTooltip ("Reload saved MIDI program");
+        midiProgram.loadButton.onClick = [this]()
+        {
+            if (GraphNodePtr ptr = node.getGraphNode())
+            {
+                if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
+                {
+                    ptr->reloadMidiProgram();
+                    stabilizeContent();
+                }
+            }
+        };
 
         addAndMakeVisible (midiChannelLabel);
         midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
@@ -121,6 +159,7 @@ namespace Element {
 
     NodeMidiContentView::~NodeMidiContentView()
     {
+        midiProgramChangedConnection.disconnect();
         selectedNodeConnection.disconnect();
         transposeLabel.onDoubleClicked = nullptr;
         keyLowLabel.onDoubleClicked = nullptr;
@@ -172,6 +211,7 @@ namespace Element {
             selectedNodeConnection = gui.nodeSelected.connect (std::bind (
                 &NodeMidiContentView::stabilizeContent, this));
 
+        midiProgramChangedConnection.disconnect();
         node = gui.getSelectedNode();
 
         if (node.isValid() && ! node.isIONode())
@@ -180,6 +220,11 @@ namespace Element {
             nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
             updateMidiChannels();
             updateSliders();
+            if (GraphNodePtr ptr = node.getGraphNode())
+            {
+                ptr->midiProgramChanged.connect (
+                    std::bind (&NodeMidiContentView::updateSliders, this));
+            }
         }
         else
         {
@@ -237,6 +282,18 @@ namespace Element {
             keyLowSlider.setValue ((double) range.getStart(), dontSendNotification);
             keyHiSlider.setValue ((double) range.getEnd(), dontSendNotification);
             transposeSlider.setValue ((double) object->getTransposeOffset(), dontSendNotification);
+        }
+
+        midiProgram.slider.setValue (1 + node.getMidiProgram(), dontSendNotification);
+        if (isPositiveAndBelow (roundToInt (midiProgram.slider.getValue()), 128))
+        {
+            midiProgram.loadButton.setEnabled (true);
+            midiProgram.saveButton.setEnabled (true);
+        }
+        else
+        {
+            midiProgram.loadButton.setEnabled (false);
+            midiProgram.saveButton.setEnabled (false);
         }
     }
 

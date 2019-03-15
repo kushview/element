@@ -54,9 +54,9 @@ public:
          
          falBars, falCog, falCopy,
          falBarsOutline, 
-         falAtomAlt, falSyncAlt,
+         falAtomAlt, falSyncAlt, falRedoAlt,
 
-         farSyncAlt,
+         farSyncAlt, farRedoAlt, farSave,
 
          fasPlay, fasStop, fasCog, fasCircle,
          fasChevronDown, fasChevronRight, fasSave,

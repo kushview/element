@@ -260,8 +260,9 @@ public:
                     if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
                         continue;
 
-                    if (msg.isProgramChange() && midiProgram == msg.getProgramChangeNumber())
+                    if (msg.isProgramChange() && midiProgram >= 0)
                     {
+                        node->setMidiProgram (msg.getProgramChangeNumber());
                         node->reloadMidiProgram();
                         continue;
                     }

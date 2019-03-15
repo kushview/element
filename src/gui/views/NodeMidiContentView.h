@@ -22,6 +22,7 @@ public:
 private:
     Node node;
     SignalConnection selectedNodeConnection;
+    SignalConnection midiProgramChangedConnection;
     
     class SignalLabel : public Label
     {
@@ -61,9 +62,9 @@ private:
         {
             addAndMakeVisible (slider);
             addAndMakeVisible (loadButton);
-            loadButton.setIcon (Icon (getIcons().falSyncAlt, LookAndFeel::textColor));
+            loadButton.setIcon (Icon (getIcons().farRedoAlt, LookAndFeel::textColor), 11.6f);
             addAndMakeVisible (saveButton);
-            saveButton.setIcon (Icon (getIcons().fasSave, LookAndFeel::textColor));
+            saveButton.setIcon (Icon (getIcons().farSave, LookAndFeel::textColor));
         }
 
         void resized() override

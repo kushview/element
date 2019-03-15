@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "ElementApp.h"
 
 #include "engine/nodes/AudioProcessorNode.h"
@@ -60,7 +61,7 @@ void GraphNode::setGain (const float f) {
     gain.set(f);
 }
 
-void GraphNode::getPluginDescription (PluginDescription& desc)
+void GraphNode::getPluginDescription (PluginDescription& desc) const
 {
     if (AudioPluginInstance* i = getAudioPluginInstance())
         i->fillInPluginDescription (desc);
@@ -317,12 +318,68 @@ void GraphNode::reloadMidiProgram()
     midiProgramLoader.triggerAsyncUpdate();
 }
 
-void GraphNode::MidiProgramLoader::handleAsyncUpdate()
+File GraphNode::getMidiProgramFile() const
 {
     PluginDescription desc;
-    node.getPluginDescription (desc);
+    getPluginDescription (desc);
     const auto uids = desc.createIdentifierString();
-    DBG(uids);
+    const auto program = getMidiProgram();
+    if (uids.isEmpty())
+    {
+        jassertfalse;
+        return File();
+    }
+
+    if (! isPositiveAndBelow (program, 128))
+    {
+        jassertfalse;
+        return File();
+    }
+
+    std::stringstream stream;
+    stream << uids.toStdString() << "_" << std::setfill('0') << std::setw(3) << program << ".eln";
+    String fileName = stream.str();
+    const File file (DataPath::applicationDataDir().getChildFile("NodeMidiPrograms").getChildFile(fileName));
+    if (! file.getParentDirectory().exists())
+        file.getParentDirectory().createDirectory();
+    return file;
+}
+
+void GraphNode::saveMidiProgram() const
+{
+    jassertfalse; // need access to Node model to do this.
+}
+
+void GraphNode::MidiProgramLoader::handleAsyncUpdate()
+{
+    const File programFile = node.getMidiProgramFile();
+    if (! programFile.existsAsFile())
+    {
+        DBG("[EL] midi program does not exist: " << programFile.getFileName());
+        return;
+    }
+
+    const auto requestedProgram = node.getMidiProgram();
+    if (node.lastMidiProgram.get() == requestedProgram)
+    {
+        DBG("[EL] same program, not loading.");
+        return;
+    }
+
+    const auto programData = Node::parse (programFile);
+    auto data = programData.getProperty(Tags::state).toString().trim();
+    if (data.isNotEmpty())
+    {
+        MemoryBlock state;
+        state.fromBase64Encoding (data);
+        if (state.getSize() > 0)
+        {
+            node.lastMidiProgram.set (requestedProgram);
+            node.setState (state.getData(), (int) state.getSize());
+            node.midiProgramChanged();
+            DBG("[EL] loaded program: " << requestedProgram);
+        }
+    }
 }
 
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
@@ -341,10 +398,8 @@ void GraphNode::resetPorts()
     metadata.removeChild (nodeList, nullptr);
     portList.removeAllChildren (nullptr);
     
-    if (ports.size (PortType::Midi, true) <= 0)
-    {
+    if (!isMidiIONode() && !isAudioIONode() && ports.size (PortType::Midi, true) <= 0)
         ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
-    }
 
     for (int i = 0; i < ports.size(); ++i)
     {

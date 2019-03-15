@@ -111,7 +111,7 @@ public:
     bool containsParameter (const int index) const;
 
     /** If an audio plugin instance, fill the details */
-    void getPluginDescription (PluginDescription& desc);
+    void getPluginDescription (PluginDescription& desc) const;
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
@@ -192,15 +192,19 @@ public:
 
     inline bool hasMidiProgram() const { return isPositiveAndBelow (midiProgram.get(), 128); }
     inline int getMidiProgram() const { return midiProgram.get(); }
+    File getMidiProgramFile() const;
     inline void setMidiProgram (const int program)
     {
         if (program < -1 || program > 127) {
             jassertfalse; // out of range
             return;
         }
+        DBG("set program: " << program);
         midiProgram.set (program);
     }
+
     void reloadMidiProgram();
+    void saveMidiProgram() const;
 
     inline void setMidiChannels (const BigInteger& ch)
     {
@@ -247,6 +251,8 @@ public:
     /** Triggered when the bypass state changes */
     Signal<void(GraphNode*)> bypassChanged;
 
+    Signal<void()> midiProgramChanged;
+
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
@@ -273,6 +279,7 @@ private:
     Atomic<int> transposeOffset { 0 };
     MidiChannels midiChannels;
     Atomic<int> midiProgram { -1 };
+    Atomic<int> lastMidiProgram { -1 };
 
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
@@ -288,7 +295,7 @@ private:
         MidiProgramLoader (GraphNode& n) : node (n) { }
         ~MidiProgramLoader() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
-        GraphNode& node;
+        GraphNode& node;    
     } midiProgramLoader;
 
     void setParentGraph (GraphProcessor*);

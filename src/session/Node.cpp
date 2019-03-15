@@ -617,6 +617,11 @@ namespace Element {
                 obj->setMidiChannels (channels.get());
             }
 
+            if (hasProperty (Tags::midiProgram))
+            {
+                obj->setMidiProgram ((int) getProperty (Tags::midiProgram, -1));
+            }
+
             if (hasProperty (Tags::transpose))
                 obj->setTransposeOffset (getProperty (Tags::transpose));
         }
@@ -672,6 +677,8 @@ namespace Element {
                 if (state.getSize() > 0)
                     objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
             }
+
+            setProperty (Tags::midiProgram, obj->getMidiProgram());
         }
 
         for (int i = 0; i < getNumNodes(); ++i)
