@@ -218,6 +218,7 @@ namespace Element {
         
         const bool canConnectTo (const Node& o) const;
 
+        int getNumPorts() const { return getPortsValueTree().getNumChildren(); }
         void getPorts (PortArray& ports, PortType type, bool isInput) const;
         void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
         void getAudioInputs (PortArray& ports) const;

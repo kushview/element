@@ -601,7 +601,7 @@ void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
 
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
-
+    bool resetPorts = false;
     if (auto* const proc = obj->getAudioProcessor())
     {
         // try to match ports
@@ -621,16 +621,20 @@ void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
                 proc->suspendProcessing (false);
             }
             
-            node.resetPorts();
+            resetPorts = true;
         }
     }
     
     if (auto* sub = obj->processor<SubGraphProcessor>())
     {
         sub->getController().setNodeModel (node);
-        node.resetPorts();
+        resetPorts = true;
     }
+
+    if (resetPorts || node.getNumPorts() != static_cast<int> (obj->getNumPorts()))
+        node.resetPorts();
     
+    jassert (node.getNumPorts() == static_cast<int> (obj->getNumPorts()));
     node.restorePluginState();
 }
 
