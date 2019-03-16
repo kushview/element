@@ -430,6 +430,56 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
                                // the property is still relavent.
 }
 
+void GraphNode::getMidiProgramsState (String& state) const
+{
+    state = String();
+    if (midiPrograms.size() <= 0)
+        return;
+    ValueTree tree ("programs");
+    for (auto* const program : midiPrograms)
+    {
+        auto& state = program->state;
+        ValueTree data ("program");
+        data.setProperty ("program", program->program, nullptr)
+            .setProperty ("state", state.toBase64Encoding(), nullptr);
+        tree.appendChild (data, nullptr);
+    }
+
+    MemoryOutputStream mo;
+    {
+        GZIPCompressorOutputStream gzipStream (mo, 9);
+        tree.writeToStream (gzipStream);
+    }
+
+    state = mo.getMemoryBlock().toBase64Encoding();
+}
+
+void GraphNode::setMidiProgramsState (const String& state)
+{
+    midiPrograms.clearQuick (true);
+    if (state.isEmpty())
+        return;
+    MemoryBlock mb;
+    mb.fromBase64Encoding (state);
+    const ValueTree tree = (mb.getSize() > 0)
+        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+        : ValueTree();
+    
+    for (int i = 0; i < tree.getNumChildren(); ++i)
+    {
+        const auto data = tree.getChild (i);
+        std::unique_ptr<GraphNode::MidiProgram> program;
+        program.reset (new GraphNode::MidiProgram());
+        program->program = (int) data ["program"];
+        const auto state = data.getProperty("state").toString().trim();
+        if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
+        {
+            program->state.fromBase64Encoding (state);
+            midiPrograms.add (program.release());
+        }
+    }
+}
+
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     audio.clear (0, audio.getNumSamples());

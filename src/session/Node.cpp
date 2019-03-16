@@ -622,16 +622,19 @@ namespace Element {
                 obj->setMidiProgram ((int) getProperty (Tags::midiProgram, -1));
             }
 
-            if (hasProperty ("midiProgramsEnabled"))
+            if (hasProperty (Tags::midiProgramsEnabled))
             {
-                obj->setMidiProgramsEnabled ((bool) getProperty ("midiProgramsEnabled", true));
+                obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));
             }
             
-            if (hasProperty ("globalMidiPrograms"))
+            if (hasProperty (Tags::globalMidiPrograms))
             {
-                obj->setUseGlobalMidiPrograms ((bool) getProperty ("globalMidiPrograms", true));
+                obj->setUseGlobalMidiPrograms ((bool) getProperty (Tags::globalMidiPrograms, true));
             }
             
+            if (hasProperty (Tags::midiProgramsState)) {
+                obj->setMidiProgramsState (getProperty (Tags::midiProgramsState).toString().trim());
+            }
             if (hasProperty (Tags::transpose))
                 obj->setTransposeOffset (getProperty (Tags::transpose));
         }
@@ -689,6 +692,10 @@ namespace Element {
             }
 
             setProperty (Tags::midiProgram, obj->getMidiProgram());
+            setProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms());
+            setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
+            String mps; obj->getMidiProgramsState (mps);
+            setProperty (Tags::midiProgramsState, mps);
         }
 
         for (int i = 0; i < getNumNodes(); ++i)

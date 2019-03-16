@@ -210,6 +210,8 @@ public:
 
     void reloadMidiProgram();
     void saveMidiProgram();
+    void getMidiProgramsState(String&) const;
+    void setMidiProgramsState(const String&);
 
     inline void setMidiChannels (const BigInteger& ch)
     {
