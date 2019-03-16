@@ -5,7 +5,7 @@
  #define EL_URL_AUTH                    "http://local.kushview.net/edd-cp"
 #else
  #define EL_URL_HOME                    "https://kushview.net"
- #define EL_URL_AUTH                    "https://local.kushview.net/authorize"
+ #define EL_URL_AUTH                    "https://kushview.net/authorize"
 #endif
 
 #define EL_URL_HELP_HOME                "https://help.kushview.net"

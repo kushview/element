@@ -112,8 +112,7 @@ UnlockStatus::UnlockResult UnlockStatus::registerTrial (const String& email,
                                                         const String& username,
                                                         const String& password)
 {
-    URL regUrl (EL_URL_AUTH);
-    regUrl = regUrl.withParameter ("kv_action", "activate_trial")
+    URL regUrl = getServerAuthenticationURL().withParameter ("kv_action", "activate_trial")
         .withParameter ("email", email.trim())
         .withParameter ("username", username.trim())
         .withParameter ("password", password.trim())
