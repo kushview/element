@@ -64,7 +64,14 @@ void GraphNode::setGain (const float f) {
 void GraphNode::getPluginDescription (PluginDescription& desc) const
 {
     if (AudioPluginInstance* i = getAudioPluginInstance())
+    {
         i->fillInPluginDescription (desc);
+    }
+    else
+    {
+        // need to fill this in for custom nodes
+        jassertfalse;
+    }
 }
 
 void GraphNode::connectAudioTo (const GraphNode* other)
@@ -354,34 +361,36 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
 {
     const File programFile = node.getMidiProgramFile();
     const bool globalPrograms = node.useGlobalMidiPrograms();
+    const auto requestedProgram = node.getMidiProgram();
+   #if 0
+    if (node.lastMidiProgram.get() == requestedProgram)
+    {
+        DBG("[EL] same program, not loading.");
+        return;
+    }
+   #endif
+
     if (globalPrograms)
     {
-        if (! programFile.existsAsFile())
+        if (programFile.existsAsFile())
         {
-            DBG("[EL] midi program does not exist: " << programFile.getFileName());
-            return;
-        }
-
-        const auto requestedProgram = node.getMidiProgram();
-        if (node.lastMidiProgram.get() == requestedProgram)
-        {
-            DBG("[EL] same program, not loading.");
-            return;
-        }
-
-        const auto programData = Node::parse (programFile);
-        auto data = programData.getProperty(Tags::state).toString().trim();
-        if (data.isNotEmpty())
-        {
-            MemoryBlock state;
-            state.fromBase64Encoding (data);
-            if (state.getSize() > 0)
+            const auto programData = Node::parse (programFile);
+            auto data = programData.getProperty(Tags::state).toString().trim();
+            if (data.isNotEmpty())
             {
-                node.lastMidiProgram.set (requestedProgram);
-                node.setState (state.getData(), (int) state.getSize());
-                node.midiProgramChanged();
-                DBG("[EL] loaded program: " << requestedProgram);
+                MemoryBlock state;
+                state.fromBase64Encoding (data);
+                if (state.getSize() > 0)
+                {
+                    node.lastMidiProgram.set (requestedProgram);
+                    node.setState (state.getData(), (int) state.getSize());
+                    DBG("[EL] loaded program: " << requestedProgram);
+                }
             }
+        }
+        else
+        {
+            DBG("[EL] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
         }
     }
     else
@@ -389,6 +398,10 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
         AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "MIDI Program",
             "Only global MIDI programs are supported at this time.");
     }
+
+    node.midiProgramChanged(); // always notify the program # changed even if not loaded.
+                               // do this because there may not be data for the program but
+                               // the property is still relavent.
 }
 
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)

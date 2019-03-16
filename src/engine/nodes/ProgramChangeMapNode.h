@@ -22,6 +22,21 @@ public:
     ProgramChangeMapNode();
     virtual ~ProgramChangeMapNode();
 
+    void getPluginDescription (PluginDescription& desc) const override
+    {
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
+        desc.name               = "MIDI Program Map";
+        desc.descriptiveName    = "Filter MIDI Program Changes";
+        desc.numInputChannels   = 0;
+        desc.numOutputChannels  = 0;
+        desc.hasSharedContainer = false;
+        desc.isInstrument       = false;
+        desc.manufacturerName   = "Element";
+        desc.pluginFormatName   = "Element";
+        desc.version            = "1.0.0";
+        desc.uid                = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
+    }
+
     void clear();
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void sendProgramChange (int program, int channel);

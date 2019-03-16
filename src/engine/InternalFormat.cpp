@@ -243,6 +243,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     {
         auto* const desc = ds.add (new PluginDescription());
         desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER;
+        desc->uid                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
         desc->name               = "MIDI Channel Splitter";
         desc->descriptiveName    = "MIDI Channel Splitter";
         desc->numInputChannels   = 0;
@@ -275,6 +276,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     {
         auto* const desc = ds.add (new PluginDescription());
         desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
+        desc->uid                = EL_INTERNAL_UID_AUDIO_ROUTER;
         desc->name               = "Audio Router";
         desc->descriptiveName    = "An Audio Patch Grid";
         desc->numInputChannels   = 4;
@@ -294,6 +296,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     {
         auto* const desc = ds.add (new PluginDescription());
         desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
+        desc->uid                = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
         desc->name               = "MIDI Program Map";
         desc->descriptiveName    = "Filter MIDI Program Changes";
         desc->numInputChannels   = 0;

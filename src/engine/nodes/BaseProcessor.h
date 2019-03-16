@@ -3,6 +3,7 @@
 #include "JuceHeader.h"
 
 #define EL_INTERNAL_FORMAT_NAME                 "Element"
+
 #define EL_INTERNAL_ID_AUDIO_FILE_PLAYER        "element.audioFilePlayer"
 #define EL_INTERNAL_ID_AUDIO_MIXER              "element.audioMixer"
 #define EL_INTERNAL_ID_AUDIO_ROUTER             "element.audioRouter"
@@ -17,6 +18,21 @@
 #define EL_INTERNAL_ID_PLACEHOLDER              "element.placeholder"
 #define EL_INTERNAL_ID_REVERB                   "element.reverb"
 #define EL_INTERNAL_ID_WET_DRY                  "element.wetDry"
+
+#define EL_INTERNAL_UID_AUDIO_FILE_PLAYER        1000
+#define EL_INTERNAL_UID_AUDIO_MIXER              1001
+#define EL_INTERNAL_UID_AUDIO_ROUTER             1002
+#define EL_INTERNAL_UID_COMB_FILTER              1003
+#define EL_INTERNAL_UID_CHANNELIZE               1004
+#define EL_INTERNAL_UID_GRAPH                    1005
+#define EL_INTERNAL_UID_MEDIA_PLAYER             1006
+#define EL_INTERNAL_UID_MIDI_CHANNEL_MAP         1007
+#define EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER    1008
+#define EL_INTERNAL_UID_MIDI_PROGRAM_MAP         1009
+#define EL_INTERNAL_UID_MIDI_SEQUENCER           1010
+#define EL_INTERNAL_UID_PLACEHOLDER              1011
+#define EL_INTERNAL_UID_REVERB                   1012
+#define EL_INTERNAL_UID_WET_DRY                  1013
 
 namespace Element
 {

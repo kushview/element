@@ -110,8 +110,8 @@ public:
      */
     bool containsParameter (const int index) const;
 
-    /** If an audio plugin instance, fill the details */
-    void getPluginDescription (PluginDescription& desc) const;
+    /** Fill the details... */
+    virtual void getPluginDescription (PluginDescription& desc) const;
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
@@ -284,9 +284,9 @@ private:
     Atomic<int> transposeOffset { 0 };
     MidiChannels midiChannels;
 
-    Atomic<int> midiProgram { -1 };
+    Atomic<int> midiProgram { 0 };
     Atomic<int> lastMidiProgram { -1 };
-    Atomic<int> midiProgramsEnabled { 1 };
+    Atomic<int> midiProgramsEnabled { 0 };
     Atomic<int> globalMidiPrograms { 1 };
 
     CriticalSection propertyLock;
@@ -305,6 +305,10 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& node;    
     } midiProgramLoader;
+
+    struct MidiProgram {
+        String state;
+    };
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
