@@ -792,7 +792,8 @@ namespace Element {
             forEach (tree.getChild (i), handler);
     }
 
-bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty ("globalMidiPrograms", true); }
+// default value here must match that as defined in GraphNode.h
+bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty (Tags::globalMidiPrograms, true); }
 void Node::setUseGlobalMidiPrograms (bool useGlobal)
 {
     if (GraphNodePtr obj = getGraphNode())
@@ -800,11 +801,12 @@ void Node::setUseGlobalMidiPrograms (bool useGlobal)
         if (obj->useGlobalMidiPrograms() == useGlobal)
             return;
         obj->setUseGlobalMidiPrograms (useGlobal);
-        setProperty ("globalMidiPrograms", obj->useGlobalMidiPrograms());
+        setProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms());
     }
 }
 
-bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty ("midiProgramsEnabled", true); }
+// default value here must match that as defined in GraphNode.h
+bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty (Tags::midiProgramsEnabled, false); }
 void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 {
     if (GraphNodePtr obj = getGraphNode())
@@ -812,7 +814,7 @@ void Node::setMidiProgramsEnabled (bool useMidiPrograms)
         if (obj->areMidiProgramsEnabled() == useMidiPrograms)
             return;
         obj->setMidiProgramsEnabled (useMidiPrograms);
-        setProperty ("midiProgramsEnabled", obj->areMidiProgramsEnabled());
+        setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
     }
 }
 
@@ -827,4 +829,5 @@ void Node::setMidiProgram (int program)
         setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
     }
 }
+
 }

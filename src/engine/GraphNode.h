@@ -209,7 +209,7 @@ public:
     }
 
     void reloadMidiProgram();
-    void saveMidiProgram() const;
+    void saveMidiProgram();
 
     inline void setMidiChannels (const BigInteger& ch)
     {
@@ -306,9 +306,13 @@ private:
         GraphNode& node;    
     } midiProgramLoader;
 
-    struct MidiProgram {
-        String state;
+    struct MidiProgram
+    {
+        int program;
+        MemoryBlock state;
     };
+    OwnedArray<MidiProgram> midiPrograms;
+    MidiProgram* getMidiProgram (int);
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);

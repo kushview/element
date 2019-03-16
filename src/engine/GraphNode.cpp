@@ -352,9 +352,28 @@ File GraphNode::getMidiProgramFile() const
     return file;
 }
 
-void GraphNode::saveMidiProgram() const
+void GraphNode::saveMidiProgram()
 {
-    jassertfalse; // need access to Node model to do this.
+    int progamNumber = midiProgram.get();
+    if (! isPositiveAndBelow (progamNumber, 128))
+        return;
+    if (auto* const program = getMidiProgram (progamNumber))
+    {
+        program->state = MemoryBlock();
+        getState (program->state);
+    }
+}
+
+GraphNode::MidiProgram* GraphNode::getMidiProgram (int program)
+{
+    if (! isPositiveAndBelow (program, 128))
+        return nullptr;
+    for (auto* const p : midiPrograms)
+        if (p->program == program)
+            return p;
+    auto* const ret = midiPrograms.add (new GraphNode::MidiProgram ());
+    ret->program = program;
+    return ret;
 }
 
 void GraphNode::MidiProgramLoader::handleAsyncUpdate()
@@ -395,8 +414,15 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
     }
     else
     {
-        AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "MIDI Program",
-            "Only global MIDI programs are supported at this time.");
+        if (auto* const program = node.getMidiProgram (requestedProgram))
+        {
+            node.setState (program->state.getData(), 
+                           static_cast<int> (program->state.getSize()));
+        }
+        else
+        {
+            DBG("[EL] program has no data");
+        }
     }
 
     node.midiProgramChanged(); // always notify the program # changed even if not loaded.

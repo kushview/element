@@ -66,6 +66,8 @@ namespace Tags
     const Identifier midiChannel        = "midiChannel";
     const Identifier midiChannels       = "midiChannels";
     const Identifier midiProgram        = "midiProgram";
+    const Identifier midiProgramsEnabled = "midiProgramsEnabled";
+    const Identifier globalMidiPrograms = "globalMidiPrograms";
     const Identifier renderMode         = "renderMode";
 
     const Identifier vertical           = "vertical";

@@ -83,10 +83,17 @@ namespace Element {
         {
             if (GraphNodePtr ptr = node.getGraphNode())
             {
-                if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
+                if (node.useGlobalMidiPrograms())
                 {
-                    node.savePluginState();
-                    node.writeToFile (ptr->getMidiProgramFile());
+                    if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
+                    {
+                        node.savePluginState();
+                        node.writeToFile (ptr->getMidiProgramFile());
+                    }
+                }
+                else
+                {
+                    ptr->saveMidiProgram();
                 }
             }
         };
