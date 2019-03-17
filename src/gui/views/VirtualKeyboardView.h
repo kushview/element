@@ -9,8 +9,7 @@ namespace Element
 class VirtualKeyboardComponent : public MidiKeyboardComponent 
 {
 public:
-    VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o)
-        : MidiKeyboardComponent (s, o) { }
+    VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o);
     ~VirtualKeyboardComponent() { }
 
     void setKeypressOctaveOffset (int offset);
@@ -30,6 +29,8 @@ public:
     
     void didBecomeActive() override;
     void stabilizeContent() override { didBecomeActive(); resized(); }
+
+    void paint (Graphics&) override;
     void resized() override;
     bool keyPressed (const KeyPress&, Component*) override;
     bool keyStateChanged (bool) override;
@@ -39,6 +40,9 @@ private:
     MidiKeyboardState internalState;
     int keyWidth = 16;
     
+    Slider midiChannel;
+    Slider midiProgram;
+
     void setupKeyboard (VirtualKeyboardComponent&);
 };
 
