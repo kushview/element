@@ -4,13 +4,13 @@
          beatsPerBar="4" beatDivisor="2">
   <graphs active="0">
     <node type="graph" name="Graph 1" bypass="0" persistent="1" renderMode="single"
-          program="0" uuid="d7c9eb442ed04ad4aff636cfd83910d0" midiProgram="-1">
+          program="0" uuid="d7c9eb442ed04ad4aff636cfd83910d0" midiProgram="0">
       <nodes>
         <node id="3" type="plugin" format="Internal" identifier="midi.input"
               name="MIDI In" relativeX="0.13198757763975155211" relativeY="0.16265060240963855054"
               numAudioIns="0" numAudioOuts="0" bypass="0" program="0" persistent="1"
               renderMode="single" uuid="86657b10367546508a7b1b87d11a7428" enabled="1"
-              midiProgram="-1">
+              midiProgram="0">
           <nodes/>
           <ports>
             <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_out_0"
@@ -21,7 +21,7 @@
               name="MIDI Out" relativeX="0.75000000000000000000" relativeY="0.75000000000000000000"
               numAudioIns="0" numAudioOuts="0" bypass="0" program="0" persistent="1"
               renderMode="single" uuid="d15ee96886eb4ceb8322dda44bf1355f" enabled="1"
-              midiProgram="-1">
+              midiProgram="0">
           <nodes/>
           <ports>
             <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_in_0"
@@ -96,7 +96,7 @@
         <node id="3" type="plugin" format="Internal" identifier="midi.input"
               name="MIDI In" relativeX="0.75" relativeY="0.25" numAudioIns="0"
               numAudioOuts="0" uuid="15dffbcd9f9f4472b08ae0c0f67a591f" bypass="0"
-              persistent="1" renderMode="single" enabled="1" program="0" midiProgram="-1">
+              persistent="1" renderMode="single" enabled="1" program="0" midiProgram="0">
           <nodes/>
           <ports>
             <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_out_0"
@@ -106,7 +106,7 @@
         <node id="4" type="plugin" format="Internal" identifier="midi.output"
               name="MIDI Out" relativeX="0.75" relativeY="0.75" numAudioIns="0"
               numAudioOuts="0" uuid="a693cb125f7240a297a791a2e873d90a" bypass="0"
-              persistent="1" renderMode="single" enabled="1" program="0" midiProgram="-1">
+              persistent="1" renderMode="single" enabled="1" program="0" midiProgram="0">
           <nodes/>
           <ports>
             <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_in_0"
