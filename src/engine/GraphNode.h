@@ -150,6 +150,7 @@ public:
     bool isAudioInputNode() const;
     bool isAudioOutputNode() const;
     bool isMidiIONode() const;
+    bool isMidiDeviceNode() const;
 
     /* returns the parent graph. If one has not been set, then
        this will return nullptr */
@@ -168,6 +169,7 @@ public:
     /** Returns true if this node is enabled */
     inline bool isEnabled()  const { return enabled.get() == 1; }
 
+    //=========================================================================
     inline void setKeyRange (const int low, const int high)
     {
         jassert (low <= high);
@@ -180,6 +182,7 @@ public:
 
     inline Range<int> getKeyRange() const { return Range<int> { keyRangeLow.get(), keyRangeHigh.get() }; }
 
+    //=========================================================================
     inline void setTransposeOffset (const int value)
     {
         jassert (value >= -24 && value <= 24);
@@ -190,29 +193,46 @@ public:
 
     const CriticalSection& getPropertyLock() const { return propertyLock; }
 
+    //=========================================================================
+    /** Returns the file used for the current global MIDI Program */
     File getMidiProgramFile() const;
-    inline bool hasMidiProgram() const                 { return isPositiveAndBelow (midiProgram.get(), 128); }
+
+    /** Returns true if this node should use global MIDI programs */
     inline bool useGlobalMidiPrograms() const          { return globalMidiPrograms.get() == 1; }
+
+    /** Change usage of global midi programs to on or off */
     inline void setUseGlobalMidiPrograms (bool use)    { globalMidiPrograms.set (use ? 1 : 0); }
+
+    /** True if MIDI programs should be loaded when Program change messages
+        are received */
     inline bool areMidiProgramsEnabled() const         { return midiProgramsEnabled.get() == 1; }
+
+    /** Enable or disable changing midi programs */
     inline void setMidiProgramsEnabled (bool enabled)  { midiProgramsEnabled.set (enabled ? 1 : 0); }
+
+    /** Returns the active midi program */
     inline int getMidiProgram() const                  { return midiProgram.get(); }
-    inline void setMidiProgram (const int program)
-    {
-        if (program < -1 || program > 127)
-        {
-            jassertfalse; // out of range
-            return;
-        }
-        
-        midiProgram.set (program);
-    }
 
+    /** Sets the MIDI program, note that this won't load it */
+    void setMidiProgram (const int program);
+
+    /** Reloads the active MIDI program */
     void reloadMidiProgram();
-    void saveMidiProgram();
-    void getMidiProgramsState(String&) const;
-    void setMidiProgramsState(const String&);
 
+    /** Save the current MIDI program */
+    void saveMidiProgram();
+
+    /** Get all MIDI program states stored directly on the node */
+    void getMidiProgramsState (String& state) const;
+
+    /** Load all MIDI program states to be stored on the node.
+        
+        @param state    The state to set. If this is empty, the midi programs
+                        on the node will be cleared.
+     */
+    void setMidiProgramsState (const String& state);
+
+    //=========================================================================
     inline void setMidiChannels (const BigInteger& ch)
     {
         ScopedLock sl (propertyLock);
@@ -221,7 +241,7 @@ public:
 
     inline const MidiChannels& getMidiChannels() const { return midiChannels; }
 
-
+    //=========================================================================
     inline virtual int getNumPrograms() const
     { 
         if (auto* const proc = getAudioProcessor())
@@ -249,9 +269,11 @@ public:
             return proc->setCurrentProgram (index);
     }
 
+    //=========================================================================
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 
+    //=========================================================================
     /** Triggered when the enabled state changes */
     Signal<void(GraphNode*)> enablementChanged;
 

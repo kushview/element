@@ -2,12 +2,14 @@
 #include "ElementApp.h"
 
 #include "engine/nodes/AudioProcessorNode.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
+#include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
+
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
-#include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/nodes/SubGraphProcessor.h"
 
 #include "session/Node.h"
 
@@ -129,6 +131,11 @@ bool GraphNode::isMidiIONode() const
     if (IOP* iop = dynamic_cast<IOP*> (getAudioProcessor()))
         return iop->getType() == IOP::midiInputNode || iop->getType() == IOP::midiOutputNode;
     return false;
+}
+
+bool GraphNode::isMidiDeviceNode() const
+{
+    return nullptr != dynamic_cast<MidiDeviceProcessor*> (getAudioProcessor());
 }
 
 int GraphNode::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
@@ -430,6 +437,17 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
                                // the property is still relavent.
 }
 
+void GraphNode::setMidiProgram (const int program)
+{
+    if (program < 0 || program > 127)
+    {
+        jassertfalse; // out of range
+        return;
+    }
+    
+    midiProgram.set (program);
+}
+
 void GraphNode::getMidiProgramsState (String& state) const
 {
     state = String();
@@ -440,8 +458,8 @@ void GraphNode::getMidiProgramsState (String& state) const
     {
         auto& state = program->state;
         ValueTree data ("program");
-        data.setProperty ("program", program->program, nullptr)
-            .setProperty ("state", state.toBase64Encoding(), nullptr);
+        data.setProperty (Tags::program, program->program, nullptr)
+            .setProperty (Tags::state, state.toBase64Encoding(), nullptr);
         tree.appendChild (data, nullptr);
     }
 
@@ -470,8 +488,8 @@ void GraphNode::setMidiProgramsState (const String& state)
         const auto data = tree.getChild (i);
         std::unique_ptr<GraphNode::MidiProgram> program;
         program.reset (new GraphNode::MidiProgram());
-        program->program = (int) data ["program"];
-        const auto state = data.getProperty("state").toString().trim();
+        program->program = (int) data [Tags::program];
+        const auto state = data.getProperty (Tags::state).toString().trim();
         if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
         {
             program->state.fromBase64Encoding (state);
@@ -496,8 +514,11 @@ void GraphNode::resetPorts()
     metadata.removeChild (nodeList, nullptr);
     portList.removeAllChildren (nullptr);
     
-    if (!isMidiIONode() && !isAudioIONode() && ports.size (PortType::Midi, true) <= 0)
+    if (ports.size (PortType::Midi, true) <= 0 &&
+        !isMidiIONode() && !isAudioIONode() && !isMidiDeviceNode())
+    {
         ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
+    }
 
     for (int i = 0; i < ports.size(); ++i)
     {
