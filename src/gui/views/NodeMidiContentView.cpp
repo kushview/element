@@ -32,7 +32,7 @@ namespace Element {
         transposeSlider.setValue (0);
         transposeSlider.setSliderStyle (Slider::LinearHorizontal);
         transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
-
+        
         addAndMakeVisible (keyLowLabel);
         keyLowLabel.setText ("Key Start", dontSendNotification);
         keyLowLabel.setFont (font);
@@ -181,6 +181,9 @@ namespace Element {
     void NodeMidiContentView::resized()
     {
         auto r (getLocalBounds().reduced (2));
+        const auto estimatedH = 4 + (7 * 26) + 2 + 2;
+        r = r.withHeight (jmax (estimatedH, r.getHeight()));
+
         r.removeFromTop (4);
         r.removeFromRight (4);
         layoutComponent (r, nameLabel, nameEditor);
