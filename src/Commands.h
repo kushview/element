@@ -67,6 +67,7 @@ namespace Commands {
         importGraph,
 
         panic,
+        importSession,
 
         checkNewerVersion      = 0x0500,
 

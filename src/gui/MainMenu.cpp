@@ -229,6 +229,9 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
     addRecentFiles (menu);
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::importSession, "Import from Session...");
+    menu.addSeparator();    
     menu.addCommandItem (&cmd, Commands::graphSave, "Save Graph");
     menu.addCommandItem (&cmd, Commands::graphSaveAs, "Save Graph As...");
 
@@ -331,11 +334,11 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::sessionSave,   "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
     
-    #ifndef EL_FREE
+   #ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-    #endif
+   #endif
 }
     
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)

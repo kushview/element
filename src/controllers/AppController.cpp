@@ -368,7 +368,8 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::graphNew,
         Commands::graphOpen,
         Commands::graphSave,
-        Commands::graphSaveAs
+        Commands::graphSaveAs,
+        Commands::importSession
        #endif
     });
     cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
@@ -549,7 +550,16 @@ bool AppController::perform (const InvocationInfo& info)
         case Commands::graphSaveAs: 
             findChild<GraphController>()->saveGraph (true);
             break;
-        
+        case Commands::importSession:
+        {
+            FileChooser chooser ("Import Session Graph", lastSavedFile, "*.els", true, false);
+            if (chooser.browseForFileToOpen())
+            {
+                findChild<GraphController>()->openGraph (chooser.getResult());
+                recentFiles.addFile (chooser.getResult());
+            }
+        } break;
+
         default: 
             res = false; 
             break;

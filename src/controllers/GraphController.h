@@ -26,11 +26,12 @@ public:
     void openGraph (const File& file);
     void newGraph();
     void saveGraph (const bool saveAs);
-
+    void loadGraph (const Node& graph);
     Signal<void()> graphChanged;
 
 private:
     GraphDocument document;
+    std::unique_ptr<Component> wizard;
     void refreshOtherControllers();
 };
 

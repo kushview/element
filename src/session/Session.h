@@ -127,6 +127,7 @@ namespace Element {
         inline ValueTree getControllerMapsValueTree()           const { return objectData.getChildWithName(Tags::maps); }
 
         friend class SessionController;
+        friend class SessionImportWizard;
         friend struct ScopedFrozenLock;
         mutable bool freezeChangeNotification = false;
         void notifyChanged();
