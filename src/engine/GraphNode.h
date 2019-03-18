@@ -10,7 +10,6 @@ class MidiPipe;
 class GraphNode : public ReferenceCountedObject
 {
 public:
-
     /** Special parameter indexes when mapping universal node settings */
     enum SpecialParameter
     {
@@ -161,8 +160,11 @@ public:
     void setOutputRMS (int chan, float val);
     float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
 
+    //=========================================================================
+    /** Connect this node's output audio to another node's input audio */
     void connectAudioTo (const GraphNode* other);
 
+    //=========================================================================
     /** Enable or disable this node */
     void setEnabled (const bool shouldBeEnabled);
 
