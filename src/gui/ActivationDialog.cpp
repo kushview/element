@@ -661,8 +661,6 @@ void ActivationComponent::setForTrial (bool setupForTrial)
 
 void ActivationComponent::setForManagement (bool setupManagement)
 {
-    if (isForManagement == setupManagement)
-        return;
     isForManagement = setupManagement;
     if (isForManagement)
     {
