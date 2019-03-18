@@ -39,6 +39,9 @@ public:
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
 
+    virtual void getState (String&) {}
+    virtual void setState (const String&) {}
+
     /** Call this to disable the entire view if the app isn't unlocked */
     void disableIfNotUnlocked();
 

@@ -376,7 +376,7 @@ namespace Element {
         ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-
+        ValueTree getUIValueTree()    const { return objectData.getChildWithName (Tags::ui); }
         const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
         const bool operator!=(const Node& o) const { return this->objectData != o.objectData; }
 

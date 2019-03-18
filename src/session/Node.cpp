@@ -313,6 +313,7 @@ namespace Element {
        #endif
         objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
         objectData.getOrCreateChildWithName (Tags::ports, nullptr);
+        objectData.getOrCreateChildWithName (Tags::ui, nullptr);
     }
 
     GraphNode* Node::getGraphNode() const

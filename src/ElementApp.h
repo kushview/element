@@ -85,6 +85,7 @@ namespace Tags
     const Identifier pluginName         = "pluginName";
     const Identifier pluginIdentifierString = "pluginIdentifierString";
     const Identifier uuid               = "uuid";
+    const Identifier ui                 = "ui";
     const Identifier parameter          = "parameter";
     const Identifier offline            = "offline";
 

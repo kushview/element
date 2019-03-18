@@ -102,6 +102,7 @@ static String noteValueToString (double value)
 
 NodeEditorContentView::NodeEditorContentView()
 {
+    setName ("NodeEditorContentView");
     addAndMakeVisible (nodesCombo);
     nodesCombo.addListener (this);
 
@@ -145,6 +146,54 @@ NodeEditorContentView::~NodeEditorContentView()
     sessionLoadedConnection.disconnect();
 }
 
+void NodeEditorContentView::getState (String& state)
+{
+    ValueTree tree ("state");
+    tree.setProperty (Tags::node, node.getUuidString(), nullptr)
+        .setProperty ("sticky", sticky, nullptr);
+
+    MemoryOutputStream mo;
+    {
+        GZIPCompressorOutputStream gzipStream (mo, 9);
+        tree.writeToStream (gzipStream);
+    }
+
+    state = mo.getMemoryBlock().toBase64Encoding();
+}
+
+void NodeEditorContentView::setState (const String& state)
+{
+    MemoryBlock mb;
+    mb.fromBase64Encoding (state);
+    const ValueTree tree = (mb.getSize() > 0)
+        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+        : ValueTree();
+    if (! tree.isValid())
+        return;
+
+    DBG(tree.toXmlString());
+    
+    setSticky ((bool) tree.getProperty ("sticky", sticky));
+    
+    auto session = ViewHelpers::getSession (this);
+    if (session == nullptr)
+    {
+        jassertfalse;
+        return;
+    }
+
+    const auto nodeStr  = tree[Tags::node].toString();
+    Node newNode;
+    if (nodeStr.isNotEmpty())
+    {
+        const Uuid gid (nodeStr);
+        newNode = session->findNodeById (gid);
+    }
+
+    if (newNode.isValid())
+        setNode (newNode);
+}
+    
 void NodeEditorContentView::nodeMenuCallback (int result, NodeEditorContentView* view)
 {
     if (result == 1)
