@@ -673,7 +673,7 @@ public:
         }
 
         int w = 120;
-        int h = 40;
+        int h = 46;
 
         const int maxPorts = jmax (numIns, numOuts) + 1;
         
@@ -687,8 +687,10 @@ public:
             int endcap = collapsed ? 9 : -5;
             h = jmax (h, int(maxPorts * pinSize) + int(maxPorts * jmax(int(pinSize * scale), 2)) + endcap);
         }
-
-        setSize (w, h);
+        
+        int textWidth = font.getStringWidth (node.getName());
+        textWidth += (vertical) ? 20 : 36;
+        setSize (jmax (w, textWidth), h);
         setName (node.getName());
 
         if (doPosition)
