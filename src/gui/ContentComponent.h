@@ -129,11 +129,16 @@ public:
     virtual void setShowAccessoryView (const bool show);
     virtual bool showAccessoryView() const;
 
+    //=========================================================================
     virtual String getWorkspaceName() const { return String(); }
     virtual WorkspaceState getWorkspaceState() { return { }; }
     virtual void applyWorkspaceState (const WorkspaceState&) { }
     virtual void addWorkspaceItemsToMenu (PopupMenu&) {}
     virtual void handleWorkspaceMenuResult (int) {}
+
+    //=========================================================================
+    virtual void getSessionState (String&) { }
+    virtual void applySessionState (const String&) { }
 
     /** @internal */
     void paint (Graphics &g) override;
