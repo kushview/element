@@ -45,8 +45,6 @@ void GraphController::openDefaultGraph()
 
 void GraphController::openGraph (const File& file)
 {
-    
-
     if (file.hasFileExtension ("els"))
     {
         if (wizard != nullptr)

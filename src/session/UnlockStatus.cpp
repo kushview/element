@@ -67,10 +67,12 @@ RSAKey UnlockStatus::getPublicKey()
 
 void UnlockStatus::saveState (const String& data)
 {
+   #if defined (EL_PRO) || defined (EL_SOLO)
     if (auto* const userProps = settings.getUserSettings())
         userProps->setValue (EL_LICENSE_SETTINGS_KEY, data);
     if (data.isEmpty()) // clear out our custom flags if no state
         this->props = ValueTree();
+   #endif
 }
 
 static URL elGetProUpgradeUrl()
@@ -233,13 +235,6 @@ void UnlockStatus::timerCallback()
 
 void UnlockStatus::loadProps()
 {
-   #if defined (EL_FREE)
-    props.removeProperty (proKey, nullptr);
-    props.removeProperty (trialKey, nullptr);
-    props.removeProperty (soloKey, nullptr);
-    return;
-   #endif
-
     props = ValueTree (propsKey);
     const var proPID (EL_PRO_PRODUCT_ID_INT);
     const var zero (0); // pro can also have a zero price id
