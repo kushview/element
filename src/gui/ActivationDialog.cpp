@@ -677,10 +677,7 @@ void ActivationComponent::setForManagement (bool setupManagement)
         licenseKey->setEnabled (false);
         licenseKey->setVisible (true);
         deactivateOthers->setVisible (false);
-        if (isForTrial)
-        {
-            progressBar.setVisible (false);
-        }
+        progressBar.setVisible (false);
         addAndMakeVisible (syncButton.get());
         activateButton->setButtonText ("Deactivate");
         quitButton->setButtonText ("Clear");
