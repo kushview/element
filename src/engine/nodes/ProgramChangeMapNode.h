@@ -81,7 +81,7 @@ public:
         {
             ScopedLock sl (lock);
             for (const auto* const entry : entries)
-                programMap[entry->in] = entry->out;
+                programMap [entry->in] = entry->out;
         }
 
         sendChangeMessage();
@@ -100,8 +100,11 @@ public:
         }
 
         MemoryOutputStream stream (block, false);
-        GZIPCompressorOutputStream gzip (stream);
-        tree.writeToStream (gzip);
+
+        {
+            GZIPCompressorOutputStream gzip (stream);
+            tree.writeToStream (gzip);
+        }
     }
 
     void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
