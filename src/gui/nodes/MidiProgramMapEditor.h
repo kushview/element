@@ -5,12 +5,12 @@
 
 namespace Element {
 
-class ProgramChangeMapEditor : public NodeEditorComponent,
+class MidiProgramMapEditor : public NodeEditorComponent,
                                public ChangeListener
 {
 public:
-    ProgramChangeMapEditor (const Node& node);
-    virtual ~ProgramChangeMapEditor();
+    MidiProgramMapEditor (const Node& node);
+    virtual ~MidiProgramMapEditor();
 
     void paint (Graphics&) override;
     void resized() override;

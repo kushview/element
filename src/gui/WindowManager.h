@@ -13,7 +13,7 @@
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
-#include "gui/nodes/ProgramChangeMapEditor.h"
+#include "gui/nodes/MidiProgramMapEditor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -155,7 +155,7 @@ public:
     {
         if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
-            return createPluginWindowFor (node, new ProgramChangeMapEditor (node));
+            return createPluginWindowFor (node, new MidiProgramMapEditor (node));
         }
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {

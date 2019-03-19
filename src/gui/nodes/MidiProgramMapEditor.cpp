@@ -1,16 +1,16 @@
 #include "engine/nodes/MidiProgramMapNode.h"
-#include "gui/nodes/ProgramChangeMapEditor.h"
+#include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {
 
-typedef ProgramChangeMapEditor PGCME;
+typedef MidiProgramMapEditor PGCME;
 typedef ReferenceCountedObjectPtr<MidiProgramMapNode> MidiProgramMapNodePtr;
 
 class ProgramNameLabel : public Label
 {
 public:
-    ProgramNameLabel (ProgramChangeMapEditor& e)
+    ProgramNameLabel (MidiProgramMapEditor& e)
         : editor (e)
     {
         setEditable (false, true);
@@ -44,14 +44,14 @@ protected:
     }
 
 private:
-    ProgramChangeMapEditor& editor;
+    MidiProgramMapEditor& editor;
     int row = -1;
 };
 
 class ProgramNumberLabel : public Label
 {
 public:
-    ProgramNumberLabel (ProgramChangeMapEditor& e, bool input)
+    ProgramNumberLabel (MidiProgramMapEditor& e, bool input)
         : editor(e), isInput (input)
     { 
         setEditable (false, true);
@@ -98,7 +98,7 @@ protected:
     }
 
 private:
-    ProgramChangeMapEditor& editor;
+    MidiProgramMapEditor& editor;
     bool isInput;
     int row = -1;
 };
@@ -106,7 +106,7 @@ private:
 class PGCME::TableModel : public TableListBoxModel
 {
 public:
-    ProgramChangeMapEditor& editor;
+    MidiProgramMapEditor& editor;
     enum ColumnId
     {
         Name = 1,
@@ -114,7 +114,7 @@ public:
         OutProgram
     };
 
-    TableModel (ProgramChangeMapEditor& e) : editor (e) { }
+    TableModel (MidiProgramMapEditor& e) : editor (e) { }
     ~TableModel() { }
 
     int getNumRows() override { return editor.getNumPrograms(); }
@@ -196,7 +196,7 @@ public:
    #endif
 };
 
-ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
+MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     addAndMakeVisible (table);
@@ -216,16 +216,16 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
 
     addAndMakeVisible (addButton);
     addButton.setButtonText ("+");
-    addButton.onClick = std::bind (&ProgramChangeMapEditor::addProgram, this);
+    addButton.onClick = std::bind (&MidiProgramMapEditor::addProgram, this);
     addAndMakeVisible (delButton);
     delButton.setButtonText ("-");
-    delButton.onClick = std::bind (&ProgramChangeMapEditor::removeSelectedProgram, this);
+    delButton.onClick = std::bind (&MidiProgramMapEditor::removeSelectedProgram, this);
 
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         setSize (node->getWidth(), node->getHeight());
         lastProgramChangeConnection = node->lastProgramChanged.connect (
-            std::bind (&ProgramChangeMapEditor::selectLastProgram, this));
+            std::bind (&MidiProgramMapEditor::selectLastProgram, this));
         node->addChangeListener (this);
     }
     else
@@ -234,7 +234,7 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
     }
 }
 
-ProgramChangeMapEditor::~ProgramChangeMapEditor()
+MidiProgramMapEditor::~MidiProgramMapEditor()
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         node->removeChangeListener (this);
@@ -245,7 +245,7 @@ ProgramChangeMapEditor::~ProgramChangeMapEditor()
     model.reset();
 }
 
-bool ProgramChangeMapEditor::keyPressed (const KeyPress& press)
+bool MidiProgramMapEditor::keyPressed (const KeyPress& press)
 {
     bool handled = true;
 
@@ -263,7 +263,7 @@ bool ProgramChangeMapEditor::keyPressed (const KeyPress& press)
     return handled;
 }
 
-void ProgramChangeMapEditor::selectRow (int row)
+void MidiProgramMapEditor::selectRow (int row)
 {
     table.selectRow (row, false, true);
 }
@@ -292,14 +292,14 @@ static int nextBestProgram (const MidiProgramMapNode& node)
     return -1;
 }
 
-MidiProgramMapNode::ProgramEntry ProgramChangeMapEditor::getProgram (int index) const
+MidiProgramMapNode::ProgramEntry MidiProgramMapEditor::getProgram (int index) const
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         return node->getProgramEntry (index);
     return {};
 }
 
-void ProgramChangeMapEditor::setProgram (int index, MidiProgramMapNode::ProgramEntry entry)
+void MidiProgramMapEditor::setProgram (int index, MidiProgramMapNode::ProgramEntry entry)
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
@@ -308,7 +308,7 @@ void ProgramChangeMapEditor::setProgram (int index, MidiProgramMapNode::ProgramE
     }
 }
 
-void ProgramChangeMapEditor::sendProgram (int index)
+void MidiProgramMapEditor::sendProgram (int index)
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
@@ -317,7 +317,7 @@ void ProgramChangeMapEditor::sendProgram (int index)
     }
 }
 
-void ProgramChangeMapEditor::addProgram()
+void MidiProgramMapEditor::addProgram()
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
@@ -335,14 +335,14 @@ void ProgramChangeMapEditor::addProgram()
     }
 }
 
-int ProgramChangeMapEditor::getNumPrograms() const
+int MidiProgramMapEditor::getNumPrograms() const
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         return node->getNumProgramEntries();
     return 0;
 }
 
-void ProgramChangeMapEditor::removeSelectedProgram()
+void MidiProgramMapEditor::removeSelectedProgram()
 {
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {    
@@ -354,12 +354,12 @@ void ProgramChangeMapEditor::removeSelectedProgram()
     }
 }
 
-void ProgramChangeMapEditor::paint (Graphics& g) 
+void MidiProgramMapEditor::paint (Graphics& g) 
 {
     
 }
 
-void ProgramChangeMapEditor::resized()
+void MidiProgramMapEditor::resized()
 {
     auto r = getLocalBounds();
     r.removeFromBottom (2);
@@ -381,7 +381,7 @@ void ProgramChangeMapEditor::resized()
             node->setSize (getWidth(), getHeight());
 }
 
-void ProgramChangeMapEditor::setStoreSize (const bool storeSize)
+void MidiProgramMapEditor::setStoreSize (const bool storeSize)
 {
     if (storeSize == storeSizeInNode)
         return;
@@ -391,7 +391,7 @@ void ProgramChangeMapEditor::setStoreSize (const bool storeSize)
             node->setSize (getWidth(), getHeight());
 }
 
-void ProgramChangeMapEditor::selectLastProgram()
+void MidiProgramMapEditor::selectLastProgram()
 {
     MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>();
     if (! node) return;

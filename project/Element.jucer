@@ -187,10 +187,10 @@
                 file="../src/gui/nodes/NodeEditorComponent.cpp"/>
           <FILE id="IPmPZF" name="NodeEditorComponent.h" compile="0" resource="0"
                 file="../src/gui/nodes/NodeEditorComponent.h"/>
-          <FILE id="LhlksD" name="ProgramChangeMapEditor.cpp" compile="1" resource="0"
-                file="../src/gui/nodes/ProgramChangeMapEditor.cpp"/>
-          <FILE id="C08nJg" name="ProgramChangeMapEditor.h" compile="0" resource="0"
-                file="../src/gui/nodes/ProgramChangeMapEditor.h"/>
+          <FILE id="LhlksD" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
+                file="../src/gui/nodes/MidiProgramMapEditor.cpp"/>
+          <FILE id="C08nJg" name="MidiProgramMapEditor.h" compile="0" resource="0"
+                file="../src/gui/nodes/MidiProgramMapEditor.h"/>
         </GROUP>
         <GROUP id="{9F26C61A-AB1F-2950-8F17-BDE8283E9444}" name="properties">
           <FILE id="TWsHgR" name="MidiMultiChannelPropertyComponent.h" compile="0"

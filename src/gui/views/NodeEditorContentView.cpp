@@ -424,7 +424,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     }
     else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
     {
-        auto* const programChangeMapEditor = new ProgramChangeMapEditor (node);
+        auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
         programChangeMapEditor->setStoreSize (false);
         return programChangeMapEditor;
     }
