@@ -7,7 +7,7 @@
 
 namespace Element {
 
-class ProgramChangeMapNode : public MidiFilterNode,
+class MidiProgramMapNode : public MidiFilterNode,
                              public AsyncUpdater,
                              public ChangeBroadcaster
 {
@@ -19,8 +19,8 @@ public:
         int out;
     };
     
-    ProgramChangeMapNode();
-    virtual ~ProgramChangeMapNode();
+    MidiProgramMapNode();
+    virtual ~MidiProgramMapNode();
 
     void getPluginDescription (PluginDescription& desc) const override
     {

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 
 namespace Element {
 
@@ -18,8 +18,8 @@ public:
     void addProgram();
     void removeSelectedProgram();
     int getNumPrograms() const;
-    ProgramChangeMapNode::ProgramEntry getProgram (int) const;
-    void setProgram (int, ProgramChangeMapNode::ProgramEntry);
+    MidiProgramMapNode::ProgramEntry getProgram (int) const;
+    void setProgram (int, MidiProgramMapNode::ProgramEntry);
     void sendProgram (int);
 
     void selectRow (int row);

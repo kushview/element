@@ -8,7 +8,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 #include "DataPath.h"
 #include "Settings.h"
 
@@ -727,7 +727,7 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
     {
-        return new ProgramChangeMapNode();
+        return new MidiProgramMapNode();
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
     {

@@ -3,7 +3,7 @@
 
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/SubGraphProcessor.h"
 

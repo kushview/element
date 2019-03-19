@@ -1,5 +1,5 @@
 #include "Tests.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 
 namespace Element {
 
@@ -12,8 +12,8 @@ public:
     void runTest() override
     {
         GraphProcessor graph;
-        GraphNodePtr node = graph.addNode (new ProgramChangeMapNode());
-        auto* pgc = dynamic_cast<ProgramChangeMapNode*> (node.get());
+        GraphNodePtr node = graph.addNode (new MidiProgramMapNode());
+        auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
 
         testMappings (node);
         testMidiStream (node);
@@ -39,9 +39,9 @@ private:
         beginTest ("port count");
         expect (node->getNumPorts (PortType::Midi, true) == 1);
         expect (node->getNumPorts (PortType::Midi, false) == 1);
-        auto* pgc = dynamic_cast<ProgramChangeMapNode*> (node.get());
+        auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
         pgc->clear();
-        ProgramChangeMapNode::ProgramEntry entry;
+        MidiProgramMapNode::ProgramEntry entry;
 
         beginTest ("3 maps to 4");
         pgc->addProgramEntry ("Program 1", 3, 4);

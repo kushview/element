@@ -121,10 +121,10 @@
                 file="../src/engine/nodes/MidiFilterNode.h"/>
           <FILE id="x0zY8n" name="PlaceholderProcessor.h" compile="0" resource="0"
                 file="../src/engine/nodes/PlaceholderProcessor.h"/>
-          <FILE id="lIo3Bb" name="ProgramChangeMapNode.cpp" compile="1" resource="0"
-                file="../src/engine/nodes/ProgramChangeMapNode.cpp"/>
-          <FILE id="jgNKI2" name="ProgramChangeMapNode.h" compile="0" resource="0"
-                file="../src/engine/nodes/ProgramChangeMapNode.h"/>
+          <FILE id="lIo3Bb" name="MidiProgramMapNode.cpp" compile="1" resource="0"
+                file="../src/engine/nodes/MidiProgramMapNode.cpp"/>
+          <FILE id="jgNKI2" name="MidiProgramMapNode.h" compile="0" resource="0"
+                file="../src/engine/nodes/MidiProgramMapNode.h"/>
           <FILE id="M99Z7Y" name="ReverbProcessor.h" compile="0" resource="0"
                 file="../src/engine/nodes/ReverbProcessor.h"/>
           <FILE id="rIbo9c" name="SubGraphProcessor.cpp" compile="1" resource="0"

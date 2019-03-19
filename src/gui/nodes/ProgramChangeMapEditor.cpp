@@ -1,11 +1,11 @@
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 #include "gui/nodes/ProgramChangeMapEditor.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {
 
 typedef ProgramChangeMapEditor PGCME;
-typedef ReferenceCountedObjectPtr<ProgramChangeMapNode> ProgramChangeMapNodePtr;
+typedef ReferenceCountedObjectPtr<MidiProgramMapNode> MidiProgramMapNodePtr;
 
 class ProgramNameLabel : public Label
 {
@@ -221,7 +221,7 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
     delButton.setButtonText ("-");
     delButton.onClick = std::bind (&ProgramChangeMapEditor::removeSelectedProgram, this);
 
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         setSize (node->getWidth(), node->getHeight());
         lastProgramChangeConnection = node->lastProgramChanged.connect (
@@ -236,7 +236,7 @@ ProgramChangeMapEditor::ProgramChangeMapEditor (const Node& node)
 
 ProgramChangeMapEditor::~ProgramChangeMapEditor()
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         node->removeChangeListener (this);
     lastProgramChangeConnection.disconnect();
     addButton.onClick = nullptr;
@@ -268,7 +268,7 @@ void ProgramChangeMapEditor::selectRow (int row)
     table.selectRow (row, false, true);
 }
 
-static bool nodeContainsProgram (const ProgramChangeMapNode& node, int program)
+static bool nodeContainsProgram (const MidiProgramMapNode& node, int program)
 {
     for (int j = 0; j < node.getNumProgramEntries(); ++j)
     {
@@ -280,7 +280,7 @@ static bool nodeContainsProgram (const ProgramChangeMapNode& node, int program)
     return false;
 }
 
-static int nextBestProgram (const ProgramChangeMapNode& node)
+static int nextBestProgram (const MidiProgramMapNode& node)
 {
     for (int i = 0; i < 128; ++i)
     {
@@ -292,16 +292,16 @@ static int nextBestProgram (const ProgramChangeMapNode& node)
     return -1;
 }
 
-ProgramChangeMapNode::ProgramEntry ProgramChangeMapEditor::getProgram (int index) const
+MidiProgramMapNode::ProgramEntry ProgramChangeMapEditor::getProgram (int index) const
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         return node->getProgramEntry (index);
     return {};
 }
 
-void ProgramChangeMapEditor::setProgram (int index, ProgramChangeMapNode::ProgramEntry entry)
+void ProgramChangeMapEditor::setProgram (int index, MidiProgramMapNode::ProgramEntry entry)
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         node->editProgramEntry (index, entry.name, entry.in, entry.out);
         table.updateContent();
@@ -310,7 +310,7 @@ void ProgramChangeMapEditor::setProgram (int index, ProgramChangeMapNode::Progra
 
 void ProgramChangeMapEditor::sendProgram (int index)
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         const auto program = getProgram (index);
         node->sendProgramChange (program.in, 1);
@@ -319,7 +319,7 @@ void ProgramChangeMapEditor::sendProgram (int index)
 
 void ProgramChangeMapEditor::addProgram()
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
         const int program = nextBestProgram (*node);
         if (program >= 0)
@@ -337,14 +337,14 @@ void ProgramChangeMapEditor::addProgram()
 
 int ProgramChangeMapEditor::getNumPrograms() const
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
         return node->getNumProgramEntries();
     return 0;
 }
 
 void ProgramChangeMapEditor::removeSelectedProgram()
 {
-    if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {    
         const int selected = table.getSelectedRow();
         if (! isPositiveAndBelow (selected, node->getNumProgramEntries()))
@@ -377,7 +377,7 @@ void ProgramChangeMapEditor::resized()
                              header.getColumnWidth (TableModel::OutProgram)));
 
     if (storeSizeInNode)
-        if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+        if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
             node->setSize (getWidth(), getHeight());
 }
 
@@ -387,13 +387,13 @@ void ProgramChangeMapEditor::setStoreSize (const bool storeSize)
         return;
     storeSizeInNode = storeSize;
     if (storeSizeInNode)
-        if (ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>())
+        if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
             node->setSize (getWidth(), getHeight());
 }
 
 void ProgramChangeMapEditor::selectLastProgram()
 {
-    ProgramChangeMapNodePtr node = getNodeObjectOfType<ProgramChangeMapNode>();
+    MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>();
     if (! node) return;
     const auto lastProgram = node->getLastProgram();
     for (int i = 0; i < getNumPrograms(); ++i)

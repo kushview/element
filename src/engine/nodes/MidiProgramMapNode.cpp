@@ -1,8 +1,8 @@
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 
 namespace Element {
 
-ProgramChangeMapNode::ProgramChangeMapNode()
+MidiProgramMapNode::MidiProgramMapNode()
     : MidiFilterNode (0)
 {
     jassert (metadata.hasType (Tags::node));
@@ -10,9 +10,9 @@ ProgramChangeMapNode::ProgramChangeMapNode()
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_PROGRAM_MAP, nullptr);
 }
 
-ProgramChangeMapNode::~ProgramChangeMapNode() { }
+MidiProgramMapNode::~MidiProgramMapNode() { }
 
-void ProgramChangeMapNode::clear()
+void MidiProgramMapNode::clear()
 {
     entries.clearQuick (true);
     ScopedLock sl (lock);
@@ -20,7 +20,7 @@ void ProgramChangeMapNode::clear()
         programMap [i] = -1;
 }
 
-void ProgramChangeMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
+void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     ignoreUnused (audio, midi);
     if (midi.getNumBuffers() <= 0)
@@ -75,16 +75,16 @@ void ProgramChangeMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     tempMidi.clear();
 }
 
-void ProgramChangeMapNode::sendProgramChange (int program, int channel)
+void MidiProgramMapNode::sendProgramChange (int program, int channel)
 {
     const auto msg (MidiMessage::programChange (channel, program));
     ScopedLock sl (lock);
     toSendMidi.addEvent (msg, 0);
 }
 
-int ProgramChangeMapNode::getNumProgramEntries() const { return entries.size(); }
+int MidiProgramMapNode::getNumProgramEntries() const { return entries.size(); }
 
-void ProgramChangeMapNode::addProgramEntry (const String& name, int programIn, int programOut)
+void MidiProgramMapNode::addProgramEntry (const String& name, int programIn, int programOut)
 {
     if (programIn < 0)      programIn = 0;
     if (programIn > 127)    programIn = 127;
@@ -115,7 +115,7 @@ void ProgramChangeMapNode::addProgramEntry (const String& name, int programIn, i
     programMap [entry->in] = entry->out;
 }
 
-void ProgramChangeMapNode::editProgramEntry (int index, const String& name, int inProgram, int outProgram)
+void MidiProgramMapNode::editProgramEntry (int index, const String& name, int inProgram, int outProgram)
 {
     if (auto* entry = entries [index])
     {
@@ -128,7 +128,7 @@ void ProgramChangeMapNode::editProgramEntry (int index, const String& name, int 
     }
 }
 
-void ProgramChangeMapNode::removeProgramEntry (int index)
+void MidiProgramMapNode::removeProgramEntry (int index)
 {
     std::unique_ptr<ProgramEntry> deleter;
     if (auto* const entry = entries [index])
@@ -141,7 +141,7 @@ void ProgramChangeMapNode::removeProgramEntry (int index)
     }
 }
 
-ProgramChangeMapNode::ProgramEntry ProgramChangeMapNode::getProgramEntry (int index) const
+MidiProgramMapNode::ProgramEntry MidiProgramMapNode::getProgramEntry (int index) const
 {
     if (auto* const entry = entries [index])
         return *entry;
