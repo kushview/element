@@ -38,6 +38,10 @@ public:
     }
 
     void clear();
+    
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void releaseResources() override;
+
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void sendProgramChange (int program, int channel);
     int getNumProgramEntries() const;
@@ -107,9 +111,6 @@ public:
         }
     }
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
-    void releaseResources() override { }
-    
     inline void handleAsyncUpdate() override { lastProgramChanged(); }
     Signal<void()> lastProgramChanged;
 

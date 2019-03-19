@@ -8,6 +8,7 @@ MidiProgramMapNode::MidiProgramMapNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_PROGRAM_MAP, nullptr);
+    
 }
 
 MidiProgramMapNode::~MidiProgramMapNode() { }
@@ -19,6 +20,21 @@ void MidiProgramMapNode::clear()
     for (int i = 0; i <= 127; ++i)
         programMap [i] = -1;
 }
+
+void MidiProgramMapNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
+    ignoreUnused (sampleRate, maxBufferSize);
+    
+    {
+        ScopedLock sl (lock);
+        for (int i = 0; i <= 127; ++i)
+            programMap [i] = -1;
+        for (const auto* const entry : entries)
+            programMap [entry->in] = entry->out;
+    }
+}
+
+void MidiProgramMapNode::releaseResources() { }
 
 void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
@@ -72,6 +88,7 @@ void MidiProgramMapNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     }
 
     midiIn->swapWith (tempMidi);
+    traceMidi (*midiIn);
     tempMidi.clear();
 }
 
