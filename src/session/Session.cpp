@@ -283,6 +283,14 @@ namespace Element {
         }
     }
 
+    void Session::setActiveGraph (int index)
+    {
+        if (! isPositiveAndBelow (index, getNumGraphs()))
+            return;
+        objectData.getChildWithName (Tags::graphs)
+            .setProperty (Tags::active, index, nullptr);
+    }
+
     bool Session::writeToFile (const File& file) const
     {
         ValueTree saveData = objectData.createCopy();
