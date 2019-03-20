@@ -184,7 +184,6 @@ GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, 
 
     if (desc->pluginFormatName == "Element")
     {
-        String errorMessage;
         if (auto* const object = pluginManager.createGraphNode (*desc, errorMessage))
             return processor.addNode (object, nodeId);
     }
