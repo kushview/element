@@ -76,11 +76,21 @@ private:
     File lastGraph;
     bool listenForChanges = true;
 
+    inline void bindChangeHandlers()
+    {
+        ScopedChangeStopper freeze (*this, false);
+        data.removeListener (this);
+        graph = session->getActiveGraph();
+        data  = session->getValueTree();
+        data.addListener (this);
+    }
+
     friend class juce::ValueTree;
     inline void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
     {
         if (! listenForChanges)
             return;
+        DBG("property change: " << property.toString() << "=" << tree.getProperty(property).toString());
         ignoreUnused (tree, property);
         setChangedFlag (true);
     }

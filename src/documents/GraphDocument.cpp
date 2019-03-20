@@ -22,19 +22,20 @@ Result GraphDocument::loadDocument (const File& file)
     if (! session)
         return Result::fail ("Cannot load graph");
     
-    auto data = Session::readFromFile (file);
-    if (data.isValid() && data.hasType (Tags::session))
+    auto newData = Session::readFromFile (file);
+    if (newData.isValid() && newData.hasType (Tags::session))
     {
-        if (! session->loadData (data))
+        if (! session->loadData (newData))
             return Result::fail ("Cannot load malformed graph");
-        else
-            return Result::ok();
+
+        bindChangeHandlers();
+        return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
     }
 
-    auto data = Node::parse (file);
-    if (! Node::isProbablyGraphNode (data))
+    newData = Node::parse (file);
+    if (! Node::isProbablyGraphNode (newData))
         return Result::fail ("Invalid graph provided");
-    setGraph (Node (data, true));
+    setGraph (Node (newData, true));
     return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
 }
 

@@ -1,5 +1,6 @@
 
 #include "session/Node.h"
+#include "session/Session.h"
 #include "controllers/GraphManager.h"
 
 namespace Element {
@@ -162,10 +163,18 @@ namespace Element {
 
     ValueTree Node::parse (const File& file)
     {
+        ValueTree sessionData = Session::readFromFile (file);
+        if (sessionData.isValid())
+        {
+            const auto graphs = sessionData.getChildWithName (Tags::graphs);
+            const auto sessionNode = graphs.getChild (graphs.getProperty (Tags::active, 0));
+            return sessionNode.createCopy();
+        }
+
         ValueTree data;
         ValueTree nodeData;
         
-        if (ScopedPointer<XmlElement> e = XmlDocument::parse(file))
+        if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
         {
             data = ValueTree::fromXml (*e);
         }

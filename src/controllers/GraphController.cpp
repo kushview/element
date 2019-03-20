@@ -15,6 +15,7 @@ namespace Element {
 
 void GraphController::activate()
 {
+    document.setSession (getWorld().getSession());
     document.setLastDocumentOpened (
         DataPath::defaultGraphDir().getChildFile ("Untitled.elg"));
 }
@@ -33,10 +34,8 @@ void GraphController::openDefaultGraph()
     if (auto* gc = findSibling<GuiController>())
         gc->closeAllPluginWindows();
     
-    getWorld().getSession()->clear();
     auto newGraph = Node::createDefaultGraph();
     document.setGraph (newGraph);
-    getWorld().getSession()->addGraph (document.getGraph(), true);
     graphChanged();
 
     refreshOtherControllers();
@@ -60,11 +59,7 @@ void GraphController::openGraph (const File& file)
     {
         GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
-
-        getWorld().getSession()->clear();
-        getWorld().getSession()->addGraph (document.getGraph(), true);
         graphChanged();
-
         refreshOtherControllers();
         findSibling<GuiController>()->stabilizeContent();
     }
@@ -78,11 +73,7 @@ void GraphController::loadGraph (const Node& graph)
 
     GraphDocument::ScopedChangeStopper freeze (document, false);
     findSibling<GuiController>()->closeAllPluginWindows();
-    getWorld().getSession()->clear();
-    getWorld().getSession()->addGraph (document.getGraph(), true);
-    
     graphChanged();
-
     refreshOtherControllers();
     findSibling<GuiController>()->stabilizeContent();
 }
@@ -105,11 +96,9 @@ void GraphController::newGraph()
         GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
 
-        getWorld().getSession()->clear();
         auto newGraph = Node::createDefaultGraph();
         document.setGraph (newGraph);
         document.setFile (File());
-        getWorld().getSession()->addGraph (document.getGraph(), true);
         graphChanged();
 
         refreshOtherControllers();
