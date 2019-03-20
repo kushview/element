@@ -95,6 +95,8 @@ namespace Tags
 
     const Identifier velocityCurveMode  = "velocityCurveMode";
     const Identifier workspace          = "workspace";
+
+    const Identifier externalSync       = "externalSync";
 }
 
 struct Alert
