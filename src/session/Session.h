@@ -99,6 +99,12 @@ namespace Element {
         typedef std::function<void(const ValueTree& tree)> ValueTreeFunction;
         void forEach (ValueTreeFunction handler) const;
 
+        bool containsGraph (const Node& graph) const;
+        
+        /** Writes an encoded file */
+        bool writeToFile (const File&) const;
+        static ValueTree readFromFile (const File&);
+        
     protected:
         void forEach (const ValueTree tree, ValueTreeFunction handler) const;
 
