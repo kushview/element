@@ -494,6 +494,7 @@ public:
             }
         }
 
+        const bool wasPlaying = transport.isPlaying();
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
 
@@ -502,6 +503,19 @@ public:
            #if defined (EL_PRO)
             if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
             {
+                if (wasPlaying != transport.isPlaying())
+                {
+                    if (transport.isPlaying())
+                    {
+                        incomingMidi.addEvent (transport.getPositionFrames() <= 0 
+                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                    }
+                    else
+                    {
+                        incomingMidi.addEvent (MidiMessage::midiStop(), 0);
+                    }
+                }
+
                 midiClockMaster.setTempo (transport.getTempo());
                 midiClockMaster.render (incomingMidi, numSamples);
             }
@@ -525,6 +539,7 @@ public:
         
         const ScopedLock sl (lock);
         const bool shouldProcess = shouldBeLocked.get() == 0;
+        const bool wasPlaying = transport.isPlaying();
         transport.preProcess (numSamples);
 
         if (shouldProcess)
@@ -532,6 +547,18 @@ public:
            #if defined (EL_PRO)
             if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
             {
+                if (wasPlaying != transport.isPlaying())
+                {
+                    if (transport.isPlaying())
+                    {
+                        midi.addEvent (transport.getPositionFrames() <= 0 
+                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                    }
+                    else
+                    {
+                        midi.addEvent (MidiMessage::midiStop(), 0);
+                    }
+                }
                 midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
                 midiClockMaster.render (midi, numSamples);
             }
