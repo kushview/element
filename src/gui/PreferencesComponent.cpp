@@ -22,8 +22,10 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "gui/ActivationDialog.h"
+#include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
+#include "gui/ViewHelpers.h"
 #include "gui/UnlockForm.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -464,6 +466,8 @@ namespace Element {
                 const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
                 settings.getUserSettings()->setValue ("clockSource", val);
                 engine->applySettings (settings);
+                if (auto* cc = ViewHelpers::findContentComponent())
+                    cc->refreshToolbar();
             }
 
             else if (value.refersToSameSourceAs (scanForPlugins.getToggleStateValue()))

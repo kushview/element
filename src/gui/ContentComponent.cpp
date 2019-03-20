@@ -160,11 +160,14 @@ public:
 
         auto* props = settings.getUserSettings();
         
-       #if ! EL_RUNNING_AS_PLUGIN
+       #if defined (EL_PRO)
         const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
-       #else
+       #elif EL_RUNNING_AS_PLUGIN
         // Plugin always has host sync option
         const bool showExt = true;
+        ignoreUnused (props, status);
+       #else
+        const bool showExt = false;
         ignoreUnused (props, status);
        #endif
        

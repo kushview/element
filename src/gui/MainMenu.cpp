@@ -195,6 +195,21 @@ void MainMenu::menuItemSelected (int index, int menu)
         if (auto *cc = getContentComponent())
             cc->getAppController().getWorld().getUnlockStatus().dump();
     }
+    else if (index == 9000)
+    {
+        engine->addMidiMessage (MidiMessage::midiStart().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
+    else if (index == 9001)
+    {
+        engine->addMidiMessage (MidiMessage::midiStop().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
+    else if (index == 9002)
+    {
+        engine->addMidiMessage (MidiMessage::midiContinue().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
    #endif
     
     if (menu == File && index >= recentMenuOffset)
@@ -311,6 +326,9 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     menu.addItem (7777, "Save Workspace");
     menu.addItem (7778, "Load Workspace");
     menu.addItem (8000, "Dump License");
+    menu.addItem (9000, "MIDI Start");
+    menu.addItem (9001, "MIDI Stop");
+    menu.addItem (9002, "MIDI Continue");
 
     menu.addCommandItem (&cmd, Commands::panic, "Panic!");
 }

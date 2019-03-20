@@ -548,7 +548,7 @@ public:
                 zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
         }
 
-        if (isTimeMaster() && transport.isPlaying())
+        if (transport.isPlaying())
             transport.advance (numSamples);
         
         transport.postProcess (numSamples);
@@ -630,8 +630,24 @@ public:
         if (! message.isActiveSense() && ! message.isMidiClock())
             midiIOMonitor->received();
         messageCollector.addMessageToQueue (message);
-        if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
+        const bool clockWanted = processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0;
+        if (clockWanted && message.isMidiClock())
+        {
             midiClock.process (message);
+        }
+        else if (clockWanted && message.isMidiStart())
+        {
+            transport.requestPlayState (true);
+            transport.requestAudioFrame (0);
+        }
+        else if (clockWanted && message.isMidiStop())
+        {
+            transport.requestPlayState (false);
+        }
+        else if (clockWanted && message.isMidiContinue())
+        {
+            transport.requestPlayState (true);
+        }   
     }
     
     void addGraph (RootGraph* graph)
@@ -869,11 +885,14 @@ RootGraph* AudioEngine::getGraph (const int index)
     return nullptr;
 }
 
-void AudioEngine::addMidiMessage (const MidiMessage msg)
+void AudioEngine::addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue)
 {
     if (priv == nullptr)
         return;
-    priv->messageCollector.addMessageToQueue (msg);
+    if (handleOnDeviceQueue)
+        priv->handleIncomingMidiMessage (nullptr, msg);
+    else
+        priv->messageCollector.addMessageToQueue (msg);
 }
     
 void AudioEngine::setActiveGraph (const int index)
