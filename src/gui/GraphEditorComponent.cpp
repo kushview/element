@@ -590,7 +590,6 @@ public:
         r.removeFromLeft (2);
         ioButton.setBounds (r.removeFromRight (14));
 
-        int indexIn = 0, indexOut = 0;
         const int halfPinSize = pinSize / 2;
         if (vertical)
         {

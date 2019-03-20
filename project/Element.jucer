@@ -392,6 +392,10 @@
               file="../src/gui/SequencerComponent.cpp"/>
         <FILE id="ZPQIYX" name="SequencerComponent.h" compile="0" resource="0"
               file="../src/gui/SequencerComponent.h"/>
+        <FILE id="frP6td" name="SessionImportWizard.cpp" compile="1" resource="0"
+              file="../src/gui/SessionImportWizard.cpp"/>
+        <FILE id="AsiI5V" name="SessionImportWizard.h" compile="0" resource="0"
+              file="../src/gui/SessionImportWizard.h"/>
         <FILE id="mTxLYX" name="SessionTreePanel.cpp" compile="1" resource="0"
               file="../src/gui/SessionTreePanel.cpp"/>
         <FILE id="beONQq" name="SessionTreePanel.h" compile="0" resource="0"

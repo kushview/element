@@ -557,7 +557,6 @@ void ActivationComponent::visibilityChanged()
 
 void ActivationComponent::setForRegistration (bool setupRegistration)
 {
-    auto& status = gui.getWorld().getUnlockStatus();
     if (isForRegistration == setupRegistration)
         return;
     isForRegistration = setupRegistration;
