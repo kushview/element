@@ -23,8 +23,6 @@ public:
         ScopedChangeStopper freeze (*this, false);
         jassert (newSession != nullptr);
         session = newSession;
-        session->getValueTree().getChildWithName (Tags::graphs)
-            .setProperty (Tags::active, 0, nullptr);
     }
 
     inline Node getGraph() const { return graph; }
