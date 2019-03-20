@@ -240,8 +240,16 @@ void ActivationComponent::resized()
     }
    #endif
 
-    copyMachineButton.setBounds (getWidth() - 34, getHeight() - 32,
-                                 24, 22);
+    if (nullptr != findParentComponentOfClass<ActivationDialog>())
+    {
+        copyMachineButton.setBounds (getWidth() - 34, getHeight() - 32,
+                                     24, 22);
+    }
+    else
+    {
+        copyMachineButton.setBounds (getWidth() - 94, getHeight() - 32,
+                                     24, 22);
+    }
     if (syncButton && syncButton->isVisible())
     {
         int shiftLeft = activateButton->getHeight() / 2;
@@ -530,7 +538,7 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             status.getLicenseKey());
         unlockRef->setOpacity (overlayOpacity);
         unlockRef->setShowText (overlayShowText);
-        unlockRef->onFinished = std::bind (&ActivationComponent::handleActivationResult, this,
+        unlockRef->onFinished = std::bind (&ActivationComponent::handleRefreshResult, this,
                                            std::placeholders::_1, std::placeholders::_2);
         addAndMakeVisible (unlock.get());
         resized();
@@ -556,6 +564,7 @@ void ActivationComponent::setForRegistration (bool setupRegistration)
 
     if (isForRegistration)
     {
+        copyMachineButton.setVisible (false);
         onlineActivateLink->setVisible(false);
         licenseKey->setVisible (false);
         deactivateOthers->setVisible (false);
@@ -585,11 +594,11 @@ void ActivationComponent::setForRegistration (bool setupRegistration)
         passwordLabel.setJustificationType (Justification::centredLeft);
         passwordLabel.setFont (Font (13.f));
         addAndMakeVisible (password);
-
         email.grabKeyboardFocus();
     }
     else
     {
+        copyMachineButton.setVisible (true);
         instructionLabel->setText (textBeforeReg, dontSendNotification);
         licenseKey->setVisible (true);
         deactivateOthers->setVisible (true);
@@ -627,6 +636,7 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     licenseKey->setVisible (false);
     deactivateOthers->setVisible (false);
     registerTrialLink->setVisible (false);
+    copyMachineButton.setVisible (false);
     addAndMakeVisible (progressBar);
     addAndMakeVisible (syncButton.get());
     progressBar.periodDays = status.getExpirationPeriodDays();
@@ -681,6 +691,7 @@ void ActivationComponent::setForManagement (bool setupManagement)
         addAndMakeVisible (syncButton.get());
         activateButton->setButtonText ("Deactivate");
         quitButton->setButtonText ("Clear");
+        copyMachineButton.setVisible (false);
     }
     else
     {
@@ -696,6 +707,7 @@ void ActivationComponent::setForManagement (bool setupManagement)
         quitButton->setButtonText ("Quit");
         if (licenseKey->isShowing())
             licenseKey->grabKeyboardFocus();
+        copyMachineButton.setVisible (true);
     }
 
     resized();
@@ -716,7 +728,7 @@ void ActivationComponent::timerCallback()
     }
 }
 
-void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
+void ActivationComponent::handleRefreshResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
 {
     if (result.succeeded)
     {

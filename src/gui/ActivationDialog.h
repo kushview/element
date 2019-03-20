@@ -111,7 +111,7 @@ private:
     std::unique_ptr<IconButton> syncButton;
     String trialQuitButtonText = "Continue";
     IconButton copyMachineButton;
-    void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
+    void handleRefreshResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 
     //==============================================================================
@@ -153,6 +153,7 @@ public:
             activation->setForTrial (true);
         setContentOwned (activation, true);
         centreAroundComponent ((Component*) gui.getContentComponent(), getWidth(), getHeight());
+        activation->resized(); // < make sure buttons are positioned appropriately
         setAlwaysOnTop (true);
         addToDesktop();
         setVisible (true);
