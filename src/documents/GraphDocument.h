@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "session/Node.h"
+#include "session/Session.h"
 
 namespace Element {
 
@@ -17,14 +18,26 @@ public:
     GraphDocument();
     ~GraphDocument();
 
+    inline void setSession (SessionPtr newSession)
+    {
+        ScopedChangeStopper freeze (*this, false);
+        jassert (newSession != nullptr);
+        session = newSession;
+        session->getValueTree().getChildWithName (Tags::graphs)
+            .setProperty (Tags::active, 0, nullptr);
+    }
+
     inline Node getGraph() const { return graph; }
     
     inline void setGraph (const Node& newGraph)
     {
+        jassert (session != nullptr);
         ScopedChangeStopper freeze (*this, false);
         data.removeListener (this);
         graph = newGraph;
-        data  = graph.getValueTree();
+        session->clear();
+        session->addGraph (graph, true);
+        data  = session->getValueTree();
         data.addListener (this);
     }
 
@@ -57,6 +70,7 @@ public:
     };
 
 private:
+    SessionPtr session;
     Node graph;
     ValueTree data;
     File lastGraph;
