@@ -5,6 +5,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/MappingController.h"
 #include "controllers/PresetsController.h"
+#include "gui/SessionImportWizard.h"
 #include "session/Session.h"
 #include "DataPath.h"
 #include "Globals.h"
@@ -14,12 +15,14 @@ namespace Element {
 
 void GraphController::activate()
 {
+    document.setSession (getWorld().getSession());
     document.setLastDocumentOpened (
         DataPath::defaultGraphDir().getChildFile ("Untitled.elg"));
 }
 
 void GraphController::deactivate()
 {
+    wizard.reset();
     if (auto* const props = getWorld().getSettings().getUserSettings())
         if (document.getFile().existsAsFile())
             props->setValue (Settings::lastGraphKey, document.getFile().getFullPathName());
@@ -29,12 +32,10 @@ void GraphController::openDefaultGraph()
 {
     GraphDocument::ScopedChangeStopper freeze (document, false);
     if (auto* gc = findSibling<GuiController>())
-        gc->closeAllPluginWindows();        
+        gc->closeAllPluginWindows();
     
-    getWorld().getSession()->clear();
     auto newGraph = Node::createDefaultGraph();
     document.setGraph (newGraph);
-    getWorld().getSession()->addGraph (document.getGraph(), true);
     graphChanged();
 
     refreshOtherControllers();
@@ -43,21 +44,38 @@ void GraphController::openDefaultGraph()
 
 void GraphController::openGraph (const File& file)
 {
-    document.saveIfNeededAndUserAgrees();
+    if (file.hasFileExtension ("els"))
+    {
+        if (wizard != nullptr)
+            wizard.reset();
+        auto* const dialog = new SessionImportWizardDialog (wizard, file);
+        dialog->onGraphChosen = std::bind (&GraphController::loadGraph, this, std::placeholders::_1);
+        return;
+    }
+
     auto result = document.loadFrom (file, true);
     
     if (result.wasOk())
     {
         GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
-
-        getWorld().getSession()->clear();
-        getWorld().getSession()->addGraph (document.getGraph(), true);
         graphChanged();
-
         refreshOtherControllers();
         findSibling<GuiController>()->stabilizeContent();
     }
+}
+
+void GraphController::loadGraph (const Node& graph)
+{
+    document.saveIfNeededAndUserAgrees();
+    document.setGraph (graph);
+    document.setFile (File());
+
+    GraphDocument::ScopedChangeStopper freeze (document, false);
+    findSibling<GuiController>()->closeAllPluginWindows();
+    graphChanged();
+    refreshOtherControllers();
+    findSibling<GuiController>()->stabilizeContent();
 }
 
 void GraphController::newGraph()
@@ -78,11 +96,9 @@ void GraphController::newGraph()
         GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
 
-        getWorld().getSession()->clear();
         auto newGraph = Node::createDefaultGraph();
         document.setGraph (newGraph);
         document.setFile (File());
-        getWorld().getSession()->addGraph (document.getGraph(), true);
         graphChanged();
 
         refreshOtherControllers();

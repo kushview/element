@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.2
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -23,7 +23,7 @@
 #include "URLs.h"
 
 #ifndef EL_ALLOW_TRIAL_REGISTRATION
- #define EL_ALLOW_TRIAL_REGISTRATION 0
+ #define EL_ALLOW_TRIAL_REGISTRATION 1
 #endif
 //[/Headers]
 
@@ -124,13 +124,22 @@ ActivationComponent::ActivationComponent (GuiController& g)
     instructionLabel2->setColour (TextEditor::textColourId, Colours::black);
     instructionLabel2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    deactivateOthers.reset (new ToggleButton ("DeactivateOthers"));
+    addAndMakeVisible (deactivateOthers.get());
+    deactivateOthers->setButtonText (TRANS("Deactivate other machines?"));
+
 
     //[UserPreSize]
     appNameLabel->setText (Util::appName().toUpperCase(), dontSendNotification);
     instructionLabel->setText (
         instructionLabel->getText().replace("APPNAME", Util::appName()),
         dontSendNotification);
+    activateInstructions = instructionLabel->getText();
     licenseKey->setWantsKeyboardFocus (true);
+    const auto key = gui.getWorld().getUnlockStatus().getLicenseKey();
+    if (key.isNotEmpty())
+        licenseKey->setText (key, dontSendNotification);
+
     instructionLabel2->setVisible (false);
     registerTrialLink->setVisible (false);
     onlineActivateLink->setURL (URL (EL_URL_HELP_ACTIVATION));
@@ -143,6 +152,12 @@ ActivationComponent::ActivationComponent (GuiController& g)
     syncButton.reset(new IconButton ("Refresh"));
     syncButton->setIcon (Icon (getIcons().farSyncAlt, LookAndFeel::textColor));
     syncButton->addListener (this);
+
+    copyMachineButton.setIcon (Icon (getIcons().falCopy,
+        findColour (TextButton::textColourOffId)));
+    copyMachineButton.addListener (this);
+    copyMachineButton.setTooltip (TRANS ("Copy your machine ID to the clip board"));
+    addAndMakeVisible (copyMachineButton);
 
    #if ! EL_ALLOW_TRIAL_REGISTRATION
     quitButton->setButtonText ("Quit");
@@ -179,6 +194,7 @@ ActivationComponent::~ActivationComponent()
     getLicenseLink = nullptr;
     registerTrialLink = nullptr;
     instructionLabel2 = nullptr;
+    deactivateOthers = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -206,13 +222,14 @@ void ActivationComponent::resized()
     appNameLabel->setBounds ((getWidth() / 2) - (320 / 2), 37, 320, 48);
     onlineActivateLink->setBounds ((getWidth() / 2) - (108 / 2), 94, 108, 18);
     instructionLabel->setBounds ((getWidth() / 2) - (352 / 2), 124, 352, 39);
-    licenseKey->setBounds ((getWidth() / 2) - (260 / 2), 171, 260, 22);
-    activateButton->setBounds (((getWidth() / 2) - (260 / 2)) + 260 / 2 + -3 - 90, 208, 90, 24);
-    quitButton->setBounds (((getWidth() / 2) - (260 / 2)) + 260 / 2 + 3, 208, 90, 24);
-    myLicenseLink->setBounds ((getWidth() / 2) - (96 / 2), 249, 96, 18);
-    getLicenseLink->setBounds ((getWidth() / 2) - (94 / 2), 272, 94, 18);
-    registerTrialLink->setBounds ((getWidth() / 2) - (100 / 2), 293, 100, 18);
+    licenseKey->setBounds ((getWidth() / 2) - (260 / 2), 169, 260, 22);
+    activateButton->setBounds (((getWidth() / 2) - (260 / 2)) + 260 / 2 + -3 - 90, 204, 90, 24);
+    quitButton->setBounds (((getWidth() / 2) - (260 / 2)) + 260 / 2 + 3, 204, 90, 24);
+    myLicenseLink->setBounds ((getWidth() / 2) - (96 / 2), 256, 96, 18);
+    getLicenseLink->setBounds ((getWidth() / 2) - (94 / 2), 279, 94, 18);
+    registerTrialLink->setBounds ((getWidth() / 2) - (100 / 2), 300, 100, 18);
     instructionLabel2->setBounds ((getWidth() / 2) - (280 / 2), 240, 280, 64);
+    deactivateOthers->setBounds ((getWidth() / 2) - (183 / 2), 234, 183, 18);
     //[UserResized] Add your own custom resize handling here..
 
    #if EL_RUNNING_AS_PLUGIN
@@ -222,6 +239,17 @@ void ActivationComponent::resized()
                 .withX (activateButton->getX() + (activateButton->getWidth() / 2)));
     }
    #endif
+
+    if (nullptr != findParentComponentOfClass<ActivationDialog>())
+    {
+        copyMachineButton.setBounds (getWidth() - 34, getHeight() - 32,
+                                     24, 22);
+    }
+    else
+    {
+        copyMachineButton.setBounds (getWidth() - 94, getHeight() - 32,
+                                     24, 22);
+    }
     if (syncButton && syncButton->isVisible())
     {
         int shiftLeft = activateButton->getHeight() / 2;
@@ -278,7 +306,26 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == activateButton.get())
     {
         //[UserButtonCode_activateButton] -- add your button handler code here..
-        if (isForTrial)
+        if (isForManagement)
+        {
+            auto* unlockRef = new UnlockOverlay (unlock,
+                status, gui.getWorld(), UnlockOverlay::Deactivate,
+                status.getLicenseKey().trim()
+            );
+            unlockRef->setOpacity (overlayOpacity);
+            unlockRef->setShowText (overlayShowText);
+            unlockRef->onFinished = [this](const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
+            {
+                if (result.succeeded)
+                {
+                    auto& _status = gui.getWorld().getUnlockStatus();
+                    setForManagement (false);
+                    _status.refreshed();
+                }
+            };
+            addAndMakeVisible (unlock.get());
+        }
+        else if (isForTrial)
         {
             if (EL_IS_TRIAL_EXPIRED (status))
             {
@@ -287,10 +334,11 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             }
             else
             {
-                URL upgradeUrl (EL_URL_LICENSE_UPGRADE);
-                upgradeUrl = upgradeUrl.withParameter("license_id", gui.getWorld().getUnlockStatus().getLicenseKey())
-                                    .withParameter("upgrade_id", "1");
-                upgradeUrl.launchInDefaultBrowser();
+                auto theLink = String(EL_URL_LICENSE_UPGRADES)
+                    .replace("LICENSE_ID", status.getLicenseID().toString().trim())
+                    .replace("PAYMENT_ID", status.getPaymentID().toString().trim());
+                if (URL::isProbablyAWebsiteURL (theLink))
+                    URL(theLink).launchInDefaultBrowser();
             }
         }
         else if (isForRegistration)
@@ -330,7 +378,8 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
                 username.getText(),
                 password.getText()
             );
-            unlockRef->setOpacity (0.72f);
+            unlockRef->setOpacity (overlayOpacity);
+            unlockRef->setShowText (overlayShowText);
             unlockRef->onFinished = [this](const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
             {
                 auto& status = gui.getWorld().getUnlockStatus();
@@ -377,10 +426,14 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             if (licenseKey->isEmpty())
                 return;
             auto* unlockRef = new UnlockOverlay (unlock,
-                status, gui.getWorld(), UnlockOverlay::Activate,
-                licenseKey->getText().trim()
+                status, gui.getWorld(),
+                UnlockOverlay::Activate,
+                licenseKey->getText().trim(),
+                String(), String(), String(),
+                deactivateOthers->getToggleState()
             );
-            unlockRef->setOpacity (0.72f);
+            unlockRef->setOpacity (overlayOpacity);
+            unlockRef->setShowText (overlayShowText);
             unlockRef->onFinished = [this](const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
             {
                 if (result.succeeded)
@@ -389,13 +442,23 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
                     if (EL_IS_TRIAL_EXPIRED(_status) ||
                         EL_IS_TRIAL_NOT_EXPIRED(_status))
                     {
+                        // not in a dialog so want the manage option
+                        if (nullptr == findParentComponentOfClass<ActivationDialog>())
+                            setQuitButtonTextForTrial ("Manage");
+
                         isForTrial = false;
                         setForTrial (true);
                         resized();
                     }
                     else if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
                     {
+                        // if in the dialog, close it
                         dialog->closeButtonPressed();
+                    }
+                    else
+                    {
+                        // otherwise go to management
+                        setForManagement (true);
                     }
                     _status.refreshed();
                 }
@@ -409,7 +472,18 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == quitButton.get())
     {
         //[UserButtonCode_quitButton] -- add your button handler code here..
-        if (isForTrial)
+        if (isForManagement)
+        {
+            status.saveState (String());
+            gui.getWorld().getSettings().saveIfNeeded();
+            status.loadAll();
+            status.refreshed();
+            licenseKey->setText (String(), dontSendNotification);
+            isForTrial = false;
+            progressBar.setVisible (false);
+            setForManagement (false);
+        }
+        else if (isForTrial)
         {
             if (quitButton->getButtonText() == "Quit")
             {
@@ -419,6 +493,12 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
             {
                 if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
                     dialog->closeButtonPressed();
+            }
+            else if (quitButton->getButtonText() == "Manage")
+            {
+                isForTrial = false;
+                progressBar.setVisible (false);
+                setForManagement (true);
             }
             else
             {
@@ -434,7 +514,10 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
         else
         {
            #if EL_ALLOW_TRIAL_REGISTRATION
-            setForRegistration (true);
+            if (quitButton->getButtonText() == "Quit")
+                JUCEApplication::getInstance()->systemRequestedQuit();
+            else
+                setForRegistration (true);
            #else
             JUCEApplication::getInstance()->systemRequestedQuit();
            #endif
@@ -443,13 +526,19 @@ void ActivationComponent::buttonClicked (Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
+    else if (buttonThatWasClicked == &copyMachineButton)
+    {
+        const auto machine = gui.getUnlockStatus().getLocalMachineIDs()[0];
+        SystemClipboard::copyTextToClipboard (machine);
+    }
     else if (buttonThatWasClicked == syncButton.get())
     {
         auto* const unlockRef = new UnlockOverlay (unlock,
             status, gui.getWorld(), UnlockOverlay::Check,
             status.getLicenseKey());
-        unlockRef->setOpacity (0.72f);
-        unlockRef->onFinished = std::bind (&ActivationComponent::handleActivationResult, this,
+        unlockRef->setOpacity (overlayOpacity);
+        unlockRef->setShowText (overlayShowText);
+        unlockRef->onFinished = std::bind (&ActivationComponent::handleRefreshResult, this,
                                            std::placeholders::_1, std::placeholders::_2);
         addAndMakeVisible (unlock.get());
         resized();
@@ -468,15 +557,16 @@ void ActivationComponent::visibilityChanged()
 
 void ActivationComponent::setForRegistration (bool setupRegistration)
 {
-    auto& status = gui.getWorld().getUnlockStatus();
     if (isForRegistration == setupRegistration)
         return;
     isForRegistration = setupRegistration;
 
     if (isForRegistration)
     {
+        copyMachineButton.setVisible (false);
         onlineActivateLink->setVisible(false);
         licenseKey->setVisible (false);
+        deactivateOthers->setVisible (false);
         instructionLabel2->setVisible (true);
         myLicenseLink->setVisible (false);
         getLicenseLink->setVisible (false);
@@ -503,13 +593,14 @@ void ActivationComponent::setForRegistration (bool setupRegistration)
         passwordLabel.setJustificationType (Justification::centredLeft);
         passwordLabel.setFont (Font (13.f));
         addAndMakeVisible (password);
-
         email.grabKeyboardFocus();
     }
     else
     {
+        copyMachineButton.setVisible (true);
         instructionLabel->setText (textBeforeReg, dontSendNotification);
         licenseKey->setVisible (true);
+        deactivateOthers->setVisible (true);
         onlineActivateLink->setVisible (true);
         instructionLabel2->setVisible (false);
         myLicenseLink->setVisible (true);
@@ -542,7 +633,9 @@ void ActivationComponent::setForTrial (bool setupForTrial)
         return;
     isForTrial = setupForTrial;
     licenseKey->setVisible (false);
+    deactivateOthers->setVisible (false);
     registerTrialLink->setVisible (false);
+    copyMachineButton.setVisible (false);
     addAndMakeVisible (progressBar);
     addAndMakeVisible (syncButton.get());
     progressBar.periodDays = status.getExpirationPeriodDays();
@@ -551,7 +644,7 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     {
         progress = 1.0;
         activateButton->setButtonText ("Purchase");
-        quitButton->setButtonText ("Quit");
+        quitButton->setButtonText (trialQuitButtonText.isNotEmpty() ? trialQuitButtonText : "Quit");
         instructionLabel->setText (
             String("Your trial license for APPNAME has expired. Use the button "
             "below to purchase a license.").replace("APPNAME", Util::appName()),
@@ -565,7 +658,7 @@ void ActivationComponent::setForTrial (bool setupForTrial)
         progress = (period - remaining) / period;
         progress = jlimit(0.0, 0.9999, progress);
         activateButton->setButtonText ("Upgrade");
-        quitButton->setButtonText ("Continue");
+        quitButton->setButtonText (trialQuitButtonText.isNotEmpty() ? trialQuitButtonText : "Continue");
         instructionLabel->setText (
             String("We hope you're enjoying APPNAME! Upgrade your trial license before expiration "
             "for a discounted price.").replace("APPNAME", Util::appName()),
@@ -575,9 +668,53 @@ void ActivationComponent::setForTrial (bool setupForTrial)
     resized();
 }
 
+void ActivationComponent::setForManagement (bool setupManagement)
+{
+    isForManagement = setupManagement;
+    if (isForManagement)
+    {
+        auto managementText = String("Your license for APPNAME is active on this machine.")
+                                   .replace("APPNAME", Util::appName());
+        if (gui.getUnlockStatus().isTrial())
+            managementText = managementText.replace("Your license", "Your trial license");
+        if (gui.getUnlockStatus().isExpiring())
+        {
+            String verb = gui.getUnlockStatus().isTrial() ? "Expires on " : "Renews on ";
+            managementText << juce::newLine << verb << gui.getUnlockStatus().getExpiryTime().toString (true, false);
+        }
+        instructionLabel->setText (managementText, dontSendNotification);
+        licenseKey->setEnabled (false);
+        licenseKey->setVisible (true);
+        deactivateOthers->setVisible (false);
+        progressBar.setVisible (false);
+        addAndMakeVisible (syncButton.get());
+        activateButton->setButtonText ("Deactivate");
+        quitButton->setButtonText ("Clear");
+        copyMachineButton.setVisible (false);
+    }
+    else
+    {
+        licenseKey->setEnabled (true);
+        deactivateOthers->setVisible (true);
+        instructionLabel->setText (activateInstructions, dontSendNotification);
+        if (isForTrial)
+        {
+            progressBar.setVisible (true);
+        }
+        removeChildComponent (syncButton.get());
+        activateButton->setButtonText ("Activate");
+        quitButton->setButtonText ("Quit");
+        if (licenseKey->isShowing())
+            licenseKey->grabKeyboardFocus();
+        copyMachineButton.setVisible (true);
+    }
+
+    resized();
+}
+
 void ActivationComponent::timerCallback()
 {
-    if (isForTrial || isForRegistration || grabbedFirstFocus)
+    if (isForTrial || isForRegistration || grabbedFirstFocus || isForManagement)
         return stopTimer();
 
     if (auto* toplevel = getTopLevelComponent())
@@ -590,22 +727,72 @@ void ActivationComponent::timerCallback()
     }
 }
 
-void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
+void ActivationComponent::handleRefreshResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action)
 {
     if (result.succeeded)
     {
         auto& _status = gui.getWorld().getUnlockStatus();
         if (EL_IS_TRIAL_EXPIRED(_status) || EL_IS_TRIAL_NOT_EXPIRED(_status))
         {
+            setForManagement (false);
             isForTrial = false;
             setForTrial (true);
-            resized();
         }
         else if (auto* dialog = findParentComponentOfClass<ActivationDialog>())
         {
             dialog->closeButtonPressed();
         }
+        else
+        {
+            isForTrial = false;
+            setForManagement (EL_IS_ACTIVATED (_status));
+        }
         _status.refreshed();
+    }
+}
+
+bool ActivationComponent::isInterestedInFileDrag (const StringArray& files)
+{
+    for (const auto& name : files)
+    {
+        const File file (name);
+        if (file.hasFileExtension ("elc"))
+            return true;
+    }
+
+    return false;
+}
+
+void ActivationComponent::filesDropped (const StringArray& files, int x, int y)
+{
+    ignoreUnused (x, y);
+    auto& status = gui.getUnlockStatus();
+    for (const auto& name : files)
+    {
+        const File file (name);
+        if (file.hasFileExtension ("elc"))
+        {
+            FileInputStream src (file);
+            if (status.applyKeyFile (src.readString()))
+            {
+                status.save();
+                status.loadAll();
+
+                if (EL_IS_TRIAL_EXPIRED(status) || EL_IS_TRIAL_NOT_EXPIRED(status))
+                {
+                    setForManagement (false);
+                    isForTrial = false;
+                    setForTrial (true);
+                }
+                else
+                {
+                    isForTrial = false;
+                    setForManagement (EL_IS_ACTIVATED (status));
+                }
+
+                status.refreshed();
+            }
+        }
     }
 }
 
@@ -623,16 +810,16 @@ void ActivationComponent::handleActivationResult (const UnlockStatus::UnlockResu
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ActivationComponent" componentName=""
-                 parentClasses="public Component, private Timer" constructorParams="GuiController&amp; g"
-                 variableInitialisers="gui(g), progressBar(progress)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="1"
-                 initialWidth="480" initialHeight="346">
+                 parentClasses="public Component, public FileDragAndDropTarget, private Timer"
+                 constructorParams="GuiController&amp; g" variableInitialisers="gui(g), progressBar(progress)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="1" initialWidth="480" initialHeight="346">
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="AppNameLabel" id="98725c68017cae68" memberName="appNameLabel"
          virtualName="" explicitFocusOrder="7" pos="0Cc 37 320 48" edTextCol="ff000000"
          edBkgCol="0" labelText="ELEMENT" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="44.0"
-         kerning="0.0" bold="0" italic="0" justification="36"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="4.4e1"
+         kerning="0" bold="0" italic="0" justification="36"/>
   <HYPERLINKBUTTON name="OnlineActivateLink" id="1b6f6eff8e1214e9" memberName="onlineActivateLink"
                    virtualName="" explicitFocusOrder="8" pos="0Cc 94 108 18" tooltip="EL_URL_HELP_ACTIVATION"
                    buttonText="Online Activation" connectedEdges="0" needsCallback="0"
@@ -641,37 +828,41 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="9" pos="0Cc 124 352 39" edTextCol="ff000000"
          edBkgCol="0" labelText="APPNAME requires activation to run.  &#10;Please enter your FULL or TRIAL license key for APPNAME.  "
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.0" kerning="0.0" bold="0"
+         fontname="Default font" fontsize="1.4e1" kerning="0" bold="0"
          italic="0" justification="36"/>
   <TEXTEDITOR name="LicenseKey" id="f335e055cddf091a" memberName="licenseKey"
-              virtualName="" explicitFocusOrder="1" pos="0Cc 171 260 22" initialText=""
+              virtualName="" explicitFocusOrder="1" pos="0Cc 169 260 22" initialText=""
               multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
               caret="1" popupmenu="0"/>
   <TEXTBUTTON name="ActivateButton" id="38181d6f9efb97c5" memberName="activateButton"
-              virtualName="" explicitFocusOrder="2" pos="-3Cr 208 90 24" posRelativeX="f335e055cddf091a"
+              virtualName="" explicitFocusOrder="2" pos="-3Cr 204 90 24" posRelativeX="f335e055cddf091a"
               buttonText="Activate" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="QuitButton" id="7b37f8d33c9651" memberName="quitButton"
-              virtualName="" explicitFocusOrder="3" pos="3C 208 90 24" posRelativeX="f335e055cddf091a"
+              virtualName="" explicitFocusOrder="3" pos="3C 204 90 24" posRelativeX="f335e055cddf091a"
               buttonText="Start Trial" connectedEdges="0" needsCallback="1"
               radioGroupId="0"/>
   <HYPERLINKBUTTON name="MyLicensesLink" id="e6525e3d0946afd7" memberName="myLicenseLink"
-                   virtualName="" explicitFocusOrder="4" pos="0Cc 249 96 18" tooltip="http://www.juce.com"
+                   virtualName="" explicitFocusOrder="4" pos="0Cc 256 96 18" tooltip="http://www.juce.com"
                    buttonText="My Licenses" connectedEdges="0" needsCallback="0"
                    radioGroupId="0" url="http://www.juce.com"/>
   <HYPERLINKBUTTON name="GetLicenseLink" id="3505ea719a627714" memberName="getLicenseLink"
-                   virtualName="" explicitFocusOrder="5" pos="0Cc 272 94 18" tooltip="https://kushview.net/element/purchase"
+                   virtualName="" explicitFocusOrder="5" pos="0Cc 279 94 18" tooltip="https://kushview.net/element/purchase"
                    buttonText="Get A License" connectedEdges="0" needsCallback="0"
                    radioGroupId="0" url="https://kushview.net/element/purchase"/>
   <HYPERLINKBUTTON name="RegisterTrialLink" id="c01a1273f8522474" memberName="registerTrialLink"
-                   virtualName="" explicitFocusOrder="6" pos="0Cc 293 100 18" tooltip="https://kushview.net/element/trial"
+                   virtualName="" explicitFocusOrder="6" pos="0Cc 300 100 18" tooltip="https://kushview.net/element/trial"
                    buttonText="Register For Trial" connectedEdges="0" needsCallback="0"
                    radioGroupId="0" url="https://kushview.net/element/trial"/>
   <LABEL name="InstructionLabel" id="114f346dab5fa0b4" memberName="instructionLabel2"
          virtualName="" explicitFocusOrder="9" pos="0Cc 240 280 64" textCol="fff2f2f2"
          edTextCol="ff000000" edBkgCol="0" labelText="Your license key will be emailed to you upon sucessful registration. Fake credentials won't cut it."
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="14.0" kerning="0.0" bold="0"
+         fontname="Default font" fontsize="1.4e1" kerning="0" bold="0"
          italic="1" justification="36" typefaceStyle="Italic"/>
+  <TOGGLEBUTTON name="DeactivateOthers" id="562f1ace17bb609a" memberName="deactivateOthers"
+                virtualName="" explicitFocusOrder="0" pos="-0.5Cc 234 183 18"
+                buttonText="Deactivate other machines?" connectedEdges="0" needsCallback="0"
+                radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

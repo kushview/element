@@ -32,6 +32,10 @@ static int getOctaveOffsetForKeyPress (const KeyPress& key, const int fallback =
     return fallback;
 }
 
+VirtualKeyboardComponent::VirtualKeyboardComponent (MidiKeyboardState& s, Orientation o)
+        : MidiKeyboardComponent (s, o)
+{  }
+
 void VirtualKeyboardComponent::setKeypressOctaveOffset (int offset)
 {
     if (offset < 0) offset = 0;
@@ -81,9 +85,20 @@ bool VirtualKeyboardComponent::keyPressed (const KeyPress& key)
 
 VirtualKeyboardView::VirtualKeyboardView()
 {
+    setOpaque (true);
     addAndMakeVisible (keyboard = new VirtualKeyboardComponent (
         internalState, MidiKeyboardComponent::horizontalKeyboard));
     setupKeyboard (*keyboard);
+   #if 0
+    addAndMakeVisible (midiChannel);
+    midiChannel.setSliderStyle (Slider::IncDecButtons);
+    midiChannel.setRange (1.0, 16.0, 1.0);
+    midiChannel.setTextBoxStyle (Slider::TextBoxLeft, false, 60, midiChannel.getTextBoxHeight());
+    addAndMakeVisible (midiProgram);
+    midiProgram.setSliderStyle (Slider::IncDecButtons);
+    midiProgram.setRange (1.0, 128, 1.0);
+    midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 60, midiProgram.getTextBoxHeight());
+   #endif
 }
 
 void VirtualKeyboardView::setupKeyboard (VirtualKeyboardComponent& kb)
@@ -96,10 +111,24 @@ VirtualKeyboardView::~VirtualKeyboardView()
     keyboard = nullptr;
 }
 
+void VirtualKeyboardView::paint (Graphics& g) 
+{
+    g.fillAll (LookAndFeel::widgetBackgroundColor);
+}
+
 void VirtualKeyboardView::resized()
 {
+    auto r = getLocalBounds();
+   #if 0
+    r.removeFromTop (2);
+    auto r2 = r.removeFromTop (18);
+    midiChannel.setBounds (r2.removeFromLeft (90));
+    r2.removeFromLeft (2);
+    midiProgram.setBounds (r2.removeFromLeft (90));
+    r.removeFromTop (2);
+   #endif
     if (keyboard)
-        keyboard->setBounds (getLocalBounds());
+        keyboard->setBounds (r);
 }
 
 void VirtualKeyboardView::didBecomeActive()

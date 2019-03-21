@@ -6,10 +6,11 @@
 
 namespace Element {
 
-class AppMessage;
 class Globals;
 class Settings;
 class UnlockStatus;
+
+struct AppMessage;
 
 class AppController :  public Controller,
                        protected ApplicationCommandTarget,

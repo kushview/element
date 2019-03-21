@@ -22,8 +22,10 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "gui/ActivationDialog.h"
+#include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
+#include "gui/ViewHelpers.h"
 #include "gui/UnlockForm.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -464,6 +466,8 @@ namespace Element {
                 const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
                 settings.getUserSettings()->setValue ("clockSource", val);
                 engine->applySettings (settings);
+                if (auto* cc = ViewHelpers::findContentComponent())
+                    cc->refreshToolbar();
             }
 
             else if (value.refersToSameSourceAs (scanForPlugins.getToggleStateValue()))
@@ -833,7 +837,7 @@ namespace Element {
         }
     };
 
-    #define EL_PREFS_NEW_UNLOCKING 0
+    #define EL_PREFS_NEW_UNLOCKING 1
     class LicenseSettingsPage : public SettingsPage
     {
     public:
@@ -844,8 +848,16 @@ namespace Element {
            #if EL_PREFS_NEW_UNLOCKING
             activation.reset (new ActivationComponent (gui));
             activation->setBackgroundColour (LookAndFeel::widgetBackgroundColor);
-            if ((EL_IS_TRIAL_EXPIRED(status)) || (EL_IS_TRIAL_NOT_EXPIRED(status)))
-                activation->setForTrial (true, true);
+            activation->setOverlayOpacity (0.0f);
+            activation->setOverlayShowText (false);
+            if ((EL_IS_TRIAL_EXPIRED (status)) || (EL_IS_TRIAL_NOT_EXPIRED (status))) 
+            {
+                activation->setForTrial (true);
+                activation->setQuitButtonTextForTrial ("Manage");
+            }
+            else if (EL_IS_ACTIVATED (status))
+                activation->setForManagement (true);
+            
             addAndMakeVisible (activation.get());
            #else
             form.reset (new UnlockForm (world, gui,

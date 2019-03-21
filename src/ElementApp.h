@@ -66,6 +66,9 @@ namespace Tags
     const Identifier midiChannel        = "midiChannel";
     const Identifier midiChannels       = "midiChannels";
     const Identifier midiProgram        = "midiProgram";
+    const Identifier midiProgramsEnabled = "midiProgramsEnabled";
+    const Identifier globalMidiPrograms = "globalMidiPrograms";
+    const Identifier midiProgramsState  = "midiProgramsState";
     const Identifier renderMode         = "renderMode";
 
     const Identifier vertical           = "vertical";
@@ -82,6 +85,7 @@ namespace Tags
     const Identifier pluginName         = "pluginName";
     const Identifier pluginIdentifierString = "pluginIdentifierString";
     const Identifier uuid               = "uuid";
+    const Identifier ui                 = "ui";
     const Identifier parameter          = "parameter";
     const Identifier offline            = "offline";
 
@@ -91,6 +95,8 @@ namespace Tags
 
     const Identifier velocityCurveMode  = "velocityCurveMode";
     const Identifier workspace          = "workspace";
+
+    const Identifier externalSync       = "externalSync";
 }
 
 struct Alert

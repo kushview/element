@@ -382,7 +382,7 @@ void GuiController::run()
    #endif
 
     stabilizeViews();
-    
+
     if ((EL_IS_TRIAL_EXPIRED (getWorld().getUnlockStatus())) ||
         (EL_IS_TRIAL_NOT_EXPIRED (getWorld().getUnlockStatus())) ||
         (EL_IS_NOT_ACTIVATED (getWorld().getUnlockStatus())))
@@ -517,6 +517,11 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
         case Commands::graphSaveAs:
             result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
             result.setInfo ("Save Graph As", "Save the current session with a new name", Commands::Categories::Session, 0);
+            break;
+        case Commands::importSession:
+            // result.addDefaultKeypress ('s', ModifierKeys::commandModifier | ModifierKeys::shiftModifier);
+            result.setInfo ("Import Session", "Import a graph from a session", 
+                Commands::Categories::Session, 0);
             break;
        #endif
 

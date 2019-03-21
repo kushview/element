@@ -125,8 +125,13 @@ public:
     
     /** Adds a message to the MIDI input.  This can be used by Controllers and UI
         components that send MIDI in a non-realtime critical situation. DO NOT call
-        this from the audio thread */
-    void addMidiMessage (const MidiMessage msg);
+        this from the audio thread 
+     
+        @param msg                      The MidiMessage to send
+        @param handleOnDeviceQueue      When true will treat it as if received by a
+                                        MidiInputDevice callback (don't use except for debugging)
+     */
+    void addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue = false);
     
     void applySettings (Settings&);
     

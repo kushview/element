@@ -494,6 +494,7 @@ public:
             }
         }
 
+        const bool wasPlaying = transport.isPlaying();
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
 
@@ -502,6 +503,19 @@ public:
            #if defined (EL_PRO)
             if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
             {
+                if (wasPlaying != transport.isPlaying())
+                {
+                    if (transport.isPlaying())
+                    {
+                        incomingMidi.addEvent (transport.getPositionFrames() <= 0 
+                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                    }
+                    else
+                    {
+                        incomingMidi.addEvent (MidiMessage::midiStop(), 0);
+                    }
+                }
+
                 midiClockMaster.setTempo (transport.getTempo());
                 midiClockMaster.render (incomingMidi, numSamples);
             }
@@ -525,6 +539,7 @@ public:
         
         const ScopedLock sl (lock);
         const bool shouldProcess = shouldBeLocked.get() == 0;
+        const bool wasPlaying = transport.isPlaying();
         transport.preProcess (numSamples);
 
         if (shouldProcess)
@@ -532,6 +547,18 @@ public:
            #if defined (EL_PRO)
             if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
             {
+                if (wasPlaying != transport.isPlaying())
+                {
+                    if (transport.isPlaying())
+                    {
+                        midi.addEvent (transport.getPositionFrames() <= 0 
+                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                    }
+                    else
+                    {
+                        midi.addEvent (MidiMessage::midiStop(), 0);
+                    }
+                }
                 midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
                 midiClockMaster.render (midi, numSamples);
             }
@@ -548,7 +575,7 @@ public:
                 zeromem (buffer.getWritePointer(i), sizeof (float) * (size_t) numSamples);
         }
 
-        if (isTimeMaster() && transport.isPlaying())
+        if (transport.isPlaying())
             transport.advance (numSamples);
         
         transport.postProcess (numSamples);
@@ -630,8 +657,24 @@ public:
         if (! message.isActiveSense() && ! message.isMidiClock())
             midiIOMonitor->received();
         messageCollector.addMessageToQueue (message);
-        if (message.isMidiClock() && processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0)
+        const bool clockWanted = processMidiClock.get() > 0 && sessionWantsExternalClock.get() > 0;
+        if (clockWanted && message.isMidiClock())
+        {
             midiClock.process (message);
+        }
+        else if (clockWanted && message.isMidiStart())
+        {
+            transport.requestPlayState (true);
+            transport.requestAudioFrame (0);
+        }
+        else if (clockWanted && message.isMidiStop())
+        {
+            transport.requestPlayState (false);
+        }
+        else if (clockWanted && message.isMidiContinue())
+        {
+            transport.requestPlayState (true);
+        }   
     }
     
     void addGraph (RootGraph* graph)
@@ -869,11 +912,14 @@ RootGraph* AudioEngine::getGraph (const int index)
     return nullptr;
 }
 
-void AudioEngine::addMidiMessage (const MidiMessage msg)
+void AudioEngine::addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueue)
 {
     if (priv == nullptr)
         return;
-    priv->messageCollector.addMessageToQueue (msg);
+    if (handleOnDeviceQueue)
+        priv->handleIncomingMidiMessage (nullptr, msg);
+    else
+        priv->messageCollector.addMessageToQueue (msg);
 }
     
 void AudioEngine::setActiveGraph (const int index)

@@ -3,6 +3,7 @@
 #include "engine/GraphNode.h"
 #include "engine/LinearFade.h"
 #include "engine/ToggleGrid.h"
+#include "engine/nodes/BaseProcessor.h"
 
 namespace Element {
 
@@ -43,6 +44,21 @@ public:
         fadeLengthSeconds = seconds;
         fadeIn.setLength (static_cast<float> (fadeLengthSeconds));
         fadeOut.setLength (static_cast<float> (fadeLengthSeconds));
+    }
+
+    void getPluginDescription (PluginDescription& desc) const override
+    {
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
+        desc.name               = "Audio Router";
+        desc.descriptiveName    = "An Audio Patch Grid";
+        desc.numInputChannels   = numDestinations;
+        desc.numOutputChannels  = numSources;
+        desc.hasSharedContainer = false;
+        desc.isInstrument       = false;
+        desc.manufacturerName   = "Element";
+        desc.pluginFormatName   = "Element";
+        desc.version            = "1.0.0";
+        desc.uid                = EL_INTERNAL_UID_AUDIO_ROUTER;
     }
 
 protected:

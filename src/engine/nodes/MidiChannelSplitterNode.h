@@ -2,6 +2,7 @@
 
 #include "engine/nodes/MidiFilterNode.h"
 #include "engine/MidiPipe.h"
+#include "engine/nodes/BaseProcessor.h"
 
 namespace Element {
 
@@ -58,6 +59,21 @@ public:
 
         input.swapWith (tempMidi);
         tempMidi.clear();
+    }
+
+    void getPluginDescription (PluginDescription& desc) const override
+    {
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER;
+        desc.name               = "MIDI Channel Splitter";
+        desc.descriptiveName    = "MIDI Channel Splitter";
+        desc.numInputChannels   = 0;
+        desc.numOutputChannels  = 0;
+        desc.hasSharedContainer = false;
+        desc.isInstrument       = false;
+        desc.manufacturerName   = "Element";
+        desc.pluginFormatName   = "Element";
+        desc.version            = "1.0.0";
+        desc.uid                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
     }
 
 protected:

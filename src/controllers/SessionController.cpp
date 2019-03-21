@@ -6,6 +6,9 @@
 #include "controllers/GuiController.h"
 #include "controllers/PresetsController.h"
 #include "controllers/SessionController.h"
+
+#include "gui/ContentComponent.h"
+
 #include "session/Node.h"
 #include "Globals.h"
 #include "Settings.h"
@@ -77,9 +80,16 @@ void SessionController::openFile (const File& file)
         
         if (result.wasOk())
         {
-            if (auto* gc = findSibling<GuiController>())
-                gc->closeAllPluginWindows();
+            auto& gui = *findSibling<GuiController>();
+            gui.closeAllPluginWindows();
             refreshOtherControllers();
+            
+            if (auto* cc = gui.getContentComponent())
+            {
+                auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+                cc->applySessionState (ui.getProperty ("content").toString());
+            }
+
             findSibling<GuiController>()->stabilizeContent();
             resetChanges();
         }
@@ -129,6 +139,15 @@ void SessionController::saveSession (const bool saveAs)
 {
     jassert (document && currentSession);
     auto result = FileBasedDocument::userCancelledSave;
+
+    auto& gui = *findSibling<GuiController>();
+
+    if (auto* cc = gui.getContentComponent())
+    {
+        String state; cc->getSessionState (state);
+        auto ui = currentSession->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+        ui.setProperty ("content", state, nullptr);
+    }
 
     if (saveAs) {
         result = document->saveAs (File(), true, true, true);

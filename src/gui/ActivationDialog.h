@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.2
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
+#include "gui/Buttons.h"
 #include "gui/UnlockOverlay.h"
 #include "session/CommandManager.h"
 #include "session/UnlockStatus.h"
@@ -50,6 +51,7 @@ struct TrialDaysProgressBar : public ProgressBar
                                                                     //[/Comments]
 */
 class ActivationComponent  : public Component,
+                             public FileDragAndDropTarget,
                              private Timer,
                              public Button::Listener
 {
@@ -62,9 +64,21 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void setForTrial (bool setupForTrial);
     void setForRegistration (bool setupRegistration);
+    void setForManagement (bool setupManagement);
+    void setQuitButtonTextForTrial (const String& text)
+    {
+        trialQuitButtonText = text;
+        if (isForTrial)
+            quitButton->setButtonText (trialQuitButtonText);
+    }
     void visibilityChanged() override;
     void timerCallback() override;
     void setBackgroundColour (const Colour& color) { backgroundColour = color; repaint(); }
+    void setOverlayOpacity (float opacity) { overlayOpacity = jlimit (0.f, 1.f, opacity); }
+    void setOverlayShowText (bool showIt) { overlayShowText = showIt; }
+
+    bool isInterestedInFileDrag (const StringArray& files) override;
+    void filesDropped (const StringArray& files, int x, int y) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -75,13 +89,17 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    String activateInstructions;
     Colour backgroundColour;
     GuiController& gui;
     std::unique_ptr<Component> unlock;
     double progress = 0.0;
+    float overlayOpacity = 0.72f;
+    bool overlayShowText = true;
     TrialDaysProgressBar progressBar;
     bool isForTrial = false;
     bool isForRegistration = false;
+    bool isForManagement = false;
     String textBeforeReg;
     Label emailLabel { "Email"};
     TextEditor email;
@@ -91,7 +109,9 @@ private:
     TextEditor password;
     bool grabbedFirstFocus = false;
     std::unique_ptr<IconButton> syncButton;
-    void handleActivationResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
+    String trialQuitButtonText = "Continue";
+    IconButton copyMachineButton;
+    void handleRefreshResult (const UnlockStatus::UnlockResult result, UnlockOverlay::Action);
     //[/UserVariables]
 
     //==============================================================================
@@ -105,6 +125,7 @@ private:
     std::unique_ptr<HyperlinkButton> getLicenseLink;
     std::unique_ptr<HyperlinkButton> registerTrialLink;
     std::unique_ptr<Label> instructionLabel2;
+    std::unique_ptr<ToggleButton> deactivateOthers;
 
 
     //==============================================================================
@@ -132,6 +153,7 @@ public:
             activation->setForTrial (true);
         setContentOwned (activation, true);
         centreAroundComponent ((Component*) gui.getContentComponent(), getWidth(), getHeight());
+        activation->resized(); // < make sure buttons are positioned appropriately
         setAlwaysOnTop (true);
         addToDesktop();
         setVisible (true);

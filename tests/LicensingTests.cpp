@@ -23,12 +23,23 @@ public:
     
     void initialise()   override  { initializeWorld(); }
     void shutdown()     override  { shutdownWorld(); }
+<<<<<<< HEAD
     void clearLicense (UnlockStatus& status)
     {
         status.saveState (String());
         getWorld().getSettings().saveIfNeeded();
         status.loadAll();
     }
+=======
+
+    void clearLicense (UnlockStatus& status)
+    {
+        status.saveState(String());
+        getWorld().getSettings().saveIfNeeded();
+        status.loadAll();
+    }
+
+>>>>>>> release/0.29.0
    #if defined (EL_SOLO)
     void runTest() override
     {
@@ -90,14 +101,17 @@ public:
         OnlineUnlockStatus::UnlockResult result;
 
         beginTest ("pro unlocked with trial license & is expiring");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_TRIAL, {}, {}, params);
         status.save(); status.loadAll();
         expect (result.succeeded, result.errorMessage);
         expect ((bool) status.isExpiring());
         expect ((bool) status.isTrial());
         expect (status.getExpiryTime() > Time::getCurrentTime());
+        expect (EL_IS_TRIAL_NOT_EXPIRED (status));
 
         beginTest ("pro locked with expired trial license");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_TRIAL_EXPIRED, {}, {}, params);
         status.save(); status.loadAll();
         DBG("response message: " << result.errorMessage);
@@ -106,6 +120,7 @@ public:
         expect ((bool) status.isTrial());
         expect (! (bool) status.isExpiring());
         expect (status.getExpiryTime() <= Time());
+        expect (EL_IS_NOT_ACTIVATED (status));
 
         beginTest ("pro locked with solo license");
         clearLicense (status);
@@ -117,8 +132,10 @@ public:
         expect (! (bool) status.isTrial());
         expect (! (bool) status.isUnlocked());
         expect (! (bool) status.isFullVersion());
+        expect (EL_IS_NOT_ACTIVATED (status));
 
         beginTest ("pro unlocks with pro license");
+        clearLicense (status);
         result = status.activateLicense (EL_LICENSE_PRO, {}, {}, params);
         status.save(); status.loadAll();
         expect (result.succeeded, result.errorMessage);
@@ -126,6 +143,7 @@ public:
         expect (! (bool) status.isTrial());
         expect ((bool) status.isUnlocked());
         expect ((bool) status.isFullVersion());
+        expect (EL_IS_ACTIVATED (status));
     }
    #endif
 };

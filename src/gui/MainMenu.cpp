@@ -190,6 +190,26 @@ void MainMenu::menuItemSelected (int index, int menu)
         cmd.invokeDirectly (Commands::workspaceOpen, true);
     }
    #endif
+    else if (index == 8000)
+    {
+        if (auto *cc = getContentComponent())
+            cc->getAppController().getWorld().getUnlockStatus().dump();
+    }
+    else if (index == 9000)
+    {
+        engine->addMidiMessage (MidiMessage::midiStart().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
+    else if (index == 9001)
+    {
+        engine->addMidiMessage (MidiMessage::midiStop().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
+    else if (index == 9002)
+    {
+        engine->addMidiMessage (MidiMessage::midiContinue().withTimeStamp (1.f + Time::getMillisecondCounterHiRes()),
+                                true);
+    }
    #endif
     
     if (menu == File && index >= recentMenuOffset)
@@ -224,6 +244,9 @@ void MainMenu::buildFileMenu (PopupMenu& menu)
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::graphOpen, "Open Graph...");
     addRecentFiles (menu);
+    menu.addSeparator();
+    menu.addCommandItem (&cmd, Commands::importSession, "Import from Session...");
+    menu.addSeparator();    
     menu.addCommandItem (&cmd, Commands::graphSave, "Save Graph");
     menu.addCommandItem (&cmd, Commands::graphSaveAs, "Save Graph As...");
 
@@ -302,6 +325,10 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     menu.addItem (6666, "Show Workspace Window");
     menu.addItem (7777, "Save Workspace");
     menu.addItem (7778, "Load Workspace");
+    menu.addItem (8000, "Dump License");
+    menu.addItem (9000, "MIDI Start");
+    menu.addItem (9001, "MIDI Stop");
+    menu.addItem (9002, "MIDI Continue");
 
     menu.addCommandItem (&cmd, Commands::panic, "Panic!");
 }
@@ -325,11 +352,11 @@ void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::sessionSave,   "Save Session");
     menu.addCommandItem (&cmd, Commands::sessionSaveAs, "Save Session As...");
     
-    #ifndef EL_FREE
+   #ifndef EL_FREE
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::importGraph, "Import...");
     menu.addCommandItem (&cmd, Commands::exportGraph, "Export graph...");
-    #endif
+   #endif
 }
     
 void MainMenu::buildEditMenu (CommandManager& cmd, PopupMenu& menu)

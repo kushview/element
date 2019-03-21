@@ -29,7 +29,7 @@ private:
     {
         beginTest ("SQLiteCpp");
         
-        const File file (DataPath::applicationDataDir().getChildFile("test.db3"));
+        const File file (DataPath::applicationDataDir().getChildFile ("test.db3"));
 
         try
         {
@@ -77,8 +77,7 @@ private:
         {
             expect (false, e.what());
         }
-       
-       
+        
         if (file.existsAsFile())
             file.deleteFile();
     }

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 
 namespace Element {
 

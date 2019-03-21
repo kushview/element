@@ -99,6 +99,13 @@ namespace Element {
         typedef std::function<void(const ValueTree& tree)> ValueTreeFunction;
         void forEach (ValueTreeFunction handler) const;
 
+        void setActiveGraph (int index);
+        bool containsGraph (const Node& graph) const;
+
+        /** Writes an encoded file */
+        bool writeToFile (const File&) const;
+        static ValueTree readFromFile (const File&);
+        
     protected:
         void forEach (const ValueTree tree, ValueTreeFunction handler) const;
 
@@ -127,6 +134,7 @@ namespace Element {
         inline ValueTree getControllerMapsValueTree()           const { return objectData.getChildWithName(Tags::maps); }
 
         friend class SessionController;
+        friend class SessionImportWizard;
         friend struct ScopedFrozenLock;
         mutable bool freezeChangeNotification = false;
         void notifyChanged();

@@ -1,12 +1,15 @@
+#include <iomanip>
 #include "ElementApp.h"
 
 #include "engine/nodes/AudioProcessorNode.h"
+#include "engine/nodes/MidiDeviceProcessor.h"
+#include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/SubGraphProcessor.h"
+
 #include "engine/AudioEngine.h"
 #include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
-#include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/nodes/SubGraphProcessor.h"
 
 #include "session/Node.h"
 
@@ -16,7 +19,8 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
       isPrepared (false),
       metadata (Tags::node),
-      enablement (*this)
+      enablement (*this),
+      midiProgramLoader (*this)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
@@ -59,10 +63,17 @@ void GraphNode::setGain (const float f) {
     gain.set(f);
 }
 
-void GraphNode::getPluginDescription (PluginDescription& desc)
+void GraphNode::getPluginDescription (PluginDescription& desc) const
 {
     if (AudioPluginInstance* i = getAudioPluginInstance())
+    {
         i->fillInPluginDescription (desc);
+    }
+    else
+    {
+        // need to fill this in for custom nodes
+        jassertfalse;
+    }
 }
 
 void GraphNode::connectAudioTo (const GraphNode* other)
@@ -120,6 +131,11 @@ bool GraphNode::isMidiIONode() const
     if (IOP* iop = dynamic_cast<IOP*> (getAudioProcessor()))
         return iop->getType() == IOP::midiInputNode || iop->getType() == IOP::midiOutputNode;
     return false;
+}
+
+bool GraphNode::isMidiDeviceNode() const
+{
+    return nullptr != dynamic_cast<MidiDeviceProcessor*> (getAudioProcessor());
 }
 
 int GraphNode::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
@@ -311,6 +327,177 @@ void GraphNode::EnablementUpdater::handleAsyncUpdate()
     graph.setEnabled (! graph.isEnabled());
 }
 
+void GraphNode::reloadMidiProgram()
+{
+    midiProgramLoader.triggerAsyncUpdate();
+}
+
+File GraphNode::getMidiProgramFile() const
+{
+    PluginDescription desc;
+    getPluginDescription (desc);
+    const auto uids = desc.createIdentifierString();
+    const auto program = getMidiProgram();
+    if (uids.isEmpty())
+    {
+        jassertfalse;
+        return File();
+    }
+
+    if (! isPositiveAndBelow (program, 128))
+    {
+        jassertfalse;
+        return File();
+    }
+
+    std::stringstream stream;
+    stream << uids.toStdString() << "_" << std::setfill('0') << std::setw(3) << program << ".eln";
+    String fileName = stream.str();
+    const File file (DataPath::applicationDataDir().getChildFile("NodeMidiPrograms").getChildFile(fileName));
+    if (! file.getParentDirectory().exists())
+        file.getParentDirectory().createDirectory();
+    return file;
+}
+
+void GraphNode::saveMidiProgram()
+{
+    int progamNumber = midiProgram.get();
+    if (! isPositiveAndBelow (progamNumber, 128))
+        return;
+    if (auto* const program = getMidiProgram (progamNumber))
+    {
+        program->state = MemoryBlock();
+        getState (program->state);
+    }
+}
+
+GraphNode::MidiProgram* GraphNode::getMidiProgram (int program)
+{
+    if (! isPositiveAndBelow (program, 128))
+        return nullptr;
+    for (auto* const p : midiPrograms)
+        if (p->program == program)
+            return p;
+    auto* const ret = midiPrograms.add (new GraphNode::MidiProgram ());
+    ret->program = program;
+    return ret;
+}
+
+void GraphNode::MidiProgramLoader::handleAsyncUpdate()
+{
+    const File programFile = node.getMidiProgramFile();
+    const bool globalPrograms = node.useGlobalMidiPrograms();
+    const auto requestedProgram = node.getMidiProgram();
+   #if 0
+    if (node.lastMidiProgram.get() == requestedProgram)
+    {
+        DBG("[EL] same program, not loading.");
+        return;
+    }
+   #endif
+
+    if (globalPrograms)
+    {
+        if (programFile.existsAsFile())
+        {
+            const auto programData = Node::parse (programFile);
+            auto data = programData.getProperty(Tags::state).toString().trim();
+            if (data.isNotEmpty())
+            {
+                MemoryBlock state;
+                state.fromBase64Encoding (data);
+                if (state.getSize() > 0)
+                {
+                    node.lastMidiProgram.set (requestedProgram);
+                    node.setState (state.getData(), (int) state.getSize());
+                    DBG("[EL] loaded program: " << requestedProgram);
+                }
+            }
+        }
+        else
+        {
+            DBG("[EL] Program file doesn't exist: " << node.getMidiProgramFile().getFileName());
+        }
+    }
+    else
+    {
+        if (auto* const program = node.getMidiProgram (requestedProgram))
+        {
+            node.setState (program->state.getData(), 
+                           static_cast<int> (program->state.getSize()));
+        }
+        else
+        {
+            DBG("[EL] program has no data");
+        }
+    }
+
+    node.midiProgramChanged(); // always notify the program # changed even if not loaded.
+                               // do this because there may not be data for the program but
+                               // the property is still relavent.
+}
+
+void GraphNode::setMidiProgram (const int program)
+{
+    if (program < 0 || program > 127)
+    {
+        jassertfalse; // out of range
+        return;
+    }
+    
+    midiProgram.set (program);
+}
+
+void GraphNode::getMidiProgramsState (String& state) const
+{
+    state = String();
+    if (midiPrograms.size() <= 0)
+        return;
+    ValueTree tree ("programs");
+    for (auto* const program : midiPrograms)
+    {
+        auto& state = program->state;
+        ValueTree data ("program");
+        data.setProperty (Tags::program, program->program, nullptr)
+            .setProperty (Tags::state, state.toBase64Encoding(), nullptr);
+        tree.appendChild (data, nullptr);
+    }
+
+    MemoryOutputStream mo;
+    {
+        GZIPCompressorOutputStream gzipStream (mo, 9);
+        tree.writeToStream (gzipStream);
+    }
+
+    state = mo.getMemoryBlock().toBase64Encoding();
+}
+
+void GraphNode::setMidiProgramsState (const String& state)
+{
+    midiPrograms.clearQuick (true);
+    if (state.isEmpty())
+        return;
+    MemoryBlock mb;
+    mb.fromBase64Encoding (state);
+    const ValueTree tree = (mb.getSize() > 0)
+        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+        : ValueTree();
+    
+    for (int i = 0; i < tree.getNumChildren(); ++i)
+    {
+        const auto data = tree.getChild (i);
+        std::unique_ptr<GraphNode::MidiProgram> program;
+        program.reset (new GraphNode::MidiProgram());
+        program->program = (int) data [Tags::program];
+        const auto state = data.getProperty (Tags::state).toString().trim();
+        if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
+        {
+            program->state.fromBase64Encoding (state);
+            midiPrograms.add (program.release());
+        }
+    }
+}
+
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     audio.clear (0, audio.getNumSamples());
@@ -326,6 +513,12 @@ void GraphNode::resetPorts()
     metadata.removeChild (portList, nullptr);
     metadata.removeChild (nodeList, nullptr);
     portList.removeAllChildren (nullptr);
+    
+    if (ports.size (PortType::Midi, true) <= 0 &&
+        !isMidiIONode() && !isAudioIONode() && !isMidiDeviceNode())
+    {
+        ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
+    }
 
     for (int i = 0; i < ports.size(); ++i)
     {

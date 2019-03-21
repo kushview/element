@@ -18,24 +18,42 @@ String GraphDocument::getDocumentTitle()
 
 Result GraphDocument::loadDocument (const File& file)
 {
-    const auto data = Node::parse (file);
-    if (! Node::isProbablyGraphNode (data))
+    jassert(session != nullptr);
+    if (! session)
+        return Result::fail ("Cannot load graph");
+    
+    auto newData = Session::readFromFile (file);
+    if (newData.isValid() && newData.hasType (Tags::session))
+    {
+        if (! session->loadData (newData))
+            return Result::fail ("Cannot load malformed graph");
+
+        bindChangeHandlers();
+        return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
+    }
+
+    newData = Node::parse (file);
+    if (! Node::isProbablyGraphNode (newData))
         return Result::fail ("Invalid graph provided");
-    setGraph (Node (data, true));
+    setGraph (Node (newData, true));
     return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
 }
 
 Result GraphDocument::saveDocument (const File& file)
 {
+    jassert(session && session->containsGraph (graph));
+    if (!session || !session->containsGraph (graph))
+        return Result::fail ("No graph data present");
+
     if (! graph.isGraph())
     {
         DBG(graph.getValueTree().toXmlString());
         return Result::fail ("No graph is loaded");
     }
 
-    graph.savePluginState();
+    session->saveGraphState();
     
-    if (graph.writeToFile (file))
+    if (session->writeToFile (file))
         return Result::ok();
 
     return Result::fail ("Could not write graph to file");

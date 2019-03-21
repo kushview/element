@@ -7,7 +7,7 @@
 
 namespace Element {
 
-class ProgramChangeMapNode : public MidiFilterNode,
+class MidiProgramMapNode : public MidiFilterNode,
                              public AsyncUpdater,
                              public ChangeBroadcaster
 {
@@ -19,10 +19,29 @@ public:
         int out;
     };
     
-    ProgramChangeMapNode();
-    virtual ~ProgramChangeMapNode();
+    MidiProgramMapNode();
+    virtual ~MidiProgramMapNode();
+
+    void getPluginDescription (PluginDescription& desc) const override
+    {
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
+        desc.name               = "MIDI Program Map";
+        desc.descriptiveName    = "Filter MIDI Program Changes";
+        desc.numInputChannels   = 0;
+        desc.numOutputChannels  = 0;
+        desc.hasSharedContainer = false;
+        desc.isInstrument       = false;
+        desc.manufacturerName   = "Element";
+        desc.pluginFormatName   = "Element";
+        desc.version            = "1.0.0";
+        desc.uid                = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
+    }
 
     void clear();
+    
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void releaseResources() override;
+
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void sendProgramChange (int program, int channel);
     int getNumProgramEntries() const;
@@ -66,7 +85,7 @@ public:
         {
             ScopedLock sl (lock);
             for (const auto* const entry : entries)
-                programMap[entry->in] = entry->out;
+                programMap [entry->in] = entry->out;
         }
 
         sendChangeMessage();
@@ -85,13 +104,13 @@ public:
         }
 
         MemoryOutputStream stream (block, false);
-        GZIPCompressorOutputStream gzip (stream);
-        tree.writeToStream (gzip);
+
+        {
+            GZIPCompressorOutputStream gzip (stream);
+            tree.writeToStream (gzip);
+        }
     }
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override { ignoreUnused (sampleRate, maxBufferSize); }
-    void releaseResources() override { }
-    
     inline void handleAsyncUpdate() override { lastProgramChanged(); }
     Signal<void()> lastProgramChanged;
 

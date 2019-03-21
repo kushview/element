@@ -218,6 +218,7 @@ namespace Element {
         
         const bool canConnectTo (const Node& o) const;
 
+        int getNumPorts() const { return getPortsValueTree().getNumChildren(); }
         void getPorts (PortArray& ports, PortType type, bool isInput) const;
         void getPorts (PortArray& ins, PortArray& outs, PortType type) const;
         void getAudioInputs (PortArray& ports) const;
@@ -355,6 +356,18 @@ namespace Element {
         void setCurrentProgram (const int index);
         int getCurrentProgram() const;
         
+        /** True if global MIDI programs should be loaded/saved */
+        bool useGlobalMidiPrograms() const;
+        /** Change whether to load/save global programs */
+        void setUseGlobalMidiPrograms (bool);
+        /** True if MIDI program functionality is on */
+        bool areMidiProgramsEnabled() const;
+        /** Turn MIDI Programs on or off */
+        void setMidiProgramsEnabled (bool);
+        
+        int getMidiProgram() const;
+        void setMidiProgram (int program);
+
         bool hasEditor() const;
         
         void getArcs (OwnedArray<Arc>&) const;
@@ -363,7 +376,7 @@ namespace Element {
         ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
         ValueTree getParentArcsNode() const;
         ValueTree getPortsValueTree() const { return objectData.getChildWithName (Tags::ports); }
-
+        ValueTree getUIValueTree()    const { return objectData.getChildWithName (Tags::ui); }
         const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
         const bool operator!=(const Node& o) const { return this->objectData != o.objectData; }
 

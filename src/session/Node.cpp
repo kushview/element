@@ -1,5 +1,6 @@
 
 #include "session/Node.h"
+#include "session/Session.h"
 #include "controllers/GraphManager.h"
 
 namespace Element {
@@ -162,10 +163,18 @@ namespace Element {
 
     ValueTree Node::parse (const File& file)
     {
+        ValueTree sessionData = Session::readFromFile (file);
+        if (sessionData.isValid())
+        {
+            const auto graphs = sessionData.getChildWithName (Tags::graphs);
+            const auto sessionNode = graphs.getChild (graphs.getProperty (Tags::active, 0));
+            return sessionNode.createCopy();
+        }
+
         ValueTree data;
         ValueTree nodeData;
         
-        if (ScopedPointer<XmlElement> e = XmlDocument::parse(file))
+        if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
         {
             data = ValueTree::fromXml (*e);
         }
@@ -308,8 +317,12 @@ namespace Element {
         stabilizeProperty (Tags::bypass, false);
         stabilizeProperty (Tags::persistent, true);
         stabilizePropertyString (Tags::renderMode, "single");
+       #if ! defined (EL_PRO)
+        stabilizeProperty (Tags::tempo, (double) 120.0);
+       #endif
         objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
         objectData.getOrCreateChildWithName (Tags::ports, nullptr);
+        objectData.getOrCreateChildWithName (Tags::ui, nullptr);
     }
 
     GraphNode* Node::getGraphNode() const
@@ -614,6 +627,24 @@ namespace Element {
                 obj->setMidiChannels (channels.get());
             }
 
+            if (hasProperty (Tags::midiProgram))
+            {
+                obj->setMidiProgram ((int) getProperty (Tags::midiProgram, -1));
+            }
+
+            if (hasProperty (Tags::midiProgramsEnabled))
+            {
+                obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));
+            }
+            
+            if (hasProperty (Tags::globalMidiPrograms))
+            {
+                obj->setUseGlobalMidiPrograms ((bool) getProperty (Tags::globalMidiPrograms, true));
+            }
+            
+            if (hasProperty (Tags::midiProgramsState)) {
+                obj->setMidiProgramsState (getProperty (Tags::midiProgramsState).toString().trim());
+            }
             if (hasProperty (Tags::transpose))
                 obj->setTransposeOffset (getProperty (Tags::transpose));
         }
@@ -669,6 +700,12 @@ namespace Element {
                 if (state.getSize() > 0)
                     objectData.setProperty (Tags::state, state.toBase64Encoding(), nullptr);
             }
+
+            setProperty (Tags::midiProgram, obj->getMidiProgram());
+            setProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms());
+            setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
+            String mps; obj->getMidiProgramsState (mps);
+            setProperty (Tags::midiProgramsState, mps);
         }
 
         for (int i = 0; i < getNumNodes(); ++i)
@@ -771,4 +808,43 @@ namespace Element {
         for (int i = 0; i < tree.getNumChildren(); ++i)
             forEach (tree.getChild (i), handler);
     }
+
+// default value here must match that as defined in GraphNode.h
+bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty (Tags::globalMidiPrograms, true); }
+void Node::setUseGlobalMidiPrograms (bool useGlobal)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->useGlobalMidiPrograms() == useGlobal)
+            return;
+        obj->setUseGlobalMidiPrograms (useGlobal);
+        setProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms());
+    }
+}
+
+// default value here must match that as defined in GraphNode.h
+bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty (Tags::midiProgramsEnabled, false); }
+void Node::setMidiProgramsEnabled (bool useMidiPrograms)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->areMidiProgramsEnabled() == useMidiPrograms)
+            return;
+        obj->setMidiProgramsEnabled (useMidiPrograms);
+        setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
+    }
+}
+
+int Node::getMidiProgram() const            { return (int) getProperty (Tags::midiProgram, 0); }
+void Node::setMidiProgram (int program)
+{
+    if (GraphNodePtr obj = getGraphNode())
+    {
+        if (obj->getMidiProgram() == program)
+            return;
+        obj->setMidiProgram (program);
+        setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
+    }
+}
+
 }

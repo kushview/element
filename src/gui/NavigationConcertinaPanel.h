@@ -7,8 +7,10 @@
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/SessionGraphsListBox.h"
+#include "session/Session.h"
 #include "session/Node.h"
 #include "DataPath.h"
+#include "Globals.h"
 
 namespace Element {
 
@@ -396,10 +398,7 @@ public:
                 .setProperty ("h",  panel->getHeight(), 0);
 
             if (auto* ned = dynamic_cast<NodeEditorContentView*> (panel))
-            {
                 item.setProperty ("sticky", ned->isSticky(), nullptr);
-                item.setProperty ("stickyNode", ned->getNode().getUuidString(), nullptr);
-            }
 
             state.addChild (item, -1, 0);
         }
@@ -420,13 +419,7 @@ public:
                 {
                     setPanelSize (c, jmax (10, (int)item["h"]), false);
                     if (auto* ned = dynamic_cast<NodeEditorContentView*> (c))
-                    {
-                        ned->setSticky ((bool) item.getProperty ("sticky", true));
-                        Uuid nid (item.getProperty ("stickyNode").toString());
-                        Node node = globals.getSession()->findNodeById (nid);
-                        if (node.isValid())
-                            ned->setNode (node);
-                    }
+                        ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
                 }
             }
 

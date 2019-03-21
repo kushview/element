@@ -1,16 +1,16 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
-#include "engine/nodes/ProgramChangeMapNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
 
 namespace Element {
 
-class ProgramChangeMapEditor : public NodeEditorComponent,
+class MidiProgramMapEditor : public NodeEditorComponent,
                                public ChangeListener
 {
 public:
-    ProgramChangeMapEditor (const Node& node);
-    virtual ~ProgramChangeMapEditor();
+    MidiProgramMapEditor (const Node& node);
+    virtual ~MidiProgramMapEditor();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -18,8 +18,8 @@ public:
     void addProgram();
     void removeSelectedProgram();
     int getNumPrograms() const;
-    ProgramChangeMapNode::ProgramEntry getProgram (int) const;
-    void setProgram (int, ProgramChangeMapNode::ProgramEntry);
+    MidiProgramMapNode::ProgramEntry getProgram (int) const;
+    void setProgram (int, MidiProgramMapNode::ProgramEntry);
     void sendProgram (int);
 
     void selectRow (int row);

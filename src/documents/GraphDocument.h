@@ -7,6 +7,7 @@
 
 #include "ElementApp.h"
 #include "session/Node.h"
+#include "session/Session.h"
 
 namespace Element {
 
@@ -17,14 +18,24 @@ public:
     GraphDocument();
     ~GraphDocument();
 
+    inline void setSession (SessionPtr newSession)
+    {
+        ScopedChangeStopper freeze (*this, false);
+        jassert (newSession != nullptr);
+        session = newSession;
+    }
+
     inline Node getGraph() const { return graph; }
     
     inline void setGraph (const Node& newGraph)
     {
+        jassert (session != nullptr);
         ScopedChangeStopper freeze (*this, false);
         data.removeListener (this);
         graph = newGraph;
-        data  = graph.getValueTree();
+        session->clear();
+        session->addGraph (graph, true);
+        data  = session->getValueTree();
         data.addListener (this);
     }
 
@@ -57,10 +68,20 @@ public:
     };
 
 private:
+    SessionPtr session;
     Node graph;
     ValueTree data;
     File lastGraph;
     bool listenForChanges = true;
+
+    inline void bindChangeHandlers()
+    {
+        ScopedChangeStopper freeze (*this, false);
+        data.removeListener (this);
+        graph = session->getActiveGraph();
+        data  = session->getValueTree();
+        data.addListener (this);
+    }
 
     friend class juce::ValueTree;
     inline void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
@@ -71,7 +92,7 @@ private:
         setChangedFlag (true);
     }
 
-    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
+    inline void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override 
     {
         if (! listenForChanges)
             return;
@@ -79,7 +100,7 @@ private:
         setChangedFlag (true);
     }
 
-    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
+    inline void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override 
     {
         if (! listenForChanges)
             return;
@@ -87,7 +108,7 @@ private:
         setChangedFlag (true);
     }
 
-    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
+    inline void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override
     {
         if (! listenForChanges)
             return;
@@ -95,14 +116,14 @@ private:
         setChangedFlag (true);
     }
 
-    void valueTreeParentChanged (ValueTree& tree) override
+    inline void valueTreeParentChanged (ValueTree& tree) override
     {
         if (! listenForChanges)
             return;
         ignoreUnused (tree);
     }
 
-    void valueTreeRedirected (ValueTree&) override { }
+    inline void valueTreeRedirected (ValueTree&) override { }
 };
 
 }

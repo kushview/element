@@ -10,7 +10,6 @@ class MidiPipe;
 class GraphNode : public ReferenceCountedObject
 {
 public:
-
     /** Special parameter indexes when mapping universal node settings */
     enum SpecialParameter
     {
@@ -110,8 +109,8 @@ public:
      */
     bool containsParameter (const int index) const;
 
-    /** If an audio plugin instance, fill the details */
-    void getPluginDescription (PluginDescription& desc);
+    /** Fill the details... */
+    virtual void getPluginDescription (PluginDescription& desc) const;
 
     /** Returns true if the processor is suspended */
     bool isSuspended() const;
@@ -150,6 +149,7 @@ public:
     bool isAudioInputNode() const;
     bool isAudioOutputNode() const;
     bool isMidiIONode() const;
+    bool isMidiDeviceNode() const;
 
     /* returns the parent graph. If one has not been set, then
        this will return nullptr */
@@ -160,14 +160,18 @@ public:
     void setOutputRMS (int chan, float val);
     float getOutputRMS (int chan) const { return (chan < outRMS.size()) ? outRMS.getUnchecked(chan)->get() : 0.0f; }
 
+    //=========================================================================
+    /** Connect this node's output audio to another node's input audio */
     void connectAudioTo (const GraphNode* other);
 
+    //=========================================================================
     /** Enable or disable this node */
     void setEnabled (const bool shouldBeEnabled);
 
     /** Returns true if this node is enabled */
     inline bool isEnabled()  const { return enabled.get() == 1; }
 
+    //=========================================================================
     inline void setKeyRange (const int low, const int high)
     {
         jassert (low <= high);
@@ -180,6 +184,7 @@ public:
 
     inline Range<int> getKeyRange() const { return Range<int> { keyRangeLow.get(), keyRangeHigh.get() }; }
 
+    //=========================================================================
     inline void setTransposeOffset (const int value)
     {
         jassert (value >= -24 && value <= 24);
@@ -190,6 +195,46 @@ public:
 
     const CriticalSection& getPropertyLock() const { return propertyLock; }
 
+    //=========================================================================
+    /** Returns the file used for the current global MIDI Program */
+    File getMidiProgramFile() const;
+
+    /** Returns true if this node should use global MIDI programs */
+    inline bool useGlobalMidiPrograms() const          { return globalMidiPrograms.get() == 1; }
+
+    /** Change usage of global midi programs to on or off */
+    inline void setUseGlobalMidiPrograms (bool use)    { globalMidiPrograms.set (use ? 1 : 0); }
+
+    /** True if MIDI programs should be loaded when Program change messages
+        are received */
+    inline bool areMidiProgramsEnabled() const         { return midiProgramsEnabled.get() == 1; }
+
+    /** Enable or disable changing midi programs */
+    inline void setMidiProgramsEnabled (bool enabled)  { midiProgramsEnabled.set (enabled ? 1 : 0); }
+
+    /** Returns the active midi program */
+    inline int getMidiProgram() const                  { return midiProgram.get(); }
+
+    /** Sets the MIDI program, note that this won't load it */
+    void setMidiProgram (const int program);
+
+    /** Reloads the active MIDI program */
+    void reloadMidiProgram();
+
+    /** Save the current MIDI program */
+    void saveMidiProgram();
+
+    /** Get all MIDI program states stored directly on the node */
+    void getMidiProgramsState (String& state) const;
+
+    /** Load all MIDI program states to be stored on the node.
+        
+        @param state    The state to set. If this is empty, the midi programs
+                        on the node will be cleared.
+     */
+    void setMidiProgramsState (const String& state);
+
+    //=========================================================================
     inline void setMidiChannels (const BigInteger& ch)
     {
         ScopedLock sl (propertyLock);
@@ -198,7 +243,7 @@ public:
 
     inline const MidiChannels& getMidiChannels() const { return midiChannels; }
 
-
+    //=========================================================================
     inline virtual int getNumPrograms() const
     { 
         if (auto* const proc = getAudioProcessor())
@@ -226,14 +271,18 @@ public:
             return proc->setCurrentProgram (index);
     }
 
+    //=========================================================================
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 
+    //=========================================================================
     /** Triggered when the enabled state changes */
     Signal<void(GraphNode*)> enablementChanged;
 
     /** Triggered when the bypass state changes */
     Signal<void(GraphNode*)> bypassChanged;
+
+    Signal<void()> midiProgramChanged;
 
 protected:
     GraphNode (uint32 nodeId) noexcept;
@@ -261,6 +310,11 @@ private:
     Atomic<int> transposeOffset { 0 };
     MidiChannels midiChannels;
 
+    Atomic<int> midiProgram { 0 };
+    Atomic<int> lastMidiProgram { -1 };
+    Atomic<int> midiProgramsEnabled { 0 };
+    Atomic<int> globalMidiPrograms { 1 };
+
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
     {
@@ -269,6 +323,22 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& graph;
     } enablement;
+
+    struct MidiProgramLoader : public AsyncUpdater
+    {
+        MidiProgramLoader (GraphNode& n) : node (n) { }
+        ~MidiProgramLoader() { cancelPendingUpdate(); }
+        void handleAsyncUpdate() override;
+        GraphNode& node;    
+    } midiProgramLoader;
+
+    struct MidiProgram
+    {
+        int program;
+        MemoryBlock state;
+    };
+    OwnedArray<MidiProgram> midiPrograms;
+    MidiProgram* getMidiProgram (int);
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);

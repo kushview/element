@@ -26,6 +26,11 @@ void drawVerticalTextRow (const String& text, Graphics& g, int w, int h, bool se
 /** Finds the content component by traversing parent component(s) */
 ContentComponent* findContentComponent (Component* c);
 
+/** Finds the content component by traversing toplevel windows
+    This will NOT work in the plugin versions
+*/
+ContentComponent* findContentComponent();
+
 /** Get the engine */
 AudioEnginePtr getAudioEngine (Component*);
 

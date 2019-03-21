@@ -191,6 +191,9 @@ private:
     }
 };
 
+// uncomment to clear license on load
+// #define EL_CLEAR_LICENSE    1
+
 class Application : public JUCEApplication,
                     public ActionListener
 {
@@ -205,11 +208,6 @@ public:
     void initialise (const String& commandLine ) override
     {
         world = new Globals (commandLine);
-        world->getUnlockStatus().loadAll();
-        world->getUnlockStatus().dump();
-
-        initializeModulePath();
-        
         if (maybeLaunchSlave (commandLine))
             return;
         
@@ -218,41 +216,10 @@ public:
             quit();
             return;
         }
-        
-        String appName = Util::appName();
-        appName << " v" << getApplicationVersion();
-        
-       #if defined (EL_PRO) || defined (EL_SOLO)
-        if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
-        {
-            appName << " (unauthorized)";
-        }
-        else if (EL_IS_ACTIVATED (world->getUnlockStatus()))
-        {
-            appName << " (authorized)";
-        }
-        else if (EL_IS_TRIAL_EXPIRED (world->getUnlockStatus()))
-        {
-            appName << " (trial expired)";
-        }
-        else if (EL_IS_TRIAL_NOT_EXPIRED (world->getUnlockStatus()))
-        {
-            appName << " (trial)";
-        }
-        else
-        {
-            jassertfalse; // this is most likely a wrong product.  e.g. SE license used for Pro
-            appName << " (unkown activation state)";
-        }
-       #else
-            appName << " (lite)";
-       #endif
-       
-        Logger::writeToLog (appName);
-        Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
-       #if EL_USE_LOCAL_AUTH
-        Logger::writeToLog ("[EL] using local authentication");
-       #endif
+
+        loadLicense();
+        initializeModulePath();
+        printCopyNotice();
         launchApplication();
     }
     
@@ -419,6 +386,54 @@ private:
     ScopedPointer<Startup>          startup;
     OwnedArray<kv::ChildProcessSlave>   slaves;
     
+    void loadLicense()
+    {
+       #if EL_CLEAR_LICENSE
+        world->getUnlockStatus().saveState (String());
+        world->getSettings().saveIfNeeded();
+       #endif
+        world->getUnlockStatus().loadAll();
+        world->getUnlockStatus().dump();
+    }
+
+    void printCopyNotice()
+    {
+        String appName = Util::appName();
+        appName << " v" << getApplicationVersion();
+        
+       #if defined (EL_PRO) || defined (EL_SOLO)
+        if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
+        {
+            appName << " (unauthorized)";
+        }
+        else if (EL_IS_ACTIVATED (world->getUnlockStatus()))
+        {
+            appName << " (authorized)";
+        }
+        else if (EL_IS_TRIAL_EXPIRED (world->getUnlockStatus()))
+        {
+            appName << " (trial expired)";
+        }
+        else if (EL_IS_TRIAL_NOT_EXPIRED (world->getUnlockStatus()))
+        {
+            appName << " (trial)";
+        }
+        else
+        {
+            jassertfalse; // this is most likely a wrong product.  e.g. SE license used for Pro
+            appName << " (unkown activation state)";
+        }
+       #else
+            appName << " (lite)";
+       #endif
+       
+        Logger::writeToLog (appName);
+        Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
+       #if EL_USE_LOCAL_AUTH
+        Logger::writeToLog ("[EL] using local authentication");
+       #endif
+    }
+
     bool maybeLaunchSlave (const String& commandLine)
     {
         slaves.clearQuick (true);

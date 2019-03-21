@@ -54,6 +54,9 @@ public:
     bool isInterestedInDragSource (const SourceDetails& dragSourceDetails) override;
     void itemDropped (const SourceDetails& dragSourceDetails) override;
 
+    void getSessionState (String&) override;
+    void applySessionState (const String&) override;
+
     // App commands
     void getAllCommands (Array<CommandID>&) override { }
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }

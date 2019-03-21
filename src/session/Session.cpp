@@ -245,11 +245,19 @@ namespace Element {
             getGraph(i).restorePluginState();
     }
 
+    bool Session::containsGraph (const Node& graph) const
+    {
+        for (int i = 0; i < getNumGraphs(); ++i)
+            if (getGraph(i) == graph)
+                return true;
+        return false;
+    }
+
     void Session::forEach (ValueTreeFunction handler) const
     {
         forEach (objectData, handler);
     }
-
+    
     void Session::forEach (const ValueTree tree, ValueTreeFunction handler) const
     {
         handler (tree);
@@ -273,5 +281,45 @@ namespace Element {
                 maps.removeChild (tree, nullptr);
             toRemove.clearQuick();
         }
+    }
+
+    void Session::setActiveGraph (int index)
+    {
+        if (! isPositiveAndBelow (index, getNumGraphs()))
+            return;
+        objectData.getChildWithName (Tags::graphs)
+            .setProperty (Tags::active, index, nullptr);
+    }
+
+    bool Session::writeToFile (const File& file) const
+    {
+        ValueTree saveData = objectData.createCopy();
+        Node::sanitizeProperties (saveData, true);
+        TemporaryFile tempFile (file);
+
+        if (auto fos = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
+        {
+            {
+                GZIPCompressorOutputStream gzip (*fos, 9);
+                saveData.writeToStream (gzip);
+            }
+            fos.reset();
+            return tempFile.overwriteTargetFileWithTemporary();
+        }
+
+        return false;
+    }
+
+    ValueTree Session::readFromFile (const File& file)
+    {
+        ValueTree data;
+        FileInputStream fi (file);
+        
+        {
+            GZIPDecompressorInputStream gzip (fi);
+            data = ValueTree::readFromStream (gzip);
+        }
+
+        return data;
     }
 }

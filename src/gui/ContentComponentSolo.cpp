@@ -660,6 +660,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
             {
                 unlock.save();
                 unlock.loadAll();
+                unlock.refreshed();
                 stabilizeViews();
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
                     "Your software has successfully been unlocked.");
@@ -879,6 +880,44 @@ void ContentComponentSolo::setShowAccessoryView (const bool show)
 bool ContentComponentSolo::showAccessoryView() const
 {
     return (container) ? container->showAccessoryView : false;
+}
+
+void ContentComponentSolo::getSessionState (String& state)
+{
+    ValueTree data ("state");
+    
+    if (auto* const ned = nav->findPanel<NodeEditorContentView>())
+    {
+        String nedState; ned->getState (nedState);
+        if (nedState.isNotEmpty())
+        {
+            data.setProperty ("NodeEditorContentView", nedState, nullptr);
+        }
+    }
+
+    MemoryOutputStream mo;
+    {
+        GZIPCompressorOutputStream gzip (mo, 9);
+        data.writeToStream (gzip);
+    }
+
+    state = mo.getMemoryBlock().toBase64Encoding();
+}
+
+void ContentComponentSolo::applySessionState (const String& state)
+{
+    MemoryBlock mb; mb.fromBase64Encoding (state);
+    const ValueTree data = (mb.getSize() > 0)
+        ? ValueTree::readFromGZIPData (mb.getData(), mb.getSize())
+        : ValueTree();
+    if (! data.isValid())
+        return;
+    
+    if (auto* const ned = nav->findPanel<NodeEditorContentView>())
+    {
+        String nedState = data.getProperty ("NodeEditorContentView").toString();
+        ned->setState (nedState);
+    }
 }
 
 }

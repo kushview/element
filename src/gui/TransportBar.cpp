@@ -167,7 +167,6 @@ void TransportBar::stabilize()
         barLabel->tempoValue  = bars + 1;
         beatLabel->tempoValue = beats + 1;
         subLabel->tempoValue  = sub + 1;
-        
         for (auto* c : { barLabel.get(), beatLabel.get(), subLabel.get() })
             c->repaint();
     }

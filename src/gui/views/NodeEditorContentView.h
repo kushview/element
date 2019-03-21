@@ -15,6 +15,9 @@ public:
     NodeEditorContentView();
     ~NodeEditorContentView();
 
+    void getState (String&) override;
+    void setState (const String&) override;
+
     void setSticky (bool shouldBeSticky);
     bool isSticky() const { return sticky; }
     
