@@ -23,14 +23,6 @@ public:
     
     void initialise()   override  { initializeWorld(); }
     void shutdown()     override  { shutdownWorld(); }
-<<<<<<< HEAD
-    void clearLicense (UnlockStatus& status)
-    {
-        status.saveState (String());
-        getWorld().getSettings().saveIfNeeded();
-        status.loadAll();
-    }
-=======
 
     void clearLicense (UnlockStatus& status)
     {
@@ -39,7 +31,6 @@ public:
         status.loadAll();
     }
 
->>>>>>> release/0.29.0
    #if defined (EL_SOLO)
     void runTest() override
     {
