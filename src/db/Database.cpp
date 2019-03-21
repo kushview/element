@@ -23,5 +23,11 @@ void Database::exec (const String& sql)
     }
 }
 
-
 }
+
+#include "../../libs/SQLiteCpp/src/Backup.cpp"
+#include "../../libs/SQLiteCpp/src/Column.cpp"
+#include "../../libs/SQLiteCpp/src/Database.cpp"
+#include "../../libs/SQLiteCpp/src/Exception.cpp"
+#include "../../libs/SQLiteCpp/src/Statement.cpp"
+#include "../../libs/SQLiteCpp/src/Transaction.cpp"

@@ -268,7 +268,6 @@ def build_mac (bld):
 
     bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      bld.path.ant_glob ('libs/SQLiteCpp/src/*.cpp') + \
                       [ 'libs/SQLiteCpp/sqlite3/sqlite3.c' ] + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
