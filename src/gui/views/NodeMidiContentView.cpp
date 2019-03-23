@@ -29,7 +29,7 @@ namespace Element {
         transposeLabel.setFont (font);
         addAndMakeVisible (transposeSlider);
         transposeSlider.setRange (-24, 24, 1);
-        transposeSlider.setValue (0);
+        transposeSlider.setValue (0, dontSendNotification);
         transposeSlider.setSliderStyle (Slider::LinearHorizontal);
         transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         
@@ -42,7 +42,7 @@ namespace Element {
         keyLowSlider.setSliderStyle (Slider::LinearHorizontal);
         keyLowSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         keyLowSlider.setTextBoxIsEditable (false);
-        keyLowSlider.setValue (0);
+        keyLowSlider.setValue (0, dontSendNotification);
 
         addAndMakeVisible (keyHiLabel);
         keyHiLabel.setText ("Key End", dontSendNotification);
@@ -53,7 +53,7 @@ namespace Element {
         keyHiSlider.setSliderStyle (Slider::LinearHorizontal);
         keyHiSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         keyHiSlider.setTextBoxIsEditable (false);
-        keyHiSlider.setValue (127);
+        keyHiSlider.setValue (127, dontSendNotification);
 
         addAndMakeVisible (midiProgramLabel);
         midiProgramLabel.setFont (font);
