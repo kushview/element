@@ -26,7 +26,7 @@
               numAudioIns="2" numAudioOuts="0" uuid="4a033540e1e7496a866b4436f8599fb1"
               bypass="0" persistent="1" renderMode="single" enabled="1" program="0"
               midiProgram="0" globalMidiPrograms="1" midiProgramsEnabled="0"
-              midiProgramsState="">
+              midiProgramsState="" keyStart="0" keyEnd="127" transpose="0">
           <nodes/>
           <ui/>
           <ports>
