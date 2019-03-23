@@ -585,10 +585,10 @@ public:
     void resized() override
     {
         const auto box (getBoxRectangle());
-        auto r = box.reduced(5, 4).removeFromBottom (12);
-        powerButton.setBounds (r.removeFromRight (14));
+        auto r = box.reduced(3, 2).removeFromBottom (14);
+        powerButton.setBounds (r.removeFromRight (16));
         r.removeFromLeft (2);
-        ioButton.setBounds (r.removeFromRight (14));
+        ioButton.setBounds (r.removeFromRight (16));
 
         const int halfPinSize = pinSize / 2;
         if (vertical)
