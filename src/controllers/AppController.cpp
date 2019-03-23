@@ -151,6 +151,8 @@ void AppController::run()
         if (graph.isValid())
             gui->showPluginWindowsFor (graph);
     }
+
+    jassert (! sessCtl->hasSessionChanged());
 }
 
 void AppController::handleMessage (const Message& msg)
