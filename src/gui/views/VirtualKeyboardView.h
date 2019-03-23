@@ -30,6 +30,9 @@ public:
     void didBecomeActive() override;
     void stabilizeContent() override { didBecomeActive(); resized(); }
 
+    void saveState (PropertiesFile*) override;
+    void restoreState (PropertiesFile*) override;
+
     void paint (Graphics&) override;
     void resized() override;
     bool keyPressed (const KeyPress&, Component*) override;
@@ -40,10 +43,15 @@ private:
     MidiKeyboardState internalState;
     int keyWidth = 16;
     
+    Label midiChannelLabel;
     Slider midiChannel;
+    Label midiProgramLabel;
     Slider midiProgram;
-
+    Label widthLabel;
+    TextButton widthDown;
+    TextButton widthUp;
     void setupKeyboard (VirtualKeyboardComponent&);
+    void stabilizeWidthControls();
 };
 
 }

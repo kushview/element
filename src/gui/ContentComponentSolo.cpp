@@ -763,6 +763,8 @@ void ContentComponentSolo::saveState (PropertiesFile* props)
         nav->saveState (props);
     if (container)
         container->saveState (props);
+    if (auto* const vk = getVirtualKeyboardView())
+        vk->saveState (props);
 }
 
 void ContentComponentSolo::restoreState (PropertiesFile* props)
@@ -772,6 +774,8 @@ void ContentComponentSolo::restoreState (PropertiesFile* props)
         nav->restoreState (props);
     if (container)
         container->restoreState (props);
+    if (auto* const vk = getVirtualKeyboardView())
+        vk->restoreState (props);
     resized();
 }
 

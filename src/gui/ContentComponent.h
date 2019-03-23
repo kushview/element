@@ -39,6 +39,9 @@ public:
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
 
+    virtual void saveState (PropertiesFile*) {}
+    virtual void restoreState (PropertiesFile*) {}
+
     virtual void getState (String&) {}
     virtual void setState (const String&) {}
 

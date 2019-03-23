@@ -56,6 +56,7 @@ namespace Element {
         keyHiSlider.setValue (127);
 
         addAndMakeVisible (midiProgramLabel);
+        midiProgramLabel.setFont (font);
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
 

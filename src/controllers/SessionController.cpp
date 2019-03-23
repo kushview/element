@@ -93,6 +93,8 @@ void SessionController::openFile (const File& file)
             findSibling<GuiController>()->stabilizeContent();
             resetChanges();
         }
+
+        jassert(!hasSessionChanged());
     }
     else
     {

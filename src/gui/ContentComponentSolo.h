@@ -79,7 +79,7 @@ private:
     bool toolBarVisible;
     int toolBarSize;
     bool virtualKeyboardVisible = false;
-    int virtualKeyboardSize = 60;
+    int virtualKeyboardSize = 80;
     int nodeStripSize = 80;
     
     String lastMainView;

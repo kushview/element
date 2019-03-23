@@ -89,16 +89,95 @@ VirtualKeyboardView::VirtualKeyboardView()
     addAndMakeVisible (keyboard = new VirtualKeyboardComponent (
         internalState, MidiKeyboardComponent::horizontalKeyboard));
     setupKeyboard (*keyboard);
-   #if 0
+   #if 1
+
+    addAndMakeVisible (midiChannelLabel);
+    midiChannelLabel.setFont (Font (12.f));
+    midiChannelLabel.setJustificationType (Justification::centredRight);
+    midiChannelLabel.setText ("Channel:", dontSendNotification);
     addAndMakeVisible (midiChannel);
     midiChannel.setSliderStyle (Slider::IncDecButtons);
     midiChannel.setRange (1.0, 16.0, 1.0);
-    midiChannel.setTextBoxStyle (Slider::TextBoxLeft, false, 60, midiChannel.getTextBoxHeight());
+    midiChannel.setTextBoxStyle (Slider::TextBoxLeft, false, 30, midiChannel.getTextBoxHeight());
+    midiChannel.onValueChange = [this]()
+    {
+        keyboard->setMidiChannel (roundToInt (midiChannel.getValue()));
+    };
+
+    addAndMakeVisible (midiProgramLabel);
+    midiProgramLabel.setFont (Font (12.f));
+    midiProgramLabel.setJustificationType (Justification::centredRight);
+    midiProgramLabel.setText ("Program:", dontSendNotification);
     addAndMakeVisible (midiProgram);
     midiProgram.setSliderStyle (Slider::IncDecButtons);
     midiProgram.setRange (1.0, 128, 1.0);
-    midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 60, midiProgram.getTextBoxHeight());
+    midiProgram.setTextBoxStyle (Slider::TextBoxLeft, false, 34, midiProgram.getTextBoxHeight());
+    midiProgram.onValueChange = [this]()
+    {
+        auto* const world = ViewHelpers::getGlobals (this);
+        AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
+        if (! engine)
+            return;
+        auto msg = MidiMessage::programChange (keyboard->getMidiChannel(),
+                                    roundToInt (midiProgram.getValue()) - 1);
+        msg.setTimeStamp (1.0 + Time::getMillisecondCounterHiRes());
+        engine->addMidiMessage (msg, false);
+    };
+
+    addAndMakeVisible (widthLabel);
+    widthLabel.setFont (Font (12.f));
+    widthLabel.setJustificationType (Justification::centredRight);
+    widthLabel.setText ("Width:", dontSendNotification);
+    addAndMakeVisible (widthDown);
+    widthDown.setButtonText ("-");
+    widthDown.setConnectedEdges(Button::ConnectedOnRight);
+    widthDown.onClick = [this]() {
+        keyWidth = jlimit (14, 24, keyWidth - 1);
+        stabilizeWidthControls();
+    };
+
+    addAndMakeVisible (widthUp);
+    widthUp.setButtonText ("+");
+    widthUp.setConnectedEdges(Button::ConnectedOnLeft);
+    widthUp.onClick = [this]() {
+        keyWidth = jlimit (14, 24, keyWidth + 1);
+        stabilizeWidthControls();
+    };
    #endif
+}
+
+void VirtualKeyboardView::stabilizeWidthControls()
+{
+    keyboard->setKeyWidth (keyWidth);
+    keyboard->setBlackNoteLengthProportion (keyWidth < 20 ? 0.7 : 0.64);
+
+    widthDown.setEnabled (keyWidth > 14);
+    widthUp.setEnabled (keyWidth < 24);
+}
+
+void VirtualKeyboardView::saveState (PropertiesFile* props)
+{
+    props->setValue ("vkChannel",       keyboard->getMidiChannel());
+    props->setValue ("vkProgram",       midiProgram.getValue());
+    props->setValue ("vkKeyWidth",      keyboard->getKeyWidth());
+    props->setValue ("vkBlackLength",   keyboard->getBlackNoteLengthProportion());
+}
+
+void VirtualKeyboardView::restoreState (PropertiesFile* props)
+{
+    midiChannel.setValue (props->getDoubleValue ("vkChannel", midiChannel.getValue()),
+                          dontSendNotification);
+    keyboard->setMidiChannel (roundToInt (midiChannel.getValue()));
+
+    midiProgram.setValue (props->getDoubleValue ("vkProgram", midiProgram.getValue()),
+                          dontSendNotification);
+    
+    keyboard->setKeyWidth (static_cast<float> (props->getDoubleValue ("vkKeyWidth", (float) keyWidth)));
+    keyWidth = jlimit (14, 24, roundToInt (keyboard->getKeyWidth()));
+    stabilizeWidthControls();
+
+    keyboard->setBlackNoteLengthProportion (static_cast<float> (
+    props->getDoubleValue ("vkBlackLength", keyboard->getBlackNoteLengthProportion())));
 }
 
 void VirtualKeyboardView::setupKeyboard (VirtualKeyboardComponent& kb)
@@ -119,12 +198,21 @@ void VirtualKeyboardView::paint (Graphics& g)
 void VirtualKeyboardView::resized()
 {
     auto r = getLocalBounds();
-   #if 0
+   #if 1
     r.removeFromTop (2);
     auto r2 = r.removeFromTop (18);
-    midiChannel.setBounds (r2.removeFromLeft (90));
+    r2.removeFromLeft (4);
+    midiChannelLabel.setBounds (r2.removeFromLeft (48));
+    midiChannel.setBounds (r2.removeFromLeft (80));
     r2.removeFromLeft (2);
-    midiProgram.setBounds (r2.removeFromLeft (90));
+    midiProgramLabel.setBounds (r2.removeFromLeft (52));
+    midiProgram.setBounds (r2.removeFromLeft (84));
+
+    r2.removeFromRight (4);
+    widthUp.setBounds (r2.removeFromRight (20));
+    widthDown.setBounds (r2.removeFromRight (20));
+    r2.removeFromRight (2);
+    widthLabel.setBounds (r2.removeFromRight (42));
     r.removeFromTop (2);
    #endif
     if (keyboard)
