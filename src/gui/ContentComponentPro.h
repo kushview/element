@@ -20,14 +20,22 @@ public:
 
     void resizeContent (const Rectangle<int>& area) override;
 
+    //=========================================================================
     void stabilize (const bool refreshDataPathTrees = false) override;
     void stabilizeViews() override;
 
+    //=========================================================================
     String getWorkspaceName() const override;
     WorkspaceState getWorkspaceState() override;
     void applyWorkspaceState (const WorkspaceState&) override;
     void addWorkspaceItemsToMenu (PopupMenu&) override;
     void handleWorkspaceMenuResult (int) override;
+
+    //=========================================================================
+    void saveState (PropertiesFile*) override;
+    void restoreState (PropertiesFile*) override;
+    void getState (String&) override;
+    void setState (const String&) override;
 
 private:
     class Impl; std::unique_ptr<Impl> impl;

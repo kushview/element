@@ -39,10 +39,16 @@ public:
     virtual void didBecomeActive() { }
     virtual void stabilizeContent() { }
 
+    /** Save state to user settings */
     virtual void saveState (PropertiesFile*) {}
+
+    /** Restore state from user settings */
     virtual void restoreState (PropertiesFile*) {}
 
+    /** Get state attached to session */
     virtual void getState (String&) {}
+
+    /** Apply state attached to session */
     virtual void setState (const String&) {}
 
     /** Call this to disable the entire view if the app isn't unlocked */

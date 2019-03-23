@@ -130,6 +130,27 @@ void ContentComponentPro::handleWorkspaceMenuResult (int result)
     }
 }
 
+
+void ContentComponentPro::saveState (PropertiesFile*)
+{
+
+}
+
+void ContentComponentPro::restoreState (PropertiesFile*)
+{
+
+}
+
+void ContentComponentPro::getState (String&)
+{
+
+}
+
+void ContentComponentPro::setState (const String&)
+{
+    
+}
+
 }
 
 #endif
