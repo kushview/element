@@ -32,8 +32,11 @@ bool WorkspaceState::writeToFile (const File& file) const
     
     if (auto out = std::unique_ptr<FileOutputStream> (tempFile.getFile().createOutputStream()))
     {
-        GZIPCompressorOutputStream gzip (*out);
-        objectData.writeToStream (gzip);
+        {
+            GZIPCompressorOutputStream gzip (*out);
+            objectData.writeToStream (gzip);
+        }
+        out.reset();
         succeded = tempFile.overwriteTargetFileWithTemporary();
     }
 
