@@ -182,8 +182,12 @@ void AppController::handleMessage (const Message& msg)
         }
 
         for (auto* const child : getChildren())
+        {
             if (auto* const acc = dynamic_cast<AppController::Child*> (child))
-                { handled |= acc->handleMessage (*message); break; }
+                handled = acc->handleMessage (*message);
+            if (handled)
+                break;
+        }
 
         if (handled)
             return;

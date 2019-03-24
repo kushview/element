@@ -165,7 +165,8 @@ bool WorkspacesController::perform (const InvocationInfo& info)
 
 void WorkspacesController::saveCurrentWorkspace()
 {
-    if (! content) return;
+    if (! content)
+        return;
 
     auto state = content->getWorkspaceState();
     if (state.isValid())
