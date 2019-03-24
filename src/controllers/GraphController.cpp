@@ -5,6 +5,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/MappingController.h"
 #include "controllers/PresetsController.h"
+#include "gui/ContentComponent.h"
 #include "gui/SessionImportWizard.h"
 #include "session/Session.h"
 #include "DataPath.h"
@@ -57,10 +58,20 @@ void GraphController::openGraph (const File& file)
     
     if (result.wasOk())
     {
+        auto& gui = *findSibling<GuiController>();
         GraphDocument::ScopedChangeStopper freeze (document, false);
         findSibling<GuiController>()->closeAllPluginWindows();
         graphChanged();
         refreshOtherControllers();
+
+        auto session = getWorld().getSession();
+        
+        if (auto* const cc = gui.getContentComponent())
+        {
+            auto ui = session->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+            cc->applySessionState (ui.getProperty ("content").toString());
+        }
+
         findSibling<GuiController>()->stabilizeContent();
     }
 }
@@ -109,6 +120,15 @@ void GraphController::newGraph()
 void GraphController::saveGraph (const bool saveAs)
 {
     auto result = FileBasedDocument::userCancelledSave;
+    auto session = getWorld().getSession();
+    auto& gui = *findSibling<GuiController>();
+
+    if (auto* const cc = gui.getContentComponent())
+    {
+        String state; cc->getSessionState (state);
+        auto ui = session->getValueTree().getOrCreateChildWithName (Tags::ui, nullptr);
+        ui.setProperty ("content", state, nullptr);
+    }
 
     if (saveAs) {
         result = document.saveAs (File(), true, true, true);

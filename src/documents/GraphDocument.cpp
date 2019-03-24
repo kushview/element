@@ -28,6 +28,13 @@ Result GraphDocument::loadDocument (const File& file)
         if (! session->loadData (newData))
             return Result::fail ("Cannot load malformed graph");
 
+        session->forEach ([](const ValueTree& tree) {
+            if (! tree.hasType (Tags::node))
+                return;
+            Node addMising (tree, true);
+            ignoreUnused (addMising);
+        });
+        
         bindChangeHandlers();
         return graph.isGraph() ? Result::ok() : Result::fail ("Malformed graph");
     }
