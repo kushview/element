@@ -34,8 +34,8 @@ public:
     //=========================================================================
     void saveState (PropertiesFile*) override;
     void restoreState (PropertiesFile*) override;
-    void getState (String&) override;
-    void setState (const String&) override;
+    void getSessionState (String&) override;
+    void applySessionState (const String&) override;
 
 private:
     class Impl; std::unique_ptr<Impl> impl;

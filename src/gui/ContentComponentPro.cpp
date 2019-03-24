@@ -141,12 +141,12 @@ void ContentComponentPro::restoreState (PropertiesFile*)
 
 }
 
-void ContentComponentPro::getState (String&)
+void ContentComponentPro::getSessionState (String&)
 {
 
 }
 
-void ContentComponentPro::setState (const String&)
+void ContentComponentPro::applySessionState (const String&)
 {
     
 }
