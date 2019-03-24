@@ -244,6 +244,8 @@ public:
         auto& settings (world->getSettings());
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
+
+        controller->saveSettings();
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);

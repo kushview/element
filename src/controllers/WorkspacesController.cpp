@@ -12,11 +12,12 @@ void WorkspacesController::activate()
 
 void WorkspacesController::deactivate()
 {
+    content = nullptr;
+}
+
+void WorkspacesController::saveSettings()
+{
     saveCurrentWorkspace();
-    if (content)
-    {
-        getSettings().setWorkspace (content->getWorkspaceName());
-    }
 }
 
 bool WorkspacesController::handleMessage (const AppMessage& msg)

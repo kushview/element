@@ -14,6 +14,7 @@ public:
     
     void activate() override;
     void deactivate() override;
+    void saveSettings() override;
 
 protected:
     bool handleMessage (const AppMessage& msg) override;

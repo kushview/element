@@ -77,7 +77,8 @@ public:
             child->initialize();
     }
 
-    virtual void saveSettings () {
+    virtual void saveSettings()
+    {
         for (auto* child : children)
             child->saveSettings();
     }
