@@ -63,7 +63,8 @@ static void addIfNotNull (OwnedArray <AudioIODeviceType>& list, AudioIODeviceTyp
 
 void DeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list)
 {
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI(true));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (true));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (false));
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
