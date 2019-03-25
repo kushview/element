@@ -740,7 +740,7 @@ private:
     double relativeX = 0.5f;
     double relativeY = 0.5f;
 
-    int pinSize = 8;    
+    int pinSize = 9;    
     Font font;
     
     Point<int> originalPos;
