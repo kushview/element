@@ -57,6 +57,7 @@ public:
          falAtomAlt, falSyncAlt, falRedoAlt,
 
          farGlobe, farSyncAlt, farRedoAlt, farSave,
+         farTrashAlt,
 
          fasPlay, fasStop, fasCog, fasCircle,
          fasChevronDown, fasChevronRight, fasSave,
