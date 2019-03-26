@@ -24,6 +24,9 @@ public:
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
 
+        addAndMakeVisible (startStopContinueToggle);
+        startStopContinueToggle.setButtonText ("Respond to MIDI start/stop/continue");
+
         addAndMakeVisible (position);
         position.setSliderStyle (Slider::LinearBar);
         position.setRange (0.0, 1.0, 0.001);
@@ -37,7 +40,7 @@ public:
         stabilizeComponents();
         bindHandlers();
 
-        setSize (360, 100);
+        setSize (360, 122);
         startTimer (1001);
     }
 
@@ -75,6 +78,9 @@ public:
         volume.setValue (
             (double) Decibels::gainToDecibels ((double) processor.getPlayer().getGain(), (double) volume.getMinimum()), 
             dontSendNotification);
+
+        startStopContinueToggle.setToggleState (processor.respondsToStartStopContinue(),
+                                                dontSendNotification);
     }
 
     void filenameComponentChanged (FilenameComponent*) override
@@ -92,6 +98,8 @@ public:
         volume.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
         position.setBounds (r.removeFromTop (18));
+        r.removeFromTop (4);
+        startStopContinueToggle.setBounds (r.removeFromTop (18));
     }
 
     void paint (Graphics& g) override
@@ -105,6 +113,9 @@ private:
     Slider position;
     Slider volume;
     TextButton playButton;
+    ToggleButton startStopContinueToggle;
+    Atomic<int> startStopContinue { 0 };
+
     bool draggingPos = false;
 
     void bindHandlers()
@@ -142,6 +153,15 @@ private:
             const double posInMinutes = (value * processor.getPlayer().getLengthInSeconds()) / 60.0;
             return Util::minutesToString (posInMinutes);
         };
+
+        startStopContinueToggle.onClick = [this]()
+        {
+            processor.setRespondToStartStopContinue (
+                startStopContinueToggle.getToggleState() ? 1 : 0);
+            startStopContinueToggle.setToggleState (
+                processor.respondsToStartStopContinue(), dontSendNotification);
+            DBG("enabled: " << (int) processor.respondsToStartStopContinue());
+        };
     }
 
     void unbindHandlers()
@@ -151,6 +171,7 @@ private:
         position.onDragEnd = nullptr;
         position.textFromValueFunction = nullptr;
         volume.onValueChange = nullptr;
+        startStopContinueToggle.onClick = nullptr;
         processor.getPlayer().removeChangeListener (this);
         chooser->removeListener (this);
     }
@@ -177,11 +198,21 @@ AudioFilePlayerNode::~AudioFilePlayerNode()
     volume = nullptr;
 }
 
+void AudioFilePlayerNode::setRespondToStartStopContinue (bool respond)
+{
+    midiStartStopContinue.set (respond ? 1 : 0);
+}
+
+bool AudioFilePlayerNode::respondsToStartStopContinue() const
+{ 
+    return midiStartStopContinue.get() == 1;
+}
+
 void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) const
 {
     desc.name = getName();
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_MEDIA_PLAYER;
-    desc.descriptiveName    = EL_INTERNAL_ID_MEDIA_PLAYER;
+    desc.fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
+    desc.descriptiveName    = "A single audio file player";
     desc.numInputChannels   = 0;
     desc.numOutputChannels  = 2;
     desc.hasSharedContainer = false;
@@ -189,6 +220,7 @@ void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) cons
     desc.manufacturerName   = "Element";
     desc.pluginFormatName   = "Element";
     desc.version            = "1.0.0";
+    desc.uid                = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
 }
 
 void AudioFilePlayerNode::clearPlayer()
@@ -248,9 +280,76 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
         }
     }
 
-    const AudioSourceChannelInfo info (buffer);
-    player.getNextAudioBlock (info);
+    MidiBuffer::Iterator iter (midi);
+    MidiMessage msg; int frame = 0, start = 0;
+    AudioSourceChannelInfo info;
+    info.buffer = &buffer;
+
+    ScopedLock sl (getCallbackLock());
+    if (midiStartStopContinue.get() == 1)
+    {
+        while (iter.getNextEvent (msg, frame))
+        {
+            info.startSample = start;
+            info.numSamples = frame - start;
+            player.getNextAudioBlock (info);
+
+            if (msg.isMidiStart())
+            {
+                midiPlayState.set (Start);
+                triggerAsyncUpdate();
+            } 
+            else if (msg.isMidiContinue())
+            {
+                midiPlayState.set (Continue);
+                triggerAsyncUpdate();
+            }
+            else if (msg.isMidiStop())
+            {
+                midiPlayState.set (Stop);
+                triggerAsyncUpdate();
+            }
+
+            start = frame;
+        }
+    }
+
+    if (start < nframes)
+    {
+        info.startSample = start;
+        info.numSamples = nframes - start;
+        player.getNextAudioBlock (info);
+    }
+
     midi.clear();
+}
+
+void AudioFilePlayerNode::handleAsyncUpdate()
+{
+    switch (midiPlayState.get())
+    {
+        case Start:
+        {
+            player.setPosition (0.0);
+            player.start();
+        } break;
+
+        case Stop:
+        {
+            player.stop();
+        } break;
+
+        case Continue:
+        {
+            player.start();
+        } break;
+
+        case None:
+        default:
+            break;
+    }
+
+    midiPlayState.set (None);
 }
 
 AudioProcessorEditor* AudioFilePlayerNode::createEditor()
@@ -263,7 +362,8 @@ void AudioFilePlayerNode::getStateInformation (juce::MemoryBlock& destData)
     ValueTree state (Tags::state);
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
          .setProperty ("playing", (bool)*playing, nullptr)
-         .setProperty ("slave", (bool)*slave, nullptr);
+         .setProperty ("slave", (bool)*slave, nullptr)
+         .setProperty ("midiStartStopContinue", midiStartStopContinue.get() == 1, nullptr);
     MemoryOutputStream stream (destData, false);
     state.writeToStream (stream);
 }
@@ -277,6 +377,7 @@ void AudioFilePlayerNode::setStateInformation (const void* data, int sizeInBytes
             openFile (File (state["audioFile"].toString()));
         *playing = (bool) state.getProperty ("playing", false);
         *slave = (bool) state.getProperty ("slave", false);
+        midiStartStopContinue.set ((bool) state.getProperty ("midiStartStopContinue", false) ? 1 : 0);
     }
 }
 

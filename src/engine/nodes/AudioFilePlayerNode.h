@@ -5,13 +5,17 @@
 namespace Element {
 
 class AudioFilePlayerNode : public BaseProcessor,
-                             public AudioProcessorParameter::Listener
+                            public AudioProcessorParameter::Listener,
+                            public AsyncUpdater
 {
 public:
     enum Parameters { Playing = 0, Slave, Volume };
+    enum MidiPlayState { None = 0, Start, Stop, Continue };
 
     AudioFilePlayerNode ();
     virtual ~AudioFilePlayerNode();
+
+    void handleAsyncUpdate() override;
 
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
@@ -19,7 +23,10 @@ public:
 
     void fillInPluginDescription (PluginDescription& desc) const override;
 
-    const String getName() const override { return "Media Player"; }
+    void setRespondToStartStopContinue (bool);
+    bool respondsToStartStopContinue() const;
+
+    const String getName() const override { return "Audio File Player"; }
     void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
     void releaseResources() override;
     void processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages) override;
@@ -95,6 +102,9 @@ private:
     AudioParameterFloat* volume     { nullptr };
 
     File audioFile;
+    Atomic<int> midiStartStopContinue;
+
+    Atomic<int> midiPlayState { None };
 
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFilePlayerNode)

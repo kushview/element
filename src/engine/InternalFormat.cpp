@@ -257,20 +257,11 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
 
     #endif
 
-    #if defined (EL_SOLO) || defined (EL_PRO)
+   #if defined (EL_SOLO) || defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
-        desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_FILE_PLAYER;
-        desc->name               = "Audio File Player";
-        desc->descriptiveName    = "An Audio File Player";
-        desc->numInputChannels   = 0;
-        desc->numOutputChannels  = 2;
-        desc->hasSharedContainer = false;
-        desc->isInstrument       = false;
-        desc->manufacturerName   = "Element";
-        desc->pluginFormatName   = "Element";
-        desc->version            = "1.0.0";
+        AudioFilePlayerNode().fillInPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
     {
@@ -324,17 +315,17 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_WET_DRY);
     results.add (EL_INTERNAL_ID_REVERB);
 
-    #if defined EL_PRO
+   #if defined EL_PRO
     results.add (EL_INTERNAL_ID_AUDIO_MIXER);
     results.add (EL_INTERNAL_ID_CHANNELIZE);
     results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
     results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
     results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
     results.add (EL_INTERNAL_ID_GRAPH);
-    #if EL_USE_MIDI_SEQUENCER
+   #if EL_USE_MIDI_SEQUENCER
     results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
-    #endif
-    #endif
+   #endif
+   #endif
 
    #if defined (EL_SOLO)
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
@@ -377,7 +368,7 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
         base = new ReverbProcessor();
 
-    #if defined(EL_PRO)
+   #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
         base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
 
@@ -389,9 +380,9 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
         base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
-    #endif
+   #endif // EL_PRO
 
-    #if defined (EL_PRO) || defined (EL_SOLO)
+   #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
         base = (world.getUnlockStatus().isFullVersion() ? new AudioFilePlayerNode() : nullptr);
 
@@ -400,7 +391,7 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
         base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
-    #endif // EL_PRO
+    #endif // EL_PRO || EL_SOLO
 
     return base != nullptr ? base.release() : nullptr;
 }
