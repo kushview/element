@@ -59,6 +59,7 @@ private:
         IconButton saveButton;
         IconButton globalButton;
         IconButton powerButton;
+        IconButton trashButton;
 
         MidiProgramLayout()
         {
@@ -71,6 +72,9 @@ private:
             loadButton.setIcon (Icon (getIcons().farRedoAlt, LookAndFeel::textColor), 11.6f);
             addAndMakeVisible (saveButton);
             saveButton.setIcon (Icon (getIcons().farSave, LookAndFeel::textColor));
+            addAndMakeVisible (trashButton);
+            trashButton.setIcon (Icon (getIcons().farGlobe, LookAndFeel::textColor));
+
             addAndMakeVisible (globalButton);
             globalButton.setColour (TextButton::buttonOnColourId, Colors::toggleGreen);
             globalButton.setClickingTogglesState (true);
@@ -88,6 +92,8 @@ private:
             powerButton.setBounds (r.removeFromRight (20));
             r.removeFromRight (1);
             globalButton.setBounds (r.removeFromRight (20));
+            r.removeFromRight (1);
+            trashButton.setBounds (r.removeFromRight (20));
             r.removeFromRight (1);
             loadButton.setBounds (r.removeFromRight (20));
             r.removeFromRight (1);

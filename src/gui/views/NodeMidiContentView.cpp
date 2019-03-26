@@ -55,6 +55,7 @@ namespace Element {
         keyHiSlider.setTextBoxIsEditable (false);
         keyHiSlider.setValue (127, dontSendNotification);
 
+       #if defined (EL_PRO) || defined (EL_SOLO)
         addAndMakeVisible (midiProgramLabel);
         midiProgramLabel.setFont (font);
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
@@ -120,11 +121,11 @@ namespace Element {
             node.setMidiProgramsEnabled (midiProgram.powerButton.getToggleState());
             updateMidiProgram();
         };
+       #endif
 
         addAndMakeVisible (midiChannelLabel);
         midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
         midiChannelLabel.setFont (font);
-        
         
         addAndMakeVisible (midiChannel);
 
@@ -190,9 +191,12 @@ namespace Element {
         layoutComponent (r, nameLabel, nameEditor);
         layoutComponent (r, midiChannelLabel, midiChannel, 
                          midiChannel.getSuggestedHeight (r.getWidth()));
+       #if defined (EL_PRO) || defined (EL_SOLO)
         r.removeFromTop (2);
+       
         layoutComponent (r, midiProgramLabel, midiProgram);
         r.removeFromTop (2);
+       #endif
         layoutComponent (r, keyLowLabel, keyLowSlider);
         layoutComponent (r, keyHiLabel, keyHiSlider);
         layoutComponent (r, transposeLabel, transposeSlider);
@@ -232,8 +236,10 @@ namespace Element {
 
             if (GraphNodePtr ptr = node.getGraphNode())
             {
+               #if defined (EL_PRO) || defined (EL_SOLO)
                 ptr->midiProgramChanged.connect (
                     std::bind (&NodeMidiContentView::updateMidiProgram, this));
+               #endif
             }
         }
         else
