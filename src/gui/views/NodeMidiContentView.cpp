@@ -80,6 +80,18 @@ namespace Element {
         };
         midiProgram.slider.updateText();
 
+        midiProgram.trashButton.setTooltip ("Delete MIDI program");
+        midiProgram.trashButton.onClick = [this]()
+        {
+            if (GraphNodePtr ptr = node.getGraphNode())
+            {
+                if (! ptr->areMidiProgramsEnabled())
+                    return;
+                ptr->removeMidiProgram (ptr->getMidiProgram(),
+                                        ptr->useGlobalMidiPrograms());
+            }
+        };
+
         midiProgram.saveButton.setTooltip ("Save MIDI program");
         midiProgram.saveButton.onClick = [this]()
         {
@@ -328,12 +340,14 @@ namespace Element {
             {
                 midiProgram.loadButton.setEnabled (enabled);
                 midiProgram.saveButton.setEnabled (enabled);
+                midiProgram.trashButton.setEnabled (enabled);
                 midiProgram.powerButton.setToggleState (enabled, dontSendNotification);
             }
             else
             {
                 midiProgram.loadButton.setEnabled (false);
                 midiProgram.saveButton.setEnabled (false);
+                midiProgram.trashButton.setEnabled (false);
                 midiProgram.powerButton.setToggleState (false, dontSendNotification);
             }
         }

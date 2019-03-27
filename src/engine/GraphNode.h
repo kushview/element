@@ -197,7 +197,7 @@ public:
 
     //=========================================================================
     /** Returns the file used for the current global MIDI Program */
-    File getMidiProgramFile() const;
+    File getMidiProgramFile (int program = -1) const;
 
     /** Returns true if this node should use global MIDI programs */
     inline bool useGlobalMidiPrograms() const          { return globalMidiPrograms.get() == 1; }
@@ -223,6 +223,9 @@ public:
 
     /** Save the current MIDI program */
     void saveMidiProgram();
+
+    /** Removes a MIDI Program */
+    void removeMidiProgram (int program, bool global);
 
     /** Get all MIDI program states stored directly on the node */
     void getMidiProgramsState (String& state) const;

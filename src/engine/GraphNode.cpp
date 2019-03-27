@@ -332,12 +332,14 @@ void GraphNode::reloadMidiProgram()
     midiProgramLoader.triggerAsyncUpdate();
 }
 
-File GraphNode::getMidiProgramFile() const
+File GraphNode::getMidiProgramFile (int program) const
 {
     PluginDescription desc;
     getPluginDescription (desc);
     const auto uids = desc.createIdentifierString();
-    const auto program = getMidiProgram();
+    if (! isPositiveAndBelow (program, 128))
+        program = getMidiProgram();
+
     if (uids.isEmpty())
     {
         jassertfalse;
@@ -368,6 +370,28 @@ void GraphNode::saveMidiProgram()
     {
         program->state = MemoryBlock();
         getState (program->state);
+    }
+}
+
+void GraphNode::removeMidiProgram (int program, bool global)
+{
+    if (! isPositiveAndBelow (program, 128))
+        return;
+    
+    if (global)
+    {
+        const auto file = getMidiProgramFile (program);
+        if (file.existsAsFile())
+            file.deleteFile();
+    }
+    else
+    {
+        for (int i = midiPrograms.size(); --i >= 0;)
+        {
+            auto* const progobj = midiPrograms.getUnchecked (i);
+            if (progobj->program == program)
+                midiPrograms.remove (i);
+        }
     }
 }
 

@@ -73,13 +73,16 @@ private:
             addAndMakeVisible (saveButton);
             saveButton.setIcon (Icon (getIcons().farSave, LookAndFeel::textColor));
             addAndMakeVisible (trashButton);
-            trashButton.setIcon (Icon (getIcons().farGlobe, LookAndFeel::textColor));
+            trashButton.setIcon (Icon (getIcons().farTrashAlt, LookAndFeel::textColor));
 
             addAndMakeVisible (globalButton);
+            globalButton.setTooltip ("Use global MIDI programs");
             globalButton.setColour (TextButton::buttonOnColourId, Colors::toggleGreen);
             globalButton.setClickingTogglesState (true);
             globalButton.setIcon (Icon (getIcons().farGlobe, LookAndFeel::textColor));
+
             addAndMakeVisible (powerButton);
+            powerButton.setTooltip ("Enable/disable MIDI programs");
             powerButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
             powerButton.setClickingTogglesState (true);
             powerButton.setIcon (Icon (getIcons().fasPowerOff, LookAndFeel::textColor));
