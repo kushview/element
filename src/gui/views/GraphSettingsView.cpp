@@ -324,7 +324,8 @@ namespace Element {
     
     void GraphSettingsView::didBecomeActive()
     {
-        grabKeyboardFocus();
+        if (isShowing())
+            grabKeyboardFocus();
         stabilizeContent();
     }
     
