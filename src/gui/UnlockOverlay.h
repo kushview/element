@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ElementApp.h"
 #include "gui/widgets/Spinner.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
@@ -95,15 +96,24 @@ struct UnlockOverlay : public Component,
 
     void run() override
     {
+        if (! areMajorWebsitesAvailable() || ! canConnectToWebsite (URL (EL_BASE_URL), 10000))
+        {
+            connectionError.set (1);
+            startTimer(200);
+            return;
+        }
+
         clearLicense();
         StringPairArray params;
-        #if defined (EL_PRO)
-         params.set ("price_id", String (EL_PRO_PRICE_ID));
-        #elif defined (EL_SOLO)
-         params.set ("price_id", String (EL_SOLO_PRICE_ID));
-        #elif defined (EL_FREE)
-         params.set ("price_id", String (EL_LITE_PRICE_ID));
-        #endif
+
+       #if defined (EL_PRO)
+        params.set ("price_id", String (EL_PRO_PRICE_ID));
+       #elif defined (EL_SOLO)
+        params.set ("price_id", String (EL_SOLO_PRICE_ID));
+       #elif defined (EL_FREE)
+        params.set ("price_id", String (EL_LITE_PRICE_ID));
+       #endif
+       
         switch (action)
         {
             case Deactivate:
@@ -153,7 +163,13 @@ struct UnlockOverlay : public Component,
         spinner.setVisible (false);
         stopTimer();
 
-        if (result.errorMessage.isNotEmpty())
+        if (connectionError.get() > 0)
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                                              getActionTitle (true),
+                                              "Could not connect to the network.");
+        }
+        else if (result.errorMessage.isNotEmpty())
         {
             AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
                                               getActionTitle (true),
@@ -177,9 +193,12 @@ struct UnlockOverlay : public Component,
         const auto _action    = action;
         UnlockStatus& _status = status;
         auto _onFinished      = onFinished;
-
+        bool _connectionError = connectionError.get() > 0;
         owner.reset();
 
+        if (_connectionError)
+            return;
+        
         if (_result.succeeded && (_action == Activate || _action == Check))
         {
             _status.save();
@@ -204,6 +223,7 @@ struct UnlockOverlay : public Component,
         _status.refreshed();
     }
 
+    Atomic<int> connectionError { 0 };
     std::unique_ptr<Component>& owner;
     float opacity { 0.5f };
     bool showText = true;
