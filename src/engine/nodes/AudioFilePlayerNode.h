@@ -103,9 +103,11 @@ private:
 
     File audioFile;
     Atomic<int> midiStartStopContinue;
-
     Atomic<int> midiPlayState { None };
 
+    bool wasPlaying { false };
+    double lastTransportPos { 0.0 };
+    
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFilePlayerNode)
 };

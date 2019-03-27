@@ -240,10 +240,11 @@ void AudioFilePlayerNode::openFile (const File& file)
         clearPlayer();
         reader.reset (new AudioFormatReaderSource (newReader, true));
         audioFile = file;
-        player.setSource (reader.get(), 1024 * 8, &thread, getSampleRate(), 2);
-        ScopedLock sl (getCallbackLock());        
+        player.setSource (reader.get(), 1024 * 8, &thread, 
+                          newReader->sampleRate, 2);
+        ScopedLock sl (getCallbackLock());
         player.setLooping (true);
-        reader->setLooping (true);
+        reader->setLooping (player.isLooping());
     }
 }
 
@@ -253,14 +254,35 @@ void AudioFilePlayerNode::prepareToPlay (double sampleRate, int maximumExpectedS
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
     player.setLooping (true);
+
     if (reader)
-        reader->setLooping (true);
+    {
+        double readerSampleRate = sampleRate;
+        if (auto* fmtReader = reader->getAudioFormatReader())
+            readerSampleRate = fmtReader->sampleRate;
+
+        reader->setLooping (player.isLooping());
+        player.setSource (reader.get(), 1024 * 8, &thread,
+                          readerSampleRate, 2);
+
+        player.setPosition (jmax (0.0, lastTransportPos));
+        if (wasPlaying)
+            player.start();
+    }
+    else
+    {
+        clearPlayer();
+    }
 }
 
 void AudioFilePlayerNode::releaseResources()
 {
+    lastTransportPos = player.getCurrentPosition();
+    wasPlaying = player.isPlaying();
+
     player.stop();
     player.releaseResources();
+    player.setSource (nullptr);
     formats.clearFormats();
     thread.stopThread (14);
 }
