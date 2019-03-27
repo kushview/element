@@ -104,6 +104,8 @@ void ContentComponentPro::addWorkspaceItemsToMenu (PopupMenu& menu)
     int index = 0;
     for (const auto* const desc : dock.getPanelDescriptions())
     {
+        if (! desc->showInMenu)
+            continue;
         menu.addItem (offset + index++, desc->name);
     }
 }

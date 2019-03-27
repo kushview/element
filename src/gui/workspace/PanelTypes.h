@@ -91,7 +91,8 @@ public:
         type = types.add (new DockPanelInfo());
         type->identifier    = PanelIDs::sessionSettings;
         type->name          = "Session Settings";
-        type->description   = "Session Settings";
+        type->description   = "Displays the current Session's settings";
+        type->showInMenu    = false;
 
         type = types.add (new DockPanelInfo());
         type->identifier    = PanelIDs::graphSettings;
