@@ -218,7 +218,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         ReverbProcessor().fillInPluginDescription (*desc);
     }
 
-    #if defined (EL_PRO)
+   #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
     {
         auto* const desc = ds.add (new PluginDescription());
@@ -254,8 +254,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->pluginFormatName   = "Element";
         desc->version            = "1.0.0";
     }
-
-    #endif
+   #endif
 
    #if defined (EL_SOLO) || defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
@@ -303,13 +302,13 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         PlaceholderProcessor().fillInPluginDescription (*desc);
     }
-    #endif
+   #endif
 }
 
 StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
 {
     StringArray results;
-    results.add ("element.comb");
+    results.add (EL_INTERNAL_ID_COMB_FILTER);
     results.add ("element.allPass");
     results.add ("element.volume");
     results.add (EL_INTERNAL_ID_WET_DRY);
@@ -327,11 +326,8 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
    #endif
    #endif
 
-   #if defined (EL_SOLO)
-    results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
-   #endif
-
    #if defined (EL_SOLO) || defined (EL_PRO)
+    results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
@@ -346,38 +342,28 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
     
     if (desc.fileOrIdentifier == "element.comb.mono")
         base = new CombFilterProcessor (false);
-    
     else if (desc.fileOrIdentifier == "element.comb.stereo")
         base = new CombFilterProcessor (true);
-    
     else if (desc.fileOrIdentifier == "element.allPass.mono")
         base = new AllPassFilterProcessor (false);
-    
     else if (desc.fileOrIdentifier == "element.allPass.stereo")
         base = new AllPassFilterProcessor (true);
-    
     else if (desc.fileOrIdentifier == "element.volume.mono")
         base = new VolumeProcessor (-30.0, 12.0, false);
-    
     else if (desc.fileOrIdentifier == "element.volume.stereo")
         base = new VolumeProcessor (-30.0, 12.0, true);
-    
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_WET_DRY)
         base = new WetDryProcessor();
-    
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
         base = new ReverbProcessor();
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
         base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
-
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
         base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
-
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
         base = (world.getUnlockStatus().isFullVersion() ? new ChannelizeProcessor() : nullptr);
-
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
         base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
    #endif // EL_PRO
@@ -385,10 +371,8 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
    #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
         base = (world.getUnlockStatus().isFullVersion() ? new AudioFilePlayerNode() : nullptr);
-
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
         base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
-
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
         base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
     #endif // EL_PRO || EL_SOLO
