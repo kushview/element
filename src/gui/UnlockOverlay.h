@@ -99,7 +99,7 @@ struct UnlockOverlay : public Component,
         if (! areMajorWebsitesAvailable() || ! canConnectToWebsite (URL (EL_BASE_URL), 10000))
         {
             connectionError.set (1);
-            startTimer(200);
+            startTimer (200);
             return;
         }
 
