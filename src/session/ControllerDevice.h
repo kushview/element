@@ -43,12 +43,31 @@ public:
 
         MidiMessage getMappingData() const
         {
-            const var& data (objectData.getProperty (Tags::mappingData));
-            if (const auto* block = data.getBinaryData())
-                if (block->getSize() > 0)
-                    return MidiMessage (block->getData(), (int) block->getSize());
-            return MidiMessage();
+            jassertfalse; // don't use this !
+            return getMidiMessage();
         }
+        
+        MidiMessage getMidiMessage() const
+        {
+            MidiMessage midi;
+            
+            if (isNoteEvent())
+            {
+                midi = MidiMessage::noteOn (1, getEventId(), (uint8) 64);
+            }
+            else if (isControllerEvent())
+            {
+                midi = MidiMessage::controllerEvent (1, getEventId(), 64);
+            }
+
+            return midi;
+        }
+
+        bool isNoteEvent() const        { return getProperty("eventType").toString() == "note"; }
+        bool isControllerEvent() const  { return getProperty("eventType").toString() == "controller"; }
+        int getEventId() const          { return (int)  getProperty ("eventId", 0); }
+        int getToggleValue() const      { return (int)  getProperty ("toggleValue", 0); }
+        bool inverseToggle() const      { return (bool) getProperty ("inverseToggle", false); }
 
         ControllerDevice getControllerDevice() const
         {
@@ -59,10 +78,40 @@ public:
         String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
 
     private:
+        MidiMessage getMappingDataLegacy() const
+        {
+            const var& data (objectData.getProperty (Tags::mappingData));
+            if (const auto* block = data.getBinaryData())
+                if (block->getSize() > 0)
+                    return MidiMessage (block->getData(), (int) block->getSize());
+            return MidiMessage();
+        }
+
         void setMissingProperties()
         {
             stabilizePropertyString (Tags::name, "Control");
             stabilizePropertyString (Tags::uuid, Uuid().toString());
+            
+            if (hasProperty (Tags::mappingData))
+            {
+                const auto midi = getMappingDataLegacy();
+                if (midi.isNoteOnOrOff())
+                {
+                    setProperty ("eventType", "note");
+                    setProperty ("eventId", midi.getNoteNumber());
+                }
+                else if (midi.isController())
+                {
+                    setProperty ("eventType", "controller");
+                    setProperty ("eventId", midi.getControllerNumber());
+                }
+                objectData.removeProperty (Tags::mappingData, nullptr);
+            }
+
+            stabilizePropertyString ("eventType", "controller");
+            stabilizePropertyPOD ("eventId", 0);
+            stabilizePropertyPOD ("toggleValue", 0);
+            stabilizePropertyPOD ("inverseToggle", false);
         }
     };
 

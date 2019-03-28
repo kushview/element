@@ -218,7 +218,7 @@ public:
         for (int i = controllerDevice.getNumControls(); --i >= 0;)
         {
             const auto control (controllerDevice.getControl (i));
-            const auto midi (control.getMappingData());
+            const auto midi (control.getMidiMessage());
             if (midi.isController())
             {
                 controllerNumbers.setBit (midi.getControllerNumber(), true);
@@ -399,7 +399,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     {
         if (auto* input = inputs->findInput (control.getControllerDevice()))
         {
-            const auto message (control.getMappingData());
+            const auto message (control.getMidiMessage());
             std::unique_ptr<ControllerMapHandler> handler;
 
             if (message.isController())

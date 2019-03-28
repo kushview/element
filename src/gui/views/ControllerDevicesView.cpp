@@ -450,12 +450,16 @@ private:
             rowNumber = row;
             setSelected (isNowSelected);
 
-            const auto midi = control.getMappingData();
+            DBG(control.getValueTree().toXmlString());
             String text = "N/A";
-            if (midi.isNoteOn())
-                text = midi.getMidiNoteName (midi.getNoteNumber(), true, true, 4);
-            if (midi.isController()) {
-                text = "CC "; text << midi.getControllerNumber();
+            if (control.isNoteEvent())
+            {
+                text = MidiMessage::getMidiNoteName (control.getEventId(), true, true, 4);
+            }
+            else if (control.isControllerEvent())
+            {
+                text = "CC "; 
+                text << control.getEventId();
             }
 
             status.setText (text, dontSendNotification);
@@ -541,6 +545,8 @@ public:
         deviceName.addListener (this);
         inputDevice.addListener (this);
         controlName.addListener (this);
+        eventId.addListener (this);
+        eventType.addListener (this);
 
         triggerAsyncUpdate();
     }
@@ -598,6 +604,14 @@ public:
                 new RefreshControllerDeviceMessage (editedDevice));
         }
         else if (value.refersToSameSourceAs (controlName))
+        {
+            triggerAsyncUpdate();
+        }
+        else if (value.refersToSameSourceAs (eventId))
+        {
+            controls.updateContent();
+        }
+        else if (value.refersToSameSourceAs (eventType))
         {
             triggerAsyncUpdate();
         }
@@ -754,6 +768,8 @@ public:
         deviceName.removeListener (this);
         inputDevice.removeListener (this);
         controlName.removeListener (this);
+        eventType.removeListener (this);
+        eventId.removeListener (this);
 
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
@@ -784,11 +800,36 @@ public:
             controlName = control.getPropertyAsValue (Tags::name);
             props.add (new TextPropertyComponent (controlName, 
                 "Control Name", 120, false, true));
+            
+            eventType = control.getPropertyAsValue ("eventType");
+            props.add (new ChoicePropertyComponent (eventType, "Event Type", 
+                { "Controller", "Note" }, { var ("controller"), var ("note") }));
+
+            eventId = control.getPropertyAsValue ("eventId");
+            props.add (new SliderPropertyComponent (eventId, "Event ID", 
+                0.0, 127.0, 1.0));
+
+            if (control.isControllerEvent())
+            {
+                Value toggleValue = control.getPropertyAsValue ("toggleValue");
+                props.add (new SliderPropertyComponent (toggleValue, "Toggle Value", 
+                    0.0, 127.0, 1.0));
+
+                Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
+                props.add (new BooleanPropertyComponent (inverseToggle, "Inverse Toggle",
+                    "Perform OFF action when above or equal the toggle value"));
+            }
+            else if (control.isNoteEvent())
+            {
+
+            }
         }
 
         controlName.addListener (this);
         inputDevice.addListener (this);
         deviceName.addListener (this);
+        eventType.addListener (this);
+        eventId.addListener (this);
     }
 
     void createNewController()
@@ -908,6 +949,7 @@ private:
     ControllerMapsTable maps;
     SessionPtr session;
     Value deviceName, inputDevice, controlName;
+    Value eventType, eventId;
 
     int mappingsSize = 150;
     void updateComboBoxes()
@@ -945,6 +987,9 @@ private:
         getControllerDeviceProperties (props);
         properties.addProperties (props);
         props.clearQuick();
+
+        // getControllerDeviceProperties (props);
+        // properties.addSection ("Section", props);
     }
 
     void connectHandlers()
