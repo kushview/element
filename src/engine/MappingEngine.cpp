@@ -80,10 +80,14 @@ private:
 };
 
 struct MidiCCControllerMapHandler : public ControllerMapHandler,
-                                    public AsyncUpdater
+                                    public AsyncUpdater,
+                                    private Value::Listener
 {
-    MidiCCControllerMapHandler (const MidiMessage& message, const Node& _node, const int _parameter)
-        : model (_node), node (_node.getGraphNode()),
+    MidiCCControllerMapHandler (const ControllerDevice::Control& ctl, 
+                                const MidiMessage& message,
+                                const Node& _node,
+                                const int _parameter)
+        : control (ctl), model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           controllerNumber (message.getControllerNumber()),
           parameterIndex (_parameter),
@@ -91,6 +95,15 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
     {
         jassert (message.isController());
         jassert (node && processor);
+
+        toggleValueObject = control.getToggleValueObject();
+        toggleValueObject.addListener (this);
+        toggleValue.set (jlimit (0, 127, control.getToggleValue()));
+
+        inverseToggleObject = control.getInverseToggleObject();
+        inverseToggleObject.addListener (this);
+        inverseToggle.set (control.inverseToggle() ? 1 : 0);
+
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
             parameter = processor->getParameters()[parameterIndex];
@@ -123,13 +136,38 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         {
             const auto wantedToggle = desiredToggleState.get();
 
-            if (lastControllerValue < 64 && ccValue >= 64 && desiredToggleState.get() != 1)
+            if (toggleValue.get() == 0)
             {
-                desiredToggleState.set (1);
+                if (lastControllerValue == 0 && ccValue > 0)
+                {
+                    desiredToggleState.set (1);
+                }
+                else if (lastControllerValue > 0 && ccValue == 0)
+                {
+                    desiredToggleState.set (0);
+                }
             }
-            else if (lastControllerValue >= 64 && ccValue < 64 && desiredToggleState.get() != 0)
+            else if (toggleValue.get() == 127)
             {
-                desiredToggleState.set (0);
+                if (lastControllerValue < 127 && ccValue == 127)
+                {
+                    desiredToggleState.set (1);
+                }
+                else if (lastControllerValue == 127 && ccValue < 127)
+                {
+                    desiredToggleState.set (0);
+                }
+            }
+            else
+            {
+                if (lastControllerValue < toggleValue.get() && ccValue >= toggleValue.get())
+                {
+                    desiredToggleState.set (1);
+                }
+                else if (lastControllerValue >= toggleValue.get() && ccValue < toggleValue.get())
+                {
+                    desiredToggleState.set (0);
+                }
             }
 
             if (wantedToggle != desiredToggleState.get())
@@ -141,29 +179,52 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 
     void handleAsyncUpdate() override
     {
+        const int stateToCompare = inverseToggle.get() == 1 ? 0 : 1;
         if (parameterIndex == GraphNode::EnabledParameter)
         {
-            node->setEnabled (desiredToggleState.get() == 1);
+            node->setEnabled (desiredToggleState.get() == stateToCompare);
             if (model.isEnabled() != node->isEnabled())
                 model.setProperty (Tags::enabled, node->isEnabled());
         }
         else if (parameterIndex == GraphNode::BypassParameter)
         {
-            node->suspendProcessing (desiredToggleState.get() == 1);
+            // inverted because UI displays bypass as inactive (or active for not bypassed)
+            node->suspendProcessing (! (desiredToggleState.get() == stateToCompare));
             if (model.isBypassed() != node->isSuspended())
                 model.setProperty (Tags::bypass, node->isSuspended());
         }
     }
 
 private:
+    ControllerDevice::Control control;
     Node model;
     GraphNodePtr node;
     AudioProcessor* processor;
-    const int parameterIndex;
     AudioProcessorParameter* parameter;
+    
     const int controllerNumber;
+    const int parameterIndex;
     int lastControllerValue = 0;
+
+    Value toggleValueObject;
+    Atomic<int> toggleValue { 64 };
+
+    Value inverseToggleObject;
+    Atomic<int> inverseToggle;
+
     Atomic<int> desiredToggleState { 1 };
+
+    void valueChanged (Value& value) override
+    {
+        if (toggleValueObject.refersToSameSourceAs (value))
+        {
+            toggleValue.set (jlimit (0, 127, (int) toggleValueObject.getValue()));
+        }
+        else if (inverseToggleObject.refersToSameSourceAs (value))
+        {
+            inverseToggle.set ((bool)value.getValue() ? 1 : 0);
+        }
+    }
 };
 
 class ControllerMapInput : public MidiInputCallback
@@ -403,7 +464,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
             std::unique_ptr<ControllerMapHandler> handler;
 
             if (message.isController())
-                handler.reset (new MidiCCControllerMapHandler (message, node, parameter));
+                handler.reset (new MidiCCControllerMapHandler (control, message, node, parameter));
             else if (message.isNoteOn())
                 handler.reset (new MidiNoteControllerMap (message, node, parameter));
 

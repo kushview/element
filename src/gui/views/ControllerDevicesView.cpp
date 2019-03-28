@@ -805,23 +805,34 @@ public:
             props.add (new ChoicePropertyComponent (eventType, "Event Type", 
                 { "Controller", "Note" }, { var ("controller"), var ("note") }));
 
+            String eventName = "Event ID";
+            if (control.isNoteEvent())
+                eventName = "Note Number";
+            else if (control.isControllerEvent())
+                eventName = "CC Number";
             eventId = control.getPropertyAsValue ("eventId");
-            props.add (new SliderPropertyComponent (eventId, "Event ID", 
+            props.add (new SliderPropertyComponent (eventId, eventName, 
                 0.0, 127.0, 1.0));
 
             if (control.isControllerEvent())
             {
+                // not ready for this, and also is redundant
+                // Value toggleMode = control.getPropertyAsValue ("toggleMode");
+                // props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", 
+                //     { "Equals or Higher", "Equals Min/Max" }, 
+                //     { "eqorhi", "eqminmax" } ));
+
                 Value toggleValue = control.getPropertyAsValue ("toggleValue");
                 props.add (new SliderPropertyComponent (toggleValue, "Toggle Value", 
                     0.0, 127.0, 1.0));
 
                 Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
-                props.add (new BooleanPropertyComponent (inverseToggle, "Inverse Toggle",
-                    "Perform OFF action when above or equal the toggle value"));
+                props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
+                    "Perform the inverse toggle action"));
             }
             else if (control.isNoteEvent())
             {
-
+                // noop
             }
         }
 

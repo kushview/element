@@ -17,6 +17,12 @@ namespace Element {
 class ControllerDevice : public ObjectModel
 {
 public:
+    enum ControlToggleMode 
+    {
+        EqualsOrHigher = 0,
+        EqualsMinMax
+    };
+
     class Control : public ObjectModel
     {
     public:
@@ -66,8 +72,20 @@ public:
         bool isNoteEvent() const        { return getProperty("eventType").toString() == "note"; }
         bool isControllerEvent() const  { return getProperty("eventType").toString() == "controller"; }
         int getEventId() const          { return (int)  getProperty ("eventId", 0); }
+        
         int getToggleValue() const      { return (int)  getProperty ("toggleValue", 0); }
+        Value getToggleValueObject()    { return getPropertyAsValue ("toggleValue"); }
         bool inverseToggle() const      { return (bool) getProperty ("inverseToggle", false); }
+        Value getInverseToggleObject()  { return getPropertyAsValue ("inverseToggle"); }
+        
+        ControllerDevice::ControlToggleMode getToggleMode() const
+        {
+            if (getProperty("toggleMode").toString() == "eqorhi")
+                return ControllerDevice::EqualsOrHigher;
+            else if (getProperty("toggleMode").toString() == "eqminmax")
+                return ControllerDevice::EqualsMinMax;
+            return ControllerDevice::EqualsOrHigher;
+        }
 
         ControllerDevice getControllerDevice() const
         {
@@ -110,7 +128,7 @@ public:
 
             stabilizePropertyString ("eventType", "controller");
             stabilizePropertyPOD ("eventId", 0);
-            stabilizePropertyPOD ("toggleValue", 0);
+            stabilizePropertyPOD ("toggleValue", 64);
             stabilizePropertyPOD ("inverseToggle", false);
         }
     };
