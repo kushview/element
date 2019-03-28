@@ -316,7 +316,7 @@ private:
     Atomic<int> midiProgram { 0 };
     Atomic<int> lastMidiProgram { -1 };
     Atomic<int> midiProgramsEnabled { 0 };
-    Atomic<int> globalMidiPrograms { 1 };
+    Atomic<int> globalMidiPrograms { 0 };
 
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
