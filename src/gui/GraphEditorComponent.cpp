@@ -270,6 +270,13 @@ public:
             powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
             powerButton.setClickingTogglesState (true);
             powerButton.addListener (this);
+
+            addAndMakeVisible (muteButton);
+            muteButton.setYesNoText ("M", "M");
+            muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
+            muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
+            muteButton.setClickingTogglesState (true);
+            muteButton.addListener (this);
         }
 
         setSize (170, 60);
@@ -323,6 +330,10 @@ public:
         {
             if (obj->isSuspended() != node.isBypassed())
                 obj->suspendProcessing (node.isBypassed());
+        }
+        else if (b == &muteButton)
+        {
+            obj->setMuted (muteButton.getToggleState());
         }
     }
 
@@ -585,10 +596,12 @@ public:
     void resized() override
     {
         const auto box (getBoxRectangle());
-        auto r = box.reduced(3, 2).removeFromBottom (14);
-        powerButton.setBounds (r.removeFromRight (16));
+        auto r = box.reduced(4, 2).removeFromBottom (14);
+        ioButton.setBounds (r.removeFromRight (16)); 
+        r.removeFromLeft (3);
+        muteButton.setBounds (r.removeFromRight (16));       
         r.removeFromLeft (2);
-        ioButton.setBounds (r.removeFromRight (16));
+        powerButton.setBounds (r.removeFromRight (16));
 
         const int halfPinSize = pinSize / 2;
         if (vertical)
@@ -752,6 +765,7 @@ private:
 
     SettingButton ioButton;
     PowerButton powerButton;
+    SettingButton muteButton;
 
     OptionalScopedPointer<CallOutBox> ioBox;
     PigWhipSource pigWhip;

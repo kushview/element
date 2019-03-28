@@ -243,8 +243,7 @@ void AudioFilePlayerNode::openFile (const File& file)
         player.setSource (reader.get(), 1024 * 8, &thread, 
                           newReader->sampleRate, 2);
         ScopedLock sl (getCallbackLock());
-        player.setLooping (true);
-        reader->setLooping (player.isLooping());
+        reader->setLooping (true);
     }
 }
 
@@ -253,7 +252,6 @@ void AudioFilePlayerNode::prepareToPlay (double sampleRate, int maximumExpectedS
     thread.startThread();
     formats.registerBasicFormats();
     player.prepareToPlay (maximumExpectedSamplesPerBlock, sampleRate);
-    player.setLooping (true);
 
     if (reader)
     {
@@ -261,10 +259,8 @@ void AudioFilePlayerNode::prepareToPlay (double sampleRate, int maximumExpectedS
         if (auto* fmtReader = reader->getAudioFormatReader())
             readerSampleRate = fmtReader->sampleRate;
 
-        reader->setLooping (player.isLooping());
-        player.setSource (reader.get(), 1024 * 8, &thread,
-                          readerSampleRate, 2);
-
+        reader->setLooping (true);
+        player.setSource (reader.get(), 1024 * 8, &thread, readerSampleRate, 2);
         player.setPosition (jmax (0.0, lastTransportPos));
         if (wasPlaying)
             player.start();

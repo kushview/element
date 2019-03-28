@@ -35,6 +35,7 @@ namespace Tags
     const Identifier map                = "map";
     const Identifier maps               = "maps";
     const Identifier missing            = "missing";
+    const Identifier mute               = "mute";
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
     const Identifier notes              = "notes";

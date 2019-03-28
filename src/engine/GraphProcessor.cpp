@@ -207,6 +207,8 @@ public:
 
         if (chans[PortType::Midi].size() > 0)
             midiBufferToUse = chans[PortType::Midi].getFirst();
+
+        lastMute = node->isMuted();
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
@@ -224,10 +226,34 @@ public:
             return;
         }
 
-        if (node->getInputGain() != node->getLastInputGain()) {
+        const bool muted = node->isMuted();
+        const bool muteInput = node->isMutingInputs();
+
+        if (muted && muteInput)
+        {
+            if (lastMute != muted)
+            {
+                // just became muted
+                buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), 0.0);
+            }
+            else
+            {
+                // normal mute processing
+                buffer.applyGain (0, numSamples, 0.0);
+            }
+        }
+        else if (!muted && muteInput && muted != lastMute)
+        {
+            // just became unmuted
+            buffer.applyGainRamp (0, numSamples, 0.0, node->getInputGain());
+        }
+        else if (node->getInputGain() != node->getLastInputGain())
+        {
             buffer.applyGainRamp (0, numSamples, node->getLastInputGain(), node->getInputGain());
-        } else {
-            buffer.applyGain(0, numSamples, node->getInputGain());
+        } 
+        else 
+        {
+            buffer.applyGain (0, numSamples, node->getInputGain());
         }
 
         for (int i = numAudioIns; --i >= 0;)
@@ -303,13 +329,35 @@ public:
             }
         }
         
-        if (node->getGain() != node->getLastGain()) {
+        if (muted && !muteInput)
+        {
+            if (lastMute != muted)
+            {
+                // just became muted
+                buffer.applyGainRamp (0, numSamples, node->getLastGain(), 0.0);
+            }
+            else
+            {
+                // normal mute processing
+                buffer.applyGain (0, numSamples, 0.0);
+            }
+        }
+        else if (!muted && !muteInput && muted != lastMute)
+        {
+            // just became unmuted
+            buffer.applyGainRamp (0, numSamples, 0.0, node->getGain());
+        }
+        else if (node->getGain() != node->getLastGain())
+        {
             buffer.applyGainRamp (0, numSamples, node->getLastGain(), node->getGain());
-        } else {
+        }
+        else 
+        {
             buffer.applyGain (0, numSamples, node->getGain());
         }
 
         node->updateGain();
+        lastMute = muted;
 
         for (int i = 0; i < numAudioOuts; ++i)
             node->setOutputRMS (i, buffer.getRMSLevel (i, 0, numSamples));
@@ -324,6 +372,7 @@ private:
     HeapBlock <float*> channels;
     int totalChans, numAudioIns, numAudioOuts;
     int midiBufferToUse;
+    bool lastMute = false;
     MidiTranspose transpose;
     MidiBuffer tempMidi;
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)

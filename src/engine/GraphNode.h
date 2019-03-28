@@ -275,6 +275,12 @@ public:
     }
 
     //=========================================================================
+    void setMuted (bool muted)  { mute.set (muted ? 1 : 0); }
+    bool isMuted() const        { return mute.get() == 1; }
+    void setMuteInput (bool shouldMuteInput) { muteInput.set (shouldMuteInput ? 1 : 0); }
+    bool isMutingInputs() const { return muteInput.get() == 1; }
+
+    //=========================================================================
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 
@@ -303,6 +309,9 @@ private:
     bool isPrepared = false;
     Atomic<int> enabled { 1 };
     Atomic<int> bypassed { 0 };
+    Atomic<int> mute { 0 };
+    Atomic<int> muteInput { 0 };
+
     int latencySamples = 0;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
