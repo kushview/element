@@ -60,6 +60,7 @@ public:
                 if (proc == capturedProcessor && 
                         (capturedParameter == GraphNode::EnabledParameter || 
                          capturedParameter == GraphNode::BypassParameter ||
+                         capturedParameter == GraphNode::MuteParameter ||
                          isPositiveAndBelow (capturedParameter, proc->getParameters().size())))
                 {
                     callback (captured, capturedParameter);
@@ -134,6 +135,18 @@ private:
         triggerAsyncUpdate();
     }
 
+    void onMuteChanged (GraphNode* ptr)
+    {
+        GraphNodePtr ref = ptr;
+        if (capture.get() == false)
+            return;
+        capture.set (false);
+        ScopedLock sl (lock);
+        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
+        parameter = GraphNode::MuteParameter;
+        triggerAsyncUpdate();
+    }
+
     void addNodesRecursive (const Node& node)
     {
         for (int j = 0; j < node.getNumNodes(); ++j)
@@ -149,6 +162,9 @@ private:
                         std::placeholders::_1)));
                     nodeConnections.add (object->bypassChanged.connect (std::bind (
                         &AudioProcessorParameterCapture::onBypassChanged, this, 
+                        std::placeholders::_1)));
+                    nodeConnections.add (object->muteChanged.connect (std::bind (
+                        &AudioProcessorParameterCapture::onMuteChanged, this, 
                         std::placeholders::_1)));
                     proc->addListener (this);
                 }
@@ -173,7 +189,10 @@ public:
         GraphNodePtr object = node.getGraphNode();
         AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         return object && proc && 
-            (parameter == GraphNode::EnabledParameter || parameter == GraphNode::BypassParameter || isPositiveAndBelow (parameter, proc->getParameters().size())) &&
+            (parameter == GraphNode::EnabledParameter || 
+             parameter == GraphNode::BypassParameter || 
+             parameter == GraphNode::MuteParameter ||
+             isPositiveAndBelow (parameter, proc->getParameters().size())) &&
             (message.isController() || message.isNoteOn()) && 
             control.getValueTree().isValid();
     }

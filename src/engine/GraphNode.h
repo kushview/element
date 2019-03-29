@@ -16,7 +16,8 @@ public:
         NoParameter             = -1,
         EnabledParameter        = -2,
         BypassParameter         = -3,
-        SpecialParameterBegin   = BypassParameter,
+        MuteParameter           = -4,
+        SpecialParameterBegin   = MuteParameter,
         SpecialParameterEnd     = NoParameter
     };
 
@@ -275,7 +276,7 @@ public:
     }
 
     //=========================================================================
-    void setMuted (bool muted)  { mute.set (muted ? 1 : 0); }
+    void setMuted (bool muted);
     bool isMuted() const        { return mute.get() == 1; }
     void setMuteInput (bool shouldMuteInput) { muteInput.set (shouldMuteInput ? 1 : 0); }
     bool isMutingInputs() const { return muteInput.get() == 1; }
@@ -290,9 +291,8 @@ public:
 
     /** Triggered when the bypass state changes */
     Signal<void(GraphNode*)> bypassChanged;
-
     Signal<void()> midiProgramChanged;
-
+    Signal<void(GraphNode*)> muteChanged;
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;

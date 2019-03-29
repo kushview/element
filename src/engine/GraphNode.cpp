@@ -589,4 +589,12 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
     }
 }
 
+void GraphNode::setMuted (bool muted)
+{
+    bool wasMuted = isMuted();
+    mute.set (muted ? 1 : 0);
+    if (wasMuted != isMuted())
+        muteChanged (this);
+}
+
 }

@@ -50,7 +50,8 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             parameter->endChangeGesture();
         }
         else if (parameterIndex == GraphNode::EnabledParameter ||
-                 parameterIndex == GraphNode::BypassParameter)
+                 parameterIndex == GraphNode::BypassParameter ||
+                 parameterIndex == GraphNode::MuteParameter)
         {
             triggerAsyncUpdate();
         }
@@ -67,6 +68,10 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         {
             node->suspendProcessing (! node->isSuspended());
             model.setProperty (Tags::bypass, node->isSuspended());
+        }
+        else if (parameterIndex == GraphNode::MuteParameter)
+        {
+            model.setMuted (! model.isMuted());
         }
     }
 
@@ -132,7 +137,8 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter->endChangeGesture();
         }
         else if (parameterIndex == GraphNode::EnabledParameter ||
-                 parameterIndex == GraphNode::BypassParameter)
+                 parameterIndex == GraphNode::BypassParameter ||
+                 parameterIndex == GraphNode::MuteParameter)
         {
             const auto wantedToggle = desiredToggleState.get();
 
@@ -192,6 +198,10 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             node->suspendProcessing (! (desiredToggleState.get() == stateToCompare));
             if (model.isBypassed() != node->isSuspended())
                 model.setProperty (Tags::bypass, node->isSuspended());
+        }
+        else if (parameterIndex == GraphNode::MuteParameter)
+        {
+            model.setMuted (desiredToggleState.get() == stateToCompare);
         }
     }
 
