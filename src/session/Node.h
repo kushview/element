@@ -170,6 +170,12 @@ public:
     bool isBypassed() const { return objectData.getProperty(Tags::bypass, false); }
     Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
     
+    bool isMuted() const { return (bool) getProperty (Tags::mute, false); }
+    Value getMutedValue() { return getPropertyAsValue (Tags::mute); }
+    bool isMutingInputs() const { return (bool) getProperty ("muteInput", false); }
+    void setMuted (bool);
+    void setMuteInput (bool);
+
     /** returns the number of connections on this node */
     int getNumConnections() const;
     ValueTree getConnectionValueTree (const int index) const;

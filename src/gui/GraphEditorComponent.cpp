@@ -333,7 +333,7 @@ public:
         }
         else if (b == &muteButton)
         {
-            obj->setMuted (muteButton.getToggleState());
+            node.setMuted (muteButton.getToggleState());
         }
     }
 
@@ -374,6 +374,8 @@ public:
                 auto& plugins (world->getPluginManager());
                 NodePopupMenu menu (node);
                 menu.addReplaceSubmenu (plugins);
+                menu.addSeparator();
+                menu.addOptionsSubmenu();
                 menu.addSeparator();
                 menu.addProgramsMenu();
                 if (world)

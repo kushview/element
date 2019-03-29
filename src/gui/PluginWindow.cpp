@@ -59,6 +59,13 @@ public:
         onTopButton.setTooltip ("Keep plugin window on top of others");
         onTopButton.addListener (this);
 
+        addAndMakeVisible (muteButton);
+        muteButton.setYesNoText ("M", "M");
+        muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
+        muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
+        muteButton.setClickingTogglesState (true);
+        muteButton.addListener (this);
+        
         updateSize();
     }
     
@@ -135,6 +142,8 @@ public:
             auto* callback = new MenuCallback (this, node);
             NodePopupMenu& menu (callback->menu);
             menu.addSeparator();
+            menu.addOptionsSubmenu();
+            menu.addSeparator();
             menu.addProgramsMenu();
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
@@ -147,6 +156,10 @@ public:
                 pw->setAlwaysOnTop (! pw->isAlwaysOnTop());
                 node.setProperty (Tags::windowOnTop, pw->isAlwaysOnTop());
             }
+        }
+        else if (button == &muteButton)
+        {
+            node.setMuted (muteButton.getToggleState());
         }
 
         stabilizeComponents();
@@ -182,6 +195,7 @@ private:
     SettingButton nodeButton;
     PowerButton powerButton;
     SettingButton onTopButton;
+    SettingButton muteButton;
     Value bypassValue;
     bool nativeEditor = false;
     ScopedPointer<Component> editor, leftPanel, rightPanel;

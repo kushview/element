@@ -14,7 +14,7 @@ namespace Element {
 inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput,
                                          const int offset = 80000)
 {
-    jassert(offset > 0);
+    jassert (offset > 0);
     const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
     for (int i = 0; i < devices.size(); ++i)
         menu.addItem (i + offset, devices [i], true, false);
@@ -183,6 +183,15 @@ public:
         reset();
     }
 
+    inline void addOptionsSubmenu()
+    {
+        PopupMenu menu;
+        int index = 30000;
+        GraphNodePtr ptr = node.getGraphNode();
+        menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
+        addSubMenu ("Options", menu, ptr != nullptr);
+    }
+
     inline void addReplaceSubmenu (PluginManager& plugins)
     {
         PopupMenu menu;
@@ -294,6 +303,16 @@ public:
                     if (data[Tags::name].toString().isNotEmpty())
                         n.setProperty (Tags::name, data[Tags::name]);
                 }
+            }
+        }
+        else if (result >= 30000 && result < 40000)
+        {
+            const int index = result - 30000;
+            switch (index)
+            {
+                case 0:
+                    node.setMuteInput (! node.isMutingInputs());
+                    break;
             }
         }
         

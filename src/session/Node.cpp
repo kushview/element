@@ -604,7 +604,7 @@ void Node::restorePluginState()
             obj->suspendProcessing (isBypassed());
         }
 
-        if (hasProperty ("gain"))
+        if (hasProperty (Tags::gain))
         {
             obj->setGain (getProperty ("gain"));
         }
@@ -633,18 +633,14 @@ void Node::restorePluginState()
         }
 
         if (hasProperty (Tags::midiProgramsEnabled))
-        {
-            obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));
-        }
-        
-        if (hasProperty (Tags::globalMidiPrograms))
-        {
-            obj->setUseGlobalMidiPrograms ((bool) getProperty (Tags::globalMidiPrograms, true));
-        }
-        
-        if (hasProperty (Tags::midiProgramsState)) {
+            obj->setMidiProgramsEnabled ((bool) getProperty (Tags::midiProgramsEnabled, true));        
+        obj->setUseGlobalMidiPrograms ((bool) getProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms()));
+        if (hasProperty (Tags::midiProgramsState))
             obj->setMidiProgramsState (getProperty (Tags::midiProgramsState).toString().trim());
-        }
+
+        obj->setMuted ((bool) getProperty (Tags::mute, obj->isMuted()));
+        obj->setMuteInput ((bool) getProperty ("muteInput", obj->isMutingInputs()));
+
         if (hasProperty (Tags::transpose))
             obj->setTransposeOffset (getProperty (Tags::transpose));
     }
@@ -704,12 +700,30 @@ void Node::savePluginState()
         setProperty (Tags::midiProgram, obj->getMidiProgram());
         setProperty (Tags::globalMidiPrograms, obj->useGlobalMidiPrograms());
         setProperty (Tags::midiProgramsEnabled, obj->areMidiProgramsEnabled());
+        setProperty (Tags::mute, obj->isMuted());
+        setProperty ("muteInput", obj->isMutingInputs());
         String mps; obj->getMidiProgramsState (mps);
         setProperty (Tags::midiProgramsState, mps);
     }
 
     for (int i = 0; i < getNumNodes(); ++i)
         getNode(i).savePluginState();
+}
+
+void Node::setMuted (bool shouldBeMuted)
+{
+    if (shouldBeMuted != isMuted())
+        setProperty (Tags::mute, shouldBeMuted);
+    if (auto* obj = getGraphNode())
+        obj->setMuted (isMuted());
+}
+
+void Node::setMuteInput (bool shouldMuteInputs)
+{
+    if (shouldMuteInputs != isMutingInputs())
+        setProperty ("muteInput", shouldMuteInputs);
+    if (auto* obj = getGraphNode())
+        obj->setMuteInput (isMutingInputs());
 }
 
 void Node::setCurrentProgram (const int index)
