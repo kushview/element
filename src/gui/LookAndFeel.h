@@ -47,6 +47,7 @@ public:
                                              double progress, const String& textToShow);
     void drawProgressBar (Graphics& g, ProgressBar& progressBar,
                           int width, int height, double progress, const String& textToShow) override;
+    
     // MARK: Concertina Panel
     void drawConcertinaPanelHeader (Graphics&, const Rectangle<int>& area,
                                     bool isMouseOver, bool isMouseDown,
@@ -83,11 +84,6 @@ public:
 
     // MARK: Treeview
     void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
-
-    // MARK: Sliders
-    void drawLinearSliderBackground (Graphics& g, int x, int y, int width, int height,
-                                     float sliderPos, float minSliderPos, float maxSliderPos,
-                                     const Slider::SliderStyle style, Slider& slider) override;
 };
 
 }

@@ -19,18 +19,18 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 LookAndFeel::LookAndFeel()
 {
     setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
-    setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
+    // setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
     // Property Component
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
     
-    // Text Editor
-    setColour (TextEditor::textColourId,            textColor);
-    setColour (TextEditor::highlightColourId,       Colors::elemental.brighter (0.31f));
-    setColour (TextEditor::highlightedTextColourId, Colours::black.brighter(0.22f));
-    setColour (TextEditor::outlineColourId,         Colours::black);
-    setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
+    // // Text Editor
+    // setColour (TextEditor::textColourId,            textColor);
+    // setColour (TextEditor::highlightColourId,       Colors::elemental.brighter (0.31f));
+    // setColour (TextEditor::highlightedTextColourId, Colours::black.brighter(0.22f));
+    // setColour (TextEditor::outlineColourId,         Colours::black);
+    // setColour (TextEditor::focusedOutlineColourId,  Colors::toggleBlue.darker (0.002).withAlpha (0.6f));
     
     setColour (Label::textWhenEditingColourId,      findColour(TextEditor::textColourId).darker (0.003));
 
@@ -69,14 +69,14 @@ LookAndFeel::LookAndFeel()
     // List Box
     setColour (ListBox::textColourId, textColor);
 
-    // Slider
-    setColour (Slider::thumbColourId,               Colours::black);
-    setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
-    setColour (Slider::trackColourId,               Colours::black);
-    setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
-    setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
-    setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
-    setColour (Slider::textBoxTextColourId,         findColour (TextEditor::textColourId));
+    // // Slider
+    // setColour (Slider::thumbColourId,               Colours::black);
+    // setColour (Slider::textBoxTextColourId,         LookAndFeel::textColor);
+    // setColour (Slider::trackColourId,               Colours::black);
+    // setColour (Slider::textBoxBackgroundColourId,   findColour (TextEditor::backgroundColourId));
+    // setColour (Slider::textBoxHighlightColourId,    findColour (TextEditor::highlightColourId));
+    // setColour (Slider::textBoxOutlineColourId,      findColour (TextEditor::outlineColourId));
+    // setColour (Slider::textBoxTextColourId,         findColour (TextEditor::textColourId));
 
     // Hyperlink button
     setColour (HyperlinkButton::textColourId, Colors::toggleBlue);
@@ -444,40 +444,6 @@ void LookAndFeel::drawTreeviewPlusMinusBox (Graphics& g, const Rectangle<float> 
                                             Colour backgroundColour, bool isOpen, bool isMouseOver)
 {
     LookAndFeel_KV1::drawTreeviewPlusMinusBox (g, area, backgroundColour, isOpen, isMouseOver);
-}
-
-void LookAndFeel::drawLinearSliderBackground (Graphics& g, int x, int y, int width, int height,
-                                              float /*sliderPos*/,
-                                              float /*minSliderPos*/,
-                                              float /*maxSliderPos*/,
-                                              const Slider::SliderStyle /*style*/, 
-                                              Slider& slider)
-{
-    const float sliderRadius = (float) (getSliderThumbRadius (slider) - 4);
-
-    const Colour trackColour (slider.findColour (Slider::trackColourId));
-    const Colour gradCol1 (trackColour.overlaidWith (Colour (slider.isEnabled() ? 0x13000000 : 0x09000000)));
-    const Colour gradCol2 (trackColour.overlaidWith (Colour (0x06000000)));
-    Path indent;
-    const float cornerSize = 1.f;
-
-    if (slider.isHorizontal())
-    {
-        auto iy = y + height * 0.5f - sliderRadius * 0.5f;
-        g.setGradientFill (ColourGradient::vertical (gradCol1, iy, gradCol2, iy + sliderRadius));
-        indent.addRoundedRectangle (x - sliderRadius * 0.5f, iy, width + sliderRadius, sliderRadius, cornerSize);
-    }
-    else
-    {
-        auto ix = x + width * 0.5f - sliderRadius * 0.5f;
-        g.setGradientFill (ColourGradient::horizontal (gradCol1, ix, gradCol2, ix + sliderRadius));
-        indent.addRoundedRectangle (ix, y - sliderRadius * 0.5f, sliderRadius, height + sliderRadius, cornerSize);
-    }
-
-    g.fillPath (indent);
-
-    g.setColour (trackColour.contrasting (0.5f));
-    g.strokePath (indent, PathStrokeType (0.5f));
 }
 
 }
