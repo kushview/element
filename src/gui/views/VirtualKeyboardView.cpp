@@ -139,6 +139,21 @@ VirtualKeyboardView::VirtualKeyboardView()
             .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
     };
 
+    addAndMakeVisible (hold);
+    hold.setButtonText ("Hold");
+    hold.setClickingTogglesState (true);
+    hold.setTriggeredOnMouseDown (true);
+    hold.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    hold.onClick = [this]() {
+        auto* const world = ViewHelpers::getGlobals (this);
+        AudioEnginePtr engine = world != nullptr ? world->getAudioEngine() : nullptr;
+        if (! engine)
+            return;
+        engine->addMidiMessage (MidiMessage::controllerEvent (
+            keyboard->getMidiChannel(), 0x42, sustain.getToggleState() ? 127 : 0)
+            .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
+    };
+
     addAndMakeVisible (widthLabel);
     widthLabel.setFont (Font (12.f));
     widthLabel.setJustificationType (Justification::centredRight);
@@ -230,8 +245,9 @@ void VirtualKeyboardView::resized()
     widthLabel.setBounds (r2.removeFromRight (42));
     
     sustain.changeWidthToFitText (r2.getHeight());
-    sustain.setBounds (jmax (midiProgram.getRight() + 2, (getWidth() / 2) - (sustain.getWidth() / 2)), 
+    sustain.setBounds (jmax (midiProgram.getRight() + 2, (getWidth() / 2) - (sustain.getWidth())), 
                         r2.getY(), sustain.getWidth(), r2.getHeight());
+    hold.setBounds (sustain.getRight(), r2.getY(), sustain.getWidth(), r2.getHeight());
 
     r.removeFromTop (2);
    #endif

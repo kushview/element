@@ -49,6 +49,7 @@ private:
     Slider midiProgram;
 
     TextButton sustain;
+    TextButton hold;
 
     Label widthLabel;
     TextButton widthDown;
