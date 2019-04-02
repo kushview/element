@@ -10,10 +10,12 @@ class PlaceholderProcessor : public BaseProcessor
 {    
 public:
     PlaceholderProcessor()
+        : BaseProcessor (BusesProperties()
+            .withInput ("Main", AudioChannelSet::stereo())
+            .withOutput ("Main", AudioChannelSet::stereo()))
     { 
-        numInputs = numOutputs = 0;
+        numInputs = numOutputs = 2;
         acceptMidi = produceMidi = true;
-        setPlayConfigDetails (numInputs, numOutputs, 44100.0, 1024);
     }
 
     PlaceholderProcessor (const Node& node, double sampleRate = 44100.0, 
@@ -24,11 +26,12 @@ public:
     
     PlaceholderProcessor (const int numAudioIns, const int numAudioOuts,
                           const bool hasMidiIn, const bool hasMidiOut)
-        : numInputs (numAudioIns), numOutputs (numAudioOuts),
+        : BaseProcessor (BusesProperties()
+            .withInput ("Main", AudioChannelSet::namedChannelSet (numAudioIns))
+            .withOutput ("Main", AudioChannelSet::namedChannelSet (numAudioOuts))),
+          numInputs (numAudioIns), numOutputs (numAudioOuts),
           acceptMidi (hasMidiIn), produceMidi (hasMidiOut)
-    {
-        setPlayConfigDetails (numInputs, numOutputs, 44100.0, 1024);
-    }
+    { }
 
     virtual ~PlaceholderProcessor() { }
 
@@ -40,24 +43,24 @@ public:
         node.getPorts (ins, outs, PortType::Audio);
         numInputs       = ins.size();
         numOutputs      = outs.size();
-        
+        setChannelLayoutOfBus (true,  0, AudioChannelSet::namedChannelSet (numInputs));
+        setChannelLayoutOfBus (false, 0, AudioChannelSet::namedChannelSet (numOutputs));
+
         ins.clearQuick(); outs.clearQuick();
         node.getPorts (ins, outs, PortType::Midi);
         acceptMidi      = ins.size() > 0;
         produceMidi     = outs.size() > 0;
-        
+
         int controlIdx = 0;
         for (int i = 0; i < node.getPortsValueTree().getNumChildren(); ++i)
         {
             const auto port = node.getPort (i);
-            if (port.isA(PortType::Control, true))
+            if (port.isA (PortType::Control, true))
             {
                 String controlId = "control-"; controlId << controlIdx++;
                 addParameter (new AudioParameterFloat (controlId, port.getName(), 0, 1, 0));
             }
         }
-
-        setPlayConfigDetails (numInputs, numOutputs, sampleRate, bufferSize);
     }
     
     inline void fillInPluginDescription (PluginDescription& d) const override
@@ -123,13 +126,23 @@ public:
     virtual void setPlayHead (AudioPlayHead* newPlayHead);
     virtual void updateTrackProperties (const TrackProperties& properties);
     virtual void fillInPluginDescription (PluginDescription& description);
-    
+
 protected:
-    virtual bool isBusesLayoutSupported (const BusesLayout&) const          { return true; }
-    virtual bool canApplyBusesLayout (const BusesLayout& layouts) const     { return isBusesLayoutSupported (layouts); }
     virtual bool canApplyBusCountChange (bool isInput, bool isAddingBuses, BusProperties& outNewBusProperties);
+
    #endif
-    
+
+protected:
+    bool isBusesLayoutSupported (const BusesLayout& layout) const override
+    {
+        if (layout.inputBuses.size() > 1 || layout.outputBuses.size() > 1)
+            return false;
+        return layout.getNumChannels (true, 0) == numInputs &&
+            layout.getNumChannels (false, 0) == numOutputs; 
+    }
+
+    bool canApplyBusesLayout (const BusesLayout& layouts) const override { return isBusesLayoutSupported (layouts); }
+
 private:
     int numInputs       = 2;
     int numOutputs      = 2;
