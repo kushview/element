@@ -20,7 +20,7 @@ public:
     enum ControlToggleMode 
     {
         EqualsOrHigher = 0,
-        EqualsMinMax
+        Equals
     };
 
     class Control : public ObjectModel
@@ -78,14 +78,19 @@ public:
         bool inverseToggle() const      { return (bool) getProperty ("inverseToggle", false); }
         Value getInverseToggleObject()  { return getPropertyAsValue ("inverseToggle"); }
         
-        ControllerDevice::ControlToggleMode getToggleMode() const
+        static ControllerDevice::ControlToggleMode getToggleMode (const String& str)
         {
-            if (getProperty("toggleMode").toString() == "eqorhi")
+            if (str == "eqorhi")
                 return ControllerDevice::EqualsOrHigher;
-            else if (getProperty("toggleMode").toString() == "eqminmax")
-                return ControllerDevice::EqualsMinMax;
+            else if (str == "eq")
+                return ControllerDevice::Equals;
             return ControllerDevice::EqualsOrHigher;
         }
+        ControllerDevice::ControlToggleMode getToggleMode() const
+        {
+            return getToggleMode (getProperty("toggleMode").toString());
+        }
+        Value getToggleModeObject() { return getPropertyAsValue ("toggleMode"); }
 
         ControllerDevice getControllerDevice() const
         {
@@ -130,6 +135,7 @@ public:
             stabilizePropertyPOD ("eventId", 0);
             stabilizePropertyPOD ("toggleValue", 64);
             stabilizePropertyPOD ("inverseToggle", false);
+            stabilizePropertyString ("toggleMode", "eqorhi");
         }
     };
 

@@ -54,7 +54,6 @@ Result GraphDocument::saveDocument (const File& file)
 
     if (! graph.isGraph())
     {
-        DBG(graph.getValueTree().toXmlString());
         return Result::fail ("No graph is loaded");
     }
 

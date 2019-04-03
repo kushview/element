@@ -450,7 +450,6 @@ private:
             rowNumber = row;
             setSelected (isNowSelected);
 
-            DBG(control.getValueTree().toXmlString());
             String text = "N/A";
             if (control.isNoteEvent())
             {
@@ -547,6 +546,7 @@ public:
         controlName.addListener (this);
         eventId.addListener (this);
         eventType.addListener (this);
+        toggleMode.addListener (this);
 
         triggerAsyncUpdate();
     }
@@ -612,6 +612,10 @@ public:
             controls.updateContent();
         }
         else if (value.refersToSameSourceAs (eventType))
+        {
+            triggerAsyncUpdate();
+        }
+        else if (value.refersToSameSourceAs (toggleMode))
         {
             triggerAsyncUpdate();
         }
@@ -770,6 +774,7 @@ public:
         controlName.removeListener (this);
         eventType.removeListener (this);
         eventId.removeListener (this);
+        toggleMode.removeListener (this);
 
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
@@ -816,19 +821,21 @@ public:
 
             if (control.isControllerEvent())
             {
-                // not ready for this, and also is redundant
-                // Value toggleMode = control.getPropertyAsValue ("toggleMode");
-                // props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", 
-                //     { "Equals or Higher", "Equals Min/Max" }, 
-                //     { "eqorhi", "eqminmax" } ));
+                toggleMode = control.getToggleModeObject();
+                props.add (new ChoicePropertyComponent (toggleMode, "Toggle Mode", 
+                    { "Equal or Higher", "Same Value" }, 
+                    { "eqorhi", "eq" } ));
 
                 Value toggleValue = control.getPropertyAsValue ("toggleValue");
                 props.add (new SliderPropertyComponent (toggleValue, "Toggle Value", 
                     0.0, 127.0, 1.0));
 
-                Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
-                props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
-                    "Perform the inverse toggle action"));
+                if (toggleMode.getValue() != "eq")
+                {
+                    Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
+                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
+                        "Perform the inverse toggle action"));
+                }
             }
             else if (control.isNoteEvent())
             {
@@ -841,6 +848,7 @@ public:
         deviceName.addListener (this);
         eventType.addListener (this);
         eventId.addListener (this);
+        toggleMode.addListener (this);
     }
 
     void createNewController()
@@ -960,7 +968,7 @@ private:
     ControllerMapsTable maps;
     SessionPtr session;
     Value deviceName, inputDevice, controlName;
-    Value eventType, eventId;
+    Value eventType, eventId, toggleMode;
 
     int mappingsSize = 150;
     void updateComboBoxes()

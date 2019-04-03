@@ -109,6 +109,10 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         inverseToggleObject.addListener (this);
         inverseToggle.set (control.inverseToggle() ? 1 : 0);
 
+        toggleModeObject = control.getToggleModeObject();
+        toggleModeObject.addListener (this);
+        toggleMode.set (static_cast<int> (control.getToggleMode()));
+
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
             parameter = processor->getParameters()[parameterIndex];
@@ -140,43 +144,59 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                  parameterIndex == GraphNode::BypassParameter ||
                  parameterIndex == GraphNode::MuteParameter)
         {
-            const auto wantedToggle = desiredToggleState.get();
+            const auto currentToggleState = desiredToggleState.get();
+            const auto mode = toggleMode.get();
 
-            if (toggleValue.get() == 0)
+            if (mode == ControllerDevice::EqualsOrHigher)
             {
-                if (lastControllerValue == 0 && ccValue > 0)
+                if (toggleValue.get() == 0)
                 {
-                    desiredToggleState.set (1);
+                    if (lastControllerValue == 0 && ccValue > 0)
+                    {
+                        desiredToggleState.set (1);
+                    }
+                    else if (lastControllerValue > 0 && ccValue == 0)
+                    {
+                        desiredToggleState.set (0);
+                    }
                 }
-                else if (lastControllerValue > 0 && ccValue == 0)
+                else if (toggleValue.get() == 127)
                 {
-                    desiredToggleState.set (0);
+                    if (lastControllerValue < 127 && ccValue == 127)
+                    {
+                        desiredToggleState.set (1);
+                    }
+                    else if (lastControllerValue == 127 && ccValue < 127)
+                    {
+                        desiredToggleState.set (0);
+                    }
+                }
+                else
+                {
+                    if (lastControllerValue < toggleValue.get() && ccValue >= toggleValue.get())
+                    {
+                        desiredToggleState.set (1);
+                    }
+                    else if (lastControllerValue >= toggleValue.get() && ccValue < toggleValue.get())
+                    {
+                        desiredToggleState.set (0);
+                    }
                 }
             }
-            else if (toggleValue.get() == 127)
+            else if (mode == ControllerDevice::Equals)
             {
-                if (lastControllerValue < 127 && ccValue == 127)
+                if (toggleValue.get() == ccValue)
                 {
-                    desiredToggleState.set (1);
-                }
-                else if (lastControllerValue == 127 && ccValue < 127)
-                {
-                    desiredToggleState.set (0);
+                    desiredToggleState.set (currentToggleState == 0 ? 1 : 0);
                 }
             }
             else
             {
-                if (lastControllerValue < toggleValue.get() && ccValue >= toggleValue.get())
-                {
-                    desiredToggleState.set (1);
-                }
-                else if (lastControllerValue >= toggleValue.get() && ccValue < toggleValue.get())
-                {
-                    desiredToggleState.set (0);
-                }
+                jassertfalse;
+                // toggle mode not supported
             }
 
-            if (wantedToggle != desiredToggleState.get())
+            if (currentToggleState != desiredToggleState.get())
                 triggerAsyncUpdate();
         }
 
@@ -185,7 +205,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 
     void handleAsyncUpdate() override
     {
-        const int stateToCompare = inverseToggle.get() == 1 ? 0 : 1;
+        const auto mode = toggleMode.get();
+        const int stateToCompare = mode != ControllerDevice::Equals 
+            ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
+            : 1;                                 // equals mode always compare true
+
         if (parameterIndex == GraphNode::EnabledParameter)
         {
             node->setEnabled (desiredToggleState.get() == stateToCompare);
@@ -222,6 +246,9 @@ private:
     Value inverseToggleObject;
     Atomic<int> inverseToggle;
 
+    Value toggleModeObject;
+    Atomic<int> toggleMode { 0 };
+
     Atomic<int> desiredToggleState { 1 };
 
     void valueChanged (Value& value) override
@@ -233,6 +260,12 @@ private:
         else if (inverseToggleObject.refersToSameSourceAs (value))
         {
             inverseToggle.set ((bool)value.getValue() ? 1 : 0);
+        }
+        else if (toggleModeObject.refersToSameSourceAs (value))
+        {
+            toggleMode. set (static_cast<int> (ControllerDevice::Control::getToggleMode (
+                toggleModeObject.getValue().toString())));
+            DBG("toggle mode: " << toggleModeObject.getValue().toString() << " = " << toggleMode.get());
         }
     }
 };

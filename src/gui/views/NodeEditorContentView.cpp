@@ -171,8 +171,6 @@ void NodeEditorContentView::setState (const String& state)
         : ValueTree();
     if (! tree.isValid())
         return;
-
-    DBG(tree.toXmlString());
     
     setSticky ((bool) tree.getProperty ("sticky", sticky));
     

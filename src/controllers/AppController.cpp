@@ -289,7 +289,6 @@ void AppController::handleMessage (const Message& msg)
         else
         {
             DBG("[EL] add controller device not valid");
-            DBG(device.getValueTree().toXmlString());
         }
     }
     else if (const auto* removeControlMessage = dynamic_cast<const RemoveControlMessage*> (&msg))
