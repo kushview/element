@@ -22,7 +22,7 @@ public:
 
         auto buildDate = Time::getCompilationDate();
         addAndMakeVisible (versionLabel);
-        versionLabel.setText (Util::appName() + String(" v") + JUCEApplication::getInstance()->getApplicationVersion()
+        versionLabel.setText (Util::appName() + String(" v") + ProjectInfo::versionString
                               + "\nBuild date: " + String (buildDate.getDayOfMonth())
                                                  + " " + Time::getMonthName (buildDate.getMonth(), true)
                                                  + " " + String (buildDate.getYear()),
