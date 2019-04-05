@@ -7,6 +7,7 @@
 
 #include "gui/views/GraphDisplayView.h"
 #include "gui/GraphEditorComponent.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -32,6 +33,8 @@ private:
     Node node;
     GraphEditorComponent graph;
     Viewport view;
+    SignalConnection nodeSelectedConnection;
+    void onNodeSelected();
 };
 
 }

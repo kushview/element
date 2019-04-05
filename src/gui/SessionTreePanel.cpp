@@ -508,6 +508,7 @@ SessionTreePanel::SessionTreePanel()
 
 SessionTreePanel::~SessionTreePanel()
 {
+    nodeSelectedConnection.disconnect();
     data.removeListener (this);
     setRoot (nullptr);
 }
@@ -529,6 +530,13 @@ void SessionTreePanel::setSession (SessionPtr s)
     data.removeListener (this);
     data = (session != nullptr) ? session->getValueTree() : ValueTree();
     data.addListener (this);
+
+    if (auto* const gui = ViewHelpers::getGuiController (this))
+    {
+        if (! nodeSelectedConnection.connected())
+            nodeSelectedConnection = gui->nodeSelected.connect (std::bind (&SessionTreePanel::onNodeSelected, this));
+    }
+
     refresh();
     selectActiveRootGraph();
 }
@@ -536,6 +544,34 @@ void SessionTreePanel::setSession (SessionPtr s)
 SessionPtr SessionTreePanel::getSession() const
 {
     return session;
+}
+
+static TreeViewItem* findItemForNodeRecursive (TreeViewItem* item, const Node& node)
+{
+    if (auto* const sitem = dynamic_cast<SessionNodeTreeItem*> (item))
+        if (sitem->node == node)
+            return sitem;
+    for (int i = 0; i < item->getNumSubItems(); ++i)
+    {
+        if (auto* const found = findItemForNodeRecursive (item->getSubItem (i), node))
+            return found;
+    }
+
+    return nullptr;
+}
+
+TreeViewItem* SessionTreePanel::findItemForNode (const Node& node) const
+{
+    if (rootItem != nullptr)
+        return findItemForNodeRecursive (rootItem.get(), node);
+    return nullptr;
+}
+
+void SessionTreePanel::onNodeSelected()
+{
+    if (auto* const gui = ViewHelpers::getGuiController (this))
+        if (auto* const item = findItemForNode (gui->getSelectedNode()))
+            item->setSelected (true, true, dontSendNotification);
 }
 
 void SessionTreePanel::selectActiveRootGraph()

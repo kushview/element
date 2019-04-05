@@ -12,6 +12,7 @@ class ContentComponent;
 class Globals;
 class Node;
 class NavigationConcertinaPanel;
+class GuiController;
 
 namespace ViewHelpers {
 
@@ -33,6 +34,9 @@ ContentComponent* findContentComponent();
 
 /** Get the engine */
 AudioEnginePtr getAudioEngine (Component*);
+
+/** Get the GUI controller */
+GuiController* getGuiController (Component* c);
 
 /** Get World */
 Globals* getGlobals (Component* c);

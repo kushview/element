@@ -1643,6 +1643,27 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
     }
 }
 
+void GraphEditorComponent::selectNode (const Node& nodeToSelect)
+{
+    for (int i = 0; i < graph.getNumNodes(); ++i)
+    {
+        auto node = graph.getNode (i);
+        if (node == nodeToSelect)
+        {
+            selectedNodes.selectOnly (nodeToSelect.getNodeId());
+            updateSelection();
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+            {
+                auto* gui = cc->getAppController().findChild<GuiController>();
+                if (gui->getSelectedNode() != nodeToSelect)
+                    gui->selectNode (nodeToSelect);
+            }
+
+            break;
+        }
+    }
+}
+
 void GraphEditorComponent::deleteSelectedNodes()
 {
     NodeArray toRemove;

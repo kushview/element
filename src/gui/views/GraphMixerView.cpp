@@ -5,8 +5,10 @@
 #include "gui/views/GraphMixerView.h"
 #include "gui/widgets/HorizontalListBox.h"
 #include "gui/LookAndFeel.h"
-#include "session/Session.h"
-#include "Globals.h"
+#include "gui/ViewHelpers.h"
+
+#include "Common.h"
+
 namespace Element {
 
 class GraphMixerChannelStrip : public NodeChannelStripComponent,
@@ -26,6 +28,9 @@ void mouseDown (const MouseEvent& ev) override
 {
     down = true; 
     dragging = false;
+    if (auto* const cc = ViewHelpers::findContentComponent (this))
+        if (auto* const gui = cc->getAppController().findChild<GuiController>())
+            gui->selectNode (getNode());
 }
 
 void mouseDrag (const MouseEvent& ev) override

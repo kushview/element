@@ -28,6 +28,7 @@ public:
     virtual ~GraphEditorComponent();
 
     void setNode (const Node& n);
+    void selectNode (const Node& n);
     
     void deleteSelectedNodes();
     

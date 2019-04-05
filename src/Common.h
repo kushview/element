@@ -15,6 +15,9 @@
 #include "controllers/ScriptingController.h"
 #include "controllers/WorkspacesController.h"
 
+#include "session/Node.h"
+#include "session/Session.h"
+
 #include "Commands.h"
 #include "Messages.h"
 #include "Globals.h"

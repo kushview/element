@@ -34,10 +34,15 @@ private:
 
     SessionPtr session;
     ValueTree data;
-
+    SignalConnection nodeSelectedConnection;
+    
     bool ignoreActiveRootGraphSelectionHandler = false;
     void selectActiveRootGraph();
     
+    TreeViewItem* findItemForNode (const Node& node) const;
+
+    void onNodeSelected();
+
     friend class ValueTree;
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
     void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override;

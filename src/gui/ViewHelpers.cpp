@@ -94,6 +94,13 @@ ContentComponent* findContentComponent (Component* c)
     return nullptr;
 }
 
+GuiController* getGuiController (Component* c)
+{
+    if (auto* const cc = findContentComponent (c))
+        return cc->getAppController().findChild<GuiController>();
+    return nullptr;
+}
+
 AudioEnginePtr getAudioEngine (Component* c)
 {
     if (auto* cc = findContentComponent (c))

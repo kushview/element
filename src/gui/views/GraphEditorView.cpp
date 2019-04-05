@@ -3,10 +3,11 @@
     Copyright (C) 2016 Kushview, LLC.  All rights reserved.
 */
 
+
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphEditorView.h"
-#include "Globals.h"
 #include "session/UnlockStatus.h"
+#include "Common.h"
 
 #ifndef EL_GRAPH_EDITOR_VIEWPORT
  #define EL_GRAPH_EDITOR_VIEWPORT 0
@@ -57,7 +58,17 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
 
 void GraphEditorView::stabilizeContent()
 {
-    if (!getGraph().isValid() || !getGraph().isGraph())
+    if (! nodeSelectedConnection.connected())
+    {
+        if (auto* const cc = ViewHelpers::findContentComponent (this))
+        {
+            auto& gui = *cc->getAppController().findChild<GuiController>();
+            nodeSelectedConnection = gui.nodeSelected.connect (
+                std::bind (&GraphEditorView::onNodeSelected, this));
+        }
+    }
+
+    if (! getGraph().isValid() || ! getGraph().isGraph())
     {
         if (auto session = ViewHelpers::getSession (this))
             setNode (session->getCurrentGraph());
@@ -111,6 +122,16 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
 {
     stabilizeContent();
+}
+
+void GraphEditorView::onNodeSelected()
+{
+    if (auto* const cc = ViewHelpers::findContentComponent (this))
+    {
+        auto& gui = *cc->getAppController().findChild<GuiController>();
+        const auto selected = gui.getSelectedNode();
+        graph.selectNode (selected);
+    }
 }
 
 } /* namespace Element */
