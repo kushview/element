@@ -534,7 +534,8 @@ void SessionTreePanel::setSession (SessionPtr s)
     if (auto* const gui = ViewHelpers::getGuiController (this))
     {
         if (! nodeSelectedConnection.connected())
-            nodeSelectedConnection = gui->nodeSelected.connect (std::bind (&SessionTreePanel::onNodeSelected, this));
+            nodeSelectedConnection = gui->nodeSelected.connect (
+                std::bind (&SessionTreePanel::onNodeSelected, this));
     }
 
     refresh();
