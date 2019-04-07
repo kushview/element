@@ -170,5 +170,5 @@ private:
     KnownPluginList& list;
     void timerCallback() override;
 };
-    
+
 }

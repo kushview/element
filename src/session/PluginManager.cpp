@@ -602,14 +602,14 @@ private:
 		owner.scanFinished();
 	}
 
-	void audioPluginScanStarted(const String& plugin) override
+	void audioPluginScanStarted (const String& plugin) override
 	{
 		DBG("[EL] scanning: " << plugin);
-		ScopedLock sl(lock);
+		ScopedLock sl (lock);
 		scannedPlugin = plugin;
 	}
 
-	void audioPluginScanProgress(const float p) override
+	void audioPluginScanProgress (const float p) override
 	{
 		ScopedLock sl(lock);
 		progress = p;
