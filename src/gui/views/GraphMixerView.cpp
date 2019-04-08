@@ -153,7 +153,8 @@ public:
         return strip;
     }
 
-    void onReordered() {
+    void onReordered()
+    {
         refreshNodes();
         box.updateContent();
     }
@@ -165,8 +166,13 @@ public:
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             const auto node = graph.getNode (i);
-            if (node.isMidiIONode())
+            if (node.isMidiIONode() || 
+                node.getIdentifier() == EL_INTERNAL_ID_MIDI_INPUT_DEVICE ||
+                node.getIdentifier() == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE)
+            {
                 continue;
+            }
+
             nodes.add (node);
         }
     }

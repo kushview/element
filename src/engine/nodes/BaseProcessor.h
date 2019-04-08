@@ -18,6 +18,8 @@
 #define EL_INTERNAL_ID_PLACEHOLDER              "element.placeholder"
 #define EL_INTERNAL_ID_REVERB                   "element.reverb"
 #define EL_INTERNAL_ID_WET_DRY                  "element.wetDry"
+#define EL_INTERNAL_ID_MIDI_INPUT_DEVICE        "element.midiInputDevice"
+#define EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE       "element.midiOutputDevice"
 
 #define EL_INTERNAL_UID_AUDIO_FILE_PLAYER        1000
 #define EL_INTERNAL_UID_AUDIO_MIXER              1001
@@ -33,6 +35,8 @@
 #define EL_INTERNAL_UID_PLACEHOLDER              1011
 #define EL_INTERNAL_UID_REVERB                   1012
 #define EL_INTERNAL_UID_WET_DRY                  1013
+#define EL_INTERNAL_UID_MIDI_INPUT_DEVICE        1014
+#define EL_INTERNAL_UID_MIDI_OUTPUT_DEVICE       1015
 
 namespace Element
 {
