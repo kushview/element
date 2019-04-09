@@ -84,10 +84,10 @@ LookAndFeel::LookAndFeel()
     // DockItem
     setColour (DockItem::selectedHighlightColourId, Colors::toggleBlue);
 
-    // ProgressBar
-    setColour (ProgressBar::foregroundColourId, Colors::elemental);
-    setColour (ProgressBar::backgroundColourId, findColour (
-        DocumentWindow::backgroundColourId).darker());
+    // // ProgressBar
+    // setColour (ProgressBar::foregroundColourId, Colors::elemental);
+    // setColour (ProgressBar::backgroundColourId, findColour (
+    //     DocumentWindow::backgroundColourId).darker());
 
     // ToggleButton
     setColour (ToggleButton::tickColourId, Colors::toggleBlue.darker());
@@ -222,68 +222,6 @@ Font LookAndFeel::getLabelFont (Label& label)
     return label.getFont();
 }
 
-// ProgressBar
-
-void LookAndFeel::drawLinearProgressBar (Graphics& g, ProgressBar& progressBar,
-                                         int width, int height,
-                                         double progress, const String& textToShow)
-{
-    auto background = progressBar.findColour (ProgressBar::backgroundColourId);
-    auto foreground = progressBar.findColour (ProgressBar::foregroundColourId);
-
-    auto barBounds = progressBar.getLocalBounds().toFloat();
-
-    g.setColour (background);
-    g.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
-
-    if (progress >= 0.0f && progress <= 1.0f)
-    {
-        Path p;
-        p.addRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
-        g.reduceClipRegion (p);
-
-        barBounds.setWidth (barBounds.getWidth() * (float) progress);
-        g.setColour (foreground);
-        g.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
-    }
-    else
-    {
-        // spinning bar..
-        g.setColour (background);
-
-        auto stripeWidth = height * 2;
-        auto position = static_cast<int> (Time::getMillisecondCounter() / 15) % stripeWidth;
-
-        Path p;
-
-        for (auto x = static_cast<float> (-position); x < width + stripeWidth; x += stripeWidth)
-            p.addQuadrilateral (x, 0.0f,
-                                x + stripeWidth * 0.5f, 0.0f,
-                                x, static_cast<float> (height),
-                                x - stripeWidth * 0.5f, static_cast<float> (height));
-
-        Image im (Image::ARGB, width, height, true);
-
-        {
-            Graphics g2 (im);
-            g2.setColour (foreground);
-            g2.fillRoundedRectangle (barBounds, progressBar.getHeight() * 0.5f);
-        }
-
-        g.setTiledImageFill (im, 0, 0, 0.85f);
-        g.fillPath (p);
-    }
-
-    if (textToShow.isNotEmpty())
-    {
-//        g.setColour (Colour::contrasting (background, foreground));
-        g.setColour (Colours::white);
-        g.setFont (height * 0.6f);
-
-        g.drawText (textToShow, 0, 0, width, height, Justification::centred, false);
-    }
-}
-
 //==============================================================================
 void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
                                    int width, int height, double progress, const String& textToShow)
@@ -303,7 +241,8 @@ void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
             theText << RelativeTime::days(remains).getDescription();
         }
     }
-    drawLinearProgressBar (g, progressBar, width, height, progress, theText);
+    
+    LookAndFeel_KV1::drawProgressBar (g, progressBar, width, height, progress, theText);
 }
 
 // MARK toggle button
