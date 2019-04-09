@@ -18,7 +18,7 @@ const Colour Colors::toggleRed      = Colour (0xffff0000);
 
 LookAndFeel::LookAndFeel()
 {
-    setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
+    // setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
     // setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
     // Property Component
@@ -241,7 +241,7 @@ void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
             theText << RelativeTime::days(remains).getDescription();
         }
     }
-    
+
     LookAndFeel_KV1::drawProgressBar (g, progressBar, width, height, progress, theText);
 }
 
