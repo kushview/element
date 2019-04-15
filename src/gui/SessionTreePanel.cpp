@@ -99,6 +99,8 @@ public:
         auto* const view = getOwnerView();
         auto* const tree = dynamic_cast<SessionTreePanel*> (view->getParentComponent());
         const bool hadFocus = view && view->hasKeyboardFocus (true);
+        
+        SharedConnectionBlock block (tree->nodeSelectedConnection, true);
 
         jassert(session != nullptr && cc != nullptr && gui != nullptr);
         
