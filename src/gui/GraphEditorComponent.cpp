@@ -1573,8 +1573,14 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
         if (auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : nullptr)
         {
             File file = panel->getSelectedFile();
-            if (file.hasFileExtension ("elg") ||
-                file.hasFileExtension ("elpreset"))
+            if (file.hasFileExtension ("els"))
+            {
+               #if defined (EL_PRO)
+                postMessage (new OpenSessionMessage (file));
+               #endif
+            }
+            else if (file.hasFileExtension ("elg") ||
+                     file.hasFileExtension ("elpreset"))
             {
                 const Node node (Node::parse (file));
                 bool wasHandled = false;
