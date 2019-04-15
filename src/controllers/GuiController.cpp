@@ -122,7 +122,7 @@ void GuiController::saveProperties (PropertiesFile* props)
     {
         props->setValue ("mainWindowState", mainWindow->getWindowStateAsString());
         props->setValue ("mainWindowFullScreen", mainWindow->isFullScreen());
-        props->setValue ("mainWindowVisible", mainWindow->isVisible());
+        props->setValue ("mainWindowVisible", mainWindow->isOnDesktop() && mainWindow->isVisible());
     }
 
     if (content)
@@ -355,8 +355,13 @@ void GuiController::run()
     if (pf->getBoolValue ("mainWindowVisible", true))
     {
         mainWindow->setVisible (true);
-        if (pf->getBoolValue ("mainWindowFullScreen"))
+        if (pf->getBoolValue ("mainWindowFullScreen", false))
             mainWindow->setFullScreen (true);
+    }
+    else
+    {
+        mainWindow->setVisible (false);
+        mainWindow->removeFromDesktop();
     }
     
     findSibling<SessionController>()->resetChanges();
@@ -801,6 +806,7 @@ bool GuiController::perform (const InvocationInfo& info)
         case Commands::hideAllPluginWindows: {
                 closeAllPluginWindows (false);
         } break;
+
         case Commands::toggleUserInterface: {
             auto session = getWorld().getSession();
             if (auto* const window = mainWindow.get())

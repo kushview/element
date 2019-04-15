@@ -146,10 +146,17 @@ void AppController::run()
 
     if (auto* gui = findChild<GuiController>())
     {
-        const Node graph (session->getCurrentGraph());
         gui->stabilizeContent();
+        const Node graph (session->getCurrentGraph());
+        auto* const props = getGlobals().getSettings().getUserSettings();
+
         if (graph.isValid())
-            gui->showPluginWindowsFor (graph);
+        {
+            // don't show plugin windows on load if the UI was hidden
+            // TODO: cleanup the boot up process for UI visibility
+            if (props->getBoolValue ("mainWindowVisible", true))
+                gui->showPluginWindowsFor (graph);
+        }
     }
 
     jassert (! sessCtl->hasSessionChanged());
