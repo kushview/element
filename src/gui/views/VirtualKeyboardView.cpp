@@ -150,7 +150,7 @@ VirtualKeyboardView::VirtualKeyboardView()
         if (! engine)
             return;
         engine->addMidiMessage (MidiMessage::controllerEvent (
-            keyboard->getMidiChannel(), 0x42, sustain.getToggleState() ? 127 : 0)
+            keyboard->getMidiChannel(), 0x42, hold.getToggleState() ? 127 : 0)
             .withTimeStamp (1.0 + Time::getMillisecondCounterHiRes()));
     };
 
