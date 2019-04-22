@@ -83,6 +83,8 @@ private:
     
     SelectedItemSet<uint32> selectedNodes;
 
+    bool ignoreNodeSelected = false;
+
     void selectNode (const Node& node, ModifierKeys mods);
 
     Component* createContainerForNode (GraphNodePtr node, bool useGenericEditor);

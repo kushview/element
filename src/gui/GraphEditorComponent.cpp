@@ -27,6 +27,8 @@
 
 #include "gui/GraphEditorComponent.h"
 
+#include "ScopedFlag.h"
+
 namespace Element {
 
 static bool elNodeIsAudioMixer (const Node& node)
@@ -362,10 +364,15 @@ public:
         originalPos = localPointToGlobal (Point<int>());
         toFront (true);
         dragging = false;
-        selectionMouseDownResult = getGraphPanel()->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
+        auto* const panel = getGraphPanel();
+        
+        selectionMouseDownResult = panel->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
         if (auto* cc = ViewHelpers::findContentComponent (this))
+        {
+            ScopedFlag block (panel->ignoreNodeSelected, true);
             cc->getAppController().findChild<GuiController>()->selectNode (node);
-            
+        }
+
         if (! collapsedToggled)
         {
             if (e.mods.isPopupMenu())
@@ -1651,6 +1658,9 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
 
 void GraphEditorComponent::selectNode (const Node& nodeToSelect)
 {
+    if (ignoreNodeSelected)
+        return;
+    
     for (int i = 0; i < graph.getNumNodes(); ++i)
     {
         auto node = graph.getNode (i);
@@ -1685,7 +1695,8 @@ void GraphEditorComponent::deleteSelectedNodes()
 
 void GraphEditorComponent::updateSelection()
 {
-    for (int i = getNumChildComponents(); --i >= 0;) {
+    for (int i = getNumChildComponents(); --i >= 0;)
+    {
         if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
         { 
             fc->repaint(); 
