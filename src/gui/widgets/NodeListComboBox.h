@@ -15,11 +15,12 @@ public:
 
     virtual ~NodeListComboBox() { }
 
-    void addNodes (const Node& parent)
+    void addNodes (const Node& parent,
+                   NotificationType notification = sendNotificationAsync)
     {
         int lastIndex = getSelectedItemIndex();
 
-        clear();
+        clear (notification);
         for (int i = 0; i < parent.getNumNodes(); ++i)
         {
             const auto node (parent.getNode (i));
@@ -27,15 +28,16 @@ public:
         }
 
         if (isPositiveAndBelow (jmin (lastIndex, getNumItems() - 1), getNumItems()))
-            setSelectedItemIndex (lastIndex);
+            setSelectedItemIndex (lastIndex, notification);
     }
 
-    void selectNode (const Node& node)
+    void selectNode (const Node& node, 
+                     NotificationType notification = sendNotificationAsync)
     {
         const auto graph (node.getParentGraph());
         const int index = graph.getNodesValueTree().indexOf (node.getValueTree());
         if (isPositiveAndBelow (index, getNumItems()))
-            setSelectedItemIndex (index);
+            setSelectedItemIndex (index, notification);
     }
 };
 

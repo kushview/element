@@ -302,7 +302,7 @@ void NodeEditorContentView::setNode (const Node& newNode)
     }
     
     if (graphChanged || nodesCombo.getNumItems() != graph.getNumNodes())
-        nodesCombo.addNodes (graph);
+        nodesCombo.addNodes (graph, dontSendNotification);
     
     if (newNode != node)
     {
@@ -320,7 +320,7 @@ void NodeEditorContentView::setNode (const Node& newNode)
         resized();
     }
 
-    nodesCombo.selectNode (node);
+    nodesCombo.selectNode (node, dontSendNotification);
 }
 
 void NodeEditorContentView::valueChanged (Value& value)
