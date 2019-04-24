@@ -15,99 +15,121 @@ class GraphMixerChannelStrip : public NodeChannelStripComponent,
                                public DragAndDropTarget
 {
 public:
-std::function<void()> onReordered;
+    std::function<void()> onReordered;
 
-GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
-{
-    onNodeChanged = [this]() { setNodeNameEditable (! (getNode().isIONode())); };
-}
-
-~GraphMixerChannelStrip() { }
-
-void mouseDown (const MouseEvent& ev) override
-{
-    down = true; 
-    dragging = false;
-    if (auto* const cc = ViewHelpers::findContentComponent (this))
-        if (auto* const gui = cc->getAppController().findChild<GuiController>())
-            gui->selectNode (getNode());
-}
-
-void mouseDrag (const MouseEvent& ev) override
-{
-    if (down && ! dragging)
+    GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
     {
-        dragging = true;
-        auto* dnd = findParentComponentOfClass<DragAndDropContainer>();
-        Image image (Image::ARGB, 1, 1, true);
-        dnd->startDragging (var("graphMixerStrip"), this, image);
+        onNodeChanged = [this]() { setNodeNameEditable (! (getNode().isIONode())); };
     }
-}
 
-void mouseMove (const MouseEvent& ev) override
-{
-    // noop
-}
+    ~GraphMixerChannelStrip() { }
 
-void mouseUp (const MouseEvent& ev) override
-{
-    dragging = down = hover = false;
-}
-
-bool shouldDrawDragImageWhenOver() override
-{
-    return false;
-}
-
-void itemDragEnter (const SourceDetails&) override
-{
-    hover = true;
-    repaint();
-}
-
-void itemDragExit (const SourceDetails&) override
-{
-    hover = false;
-    repaint();
-}
-
-void paintOverChildren (Graphics& g) override
-{
-    if (hover && ! dragging && ! down) {
-        g.setColour (Colors::toggleBlue);
-        g.drawRect(0, 0, getWidth(), getHeight(), 1);
-    }
-}
-
-bool isInterestedInDragSource (const SourceDetails& details) override
-{
-   return details.description == "graphMixerStrip";
-}
-
-void itemDropped (const SourceDetails& details) override
-{
-    if (details.description == "graphMixerStrip")
+    void mouseDown (const MouseEvent& ev) override
     {
-        auto* strip = dynamic_cast<GraphMixerChannelStrip*> (details.sourceComponent.get());
-        auto myNode = getNode().getValueTree();
-        auto dNode  = strip->getNode().getValueTree();
-        ValueTree parent = dNode.getParent();
+        down = true;
+        dragging = false;
+        if (auto* const cc = ViewHelpers::findContentComponent (this))
+            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+                gui->selectNode (getNode());
+    }
 
-        int myIndex = parent.indexOf (myNode);
-        int dIndex  = parent.indexOf (dNode);
-        if (myIndex >= 0 && dIndex >= 0)
+    void mouseDrag (const MouseEvent& ev) override
+    {
+        if (down && ! dragging)
         {
-            parent.moveChild (dIndex, myIndex, nullptr);
-            if (onReordered)
-                onReordered();
-        }    
+            dragging = true;
+            auto* dnd = findParentComponentOfClass<DragAndDropContainer>();
+            Image image (Image::ARGB, 1, 1, true);
+            dnd->startDragging (var("graphMixerStrip"), this, image);
+        }
     }
 
-    hover = false;
-    repaint();
-}
+    void mouseMove (const MouseEvent& ev) override
+    {
+        // noop
+    }
+
+    void mouseUp (const MouseEvent& ev) override
+    {
+        dragging = down = hover = false;
+    }
+
+    bool shouldDrawDragImageWhenOver() override
+    {
+        return false;
+    }
+
+    void itemDragEnter (const SourceDetails&) override
+    {
+        hover = true;
+        repaint();
+    }
+
+    void itemDragExit (const SourceDetails&) override
+    {
+        hover = false;
+        repaint();
+    }
+
+    void paint (Graphics& g) override
+    {
+        NodeChannelStripComponent::paint (g);
+        if (selected)
+        {
+            g.setColour (Colours::white);
+            g.setOpacity (0.09);
+            g.fillAll();
+        }
+    }
+
+    void paintOverChildren (Graphics& g) override
+    {
+        if (selected || (hover && ! dragging && ! down))
+        {
+            g.setColour (Colors::toggleBlue);
+            g.drawRect (0.f, 0.f, (float)getWidth(), (float)getHeight(), 
+                        selected ? 1.4 : 1.0);
+        }
+    }
+
+    bool isInterestedInDragSource (const SourceDetails& details) override
+    {
+    return details.description == "graphMixerStrip";
+    }
+
+    void itemDropped (const SourceDetails& details) override
+    {
+        if (details.description == "graphMixerStrip")
+        {
+            auto* strip = dynamic_cast<GraphMixerChannelStrip*> (details.sourceComponent.get());
+            auto myNode = getNode().getValueTree();
+            auto dNode  = strip->getNode().getValueTree();
+            ValueTree parent = dNode.getParent();
+
+            int myIndex = parent.indexOf (myNode);
+            int dIndex  = parent.indexOf (dNode);
+            if (myIndex >= 0 && dIndex >= 0)
+            {
+                parent.moveChild (dIndex, myIndex, nullptr);
+                if (onReordered)
+                    onReordered();
+            }
+        }
+
+        hover = false;
+        repaint();
+    }
+
+    void setSelected (bool isNowSelected)
+    {
+        if (selected == isNowSelected)
+            return;
+        selected = isNowSelected;
+        repaint();
+    }
 
 private:
+    bool selected = false;
     bool dragging = false;
     bool down = false;
     bool hover = false;
@@ -149,7 +171,9 @@ public:
             ? new GraphMixerChannelStrip (gui) 
             : dynamic_cast<GraphMixerChannelStrip*> (existing);
         strip->onReordered = std::bind(&GraphMixerListBoxModel::onReordered, this);
-        strip->setNode (getNode (rowNumber));
+        auto node = getNode (rowNumber);
+        strip->setNode (node);
+        strip->setSelected (node == gui.getSelectedNode());
         return strip;
     }
 
@@ -207,12 +231,19 @@ public:
         model.reset (new GraphMixerListBoxModel (gui, box));
         box.setModel (model.get());
         box.updateContent();
+
+        gui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
     }
 
     ~Content()
     {
         box.setModel (nullptr);
         model.reset();
+    }
+
+    void onNodeSelected()
+    {
+        box.updateContent();
     }
 
     void resized() override

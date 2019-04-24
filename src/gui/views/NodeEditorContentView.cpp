@@ -127,12 +127,12 @@ NodeEditorContentView::NodeEditorContentView()
 
     watcher.reset (new NodeWatcher());
     watcher->onSiblingNodeAdded = watcher->onSiblingNodeRemoved = watcher->onNodesReOrdered = [this]() {
-        nodesCombo.addNodes (graph);
+        nodesCombo.addNodes (graph, dontSendNotification);
     };
 
     watcher->onNodeNameChanged = [this]()
     {
-        nodesCombo.addNodes (graph);
+        nodesCombo.addNodes (graph, dontSendNotification);
     };
 }
 
