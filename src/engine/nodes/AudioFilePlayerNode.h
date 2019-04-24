@@ -20,6 +20,11 @@ public:
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
     String getWildcard() const { return formats.getWildcardForAllFormats(); }
+    bool canLoad (const File& file)
+    {
+        std::unique_ptr<AudioFormatReader> reader (formats.createReaderFor (file));
+        return reader != nullptr;
+    }
 
     void fillInPluginDescription (PluginDescription& desc) const override;
 

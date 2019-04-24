@@ -1,5 +1,14 @@
 #include "engine/nodes/AudioFilePlayerNode.h"
 #include "gui/LookAndFeel.h"
+#include "gui/ViewHelpers.h"
+
+// nav panel needs these headers included
+#include "controllers/EngineController.h"
+#include "gui/AudioIOPanelView.h"
+#include "gui/SessionTreePanel.h"
+#include "gui/views/PluginsPanelView.h"
+#include "gui/NavigationConcertinaPanel.h"
+
 #include "Utils.h"
 
 namespace Element {
@@ -7,6 +16,8 @@ namespace Element {
 class AudioFilePlayerEditor : public AudioProcessorEditor,
                               public FilenameComponentListener,
                               public ChangeListener,
+                              public DragAndDropTarget,
+                              public FileDragAndDropTarget,
                               public Timer
 {
 public:
@@ -106,6 +117,53 @@ public:
     {
         g.fillAll (LookAndFeel::widgetBackgroundColor);
     }
+
+    //=========================================================================
+    bool isInterestedInDragSource (const SourceDetails& details) override
+    {
+        if (details.description.toString() == "ccNavConcertinaPanel")
+            return true;
+        return false;
+    }
+
+    void itemDropped (const SourceDetails& details) override 
+    {
+        if (details.description.toString() == "ccNavConcertinaPanel")
+        {
+            auto* const nav = ViewHelpers::getNavigationConcertinaPanel (this);
+            if (auto* panel = (nav) ? nav->findPanel<DataPathTreeComponent>() : nullptr)
+            {
+                File file = panel->getSelectedFile();
+                if (processor.canLoad (file))
+                    processor.openFile (file);
+            }
+        }
+    }
+   #if 0
+    virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
+    virtual void itemDragMove (const SourceDetails& dragSourceDetails);
+    virtual void itemDragExit (const SourceDetails& dragSourceDetails);
+    virtual bool shouldDrawDragImageWhenOver();
+   #endif
+
+    //=========================================================================
+    bool isInterestedInFileDrag (const StringArray& files) override
+    {
+        if (! File::isAbsolutePath (files[0]))
+            return false;
+        return processor.canLoad (File (files [0]));
+    }
+
+    void filesDropped (const StringArray& files, int x, int y) override
+    {
+        ignoreUnused (x, y);
+        processor.openFile (File (files [0]));
+    }
+    
+   #if 0
+    virtual void fileDragEnter (const StringArray& files, int x, int y);
+    virtual void fileDragExit (const StringArray& files);
+   #endif
 
 private:
     AudioFilePlayerNode& processor;
