@@ -567,7 +567,7 @@ private:
             : Header (_parent, _panel)
         {
             addAndMakeVisible (addButton);
-            addButton.setButtonText ("+");
+            addButton.setIcon (Icon (getIcons().falBars, Colours::white));
             addButton.setTriggeredOnMouseDown (true);
             addButton.addListener (this);
             setInterceptsMouseClicks (false, true);
@@ -575,7 +575,7 @@ private:
         
         void resized() override
         {
-            const int padding = 4;
+            const int padding = 5;
             const int buttonSize = getHeight() - (padding * 2);
             addButton.setBounds (getWidth() - padding - buttonSize,
                                  padding, buttonSize, buttonSize);
@@ -583,12 +583,17 @@ private:
         
         static void menuInvocationCallback (int chosenItemID, ElementsHeader* header)
         {
-            header->menuCallback (chosenItemID);
+            if (chosenItemID > 0 && header)
+                header->menuCallback (chosenItemID);
         }
 
         void menuCallback (int menuId)
         {
             if (1 == menuId)
+            {
+                ViewHelpers::invokeDirectly (this, Commands::showSessionConfig, true);
+            }
+            else if (2 == menuId)
             {
                 ViewHelpers::invokeDirectly (this, Commands::sessionAddGraph, false);
                 if (auto* p = dynamic_cast<SessionTreePanel*> (&panel))
@@ -599,13 +604,15 @@ private:
         void buttonClicked (Button*) override
         {
             PopupMenu menu;
-            menu.addItem (1, "Add Graph");
+            menu.addItem (1, "Session Settings...");
+            menu.addSeparator();
+            menu.addItem (2, "Add Graph");
             menu.showMenuAsync (PopupMenu::Options().withTargetComponent (&addButton),
                 ModalCallbackFunction::forComponent (menuInvocationCallback, this));
         }
         
     private:
-        TextButton addButton;
+        IconButton addButton;
     };
     
     class UserDataPathHeader : public Header,
