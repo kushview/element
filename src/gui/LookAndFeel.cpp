@@ -219,7 +219,8 @@ Font LookAndFeel::getComboBoxFont (ComboBox& box)
 // Label
 Font LookAndFeel::getLabelFont (Label& label)
 {
-    return label.getFont();
+//    return label.getFont();
+    return Font (13.f);
 }
 
 //==============================================================================
@@ -363,8 +364,9 @@ void LookAndFeel::drawPropertyComponentLabel (Graphics& g, int width, int height
     g.setColour (component.findColour (PropertyComponent::labelTextColourId)
                  .withMultipliedAlpha (component.isEnabled() ? 1.0f : 0.6f));
     
-    g.setFont (jmin (height, 24) * 0.65f);
-    
+    // g.setFont (jmin (height, 24) * 0.65f);
+    g.setFont (12.5f);
+
     auto r = getPropertyComponentContentPosition (component);
     
     g.drawFittedText (component.getName(),

@@ -79,6 +79,14 @@ public:
                       bool shouldDrawButtonAsDown) override;
 
     void changeToggleButtonWidthToFitText (ToggleButton&) override;
+    
+    // slider
+    Label* createSliderTextBox (Slider& slider) override
+    {
+        auto l = LookAndFeel_V2::createSliderTextBox (slider);
+        l->setFont (Font (13.f));
+        return l;
+    }
 
     // MARK: Treeview
     void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
