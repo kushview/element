@@ -815,6 +815,12 @@ public:
                 eventName = "Note Number";
             else if (control.isControllerEvent())
                 eventName = "CC Number";
+
+            props.add (new ChoicePropertyComponent (control.getPropertyAsValue (Tags::midiChannel),
+                "Channel", { "Omni", "1", "2", "3", "4", "5", "6", "7", "8",
+                             "9", "10", "11", "12", "13", "14", "15", "16" },
+                            { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
+
             eventId = control.getPropertyAsValue ("eventId");
             props.add (new SliderPropertyComponent (eventId, eventName, 
                 0.0, 127.0, 1.0));
