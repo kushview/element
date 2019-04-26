@@ -67,9 +67,11 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
     bool wants (const MidiMessage& message) const override
     {
-        return momentary.get() == 0
+        bool wants = momentary.get() == 0
             ? message.isNoteOn() && checkNoteAndChannel (message)
             : message.isNoteOnOrOff() && checkNoteAndChannel (message);
+        // DBG("momentary: " << momentary.get() << " wants: " << (int) wants << " on: " << (int) message.isNoteOn() << " off: " << (int) message.isNoteOff());
+        return wants;
     }
 
     void perform (const MidiMessage& message) override
@@ -81,6 +83,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
         jassert (message.isNoteOnOrOff());
         
+        // DBG("note on : " << (int) message.isNoteOn());
+        // DBG("note off: " << (int) message.isNoteOff());
+
         if (parameter != nullptr)
         {
             parameter->beginChangeGesture();
@@ -90,7 +95,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             }
             else
             {
-                parameter->setValueNotifyingHost (message.isNoteOn() ? 0.f : 1.f);
+                parameter->setValueNotifyingHost (message.isNoteOn() ? 1.f : 0.f);
             }
 
             parameter->endChangeGesture();
@@ -132,6 +137,8 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         else
         {
             jassert (event.isNoteOnOrOff());
+            // DBG("async note off: " << (int) event.isNoteOff());
+
             if (parameterIndex == GraphNode::EnabledParameter)
             {
                 node->setEnabled (event.isNoteOn());
@@ -405,7 +412,7 @@ public:
     void handleIncomingMidiMessage (MidiInput*, const MidiMessage& message)
     {
         if ((! message.isController() || !controllerNumbers [message.getControllerNumber()]) &&
-            (!message.isNoteOn() || !noteNumbers [message.getNoteNumber()]))
+            (!message.isNoteOnOrOff() || !noteNumbers [message.getNoteNumber()]))
             return;
 
         // DBG("[EL] handle mapped MIDI: " << message.getControllerNumber() 
@@ -604,7 +611,7 @@ bool MappingEngine::addInput (const ControllerDevice& controller)
     std::unique_ptr<ControllerMapInput> input;
     input.reset (new ControllerMapInput (*this, controller));
 
-    DBG("[EL] added input for " << controller.getName().toString());
+    // DBG("[EL] added input for " << controller.getName().toString());
     return inputs->add (input.release());
 }
 
