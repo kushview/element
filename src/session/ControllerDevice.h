@@ -136,6 +136,7 @@ public:
             stabilizePropertyString ("eventType", "controller");
             stabilizePropertyPOD ("momentary", false);
             stabilizePropertyPOD ("eventId", 0);
+            stabilizePropertyPOD (Tags::midiChannel, 0);
             stabilizePropertyPOD ("toggleValue", 64);
             stabilizePropertyPOD ("inverseToggle", false);
             stabilizePropertyString ("toggleMode", "eqorhi");

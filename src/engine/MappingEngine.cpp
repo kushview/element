@@ -17,10 +17,14 @@ public:
 };
 
 struct MidiNoteControllerMap : public ControllerMapHandler,
-                               public AsyncUpdater
+                               public AsyncUpdater,
+                               private Value::Listener
 {
-    MidiNoteControllerMap (const MidiMessage& message, const Node& _node, const int _parameter)
-        : model (_node), node (_node.getGraphNode()),
+    MidiNoteControllerMap (const ControllerDevice::Control& ctl,
+                           const MidiMessage& message, const Node& _node, 
+                           const int _parameter)
+        : control (ctl),
+          model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           noteNumber (message.getNoteNumber()),
           parameterIndex (_parameter),
@@ -29,6 +33,10 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         jassert (message.isNoteOn());
         jassert (node && processor);
 
+        channelObject = control.getPropertyAsValue (Tags::midiChannel);
+        channelObject.addListener (this);
+        valueChanged (channelObject);
+
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
             parameter = processor->getParameters()[parameterIndex];
@@ -36,9 +44,16 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         }
     }
 
+    ~MidiNoteControllerMap()
+    {
+        channelObject.removeListener (this);
+    }
+    
     bool wants (const MidiMessage& message) const override
     {
-        return message.isNoteOn() && message.getNoteNumber() == noteNumber;
+        return message.isNoteOn() && 
+            message.getNoteNumber() == noteNumber &&
+            (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
     }
 
     void perform (const MidiMessage&) override
@@ -76,12 +91,23 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
     }
 
 private:
+    ControllerDevice::Control control;
     Node model;
     GraphNodePtr node;
     AudioProcessor* processor;
+    Value channelObject;
+    Atomic<int> channel { 0 };
     int parameterIndex = -1;
     AudioProcessorParameter* parameter;
     const int noteNumber;
+
+    void valueChanged (Value& value) override
+    {
+        if (channelObject.refersToSameSourceAs (value))
+        {
+            channel.set (jlimit (0, 16, (int) channelObject.getValue()));
+        }
+    }
 };
 
 struct MidiCCControllerMapHandler : public ControllerMapHandler,
@@ -113,6 +139,10 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         toggleModeObject.addListener (this);
         toggleMode.set (static_cast<int> (control.getToggleMode()));
 
+        channelObject = control.getPropertyAsValue (Tags::midiChannel);
+        channelObject.addListener (this);
+        valueChanged (channelObject);
+
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
             parameter = processor->getParameters()[parameterIndex];
@@ -124,10 +154,19 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         }
     }
 
+    ~MidiCCControllerMapHandler()
+    {
+        toggleValueObject.removeListener (this);
+        inverseToggleObject.removeListener (this);
+        toggleModeObject.removeListener (this);
+        channelObject.removeListener (this);
+    }
+
     bool wants (const MidiMessage& message) const override
     {
         return message.isController() && 
-            message.getControllerNumber() == controllerNumber;
+            message.getControllerNumber() == controllerNumber &&
+            (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
     }
 
     void perform (const MidiMessage& message) override
@@ -249,6 +288,9 @@ private:
     Value toggleModeObject;
     Atomic<int> toggleMode { 0 };
 
+    Value channelObject;
+    Atomic<int> channel { 0 };
+
     Atomic<int> desiredToggleState { 1 };
 
     void valueChanged (Value& value) override
@@ -265,7 +307,10 @@ private:
         {
             toggleMode. set (static_cast<int> (ControllerDevice::Control::getToggleMode (
                 toggleModeObject.getValue().toString())));
-            DBG("toggle mode: " << toggleModeObject.getValue().toString() << " = " << toggleMode.get());
+        }
+        else if (channelObject.refersToSameSourceAs (value))
+        {
+            channel.set (jlimit (0, 16, (int) channelObject.getValue()));
         }
     }
 };
@@ -509,7 +554,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
             if (message.isController())
                 handler.reset (new MidiCCControllerMapHandler (control, message, node, parameter));
             else if (message.isNoteOn())
-                handler.reset (new MidiNoteControllerMap (message, node, parameter));
+                handler.reset (new MidiNoteControllerMap (control, message, node, parameter));
 
             if (nullptr != handler)
             {
