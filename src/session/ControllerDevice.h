@@ -73,6 +73,8 @@ public:
         bool isControllerEvent() const  { return getProperty("eventType").toString() == "controller"; }
         int getEventId() const          { return (int)  getProperty ("eventId", 0); }
         
+        bool isMomentary() const        { return (bool) getProperty ("momentary", false); }
+        Value getMomentaryValue()       { return getPropertyAsValue ("momentary"); }
         int getToggleValue() const      { return (int)  getProperty ("toggleValue", 0); }
         Value getToggleValueObject()    { return getPropertyAsValue ("toggleValue"); }
         bool inverseToggle() const      { return (bool) getProperty ("inverseToggle", false); }
@@ -132,6 +134,7 @@ public:
             }
 
             stabilizePropertyString ("eventType", "controller");
+            stabilizePropertyPOD ("momentary", false);
             stabilizePropertyPOD ("eventId", 0);
             stabilizePropertyPOD ("toggleValue", 64);
             stabilizePropertyPOD ("inverseToggle", false);
