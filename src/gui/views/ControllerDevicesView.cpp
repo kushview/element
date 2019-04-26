@@ -11,6 +11,10 @@
 #include "Messages.h"
 #include "Globals.h"
 
+#ifndef EL_MIDI_MAPPING_CHANNELS
+ #define EL_MIDI_MAPPING_CHANNELS   0
+#endif
+
 namespace Element {
 
 class ControllerMapsTable : public TableListBox,
@@ -816,10 +820,12 @@ public:
             else if (control.isControllerEvent())
                 eventName = "CC Number";
 
+           #if EL_MIDI_MAPPING_CHANNELS
             props.add (new ChoicePropertyComponent (control.getPropertyAsValue (Tags::midiChannel),
                 "Channel", { "Omni", "1", "2", "3", "4", "5", "6", "7", "8",
                              "9", "10", "11", "12", "13", "14", "15", "16" },
                             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
+           #endif
 
             eventId = control.getPropertyAsValue ("eventId");
             props.add (new SliderPropertyComponent (eventId, eventName, 
@@ -845,7 +851,9 @@ public:
             }
             else if (control.isNoteEvent())
             {
-                // noop
+                Value momentary = control.getMomentaryValue();
+                props.add (new BooleanPropertyComponent (momentary, "Momentary",
+                    "Hold the toggle until note off received?"));
             }
         }
 

@@ -4,6 +4,10 @@
 #include "session/ControllerDevice.h"
 #include "session/Node.h"
 
+#ifndef EL_MIDI_MAPPING_CHANNELS
+ #define EL_MIDI_MAPPING_CHANNELS   0
+#endif
+
 namespace Element {
 
 class ControllerMapHandler
@@ -33,9 +37,15 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         jassert (message.isNoteOn());
         jassert (node && processor);
 
+       #if EL_MIDI_MAPPING_CHANNELS
         channelObject = control.getPropertyAsValue (Tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
+       #endif
+
+        momentaryObject = control.getMomentaryValue();
+        momentaryObject.addListener (this);
+        valueChanged (momentaryObject);
 
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
@@ -49,19 +59,40 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         channelObject.removeListener (this);
     }
     
-    bool wants (const MidiMessage& message) const override
+    bool checkNoteAndChannel (const MidiMessage& message) const
     {
-        return message.isNoteOn() && 
-            message.getNoteNumber() == noteNumber &&
+        return message.getNoteNumber() == noteNumber &&
             (channel.get() == 0 || (channel.get() > 0 && message.getChannel() == channel.get()));
     }
 
-    void perform (const MidiMessage&) override
+    bool wants (const MidiMessage& message) const override
     {
+        return momentary.get() == 0
+            ? message.isNoteOn() && checkNoteAndChannel (message)
+            : message.isNoteOnOrOff() && checkNoteAndChannel (message);
+    }
+
+    void perform (const MidiMessage& message) override
+    {
+        {
+            SpinLock::ScopedLockType sl (eventLock);
+            lastEvent = message;
+        }
+
+        jassert (message.isNoteOnOrOff());
+        
         if (parameter != nullptr)
         {
             parameter->beginChangeGesture();
-            parameter->setValueNotifyingHost (parameter->getValue() < 0.5 ? 1.f : 0.f);
+            if (momentary.get() == 0)
+            {
+                parameter->setValueNotifyingHost (parameter->getValue() < 0.5 ? 1.f : 0.f);
+            }
+            else
+            {
+                parameter->setValueNotifyingHost (message.isNoteOn() ? 0.f : 1.f);
+            }
+
             parameter->endChangeGesture();
         }
         else if (parameterIndex == GraphNode::EnabledParameter ||
@@ -74,19 +105,47 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
     void handleAsyncUpdate() override
     {
-        if (parameterIndex == GraphNode::EnabledParameter)
+        MidiMessage event;
+
         {
-            node->setEnabled (! node->isEnabled());
-            model.setProperty (Tags::enabled, node->isEnabled());
+            SpinLock::ScopedLockType sl (eventLock);
+            event = lastEvent;
         }
-        else if (parameterIndex == GraphNode::BypassParameter)
+
+        if (momentary.get() == 0)
         {
-            node->suspendProcessing (! node->isSuspended());
-            model.setProperty (Tags::bypass, node->isSuspended());
+            if (parameterIndex == GraphNode::EnabledParameter)
+            {
+                node->setEnabled (! node->isEnabled());
+                model.setProperty (Tags::enabled, node->isEnabled());
+            }
+            else if (parameterIndex == GraphNode::BypassParameter)
+            {
+                node->suspendProcessing (! node->isSuspended());
+                model.setProperty (Tags::bypass, node->isSuspended());
+            }
+            else if (parameterIndex == GraphNode::MuteParameter)
+            {
+                model.setMuted (! model.isMuted());
+            }
         }
-        else if (parameterIndex == GraphNode::MuteParameter)
+        else
         {
-            model.setMuted (! model.isMuted());
+            jassert (event.isNoteOnOrOff());
+            if (parameterIndex == GraphNode::EnabledParameter)
+            {
+                node->setEnabled (event.isNoteOn());
+                model.setProperty (Tags::enabled, node->isEnabled());
+            }
+            else if (parameterIndex == GraphNode::BypassParameter)
+            {
+                node->suspendProcessing (event.isNoteOff());
+                model.setProperty (Tags::bypass, node->isSuspended());
+            }
+            else if (parameterIndex == GraphNode::MuteParameter)
+            {
+                model.setMuted (event.isNoteOn());
+            }
         }
     }
 
@@ -95,17 +154,29 @@ private:
     Node model;
     GraphNodePtr node;
     AudioProcessor* processor;
+    
     Value channelObject;
     Atomic<int> channel { 0 };
+
+    Value momentaryObject;
+    Atomic<int> momentary { 0 };
+
     int parameterIndex = -1;
     AudioProcessorParameter* parameter;
     const int noteNumber;
+
+    SpinLock eventLock;
+    MidiMessage lastEvent;
 
     void valueChanged (Value& value) override
     {
         if (channelObject.refersToSameSourceAs (value))
         {
             channel.set (jlimit (0, 16, (int) channelObject.getValue()));
+        }
+        else if (momentaryObject.refersToSameSourceAs (value))
+        {
+            momentary.set ((bool) momentaryObject.getValue() ? 1 : 0);
         }
     }
 };
@@ -139,9 +210,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         toggleModeObject.addListener (this);
         toggleMode.set (static_cast<int> (control.getToggleMode()));
 
+       #if EL_MIDI_MAPPING_CHANNELS
         channelObject = control.getPropertyAsValue (Tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
+       #endif
 
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
