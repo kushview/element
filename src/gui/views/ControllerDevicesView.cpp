@@ -396,12 +396,19 @@ public:
             selectionChanged();
     }
 
+    void deleteKeyPressed (int lastRowSelected) override
+    {
+        const auto selected (ControllerDevice::Control (
+            editedDevice.getControl (lastRowSelected)));
+        ViewHelpers::postMessageFor (this, new RemoveControlMessage (editedDevice, selected));
+    }
+
    #if 0
     void listBoxItemClicked (int row, const MouseEvent&) override { }
     void listBoxItemDoubleClicked (int row, const MouseEvent&) override { }
     void backgroundClicked (const MouseEvent&) override { }
     void selectedRowsChanged (int lastRowSelected) override { }
-    void deleteKeyPressed (int lastRowSelected) override { }
+    
     void returnKeyPressed (int lastRowSelected) override { }
     void listWasScrolled() override { }
     var getDragSourceDescription (const SparseSet<int>& rowsToDescribe) override { }
