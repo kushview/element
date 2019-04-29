@@ -12,7 +12,8 @@
 namespace Element {
 
 class GraphMixerChannelStrip : public NodeChannelStripComponent,
-                               public DragAndDropTarget
+                               public DragAndDropTarget,
+                               public ComponentListener
 {
 public:
     std::function<void()> onReordered;
@@ -20,17 +21,28 @@ public:
     GraphMixerChannelStrip (GuiController& gui) : NodeChannelStripComponent (gui, false)
     {
         onNodeChanged = [this]() { setNodeNameEditable (! (getNode().isIONode())); };
+        listener.reset (new ChildListener (*this));
+        addMouseListener (listener.get(), true);
     }
 
-    ~GraphMixerChannelStrip() { }
+    ~GraphMixerChannelStrip()
+    {
+        removeMouseListener (listener.get());
+        listener.reset();
+    }
+
+    void selectInGuiController()
+    {
+        if (auto* const cc = ViewHelpers::findContentComponent (this))
+            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+                gui->selectNode (getNode());
+    }
 
     void mouseDown (const MouseEvent& ev) override
     {
         down = true;
         dragging = false;
-        if (auto* const cc = ViewHelpers::findContentComponent (this))
-            if (auto* const gui = cc->getAppController().findChild<GuiController>())
-                gui->selectNode (getNode());
+        selectInGuiController();
     }
 
     void mouseDrag (const MouseEvent& ev) override
@@ -133,6 +145,19 @@ private:
     bool dragging = false;
     bool down = false;
     bool hover = false;
+
+    struct ChildListener : public MouseListener
+    {
+        ChildListener (GraphMixerChannelStrip& o) : owner (o) { }
+        void mouseDown (const MouseEvent& ev) override
+        {
+            owner.selectInGuiController();
+        }
+
+        GraphMixerChannelStrip& owner;
+    };
+    
+    std::unique_ptr<ChildListener> listener;
 
 #if 0
     virtual void itemDragEnter (const SourceDetails& dragSourceDetails);
