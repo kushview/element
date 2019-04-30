@@ -42,6 +42,11 @@ public:
     Font getAlertWindowFont() override;
    #endif
 
+    // rotary slider
+    void drawRotarySlider (Graphics& g, int x, int y, int width, int height, float sliderPos,
+                           const float rotaryStartAngle, const float rotaryEndAngle, 
+                           Slider& slider) override;
+
     void drawProgressBar (Graphics& g, ProgressBar& progressBar,
                           int width, int height, double progress, 
                           const String& textToShow) override;
