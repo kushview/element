@@ -81,6 +81,14 @@ bool ContentView::keyPressed (const KeyPress& k, Component*)
     return false;
 }
 
+void ContentComponent::setExtraView (Component* c)
+{
+    extra.reset (c);
+    if (extra)
+        addAndMakeVisible (extra.get());
+    resized();
+}
+
 void ContentView::disableIfNotUnlocked()
 {
     if (auto* w = ViewHelpers::getGlobals (this))
@@ -501,6 +509,8 @@ void ContentComponent::resized()
         toolBar->setBounds (r.removeFromTop (toolBarSize));
     if (statusBarVisible && statusBar)
         statusBar->setBounds (r.removeFromBottom (statusBarSize));
+    if (extra && extraViewHeight > 0)
+        extra->setBounds (r.removeFromBottom (extraViewHeight));
     
     resizeContent (r);
 }

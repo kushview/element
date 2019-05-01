@@ -102,6 +102,7 @@ public:
     /** Manually refresh the toolbar */
     void refreshToolbar();
     
+    //=========================================================================
     /** Manually refresh the status bar */
     void refreshStatusBar();
 
@@ -149,6 +150,11 @@ public:
     virtual void getSessionState (String&) { }
     virtual void applySessionState (const String&) { }
 
+    //=========================================================================
+    void setExtraView (Component* c);
+    
+    Component* getExtraView() const { return extra.get(); }
+
     /** @internal */
     void paint (Graphics &g) override;
     /** @internal */
@@ -182,6 +188,9 @@ private:
     
     class StatusBar; friend class StatusBar;
     ScopedPointer<StatusBar> statusBar;
+
+    std::unique_ptr<Component> extra;
+    int extraViewHeight = 44;
 
     bool statusBarVisible;
     int statusBarSize;
