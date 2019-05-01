@@ -269,7 +269,11 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* osm = dynamic_cast<const OpenSessionMessage*> (&msg))
     {
+       #if defined (EL_PRO)
         sess->openFile (osm->file);
+       #else
+        findChild<GraphController>()->openGraph (osm->file);
+       #endif
         recentFiles.addFile (osm->file);
     }
     else if (const auto* mdm = dynamic_cast<const AddMidiDeviceMessage*> (&msg))

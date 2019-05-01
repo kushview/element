@@ -257,7 +257,27 @@ public:
             runFileMenu (file);
     }
     
-    virtual void fileDoubleClicked (const File& file) override { }
+    void fileDoubleClicked (const File& file) override
+    {   
+        auto session = ViewHelpers::getSession (this);
+        auto* const cc = ViewHelpers::findContentComponent (this);
+
+        if (session && cc)
+        {
+            if (file.getFileExtension().toLowerCase() == ".elg" ||
+                file.getFileExtension().toLowerCase() == ".els")
+            {
+                cc->post (new OpenSessionMessage (file));
+            }
+            else if (file.getFileExtension().toLowerCase() == ".elpreset")
+            {
+                const Node node (Node::parse (file), false);
+                if (node.isValid())
+                    cc->post (new AddNodeMessage (node, session->getActiveGraph()));
+            }
+        }
+    }
+
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
     
 private:
