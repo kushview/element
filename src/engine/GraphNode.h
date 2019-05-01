@@ -293,6 +293,7 @@ public:
     Signal<void(GraphNode*)> bypassChanged;
     Signal<void()> midiProgramChanged;
     Signal<void(GraphNode*)> muteChanged;
+    Signal<void()> willBeRemoved;
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
