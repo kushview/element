@@ -279,7 +279,7 @@ public:
 
            #if EL_RUNNING_AS_PLUGIN
             if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
-                menu.addItem (99998, "Graph keyboard focus", true, pe->getWantsPluginKeyboardFocus());
+                menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
            #endif
 
             auto result = menu.show();
