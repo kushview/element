@@ -257,11 +257,12 @@ public:
         box.setModel (model.get());
         box.updateContent();
 
-        gui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
+        nodeSelectedConnection = gui.nodeSelected.connect (std::bind (&Content::onNodeSelected, this));
     }
 
     ~Content()
     {
+        nodeSelectedConnection.disconnect();
         box.setModel (nullptr);
         model.reset();
     }
@@ -303,6 +304,7 @@ private:
     std::unique_ptr<GraphMixerListBoxModel> model;
     ChannelStripComponent channelStrip;
     HorizontalListBox box;
+    SignalConnection nodeSelectedConnection;
 };
 
 GraphMixerView::GraphMixerView()
