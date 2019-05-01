@@ -29,6 +29,10 @@
 
 #include "gui/ContentComponent.h"
 
+#if EL_RUNNING_AS_PLUGIN
+ #include "../../plugins/Element/Source/PluginEditor.h"
+#endif
+
 #ifndef EL_USE_ACCESSORY_BUTTONS
  #define EL_USE_ACCESSORY_BUTTONS 0
 #endif
@@ -272,8 +276,23 @@ public:
             PopupMenu menu;
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
-            if (99999 == menu.show())
+
+           #if EL_RUNNING_AS_PLUGIN
+            if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+                menu.addItem (99998, "Graph keyboard focus", true, pe->getWantsPluginKeyboardFocus());
+           #endif
+
+            auto result = menu.show();
+
+            if (99999 == result)
                 ViewHelpers::closePluginWindows (this, false);
+            else if (99998 == result)
+            {
+               #if EL_RUNNING_AS_PLUGIN
+                if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+                    pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
+               #endif
+            }
         }
         else if (btn == &mapButton)
         {

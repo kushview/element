@@ -428,9 +428,10 @@ void MainMenu::buildPluginMainMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
     menu.addSeparator();
     menu.addItem (99999, "Close all plugin windows...");
-    #if 0
+
+   #if 0
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPreferences, "Preferences..");
-    #endif
+   #endif
 }
 }
