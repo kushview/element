@@ -290,8 +290,9 @@ Font LookAndFeel::getComboBoxFont (ComboBox& box)
 // Label
 Font LookAndFeel::getLabelFont (Label& label)
 {
-//    return label.getFont();
-    return Font (13.f);
+    if (nullptr != dynamic_cast<PropertyComponent*> (label.getParentComponent()))
+        label.setFont (Font (13.f));
+    return label.getFont();
 }
 
 //==============================================================================
