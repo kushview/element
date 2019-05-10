@@ -558,6 +558,7 @@ public:
         eventId.addListener (this);
         eventType.addListener (this);
         toggleMode.addListener (this);
+        momentary.addListener (this);
 
         triggerAsyncUpdate();
     }
@@ -627,6 +628,10 @@ public:
             triggerAsyncUpdate();
         }
         else if (value.refersToSameSourceAs (toggleMode))
+        {
+            triggerAsyncUpdate();
+        }
+        else if (value.refersToSameSourceAs (momentary))
         {
             triggerAsyncUpdate();
         }
@@ -786,6 +791,7 @@ public:
         eventType.removeListener (this);
         eventId.removeListener (this);
         toggleMode.removeListener (this);
+        momentary.removeListener (this);
 
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
@@ -858,9 +864,16 @@ public:
             }
             else if (control.isNoteEvent())
             {
-                Value momentary = control.getMomentaryValue();
+                momentary = control.getMomentaryValue();
                 props.add (new BooleanPropertyComponent (momentary, "Momentary",
                     "Hold the toggle until note off received?"));
+
+                if ((bool) momentary.getValue())
+                {
+                    Value inverseToggle = control.getPropertyAsValue ("inverseToggle");
+                    props.add (new BooleanPropertyComponent (inverseToggle, "Toggle Inversely",
+                        "Perform the inverse toggle action"));
+                }
             }
         }
 
@@ -870,6 +883,7 @@ public:
         eventType.addListener (this);
         eventId.addListener (this);
         toggleMode.addListener (this);
+        momentary.addListener (this);
     }
 
     void createNewController()
@@ -990,6 +1004,7 @@ private:
     SessionPtr session;
     Value deviceName, inputDevice, controlName;
     Value eventType, eventId, toggleMode;
+    Value momentary;
 
     int mappingsSize = 150;
     void updateComboBoxes()
