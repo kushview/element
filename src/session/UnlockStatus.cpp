@@ -6,6 +6,7 @@
 #include "Utils.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
+#define EL_GOLD_PRODUCT_ID "1008"
 
 namespace Element {
 
@@ -43,7 +44,7 @@ bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
 {
    #if defined (EL_PRO)
     // Pro only deals with pro product ID
-    const StringArray pids { EL_PRO_PRODUCT_ID };
+    const StringArray pids { EL_GOLD_PRODUCT_ID, EL_PRO_PRODUCT_ID };
    #elif defined (EL_SOLO)
     // solo can be unlocked by a Pro license
     const StringArray pids { EL_PRO_PRODUCT_ID, EL_SOLO_PRODUCT_ID };
@@ -237,6 +238,7 @@ void UnlockStatus::loadProps()
 {
     props = ValueTree (propsKey);
     const var proPID (EL_PRO_PRODUCT_ID_INT);
+    const var goldPID (1008);
     const var zero (0); // pro can also have a zero price id
     const var trial (EL_TRIAL_PRICE_ID);
     const var fullPro (EL_PRO_PRICE_ID);
@@ -261,6 +263,12 @@ void UnlockStatus::loadProps()
     {
         props.removeProperty (proKey, nullptr);
         props.setProperty (trialKey, 1, nullptr);
+        props.removeProperty (soloKey, nullptr);
+    }
+    else if (goldPID.equals (getProperty (downloadIdKey, -1)))
+    {
+        props.setProperty (proKey, 1, nullptr);
+        props.removeProperty (trialKey, nullptr);
         props.removeProperty (soloKey, nullptr);
     }
     else
