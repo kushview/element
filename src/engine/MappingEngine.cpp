@@ -47,6 +47,10 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         momentaryObject.addListener (this);
         valueChanged (momentaryObject);
 
+        inverseObject = control.getInverseToggleObject();
+        inverseObject.addListener (this);
+        valueChanged (inverseObject);
+
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {
             parameter = processor->getParameters()[parameterIndex];
@@ -76,16 +80,15 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
     void perform (const MidiMessage& message) override
     {
+        const bool isInverse = inverse.get() == 1;
+
         {
             SpinLock::ScopedLockType sl (eventLock);
             lastEvent = message;
         }
 
         jassert (message.isNoteOnOrOff());
-        
-        // DBG("note on : " << (int) message.isNoteOn());
-        // DBG("note off: " << (int) message.isNoteOff());
-
+       
         if (parameter != nullptr)
         {
             parameter->beginChangeGesture();
@@ -95,7 +98,8 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             }
             else
             {
-                parameter->setValueNotifyingHost (message.isNoteOn() ? 1.f : 0.f);
+                const bool onOrOff = isInverse ? message.isNoteOff() : message.isNoteOn();
+                parameter->setValueNotifyingHost (onOrOff ? 1.f : 0.f);
             }
 
             parameter->endChangeGesture();
@@ -138,20 +142,21 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         {
             jassert (event.isNoteOnOrOff());
             // DBG("async note off: " << (int) event.isNoteOff());
+            const bool isInverse = inverse.get() == 1;
 
             if (parameterIndex == GraphNode::EnabledParameter)
             {
-                node->setEnabled (event.isNoteOn());
+                node->setEnabled (isInverse ? event.isNoteOff() : event.isNoteOn());
                 model.setProperty (Tags::enabled, node->isEnabled());
             }
             else if (parameterIndex == GraphNode::BypassParameter)
             {
-                node->suspendProcessing (event.isNoteOff());
+                node->suspendProcessing (isInverse ? event.isNoteOn() : event.isNoteOff());
                 model.setProperty (Tags::bypass, node->isSuspended());
             }
             else if (parameterIndex == GraphNode::MuteParameter)
             {
-                model.setMuted (event.isNoteOn());
+                model.setMuted (isInverse ? event.isNoteOff() : event.isNoteOn());
             }
         }
     }
@@ -167,6 +172,9 @@ private:
 
     Value momentaryObject;
     Atomic<int> momentary { 0 };
+
+    Value inverseObject;
+    Atomic<int> inverse { 0 };
 
     int parameterIndex = -1;
     AudioProcessorParameter* parameter;
@@ -184,6 +192,10 @@ private:
         else if (momentaryObject.refersToSameSourceAs (value))
         {
             momentary.set ((bool) momentaryObject.getValue() ? 1 : 0);
+        }
+        else if (inverseObject.refersToSameSourceAs (value))
+        {
+            inverse.set ((bool) inverseObject.getValue() ? 1 : 0);
         }
     }
 };

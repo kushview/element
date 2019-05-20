@@ -69,21 +69,42 @@ public:
         TreeItemBase::itemClicked (ev);
     }
 
+    void showPluginWindow (bool showIt = true)
+    {
+        auto* const cc = ViewHelpers::findContentComponent (getOwnerView());
+        auto* const gui = cc != nullptr ? cc->getAppController().findChild<GuiController>() : nullptr;
+        if (nullptr == gui) return;
+
+        if (showIt)
+        {
+            gui->presentPluginWindow (node, true);
+        }
+        else
+        {
+            if (auto* const window = gui->getPluginWindow (node))
+                gui->closePluginWindow (window);
+        }
+    }
+
+    void togglePluginWindow()
+    {
+        if (auto* const cc = ViewHelpers::findContentComponent (getOwnerView()))
+        {
+            if (auto* const gui = cc->getAppController().findChild<GuiController>())
+            {
+                if (auto* const window = gui->getPluginWindow (node))
+                    gui->closePluginWindow (window);
+                else
+                    gui->presentPluginWindow (node, true);
+            }
+        }
+    }
+    
     virtual void itemDoubleClicked (const MouseEvent& ev) override
     {
         if (ev.x < roundToInt (1.f + getIconSize()))
         {
-            // icon area clicked
-            if (auto* const cc = ViewHelpers::findContentComponent (getOwnerView()))
-            {
-                if (auto* const gui = cc->getAppController().findChild<GuiController>())
-                {
-                    if (auto* const window = gui->getPluginWindow (node))
-                        gui->closePluginWindow (window);
-                    else
-                        gui->presentPluginWindow (node, true);
-                }
-            }
+            togglePluginWindow();
         }
         else if (! ev.mods.isPopupMenu())
         {
@@ -667,10 +688,20 @@ void SessionTreePanel::valueTreeRedirected (ValueTree& tree)
 
 bool SessionTreePanel::keyPressed (const KeyPress& k)
 {
-    if ((k.getKeyCode() == 'A' || k.getKeyCode() == 'a') && k.getModifiers().isCommandDown()) {
+    if ((k.getKeyCode() == 'A' || k.getKeyCode() == 'a') && k.getModifiers().isCommandDown())
+    {
         rootItem->getSubItem(0)->setSelected (true, true, dontSendNotification);
         return true;
     }
+    else if (k.getKeyCode() == KeyPress::rightKey && k.getModifiers().isAltDown())
+    {
+        if (auto* const item = dynamic_cast<SessionNodeTreeItem*> (tree.getSelectedItem (0)))
+        {
+            item->showPluginWindow (true);
+            return true;
+        }
+    }
+
     return TreePanelBase::keyPressed (k);
 }
 
