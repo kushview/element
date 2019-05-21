@@ -9,8 +9,10 @@
 
 #if EL_USE_LOCAL_AUTH
  #define EL_GOLD_PRODUCT_ID "1008"
+ #define EL_GOLD_PRODUCT_ID_INT 1008
 #else
  #define EL_GOLD_PRODUCT_ID "12692"
+ #define EL_GOLD_PRODUCT_ID_INT 12692
 #endif
 
 namespace Element {
@@ -52,7 +54,7 @@ bool UnlockStatus::doesProductIDMatch (const String& returnedIDFromServer)
     const StringArray pids { EL_GOLD_PRODUCT_ID, EL_PRO_PRODUCT_ID };
    #elif defined (EL_SOLO)
     // solo can be unlocked by a Pro license
-    const StringArray pids { EL_PRO_PRODUCT_ID, EL_SOLO_PRODUCT_ID };
+    const StringArray pids { EL_GOLD_PRODUCT_ID, EL_PRO_PRODUCT_ID, EL_SOLO_PRODUCT_ID };
    #else
     const StringArray pids;
    #endif
@@ -243,7 +245,7 @@ void UnlockStatus::loadProps()
 {
     props = ValueTree (propsKey);
     const var proPID (EL_PRO_PRODUCT_ID_INT);
-    const var goldPID (1008);
+    const var goldPID (EL_GOLD_PRODUCT_ID_INT);
     const var zero (0); // pro can also have a zero price id
     const var trial (EL_TRIAL_PRICE_ID);
     const var fullPro (EL_PRO_PRICE_ID);
@@ -318,6 +320,12 @@ void UnlockStatus::loadProps()
         )
     {
         // SE can unlock SE
+        props.removeProperty (proKey, nullptr);
+        props.removeProperty (trialKey, nullptr);
+        props.setProperty (soloKey, 1, nullptr);
+    }
+    else if (goldPID.equals (getProperty (downloadIdKey, -1)))
+    {
         props.removeProperty (proKey, nullptr);
         props.removeProperty (trialKey, nullptr);
         props.setProperty (soloKey, 1, nullptr);
