@@ -6,7 +6,12 @@
 #include "Utils.h"
 
 #define EL_LICENSE_SETTINGS_KEY "L"
-#define EL_GOLD_PRODUCT_ID "1008"
+
+#if EL_USE_LOCAL_AUTH
+ #define EL_GOLD_PRODUCT_ID "1008"
+#else
+ #define EL_GOLD_PRODUCT_ID "12692"
+#endif
 
 namespace Element {
 
