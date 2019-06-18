@@ -14,6 +14,8 @@ public:
     GraphSettingsView();
     ~GraphSettingsView();
     
+    void setGraphButtonVisible (bool isVisible);
+
     void resized() override;
     void didBecomeActive() override;
     void paint (Graphics& g) override;

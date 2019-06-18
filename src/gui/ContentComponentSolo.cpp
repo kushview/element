@@ -732,6 +732,8 @@ void ContentComponentSolo::stabilize (const bool refreshDataPathTrees)
         mcv->stabilizeContent();
     if (auto* ncv = nav->findPanel<NodeEditorContentView>())
         ncv->stabilizeContent();
+    if (auto* gcv = nav->findPanel<GraphSettingsView>())
+        gcv->stabilizeContent();
     
     stabilizeViews();
     

@@ -4,6 +4,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/ControllerDevicesView.h"
 #include "gui/views/ControllerMapsView.h"
+#include "gui/views/GraphSettingsView.h"
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/views/NodeEditorContentView.h"
 #include "gui/widgets/SessionGraphsListBox.h"
@@ -485,6 +486,13 @@ public:
        #endif
 
        #ifndef EL_FREE
+
+        auto* gv = new GraphSettingsView();
+        gv->setName ("Graph");
+        gv->setComponentID ("Graph");
+        gv->setGraphButtonVisible (false);
+        addPanelInternal (-1, gv, "Graph", nullptr);
+
         auto* nv = new NodeEditorContentView();
         nv->setName ("Node");
         nv->setComponentID ("Node");

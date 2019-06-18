@@ -322,6 +322,13 @@ namespace Element {
         
     }
     
+    void GraphSettingsView::setGraphButtonVisible (bool isVisible)
+    {
+        graphButton.setVisible (isVisible);
+        resized();
+        repaint();
+    }
+
     void GraphSettingsView::didBecomeActive()
     {
         if (isShowing())
