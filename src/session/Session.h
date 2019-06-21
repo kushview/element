@@ -106,6 +106,11 @@ namespace Element {
         bool writeToFile (const File&) const;
         static ValueTree readFromFile (const File&);
         
+        Value getActiveGraphIndexObject (bool syncUpdate = false) const
+        { 
+            return getGraphsValueTree().getPropertyAsValue (Tags::active, nullptr, syncUpdate);
+        }
+
     protected:
         void forEach (const ValueTree tree, ValueTreeFunction handler) const;
 

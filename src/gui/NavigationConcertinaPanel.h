@@ -491,6 +491,7 @@ public:
         gv->setName ("Graph");
         gv->setComponentID ("Graph");
         gv->setGraphButtonVisible (false);
+        gv->setUpdateOnActiveGraphChange (true);
         addPanelInternal (-1, gv, "Graph", nullptr);
 
         auto* nv = new NodeEditorContentView();

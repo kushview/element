@@ -9,6 +9,7 @@
 #include "gui/views/GraphSettingsView.h"
 
 #include "session/UnlockStatus.h"
+#include "ScopedFlag.h"
 
 namespace Element {
     typedef Array<PropertyComponent*> PropertyArray;
@@ -315,11 +316,13 @@ namespace Element {
         graphButton.setTooltip ("Show graph editor");
         graphButton.addListener (this);
         setEscapeTriggersClose (true);
+
+        activeGraphIndex.addListener (this);
     }
     
     GraphSettingsView::~GraphSettingsView()
     {
-        
+        activeGraphIndex.removeListener (this);
     }
     
     void GraphSettingsView::setGraphButtonVisible (bool isVisible)
@@ -344,6 +347,15 @@ namespace Element {
             props->setLocked (notFull);
             props->setNode (world->getSession()->getCurrentGraph());
         }
+   
+        if (auto session = ViewHelpers::getSession (this))
+        {
+            if (! activeGraphIndex.refersToSameSourceAs (session->getActiveGraphIndexObject ()))
+            {
+                ScopedFlag flag (updateWhenActiveGraphChanges, false);
+                activeGraphIndex.referTo (session->getActiveGraphIndexObject ());
+            }
+        }
     }
     
     void GraphSettingsView::paint (Graphics& g)
@@ -364,5 +376,18 @@ namespace Element {
         if (button == &graphButton)
             if (auto* const world = ViewHelpers::getGlobals (this))
                 world->getCommandManager().invokeDirectly (Commands::showGraphEditor, true);
+    }
+
+    void GraphSettingsView::setUpdateOnActiveGraphChange (bool shouldUpdate)
+    {
+        if (updateWhenActiveGraphChanges == shouldUpdate)
+            return;
+        updateWhenActiveGraphChanges = shouldUpdate;
+    }
+
+    void GraphSettingsView::valueChanged (Value& value)
+    {
+        if (updateWhenActiveGraphChanges && value.refersToSameSourceAs (value))
+            stabilizeContent();
     }
 }
