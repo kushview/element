@@ -8,6 +8,7 @@
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"
+#include "gui/nodes/VolumeNodeEditor.h"
 #include "session/Presets.h"
 
 namespace Element {
@@ -245,6 +246,11 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     else if (auto* ed = dynamic_cast<AudioProcessorEditor*> (ui))
     {
         setResizable (ed->isResizable(), false);
+    }
+    else if (auto* ved = dynamic_cast<VolumeNodeEditor*> (ui))
+    {
+        ignoreUnused (ved);
+        setResizable (false, false);
     }
     else
     {

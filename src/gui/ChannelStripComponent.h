@@ -23,9 +23,24 @@ public:
         if (notify)
             powerChanged();
     }
+    inline void setMuted (const bool muted, const bool notify = true)
+    {
+        if (muted == mute2.getToggleState())
+            return;
+        mute2.setToggleState (muted, notify);
+        if (notify)
+            muteChanged();
+    }
 
     inline bool isPowerOn()    const { return mute.getToggleState(); }
     inline bool isPowerOff()   const { return ! isPowerOn(); }
+    inline bool isMuted()      const { return mute2.getToggleState(); }
+
+    inline void setMuteButtonVisible (bool visible)
+    {
+        mute2.setVisible (visible);
+        resized();
+    }
 
     /** @internal */
     void buttonClicked (Button*) override;
@@ -36,16 +51,17 @@ public:
     /** @internal */
     void valueChanged (Value&) override;
 
-    boost::signals2::signal<void(double)> volumeChanged;
-    boost::signals2::signal<void()> powerChanged;
-    boost::signals2::signal<void()> volumeLabelDoubleClicked;
+    Signal<void(double)> volumeChanged;
+    Signal<void()> powerChanged;
+    Signal<void()> muteChanged;
+    Signal<void()> volumeLabelDoubleClicked;
     
 private:
     Slider fader;
     DigitalMeter meter;
     DecibelScaleComponent scale;
     Label name;
-    class VolumeLabel : public DragableIntLabel 
+    class VolumeLabel : public DragableIntLabel
     {
     public:
         VolumeLabel();
@@ -54,6 +70,7 @@ private:
     } volume;
     
     PowerButton mute;
+    SettingButton mute2;
 
     void stabilizeContent();
 };

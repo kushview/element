@@ -36,6 +36,13 @@ ChannelStripComponent::ChannelStripComponent()
     mute.setButtonText ("M");
     mute.addListener (this);
 
+    addAndMakeVisible (mute2);
+    mute2.setYesNoText ("M", "M");
+    mute2.setButtonText ("M");
+    mute2.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
+    mute2.setColour (SettingButton::textColourId, Colours::black);
+    mute2.addListener (this);
+    
     addAndMakeVisible (volume);
     volume.setNumDecimalPlaces (1);
     volume.setMinMax (fader.getMinimum(), fader.getMaximum());
@@ -60,6 +67,13 @@ void ChannelStripComponent::resized()
     volume.setBounds (r1.removeFromTop (18).withSizeKeepingCentre (30, 18));
     r1.removeFromBottom (4);
     mute.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
+    
+    if (mute2.isVisible())
+    {
+        r1.removeFromBottom (1);
+        mute2.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
+    }
+
     const int quarter = r2.getWidth() / 2;
     fader.setBounds (r2.removeFromRight (quarter));
     auto r3 = r2.removeFromRight (quarter);
@@ -75,6 +89,11 @@ void ChannelStripComponent::buttonClicked (Button* b)
     {
         mute.setToggleState (! mute.getToggleState(), false);
         powerChanged();
+    }
+    else if (b == &mute2)
+    {
+        mute2.setToggleState (! mute2.getToggleState(), false);
+        muteChanged();
     }
 }
 

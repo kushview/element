@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
 #include "engine/GraphNode.h"
@@ -48,6 +50,8 @@ public:
             std::bind (&NodeChannelStripComponent::volumeChanged, this, std::placeholders::_1));
         powerChangedConnection = channelStrip.powerChanged.connect (
             std::bind (&NodeChannelStripComponent::powerChanged, this));
+        muteChangedConnection = channelStrip.muteChanged.connect (
+            std::bind (&NodeChannelStripComponent::muteChanged, this));
         volumeDoubleClickedConnection = channelStrip.volumeLabelDoubleClicked.connect (
             std::bind (&NodeChannelStripComponent::setUnityGain, this));
     }
@@ -58,6 +62,7 @@ public:
         nodeSelectedConnection.disconnect();
         volumeChangedConnection.disconnect();
         powerChangedConnection.disconnect();
+        muteChangedConnection.disconnect();
         volumeDoubleClickedConnection.disconnect();
     }
 
@@ -108,7 +113,10 @@ public:
                     for (int c = startChannel; c < endChannel; ++c)
                         meter.setValue (c - startChannel, ptr->getOutputRMS (c));
             }
+
             channelStrip.setPower (! ptr->isSuspended(), false);
+            if (channelStrip.isMuted() != ptr->isMuted())
+                channelStrip.setMuted (ptr->isMuted(), false);
         }
         else
         {
@@ -138,11 +146,16 @@ public:
         {
             SharedConnectionBlock b1 (volumeChangedConnection);
             SharedConnectionBlock b2 (powerChangedConnection);
+            SharedConnectionBlock b3 (muteChangedConnection);
+
             float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
             channelStrip.setVolume (Decibels::gainToDecibels (gain, -60.f));
             channelStrip.setPower (! object->isSuspended());
+            channelStrip.setMuted (object->isMuted(), false);
+
             b1.unblock();
             b2.unblock();
+            b3.unblock();
         }
     }
 
@@ -198,6 +211,7 @@ private:
     SignalConnection volumeChangedConnection;
     SignalConnection powerChangedConnection;
     SignalConnection volumeDoubleClickedConnection;
+    SignalConnection muteChangedConnection;
 
     inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 1; }
@@ -293,6 +307,14 @@ private:
             node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
         if (auto* obj = node.getGraphNode())
             obj->suspendProcessing (! channelStrip.isPowerOn());
+    }
+
+    void muteChanged()
+    {
+        if (node.isValid())
+            node.setProperty (Tags::mute, channelStrip.isMuted());
+        if (auto* obj = node.getGraphNode())
+            obj->setMuted (channelStrip.isMuted());
     }
 
     void setUnityGain()

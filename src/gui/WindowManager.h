@@ -14,6 +14,7 @@
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
+#include "gui/nodes/VolumeNodeEditor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -160,6 +161,10 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             return createPluginWindowFor (node, new AudioRouterEditor (node));
+        }
+        else if (node.getIdentifier().toString().contains ("element.volume"))
+        {
+            return createPluginWindowFor (node, new VolumeNodeEditor (node, gui));
         }
         
         GraphNodePtr object = node.getGraphNode();
