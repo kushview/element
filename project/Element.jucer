@@ -197,6 +197,10 @@
                 file="../src/gui/nodes/NodeEditorComponent.cpp"/>
           <FILE id="dVkT0v" name="NodeEditorComponent.h" compile="0" resource="0"
                 file="../src/gui/nodes/NodeEditorComponent.h"/>
+          <FILE id="gS6sEa" name="VolumeNodeEditor.cpp" compile="1" resource="0"
+                file="../src/gui/nodes/VolumeNodeEditor.cpp"/>
+          <FILE id="hsnriq" name="VolumeNodeEditor.h" compile="0" resource="0"
+                file="../src/gui/nodes/VolumeNodeEditor.h"/>
         </GROUP>
         <GROUP id="{9F26C61A-AB1F-2950-8F17-BDE8283E9444}" name="properties">
           <FILE id="zstGVd" name="MidiMultiChannelPropertyComponent.h" compile="0"
