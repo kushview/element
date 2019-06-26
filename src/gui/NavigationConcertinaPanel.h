@@ -485,8 +485,6 @@ public:
         addPanelInternal (-1, sess, "Session", new ElementsHeader (*this, *sess));
        #endif
 
-       #ifndef EL_FREE
-
         auto* gv = new GraphSettingsView();
         gv->setName ("Graph");
         gv->setComponentID ("Graph");
@@ -494,6 +492,7 @@ public:
         gv->setUpdateOnActiveGraphChange (true);
         addPanelInternal (-1, gv, "Graph", nullptr);
 
+       #ifndef EL_FREE
         auto* nv = new NodeEditorContentView();
         nv->setName ("Node");
         nv->setComponentID ("Node");
