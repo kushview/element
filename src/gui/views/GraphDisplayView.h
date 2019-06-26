@@ -17,7 +17,8 @@ public:
         addAndMakeVisible (configButton);
         configButton.setTooltip ("Show graph settings");
         configButton.addListener (this);
-
+        configButton.setVisible (false);
+        
         addAndMakeVisible (sessionConfigButton);
         sessionConfigButton.setTooltip ("Show session settings");
         sessionConfigButton.addListener (this);
