@@ -308,7 +308,7 @@ void GuiController::presentPluginWindow (const Node& node, const bool focus)
 
     if (window != nullptr)
     {
-        window->setName (node.getName());
+        window->setName (String());
        #if EL_RUNNING_AS_PLUGIN
         // This makes plugin window handling more like the standalone
         // we don't want to modify the existing standalone behavior
