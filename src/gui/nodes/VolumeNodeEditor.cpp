@@ -5,7 +5,8 @@
 
 namespace Element {
 
-class VolumeNodeEditor::ChannelStrip : public NodeChannelStripComponent
+class VolumeNodeEditor::ChannelStrip : public NodeChannelStripComponent,
+                                       public AudioProcessorParameter::Listener
 {
 public:
     ChannelStrip (GuiController& g)
@@ -16,31 +17,60 @@ public:
         onVolumeChanged = [this](double value)
         {
             float fvalue = static_cast<float> (value);
-            if (auto object = getNode().getGraphNode()) {
-                if (auto* proc = dynamic_cast<VolumeProcessor*> (object->getAudioProcessor())) {
-                    if (auto* const param = dynamic_cast<AudioParameterFloat*> (proc->getParameters()[0]))
-                    {
-                        param->beginChangeGesture();
-                        *param = fvalue;
-                        param->endChangeGesture();
-                    }
-                }
+            if (param != nullptr)
+            {
+                param->beginChangeGesture();
+                *param = fvalue;
+                param->endChangeGesture();
             }
         };
     }
 
-    ~ChannelStrip() { }
+    ~ChannelStrip()
+    { 
+        if (param)
+            param->removeListener (this);
+        param = nullptr;
+        onVolumeChanged = nullptr;
+    }
+
+    void parameterValueChanged (int parameterIndex, float newValue) override
+    {
+        ignoreUnused (parameterIndex, newValue);
+        // updateChannelStrip();
+    }
+
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override
+    {
+        ignoreUnused (parameterIndex, gestureIsStarting);
+    }
+    
+    void updateParameter()
+    {
+        if (param)
+        {
+            param->removeListener (this);
+            param = nullptr;
+        }
+
+        if (auto object = getNode().getGraphNode())
+            if (auto* proc = dynamic_cast<VolumeProcessor*> (object->getAudioProcessor()))
+                param = dynamic_cast<AudioParameterFloat*> (proc->getParameters()[0]);
+        
+        stabilizeContent();
+
+        if (param)
+            param->addListener (this);
+    }
 
 protected:
     float getCurrentVolume() override
     {
-        float fvalue = 0.0f;
-        if (auto object = getNode().getGraphNode())
-            if (auto* proc = dynamic_cast<VolumeProcessor*> (object->getAudioProcessor()))
-                if (auto* const param = dynamic_cast<AudioParameterFloat*> (proc->getParameters()[0]))
-                    fvalue = *param;
-        return fvalue;
+        return param != nullptr ? *param : 0.f;
     }
+
+private:
+    AudioParameterFloat* param = nullptr;
 };
 
 VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiController& gui)
@@ -52,7 +82,9 @@ VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiController& gui)
     strip->setComboBoxesVisible (false, false);
 
     setSize (40, 260);
+    
     strip->setNode (node);
+    strip->updateParameter();
 }
 
 VolumeNodeEditor::~VolumeNodeEditor()

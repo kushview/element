@@ -21,7 +21,7 @@ ChannelStripComponent::ChannelStripComponent()
     fader.setRange (-60.0, 6.0, 0.001);
     fader.setValue (0.f, dontSendNotification);
     fader.setSkewFactor (2);
-    fader.getValueObject().addListener (this);
+    fader.addListener (this);
 
     addAndMakeVisible (meter, 100);
     addAndMakeVisible (scale, 101);
@@ -46,15 +46,16 @@ ChannelStripComponent::ChannelStripComponent()
     addAndMakeVisible (volume);
     volume.setNumDecimalPlaces (1);
     volume.setMinMax (fader.getMinimum(), fader.getMaximum());
-    volume.setValue (0.0);
+    volume.setValue (fader.getValue());
     volume.setTextWhenMinimum ("-inf");
-    volume.getValueObject().referTo (fader.getValueObject());
+    volume.getValueObject().addListener (this);
+
     stabilizeContent();
 }
 
 ChannelStripComponent::~ChannelStripComponent() noexcept
 {
-    fader.getValueObject().removeListener (this);  
+    fader.removeListener (this);
     volume.getValueObject().removeListener (this);
 }
 
@@ -63,6 +64,7 @@ void ChannelStripComponent::setMinMaxDecibels (double minDb, double maxDb)
     jassert (maxDb > minDb);
     fader.setRange (minDb, maxDb, 0.001);
     volume.setMinMax (fader.getMinimum(), fader.getMaximum());
+    volume.setValue (fader.getValue());
 }
 
 void ChannelStripComponent::resized()
@@ -104,19 +106,24 @@ void ChannelStripComponent::buttonClicked (Button* b)
     }
 }
 
+void ChannelStripComponent::sliderValueChanged (Slider* slider)
+{
+    volumeChanged (slider->getValue());
+    stabilizeContent();
+}
+
 void ChannelStripComponent::valueChanged (Value& value)
 {
-    volumeChanged (fader.getValue());
+    fader.setValue ((double) value.getValue(), sendNotificationAsync);
 }
 
-void ChannelStripComponent::paint (Graphics&)
-{
-
-}
+void ChannelStripComponent::paint (Graphics&) {}
 
 void ChannelStripComponent::stabilizeContent()
 {
-    
+    volume.getValueObject().removeListener (this);
+    volume.setValue (fader.getValue());
+    volume.getValueObject().addListener (this);
 }
 
 }

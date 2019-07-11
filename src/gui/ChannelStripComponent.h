@@ -7,14 +7,23 @@ namespace Element {
 
 class ChannelStripComponent : public Component,
                               public Button::Listener,
-                              public Value::Listener
+                              public Value::Listener,
+                              public Slider::Listener
 {
 public:
     ChannelStripComponent();
     ~ChannelStripComponent() noexcept;
 
     inline DigitalMeter& getDigitalMeter() { return meter; }
-    inline void setVolume (const double dB) { fader.setValue (dB, sendNotificationAsync); }
+    inline void setVolume (const double dB, NotificationType notify = sendNotificationAsync)
+    {
+        fader.setValue (dB, notify);
+        if (notify == dontSendNotification)
+            stabilizeContent();
+    }
+
+    inline double getVolume() const { return fader.getValue(); }
+
     inline void setPower (const bool powerOn, const bool notify = true)
     {
         if (powerOn == mute.getToggleState())
@@ -58,7 +67,10 @@ public:
     void paint (Graphics&) override;
     /** @internal */
     void valueChanged (Value&) override;
-
+    void sliderValueChanged (Slider* slider) override;
+    void sliderDragStarted (Slider*) override {}
+    void sliderDragEnded (Slider*) override {}
+    
     Signal<void(double)> volumeChanged;
     Signal<void()> powerChanged;
     Signal<void()> muteChanged;

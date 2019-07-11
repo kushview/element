@@ -120,6 +120,10 @@ public:
                         meter.setValue (c - startChannel, ptr->getOutputRMS (c));
             }
 
+            const auto cv = getCurrentVolume();
+            if (static_cast<float> (channelStrip.getVolume()) != cv)
+                channelStrip.setVolume (cv, dontSendNotification);
+            
             channelStrip.setPower (! ptr->isSuspended(), false);
             if (channelStrip.isMuted() != ptr->isMuted())
                 channelStrip.setMuted (ptr->isMuted(), false);
