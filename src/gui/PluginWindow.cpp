@@ -128,6 +128,8 @@ public:
         }
         
         editor->addComponentListener (this);
+
+        checkWindowTitle();
     }
 
     void buttonClicked (Button* button) override
@@ -182,6 +184,19 @@ public:
         if (auto* pw = findParentComponentOfClass<PluginWindow>())
         {
             onTopButton.setToggleState (pw->isAlwaysOnTop(), dontSendNotification);
+        }
+
+        checkWindowTitle();
+    }
+
+    void checkWindowTitle()
+    {
+        if (auto* window = findParentComponentOfClass<PluginWindow>())
+        {
+            if (editor->getWidth() < 100 && window->getName().isNotEmpty())
+                window->setName (String());
+            if (editor->getWidth() >= 100 && node.getName() != window->getName())
+                window->setName (node.getName());
         }
     }
 
@@ -263,7 +278,8 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     auto* const content = new PluginWindowContent (ui, node);
     setContentOwned (content, true);
     content->stabilizeComponents();
-
+    DBG("name: " << node.getName());
+    DBG("content W: " << content->getWidth());
     addToDesktop();
 }
 
