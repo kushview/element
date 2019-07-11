@@ -39,6 +39,12 @@ public:
         unbindSignals();
     }
 
+    void setVolumeMinMax (double minDb, double maxDb, double skew = 2.0)
+    {
+        channelStrip.setMinMaxDecibels (minDb, maxDb);
+        channelStrip.setFaderSkewFactor (skew);
+    }
+
     void bindSignals()
     {
         unbindSignals();
@@ -90,7 +96,7 @@ public:
     inline void timerCallback() override
     {
         auto& meter = channelStrip.getDigitalMeter();
-        const bool isAudioOut = node.isAudioIONode ();
+        const bool isAudioOut = node.isAudioIONode();
         if (GraphNodePtr ptr = node.getGraphNode())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
@@ -148,8 +154,7 @@ public:
             SharedConnectionBlock b2 (powerChangedConnection);
             SharedConnectionBlock b3 (muteChangedConnection);
 
-            float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
-            channelStrip.setVolume (Decibels::gainToDecibels (gain, -60.f));
+            channelStrip.setVolume (getCurrentVolume());
             channelStrip.setPower (! object->isSuspended());
             channelStrip.setMuted (object->isMuted(), false);
 
@@ -182,6 +187,14 @@ public:
 
     inline Node getNode() const { return node; }
     
+    inline void setComboBoxesVisible (bool showChannelBox = true, bool showFlowBox = true)
+    {
+        useChannelBox = showChannelBox;
+        useFlowBox = showFlowBox;
+        updateComboBoxes();
+        resized();
+    }
+
     /** @internal */
     inline void comboBoxChanged (ComboBox* box) override
     {    
@@ -190,6 +203,23 @@ public:
             updateComboBoxes (false, true);
             updateChannelStrip();
         }
+    }
+
+    /** Called when the volume slider changes. If this is set, you probably
+        also want to override getCurrentVolume() */
+    std::function<void(double)> onVolumeChanged;
+
+protected:
+    /** Override this to return volume from the backend/model layer. The
+        default returns either the input or output gain of the node */
+    virtual float getCurrentVolume()
+    {
+        GraphNodePtr object = node.getGraphNode();
+        if (object == nullptr)
+            return 0.f;
+
+        float gain = isMonitoringInputs() || isAudioOutNode ? object->getInputGain() : object->getGain();
+        return Decibels::gainToDecibels (gain, -60.f);
     }
 
 private:
@@ -202,6 +232,9 @@ private:
     ChannelStripComponent channelStrip;
     bool listenForNodeSelected;
     
+    bool useFlowBox = true;
+    bool useChannelBox = true;
+
     int meterSpeedHz    = 15;
     bool isAudioOutNode = false;
     bool isAudioInNode  = false;
@@ -213,8 +246,8 @@ private:
     SignalConnection volumeDoubleClickedConnection;
     SignalConnection muteChangedConnection;
 
-    inline bool isMonitoringInputs() const { return flowBox.getSelectedId() == 1; }
-    inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 1; }
+    inline bool isMonitoringInputs() const  { return flowBox.getSelectedId() == 1; }
+    inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 2; }
 
     void updateComboBoxes (bool doFlowBox = true, bool doChannelBox = true)
     {
@@ -224,8 +257,6 @@ private:
             if (flowId <= 0)
                 flowId = 2;
             flowBox.clear();
-            
-            
             flowBox.setTooltip ("Signal flow to monitor");
             
             if (audioIns.size() > 0)
@@ -235,7 +266,7 @@ private:
         
             if (flowBox.getNumItems() > 0 && !isAudioInNode && !isAudioOutNode)
             {
-                flowBox.setVisible (true);
+                flowBox.setVisible (useFlowBox);
                 flowBox.setSelectedId (flowId, false);
                 if (flowBox.getSelectedId() <= 0)
                     flowBox.setSelectedItemIndex (0);
@@ -268,7 +299,7 @@ private:
 
             if (channelBox.getNumItems() > 0)
             {
-                channelBox.setVisible (true);
+                channelBox.setVisible (useFlowBox);
                 channelBox.setSelectedItemIndex (0);
             }
             else
@@ -283,8 +314,19 @@ private:
         setNode (gui.getSelectedNode());
     }
 
+    void powerChanged()
+    {
+        if (node.isValid())
+            node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
+        if (auto* obj = node.getGraphNode())
+            obj->suspendProcessing (! channelStrip.isPowerOn());
+    }
+
     void volumeChanged (double value)
     {
+        if (onVolumeChanged != nullptr)
+            return onVolumeChanged (value);
+        
         if (GraphNodePtr object = node.getGraphNode())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
@@ -299,14 +341,6 @@ private:
                 object->setGain (static_cast<float> (gain));
             }
         }
-    }
-
-    void powerChanged()
-    {
-        if (node.isValid())
-            node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
-        if (auto* obj = node.getGraphNode())
-            obj->suspendProcessing (! channelStrip.isPowerOn());
     }
 
     void muteChanged()

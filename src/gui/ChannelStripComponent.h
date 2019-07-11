@@ -23,6 +23,7 @@ public:
         if (notify)
             powerChanged();
     }
+
     inline void setMuted (const bool muted, const bool notify = true)
     {
         if (muted == mute2.getToggleState())
@@ -41,6 +42,13 @@ public:
         mute2.setVisible (visible);
         resized();
     }
+
+    void setFaderSkewFactor (double factor)
+    {
+        fader.setSkewFactor (factor);
+    }
+
+    void setMinMaxDecibels (double minDb, double maxDb);
 
     /** @internal */
     void buttonClicked (Button*) override;

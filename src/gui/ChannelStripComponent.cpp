@@ -58,6 +58,13 @@ ChannelStripComponent::~ChannelStripComponent() noexcept
     volume.getValueObject().removeListener (this);
 }
 
+void ChannelStripComponent::setMinMaxDecibels (double minDb, double maxDb)
+{
+    jassert (maxDb > minDb);
+    fader.setRange (minDb, maxDb, 0.001);
+    volume.setMinMax (fader.getMinimum(), fader.getMaximum());
+}
+
 void ChannelStripComponent::resized()
 {
     auto r1 = getLocalBounds().reduced (2);

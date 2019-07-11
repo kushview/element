@@ -15,6 +15,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+
 private:
     class ChannelStrip; friend class ChannelStrip;
     std::unique_ptr<ChannelStrip> strip;
