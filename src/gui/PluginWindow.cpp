@@ -278,8 +278,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     auto* const content = new PluginWindowContent (ui, node);
     setContentOwned (content, true);
     content->stabilizeComponents();
-    DBG("name: " << node.getName());
-    DBG("content W: " << content->getWidth());
+
     addToDesktop();
 }
 
