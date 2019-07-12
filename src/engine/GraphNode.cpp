@@ -27,7 +27,6 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
     inputGain.set(1.0f); lastInputGain.set (1.0f);
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Slugs::type, getTypeString(), nullptr);
-    // resetPorts();
 }
 
 GraphNode::~GraphNode()
