@@ -67,6 +67,14 @@ void ChannelStripComponent::setMinMaxDecibels (double minDb, double maxDb)
     volume.setValue (fader.getValue());
 }
 
+void ChannelStripComponent::addButton (Component* btn)
+{
+    jassert (! extraButtons.contains (btn));
+    if (extraButtons.addIfNotAlreadyThere (btn))
+        addAndMakeVisible (btn);
+    resized();
+}
+
 void ChannelStripComponent::resized()
 {
     auto r1 = getLocalBounds().reduced (2);
@@ -75,6 +83,13 @@ void ChannelStripComponent::resized()
     r1.removeFromTop (4);
     volume.setBounds (r1.removeFromTop (18).withSizeKeepingCentre (30, 18));
     r1.removeFromBottom (4);
+
+    for (auto* const button : extraButtons)
+    {
+        button->setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
+        r1.removeFromBottom (1);
+    }
+
     mute.setBounds (r1.removeFromBottom (18).withSizeKeepingCentre (26, 18));
     
     if (mute2.isVisible())

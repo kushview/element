@@ -59,6 +59,8 @@ public:
 
     void setMinMaxDecibels (double minDb, double maxDb);
 
+    void addButton (Component*);
+
     /** @internal */
     void buttonClicked (Button*) override;
     /** @internal */
@@ -92,6 +94,8 @@ private:
     PowerButton mute;
     SettingButton mute2;
 
+    OwnedArray<Component> extraButtons;
+    
     void stabilizeContent();
 };
 

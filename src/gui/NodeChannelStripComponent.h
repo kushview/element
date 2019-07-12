@@ -39,6 +39,8 @@ public:
         unbindSignals();
     }
 
+    ChannelStripComponent& getChannelStrip() { return channelStrip; }
+    
     void setVolumeMinMax (double minDb, double maxDb, double skew = 2.0)
     {
         channelStrip.setMinMaxDecibels (minDb, maxDb);
