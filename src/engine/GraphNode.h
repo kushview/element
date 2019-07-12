@@ -30,6 +30,9 @@ public:
     /** Create a node suitable for binding to a root graph */
     static GraphNode* createForRoot (GraphProcessor*);
     
+    static bool isSpecialParameter (int parameter);
+    static String getSpecialParameterName (int parameter);
+
     /** Returns an audio processor if available */
     JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
    

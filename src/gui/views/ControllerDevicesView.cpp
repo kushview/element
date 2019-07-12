@@ -50,6 +50,7 @@ public:
                          const ControllerDevice::Control& control = ControllerDevice::Control())
     {
         maps.clear (true);
+        
         if (session)
         {
             for (int i = 0; i < session->getNumControllerMaps(); ++i)
@@ -85,8 +86,7 @@ public:
         ViewHelpers::drawBasicTextRow ("", g, width, height, rowIsSelected);
     }
 
-    void paintCell (Graphics& g, int rowNumber,
-                    int columnId, int width, int height,
+    void paintCell (Graphics& g, int rowNumber, int columnId, int width, int height,
                     bool rowIsSelected) override
     {
         auto* const objects = maps [rowNumber];
@@ -113,10 +113,11 @@ public:
                 text = node.getName();
             } break;
 
-            case Parameter: {
-                if (mapp.getParameterIndex() == -2)
+            case Parameter:
+            {
+                if (GraphNode::isSpecialParameter (mapp.getParameterIndex()))
                 {
-                    text = "Enable/Disable";
+                    text = GraphNode::getSpecialParameterName (mapp.getParameterIndex());
                 }
                 else if (auto* obj = node.getGraphNode())
                 {

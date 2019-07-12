@@ -36,6 +36,26 @@ GraphNode::~GraphNode()
     parent = nullptr;
 }
 
+bool GraphNode::isSpecialParameter (int parameter)
+{
+    return parameter >= SpecialParameterBegin && parameter < SpecialParameterBegin;
+}
+
+String GraphNode::getSpecialParameterName (int parameter)
+{
+    String name = "N/A";
+
+    switch (parameter)
+    {
+        case NoParameter:       name = "None"; break;
+        case EnabledParameter:  name = "Enable/Disable"; break;
+        case BypassParameter:   name = "Bypass"; break;
+        case MuteParameter:     name = "Mute"; break;
+    }
+
+    return name;
+}
+
 const String& GraphNode::getTypeString() const
 { 
     return (nullptr == processor<GraphProcessor>())
