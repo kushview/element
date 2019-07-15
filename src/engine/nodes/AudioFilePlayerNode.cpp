@@ -35,6 +35,10 @@ public:
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
 
+        addAndMakeVisible (loopButton);
+        loopButton.setButtonText ("Loop");
+        loopButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+
         addAndMakeVisible (startStopContinueToggle);
         startStopContinueToggle.setButtonText ("Respond to MIDI start/stop/continue");
 
@@ -51,7 +55,7 @@ public:
         stabilizeComponents();
         bindHandlers();
 
-        setSize (360, 122);
+        setSize (360, 144);
         startTimer (1001);
     }
 
@@ -71,6 +75,8 @@ public:
 
         playButton.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
         playButton.setButtonText (playButton.getToggleState() ? "Pause" : "Play");
+
+        loopButton.setToggleState (processor.isLooping(), dontSendNotification);
 
         if (! draggingPos)
         {
@@ -105,6 +111,8 @@ public:
         chooser->setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
         playButton.setBounds (r.removeFromTop (18));
+        r.removeFromTop (4);
+        loopButton.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
         volume.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
@@ -171,6 +179,7 @@ private:
     Slider position;
     Slider volume;
     TextButton playButton;
+    TextButton loopButton;
     ToggleButton startStopContinueToggle;
     Atomic<int> startStopContinue { 0 };
 
@@ -188,6 +197,14 @@ private:
                 *playing = !*playing;
                 stabilizeComponents();
             }
+        };
+
+        loopButton.onClick = [this]()
+        {
+            int index = AudioFilePlayerNode::Looping;
+            processor.setLooping (! processor.isLooping());
+            DBG("LOOP: " << (int) processor.isLooping());
+            stabilizeComponents();
         };
 
         volume.onValueChange = [this]() {
@@ -225,6 +242,7 @@ private:
     void unbindHandlers()
     {
         playButton.onClick = nullptr;
+        loopButton.onClick = nullptr;
         position.onDragStart = nullptr;
         position.onDragEnd = nullptr;
         position.textFromValueFunction = nullptr;
@@ -240,8 +258,10 @@ AudioFilePlayerNode::AudioFilePlayerNode()
         .withOutput  ("Main",  AudioChannelSet::stereo(), true))
 {
     addParameter (playing = new AudioParameterBool ("playing", "Playing", false));
-    addParameter (slave = new AudioParameterBool ("slave", "Slave", false));
-    addParameter (volume = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addParameter (slave   = new AudioParameterBool ("slave", "Slave", false));
+    addParameter (volume  = new AudioParameterFloat ("volume", "Volume", -60.f, 12.f, 0.f));
+    addParameter (looping = new AudioParameterBool ("loop", "Loop", false));
+
     for (auto* const param : getParameters())
         param->addListener (this);
 }
@@ -300,8 +320,10 @@ void AudioFilePlayerNode::openFile (const File& file)
         audioFile = file;
         player.setSource (reader.get(), 1024 * 8, &thread, 
                           newReader->sampleRate, 2);
+
         ScopedLock sl (getCallbackLock());
-        reader->setLooping (true);
+        reader->setLooping (*looping);
+        player.setLooping (*looping);
     }
 }
 
@@ -317,7 +339,8 @@ void AudioFilePlayerNode::prepareToPlay (double sampleRate, int maximumExpectedS
         if (auto* fmtReader = reader->getAudioFormatReader())
             readerSampleRate = fmtReader->sampleRate;
 
-        reader->setLooping (true);
+        reader->setLooping (*looping);
+        player.setLooping (*looping);
         player.setSource (reader.get(), 1024 * 8, &thread, readerSampleRate, 2);
         player.setPosition (jmax (0.0, lastTransportPos));
         if (wasPlaying)
@@ -400,6 +423,17 @@ void AudioFilePlayerNode::processBlock (AudioBuffer<float>& buffer, MidiBuffer& 
     midi.clear();
 }
 
+void AudioFilePlayerNode::setLooping (const bool shouldLoop)
+{
+    jassert (looping != nullptr);
+    *looping = shouldLoop;
+}
+
+bool AudioFilePlayerNode::isLooping() const
+{ 
+    return *looping;
+}
+
 void AudioFilePlayerNode::handleAsyncUpdate()
 {
     switch (midiPlayState.get())
@@ -439,6 +473,7 @@ void AudioFilePlayerNode::getStateInformation (juce::MemoryBlock& destData)
     state.setProperty ("audioFile", audioFile.getFullPathName(), nullptr)
          .setProperty ("playing", (bool)*playing, nullptr)
          .setProperty ("slave", (bool)*slave, nullptr)
+         .setProperty ("loop", (bool)*looping, nullptr)
          .setProperty ("midiStartStopContinue", midiStartStopContinue.get() == 1, nullptr);
     MemoryOutputStream stream (destData, false);
     state.writeToStream (stream);
@@ -453,6 +488,7 @@ void AudioFilePlayerNode::setStateInformation (const void* data, int sizeInBytes
             openFile (File (state["audioFile"].toString()));
         *playing = (bool) state.getProperty ("playing", false);
         *slave = (bool) state.getProperty ("slave", false);
+        *looping = (bool) state.getProperty ("loop", true);
         midiStartStopContinue.set ((bool) state.getProperty ("midiStartStopContinue", false) ? 1 : 0);
     }
 }
@@ -463,7 +499,8 @@ void AudioFilePlayerNode::parameterValueChanged (int parameter, float newValue)
 
     switch (parameter)
     {
-        case Playing: {
+        case Playing:
+        {
             if (*playing)
                 player.start();
             else
@@ -474,8 +511,18 @@ void AudioFilePlayerNode::parameterValueChanged (int parameter, float newValue)
             // noop
         } break;
 
-        case Volume: {
+        case Volume:
+        {
             player.setGain (Decibels::decibelsToGain (volume->get(), volume->range.start));
+        } break;
+
+        case Looping:
+        {
+            if (reader != nullptr)
+            {
+                player.setLooping (*looping);
+                reader->setLooping (*looping);
+            }
         } break;
     }
 }

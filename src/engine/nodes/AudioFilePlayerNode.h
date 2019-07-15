@@ -9,13 +9,16 @@ class AudioFilePlayerNode : public BaseProcessor,
                             public AsyncUpdater
 {
 public:
-    enum Parameters { Playing = 0, Slave, Volume };
+    enum Parameters { Playing = 0, Slave, Volume, Looping };
     enum MidiPlayState { None = 0, Start, Stop, Continue };
 
     AudioFilePlayerNode ();
     virtual ~AudioFilePlayerNode();
 
     void handleAsyncUpdate() override;
+
+    void setLooping (const bool shouldLoop);
+    bool isLooping() const;
 
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
@@ -102,9 +105,10 @@ private:
     AudioFormatManager formats;
     AudioTransportSource player;
 
-    AudioParameterBool* slave       { nullptr };
+    AudioParameterBool*   slave     { nullptr };
     AudioParameterBool* playing     { nullptr };
     AudioParameterFloat* volume     { nullptr };
+    AudioParameterBool* looping     { nullptr };
 
     File audioFile;
     Atomic<int> midiStartStopContinue;
