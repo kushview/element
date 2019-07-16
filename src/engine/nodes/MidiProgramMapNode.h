@@ -59,6 +59,11 @@ public:
         height = jmax (h, (int) 1);
     }
 
+    inline void setFontSize (float newSize)
+    {
+        fontSize = jlimit (9.f, 72.f, newSize);
+    }
+
     inline int getLastProgram() const
     {
         ScopedLock sl (lock);
@@ -73,6 +78,8 @@ public:
 
         clear();
 
+        fontSize = (float) tree.getProperty ("fontSize", 15.f);
+        
         for (int i = 0; i < tree.getNumChildren(); ++i)
         {
             const auto e = tree.getChild (i);
@@ -94,6 +101,7 @@ public:
     void getState (MemoryBlock& block) override
     {
         ValueTree tree ("state");
+        tree.setProperty ("fontSize", fontSize, nullptr);
         for (const auto* const entry : entries)
         {
             ValueTree e ("entry");
@@ -127,7 +135,7 @@ protected:
 
     int width = 230;
     int height = 260;
-
+    float fontSize = 15.f;
     int lastProgram = -1;
 
     inline void createPorts() override

@@ -257,9 +257,21 @@ MidiProgramMapEditor::~MidiProgramMapEditor()
 
 void MidiProgramMapEditor::setFontSize (float newSize)
 {
+    float defaultSize = 15.f;
     fontSize = jlimit (9.f, 72.f, newSize);
-    table.setRowHeight (6 + static_cast<int> (1.125 * newSize));
+    
+    if (isRunningInPluginWindow())
+    {
+        table.setRowHeight (6 + static_cast<int> (1.125 * newSize));
+    }
+    else
+    {
+        table.setRowHeight (6 + static_cast<int> (1.125 * defaultSize));
+    }
+
     table.updateContent();
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
+        node->setFontSize (fontSize);
 }
 
 bool MidiProgramMapEditor::keyPressed (const KeyPress& press)
