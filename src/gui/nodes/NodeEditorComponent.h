@@ -14,6 +14,7 @@ protected:
 public:
     virtual ~NodeEditorComponent() override;
     inline Node getNode() const { return node; }
+    bool isRunningInPluginWindow() const;
 
 protected:
     inline GraphNode* getNodeObject() const { return node.getGraphNode(); }
