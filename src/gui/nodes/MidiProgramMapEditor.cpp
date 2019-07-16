@@ -52,7 +52,7 @@ class ProgramNumberLabel : public Label
 {
 public:
     ProgramNumberLabel (MidiProgramMapEditor& e, bool input)
-        : editor(e), isInput (input)
+        : editor (e), isInput (input)
     { 
         setEditable (false, true);
         setJustificationType (Justification::centred);
@@ -114,7 +114,9 @@ public:
         OutProgram
     };
 
-    TableModel (MidiProgramMapEditor& e) : editor (e) { }
+    TableModel (MidiProgramMapEditor& e)
+        : editor (e) {}
+
     ~TableModel() { }
 
     int getNumRows() override { return editor.getNumPrograms(); }
@@ -141,6 +143,7 @@ public:
             case TableModel::OutProgram: text = String (1 + program.out); break;
         }
 
+        g.setFont (editor.getFontSize());
         ViewHelpers::drawBasicTextRow (text, g, width, height, rowIsSelected, padding, alignment);
     }
 
@@ -148,6 +151,7 @@ public:
                                         Component* existing) override
     {
         const auto program = editor.getProgram (rowNumber);
+        Label* label = nullptr;
         switch (columnId)
         {
             case TableModel::Name:
@@ -156,7 +160,7 @@ public:
                     dynamic_cast<ProgramNameLabel*> (existing);
                 name->setText (program.name, dontSendNotification);
                 name->setRow (rowNumber);
-                return name;
+                label = name;
             } break;
 
             case TableModel::InProgram:
@@ -165,7 +169,7 @@ public:
                     dynamic_cast<ProgramNumberLabel*> (existing);
                 input->setProgram (program.in);
                 input->setRow (rowNumber);
-                return input;
+                label = input;
             } break;
 
             case TableModel::OutProgram: 
@@ -174,11 +178,16 @@ public:
                     dynamic_cast<ProgramNumberLabel*> (existing);
                 output->setProgram (program.out);
                 output->setRow (rowNumber);
-                return output;
+                label = output;
             } break;
         }
-        jassertfalse;
-        return nullptr;
+        
+        if (label == nullptr)
+            return nullptr;
+        
+        label->setFont (Font (editor.getFontSize()));
+
+        return label;
     }
 
    #if 0
@@ -201,7 +210,8 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 {
     addAndMakeVisible (table);
     table.setHeaderHeight (22);
-    table.setRowHeight (20);
+    setFontSize (15.f);
+
     auto& header = table.getHeader();
     const int flags = TableHeaderComponent::visible;
     header.addColumn ("Name", TableModel::Name, 100, 100, -1, 
@@ -243,6 +253,13 @@ MidiProgramMapEditor::~MidiProgramMapEditor()
     delButton.onClick = nullptr;
     table.setModel (nullptr);
     model.reset();
+}
+
+void MidiProgramMapEditor::setFontSize (float newSize)
+{
+    fontSize = jlimit (9.f, 72.f, newSize);
+    table.setRowHeight (6 + static_cast<int> (1.125 * newSize));
+    table.updateContent();
 }
 
 bool MidiProgramMapEditor::keyPressed (const KeyPress& press)
@@ -376,7 +393,7 @@ void MidiProgramMapEditor::resized()
         table.getWidth() - (header.getColumnWidth (TableModel::InProgram) + 
                              header.getColumnWidth (TableModel::OutProgram)));
 
-    if (storeSizeInNode)
+    if (isRunningInPluginWindow())
         if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
             node->setSize (getWidth(), getHeight());
 }

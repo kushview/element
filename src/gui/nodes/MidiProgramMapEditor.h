@@ -6,7 +6,7 @@
 namespace Element {
 
 class MidiProgramMapEditor : public NodeEditorComponent,
-                               public ChangeListener
+                             public ChangeListener
 {
 public:
     MidiProgramMapEditor (const Node& node);
@@ -21,6 +21,9 @@ public:
     MidiProgramMapNode::ProgramEntry getProgram (int) const;
     void setProgram (int, MidiProgramMapNode::ProgramEntry);
     void sendProgram (int);
+
+    float getFontSize() const { return fontSize; }
+    void setFontSize (float newSize);
 
     void selectRow (int row);
     void setStoreSize (const bool storeSize);
@@ -37,6 +40,7 @@ private:
     TextButton addButton;
     TextButton delButton;
     bool storeSizeInNode = true;
+    float fontSize = 15.f;
     SignalConnection lastProgramChangeConnection;
     void selectLastProgram();
 };
