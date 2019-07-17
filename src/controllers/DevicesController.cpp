@@ -1,6 +1,7 @@
 
 #include "controllers/DevicesController.h"
 #include "engine/MappingEngine.h"
+#include "engine/MidiEngine.h"
 #include "session/Session.h"
 #include "session/UnlockStatus.h"
 #include "Globals.h"
@@ -10,7 +11,7 @@ namespace Element {
 class DevicesController::Impl
 {
 public:
-    Impl (DevicesController& o) : owner(o) { }
+    Impl (DevicesController& o) : owner (o) { }
     ~Impl() { }
 
 private:
@@ -41,7 +42,8 @@ void DevicesController::add (const ControllerDevice& device)
 {
     returnIfNotFullVersion
     auto& mapping (getWorld().getMappingEngine());
-    if (! mapping.addInput (device))
+    auto& midi (getWorld().getMidiEngine());
+    if (! mapping.addInput (device, midi))
         return;
 
     auto session = getWorld().getSession();
@@ -150,13 +152,14 @@ void DevicesController::refresh (const ControllerDevice& device)
 void DevicesController::refresh()
 {
     auto& mapping (getWorld().getMappingEngine());
+    auto& midi (getWorld().getMidiEngine());
     auto session = getWorld().getSession();
     mapping.clear();
 
     returnIfNotFullVersion
 
     for (int i = 0; i < session->getNumControllerDevices(); ++i)
-        mapping.addInput (session->getControllerDevice (i));
+        mapping.addInput (session->getControllerDevice (i), midi);
 
     for (int i = 0; i < session->getNumControllerMaps(); ++i)
     {

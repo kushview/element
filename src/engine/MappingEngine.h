@@ -10,6 +10,7 @@ namespace Element {
 class ControllerMapHandler;
 class ControllerMapInput;
 class GraphNode;
+class MidiEngine;
 
 class MappingEngine
 {
@@ -19,7 +20,7 @@ public:
     MappingEngine();
     ~MappingEngine();
 
-    bool addInput (const ControllerDevice&);
+    bool addInput (const ControllerDevice&, MidiEngine&);
     bool addHandler (const ControllerDevice::Control&, const Node&, const int);
 
     bool removeInput (const ControllerDevice&);

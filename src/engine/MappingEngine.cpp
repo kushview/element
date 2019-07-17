@@ -1,6 +1,7 @@
 
-#include "engine/MappingEngine.h"
 #include "engine/GraphNode.h"
+#include "engine/MappingEngine.h"
+#include "engine/MidiEngine.h"
 #include "session/ControllerDevice.h"
 #include "session/Node.h"
 
@@ -410,8 +411,8 @@ private:
 class ControllerMapInput : public MidiInputCallback
 {
 public:
-    explicit ControllerMapInput (MappingEngine& owner, const ControllerDevice& device)
-        : mapping (owner), controllerDevice (device)
+    explicit ControllerMapInput (MappingEngine& owner, MidiEngine& m, const ControllerDevice& device)
+        : midi (m), mapping (owner), controllerDevice (device)
     {
 
     }
@@ -441,15 +442,9 @@ public:
 
     bool close()
     {
-        if (midiInput != nullptr)
-        {
-            stop();
-            midiInput.reset (nullptr);
-        }
-
-        controllerNumbers.setRange (0, 127, false);
-        noteNumbers.setRange (0, 127, false);
-        return midiInput == nullptr;
+        const auto deviceName = controllerDevice.getInputDevice().toString();
+        midi.removeMidiInputCallback (deviceName, this);
+        return true;
     }
 
     bool open()
@@ -472,29 +467,20 @@ public:
             }
         }
 
-        if (midiInput == nullptr)
-        {
-            const auto devices = MidiInput::getDevices();
-            const auto index = devices.indexOf (controllerDevice.getInputDevice().toString());
-            if (isPositiveAndBelow (index, devices.size()))
-                midiInput.reset (MidiInput::openDevice (index, this));
-        }
-
-        return midiInput != nullptr;
+        const auto deviceName = controllerDevice.getInputDevice().toString();
+        midi.addMidiInputCallback (deviceName, this);
+        
+        return true;
     }
 
     void start()
     {
-        if (midiInput == nullptr)
-            open();
-        if (midiInput)
-            midiInput->start();
+        open();
     }
 
     void stop()
     {
-        if (midiInput)
-            midiInput->stop();
+        close();
     }
 
     bool isInputFor (const ControllerDevice& device) const
@@ -515,6 +501,7 @@ public:
     }
 
 private:
+    MidiEngine& midi;
     MappingEngine& mapping;
     ControllerDevice controllerDevice;
     std::unique_ptr<MidiInput> midiInput;
@@ -615,13 +602,13 @@ MappingEngine::~MappingEngine()
     inputs = nullptr;
 }
 
-bool MappingEngine::addInput (const ControllerDevice& controller)
+bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& midi)
 {
     if (inputs->containsInputFor (controller))
         return true;
     
     std::unique_ptr<ControllerMapInput> input;
-    input.reset (new ControllerMapInput (*this, controller));
+    input.reset (new ControllerMapInput (*this, midi, controller));
 
     // DBG("[EL] added input for " << controller.getName().toString());
     return inputs->add (input.release());
