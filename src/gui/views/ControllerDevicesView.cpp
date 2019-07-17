@@ -225,27 +225,26 @@ private:
 };
 
 class MidiLearnButton : public SettingButton,
-                         public MidiInputCallback,
-                         public AsyncUpdater,
-                         public Button::Listener
+                        public MidiInputCallback,
+                        public AsyncUpdater,
+                        public Button::Listener
 {
 public:
-    boost::signals2::signal<void()> messageReceived;
+    Signal<void()> messageReceived;
 
     explicit MidiLearnButton (const String& deviceName = String())
     { 
         addListener (this);
     }
 
-    void buttonClicked (Button*) override
+    ~MidiLearnButton()
     {
-        // if (! isEnabled())
-        //     return;
-        // if (isListening()) stopListening();
-        // else startListening();
+        stopListening();
     }
 
-    bool isListening() const { return input != nullptr; }
+    void buttonClicked (Button*) override { }
+
+    bool isListening() const { return listening; }
 
     void updateToggleState()
     {
@@ -265,12 +264,19 @@ public:
 
     void stopListening()
     {
+       #if 0
         if (input)
         {
             input->stop();
             input.reset (nullptr);
         }
+       #else
+        jassert (ViewHelpers::getGlobals (this));
+        if (auto* world = ViewHelpers::getGlobals (this))
+            world->getMidiEngine().removeMidiInputCallback (this);
+       #endif
 
+        listening = false;
         updateToggleState();
     }
 
@@ -279,6 +285,7 @@ public:
         stopListening();
         clearMessage();
         
+       #if 0
         const auto deviceIdx = MidiInput::getDevices().indexOf (inputName);
         if (deviceIdx >= 0)
             input.reset (MidiInput::openDevice (deviceIdx, this));
@@ -292,7 +299,13 @@ public:
         {
             DBG("[EL] could not start MIDI device: " << inputName);
         }
+       #else
+        jassert (ViewHelpers::getGlobals (this));
+        if (auto* world = ViewHelpers::getGlobals (this))
+            world->getMidiEngine().addMidiInputCallback (inputName, this, true);
+       #endif
 
+        listening = true;
         updateToggleState();
     }
 
@@ -328,11 +341,11 @@ private:
     }
 
     CriticalSection lock;
+    bool listening = false;
     Atomic<bool> gotFirstMessage = false;
     Atomic<bool> stopOnFirstMessage = false;
     MidiMessage message;
     String inputName;
-    std::unique_ptr<MidiInput> input;
 };
 
 class ControlListBox : public ListBox,
