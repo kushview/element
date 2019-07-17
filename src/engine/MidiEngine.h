@@ -55,7 +55,8 @@ public:
         events forwarded on to listeners.
      */
     void addMidiInputCallback (const String& midiInputDeviceName,
-                               MidiInputCallback* callback);
+                               MidiInputCallback* callback,
+                               bool consumer = false);
 
     /** Removes a listener that was previously registered with addMidiInputCallback(). */
     void removeMidiInputCallback (const String& midiInputDeviceName,
@@ -93,11 +94,32 @@ private:
     struct MidiCallbackInfo
     {
         String deviceName;
+
+        /** If true, will receive callbacks no matter the active state for the
+            Audio Engine. If false, then will only receive callbacks if active
+            for the audio engine.
+         */
+        bool consumer = false;
+
         MidiInputCallback* callback;
     };
 
+    struct MidiInputHolder : public MidiInputCallback
+    {
+        MidiInputHolder (MidiEngine& e)
+            : engine (e) { }
+
+        std::unique_ptr<MidiInput> input;
+        bool active = false;  // if true, then will feed to audio engine
+
+        void handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message) override;
+
+    private:
+        MidiEngine& engine;
+    };
+
     StringArray midiInsFromXml;
-    OwnedArray<MidiInput> enabledMidiInputs;
+    OwnedArray<MidiInputHolder> openMidiInputs;
     Array<MidiCallbackInfo> midiCallbacks;
 
     String defaultMidiOutputName;
@@ -107,6 +129,7 @@ private:
     class CallbackHandler;
     std::unique_ptr<CallbackHandler> callbackHandler;
 
+    MidiInputHolder* getMidiInput (const String& deviceName, bool openIfNotAlready);
     void handleIncomingMidiMessageInt (MidiInput*, const MidiMessage&);
 };
 

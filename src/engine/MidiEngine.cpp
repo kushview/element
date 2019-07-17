@@ -17,7 +17,12 @@ void MidiEngine::applySettings (Settings& settings)
             const auto child (data.getChild (i));
             if (child.hasType ("input"))
             {
-                midiInsFromXml.add (child [Tags::name]);
+                if (auto* const holder = getMidiInput (child [Tags::name], true))
+                {
+                    holder->active = false;  // open but not active initially
+                    if ((bool) child [Tags::active])
+                        midiInsFromXml.add (child [Tags::name]);
+                }
             }
         }
 
@@ -31,10 +36,11 @@ void MidiEngine::applySettings (Settings& settings)
 void MidiEngine::writeSettings (Settings& settings)
 {
     ValueTree data ("MidiSettings");
-    for (int i = 0; i < enabledMidiInputs.size(); ++i)
+    for (auto* const holder : openMidiInputs)
     {
         ValueTree input ("input");
-        input.setProperty (Tags::name, enabledMidiInputs[i]->getName(), nullptr);
+        input.setProperty (Tags::name, holder->input->getName(), nullptr)
+             .setProperty (Tags::active, holder->active, nullptr);
         data.appendChild (input, nullptr);
     }
 
@@ -49,7 +55,8 @@ void MidiEngine::writeSettings (Settings& settings)
             if (availableMidiDevices.contains (midiInsFromXml[i], true))
                 continue;
             ValueTree input ("input");
-            input.setProperty (Tags::name, midiInsFromXml [i], nullptr);
+            input.setProperty (Tags::name, midiInsFromXml [i], nullptr)
+                 .setProperty (Tags::active, true, nullptr);
             data.appendChild (input, nullptr);
         }
     }
@@ -104,6 +111,19 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CallbackHandler)
 };
 
+void MidiEngine::MidiInputHolder::handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
+{
+    if (message.isActiveSense())
+        return;
+
+    jassert (source == input.get());
+    const ScopedLock sl (engine.midiCallbackLock);
+
+    for (auto& mc : engine.midiCallbacks)
+        if ((active || mc.consumer) && (mc.deviceName.isEmpty() || mc.deviceName == input->getName()))
+            mc.callback->handleIncomingMidiMessage (input.get(), message);
+}
+
 //==============================================================================
 MidiEngine::MidiEngine()
 {
@@ -116,28 +136,45 @@ MidiEngine::~MidiEngine()
 }
 
 //==============================================================================
+MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& deviceName, bool openIfNotAlready)
+{
+    for (auto* const holder : openMidiInputs)
+        if (holder->input && holder->input->getName() == deviceName)
+            return holder;
+    
+    if (! openIfNotAlready)
+        return nullptr;
+    
+    auto index = MidiInput::getDevices().indexOf (deviceName);
+    if (index >= 0)
+    {
+        std::unique_ptr<MidiInputHolder> holder;
+        holder.reset (new MidiInputHolder (*this));
+        if (auto* midiIn = MidiInput::openDevice (index, holder.get()))
+        {
+            holder->input.reset (midiIn);
+            holder->input->start();
+            return openMidiInputs.add (holder.release());
+        }
+    }
+
+    return nullptr;
+}
+
+//==============================================================================
 void MidiEngine::setMidiInputEnabled (const String& name, const bool enabled)
 {
     if (enabled != isMidiInputEnabled (name))
     {
         if (enabled)
         {
-            auto index = MidiInput::getDevices().indexOf (name);
-
-            if (index >= 0)
-            {
-                if (auto* midiIn = MidiInput::openDevice (index, callbackHandler.get()))
-                {
-                    enabledMidiInputs.add (midiIn);
-                    midiIn->start();
-                }
-            }
+            if (auto* holder = getMidiInput (name, true))
+                holder->active = true;
         }
         else
         {
-            for (int i = enabledMidiInputs.size(); --i >= 0;)
-                if (enabledMidiInputs[i]->getName() == name)
-                    enabledMidiInputs.remove (i);
+            if (auto* holder = getMidiInput (name, false))
+                holder->active = false;
         }
 
         sendChangeMessage();
@@ -146,24 +183,25 @@ void MidiEngine::setMidiInputEnabled (const String& name, const bool enabled)
 
 bool MidiEngine::isMidiInputEnabled (const String& name) const
 {
-    for (auto* mi : enabledMidiInputs)
-        if (mi->getName() == name)
+    for (auto* mi : openMidiInputs)
+        if (mi->input != nullptr && mi->input->getName() == name && mi->active)
             return true;
 
     return false;
 }
 
-void MidiEngine::addMidiInputCallback (const String& name, MidiInputCallback* callbackToAdd)
+void MidiEngine::addMidiInputCallback (const String& name, MidiInputCallback* callbackToAdd, bool consumer)
 {
     removeMidiInputCallback (name, callbackToAdd);
 
-    if (name.isEmpty() || isMidiInputEnabled (name))
+    if (name.isEmpty() || isMidiInputEnabled (name) || consumer)
     {
-        const ScopedLock sl (midiCallbackLock);
-
         MidiCallbackInfo mc;
         mc.deviceName = name;
         mc.callback = callbackToAdd;
+        mc.consumer = consumer;
+
+        const ScopedLock sl (midiCallbackLock);
         midiCallbacks.add (mc);
     }
 }
@@ -172,7 +210,7 @@ void MidiEngine::removeMidiInputCallback (const String& name, MidiInputCallback*
 {
     for (int i = midiCallbacks.size(); --i >= 0;)
     {
-        auto& mc = midiCallbacks.getReference(i);
+        auto& mc = midiCallbacks.getReference (i);
 
         if (mc.callback == callbackToRemove && mc.deviceName == name)
         {
