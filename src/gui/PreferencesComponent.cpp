@@ -576,6 +576,7 @@ namespace Element {
         MidiSettingsPage (Globals& g)
             : devices (g.getDeviceManager()),
               settings (g.getSettings()),
+              midi (g.getMidiEngine()),
               world (g)
         {
             addAndMakeVisible (midiOutputLabel);
@@ -668,7 +669,7 @@ namespace Element {
         {
             const auto name = outputs [midiOutput.getSelectedId() - 10];
             if (box == &midiOutput)
-                devices.setDefaultMidiOutput (name);
+                midi.setDefaultMidiOutput (name);
         }
 
         void changeListenerCallback (ChangeBroadcaster*) override
@@ -682,6 +683,7 @@ namespace Element {
     private:
         DeviceManager& devices;
         Settings& settings;
+        MidiEngine& midi;
         Globals& world;
 
         Label midiOutputLabel;
@@ -777,14 +779,14 @@ namespace Element {
             {
                 if (midiInputs.contains (dynamic_cast<SettingButton*> (btn)))
                 {
-                    owner.devices.setMidiInputEnabled (btn->getName(), btn->getToggleState());
+                    owner.midi.setMidiInputEnabled (btn->getName(), btn->getToggleState());
                 }
             }
 
             void updateSelection()
             {
                 for (auto* input : midiInputs)
-                    input->setToggleState (owner.devices.isMidiInputEnabled(input->getName()), dontSendNotification);
+                    input->setToggleState (owner.midi.isMidiInputEnabled(input->getName()), dontSendNotification);
             }
 
         private:
@@ -824,7 +826,7 @@ namespace Element {
 
         void updateOutputSelection()
         {
-            if (auto* out = devices.getDefaultMidiOutput())
+            if (auto* out = midi.getDefaultMidiOutput())
                 midiOutput.setSelectedId (10 + outputs.indexOf (out->getName()));
             else
                 midiOutput.setSelectedId (1);

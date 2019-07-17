@@ -8,6 +8,7 @@
 #include "ElementApp.h"
 #include "engine/AudioEngine.h"
 #include "engine/MappingEngine.h"
+#include "engine/MidiEngine.h"
 #include "session/Session.h"
 #include "URIs.h"
 #include "WorldBase.h"
@@ -44,6 +45,7 @@ public:
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
     MappingEngine& getMappingEngine();
+    MidiEngine& getMidiEngine();
     PluginManager& getPluginManager();
     PresetCollection& getPresetCollection();
     Settings& getSettings();

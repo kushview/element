@@ -56,6 +56,7 @@ public:
     ScopedPointer<UnlockStatus>   unlock;
     std::unique_ptr<MappingEngine> mapping;
     std::unique_ptr<PresetCollection> presets;
+    std::unique_ptr<MidiEngine>   midi;
    #if !ELEMENT_LV2_PLUGIN_HOST
     ScopedPointer<SymbolMap>      symbols;
    #endif
@@ -75,6 +76,7 @@ private:
         unlock   = new UnlockStatus (owner);
         session  = new Session();
         mapping.reset (new MappingEngine());
+        midi.reset (new MidiEngine());
         presets.reset (new PresetCollection());
     }
     
@@ -88,6 +90,7 @@ private:
         session  = nullptr;
         media    = nullptr;
         devices  = nullptr;
+        midi     = nullptr;
         presets  = nullptr;
     }
 };
@@ -122,6 +125,12 @@ MappingEngine& Globals::getMappingEngine()
 {
     jassert (impl != nullptr && impl->mapping != nullptr);
     return *impl->mapping;
+}
+
+MidiEngine& Globals::getMidiEngine()
+{
+    jassert (impl != nullptr && impl->midi != nullptr);
+    return *impl->midi;
 }
 
 MediaManager& Globals::getMediaManager()

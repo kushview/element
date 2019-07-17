@@ -33,6 +33,7 @@ public:
     static const char* lastGraphKey;
     static const char* legacyInterfaceKey;
     static const char* workspaceKey;
+    static const char* midiEngineKey;
 
     XmlElement* getLastGraph() const;
     void setLastGraph (const ValueTree& data);

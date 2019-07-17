@@ -139,6 +139,8 @@ private:
 
         setupPlugins();
         setupKeyMappings();
+        setupAudioEngine();
+        setupMidiEngine();
 
         sendActionMessage ("finishedLaunching");
     }
@@ -146,6 +148,12 @@ private:
     void setupAudioEngine()
     {
 
+    }
+
+    void setupMidiEngine()
+    {
+        auto& midi = world.getMidiEngine();
+        midi.applySettings (world.getSettings());
     }
 
     void setupKeyMappings()
@@ -242,6 +250,7 @@ public:
         auto engine (world->getAudioEngine());
         auto& plugins (world->getPluginManager());
         auto& settings (world->getSettings());
+        auto& midi (world->getMidiEngine());
         auto* props = settings.getUserSettings();
         plugins.setPropertiesFile (nullptr); // must be done before Settings is deleted
 
@@ -249,6 +258,8 @@ public:
         controller->deactivate();
         
         plugins.saveUserPlugins (settings);
+        midi.writeSettings (settings);
+        
         if (ScopedXml el = world->getDeviceManager().createStateXml())
             props->setValue ("devices", el);
         if (ScopedXml keymappings = world->getCommandManager().getKeyMappings()->createXml (true))

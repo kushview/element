@@ -395,7 +395,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     {
         if (node.isChildOfRootGraph())
         {
-            return new MidiIONodeEditor (node, world->getDeviceManager(), true, false);
+            return new MidiIONodeEditor (node, world->getMidiEngine(), true, false);
 
         }
         else
@@ -408,7 +408,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     {
         if (node.isChildOfRootGraph())
         {
-            return new MidiIONodeEditor (node, world->getDeviceManager(), false, true);
+            return new MidiIONodeEditor (node, world->getMidiEngine(), false, true);
         }
         else
         {

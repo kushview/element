@@ -8,6 +8,7 @@
 #include "engine/InternalFormat.h"
 #include "engine/MidiClock.h"
 #include "engine/MidiChannelMap.h"
+#include "engine/MidiEngine.h"
 #include "engine/MidiTranspose.h"
 #include "engine/Transport.h"
 #include "session/UnlockStatus.h"
@@ -498,34 +499,37 @@ public:
         AudioSampleBuffer buffer (channels, totalNumChans, numSamples);
         processCurrentGraph (buffer, incomingMidi);
 
-        if (auto* const midiOut = engine.world.getDeviceManager().getDefaultMidiOutput())
         {
-           #if defined (EL_PRO)
-            if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
+            ScopedLock lockMidiOut (engine.world.getMidiEngine().getMidiOutputLock());
+            if (auto* const midiOut = engine.world.getMidiEngine().getDefaultMidiOutput())
             {
-                if (wasPlaying != transport.isPlaying())
+               #if defined (EL_PRO)
+                if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
                 {
-                    if (transport.isPlaying())
+                    if (wasPlaying != transport.isPlaying())
                     {
-                        incomingMidi.addEvent (transport.getPositionFrames() <= 0 
-                            ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                        if (transport.isPlaying())
+                        {
+                            incomingMidi.addEvent (transport.getPositionFrames() <= 0 
+                                ? MidiMessage::midiStart() : MidiMessage::midiContinue(), 0);
+                        }
+                        else
+                        {
+                            incomingMidi.addEvent (MidiMessage::midiStop(), 0);
+                        }
                     }
-                    else
-                    {
-                        incomingMidi.addEvent (MidiMessage::midiStop(), 0);
-                    }
+
+                    midiClockMaster.setTempo (transport.getTempo());
+                    midiClockMaster.render (incomingMidi, numSamples);
                 }
+               #endif
 
-                midiClockMaster.setTempo (transport.getTempo());
-                midiClockMaster.render (incomingMidi, numSamples);
-            }
-           #endif
-
-            const double delayMs = 6.0;
-            if (! incomingMidi.isEmpty())
-            {
-                midiIOMonitor->sent();
-                midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
+                const double delayMs = 6.0;
+                if (! incomingMidi.isEmpty())
+                {
+                    midiIOMonitor->sent();
+                    midiOut->sendBlockOfMessages (incomingMidi, delayMs + Time::getMillisecondCounterHiRes(), sampleRate);
+                }
             }
         }
         
@@ -597,10 +601,6 @@ public:
         const int numChansIn       = device->getActiveInputChannels().countNumberOfSetBits();
         const int numChansOut      = device->getActiveOutputChannels().countNumberOfSetBits();
         audioAboutToStart (newSampleRate, newBlockSize, numChansIn, numChansOut);
-        
-        if (auto* midi = engine.world.getDeviceManager().getDefaultMidiOutput()) {
-            midi->startBackgroundThread();
-        }
     }
     
     void audioAboutToStart (const double newSampleRate, const int newBlockSize,
@@ -635,8 +635,6 @@ public:
     void audioDeviceStopped() override
     {
         audioStopped();
-        if (auto* midi = engine.world.getDeviceManager().getDefaultMidiOutput())
-            midi->stopBackgroundThread();
     }
     
     void audioStopped()
@@ -864,16 +862,16 @@ AudioEngine::~AudioEngine() noexcept
 void AudioEngine::activate()
 {
    #if ! EL_RUNNING_AS_PLUGIN
-    auto& devices (world.getDeviceManager());
-    devices.addMidiInputCallback (String(), &getMidiInputCallback());
+    auto& midi (world.getMidiEngine());
+    midi.addMidiInputCallback (String(), &getMidiInputCallback());
    #endif
 }
 
 void AudioEngine::deactivate()
 {
    #if ! EL_RUNNING_AS_PLUGIN
-    auto& devices (world.getDeviceManager());
-    devices.removeMidiInputCallback (String(), &getMidiInputCallback());
+    auto& midi (world.getMidiEngine());
+    midi.removeMidiInputCallback (String(), &getMidiInputCallback());
    #endif
 }
 

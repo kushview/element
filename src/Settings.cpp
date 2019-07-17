@@ -24,6 +24,7 @@ const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhen
 const char* Settings::lastGraphKey              = "lastGraph";
 const char* Settings::legacyInterfaceKey        = "legacyInterface";
 const char* Settings::workspaceKey              = "workspace";
+const char* Settings::midiEngineKey             = "midiEngine";
 
 enum OptionsMenuItemId
 {
@@ -307,7 +308,8 @@ File Settings::getWorkspaceFile() const
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 {
-    DeviceManager& devices (world.getDeviceManager());
+    auto& devices (world.getDeviceManager());
+    auto& midi (world.getMidiEngine());
     PopupMenu sub;
 
     sub.addItem (CheckForUpdatesOnStart, "Check Updates at Startup", 
@@ -345,13 +347,13 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
     int index = 0; sub.clear();
     for (const auto& device : MidiInput::getDevices())
         sub.addItem (MidiInputDevice + index++, device, true, 
-            devices.isMidiInputEnabled (device));
+            midi.isMidiInputEnabled (device));
     menu.addSubMenu ("MIDI Input Devices", sub);
 
     index = 0; sub.clear();
     for (const auto& device : MidiOutput::getDevices())
         sub.addItem (MidiOutputDevice + index++, device, true, 
-            device == devices.getDefaultMidiOutputName());
+            device == midi.getDefaultMidiOutputName());
     menu.addSubMenu ("MIDI Ouptut Device", sub);
 
     if (auto* type = devices.getCurrentDeviceTypeObject())
@@ -396,6 +398,7 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 bool Settings::performMenuResult (Globals& world, const int result)
 {
     auto& devices (world.getDeviceManager());
+    auto& midi (world.getMidiEngine());
     bool handled = true;
 
     switch (result)
@@ -422,16 +425,16 @@ bool Settings::performMenuResult (Globals& world, const int result)
         // MIDI input device
         const auto device = MidiInput::getDevices()[result - MidiInputDevice];
         if (device.isNotEmpty())
-            devices.setMidiInputEnabled (device, ! devices.isMidiInputEnabled (device));
+            midi.setMidiInputEnabled (device, ! midi.isMidiInputEnabled (device));
     }
     else if (settingResultIsFor (result, MidiOutputDevice))
     {
         // MIDI Output device
         const auto device = MidiOutput::getDevices()[result - MidiOutputDevice];
-        if (device.isNotEmpty() && device == devices.getDefaultMidiOutputName())
-            devices.setDefaultMidiOutput ({});
+        if (device.isNotEmpty() && device == midi.getDefaultMidiOutputName())
+            midi.setDefaultMidiOutput ({});
         else if (device.isNotEmpty())
-            devices.setDefaultMidiOutput (device);
+            midi.setDefaultMidiOutput (device);
     }
     else if (settingResultIsFor (result, AudioInputDevice))
     {

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "engine/MidiEngine.h"
 #include "gui/nodes/NodeEditorComponent.h"
-#include "session/DeviceManager.h"
 
 namespace Element {
 
@@ -9,22 +9,22 @@ class MidiIONodeEditor : public NodeEditorComponent,
                          public ChangeListener
 {
 public:
-    MidiIONodeEditor (const Node& node, DeviceManager& devs, bool ins = true, bool outs = true)
-        : NodeEditorComponent (node), devices (devs), showIns(ins), showOuts(outs)
+    MidiIONodeEditor (const Node& node, MidiEngine& engine, bool ins = true, bool outs = true)
+        : NodeEditorComponent (node), midi (engine), showIns (ins), showOuts (outs)
     {
        #if ! EL_RUNNING_AS_PLUGIN
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
         view.setScrollBarsShown (true, false);
         addAndMakeVisible (view);
-        devices.addChangeListener (this);
+        midi.addChangeListener (this);
        #endif
     }
 
     ~MidiIONodeEditor()
     {
        #if ! EL_RUNNING_AS_PLUGIN
-        devices.removeChangeListener (this);
+        midi.removeChangeListener (this);
         view.setViewedComponent (nullptr, false);
         content.reset();
        #endif
@@ -81,7 +81,7 @@ public:
     }
 
 private:
-    DeviceManager& devices;
+    MidiEngine& midi;
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
@@ -105,11 +105,11 @@ private:
                     auto index = midiOutputs.getSelectedItemIndex();
                     if (index == 0)
                     {
-                        owner.devices.setDefaultMidiOutput (String());
+                        owner.midi.setDefaultMidiOutput (String());
                     }
                     else if (index > 0)
                     {
-                        owner.devices.setDefaultMidiOutput (midiOutputs.getItemText (index));
+                        owner.midi.setDefaultMidiOutput (midiOutputs.getItemText (index));
                     }
                 };
             }
@@ -159,7 +159,7 @@ private:
             for (const auto& name : MidiInput::getDevices())
             {
                 auto* toggle = midiInputs.add (new ToggleButton (name));
-                toggle->setToggleState (owner.devices.isMidiInputEnabled (name), dontSendNotification);
+                toggle->setToggleState (owner.midi.isMidiInputEnabled (name), dontSendNotification);
                 toggle->addListener (this);
                 addAndMakeVisible (toggle);
             }
@@ -175,7 +175,7 @@ private:
                 midiOutputs.addItem (name, itemId++);
             }
 
-            auto outName = owner.devices.getDefaultMidiOutputName();
+            auto outName = owner.midi.getDefaultMidiOutputName();
             if (outName.isEmpty())
             {
                 midiOutputs.setSelectedItemIndex (0, dontSendNotification);
@@ -194,7 +194,7 @@ private:
 
         void buttonClicked (Button* button) override
         {
-            owner.devices.setMidiInputEnabled (button->getButtonText(), button->getToggleState());
+            owner.midi.setMidiInputEnabled (button->getButtonText(), button->getToggleState());
         }
 
         void resized() override
