@@ -59,6 +59,7 @@ public:
         height = jmax (h, (int) 1);
     }
 
+    inline float getFontSize() const { return fontSize; }
     inline void setFontSize (float newSize)
     {
         fontSize = jlimit (9.f, 72.f, newSize);
@@ -78,7 +79,7 @@ public:
 
         clear();
 
-        fontSize = (float) tree.getProperty ("fontSize", 15.f);
+        fontSize = jlimit (9.f, 72.f, (float) tree.getProperty ("fontSize", 15.f));
         
         for (int i = 0; i < tree.getNumChildren(); ++i)
         {

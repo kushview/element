@@ -23,12 +23,12 @@ public:
     void sendProgram (int);
 
     float getFontSize() const { return fontSize; }
-    void setFontSize (float newSize);
+    void setFontSize (float newSize, bool updateNode = true);
 
     void selectRow (int row);
     void setStoreSize (const bool storeSize);
 
-    inline void changeListenerCallback (ChangeBroadcaster*) override { table.updateContent(); }
+    void changeListenerCallback (ChangeBroadcaster*) override;
     
     bool keyPressed (const KeyPress&) override;
     
@@ -39,6 +39,7 @@ private:
     TableListBox table;
     TextButton addButton;
     TextButton delButton;
+    Slider fontSlider;
     bool storeSizeInNode = true;
     float fontSize = 15.f;
     SignalConnection lastProgramChangeConnection;

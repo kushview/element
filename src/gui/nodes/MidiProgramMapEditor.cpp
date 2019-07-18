@@ -210,7 +210,7 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 {
     addAndMakeVisible (table);
     table.setHeaderHeight (22);
-    setFontSize (15.f);
+    setFontSize (15.f, false);
 
     auto& header = table.getHeader();
     const int flags = TableHeaderComponent::visible;
@@ -230,9 +230,22 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
     addAndMakeVisible (delButton);
     delButton.setButtonText ("-");
     delButton.onClick = std::bind (&MidiProgramMapEditor::removeSelectedProgram, this);
+    
+    addAndMakeVisible (fontSlider);
+    fontSlider.setSliderStyle (Slider::LinearBar);
+    fontSlider.setRange (9.0, 72.0, 1.0);
+    fontSlider.setValue (fontSize);
+    fontSlider.onValueChange = [this]() {
+        fontSize = fontSlider.getValue();
+        setFontSize (fontSize);
+    };
+    fontSlider.onDragEnd = [this]() {
+        setFontSize (fontSize);
+    };
 
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
+        setFontSize (node->getFontSize(), false);
         setSize (node->getWidth(), node->getHeight());
         lastProgramChangeConnection = node->lastProgramChanged.connect (
             std::bind (&MidiProgramMapEditor::selectLastProgram, this));
@@ -255,23 +268,41 @@ MidiProgramMapEditor::~MidiProgramMapEditor()
     model.reset();
 }
 
-void MidiProgramMapEditor::setFontSize (float newSize)
+void MidiProgramMapEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
+    {
+        if (isRunningInPluginWindow())
+        {
+            setFontSize (node->getFontSize(), false);
+        }
+    }
+
+    table.updateContent();
+}
+
+void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)
 {
     float defaultSize = 15.f;
     fontSize = jlimit (9.f, 72.f, newSize);
     
     if (isRunningInPluginWindow())
     {
-        table.setRowHeight (6 + static_cast<int> (1.125 * newSize));
+        table.setRowHeight (6 + static_cast<int> (1.125 * fontSize));
     }
     else
     {
         table.setRowHeight (6 + static_cast<int> (1.125 * defaultSize));
     }
 
+    if ((double) fontSize != fontSlider.getValue())
+        fontSlider.setValue (fontSize, dontSendNotification);
+    
     table.updateContent();
-    if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
-        node->setFontSize (fontSize);
+
+    if (updateNode)
+        if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
+            node->setFontSize (fontSize);
 }
 
 bool MidiProgramMapEditor::keyPressed (const KeyPress& press)
@@ -397,6 +428,9 @@ void MidiProgramMapEditor::resized()
     delButton.setBounds (r2.removeFromRight (20));
     r2.removeFromRight (2);
     addButton.setBounds (r2.removeFromRight (20));
+    r2.removeFromRight (2);
+    r2.removeFromLeft (2);
+    fontSlider.setBounds (r2);
 
     table.setBounds (r.reduced (2));
     auto& header = table.getHeader();
