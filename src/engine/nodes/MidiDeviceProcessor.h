@@ -4,11 +4,13 @@
 
 namespace Element {
 
+class MidiEngine;
+
 class MidiDeviceProcessor : public BaseProcessor,
                             public MidiInputCallback
 {
 public:
-    explicit MidiDeviceProcessor (const bool isInput = true);
+    explicit MidiDeviceProcessor (const bool isInput, MidiEngine&);
     ~MidiDeviceProcessor() noexcept;
 
     void fillInPluginDescription (PluginDescription& desc) const override
@@ -61,7 +63,6 @@ public:
     const String getProgramName (int index)     override { ignoreUnused (index); return String(); }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
-
     void handleIncomingMidiMessage (MidiInput* source,
                                     const MidiMessage& message) override;
 
@@ -110,6 +111,7 @@ protected:
     
 private:
     const bool inputDevice;
+    MidiEngine& midi;
     bool prepared = false;
     String deviceName;
     ScopedPointer<MidiInput> input;

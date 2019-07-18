@@ -37,7 +37,7 @@ GraphNode::~GraphNode()
 
 bool GraphNode::isSpecialParameter (int parameter)
 {
-    return parameter >= SpecialParameterBegin && parameter < SpecialParameterBegin;
+    return parameter >= SpecialParameterBegin && parameter < SpecialParameterEnd;
 }
 
 String GraphNode::getSpecialParameterName (int parameter)

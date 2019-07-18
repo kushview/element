@@ -53,7 +53,7 @@ protected:
         world->setEngine (new AudioEngine (*world));
         world->getPluginManager().addDefaultFormats();
         world->getPluginManager().addFormat (new ElementAudioPluginFormat (*world));
-        world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine()));
+        world->getPluginManager().addFormat (new InternalFormat (*world->getAudioEngine(), world->getMidiEngine()));
         app.reset (new AppController (*world));
         app->activate();
         auto& settings = getWorld().getSettings();

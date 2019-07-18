@@ -177,7 +177,7 @@ private:
         auto  engine   (world.getAudioEngine());
         
         plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine));
+        plugins.addFormat (new InternalFormat (*engine, world.getMidiEngine()));
         plugins.addFormat (new ElementAudioPluginFormat (world));
         plugins.restoreUserPlugins (settings);
         plugins.setPropertiesFile (settings.getUserSettings());

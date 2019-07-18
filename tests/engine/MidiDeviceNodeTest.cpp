@@ -21,6 +21,7 @@ public:
 
     void initialise() override
     {
+        initializeWorld();
         graph.reset (new GraphProcessor());
         graph->prepareToPlay (44100.f, 1024);
     }
@@ -29,13 +30,14 @@ public:
     {
         graph->releaseResources();
         graph.reset (nullptr);
+        shutdownWorld();
     }
 
     void runTest() override
     {
         beginTest ("Processor Channels");
         std::unique_ptr<MidiDeviceProcessor> proc;
-        proc.reset (new MidiDeviceProcessor (true));
+        proc.reset (new MidiDeviceProcessor (true, getWorld().getMidiEngine()));
         expect (proc->getTotalNumInputChannels() == 0 &&
                 proc->getTotalNumOutputChannels() == 0 &&
                 proc->acceptsMidi() == false &&

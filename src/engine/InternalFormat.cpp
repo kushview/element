@@ -34,8 +34,8 @@ namespace Element {
 
 typedef GraphProcessor::AudioGraphIOProcessor IOP;
 
-InternalFormat::InternalFormat (AudioEngine& e)
-    : engine (e)
+InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
+    : engine (e), midi (me)
 {
     {
         IOP p (IOP::audioOutputNode);
@@ -62,9 +62,9 @@ InternalFormat::InternalFormat (AudioEngine& e)
         p.fillInPluginDescription (placeholderDesc);
     }
     {
-        MidiDeviceProcessor in (true);
+        MidiDeviceProcessor in (true, midi);
         in.fillInPluginDescription (midiInputDeviceDesc);
-        MidiDeviceProcessor out (false);
+        MidiDeviceProcessor out (false, midi);
         out.fillInPluginDescription (midiOutputDeviceDesc);
     }
     #endif
@@ -92,11 +92,11 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
    #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == "element.midiInputDevice")
     {
-        return new MidiDeviceProcessor (true);
+        return new MidiDeviceProcessor (true, midi);
     }
     else if (desc.fileOrIdentifier == "element.midiOutputDevice")
     {
-        return new MidiDeviceProcessor (false);
+        return new MidiDeviceProcessor (false, midi);
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
     {

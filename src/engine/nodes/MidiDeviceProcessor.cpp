@@ -1,5 +1,6 @@
 
 #include "engine/nodes/MidiDeviceProcessor.h"
+#include "engine/MidiEngine.h"
 #include "gui/LookAndFeel.h"
 
 namespace Element {
@@ -91,10 +92,11 @@ private:
     }
 };
 
-MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput)
+MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
     : BaseProcessor(),
-      inputDevice (isInput)
-{ 
+      inputDevice (isInput),
+      midi (me)
+{
     setPlayConfigDetails (0, 0, 44100.0, 1024);
 }
 
@@ -122,7 +124,7 @@ void MidiDeviceProcessor::setCurrentDevice (const String& device)
 bool MidiDeviceProcessor::isDeviceOpen() const
 {
     ScopedLock sl (getCallbackLock());
-    return inputDevice ? input != nullptr : output != nullptr;
+    return inputDevice ? deviceName.isNotEmpty() : output != nullptr;
 }
 
 void MidiDeviceProcessor::reload()
@@ -132,12 +134,7 @@ void MidiDeviceProcessor::reload()
 
 const String MidiDeviceProcessor::getName() const
 {
-    String name;
-    if (isInputDevice() && input != nullptr)
-        name = input->getName();
-    if (isOutputDevice() && output != nullptr)
-        name = output->getName();
-    return name.isNotEmpty() ? name : "N/A";
+    return deviceName;
 }
 
 void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock)
@@ -153,8 +150,8 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
 
     if (inputDevice)
     {
-        input = MidiInput::openDevice (deviceIdx, this);
-        if (input) input->start();
+        if (deviceName.isNotEmpty())
+            midi.addMidiInputCallback (deviceName, this, true);
     }
     else
     {
@@ -199,11 +196,14 @@ void MidiDeviceProcessor::releaseResources()
 {
     prepared = false;
     inputMessages.reset (getSampleRate());
+    midi.removeMidiInputCallback (this);
+
     if (input)
     {
         input->stop();
         input = nullptr;
     }
+
     if (output)
     {
         output->stopBackgroundThread();
@@ -238,12 +238,12 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
     {
         DBG("[EL] MIDI Device node wrong direction");
     }
-    setCurrentDevice (state.getProperty("deviceName", "").toString());
+    setCurrentDevice (state.getProperty ("deviceName", "").toString());
 }
 
 void MidiDeviceProcessor::handleIncomingMidiMessage (MidiInput* source, const MidiMessage& message)
 {
-    if (input == nullptr || input != source)
+    if (message.isActiveSense())
         return;
     inputMessages.addMessageToQueue (message);
 }

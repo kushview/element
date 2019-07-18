@@ -115,6 +115,9 @@ public:
 
             case Parameter:
             {
+                text = "Parameter ";
+                text << mapp.getParameterIndex();
+                
                 if (GraphNode::isSpecialParameter (mapp.getParameterIndex()))
                 {
                     text = GraphNode::getSpecialParameterName (mapp.getParameterIndex());
