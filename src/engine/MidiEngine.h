@@ -62,6 +62,8 @@ public:
     void removeMidiInputCallback (const String& midiInputDeviceName,
                                   MidiInputCallback* callback);
 
+    void removeMidiInputCallback (MidiInputCallback* callback);
+
     //==============================================================================
     /** Sets a midi output device to use as the default.
 

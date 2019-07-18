@@ -260,6 +260,7 @@ void MappingController::learn (const bool shouldLearn)
 
     if (shouldLearn)
     {
+        DBG("[EL] MappingController: start learning");
         impl->learnState = CaptureParameter;
         capture.addNodes (getWorld().getSession());
     }
@@ -271,6 +272,7 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
 
     if (impl->learnState == CaptureParameter)
     {
+        DBG("[EL] MappingController: got parameter: " << parameter);
         auto& mapping (getWorld().getMappingEngine());
         impl->learnState = CaptureControl;
         impl->node = node;
@@ -294,6 +296,9 @@ void MappingController::onControlCaptured()
         impl->learnState = CaptureStopped;
         impl->message = mapping.getCapturedMidiMessage();
         impl->control = mapping.getCapturedControl();
+
+        DBG("[EL] MappingController: got control: " << impl->control.getName().toString());
+
         if (impl->isCaptureComplete())
         {
             if (mapping.addHandler (impl->control, impl->node, impl->parameter))

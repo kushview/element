@@ -443,7 +443,7 @@ public:
     bool close()
     {
         const auto deviceName = controllerDevice.getInputDevice().toString();
-        midi.removeMidiInputCallback (deviceName, this);
+        midi.removeMidiInputCallback (this);
         return true;
     }
 
@@ -468,7 +468,7 @@ public:
         }
 
         const auto deviceName = controllerDevice.getInputDevice().toString();
-        midi.addMidiInputCallback (deviceName, this);
+        midi.addMidiInputCallback (deviceName, this, true);
         
         return true;
     }
@@ -610,7 +610,7 @@ bool MappingEngine::addInput (const ControllerDevice& controller, MidiEngine& mi
     std::unique_ptr<ControllerMapInput> input;
     input.reset (new ControllerMapInput (*this, midi, controller));
 
-    // DBG("[EL] added input for " << controller.getName().toString());
+    DBG("[EL] MappingEngine: added input handler for controller: " << controller.getName().toString());
     return inputs->add (input.release());
 }
 

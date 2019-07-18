@@ -220,6 +220,20 @@ void MidiEngine::removeMidiInputCallback (const String& name, MidiInputCallback*
     }
 }
 
+void MidiEngine::removeMidiInputCallback (MidiInputCallback* callbackToRemove)
+{
+    for (int i = midiCallbacks.size(); --i >= 0;)
+    {
+        auto& mc = midiCallbacks.getReference (i);
+
+        if (mc.callback == callbackToRemove)
+        {
+            const ScopedLock sl (midiCallbackLock);
+            midiCallbacks.remove (i);
+        }
+    }
+}
+
 void MidiEngine::handleIncomingMidiMessageInt (MidiInput* source, const MidiMessage& message)
 {
     if (! message.isActiveSense())
