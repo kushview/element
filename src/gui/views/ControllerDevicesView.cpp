@@ -813,6 +813,7 @@ public:
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
+       #if ! EL_RUNNING_AS_PLUGIN
         StringArray keys = MidiInput::getDevices();
         Array<var> values;
         for (const auto& d : keys)
@@ -827,10 +828,24 @@ public:
             keys.add (inputDeviceVar.toString()); 
             values.add (inputDeviceVar);
         }
-
         inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
-        props.add (new ChoicePropertyComponent (editedDevice.getPropertyAsValue ("inputDevice"),
-            "Input Device", keys, values));
+       
+       #else
+        StringArray keys; keys.add ("Host MIDI");
+        Array<var> values; values.add (String ("hostMidi"));
+        inputDevice = Value();
+        inputDevice.setValue ("hostMidi");
+       #endif
+        
+        props.add (new ChoicePropertyComponent (inputDevice, "Input Device", keys, values));
+
+       #if EL_RUNNING_AS_PLUGIN
+        if (auto* inputDeviceProp = dynamic_cast<ChoicePropertyComponent*> (props.getLast()))
+        {
+            inputDeviceProp->refresh();
+            inputDeviceProp->setEnabled (false);
+        }
+       #endif
 
         auto control = controls.getSelectedControl();
 

@@ -246,6 +246,25 @@ void MidiEngine::handleIncomingMidiMessageInt (MidiInput* source, const MidiMess
     }
 }
 
+void MidiEngine::processMidiBuffer (const MidiBuffer& buffer, int nframes, double sampleRate)
+{
+    MidiBuffer::Iterator iter (buffer);
+    MidiMessage message; int frame = 0;
+    const double timeNow = 1.5 + Time::getMillisecondCounterHiRes();
+    
+    const ScopedLock sl (midiCallbackLock);
+
+    while (iter.getNextEvent (message, frame))
+    {
+        if (frame >= nframes)
+            break;
+        
+        message.setTimeStamp (timeNow + (1000.0 * (static_cast<double> (frame) / sampleRate)));
+        for (auto& mc : midiCallbacks)
+            mc.callback->handleIncomingMidiMessage (nullptr, message);
+    }
+}
+
 //==============================================================================
 void MidiEngine::setDefaultMidiOutput (const String& deviceName)
 {
@@ -260,7 +279,7 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
         {
             newMidiOut->startBackgroundThread();
             {
-                ScopedLock sl (getMidiOutputLock());
+                ScopedLock sl (midiOutputLock);
                 defaultMidiOutput.swap (newMidiOut);
             }
 

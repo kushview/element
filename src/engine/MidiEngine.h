@@ -62,6 +62,9 @@ public:
     void removeMidiInputCallback (const String& midiInputDeviceName,
                                   MidiInputCallback* callback);
 
+    /** Removes a listener that was previously registered with addMidiInputCallback().
+        This version does not check device name.
+     */
     void removeMidiInputCallback (MidiInputCallback* callback);
 
     //==============================================================================
@@ -90,7 +93,9 @@ public:
     */
     MidiOutput* getDefaultMidiOutput() const noexcept               { return defaultMidiOutput.get(); }
 
-    CriticalSection& getMidiOutputLock() { return midiCallbackLock; }
+    void processMidiBuffer (const MidiBuffer& buffer, int nframes, double sampleRate);
+
+    CriticalSection& getMidiOutputLock() { return midiOutputLock; }
 
 private:
     struct MidiCallbackInfo
@@ -126,7 +131,7 @@ private:
 
     String defaultMidiOutputName;
     std::unique_ptr<MidiOutput> defaultMidiOutput;
-    CriticalSection audioCallbackLock, midiCallbackLock;
+    CriticalSection audioCallbackLock, midiCallbackLock, midiOutputLock;
 
     class CallbackHandler;
     std::unique_ptr<CallbackHandler> callbackHandler;

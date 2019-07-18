@@ -166,6 +166,8 @@
               file="../src/engine/MidiChannelMap.h"/>
         <FILE id="IjKEB7" name="MidiClock.cpp" compile="1" resource="0" file="../src/engine/MidiClock.cpp"/>
         <FILE id="MoQf1b" name="MidiClock.h" compile="0" resource="0" file="../src/engine/MidiClock.h"/>
+        <FILE id="bNDR26" name="MidiEngine.cpp" compile="1" resource="0" file="../src/engine/MidiEngine.cpp"/>
+        <FILE id="PBixoQ" name="MidiEngine.h" compile="0" resource="0" file="../src/engine/MidiEngine.h"/>
         <FILE id="pxaTlc" name="MidiIOMonitor.h" compile="0" resource="0" file="../src/engine/MidiIOMonitor.h"/>
         <FILE id="aL5qTA" name="MidiPipe.cpp" compile="1" resource="0" file="../src/engine/MidiPipe.cpp"/>
         <FILE id="QMxnQK" name="MidiPipe.h" compile="0" resource="0" file="../src/engine/MidiPipe.h"/>

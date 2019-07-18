@@ -992,7 +992,12 @@ void AudioEngine::prepareExternalPlayback (const double sampleRate, const int bl
 void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer& midi)
 {
     if (priv)
+    {
+       #if EL_RUNNING_AS_PLUGIN
+        world.getMidiEngine().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
+       #endif
         priv->processCurrentGraph (buffer, midi);
+    }
 }
 
 bool AudioEngine::isUsingExternalClock() const {
