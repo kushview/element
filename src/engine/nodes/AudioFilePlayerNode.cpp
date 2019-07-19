@@ -203,7 +203,6 @@ private:
         {
             int index = AudioFilePlayerNode::Looping;
             processor.setLooping (! processor.isLooping());
-            DBG("LOOP: " << (int) processor.isLooping());
             stabilizeComponents();
         };
 

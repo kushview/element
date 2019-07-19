@@ -391,7 +391,6 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showSessionConfig, "Session Properties");
-    menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
@@ -406,8 +405,6 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::toggleChannelStrip, "Channel Strip");
    #endif
     menu.addCommandItem (&cmd, Commands::toggleVirtualKeyboard, "Virtual Keyboard");
-    menu.addSeparator();
-    menu.addCommandItem (&cmd, Commands::showGraphConfig, "Graph Properties");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showPluginManager, "Plugin Manager");
     menu.addCommandItem (&cmd, Commands::showKeymapEditor, "Key Mappings");
