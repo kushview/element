@@ -38,9 +38,6 @@ private:
 
         std::function<void(const MouseEvent&)> onDoubleClicked;
     };
-
-    Label nameLabel;
-    TextEditor nameEditor;
     
     SignalLabel keyLowLabel;
     Slider keyLowSlider;

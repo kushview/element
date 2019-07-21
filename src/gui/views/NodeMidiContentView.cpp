@@ -18,11 +18,6 @@ namespace Element {
         setWantsKeyboardFocus (false);
         setMouseClickGrabsKeyboardFocus (false);
         setInterceptsMouseClicks (true, true);
-
-        addAndMakeVisible (nameLabel);
-        nameLabel.setText ("Name", dontSendNotification);
-        nameLabel.setFont (font);
-        addAndMakeVisible (nameEditor);
         
         addAndMakeVisible (transposeLabel);
         transposeLabel.setText ("Transpose", dontSendNotification);
@@ -200,7 +195,7 @@ namespace Element {
 
         r.removeFromTop (4);
         r.removeFromRight (4);
-        layoutComponent (r, nameLabel, nameEditor);
+        
         layoutComponent (r, midiChannelLabel, midiChannel, 
                          midiChannel.getSuggestedHeight (r.getWidth()));
        #if defined (EL_PRO) || defined (EL_SOLO)
@@ -241,7 +236,6 @@ namespace Element {
         if (node.isValid() && ! node.isIONode())
         {
             setEnabled (true);
-            nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
             updateMidiChannels();
             updateSliders();
             updateMidiProgram();
@@ -256,16 +250,6 @@ namespace Element {
         }
         else
         {
-            if (node.isValid() && node.isIONode())
-            {
-                nameEditor.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-            }
-            else
-            {
-                nameEditor.getTextValue().referTo (Value());
-                nameEditor.setText (String(), false);
-            }
-            
             setEnabled (false);
         }
     }
