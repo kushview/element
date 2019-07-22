@@ -263,7 +263,7 @@ public:
         ioButton.addListener (this);
         ioButton.setVisible (elNodeCanChangeIO (node));
 
-        if (!node.isIONode() && !node.isGraph())
+        if (! node.isIONode() && ! node.isRootGraph())
         {
             addAndMakeVisible (powerButton);
             powerButton.setColour (SettingButton::backgroundOnColourId,
