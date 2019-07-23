@@ -570,7 +570,8 @@ namespace Element {
     class MidiSettingsPage : public SettingsPage,
                              public ComboBox::Listener,
                              public Button::Listener,
-                             public ChangeListener
+                             public ChangeListener,
+                             public Timer
     {
     public:
         MidiSettingsPage (Globals& g)
@@ -618,6 +619,7 @@ namespace Element {
 
             devices.addChangeListener (this);
             updateDevices();
+            startTimer (1 * 1000); // refresh if needed every 1 second
         }
 
         ~MidiSettingsPage()
@@ -625,6 +627,15 @@ namespace Element {
             devices.removeChangeListener (this);
             midiInputs = nullptr;
             midiOutput.removeListener (this);
+        }
+
+        void timerCallback() override
+        {
+            if ((midiInputs && midiInputs->getNumDevices() != MidiInput::getDevices().size()) ||
+                midiOutput.getNumItems() - 1 != MidiOutput::getDevices().size())
+            {
+                updateDevices();
+            }
         }
 
         void resized() override
@@ -701,6 +712,8 @@ namespace Element {
         public:
             MidiInputs (MidiSettingsPage& o)
                 : owner (o) { }
+
+            int getNumDevices() const { return midiInputs.size(); }
 
             void updateDevices()
             {

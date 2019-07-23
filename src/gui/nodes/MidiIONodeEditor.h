@@ -6,7 +6,8 @@
 namespace Element {
 
 class MidiIONodeEditor : public NodeEditorComponent,
-                         public ChangeListener
+                         public ChangeListener,
+                         private Timer
 {
 public:
     MidiIONodeEditor (const Node& node, MidiEngine& engine, bool ins = true, bool outs = true)
@@ -18,12 +19,14 @@ public:
         view.setScrollBarsShown (true, false);
         addAndMakeVisible (view);
         midi.addChangeListener (this);
+        startTimer (1.5 * 1000);
        #endif
     }
 
     ~MidiIONodeEditor()
     {
        #if ! EL_RUNNING_AS_PLUGIN
+        stopTimer();
         midi.removeChangeListener (this);
         view.setViewedComponent (nullptr, false);
         content.reset();
@@ -69,6 +72,7 @@ public:
     {
        #if ! EL_RUNNING_AS_PLUGIN
         content->updateDevices();
+        content->updateSize();
        #endif
     }
 
@@ -123,6 +127,7 @@ private:
             }
 
             updateDevices();
+            updateSize();
         }
         
         int computeHeight()
@@ -147,6 +152,10 @@ private:
                 updateInputs();
             if (owner.showOuts)
                 updateOutputs();
+        }
+
+        void updateSize()
+        {
             setSize (jmax (getWidth(), 150), computeHeight());
             resized();
         }
@@ -227,6 +236,22 @@ private:
     };
 
     std::unique_ptr<Content> content;
+
+    void timerCallback() override
+    {
+       #if ! EL_RUNNING_AS_PLUGIN
+        if (! content)
+            return;
+        bool didAnything = false;
+        if (showIns && content->midiInputs.size() != MidiInput::getDevices().size())
+            { content->updateInputs(); didAnything = true; }
+        if (showOuts && content->midiOutputs.getNumItems() - 1 != MidiOutput::getDevices().size())
+            { content->updateOutputs(); didAnything = true; }
+
+        if (didAnything)
+            content->updateSize();
+       #endif
+    }
 };
 
 }
