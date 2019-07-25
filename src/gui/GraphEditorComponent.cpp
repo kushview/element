@@ -383,8 +383,7 @@ public:
                 menu.addReplaceSubmenu (plugins);
                 menu.addSeparator();
                 menu.addOptionsSubmenu();
-                menu.addSeparator();
-                menu.addProgramsMenu();
+                
                 if (world)
                     menu.addPresetsMenu (world->getPresetCollection());
                 

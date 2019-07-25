@@ -187,7 +187,7 @@ namespace Element
             auto* const world = ViewHelpers::getGlobals (this);
 
             NodePopupMenu menu (node);
-            menu.addProgramsMenu();
+            
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
             
@@ -205,7 +205,7 @@ namespace Element
             auto* const world = ViewHelpers::getGlobals (this);
 
             NodePopupMenu menu (n, p);
-            menu.addProgramsMenu();
+            
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
             const int result = menu.show();

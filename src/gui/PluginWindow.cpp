@@ -144,8 +144,6 @@ public:
             NodePopupMenu& menu (callback->menu);
             menu.addSeparator();
             menu.addOptionsSubmenu();
-            menu.addSeparator();
-            menu.addProgramsMenu();
             if (world)
                 menu.addPresetsMenu (world->getPresetCollection());
             menu.show (0, 0, 0, 0, callback);

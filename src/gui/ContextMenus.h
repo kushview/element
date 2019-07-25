@@ -201,7 +201,7 @@ public:
         addSubMenu ("Replace", menu);
     }
 
-    inline void addProgramsMenu (const String& subMenuName = "Programs")
+    inline void addProgramsMenu (const String& subMenuName = "Factory Presets")
     {
         PopupMenu programs; getProgramsMenu (programs);
         addSubMenu (subMenuName, programs);
@@ -224,6 +224,13 @@ public:
         addItemInternal (menu, "Add Preset", new AddPresetOp (node));
         
         menu.addSeparator();
+
+        {
+            PopupMenu progs;
+            getProgramsMenu (progs);
+            menu.addSubMenu ("Factory Presets", progs);
+        }
+        
         if (format == "VST")
         {
             PopupMenu native;
