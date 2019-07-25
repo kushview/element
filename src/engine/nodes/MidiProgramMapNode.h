@@ -80,6 +80,8 @@ public:
         clear();
 
         fontSize = jlimit (9.f, 72.f, (float) tree.getProperty ("fontSize", 15.f));
+        width    = jmax (10, (int) tree.getProperty ("width", 360));
+        height   = jmax (10, (int) tree.getProperty ("height", 540));
         
         for (int i = 0; i < tree.getNumChildren(); ++i)
         {
@@ -102,7 +104,9 @@ public:
     void getState (MemoryBlock& block) override
     {
         ValueTree tree ("state");
-        tree.setProperty ("fontSize", fontSize, nullptr);
+        tree.setProperty ("fontSize", fontSize, nullptr)
+            .setProperty ("width", width, nullptr)
+            .setProperty ("height", height, nullptr);
         for (const auto* const entry : entries)
         {
             ValueTree e ("entry");
@@ -134,8 +138,8 @@ protected:
     MidiBuffer tempMidi;
     MidiBuffer toSendMidi;
 
-    int width = 230;
-    int height = 260;
+    int width = 360;
+    int height = 540;
     float fontSize = 15.f;
     int lastProgram = -1;
 

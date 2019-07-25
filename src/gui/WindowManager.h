@@ -156,7 +156,11 @@ public:
     {
         if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
-            return createPluginWindowFor (node, new MidiProgramMapEditor (node));
+            auto* const pgced = new MidiProgramMapEditor (node);
+            if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getGraphNode()))
+                pgced->setSize (object->getWidth(), object->getHeight());
+
+            return createPluginWindowFor (node, pgced);
         }
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
