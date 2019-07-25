@@ -283,7 +283,7 @@ void MidiProgramMapEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)
 {
-    float defaultSize = 15.f;
+    float defaultSize = getDefaultFontSize();
     fontSize = jlimit (9.f, 72.f, newSize);
     
     if (isRunningInPluginWindow())

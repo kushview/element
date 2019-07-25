@@ -9,6 +9,7 @@ class MidiProgramMapEditor : public NodeEditorComponent,
                              public ChangeListener
 {
 public:
+
     MidiProgramMapEditor (const Node& node);
     virtual ~MidiProgramMapEditor();
 
@@ -22,6 +23,7 @@ public:
     void setProgram (int, MidiProgramMapNode::ProgramEntry);
     void sendProgram (int);
 
+    float getDefaultFontSize() const { return 15.f; }
     float getFontSize() const { return fontSize; }
     void setFontSize (float newSize, bool updateNode = true);
 

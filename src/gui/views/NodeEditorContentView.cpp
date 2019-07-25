@@ -428,6 +428,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     {
         auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
         programChangeMapEditor->setStoreSize (false);
+        programChangeMapEditor->setFontSize (programChangeMapEditor->getDefaultFontSize(), false);
         return programChangeMapEditor;
     }
     else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
