@@ -312,7 +312,7 @@ void MappingController::onControlCaptured()
                 maps.addChild (newMap, -1, nullptr);
 
                 if (auto* gui = findSibling<GuiController>())
-                    gui->stabilizeContent();
+                    gui->stabilizeViews();
             }
         }
     }
