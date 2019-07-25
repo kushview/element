@@ -21,6 +21,7 @@
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
+#include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ActivationDialog.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
@@ -561,7 +562,7 @@ namespace Element {
         void resized() override { devs.setBounds (getLocalBounds()); }
 
     private:
-        AudioDeviceSelectorComponent devs;
+        Element::AudioDeviceSelectorComponent devs;
         DeviceManager& devices;
     };
 

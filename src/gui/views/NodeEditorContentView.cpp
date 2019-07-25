@@ -10,8 +10,8 @@
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/GenericNodeEditor.h"
 #include "gui/nodes/MidiIONodeEditor.h"
-
 #include "gui/views/NodeEditorContentView.h"
+#include "gui/widgets/AudioDeviceSelectorComponent.h"
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
@@ -360,7 +360,7 @@ Component* NodeEditorContentView::createEmbededEditor()
        #if ! EL_RUNNING_AS_PLUGIN
         if (node.isChildOfRootGraph())
         {
-            return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
+            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
                 1, DeviceManager::maxAudioChannels, 0, 0, 
                 false, false, false, false);
         }
@@ -378,7 +378,7 @@ Component* NodeEditorContentView::createEmbededEditor()
        #if ! EL_RUNNING_AS_PLUGIN
         if (node.isChildOfRootGraph())
         {
-            return new AudioDeviceSelectorComponent (world->getDeviceManager(), 
+            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
                 0, 0, 1, DeviceManager::maxAudioChannels, 
                 false, false, false, false);
         }
