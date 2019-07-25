@@ -441,7 +441,7 @@ void GraphManager::removeConnection (const int index)
 }
 
 void GraphManager::removeConnection (uint32 sourceNode, uint32 sourcePort,
-                                        uint32 destNode, uint32 destPort)
+                                     uint32 destNode, uint32 destPort)
 {
     if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
         processorArcsChanged();

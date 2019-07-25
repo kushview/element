@@ -145,8 +145,11 @@ public:
 
         if (node.isValid())
         {
-            nodeName.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-            nodeName.setTooltip (node.getName());
+            nodeName.setText (node.getDisplayName(), dontSendNotification);
+            String tooltip = node.getDisplayName();
+            if (node.hasDisplayName())
+                tooltip << " (" << node.getName() << ")";
+            nodeName.setTooltip (tooltip);
         }
 
         updateChannelStrip();

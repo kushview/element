@@ -35,7 +35,9 @@ public:
 
     /** Returns an audio processor if available */
     JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
-   
+    
+    String getName() const;
+    
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
 
