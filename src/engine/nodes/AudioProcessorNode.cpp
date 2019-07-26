@@ -51,6 +51,8 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     proc = processor;
     jassert (proc != nullptr);
     setLatencySamples (proc->getLatencySamples());
+    setName (proc->getName());
+    
     if (auto* instance = dynamic_cast<AudioPluginInstance*> (proc.get()))
     {
         setAudioProcessorNodePropertiesFrom (instance->getPluginDescription(), metadata);

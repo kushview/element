@@ -230,6 +230,10 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     setUsingNativeTitleBar (true);
     setSize (400, 300);
     
+    name = node.getPropertyAsValue (Tags::name);
+    name.addListener (this);
+    setName (node.getDisplayName());
+    
     if (node.isValid())
     {
         setTopLeftPosition (node.getValueTree().getProperty (Tags::windowX, Random::getSystemRandom().nextInt (500)),
@@ -267,6 +271,7 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
 
 PluginWindow::~PluginWindow()
 {
+    name.removeListener (this);
     clearContentComponent();
     setLookAndFeel (nullptr);
 }
@@ -302,7 +307,7 @@ void PluginWindow::resized()
     }
     else
     {
-        setName (node.getName());
+        setName (node.getDisplayName());
     }
 }
 

@@ -143,6 +143,13 @@ Node Node::createDefaultGraph (const String& name)
     return graph;
 }
 
+const String Node::getPluginName() const
+{
+    if (GraphNodePtr object = getGraphNode())
+        return object->getName();
+    return {};
+}
+
 bool Node::isProbablyGraphNode (const ValueTree& data)
 {
     return data.hasType (Tags::node) &&
@@ -302,6 +309,15 @@ ValueTree Node::getParentArcsNode() const
     
     jassert (arcs.hasType (Tags::node));
     return arcs.getOrCreateChildWithName (Tags::arcs, nullptr);
+}
+
+const String Node::getDisplayName() const
+{
+    String name = getName();
+    if (name.isEmpty())
+        name = getPluginName();
+    jassert (name.isNotEmpty());
+    return name;
 }
 
 void Node::getPluginDescription (PluginDescription& p) const

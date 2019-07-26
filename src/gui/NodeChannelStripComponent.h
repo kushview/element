@@ -11,7 +11,8 @@ namespace Element {
 
 class NodeChannelStripComponent : public Component,
                                   public Timer,
-                                  public ComboBox::Listener
+                                  public ComboBox::Listener,
+                                  private Value::Listener
 {
 public:
     std::function<void()> onNodeChanged;
@@ -24,6 +25,11 @@ public:
         nodeName.setJustificationType (Justification::centredBottom);
         nodeName.setEditable (false, true, false);
         nodeName.setFont (10.f);
+        nodeName.onTextChange = [this]
+        {
+            if (node.isValid())
+                node.setProperty (Tags::name, nodeName.getText());
+        };
 
         addAndMakeVisible (channelBox);
         channelBox.setJustificationType (Justification::centred);
@@ -50,6 +56,7 @@ public:
     void bindSignals()
     {
         unbindSignals();
+        displayName.addListener (this);
         flowBox.addListener (this);
         if (listenForNodeSelected)
             nodeSelectedConnection = gui.nodeSelected.connect (
@@ -66,6 +73,7 @@ public:
 
     void unbindSignals()
     {
+        displayName.removeListener (this);
         flowBox.removeListener (this);
         nodeSelectedConnection.disconnect();
         volumeChangedConnection.disconnect();
@@ -142,13 +150,7 @@ public:
     inline void stabilizeContent()
     {
         updateComboBoxes();
-
-        if (node.isValid())
-        {
-            nodeName.getTextValue().referTo (node.getPropertyAsValue (Tags::name));
-            nodeName.setTooltip (node.getName());
-        }
-
+        updateNodeName();
         updateChannelStrip();
     }
 
@@ -183,7 +185,7 @@ public:
         isAudioInNode  = node.isAudioInputNode();
         audioIns.clearQuick(); audioOuts.clearQuick();
         node.getPorts (audioIns, audioOuts, PortType::Audio);
-
+        displayName.referTo (node.getPropertyAsValue (Tags::name));
         stabilizeContent();
         startTimerHz (meterSpeedHz);
 
@@ -246,6 +248,8 @@ private:
     bool isAudioInNode  = false;
     bool monoMeter      = false;
 
+    Value displayName;
+
     SignalConnection nodeSelectedConnection;
     SignalConnection volumeChangedConnection;
     SignalConnection powerChangedConnection;
@@ -254,6 +258,24 @@ private:
 
     inline bool isMonitoringInputs() const  { return flowBox.getSelectedId() == 1; }
     inline bool isMonitoringOutputs() const { return flowBox.getSelectedId() == 2; }
+
+    void valueChanged (Value& value) override
+    {
+        if (value.refersToSameSourceAs (displayName))
+            updateNodeName();
+    }
+
+    void updateNodeName()
+    {
+        if (node.isValid())
+        {
+            nodeName.setText (node.getDisplayName(), dontSendNotification);
+            String tooltip = node.getDisplayName();
+            if (node.hasModifiedName())
+                tooltip << " (" << node.getName() << ")";
+            nodeName.setTooltip (tooltip);
+        }
+    }
 
     void updateComboBoxes (bool doFlowBox = true, bool doChannelBox = true)
     {

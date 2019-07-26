@@ -185,7 +185,9 @@ GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, 
     if (desc->pluginFormatName == "Element")
     {
         if (auto* const object = pluginManager.createGraphNode (*desc, errorMessage))
+        {
             return processor.addNode (object, nodeId);
+        }
     }
 
     errorMessage.clear();
@@ -200,6 +202,11 @@ GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, 
         node = processor.addNode (instance, nodeId);
     }
     
+    if (node != nullptr)
+    {
+        // noop
+    }
+
     if (errorMessage.isNotEmpty())
     {
         DBG("[EL] error creating audio plugin: " << errorMessage);
@@ -441,7 +448,7 @@ void GraphManager::removeConnection (const int index)
 }
 
 void GraphManager::removeConnection (uint32 sourceNode, uint32 sourcePort,
-                                        uint32 destNode, uint32 destPort)
+                                     uint32 destNode, uint32 destPort)
 {
     if (processor.removeConnection (sourceNode, sourcePort, destNode, destPort))
         processorArcsChanged();

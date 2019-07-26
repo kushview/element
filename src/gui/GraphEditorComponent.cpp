@@ -587,13 +587,25 @@ public:
         
         if (vertical)
         {
-            g.drawFittedText (getName(), box.getX() + 9, box.getY() + 2, box.getWidth(),
+            g.drawFittedText (node.getDisplayName(), box.getX() + 9, box.getY() + 2, box.getWidth(),
                                          18, Justification::centredLeft, 2);
+            if (node.hasModifiedName())
+            {
+                g.setFont (Font (8.f));
+                g.drawFittedText (node.getPluginName(), box.getX() + 9, box.getY() + 10, box.getWidth(),
+                                                  18, Justification::centredLeft, 2);
+            }
         }
         else
         {
-            g.drawFittedText (getName(), box.getX() + 20, box.getY() + 2, box.getWidth(),
-                                         18, Justification::centredLeft, 2);
+            g.drawFittedText (node.getDisplayName(), box.getX() + 20, box.getY() + 2, box.getWidth(),
+                                                     18, Justification::centredLeft, 2);
+            if (node.hasModifiedName())
+            {
+                g.setFont (Font (8.f));
+                g.drawFittedText (node.getPluginName(), box.getX() + 20, box.getY() + 10, box.getWidth(),
+                                                  18, Justification::centredLeft, 2);
+            }
         }
         
         bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
@@ -708,10 +720,10 @@ public:
             h = jmax (h, int(maxPorts * pinSize) + int(maxPorts * jmax(int(pinSize * scale), 2)) + endcap);
         }
         
-        int textWidth = font.getStringWidth (node.getName());
+        int textWidth = font.getStringWidth (node.getDisplayName());
         textWidth += (vertical) ? 20 : 36;
         setSize (jmax (w, textWidth), h);
-        setName (node.getName());
+        setName (node.getDisplayName());
 
         if (doPosition)
         {

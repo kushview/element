@@ -24,7 +24,7 @@ public:
         for (int i = 0; i < parent.getNumNodes(); ++i)
         {
             const auto node (parent.getNode (i));
-            addItem (node.getName(), i + 1);
+            addItem (node.getDisplayName(), i + 1);
         }
 
         if (isPositiveAndBelow (jmin (lastIndex, getNumItems() - 1), getNumItems()))

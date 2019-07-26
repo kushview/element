@@ -10,7 +10,8 @@ class GuiController;
 class GraphNode;
 
 /** A desktop window containing a plugin's UI. */
-class PluginWindow : public DocumentWindow
+class PluginWindow : public DocumentWindow,
+                     private Value::Listener
 {
 public:
     struct Settings
@@ -48,6 +49,13 @@ private:
     friend class WindowManager;
     GraphNode* owner;
     Node node;
+    Value name;
+
+    void valueChanged (Value& value) override
+    {
+        if (value.refersToSameSourceAs (name))
+            setName (node.getDisplayName());
+    }
 };
 
 }

@@ -162,12 +162,11 @@ public:
 
     bool mightContainSubItems() override            { return node.isGraph(); }
     String getRenamingName() const override         { return getDisplayName(); }
-    String getDisplayName() const override          { return node.getName(); }
+    String getDisplayName() const override          { return node.getDisplayName(); }
 
     void setName (const String& newName) override   
     {
-        if (newName.isNotEmpty())
-            node.setProperty (Tags::name, newName); 
+        node.setProperty (Tags::name, newName);
     }
     
     bool isMissing() override { return false; }

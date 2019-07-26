@@ -202,15 +202,22 @@ public:
     
     const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
 
-    /** Returns the node name defined by the user. Initially this is equal
-        to the plugin name from a PluginDescription.
-        */        
-    const String getName()          const { return getProperty (Slugs::name); }
+    
+    /** Returns the user-modifiable name of this node */
+    const String getName() const { return getProperty (Tags::name); }
 
-    /** Returns the plugin name as provided by the plugin binary when
-        scanned by an AudioPluginFormat
-        */
-    const String getPluginName()    const { return getProperty (Tags::name); }
+    /** Returns the node name defined by the user. If not set it returns the
+        node name set when loaded. 
+     */
+    const String getDisplayName() const;
+
+    const String getPluginName() const;
+
+    bool hasModifiedName() const
+    {
+        auto dname = getName();
+        return dname.isNotEmpty() && dname != getPluginName();
+    }
 
     GraphNode* getGraphNode() const;
     
