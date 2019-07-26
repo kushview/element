@@ -234,7 +234,7 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
     addAndMakeVisible (fontSlider);
     fontSlider.setSliderStyle (Slider::LinearBar);
     fontSlider.setRange (9.0, 72.0, 1.0);
-    fontSlider.setValue (fontSize);
+    fontSlider.setValue (fontSize, dontSendNotification);
     fontSlider.onValueChange = [this]() {
         fontSize = fontSlider.getValue();
         setFontSize (fontSize);
@@ -245,11 +245,13 @@ MidiProgramMapEditor::MidiProgramMapEditor (const Node& node)
 
     if (MidiProgramMapNodePtr node = getNodeObjectOfType<MidiProgramMapNode>())
     {
-        setFontSize (node->getFontSize(), false);
         setSize (node->getWidth(), node->getHeight());
         lastProgramChangeConnection = node->lastProgramChanged.connect (
             std::bind (&MidiProgramMapEditor::selectLastProgram, this));
         node->addChangeListener (this);
+        node->sendChangeMessage();  // Workaround to get font size right.
+                                    // setFontSize needs to know if this is in a plugin window
+                                    // and doesn't know until after the ctor has returned
     }
     else
     {
@@ -279,6 +281,12 @@ void MidiProgramMapEditor::changeListenerCallback (ChangeBroadcaster*)
     }
 
     table.updateContent();
+}
+
+void MidiProgramMapEditor::setFontControlsVisible (bool visible)
+{
+    fontSlider.setVisible (visible);
+    resized();
 }
 
 void MidiProgramMapEditor::setFontSize (float newSize, bool updateNode)

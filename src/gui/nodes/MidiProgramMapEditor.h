@@ -23,6 +23,8 @@ public:
     void setProgram (int, MidiProgramMapNode::ProgramEntry);
     void sendProgram (int);
 
+    void setFontControlsVisible (bool);
+
     float getDefaultFontSize() const { return 15.f; }
     float getFontSize() const { return fontSize; }
     void setFontSize (float newSize, bool updateNode = true);
