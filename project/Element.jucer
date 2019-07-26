@@ -273,6 +273,10 @@
                 file="../src/gui/views/VirtualKeyboardView.h"/>
         </GROUP>
         <GROUP id="{5F45767F-D36A-8F72-DDD6-DE215310E039}" name="widgets">
+          <FILE id="GW27Yr" name="AudioDeviceSelectorComponent.cpp" compile="1"
+                resource="0" file="../src/gui/widgets/AudioDeviceSelectorComponent.cpp"/>
+          <FILE id="E3b7zH" name="AudioDeviceSelectorComponent.h" compile="0"
+                resource="0" file="../src/gui/widgets/AudioDeviceSelectorComponent.h"/>
           <FILE id="JeeT5w" name="BreadCrumbComponent.h" compile="0" resource="0"
                 file="../src/gui/widgets/BreadCrumbComponent.h"/>
           <FILE id="cLNerQ" name="HorizontalListBox.cpp" compile="1" resource="0"
