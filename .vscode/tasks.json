@@ -236,6 +236,12 @@
             "type": "shell",
             "command": "tools/build-osx.sh && tools/build-free-osx.sh",
             "problemMatcher": []
+        },
+        {
+            "label": "Version Bump",
+            "type": "shell",
+            "command": "python tools/versionbump.py",
+            "problemMatcher": []
         }
     ]
 }
