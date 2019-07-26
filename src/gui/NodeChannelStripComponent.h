@@ -28,7 +28,7 @@ public:
         nodeName.onTextChange = [this]
         {
             if (node.isValid())
-                node.setProperty (Tags::displayName, nodeName.getText());
+                node.setProperty (Tags::name, nodeName.getText());
         };
 
         addAndMakeVisible (channelBox);
@@ -185,7 +185,7 @@ public:
         isAudioInNode  = node.isAudioInputNode();
         audioIns.clearQuick(); audioOuts.clearQuick();
         node.getPorts (audioIns, audioOuts, PortType::Audio);
-        displayName.referTo (node.getPropertyAsValue (Tags::displayName));
+        displayName.referTo (node.getPropertyAsValue (Tags::name));
         stabilizeContent();
         startTimerHz (meterSpeedHz);
 
@@ -271,7 +271,7 @@ private:
         {
             nodeName.setText (node.getDisplayName(), dontSendNotification);
             String tooltip = node.getDisplayName();
-            if (node.hasDisplayName())
+            if (node.hasModifiedName())
                 tooltip << " (" << node.getName() << ")";
             nodeName.setTooltip (tooltip);
         }

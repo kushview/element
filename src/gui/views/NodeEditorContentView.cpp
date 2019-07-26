@@ -55,7 +55,14 @@ private:
     friend class juce::ValueTree;
     void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override
     {
+        // watched node changed
         if (tree == node.getValueTree() && property == Tags::name) {
+            if (onNodeNameChanged)
+                onNodeNameChanged();
+        }
+
+        // Sibling node name changed
+        if (property == Tags::name && data.getChildWithName(Tags::nodes).indexOf(tree) > 0) {
             if (onNodeNameChanged)
                 onNodeNameChanged();
         }

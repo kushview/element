@@ -36,7 +36,7 @@ public:
     /** Returns an audio processor if available */
     JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
     
-    String getName() const;
+    String getName() const { return name; }
     
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
@@ -299,9 +299,18 @@ public:
     Signal<void()> midiProgramChanged;
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
+
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
+    
+    void setName (const String& newName)
+    {
+        jassert (newName.isNotEmpty());
+        if (newName.isNotEmpty())
+            name = newName;
+    }
+
     kv::PortList ports;
     ValueTree metadata;
 
@@ -319,6 +328,7 @@ private:
     Atomic<int> muteInput { 0 };
 
     int latencySamples = 0;
+    String name;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;

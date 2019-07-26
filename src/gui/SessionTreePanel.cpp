@@ -166,7 +166,7 @@ public:
 
     void setName (const String& newName) override   
     {
-        node.setProperty (Tags::displayName, newName);
+        node.setProperty (Tags::name, newName);
     }
     
     bool isMissing() override { return false; }
@@ -632,7 +632,7 @@ void SessionTreePanel::valueTreePropertyChanged (ValueTree& tree, const Identifi
     else if (tree.hasType (Tags::node))
     {
         const Node graph (tree, false);
-        if (property == Tags::name || property == Tags::displayName || (graph.isRootGraph() && property == Tags::midiProgram))
+        if (property == Tags::name || (graph.isRootGraph() && property == Tags::midiProgram))
             repaint();
     }
 }
