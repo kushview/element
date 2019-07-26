@@ -272,7 +272,7 @@ private:
             nodeName.setText (node.getDisplayName(), dontSendNotification);
             String tooltip = node.getDisplayName();
             if (node.hasModifiedName())
-                tooltip << " (" << node.getName() << ")";
+                tooltip << " (" << node.getPluginName() << ")";
             nodeName.setTooltip (tooltip);
         }
     }
