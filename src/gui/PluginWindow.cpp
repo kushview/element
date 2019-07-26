@@ -232,8 +232,9 @@ PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n
     setUsingNativeTitleBar (true);
     setSize (400, 300);
     
+    name = node.getPropertyAsValue (Tags::name);
     name.addListener (this);
-    name.referTo (node.getPropertyAsValue (Tags::name));
+    setName (node.getDisplayName());
     
     if (node.isValid())
     {
@@ -308,7 +309,7 @@ void PluginWindow::resized()
     }
     else
     {
-        setName (node.getName());
+        setName (node.getDisplayName());
     }
 }
 
