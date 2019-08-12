@@ -466,7 +466,7 @@ public:
 
         if (props)
         {
-            const StringArray formats = { "AU", "VST", "VST3" };
+            const StringArray formats = { "AU", "VST", "VST3", "LV2" };
             for (const auto& f : formats)
             {
                 const auto key = String(Settings::lastPluginScanPathPrefix) + f;
@@ -580,7 +580,7 @@ private:
 	double sampleRate = 44100.0;
 	int    blockSize = 512;
 	ScopedPointer<PluginScanner> scanner;
-   #if ELEMENT_LV2_PLUGIN_HOST
+   #if KV_LV2_PLUGIN_HOST
 	OptionalPtr<LV2World> lv2;
 	OptionalPtr<SymbolMap> symbols;
    #endif
@@ -643,7 +643,7 @@ private:
 PluginManager::PluginManager()
 {
     priv = new Private (*this);
-   #if ELEMENT_LV2_PLUGIN_HOST
+   #if KV_LV2_PLUGIN_HOST
     priv->symbols.setOwned (new SymbolMap ());
     priv->lv2.setOwned (new LV2World());
    #endif
@@ -657,7 +657,7 @@ PluginManager::~PluginManager()
 void PluginManager::addDefaultFormats()
 {
     getAudioPluginFormats().addDefaultFormats();
-   #if ELEMENT_LV2_PLUGIN_HOST
+   #if KV_LV2_PLUGIN_HOST
     addFormat (new LV2PluginFormat (*priv->lv2));
    #endif
 }

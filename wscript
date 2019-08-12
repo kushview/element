@@ -49,6 +49,7 @@ def configure_product (conf):
         conf.env.EL_FREE = False
         conf.env.EL_PRO  = False
     if not conf.options.enable_free and not conf.options.enable_solo:
+        conf.define ('EL_PRO', 1)
         conf.env.EL_SOLO = False
         conf.env.EL_FREE = False
         conf.env.EL_PRO  = True
@@ -95,6 +96,10 @@ def configure (conf):
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
     conf.check(lib='curl', mandatory=False)
+
+    conf.check_cfg(package='kv-0' if not conf.options.debug else 'kv_debug-0', 
+                   uselib_store='KV', args='--libs --cflags', mandatory=True)
+
     if juce.is_linux():
         conf.check(lib='pthread', mandatory=True)
         conf.check(lib='dl', mandatory=True)
@@ -274,25 +279,23 @@ def build_mac (bld):
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       [ 'libs/SQLiteCpp/sqlite3/sqlite3.c' ] + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'libs/pybind11/include', \
-                        'project/JuceLibraryCode', \
+        includes    = [ 'libs/compat', \
+                        '/opt/kushview/include', \
+                        'libs/pybind11/include', \
                         'libs/SQLiteCpp/sqlite3', \
                         'libs/SQLiteCpp/include', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = [ 'KV', 'PYTHON' ]
+        use         = ['KV', 'PYTHON']
     )
 
     bld.add_group()
     
     app = bld.program (
         source      = [ 'project/Source/Main.cpp' ],
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        includes    = [ 'libs/compat', 'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
