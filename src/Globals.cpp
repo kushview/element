@@ -171,12 +171,6 @@ SymbolMap& Globals::getSymbolMap()
    #endif
 }
 
-UnlockStatus& Globals::getUnlockStatus()
-{
-    jassert (impl && impl->unlock);
-    return *impl->unlock;
-}
-    
 SessionPtr Globals::getSession()
 {
     return (impl) ? impl->session : nullptr;

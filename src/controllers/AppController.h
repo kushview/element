@@ -44,7 +44,6 @@ public:
         }
 
         Settings& getSettings();
-        UnlockStatus& getUnlockStatus();
         Globals& getWorld();
 
     protected:

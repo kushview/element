@@ -22,7 +22,6 @@ struct RootGraphHolder
     RootGraphHolder (const Node& n, Globals& world)
         : plugins (world.getPluginManager()),
           devices (world.getDeviceManager()),
-          status  (world.getUnlockStatus()),
           model (n)
     { }
     
@@ -58,7 +57,7 @@ struct RootGraphHolder
             const auto channels = model.getMidiChannels();
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
-            root->setLocked (!(bool) status.isFullVersion());
+            root->setLocked (false);
             root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
             root->setMidiChannels (channels);
@@ -119,7 +118,6 @@ private:
     friend class EngineController::RootGraphs;
     PluginManager&                      plugins;
     DeviceManager&                      devices;
-    UnlockStatus&                       status;
     ScopedPointer<RootGraphManager>  controller;
     Node                                model;
     GraphNodePtr                        node;

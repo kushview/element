@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#if 0
 #include "controllers/GuiController.h"
 #include "gui/Buttons.h"
 #include "URLs.h"
@@ -871,5 +872,6 @@ END_JUCER_METADATA
 
 
 //[EndFile] You can add extra defines here...
+#endif
 //[/EndFile]
 

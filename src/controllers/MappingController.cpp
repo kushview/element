@@ -256,8 +256,6 @@ void MappingController::learn (const bool shouldLearn)
     capture.clear();
     mapping.capture (false);
 
-    returnIfNotFullVersion
-
     if (shouldLearn)
     {
         DBG("[EL] MappingController: start learning");
@@ -268,8 +266,6 @@ void MappingController::learn (const bool shouldLearn)
 
 void MappingController::onParameterCaptured (const Node& node, int parameter)
 {
-    returnIfNotFullVersion
-
     if (impl->learnState == CaptureParameter)
     {
         DBG("[EL] MappingController: got parameter: " << parameter);
@@ -287,7 +283,6 @@ void MappingController::onParameterCaptured (const Node& node, int parameter)
 
 void MappingController::onControlCaptured()
 {
-    returnIfNotFullVersion
     auto session = getWorld().getSession();
 
     if (impl->learnState == CaptureControl)

@@ -41,6 +41,7 @@ struct TrialDaysProgressBar : public ProgressBar
     double periodDays = 14.0;
 };
 
+#if 0
 //[/Headers]
 
 
@@ -169,6 +170,7 @@ private:
     GuiController& gui;
 };
 
+#endif
 } // namespace element
 //[/EndFile]
 

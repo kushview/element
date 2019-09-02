@@ -3,7 +3,6 @@
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
 #include "session/Session.h"
-#include "session/UnlockStatus.h"
 #include "Globals.h"
 
 namespace Element {
@@ -40,7 +39,6 @@ void DevicesController::deactivate()
 
 void DevicesController::add (const ControllerDevice& device)
 {
-    returnIfNotFullVersion
     auto& mapping (getWorld().getMappingEngine());
     auto& midi (getWorld().getMidiEngine());
     if (! mapping.addInput (device, midi))
@@ -58,7 +56,6 @@ void DevicesController::add (const ControllerDevice& device)
 
 void DevicesController::add (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
-    returnIfNotFullVersion
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) < 0)
     {
@@ -74,7 +71,6 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
 
 void DevicesController::add (const File& file)
 {
-    returnIfNotFullVersion
     ValueTree data;
     if (ScopedXml xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
@@ -102,7 +98,6 @@ void DevicesController::add (const File& file)
 
 void DevicesController::remove (const ControllerDevice& device)
 {
-    returnIfNotFullVersion
     auto& mapping (getWorld().getMappingEngine());
     if (! mapping.removeInput (device))
         return;
@@ -113,7 +108,6 @@ void DevicesController::remove (const ControllerDevice& device)
 
 void DevicesController::remove (const ControllerDevice& device, const ControllerDevice::Control& control)
 {
-    returnIfNotFullVersion
     auto session = getWorld().getSession();
     if (session && session->indexOf (device) >= 0 && device.indexOf (control) >= 0)
     {
@@ -155,8 +149,6 @@ void DevicesController::refresh()
     auto& midi (getWorld().getMidiEngine());
     auto session = getWorld().getSession();
     mapping.clear();
-
-    returnIfNotFullVersion
 
     for (int i = 0; i < session->getNumControllerDevices(); ++i)
         mapping.addInput (session->getControllerDevice (i), midi);

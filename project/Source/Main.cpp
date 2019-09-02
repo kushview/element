@@ -117,10 +117,8 @@ private:
 
     void updateSettingsIfNeeded()
     {
-        UnlockStatus& status (world.getUnlockStatus());
         Settings& settings (world.getSettings());
         
-        if (! status.isFullVersion())
         {
             auto* props = settings.getUserSettings();
             props->setValue ("clockSource", "internal");
@@ -243,9 +241,6 @@ public:
             return;
 
         slaves.clearQuick (true);
-                
-        UnlockStatus& status (world->getUnlockStatus());
-        status.save();
         
         auto engine (world->getAudioEngine());
         auto& plugins (world->getPluginManager());
@@ -377,7 +372,6 @@ public:
             CurrentVersion::checkAfterDelay (12 * 1000, false);
        #endif
 
-        world->getUnlockStatus().checkLicenseInBackground();
        #if EL_PRO
         if (auto* sc = controller->findChild<SessionController>())
         {
@@ -401,19 +395,14 @@ private:
     
     void loadLicense()
     {
-       #if EL_CLEAR_LICENSE
-        world->getUnlockStatus().saveState (String());
-        world->getSettings().saveIfNeeded();
-       #endif
-        world->getUnlockStatus().loadAll();
-        world->getUnlockStatus().dump();
+    
     }
 
     void printCopyNotice()
     {
         String appName = Util::appName();
         appName << " v" << getApplicationVersion();
-        
+    #if 0
        #if defined (EL_PRO) || defined (EL_SOLO)
         if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
         {
@@ -444,6 +433,7 @@ private:
         Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
        #if EL_USE_LOCAL_AUTH
         Logger::writeToLog ("[EL] using local authentication");
+       #endif
        #endif
     }
 

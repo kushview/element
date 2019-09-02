@@ -22,7 +22,6 @@
 #include "session/PluginManager.h"
 #include "session/UnlockStatus.h"
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
-#include "gui/ActivationDialog.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
@@ -265,7 +264,6 @@ namespace Element {
             : pluginSettings (world),
               settings (world.getSettings()),
               engine (world.getAudioEngine()),
-              status (world.getUnlockStatus()),
               gui (g),
              #ifdef EL_PRO
               defaultSessionFile ("Default Session", File(), true, false,
@@ -368,7 +366,7 @@ namespace Element {
            #endif
 
            #if defined (EL_PRO)
-            if (status.isFullVersion())
+            if (true)
             {
                 const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
                     ? ClockSourceInternal : ClockSourceMidiClock;
@@ -459,9 +457,9 @@ namespace Element {
             }
 
             // clock source
-            else if (value.refersToSameSourceAs (clockSource) && status.isFullVersion())
+            else if (value.refersToSameSourceAs (clockSource) && true)
             {
-                if (! status.isFullVersion())
+                if (! true)
                     return;
 
                 const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
@@ -535,7 +533,6 @@ namespace Element {
 
         Settings& settings;
         AudioEnginePtr engine;
-        UnlockStatus& status;
         GuiController& gui;
     };
 
@@ -853,60 +850,6 @@ namespace Element {
         }
     };
 
-    #define EL_PREFS_NEW_UNLOCKING 1
-    class LicenseSettingsPage : public SettingsPage
-    {
-    public:
-        LicenseSettingsPage (Globals& world, GuiController& gui)
-        {
-            auto& status = world.getUnlockStatus();
-            setName (EL_LICENSE_SETTINGS_NAME);
-           #if EL_PREFS_NEW_UNLOCKING
-            activation.reset (new ActivationComponent (gui));
-            activation->setBackgroundColour (LookAndFeel::widgetBackgroundColor);
-            activation->setOverlayOpacity (0.0f);
-            activation->setOverlayShowText (false);
-            if ((EL_IS_TRIAL_EXPIRED (status)) || (EL_IS_TRIAL_NOT_EXPIRED (status))) 
-            {
-                activation->setForTrial (true);
-                activation->setQuitButtonTextForTrial ("Manage");
-            }
-            else if (EL_IS_ACTIVATED (status))
-                activation->setForManagement (true);
-            
-            addAndMakeVisible (activation.get());
-           #else
-            form.reset (new UnlockForm (world, gui,
-                "Enter your license key.", false, false, true, true));
-            addAndMakeVisible (form.get());
-           #endif
-        }
-
-        void resized() override
-        {
-           #if EL_PREFS_NEW_UNLOCKING
-            activation->centreWithSize (activation->getWidth(), activation->getHeight());
-           #else
-            form->setBounds (getLocalBounds().reduced (2));
-           #endif
-        }
-
-        ~LicenseSettingsPage()
-        {
-           #if EL_PREFS_NEW_UNLOCKING
-            activation.reset();
-           #else
-            form.reset();
-           #endif
-        }
-
-    private:
-       #if EL_PREFS_NEW_UNLOCKING
-        std::unique_ptr<ActivationComponent> activation;
-       #else
-        std::unique_ptr<UnlockForm> form;
-       #endif
-    };
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -1003,8 +946,6 @@ Component* PreferencesComponent::createPageForName (const String& name)
         return new PluginSettingsComponent (world);
     } else if (name == EL_MIDI_SETTINGS_NAME) {
         return new MidiSettingsPage (world);
-    } else if (name == EL_LICENSE_SETTINGS_NAME) {
-        return new LicenseSettingsPage (world, gui);
     }
 
     return nullptr;

@@ -173,10 +173,8 @@ public:
     int getExternalLatencySamples() const;
 
     Globals& getWorld() const;
-
-    void updateUnlockStatus();
-
     MidiIOMonitorPtr getMidiIOMonitor() const;
+
 private:
     class Private;
     ScopedPointer<Private> priv;

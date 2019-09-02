@@ -27,7 +27,6 @@ namespace Element {
 
 Globals& AppController::Child::getWorld()               { return getAppController().getWorld(); }
 Settings& AppController::Child::getSettings()           { return getWorld().getSettings(); }
-UnlockStatus& AppController::Child::getUnlockStatus()   { return getWorld().getUnlockStatus(); }
 
 AppController::AppController (Globals& g)
     : world (g)
@@ -70,9 +69,6 @@ void AppController::activate()
         FileInputStream stream (recentList);
         recentFiles.restoreFromString (stream.readEntireStreamAsString());
     }
-
-    licenseRefreshedConnection = getWorld().getUnlockStatus().refreshed.connect (
-        std::bind (&AppController::licenseRefreshed, this));
 
     Controller::activate();
 }
@@ -253,12 +249,7 @@ void AppController::handleMessage (const Message& msg)
     }
     else if (const auto* anm = dynamic_cast<const AddNodeMessage*> (&msg))
     {
-        if (anm->node.isGraph() && !getWorld().getUnlockStatus().isFullVersion())
-        {
-            Alert::showProductLockedAlert ("Nested graphs are not supported without a license");
-        }
-
-        else if (anm->target.isValid ())
+        if (anm->target.isValid ())
             ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
@@ -401,7 +392,6 @@ void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
 
 bool AppController::perform (const InvocationInfo& info)
 {
-    auto& status (world.getUnlockStatus());
 	auto& settings(getGlobals().getSettings());
     bool res = true;
     switch (info.commandID)
@@ -461,16 +451,9 @@ bool AppController::perform (const InvocationInfo& info)
             
         case Commands::importGraph:
         {
-            if (world.getUnlockStatus().isFullVersion())
-            {
-                FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
-                if (chooser.browseForFileToOpen())
-                    findChild<SessionController>()->importGraph (chooser.getResult());
-            }
-            else
-            {
-                Alert::showProductLockedAlert();
-            }
+            FileChooser chooser ("Import Graph", lastExportedGraph, "*.elg");
+            if (chooser.browseForFileToOpen())
+                findChild<SessionController>()->importGraph (chooser.getResult());
             
         } break;
             
@@ -487,17 +470,13 @@ bool AppController::perform (const InvocationInfo& info)
                 lastExportedGraph = lastExportedGraph.getChildFile(node.getName()).withFileExtension ("elg");
                 lastExportedGraph = lastExportedGraph.getNonexistentSibling();
             }
-            if (world.getUnlockStatus().isFullVersion())
+
             {
                 FileChooser chooser ("Export Graph", lastExportedGraph, "*.elg");
                 if (chooser.browseForFileToSave (true))
                     findChild<SessionController>()->exportGraph (node, chooser.getResult());
                 if (auto* gui = findChild<GuiController>())
                     gui->stabilizeContent();
-            }
-            else
-            {
-                Alert::showProductLockedAlert();
             }
         } break;
 
@@ -522,25 +501,13 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signIn:
         {
-            auto* form = new UnlockForm (getWorld(), *findChild<GuiController>(),
-                                        "Enter your license key.",
-                                         false, false, true, true);
-            DialogWindow::LaunchOptions opts;
-            opts.content.setOwned (form);
-            opts.resizable = false;
-            opts.dialogTitle = "License Manager";
-            opts.runModal();
+            
         } break;
         
         case Commands::signOut:
         {
-            if (status.isUnlocked())
             {
                 auto* props = settings.getUserSettings();
-                props->removeValue("L");
-                props->save();
-                props->reload();
-                status.load();
             }
         } break;
         
@@ -628,6 +595,7 @@ void AppController::checkForegroundStatus()
 
 void AppController::licenseRefreshed()
 {
+   #if 0
     findChild<Element::DevicesController>()->refresh();
     findChild<Element::MappingController>()->learn (false);
     if (auto engine = getWorld().getAudioEngine())
@@ -644,6 +612,7 @@ void AppController::licenseRefreshed()
 
     findChild<GuiController>()->stabilizeContent();
     findChild<GuiController>()->stabilizeViews();
+   #endif
 }
 
 }

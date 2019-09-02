@@ -21,7 +21,6 @@ class MediaManager;
 class PluginManager;
 class PresetCollection;
 class Settings;
-class UnlockStatus;
 class Writer;
 
 struct CommandLine
@@ -50,7 +49,6 @@ public:
     PresetCollection& getPresetCollection();
     Settings& getSettings();
     MediaManager& getMediaManager();
-    UnlockStatus& getUnlockStatus();
     SymbolMap& getSymbolMap();
     SessionPtr getSession();
 

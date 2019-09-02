@@ -39,14 +39,6 @@
 
 namespace Element {
 
-static void showProductLockedAlert (const String& msg = String(), const String& title = "Feature not Available")
-{
-    String message = (msg.isEmpty()) ? "Unlock the full version of Element to use this feature.\nGet a copy @ https://kushview.net"
-        : msg;
-    if (AlertWindow::showOkCancelBox (AlertWindow::InfoIcon, title, message, "Upgrade", "Cancel"))
-        URL("https://kushview.net/products/element/").launchInDefaultBrowser();
-}
-
 // MARK: Content View
 
 ContentView::ContentView()
@@ -97,7 +89,7 @@ void ContentView::disableIfNotUnlocked()
 {
     if (auto* w = ViewHelpers::getGlobals (this))
     {
-        setEnabled (w->getUnlockStatus().isFullVersion());
+        setEnabled (true);
     }
     else
     {
@@ -160,7 +152,6 @@ public:
     void setSession (SessionPtr s)
     {
         session = s;
-        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
         auto& settings (ViewHelpers::getGlobals(this)->getSettings());
         auto engine (ViewHelpers::getGlobals(this)->getAudioEngine());
 
@@ -180,7 +171,7 @@ public:
         const bool showExt = true;
         ignoreUnused (props, status);
        #elif defined (EL_PRO)
-        const bool showExt = props->getValue ("clockSource") == "midiClock" && status.isFullVersion();
+        const bool showExt = props->getValue ("clockSource") == "midiClock";
        #else
         const bool showExt = false;
         ignoreUnused (props, status);
@@ -194,7 +185,7 @@ public:
             tempoBar.stabilizeWithSession (false);
         }
         
-        mapButton.setEnabled ((bool) status.isFullVersion());
+        mapButton.setEnabled (true);
 
         resized();
     }
@@ -260,7 +251,6 @@ public:
     
     void buttonClicked (Button* btn) override
     {
-        auto& status (ViewHelpers::getGlobals(this)->getUnlockStatus());
         if (btn == &viewBtn)
         {
             const int command = owner.getMainViewName() == "PatchBay" || owner.getMainViewName() == "GraphEditor"
@@ -297,7 +287,7 @@ public:
         else if (btn == &mapButton)
         {
            #if defined (EL_PRO) || defined (EL_SOLO)
-            if ((bool) status.isFullVersion())
+            if (true)
             {
                 if (auto* mapping = owner.getAppController().findChild<MappingController>())
                 {
@@ -354,7 +344,6 @@ public:
     {
         sampleRate.addListener (this);
         streamingStatus.addListener (this);
-        status.addListener (this);
         
         addAndMakeVisible (sampleRateLabel);
         addAndMakeVisible (streamingStatusLabel);
@@ -381,7 +370,6 @@ public:
     {
         sampleRate.removeListener (this);
         streamingStatus.removeListener (this);
-        status.removeListener (this);
     }
     
     void paint (Graphics& g) override
@@ -580,21 +568,20 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         const File file (path);
         if (file.hasFileExtension ("elc"))
         {
-            auto& unlock (controller.getGlobals().getUnlockStatus());
             FileInputStream src (file);
-            if (unlock.applyKeyFile (src.readString()))
-            {
-                unlock.save();
-                unlock.loadAll();
-                stabilizeViews();
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
-                    "Your software has successfully been unlocked.");
-            }
-            else
-            {
-                AlertWindow::showMessageBox (AlertWindow::InfoIcon,
-                    "Apply License File", "Your software could not be unlocked.");
-            }
+            // if (unlock.applyKeyFile (src.readString()))
+            // {
+            //     unlock.save();
+            //     unlock.loadAll();
+            //     stabilizeViews();
+            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
+            //         "Your software has successfully been unlocked.");
+            // }
+            // else
+            // {
+            //     AlertWindow::showMessageBox (AlertWindow::InfoIcon,
+            //         "Apply License File", "Your software could not be unlocked.");
+            // }
         }
         else if (file.hasFileExtension ("els"))
         {
@@ -602,7 +589,7 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
         }
         else if (file.hasFileExtension ("elg"))
         {
-            if (getGlobals().getUnlockStatus().isFullVersion())
+            if (true)
             {
                #if defined (EL_PRO)
                 if (auto* sess = controller.findChild<SessionController>())
@@ -614,7 +601,7 @@ void ContentComponent::filesDropped (const StringArray &files, int x, int y)
             }
             else
             {
-                showProductLockedAlert();
+                //
             }
         }
         else if (file.hasFileExtension ("elpreset"))

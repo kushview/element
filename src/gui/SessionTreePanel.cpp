@@ -298,31 +298,17 @@ public:
             const auto file ((panel) ? panel->getSelectedFile() : File());
             if (file.hasFileExtension ("elg"))
             {
-                if (world->getUnlockStatus().isFullVersion())
-                {
-                    const Node newGraph (Node::parse (file));
-                    ViewHelpers::postMessageFor (getOwnerView(),
-                        new AddNodeMessage (newGraph, graph));
-                }
-                else
-                {
-                    Alert::showProductLockedAlert();
-                }
+                const Node newGraph (Node::parse (file));
+                ViewHelpers::postMessageFor (getOwnerView(),
+                    new AddNodeMessage (newGraph, graph));
             }
         }
         else if (desc.isArray() && desc[0] == "plugin")
         {
             if (auto* p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString(desc[1].toString()))
             {
-                if (p->fileOrIdentifier == "element.graph" && !(bool) world->getUnlockStatus().isFullVersion())
-                {
-                    Alert::showProductLockedAlert ("Nested graphs are only available in the paid version.");
-                }
-                else
-                {
-                    ViewHelpers::postMessageFor (getOwnerView(),
-                        new AddPluginMessage (graph, *p));
-                }
+                ViewHelpers::postMessageFor (getOwnerView(),
+                    new AddPluginMessage (graph, *p));
             }
         }
     }
@@ -494,15 +480,8 @@ public:
             const auto file ((panel) ? panel->getSelectedFile() : File());
             if (file.hasFileExtension ("elg"))
             {
-                if (world->getUnlockStatus().isFullVersion())
-                {
-                    if (auto* sess = app.findChild<SessionController>())
-                        sess->importGraph (file);
-                }
-                else
-                {
-                    Alert::showProductLockedAlert();
-                }
+                if (auto* sess = app.findChild<SessionController>())
+                    sess->importGraph (file);
             }
         }
     }

@@ -1,3 +1,4 @@
+#if 0
 #include "controllers/GuiController.h"
 #include "controllers/DevicesController.h"
 #include "controllers/MappingController.h"
@@ -585,3 +586,4 @@ void UnlockForm::dismiss()
 }
 
 }
+#endif

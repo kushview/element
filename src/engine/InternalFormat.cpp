@@ -359,22 +359,22 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
-        base = (world.getUnlockStatus().isFullVersion() ? new SubGraphProcessor() : nullptr);
+        base = (true ? new SubGraphProcessor() : nullptr);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
-        base = (world.getUnlockStatus().isFullVersion() ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
+        base = (true ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
-        base = (world.getUnlockStatus().isFullVersion() ? new ChannelizeProcessor() : nullptr);
+        base = (true ? new ChannelizeProcessor() : nullptr);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
-        base = (world.getUnlockStatus().isFullVersion() ? new MidiChannelMapProcessor() : nullptr);
+        base = (true ? new MidiChannelMapProcessor() : nullptr);
    #endif // EL_PRO
 
    #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
-        base = (world.getUnlockStatus().isFullVersion() ? new AudioFilePlayerNode() : nullptr);
+        base = (true ? new AudioFilePlayerNode() : nullptr);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
-        base = (world.getUnlockStatus().isFullVersion() ? new MediaPlayerProcessor() : nullptr);
+        base = (true ? new MediaPlayerProcessor() : nullptr);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
-        base = (world.getUnlockStatus().isFullVersion() ? new PlaceholderProcessor() : nullptr);
+        base = (true ? new PlaceholderProcessor() : nullptr);
     #endif // EL_PRO || EL_SOLO
 
     return base != nullptr ? base.release() : nullptr;

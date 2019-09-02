@@ -387,14 +387,6 @@ void GuiController::run()
    #endif
 
     stabilizeViews();
-
-    if ((EL_IS_TRIAL_EXPIRED (getWorld().getUnlockStatus())) ||
-        (EL_IS_TRIAL_NOT_EXPIRED (getWorld().getUnlockStatus())) ||
-        (EL_IS_NOT_ACTIVATED (getWorld().getUnlockStatus())))
-    {
-        jassert (activation == nullptr);
-        new ActivationDialog (*this, activation);
-    }
 }
 
 SessionRef GuiController::session()
@@ -733,8 +725,6 @@ bool GuiController::perform (const InvocationInfo& info)
             toggleAboutScreen();
             break;
         case Commands::showControllerDevices: {
-            if (! (bool) getWorld().getUnlockStatus().isFullVersion())
-                Alert::showProductLockedAlertAsync ("Controller Mapping is available in the full version only.");
             content->setMainView ("ControllerDevicesView");
         } break;
         case Commands::showKeymapEditor:
@@ -770,10 +760,6 @@ bool GuiController::perform (const InvocationInfo& info)
                 content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
                 showedIt = true;
             }
-
-            if (showedIt && ! (bool) getWorld().getUnlockStatus().isFullVersion())
-                Alert::showProductLockedAlertAsync (String(), "Graph Mixer Unavailable");
-            
         } break;
         
         case Commands::toggleVirtualKeyboard:
@@ -784,8 +770,6 @@ bool GuiController::perform (const InvocationInfo& info)
            #if defined (EL_PRO) || defined (EL_SOLO)
             const bool wasHidden = ! content->isNodeChannelStripVisible();
             content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
-            if (wasHidden && ! (bool) getWorld().getUnlockStatus().isFullVersion())
-                Alert::showProductLockedAlertAsync (String(), "Channel Strip Unavailable");
            #else
             content->setNodeChannelStripVisible (false);
            #endif
@@ -856,7 +840,7 @@ void GuiController::stabilizeViews()
 {
     if (auto* cc = content.get())
     {
-        const auto shouldBeEnabled = (bool) getWorld().getUnlockStatus().isFullVersion();
+        const auto shouldBeEnabled = true;
         if (cc->isEnabled() != shouldBeEnabled)
             cc->setEnabled (shouldBeEnabled);
         cc->stabilizeViews();

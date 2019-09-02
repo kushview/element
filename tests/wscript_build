@@ -6,6 +6,8 @@ bld.program (
                 '../project/Source', 
                 '../project/JuceLibraryCode',
                 '../src',
+                '/opt/kushview/include',
+                '../libs/lv2', 
                 '../libs/JUCE/modules', 
                 '../libs/kv/modules',
                 '../libs/SQLiteCpp/sqlite3',
@@ -13,6 +15,7 @@ bld.program (
                 '../libs/lv2',
                 '/opt/kushview/include' ],
     target = '../bin/test-element',
-    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
+    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
+            'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
     install_path = None
 )

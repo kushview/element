@@ -192,8 +192,7 @@ void MainMenu::menuItemSelected (int index, int menu)
    #endif
     else if (index == 8000)
     {
-        if (auto *cc = getContentComponent())
-            cc->getAppController().getWorld().getUnlockStatus().dump();
+        
     }
     else if (index == 9000)
     {

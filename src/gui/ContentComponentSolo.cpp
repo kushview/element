@@ -654,6 +654,7 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
         const File file (path);
         if (file.hasFileExtension ("elc"))
         {
+            #if 0
             auto& unlock (getGlobals().getUnlockStatus());
             FileInputStream src (file);
             if (unlock.applyKeyFile (src.readString()))
@@ -664,12 +665,14 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
                 stabilizeViews();
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon, "Apply License File", 
                     "Your software has successfully been unlocked.");
+
             }
             else
             {
                 AlertWindow::showMessageBox (AlertWindow::InfoIcon,
                     "Apply License File", "Your software could not be unlocked.");
             }
+            #endif
         }
         else if (file.hasFileExtension ("els"))
         {
@@ -677,15 +680,8 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
         }
         else if (file.hasFileExtension ("elg"))
         {
-            if (getGlobals().getUnlockStatus().isFullVersion())
-            {
-                if (auto* sess = getAppController().findChild<SessionController>())
-                    sess->importGraph (file);
-            }
-            else
-            {
-                showProductLockedAlert();
-            }
+            if (auto* sess = getAppController().findChild<SessionController>())
+                sess->importGraph (file);
         }
         else if (file.hasFileExtension ("elpreset"))
         {

@@ -8,7 +8,6 @@
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"
 
-#include "session/UnlockStatus.h"
 #include "ScopedFlag.h"
 
 namespace Element {
@@ -50,8 +49,7 @@ namespace Element {
         int midiChannel = 0;
     };
     
-    class RenderModePropertyComponent : public ChoicePropertyComponent,
-                                        public UnlockStatus::LockableObject
+    class RenderModePropertyComponent : public ChoicePropertyComponent
     {
     public:
         RenderModePropertyComponent (const Node& g, const String& name = "Rendering Mode")
@@ -80,20 +78,13 @@ namespace Element {
             }
             else
             {
-                showLockedAlert();
                 refresh();
             }
         }
         
-        void setLocked (const var& isLocked) override
-        {
-            locked = isLocked;
-            refresh();
-        }
-        
     protected:
         Node graph;
-        bool locked;
+        bool locked = false;
     };
 
     class VelocityCurvePropertyComponent : public ChoicePropertyComponent
@@ -360,8 +351,6 @@ namespace Element {
     {
         if (auto* const world = ViewHelpers::getGlobals (this))
         {
-            const auto notFull (!(bool) world->getUnlockStatus().isFullVersion());
-            props->setLocked (notFull);
             props->setNode (world->getSession()->getCurrentGraph());
         }
    
