@@ -865,7 +865,7 @@ void Node::setMidiProgramsEnabled (bool useMidiPrograms)
     }
 }
 
-int Node::getMidiProgram() const            { return (int) getProperty (Tags::midiProgram, 0); }
+int Node::getMidiProgram() const { return (int) getProperty (Tags::midiProgram, 0); }
 void Node::setMidiProgram (int program)
 {
     if (GraphNodePtr obj = getGraphNode())
@@ -875,6 +875,20 @@ void Node::setMidiProgram (int program)
         obj->setMidiProgram (program);
         setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
     }
+}
+
+String Node::getMidiProgramName (int program) const
+{
+    if (GraphNodePtr obj = getGraphNode())
+        return obj->getMidiProgramName (program);
+    return {};
+}
+
+void Node::setMidiProgramName (int program, const String& name)
+{
+    if (GraphNodePtr obj = getGraphNode())
+        obj->setMidiProgramName (program, name);
+    // setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
 }
 
 }

@@ -346,6 +346,8 @@ void GraphNode::EnablementUpdater::handleAsyncUpdate()
     graph.setEnabled (! graph.isEnabled());
 }
 
+//=============================================================================
+
 void GraphNode::reloadMidiProgram()
 {
     midiProgramLoader.triggerAsyncUpdate();
@@ -414,7 +416,7 @@ void GraphNode::removeMidiProgram (int program, bool global)
     }
 }
 
-GraphNode::MidiProgram* GraphNode::getMidiProgram (int program)
+GraphNode::MidiProgram* GraphNode::getMidiProgram (int program) const
 {
     if (! isPositiveAndBelow (program, 128))
         return nullptr;
@@ -491,6 +493,21 @@ void GraphNode::setMidiProgram (const int program)
     midiProgram.set (program);
 }
 
+void GraphNode::setMidiProgramName (const int program, const String& name) 
+{
+    if (auto* pr = getMidiProgram (program))
+    {
+        pr->name = name;
+    }
+}
+
+String GraphNode::getMidiProgramName (const int program) const
+{
+    if (auto* pr = getMidiProgram (program))
+        return pr->name;
+    return {};
+}
+
 void GraphNode::getMidiProgramsState (String& state) const
 {
     state = String();
@@ -502,6 +519,7 @@ void GraphNode::getMidiProgramsState (String& state) const
         auto& state = program->state;
         ValueTree data ("program");
         data.setProperty (Tags::program, program->program, nullptr)
+            .setProperty (Tags::name, program->name, nullptr)
             .setProperty (Tags::state, state.toBase64Encoding(), nullptr);
         tree.appendChild (data, nullptr);
     }
@@ -532,6 +550,7 @@ void GraphNode::setMidiProgramsState (const String& state)
         std::unique_ptr<GraphNode::MidiProgram> program;
         program.reset (new GraphNode::MidiProgram());
         program->program = (int) data [Tags::program];
+        program->name = data[Tags::name].toString();
         const auto state = data.getProperty (Tags::state).toString().trim();
         if (state.isNotEmpty() && isPositiveAndBelow (program->program, 128))
         {
@@ -540,6 +559,8 @@ void GraphNode::setMidiProgramsState (const String& state)
         }
     }
 }
+
+//=============================================================================
 
 void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {

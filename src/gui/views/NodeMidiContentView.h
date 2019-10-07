@@ -51,6 +51,7 @@ private:
     SignalLabel midiProgramLabel;
     struct MidiProgramLayout : public Component
     {
+        Label name;
         Slider slider;
         IconButton loadButton;
         IconButton saveButton;
@@ -60,6 +61,8 @@ private:
 
         MidiProgramLayout()
         {
+            addAndMakeVisible (name);
+
             addAndMakeVisible (slider);
             slider.setSliderStyle (Slider::IncDecButtons);
             slider.setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
@@ -88,6 +91,7 @@ private:
         void resized() override
         {
             auto r = getLocalBounds();
+            auto r2 = r.removeFromTop (r.getHeight() / 2);
             r = r.withWidth (jmax (100 + 48, r.getWidth()));
             powerButton.setBounds (r.removeFromRight (20));
             r.removeFromRight (1);
@@ -99,6 +103,8 @@ private:
             r.removeFromRight (1);
             saveButton.setBounds (r.removeFromRight (20));
             slider.setBounds (r.removeFromLeft (108));
+
+            name.setBounds (r2);
         }
     } midiProgram;
     

@@ -381,6 +381,8 @@ public:
     
     int getMidiProgram() const;
     void setMidiProgram (int program);
+    String getMidiProgramName (int program) const;
+    void setMidiProgramName (int program, const String& name);
 
     bool hasEditor() const;
     

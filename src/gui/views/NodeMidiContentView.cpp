@@ -5,6 +5,8 @@
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/ViewHelpers.h"
 
+#define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
+
 namespace Element {
 
     static String noteValueToString (double value)
@@ -55,6 +57,23 @@ namespace Element {
         midiProgramLabel.setFont (font);
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
+        
+        midiProgram.name.setText ("Program name...", dontSendNotification);
+        midiProgram.name.setFont (font);
+        midiProgram.name.setEditable (false, true, false);
+        midiProgram.name.setTooltip ("MIDI Program name");
+        midiProgram.name.onTextChange = [this]()
+        {
+            if (midiProgram.name.getText().isEmpty())
+                midiProgram.name.setText (EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
+            auto theText = midiProgram.name.getText();
+            if (theText == EL_PROGRAM_NAME_PLACEHOLDER)
+                theText = "";
+
+            const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
+            node.setMidiProgramName (program, theText);
+            updateMidiProgram();
+        };
 
         midiProgram.slider.textFromValueFunction = [this](double value) -> String {
             if (! node.areMidiProgramsEnabled()) return "Off";
@@ -201,7 +220,7 @@ namespace Element {
        #if defined (EL_PRO) || defined (EL_SOLO)
         r.removeFromTop (2);
        
-        layoutComponent (r, midiProgramLabel, midiProgram);
+        layoutComponent (r, midiProgramLabel, midiProgram, 40);
         r.removeFromTop (2);
        #endif
         layoutComponent (r, keyLowLabel, keyLowSlider);
@@ -314,14 +333,17 @@ namespace Element {
     void NodeMidiContentView::updateMidiProgram()
     {
         const bool enabled = node.areMidiProgramsEnabled();
-
+        String programName;
         if (GraphNodePtr object = node.getGraphNode())
         {
             // use the object because there isn't a notifaction directly back to node model
             // in all cases
+            const auto programNumber = object->getMidiProgram();
             midiProgram.slider.setValue (1 + object->getMidiProgram(), dontSendNotification);
             if (isPositiveAndNotGreaterThan (roundToInt (midiProgram.slider.getValue()), 128))
             {
+                programName = node.getMidiProgramName (programNumber);
+                midiProgram.name.setEnabled (enabled);
                 midiProgram.loadButton.setEnabled (enabled);
                 midiProgram.saveButton.setEnabled (enabled);
                 midiProgram.trashButton.setEnabled (enabled);
@@ -329,13 +351,16 @@ namespace Element {
             }
             else
             {
+                midiProgram.name.setEnabled (false);
                 midiProgram.loadButton.setEnabled (false);
                 midiProgram.saveButton.setEnabled (false);
                 midiProgram.trashButton.setEnabled (false);
                 midiProgram.powerButton.setToggleState (false, dontSendNotification);
             }
         }
-
+        
+        midiProgram.name.setText (programName.isNotEmpty() ? 
+            programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
         midiProgram.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
         midiProgram.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
         midiProgram.globalButton.setEnabled (enabled);

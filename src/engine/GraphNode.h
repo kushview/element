@@ -224,6 +224,12 @@ public:
     /** Sets the MIDI program, note that this won't load it */
     void setMidiProgram (const int program);
 
+    /** Sets the MIDI program's name */
+    void setMidiProgramName (const int program, const String& name);
+
+    /** Gets the MIDI program's name */
+    String getMidiProgramName (const int program) const;
+
     /** Reloads the active MIDI program */
     void reloadMidiProgram();
 
@@ -363,10 +369,11 @@ private:
     struct MidiProgram
     {
         int program;
+        String name;
         MemoryBlock state;
     };
-    OwnedArray<MidiProgram> midiPrograms;
-    MidiProgram* getMidiProgram (int);
+    mutable OwnedArray<MidiProgram> midiPrograms;
+    MidiProgram* getMidiProgram (int) const;
 
     void setParentGraph (GraphProcessor*);
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
