@@ -9,7 +9,9 @@ bld.program (
                 '../libs/JUCE/modules', 
                 '../libs/kv/modules',
                 '../libs/SQLiteCpp/sqlite3',
-                '../libs/SQLiteCpp/include' ],
+                '../libs/SQLiteCpp/include',
+                '../libs/lv2',
+                '/opt/kushview/include' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
     install_path = None
