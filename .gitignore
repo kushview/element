@@ -33,3 +33,8 @@ build/
 !/.vscode/launch.json
 !/.vscode/c_cpp_properties.json
 !/.vscode/vscode.h
+
+/libs/eldb/*.dylib
+/libs/eldb/*.dll
+/libs/eldb/*.so
+/libs/eldb/eldb
