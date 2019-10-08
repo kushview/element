@@ -23,7 +23,7 @@ LookAndFeel::LookAndFeel()
 
     // Property Component
     setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
-    setColour (PropertyComponent::backgroundColourId, LookAndFeel::widgetBackgroundColor.brighter (0.002));
+    setColour (PropertyComponent::backgroundColourId, LookAndFeel::backgroundColor);
     
     // // Text Editor
     // setColour (TextEditor::textColourId,            textColor);
@@ -417,8 +417,12 @@ void LookAndFeel::drawPropertyPanelSectionHeader (Graphics& g, const String& nam
 void LookAndFeel::drawPropertyComponentBackground (Graphics& g, int width, int height,
                                                    PropertyComponent& pc)
 {
+    const auto r = getPropertyComponentContentPosition (pc);
+    g.setColour (widgetBackgroundColor.brighter (0.001));
+    g.fillRect (0, 0, r.getX(), height - 1);
+    
     g.setColour (pc.findColour (PropertyComponent::backgroundColourId));
-    g.fillRect (0, 0, width, height - 1);
+    g.fillRect (r.getX(), 0, width - r.getX(), height - 1);
 }
 
 static int getPropertyComponentIndent (PropertyComponent& component)
