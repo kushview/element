@@ -2,6 +2,7 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/LookAndFeel.h"
+#include "gui/properties/NodeProperties.h"
 #include "gui/views/NodeMidiContentView.h"
 #include "gui/ViewHelpers.h"
 
@@ -36,7 +37,7 @@ namespace Element {
         addAndMakeVisible (keyLowSlider);
         keyLowSlider.textFromValueFunction = noteValueToString;
         keyLowSlider.setRange (0, 127, 1.0);
-        keyLowSlider.setSliderStyle (Slider::LinearHorizontal);
+        keyLowSlider.setSliderStyle (Slider::LinearBar);
         keyLowSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         keyLowSlider.setTextBoxIsEditable (false);
         keyLowSlider.setValue (0, dontSendNotification);
@@ -47,7 +48,7 @@ namespace Element {
         addAndMakeVisible (keyHiSlider);
         keyHiSlider.textFromValueFunction = noteValueToString;
         keyHiSlider.setRange (0, 127, 1.0);
-        keyHiSlider.setSliderStyle (Slider::LinearHorizontal);
+        keyHiSlider.setSliderStyle (Slider::LinearBar);
         keyHiSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         keyHiSlider.setTextBoxIsEditable (false);
         keyHiSlider.setValue (127, dontSendNotification);
@@ -185,6 +186,8 @@ namespace Element {
         keyLowSlider.addListener (this);
         keyHiSlider.addListener (this);
         transposeSlider.addListener (this);
+
+        // addAndMakeVisible (props);
     }
 
     NodeMidiContentView::~NodeMidiContentView()
@@ -209,6 +212,8 @@ namespace Element {
     void NodeMidiContentView::resized()
     {
         auto r (getLocalBounds().reduced (2));
+        props.setBounds(r);
+        return;
         const auto estimatedH = 4 + (7 * 26) + 2 + 2;
         r = r.withHeight (jmax (estimatedH, r.getHeight()));
 
@@ -258,6 +263,7 @@ namespace Element {
             updateMidiChannels();
             updateSliders();
             updateMidiProgram();
+            // updateProperties();
 
             if (GraphNodePtr ptr = node.getGraphNode())
             {
@@ -303,6 +309,13 @@ namespace Element {
             .setProperty (Tags::transpose, object->getTransposeOffset(), nullptr);
 
         updateSliders(); // in case graph node changes requested values
+    }
+
+    void NodeMidiContentView::updateProperties()
+    {
+        props.clear();
+        props.addProperties (NodeProperties (node, false, true));
+        resized();
     }
 
     void NodeMidiContentView::updateSliders()

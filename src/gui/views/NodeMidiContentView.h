@@ -112,6 +112,9 @@ private:
     SignalLabel midiChannelLabel;
     MidiChannelSelectComponent midiChannel;
 
+    PropertyPanel props;
+    void updateProperties();
+    
     void layoutComponent (Rectangle<int>&, Label&, Component&, int preferedHeight = 0);
     void updateSliders();
     void updateMidiChannels();

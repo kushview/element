@@ -146,7 +146,7 @@ public:
     inline kv::MidiChannels getMidiChannels() const
     {
         kv::MidiChannels chans;
-        #ifndef EL_FREE
+       #ifndef EL_FREE
         if (objectData.hasProperty (Tags::midiChannels))
         {
             if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
@@ -156,7 +156,7 @@ public:
             }
         }
         else
-        #endif
+       #endif
         {
             const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
             if (channel > 0)
