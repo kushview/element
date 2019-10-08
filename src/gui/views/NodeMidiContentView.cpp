@@ -7,6 +7,7 @@
 #include "gui/ViewHelpers.h"
 
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
+#define EL_NODE_MIDI_CONTENT_VIEW_PROPS 0
 
 namespace Element {
 
@@ -28,7 +29,7 @@ namespace Element {
         addAndMakeVisible (transposeSlider);
         transposeSlider.setRange (-24, 24, 1);
         transposeSlider.setValue (0, dontSendNotification);
-        transposeSlider.setSliderStyle (Slider::LinearHorizontal);
+        transposeSlider.setSliderStyle (Slider::LinearBar);
         transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
         
         addAndMakeVisible (keyLowLabel);
@@ -59,7 +60,7 @@ namespace Element {
         midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
         addAndMakeVisible (midiProgram);
         
-        midiProgram.name.setText ("Program name...", dontSendNotification);
+        midiProgram.name.setText ("Name...", dontSendNotification);
         midiProgram.name.setFont (font);
         midiProgram.name.setEditable (false, true, false);
         midiProgram.name.setTooltip ("MIDI Program name");
@@ -187,7 +188,9 @@ namespace Element {
         keyHiSlider.addListener (this);
         transposeSlider.addListener (this);
 
-        // addAndMakeVisible (props);
+       #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
+        addAndMakeVisible (props);
+       #endif
     }
 
     NodeMidiContentView::~NodeMidiContentView()
@@ -212,8 +215,12 @@ namespace Element {
     void NodeMidiContentView::resized()
     {
         auto r (getLocalBounds().reduced (2));
+
+       #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
         props.setBounds(r);
         return;
+       #endif
+
         const auto estimatedH = 4 + (7 * 26) + 2 + 2;
         r = r.withHeight (jmax (estimatedH, r.getHeight()));
 
@@ -263,7 +270,7 @@ namespace Element {
             updateMidiChannels();
             updateSliders();
             updateMidiProgram();
-            // updateProperties();
+            updateProperties();
 
             if (GraphNodePtr ptr = node.getGraphNode())
             {
@@ -313,9 +320,11 @@ namespace Element {
 
     void NodeMidiContentView::updateProperties()
     {
+       #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
         props.clear();
         props.addProperties (NodeProperties (node, false, true));
         resized();
+       #endif
     }
 
     void NodeMidiContentView::updateSliders()
