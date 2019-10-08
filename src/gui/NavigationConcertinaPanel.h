@@ -490,6 +490,7 @@ public:
         gv->setComponentID ("Graph");
         gv->setGraphButtonVisible (false);
         gv->setUpdateOnActiveGraphChange (true);
+        gv->setPropertyPanelHeaderVisible (false);
         addPanelInternal (-1, gv, "Graph", nullptr);
 
        #ifndef EL_FREE

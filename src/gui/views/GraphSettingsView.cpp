@@ -266,13 +266,25 @@ namespace Element {
             {
                 PropertyArray props;
                 getSessionProperties (props, graph);
-                addSection ("Graph Settings", props);
+                if (useHeader)
+                    addSection ("Graph Settings", props);
+                else
+                    addProperties (props);
             }
         }
         
+        void setUseHeader (bool header)
+        {
+            if (useHeader == header)
+                return;
+            useHeader = header;
+            setNode (graph);
+        }
+
     private:
         Node graph;
         var locked;
+        bool useHeader = true;
 
         static void maybeLockObject (PropertyComponent* p, const var& locked)
         {
@@ -325,6 +337,11 @@ namespace Element {
         activeGraphIndex.removeListener (this);
     }
     
+    void GraphSettingsView::setPropertyPanelHeaderVisible (bool useHeader)
+    {
+        props->setUseHeader (useHeader);
+    }
+
     void GraphSettingsView::setGraphButtonVisible (bool isVisible)
     {
         graphButton.setVisible (isVisible);

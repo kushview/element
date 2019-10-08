@@ -15,6 +15,7 @@ public:
     GraphSettingsView();
     ~GraphSettingsView();
     
+    void setPropertyPanelHeaderVisible (bool);
     void setGraphButtonVisible (bool isVisible);
     void setUpdateOnActiveGraphChange (bool shouldUpdate);
 
