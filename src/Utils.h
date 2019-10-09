@@ -30,6 +30,11 @@ inline static String secondsToString (const double input)
     return minutesToString (input / 60.0);
 }
 
+inline static String noteValueToString (double value)
+{
+    return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
+}
+
 /** Returns the application name depending on product.
     Element Lite, Element Solo, or Element
  */

@@ -10,12 +10,6 @@
 #define EL_NODE_MIDI_CONTENT_VIEW_PROPS 1
 
 namespace Element {
-
-    static String noteValueToString (double value)
-    {
-        return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
-    }
-
     NodeMidiContentView::NodeMidiContentView()
     {
         const Font font (12.f);

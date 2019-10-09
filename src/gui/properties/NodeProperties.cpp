@@ -3,6 +3,7 @@
 #include "gui/properties/NodeProperties.h"
 #include "gui/widgets/NodeMidiProgramComponent.h"
 #include "session/Node.h"
+#include "Utils.h"
 
 #ifndef EL_PROGRAM_NAME_PLACEHOLDER
  #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
@@ -162,13 +163,10 @@ private:
 class MidiNotePropertyComponent : public SliderPropertyComponent
 {
 public:
-    MidiNotePropertyComponent (const Value& valueToControl, const String& propertyName)
-        : SliderPropertyComponent (valueToControl, propertyName, 0.0, 127.0, 1.0, 1.0, false)
+    MidiNotePropertyComponent (const Value& value, const String& name)
+        : SliderPropertyComponent (value, name, 0.0, 127.0, 1.0, 1.0, false)
     {
-        slider.textFromValueFunction = [this](double value) -> String {
-            return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 4);
-        };
-
+        slider.textFromValueFunction = Util::noteValueToString;
         slider.valueFromTextFunction = [this](const String& text) -> double {
             return 0.0;
         };
