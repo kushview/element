@@ -891,4 +891,77 @@ void Node::setMidiProgramName (int program, const String& name)
     // setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
 }
 
+
+NodeObjectSync::NodeObjectSync()
+{
+    data.addListener (this);
+}
+
+NodeObjectSync::~NodeObjectSync()
+{
+    data.removeListener (this);
+}
+
+void NodeObjectSync::setNode (const Node& n)
+{
+    node = n;
+    data.removeListener (this);
+    data = node.getValueTree();
+    data.addListener (this);
+}
+
+void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
+{
+    GraphNodePtr obj = node.getGraphNode();
+    if (tree != data || frozen || obj == nullptr)
+        return;
+        
+    if (property == Tags::midiChannels)
+    {
+        auto chans = node.getMidiChannels();
+        obj->setMidiChannels (chans.get());
+    }
+    else if (property == Tags::keyStart)
+    {
+        auto keyRange (obj->getKeyRange());
+        keyRange.setStart (roundToInt ((double) tree.getProperty (property)));
+        obj->setKeyRange (keyRange);
+    }
+    else if (property == Tags::keyEnd)
+    {
+        auto keyRange (obj->getKeyRange());
+        keyRange.setEnd (roundToInt ((double) tree.getProperty (property)));
+        obj->setKeyRange (keyRange);
+    }
+    else if (property == Tags::transpose)
+    {
+        obj->setTransposeOffset (roundToInt ((double) tree.getProperty (property)));
+    }
+}
+
+void NodeObjectSync::valueTreeChildAdded (ValueTree& parent, ValueTree& child)
+{
+    ignoreUnused (parent, child);
+}
+
+void NodeObjectSync::valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index)
+{
+    ignoreUnused (parent, child, index);
+}
+
+void NodeObjectSync::valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex)
+{
+    ignoreUnused (parent, oldIndex, newIndex);
+}
+
+void NodeObjectSync::valueTreeParentChanged (ValueTree& tree)
+{
+    ignoreUnused (tree);
+}
+
+void NodeObjectSync::valueTreeRedirected (ValueTree& tree)
+{
+    ignoreUnused (tree);
+}
+
 }

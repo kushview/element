@@ -111,14 +111,70 @@ public:
 
     void refresh() override
     {
-
+        updateMidiProgram();
     }
 
 private:
     Node node;
     NodeMidiProgramComponent program;
-    void updateMidiProgram() {}
+
+    void updateMidiProgram()
+    {
+        const bool enabled = node.areMidiProgramsEnabled();
+        String programName;
+        if (GraphNodePtr object = node.getGraphNode())
+        {
+            // use the object because there isn't a notifaction directly back to node model
+            // in all cases
+            const auto programNumber = object->getMidiProgram();
+            program.slider.setValue (1 + object->getMidiProgram(), dontSendNotification);
+            if (isPositiveAndNotGreaterThan (roundToInt (program.slider.getValue()), 128))
+            {
+                programName = node.getMidiProgramName (programNumber);
+                program.name.setEnabled (enabled);
+                program.loadButton.setEnabled (enabled);
+                program.saveButton.setEnabled (enabled);
+                program.trashButton.setEnabled (enabled);
+                program.powerButton.setToggleState (enabled, dontSendNotification);
+            }
+            else
+            {
+                program.name.setEnabled (false);
+                program.loadButton.setEnabled (false);
+                program.saveButton.setEnabled (false);
+                program.trashButton.setEnabled (false);
+                program.powerButton.setToggleState (false, dontSendNotification);
+            }
+        }
+        
+        program.name.setText (programName.isNotEmpty() ? 
+            programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
+        program.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
+        program.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
+        program.globalButton.setEnabled (enabled);
+        program.slider.updateText();
+        program.slider.setEnabled (enabled);
+    }
+
     void stabilizeContent() {}
+};
+
+class MidiNotePropertyComponent : public SliderPropertyComponent
+{
+public:
+    MidiNotePropertyComponent (const Value& valueToControl, const String& propertyName)
+        : SliderPropertyComponent (valueToControl, propertyName, 0.0, 127.0, 1.0, 1.0, false)
+    {
+        slider.textFromValueFunction = [this](double value) -> String {
+            return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 4);
+        };
+
+        slider.valueFromTextFunction = [this](const String& text) -> double {
+            return 0.0;
+        };
+
+        slider.updateText();
+    }
 };
 
 NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
@@ -139,20 +195,19 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
             node.getPropertyAsValue (Tags::midiChannels, false));
         add (mcp);
 
+       #if defined (EL_PRO) || defined (EL_SOLO)
         // MIDI Program
         add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
+       #endif
 
         // Key Start
-        add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::keyStart, false),
-            "Key Start", 0.0, 127.0, 1.0));
+        add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyStart, false), "Key Start"));
         
         // Key End
-        add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::keyEnd, false),
-            "Key End", 0.0, 127.0, 1.0));
+        add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyEnd, false), "Key End"));
         
         // Transpose
-        add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::transpose, false),
-            "Transpose", -24.0, 24.0, 1.0));
+        add (new SliderPropertyComponent (node.getPropertyAsValue (Tags::transpose, false), "Transpose", -24.0, 24.0, 1.0));
     }
 }
 

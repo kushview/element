@@ -7,7 +7,7 @@
 #include "gui/ViewHelpers.h"
 
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
-#define EL_NODE_MIDI_CONTENT_VIEW_PROPS 0
+#define EL_NODE_MIDI_CONTENT_VIEW_PROPS 1
 
 namespace Element {
 
@@ -22,171 +22,6 @@ namespace Element {
         setWantsKeyboardFocus (false);
         setMouseClickGrabsKeyboardFocus (false);
         setInterceptsMouseClicks (true, true);
-        
-        addAndMakeVisible (transposeLabel);
-        transposeLabel.setText ("Transpose", dontSendNotification);
-        transposeLabel.setFont (font);
-        addAndMakeVisible (transposeSlider);
-        transposeSlider.setRange (-24, 24, 1);
-        transposeSlider.setValue (0, dontSendNotification);
-        transposeSlider.setSliderStyle (Slider::LinearBar);
-        transposeSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
-        
-        addAndMakeVisible (keyLowLabel);
-        keyLowLabel.setText ("Key Start", dontSendNotification);
-        keyLowLabel.setFont (font);
-        addAndMakeVisible (keyLowSlider);
-        keyLowSlider.textFromValueFunction = noteValueToString;
-        keyLowSlider.setRange (0, 127, 1.0);
-        keyLowSlider.setSliderStyle (Slider::LinearBar);
-        keyLowSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
-        keyLowSlider.setTextBoxIsEditable (false);
-        keyLowSlider.setValue (0, dontSendNotification);
-
-        addAndMakeVisible (keyHiLabel);
-        keyHiLabel.setText ("Key End", dontSendNotification);
-        keyHiLabel.setFont (font);
-        addAndMakeVisible (keyHiSlider);
-        keyHiSlider.textFromValueFunction = noteValueToString;
-        keyHiSlider.setRange (0, 127, 1.0);
-        keyHiSlider.setSliderStyle (Slider::LinearBar);
-        keyHiSlider.setTextBoxStyle (Slider::TextBoxRight, true, 40, 18);
-        keyHiSlider.setTextBoxIsEditable (false);
-        keyHiSlider.setValue (127, dontSendNotification);
-
-       #if defined (EL_PRO) || defined (EL_SOLO)
-        addAndMakeVisible (midiProgramLabel);
-        midiProgramLabel.setFont (font);
-        midiProgramLabel.setText ("MIDI Prog.", dontSendNotification);
-        addAndMakeVisible (midiProgram);
-        
-        midiProgram.name.setText ("Name...", dontSendNotification);
-        midiProgram.name.setFont (font);
-        midiProgram.name.setEditable (false, true, false);
-        midiProgram.name.setTooltip ("MIDI Program name");
-        midiProgram.name.onTextChange = [this]()
-        {
-            if (midiProgram.name.getText().isEmpty())
-                midiProgram.name.setText (EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
-            auto theText = midiProgram.name.getText();
-            if (theText == EL_PROGRAM_NAME_PLACEHOLDER)
-                theText = "";
-
-            const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
-            node.setMidiProgramName (program, theText);
-            updateMidiProgram();
-        };
-
-        midiProgram.slider.textFromValueFunction = [this](double value) -> String {
-            if (! node.areMidiProgramsEnabled()) return "Off";
-            return String (roundToInt (value));
-        };
-        midiProgram.slider.valueFromTextFunction = [this](const String& text) -> double {
-            return text.getDoubleValue();
-        };
-
-        midiProgram.slider.onValueChange = [this]() {
-            const auto program = roundToInt (midiProgram.slider.getValue()) - 1;
-            node.setMidiProgram (program);
-            updateMidiProgram();
-        };
-
-        midiProgramLabel.onDoubleClicked = [this](const MouseEvent&) {
-            midiProgram.slider.setValue (0.0);
-        };
-        midiProgram.slider.updateText();
-
-        midiProgram.trashButton.setTooltip ("Delete MIDI program");
-        midiProgram.trashButton.onClick = [this]()
-        {
-            if (GraphNodePtr ptr = node.getGraphNode())
-            {
-                if (! ptr->areMidiProgramsEnabled())
-                    return;
-                ptr->removeMidiProgram (ptr->getMidiProgram(),
-                                        ptr->useGlobalMidiPrograms());
-            }
-        };
-
-        midiProgram.saveButton.setTooltip ("Save MIDI program");
-        midiProgram.saveButton.onClick = [this]()
-        {
-            if (GraphNodePtr ptr = node.getGraphNode())
-            {
-                if (node.useGlobalMidiPrograms())
-                {
-                    if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
-                    {
-                        node.savePluginState();
-                        node.writeToFile (ptr->getMidiProgramFile());
-                    }
-                }
-                else
-                {
-                    ptr->saveMidiProgram();
-                }
-            }
-        };
-
-        midiProgram.loadButton.setTooltip ("Reload saved MIDI program");
-        midiProgram.loadButton.onClick = [this]()
-        {
-            if (GraphNodePtr ptr = node.getGraphNode())
-            {
-                if (isPositiveAndBelow (ptr->getMidiProgram(), 128))
-                {
-                    ptr->reloadMidiProgram();
-                    stabilizeContent();
-                }
-            }
-        };
-
-        midiProgram.globalButton.onClick = [this]() {
-            node.setUseGlobalMidiPrograms (midiProgram.globalButton.getToggleState());
-            updateMidiProgram();
-        };
-        midiProgram.powerButton.onClick = [this]() {
-            node.setMidiProgramsEnabled (midiProgram.powerButton.getToggleState());
-            updateMidiProgram();
-        };
-       #endif
-
-        addAndMakeVisible (midiChannelLabel);
-        midiChannelLabel.setText ("MIDI Ch.", dontSendNotification);
-        midiChannelLabel.setFont (font);
-        
-        addAndMakeVisible (midiChannel);
-
-        transposeLabel.onDoubleClicked = [this](const MouseEvent&) {
-            transposeSlider.setValue (0.0, sendNotificationAsync);
-        };
-
-        keyLowLabel.onDoubleClicked = [this](const MouseEvent&) {
-            keyLowSlider.setValue (0.0, sendNotificationAsync);
-        };
-
-        keyHiLabel.onDoubleClicked = [this](const MouseEvent&) {
-            keyHiSlider.setValue (127.0, sendNotificationAsync); 
-        };
-
-        midiChannelLabel.onDoubleClicked = [this](const MouseEvent&) {
-            BigInteger chans;
-            chans.setRange (0, 17, false);
-            chans.setBit (0, true);
-            midiChannel.setChannels (chans);
-        };
-
-        midiChannel.onChanged = [this]()  {
-            if (auto* o = node.getGraphNode())
-            {
-                o->setMidiChannels (midiChannel.getChannels());
-                node.setProperty (Tags::midiChannels, midiChannel.getChannels().toMemoryBlock());
-            }
-        };
-
-        keyLowSlider.addListener (this);
-        keyHiSlider.addListener (this);
-        transposeSlider.addListener (this);
 
        #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
         addAndMakeVisible (props);
@@ -263,13 +98,12 @@ namespace Element {
 
         midiProgramChangedConnection.disconnect();
         node = gui.getSelectedNode();
+        nodeSync.setFrozen (true);
+        nodeSync.setNode (node);
 
         if (node.isValid() && ! node.isIONode())
         {
             setEnabled (true);
-            updateMidiChannels();
-            updateSliders();
-            updateMidiProgram();
             updateProperties();
 
             if (GraphNodePtr ptr = node.getGraphNode())
@@ -284,6 +118,8 @@ namespace Element {
         {
             setEnabled (false);
         }
+
+        nodeSync.setFrozen (false);
     }
 
     void NodeMidiContentView::sliderValueChanged (Slider* slider)

@@ -405,6 +405,30 @@ private:
 
 typedef Node NodeModel;
 
+class NodeObjectSync final : private ValueTree::Listener
+{
+public:
+    NodeObjectSync();
+    ~NodeObjectSync();
+
+    void setNode (const Node&);
+    Node getNode() const { return node; }
+    void setFrozen (bool freeze) { frozen = freeze; }
+    bool isFrozen() const { return frozen; }
+
+private:
+    Node node;
+    ValueTree data;
+    bool frozen = false;
+
+    void valueTreePropertyChanged (ValueTree& tree, const Identifier& property) override;
+    void valueTreeChildAdded (ValueTree& parent, ValueTree& child) override;
+    void valueTreeChildRemoved (ValueTree& parent, ValueTree& child, int index) override;
+    void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override;
+    void valueTreeParentChanged (ValueTree& tree) override;
+    void valueTreeRedirected (ValueTree& tree) override;
+};
+
 class PortArray : public Array<Port>
 {
 public:

@@ -56,6 +56,7 @@ private:
     MidiChannelSelectComponent midiChannel;
 
     PropertyPanel props;
+    NodeObjectSync nodeSync;
     void updateProperties();
 
     void layoutComponent (Rectangle<int>&, Label&, Component&, int preferedHeight = 0);
