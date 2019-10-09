@@ -633,7 +633,7 @@ void Node::restorePluginState()
         if (hasProperty (Tags::keyStart) && hasProperty (Tags::keyEnd))
         {
             Range<int> range (getProperty (Tags::keyStart, 0),
-                                getProperty (Tags::keyEnd, 127));
+                              getProperty (Tags::keyEnd, 127));
             obj->setKeyRange (range);
         }
 

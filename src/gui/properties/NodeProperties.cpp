@@ -160,6 +160,30 @@ private:
     void stabilizeContent() {}
 };
 
+class NodeMidiChannelsPropertyComponent : public MidiMultiChannelPropertyComponent
+{
+public:
+    NodeMidiChannelsPropertyComponent (const Node& n)
+        : node (n) 
+    {
+        setChannels (node.getMidiChannels().get());
+        node.getPropertyAsValue (Tags::midiChannels, false).referTo (getChannelsValue());
+        changed.connect (std::bind (&NodeMidiChannelsPropertyComponent::onChannelsChanged, this));
+    }
+
+    ~NodeMidiChannelsPropertyComponent()
+    {
+        changed.disconnect_all_slots();
+    }
+
+    void onChannelsChanged()
+    {
+        // noop
+    }
+
+    Node node;
+};
+
 class MidiNotePropertyComponent : public SliderPropertyComponent
 {
 public:
@@ -188,11 +212,8 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
     if (midiProps)
     {
         // MIDI Channel
-        auto* mcp = new MidiMultiChannelPropertyComponent();
-        mcp->getChannelsValue().referTo (
-            node.getPropertyAsValue (Tags::midiChannels, false));
-        add (mcp);
-
+        add (new NodeMidiChannelsPropertyComponent (node));
+        
        #if defined (EL_PRO) || defined (EL_SOLO)
         // MIDI Program
         add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
