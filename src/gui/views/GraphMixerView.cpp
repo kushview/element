@@ -35,14 +35,18 @@ public:
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
             if (auto* const gui = cc->getAppController().findChild<GuiController>())
-                gui->selectNode (getNode());
+                if (getNode() != gui->getSelectedNode())
+                    gui->selectNode (getNode());
     }
 
     void mouseDown (const MouseEvent& ev) override
     {
-        down = true;
-        dragging = false;
-        selectInGuiController();
+        if (! down)
+        {
+            down = true;
+            dragging = false;
+            selectInGuiController();
+        }    
     }
 
     void mouseDrag (const MouseEvent& ev) override
