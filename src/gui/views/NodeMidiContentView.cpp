@@ -24,11 +24,6 @@ NodeMidiContentView::~NodeMidiContentView()
 {
     midiProgramChangedConnection.disconnect();
     selectedNodeConnection.disconnect();
-    transposeLabel.onDoubleClicked = nullptr;
-    keyLowLabel.onDoubleClicked = nullptr;
-    keyHiLabel.onDoubleClicked = nullptr;
-    midiChannelLabel.onDoubleClicked = nullptr;
-    midiChannel.onChanged = nullptr;
 }
 
 void NodeMidiContentView::paint (Graphics& g)
@@ -88,6 +83,7 @@ void NodeMidiContentView::updateProperties()
 
 void NodeMidiContentView::updateMidiProgram()
 {
+   #if 0
     const bool enabled = node.areMidiProgramsEnabled();
     String programName;
     if (GraphNodePtr object = node.getGraphNode())
@@ -122,6 +118,7 @@ void NodeMidiContentView::updateMidiProgram()
     midiProgram.globalButton.setEnabled (enabled);
     midiProgram.slider.updateText();
     midiProgram.slider.setEnabled (enabled);
+   #endif
 }
 
 }

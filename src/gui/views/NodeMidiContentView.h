@@ -37,21 +37,6 @@ private:
 
         std::function<void(const MouseEvent&)> onDoubleClicked;
     };
-    
-    SignalLabel keyLowLabel;
-    Slider keyLowSlider;
-
-    SignalLabel keyHiLabel;
-    Slider keyHiSlider;
-
-    SignalLabel transposeLabel;
-    Slider transposeSlider;
-
-    SignalLabel midiProgramLabel;
-    NodeMidiProgramComponent midiProgram;
-    
-    SignalLabel midiChannelLabel;
-    MidiChannelSelectComponent midiChannel;
 
     PropertyPanel props;
     NodeObjectSync nodeSync;
