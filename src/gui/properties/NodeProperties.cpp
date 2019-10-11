@@ -21,10 +21,7 @@ public:
         setPreferredHeight (40);
 
         addAndMakeVisible (program);
-        program.name.setText ("Program name...", dontSendNotification);
-        program.name.setFont (Font (12.f));
-        program.name.setEditable (false, true, false);
-        program.name.setTooltip ("MIDI Program name");
+
         program.name.onTextChange = [this]()
         {
             if (program.name.getText().isEmpty())
@@ -167,7 +164,7 @@ public:
         : node (n) 
     {
         setChannels (node.getMidiChannels().get());
-        node.getPropertyAsValue (Tags::midiChannels, false).referTo (getChannelsValue());
+        getChannelsValue().referTo (node.getPropertyAsValue (Tags::midiChannels, false));
         changed.connect (std::bind (&NodeMidiChannelsPropertyComponent::onChannelsChanged, this));
     }
 

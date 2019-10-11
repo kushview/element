@@ -4,7 +4,11 @@ namespace Element {
 NodeMidiProgramComponent::NodeMidiProgramComponent()
 {
     addAndMakeVisible (name);
-
+    name.setText ("Program name...", dontSendNotification);
+    name.setTooltip ("MIDI Program name");
+    name.setFont (Font (12.f));
+    name.setEditable (false, true, false);
+    
     addAndMakeVisible (slider);
     slider.setSliderStyle (Slider::IncDecButtons);
     slider.setTextBoxStyle (Slider::TextBoxRight, false, 60, 20);
