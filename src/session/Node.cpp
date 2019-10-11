@@ -333,9 +333,13 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::bypass, false);
     stabilizeProperty (Tags::persistent, true);
     stabilizePropertyString (Tags::renderMode, "single");
-    #if ! defined (EL_PRO)
+    stabilizeProperty (Tags::keyStart, 0);
+    stabilizeProperty (Tags::keyEnd, 127);
+    stabilizeProperty (Tags::transpose, 0);
+    
+   #if ! defined (EL_PRO)
     stabilizeProperty (Tags::tempo, (double) 120.0);
-    #endif
+   #endif
     objectData.getOrCreateChildWithName (Tags::nodes, nullptr);
     objectData.getOrCreateChildWithName (Tags::ports, nullptr);
     objectData.getOrCreateChildWithName (Tags::ui, nullptr);

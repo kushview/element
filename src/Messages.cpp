@@ -167,6 +167,8 @@ private:
     const Arc arc;
 };
 
+//=============================================================================
+
 void AddPluginMessage::createActions (AppController& app, OwnedArray<UndoableAction>& actions) const
 {
     actions.add (new AddPluginAction (app, *this));
