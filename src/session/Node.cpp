@@ -2,6 +2,7 @@
 #include "session/Node.h"
 #include "session/Session.h"
 #include "controllers/GraphManager.h"
+#include "ScopedFlag.h"
 
 namespace Element {
 
@@ -336,7 +337,7 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::keyStart, 0);
     stabilizeProperty (Tags::keyEnd, 127);
     stabilizeProperty (Tags::transpose, 0);
-    
+
    #if ! defined (EL_PRO)
     stabilizeProperty (Tags::tempo, (double) 120.0);
    #endif
@@ -927,15 +928,28 @@ void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier
     }
     else if (property == Tags::keyStart)
     {
-        auto keyRange (obj->getKeyRange());
-        keyRange.setStart (roundToInt ((double) tree.getProperty (property)));
-        obj->setKeyRange (keyRange);
+        ScopedFlag sf (frozen, true);
+        auto start = roundToInt ((double) tree.getProperty (property));
+        auto end   = roundToInt ((double) tree.getProperty (Tags::keyEnd));
+        if (end < start) {
+            end = start;
+            tree.setProperty (Tags::keyEnd, end, nullptr);
+        }
+
+        obj->setKeyRange (Range<int>(start, end));
     }
     else if (property == Tags::keyEnd)
     {
-        auto keyRange (obj->getKeyRange());
-        keyRange.setEnd (roundToInt ((double) tree.getProperty (property)));
-        obj->setKeyRange (keyRange);
+        ScopedFlag sf (frozen, true);
+        auto end   = roundToInt ((double) tree.getProperty (property));
+        auto start = roundToInt ((double) tree.getProperty (Tags::keyStart));
+        if (start > end)
+        {
+            start = end;
+            tree.setProperty (Tags::keyStart, start, nullptr);
+        }
+        
+        obj->setKeyRange (Range<int> (start, end));
     }
     else if (property == Tags::transpose)
     {

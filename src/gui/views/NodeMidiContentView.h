@@ -7,8 +7,7 @@
 
 namespace Element {
 
-class NodeMidiContentView : public ContentView,
-                        public Slider::Listener
+class NodeMidiContentView : public ContentView
 {
 public:
     NodeMidiContentView();
@@ -18,7 +17,6 @@ public:
 
     void resized() override;
     void paint (Graphics& g) override;
-    void sliderValueChanged (Slider*) override;
 
 private:
     Node node;
@@ -58,10 +56,6 @@ private:
     PropertyPanel props;
     NodeObjectSync nodeSync;
     void updateProperties();
-
-    void layoutComponent (Rectangle<int>&, Label&, Component&, int preferedHeight = 0);
-    void updateSliders();
-    void updateMidiChannels();
     void updateMidiProgram();
 };
 
