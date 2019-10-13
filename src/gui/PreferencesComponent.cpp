@@ -34,7 +34,6 @@
 #define EL_AUDIO_SETTINGS_NAME "Audio"
 #define EL_MIDI_SETTINGS_NAME "MIDI"
 #define EL_PLUGINS_PREFERENCE_NAME  "Plugins"
-#define EL_LICENSE_SETTINGS_NAME "License"
 //[/Headers]
 
 #include "PreferencesComponent.h"
@@ -882,9 +881,6 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
-   #ifndef EL_FREE
-    addPage (EL_LICENSE_SETTINGS_NAME);
-   #endif
     setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
