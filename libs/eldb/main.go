@@ -2,16 +2,18 @@ package main
 
 import "C"
 import (
-	"./schema"
+	"fmt"
+	"log"
+	"net/http"
 )
 
 func init() {}
 
-func main() {
-	db := open()
-	defer db.Close()
+func dbopen() {
+	// db := schema.open()
+	// defer db.Close()
 
-	schema.Migrate(db)
+	// schema.Migrate(db)
 
 	// // Migrate the schema
 	// db.AutoMigrate(&NodeType{})
@@ -29,4 +31,14 @@ func main() {
 	// fmt.Println(plugin.Price)
 	// // Delete - delete Plugin
 	// db.Delete(&plugin)
+}
+
+func presets(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, "{ \"text\": \"Hi there, I love %s!\" }", r.URL.Path[1:])
+}
+
+func main() {
+	http.HandleFunc("/presets.json", presets)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
