@@ -1,9 +1,7 @@
 package main
 
-import "github.com/jinzhu/gorm"
-
 type Plugin struct {
-	gorm.Model
+	Model
 	Name     string
 	Format   string
 	Favorite bool

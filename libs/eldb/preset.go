@@ -1,9 +1,7 @@
 package main
 
-import "github.com/jinzhu/gorm"
-
 type Preset struct {
-	gorm.Model
-	Name   string
-	Format string
+	Model
+	Name   string `json:"name"`
+	Format string `json:"format"`
 }
