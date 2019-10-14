@@ -26,7 +26,7 @@ static inline bool isCapsLockOn()
    #else
     // linux
    #endif
-   return false;
+    return false;
 }
 
 }
