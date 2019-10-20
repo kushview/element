@@ -2,7 +2,10 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
+
+	"github.com/jinzhu/gorm"
 )
 
 // Preset model
@@ -15,15 +18,22 @@ type Preset struct {
 type presetsController struct {
 }
 
+func searchPresets(q string, db *gorm.DB) []Preset {
+	psets := make([]Preset, 0)
+	q = fmt.Sprintf("%%%s%%", q)
+	fmt.Println(q)
+	db.Where("name LIKE ?", q).Find(&psets)
+	return psets
+}
+
 func (pc *presetsController) index(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	db := open()
 	defer db.Close()
-	var pset Preset
-	db.First(&pset)
 
-	if out, err := json.Marshal(pset); err == nil {
+	psets := searchPresets("Preset", db)
+	if out, err := json.Marshal(psets); err == nil {
 		w.Write(out)
 	}
 }

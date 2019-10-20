@@ -1,11 +1,12 @@
 package main
 
 import (
+	"./plugin"
 	"github.com/jinzhu/gorm"
 )
 
 // Migrate the database
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&Plugin{})
+	db.AutoMigrate(&plugin.Model{})
 	db.AutoMigrate(&Preset{})
 }

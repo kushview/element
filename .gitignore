@@ -37,4 +37,5 @@ build/
 /libs/eldb/*.dylib
 /libs/eldb/*.dll
 /libs/eldb/*.so
+/libs/eldb/*.db
 /libs/eldb/eldb
