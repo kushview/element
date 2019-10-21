@@ -1,6 +1,8 @@
 package plugin
 
+import "C"
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
@@ -24,6 +26,13 @@ type Plugin struct {
 // Collection of plugins
 type Collection []Plugin
 
+func (c Collection) ToJSON() []byte {
+	if out, err := json.Marshal(c); err == nil {
+		return out
+	}
+	return make([]byte, 0)
+}
+
 // All plugins
 func All(db *gorm.DB) Collection {
 	r := make(Collection, 0)
@@ -32,11 +41,14 @@ func All(db *gorm.DB) Collection {
 }
 
 // Search for plugins
-func Search(q string, db *gorm.DB) Collection {
-	r := make(Collection, 0)
+func Search(q string, db *gorm.DB) *gorm.DB {
 	q = fmt.Sprintf("%%%s%%", q)
-	db.Where("name LIKE ?", q).Find(&r)
-	return r
+	return db.Where("name LIKE ?", q)
+}
+
+// Favorites ...
+func Favorites(db *gorm.DB) *gorm.DB {
+	return db.Where("favorite = ?", true)
 }
 
 // TableName ...

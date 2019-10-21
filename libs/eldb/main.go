@@ -2,7 +2,6 @@ package main
 
 import "C"
 import (
-	"encoding/json"
 	"log"
 	"net/http"
 
@@ -32,12 +31,12 @@ func searchPlugins(w http.ResponseWriter, r *http.Request) {
 	q := keys[0]
 
 	db := open()
+	defer db.Close()
 
-	if out, err := json.Marshal(plugin.Search(q, db)); err == nil {
-		w.Write(out)
-	}
-
-	db.Close()
+	db = plugin.Search(q, db)
+	plugins := make(plugin.Collection, 0)
+	db.Find(&plugins)
+	w.Write(plugins.ToJSON())
 }
 
 func serve() {
@@ -57,7 +56,25 @@ func main() {
 	serve()
 }
 
+//export eldb_migrate
+func eldb_migrate() {
+	db := open()
+	defer db.Close()
+	migrate(db)
+}
+
 //export eldb_preset_count
 func eldb_preset_count() C.int {
 	return 0
+}
+
+//export eldb_plugin_search
+func eldb_plugin_search(q *C.char) *C.char {
+	db := open()
+	db = plugin.Search(C.GoString(q), db)
+	c := make(plugin.Collection, 0)
+	db.Find(&c)
+	db.Close()
+
+	return C.CString(string(c.ToJSON()))
 }
