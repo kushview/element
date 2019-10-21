@@ -510,7 +510,7 @@ bool AppController::perform (const InvocationInfo& info)
                 msg.setTimeStamp (Time::getMillisecondCounterHiRes());
                 e->addMidiMessage (msg);
                 msg = MidiMessage::allSoundOff(c);
-                msg.setTimeStamp (msg.getTimeStamp());
+                msg.setTimeStamp (Time::getMillisecondCounterHiRes());
                 e->addMidiMessage (msg);
             }
         }  break;
