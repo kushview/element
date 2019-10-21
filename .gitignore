@@ -34,6 +34,7 @@ build/
 !/.vscode/c_cpp_properties.json
 !/.vscode/vscode.h
 
+/libs/vstsdk2.4/
 /libs/eldb/*.dylib
 /libs/eldb/*.dll
 /libs/eldb/*.so
