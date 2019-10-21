@@ -26,12 +26,22 @@ type Plugin struct {
 // Collection of plugins
 type Collection []Plugin
 
+//=============================================================================
+
+// TableName ...
+func (Plugin) TableName() string { return Table }
+
+//=============================================================================
+
+// ToJSON converts to a JSON encoded byte array
 func (c Collection) ToJSON() []byte {
 	if out, err := json.Marshal(c); err == nil {
 		return out
 	}
 	return make([]byte, 0)
 }
+
+//=============================================================================
 
 // All plugins
 func All(db *gorm.DB) Collection {
@@ -50,6 +60,3 @@ func Search(q string, db *gorm.DB) *gorm.DB {
 func Favorites(db *gorm.DB) *gorm.DB {
 	return db.Where("favorite = ?", true)
 }
-
-// TableName ...
-func (Plugin) TableName() string { return Table }
