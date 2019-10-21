@@ -39,3 +39,7 @@ build/
 /libs/eldb/*.so
 /libs/eldb/*.db
 /libs/eldb/eldb
+
+/delete.txt
+/tools/deploy/
+/tools/installers/
