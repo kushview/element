@@ -295,14 +295,14 @@ def build_mac (bld):
         use         = [ 'KV', 'EL', 'PYTHON' ],
         linkflags   = [ '-framework', 'Python' ],
         mac_app     = True,
-        mac_plist   = 'tools/macdeploy/InfoPro.plist',
+        mac_plist   = 'data/Pro.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
     )
 
     if bld.env.EL_FREE:
-        app.mac_plist = 'tools/macdeploy/InfoLite.plist'
+        app.mac_plist = 'data/Lite.plist'
     elif bld.env.EL_SOLO:
-        app.mac_plist = 'tools/macdeploy/InfoSolo.plist'
+        app.mac_plist = 'data/Solo.plist'
     
 def build (bld):
     if cross.is_windows (bld):
