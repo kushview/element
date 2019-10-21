@@ -7,6 +7,6 @@ import (
 
 // Migrate the database
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&plugin.Model{})
+	db.AutoMigrate(&plugin.Plugin{})
 	db.AutoMigrate(&Preset{})
 }
