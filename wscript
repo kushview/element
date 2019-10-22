@@ -254,9 +254,13 @@ def build_mac (bld):
     libEnv = bld.env.derive()
     bld.shlib (
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
-                        'libs/vst3sdk', 'libs/vstsdk2.4', 'src' ],
+        includes    = [ '/opt/kushview/include', \
+                        'libs/JUCE/modules', \
+                        'libs/kv/modules', \
+                        'project/JuceLibraryCode', \
+                        'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK', \
+                        'libs/vstsdk2.4', \
+                        'src' ],
         target      = 'lib/kv',
         name        = 'KV',
         env         = libEnv,

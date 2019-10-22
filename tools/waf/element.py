@@ -21,6 +21,12 @@ mingw_libs = '''
 def check_common (self):
     self.check(header_name='stdbool.h', mandatory=True)
 
+    # VST support
+    line_just = self.line_just
+    self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
+               mandatory=False, uselib_store="VST")
+    self.line_just = line_just
+
     # LV2 Support
     # self.env.append_unique ('CXXFLAGS', ["-I../../libs/lv2"])
     # self.check(header_name='lv2/lv2plug.in/ns/lv2core/lv2.h', mandatory=True)
@@ -34,7 +40,7 @@ def check_mingw (self):
     for l in mingw_libs.split():
         self.check_cxx(lib=l, uselib_store=l.upper())
     self.define('JUCE_PLUGINHOST_VST3', 0)
-    self.define('JUCE_PLUGINHOST_VST', 1)
+    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
     self.define('JUCE_PLUGINHOST_AU', 0)
     for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
         self.env.append_unique ('CFLAGS', [flag])
@@ -44,7 +50,7 @@ def check_mingw (self):
 def check_mac (self):
     # VST/VST3 OSX Support
     self.define('JUCE_PLUGINHOST_VST3', 1)
-    self.define('JUCE_PLUGINHOST_VST', 1)
+    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
     # Python scripting
     if (self.options.enable_python):
         self.check_cfg(path='python-config', args='--includes', package='Python', use='PYTHON')
