@@ -1,28 +1,21 @@
 /*
- ==============================================================================
- 
- Adapted:
- 
- This file is part of the JUCE library.
- Copyright (c) 2015 - ROLI Ltd.
- 
- Permission is granted to use this software under the terms of either:
- a) the GPL v2 (or any later version)
- b) the Affero GPL v3
- 
- Details of these licenses can be found at: www.gnu.org/licenses
- 
- JUCE is distributed in the hope that it will be useful, but WITHOUT ANY
- WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
- A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
- 
- ------------------------------------------------------------------------------
- 
- To release a closed-source product which uses JUCE, commercial licenses are
- available: visit www.juce.com for more information.
- 
- ==============================================================================
- */
+    This file is part of Element
+    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #pragma once
 
