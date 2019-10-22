@@ -183,7 +183,7 @@ public:
        #if EL_RUNNING_AS_PLUGIN
         // Plugin always has host sync option
         const bool showExt = true;
-        ignoreUnused (props, status);
+        ignoreUnused (props);
        #elif defined (EL_PRO)
         const bool showExt = props->getValue ("clockSource") == "midiClock";
        #else
