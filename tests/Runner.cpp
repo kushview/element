@@ -57,7 +57,7 @@ int main (int argc, char** argv)
         Logger::writeToLog (notfound);
     }
 
-    int totalFails, totalPass;
+    int totalFails = 0, totalPass = 0;
     for (int i = 0; i < runner.getNumResults(); ++i)
     {
         const auto* const result = runner.getResult (i);

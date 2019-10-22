@@ -4,44 +4,16 @@
          beatDivisor="2">
   <graphs active="0">
     <node type="graph" uuid="1e1bbdc8da0a4141b40358252053ad8a" name="Graph"
-          bypass="0" persistent="1" renderMode="single">
+          bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+          transpose="0">
       <nodes>
-        <node id="1" type="plugin" format="Internal" identifier="audio.input"
-              name="Built-in Microphone" relativeX="0.25000000000000000000"
-              relativeY="0.25000000000000000000" numAudioIns="0" numAudioOuts="2"
-              uuid="e3ed025cb0644518b4ce08a84ce57c4f" bypass="0" persistent="1"
-              renderMode="single" enabled="1" program="0" midiProgram="0" globalMidiPrograms="1"
-              midiProgramsEnabled="0" midiProgramsState="">
-          <nodes/>
-          <ui/>
-          <ports>
-            <port index="0" channel="0" type="audio" name="Input 1" symbol="audio_out_1"
-                  flow="output"/>
-            <port index="1" channel="1" type="audio" name="Input 2" symbol="audio_out_2"
-                  flow="output"/>
-          </ports>
-        </node>
-        <node id="2" type="plugin" format="Internal" identifier="audio.output"
-              name="Built-in Output" relativeX="0.25000000000000000000" relativeY="0.75000000000000000000"
-              numAudioIns="2" numAudioOuts="0" uuid="4a033540e1e7496a866b4436f8599fb1"
-              bypass="0" persistent="1" renderMode="single" enabled="1" program="0"
-              midiProgram="0" globalMidiPrograms="1" midiProgramsEnabled="0"
-              midiProgramsState="" keyStart="0" keyEnd="127" transpose="0">
-          <nodes/>
-          <ui/>
-          <ports>
-            <port index="0" channel="0" type="audio" name="Output 1" symbol="audio_in_1"
-                  flow="input"/>
-            <port index="1" channel="1" type="audio" name="Output 2" symbol="audio_in_2"
-                  flow="input"/>
-          </ports>
-        </node>
         <node id="3" type="plugin" format="Internal" identifier="midi.input"
               name="MIDI In" relativeX="0.75000000000000000000" relativeY="0.25000000000000000000"
               numAudioIns="0" numAudioOuts="0" uuid="dc22d5e3f85643f69b9d6b9579afb220"
               bypass="0" persistent="1" renderMode="single" enabled="1" program="0"
               midiProgram="0" globalMidiPrograms="1" midiProgramsEnabled="0"
-              midiProgramsState="">
+              midiProgramsState="" keyStart="0" keyEnd="127" transpose="0"
+              mute="0" muteInput="0">
           <nodes/>
           <ui/>
           <ports>
@@ -54,7 +26,8 @@
               numAudioIns="0" numAudioOuts="0" uuid="40b0d2df95044cf8a1ed0a74c593c6ac"
               bypass="0" persistent="1" renderMode="single" enabled="1" program="0"
               midiProgram="0" globalMidiPrograms="1" midiProgramsEnabled="0"
-              midiProgramsState="">
+              midiProgramsState="" keyStart="0" keyEnd="127" transpose="0"
+              mute="0" muteInput="0">
           <nodes/>
           <ui/>
           <ports>
@@ -70,5 +43,5 @@
   </graphs>
   <controllers/>
   <maps/>
-  <ui content="128.3ocEJGrCBBBF..FNzqCWZUd0UXCbEEVMg4k1DSXH+M6eS8su55299fOQGgROCsNdqGgw8PBcI7g2MQnMq1tgsFxjX3Po3dQc.1Mq3c2jS12ECV4eQLDxildQzl3BidFrcbgM+hr5jxTo8u5KEKgET+KeMVyXALSMdjP9BTzzo3I"/>
+  <ui content="128.3ocCE2zCBBBF..FNzeGuTQd2fEjqz9f.15faRahjut5cB+7qmKOewNzSnzSPum2OfvmJXB8SndvmHzmqXrh0PoBC6OJuKLAXW9L+0MUxojcgVv3lEui7nKJ+uUGCifQeQ6l2niFmzFZEKMowfMaeHqpyGtVWrrkU1XHje.XapL."/>
 </session>
