@@ -23,7 +23,6 @@
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
-#include "session/UnlockStatus.h"
 #include "Settings.h"
 #include "URIs.h"
 #include "session/CommandManager.h"
@@ -66,7 +65,6 @@ public:
     ScopedPointer<MediaManager>   media;
     ScopedPointer<PluginManager>  plugins;
     ScopedPointer<Settings>       settings;
-    ScopedPointer<UnlockStatus>   unlock;
     std::unique_ptr<MappingEngine> mapping;
     std::unique_ptr<PresetCollection> presets;
     std::unique_ptr<MidiEngine>   midi;
@@ -86,7 +84,6 @@ private:
         media    = new MediaManager();
         settings = new Settings();
         commands = new CommandManager();
-        unlock   = new UnlockStatus (owner);
         session  = new Session();
         mapping.reset (new MappingEngine());
         midi.reset (new MidiEngine());
@@ -99,7 +96,6 @@ private:
         plugins  = nullptr;
         settings = nullptr;
         engine   = nullptr;
-        unlock   = nullptr;
         session  = nullptr;
         media    = nullptr;
         devices  = nullptr;

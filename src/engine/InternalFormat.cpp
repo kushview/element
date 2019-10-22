@@ -38,8 +38,6 @@
 #include "engine/InternalFormat.h"
 
 #include "session/Session.h"
-#include "session/UnlockStatus.h"
-
 #include "../experimental/MidiSequenceProcessor.h"
 
 #include "Globals.h"

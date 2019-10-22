@@ -31,7 +31,6 @@
 #include "session/Session.h"
 #include "session/CommandManager.h"
 #include "session/Node.h"
-#include "session/UnlockStatus.h"
 #include "Commands.h"
 #include "Globals.h"
 #include "Settings.h"

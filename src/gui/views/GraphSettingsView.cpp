@@ -191,8 +191,7 @@ namespace Element {
         Node node;
     };
     
-    class MidiProgramPropertyComponent : public SliderPropertyComponent,
-                                         public UnlockStatus::LockableObject
+    class MidiProgramPropertyComponent : public SliderPropertyComponent
 
     {
     public:
@@ -223,7 +222,7 @@ namespace Element {
             slider.valueFromTextFunction = nullptr;
         }
 
-        void setLocked (const var& isLocked) override
+        void setLocked (const var& isLocked)
         {
             locked = isLocked;
             refresh();
@@ -240,7 +239,6 @@ namespace Element {
             }
             else
             {
-                showLockedAlert();
                 refresh();
             }
         }
@@ -297,8 +295,7 @@ namespace Element {
 
         static void maybeLockObject (PropertyComponent* p, const var& locked)
         {
-            if (auto* lc = dynamic_cast<UnlockStatus::LockableObject*> (p))
-                lc->setLocked (locked);
+            ignoreUnused (p, locked);
         }
 
         void getSessionProperties (PropertyArray& props, Node g)

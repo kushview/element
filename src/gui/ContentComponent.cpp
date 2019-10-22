@@ -35,7 +35,6 @@
 #include "session/DeviceManager.h"
 #include "session/Node.h"
 #include "session/PluginManager.h"
-#include "session/UnlockStatus.h"
 
 #include "Commands.h"
 #include "Globals.h"

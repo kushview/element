@@ -30,10 +30,8 @@
 #include "controllers/WorkspacesController.h"
 
 #include "gui/MainWindow.h"
-#include "gui/UnlockForm.h"
 #include "gui/GuiCommon.h"
 
-#include "session/UnlockStatus.h"
 #include "session/Presets.h"
 #include "Commands.h"
 #include "Globals.h"

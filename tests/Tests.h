@@ -37,7 +37,6 @@
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"
-#include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Settings.h"
 #include "Common.h"

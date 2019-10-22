@@ -26,7 +26,6 @@
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
-#include "session/UnlockStatus.h"
 
 namespace Element {
 
@@ -37,8 +36,7 @@ class Settings;
 
 typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
 
-class RootGraph : public GraphProcessor,
-                  public UnlockStatus::LockableObject
+class RootGraph : public GraphProcessor
 {
 public:
     RootGraph();
@@ -50,9 +48,9 @@ public:
         Parallel        = (1 << 0)
     };
 
-    inline void setLocked (const var& l) override
+    inline void setLocked (const var&)
     {
-        const bool isNowLocked = (bool) l;
+        const bool isNowLocked = false;
         ScopedLock sl (getCallbackLock());
         locked = isNowLocked;
     }

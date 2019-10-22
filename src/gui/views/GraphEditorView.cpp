@@ -19,7 +19,6 @@
 
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphEditorView.h"
-#include "session/UnlockStatus.h"
 #include "Common.h"
 
 #ifndef EL_GRAPH_EDITOR_VIEWPORT

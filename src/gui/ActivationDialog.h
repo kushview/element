@@ -23,9 +23,7 @@
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
 #include "gui/Buttons.h"
-#include "gui/UnlockOverlay.h"
 #include "session/CommandManager.h"
-#include "session/UnlockStatus.h"
 #include "Globals.h"
 #include "Utils.h"
 
