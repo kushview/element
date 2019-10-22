@@ -302,7 +302,7 @@ def build_mac (bld):
         use         = [ 'KV', 'EL', 'PYTHON' ],
         linkflags   = [ '-framework', 'Python' ],
         mac_app     = True,
-        mac_plist   = 'data/Pro.plist',
+        mac_plist   = 'data/InfoPro.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
     )
 

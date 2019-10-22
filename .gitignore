@@ -45,3 +45,5 @@ build/
 /deploy/
 /tools/deploy/
 /tools/installers/
+
+/plugins
