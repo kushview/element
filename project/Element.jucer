@@ -551,9 +551,10 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=0"
                extraLinkerFlags="" bigIcon="eG1U6B" smallIcon="eG1U6B" iosDevelopmentTeamID=""
                extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;CFBundleDisplayName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_DISPLAY_NAME)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleIdentifier&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_IDENTIFIER)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_NAME)&lt;/string&gt;&#10;        &lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
-               documentExtensions="elc,elg,els" vstLegacyFolder="../libs/vstsdk2.4"
-               vst3Folder="../libs/vst3sdk" hardenedRuntime="1" iosInAppPurchases="0"
-               iosPushNotifications="0" hardenedRuntimeOptions="com.apple.security.device.audio-input">
+               documentExtensions="elc,elg,els" vstLegacyFolder="/opt/kushview/vstsdk2.4"
+               vst3Folder="../libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK"
+               hardenedRuntime="1" iosInAppPurchases="0" iosPushNotifications="0"
+               hardenedRuntimeOptions="com.apple.security.device.audio-input">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"

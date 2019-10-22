@@ -42,5 +42,6 @@ build/
 /libs/eldb/eldb
 
 /delete.txt
+/deploy/
 /tools/deploy/
 /tools/installers/
