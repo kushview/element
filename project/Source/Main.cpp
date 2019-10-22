@@ -11,7 +11,6 @@
 #include "engine/GraphProcessor.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
-#include "session/GoogleAnalyticsDestination.h"
 #include "Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
