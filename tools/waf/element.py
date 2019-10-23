@@ -5,11 +5,10 @@ import os, platform
 from waflib.Configure import conf
 
 juce_modules = '''
-    juce_analytics juce_audio_basics juce_audio_devices juce_audio_formats
+    juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
     juce_data_structures juce_events juce_graphics juce_gui_basics
-    juce_gui_extra juce_product_unlocking kv_core kv_edd kv_engines
-    kv_gui kv_lv2 kv_models
+    juce_gui_extra kv_core kv_engines kv_gui kv_lv2 kv_models
 '''
 
 mingw_libs = '''
@@ -19,7 +18,9 @@ mingw_libs = '''
 
 @conf 
 def check_common (self):
+    self.check(lib='curl', mandatory=False)
     self.check(header_name='stdbool.h', mandatory=True)
+    self.check(header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
 
     # VST support
     line_just = self.line_just
@@ -54,7 +55,12 @@ def check_mac (self):
 
 @conf
 def check_linux (self):
-    return
+    conf.check(lib='pthread', mandatory=True)
+    conf.check(lib='dl', mandatory=True)
+    conf.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
+    conf.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
+    conf.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
+    conf.check_cfg(package='alsa', args='--cflags --libs', mandatory=True)
 
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]

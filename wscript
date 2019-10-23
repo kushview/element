@@ -59,23 +59,6 @@ def configure (conf):
     
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
-    conf.check(lib='curl', mandatory=False)
-
-    if juce.is_linux():
-        conf.check(lib='pthread', mandatory=True)
-        conf.check(lib='dl', mandatory=True)
-        conf.check_cfg(package='freetype2', args='--cflags --libs', \
-            mandatory=True)
-        conf.check_cfg(package='x11', args='--cflags --libs', \
-            mandatory=True)
-        conf.check_cfg(package='xext', args='--cflags --libs', \
-            mandatory=True)
-        conf.check_cfg(package='alsa', args='--cflags --libs', \
-            mandatory=True)
-    if cross.is_windows (conf):
-        conf.check(lib='ws2_32', mandatory=True)
-        conf.check(lib='pthread', mandatory=True)
-
     print
     juce.display_header ("Element Configuration")
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
@@ -179,10 +162,10 @@ def build_linux (bld):
 
 def build_mac (bld):
     libEnv = bld.env.derive()
-    bld.shlib (
+    bld (
+        features    = 'cxx cxxshlib',
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
-        includes    = [ '/opt/kushview/include', \
-                        'libs/JUCE/modules', \
+        includes    = [ 'libs/JUCE/modules', \
                         'libs/kv/modules', \
                         'project/JuceLibraryCode', \
                         VST3_PATH, \
@@ -207,7 +190,7 @@ def build_mac (bld):
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = [ 'KV' ]
+        use         = [ 'KV', 'BOOST_SIGNALS' ]
     )
 
     bld.add_group()

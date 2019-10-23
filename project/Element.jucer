@@ -19,9 +19,6 @@
       <FILE id="eG1U6B" name="ElementIcon.png" compile="0" resource="1" file="../data/ElementIcon.png"/>
       <FILE id="xX315d" name="test_icon.png" compile="0" resource="0" file="../data/test_icon.png"/>
     </GROUP>
-    <GROUP id="{CC2B2216-56C8-E6C4-F121-321535DA022D}" name="sqlite3">
-      <FILE id="rIK1BZ" name="sqlite3.c" compile="1" resource="0" file="../libs/SQLiteCpp/sqlite3/sqlite3.c"/>
-    </GROUP>
     <GROUP id="{AD6CAB54-316B-E642-B386-F92400156648}" name="src">
       <GROUP id="{9DD5458B-19BD-A4F6-EF49-91FD7FC11465}" name="controllers">
         <FILE id="D7U0HM" name="AppController.cpp" compile="1" resource="0"
@@ -594,14 +591,11 @@
         <MODULEPATH id="juce_audio_formats" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
-        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
-        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
@@ -653,7 +647,6 @@
                        linkTimeOptimisation="1"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../libs/JUCE/modules"/>
@@ -671,8 +664,6 @@
         <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../libs/kv/modules"/>
-        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
-        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile">
@@ -685,9 +676,7 @@
         <MODULEPATH id="kv_lv2" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_engines" path="../libs/kv/modules"/>
-        <MODULEPATH id="kv_edd" path="../libs/kv/modules"/>
         <MODULEPATH id="kv_core" path="../libs/kv/modules"/>
-        <MODULEPATH id="juce_product_unlocking" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_extra" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_gui_basics" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_graphics" path="../libs/JUCE/modules"/>
@@ -700,12 +689,10 @@
         <MODULEPATH id="juce_audio_formats" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_audio_devices" path="../libs/JUCE/modules"/>
         <MODULEPATH id="juce_audio_basics" path="../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_analytics" path="../libs/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
-    <MODULE id="juce_analytics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULES id="juce_audio_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_devices" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_audio_formats" showAllCode="1" useLocalCopy="0"/>
@@ -718,9 +705,7 @@
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
-    <MODULE id="juce_product_unlocking" showAllCode="1" useLocalCopy="0"/>
     <MODULE id="kv_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
-    <MODULE id="kv_edd" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_engines" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_lv2" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

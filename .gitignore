@@ -2,9 +2,9 @@
 
 project/Builds
 project/JuceLibraryCode/ReadMe.txt
-project/JuceLibraryCode/include_*.*
-project/JuceLibraryCode/include_*.*
-project/JuceLibraryCode/BinaryData*.*
+# project/JuceLibraryCode/include_*.*
+# project/JuceLibraryCode/include_*.*
+# project/JuceLibraryCode/BinaryData*.*
 
 plugins/Element/Builds
 plugins/Element/JuceLibraryCode/ReadMe.txt
