@@ -8,20 +8,14 @@ import cross, element, juce
 
 VERSION='0.39.0'
 
+VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
+
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
-    opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
-        help="Build without license protection [ Default: False ]")
-    opt.add_option ('--disable-unlocking', default=False, action="store_true", dest="disable_unlocking", \
-        help="Build without license protection [ Default: False ]")
-    opt.add_option ('--enable-free', default=False, action='store_true', dest='enable_free', \
-        help="Build Element Lite")
-    opt.add_option ('--enable-solo', default=False, action='store_true', dest='enable_solo', \
-        help="Build Element Solo")
+    
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
-    opt.add_option ('--enable-local-auth', default=False, action='store_true', dest='enable_local_auth', \
-        help="Authenticate locally")
+
     opt.add_option ('--enable-python', default=False, action='store_true', dest='enable_python', \
         help="Enable Python scripting support")
 
@@ -35,33 +29,10 @@ def silence_warnings (conf):
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
 
 def configure_product (conf):
-    if conf.options.enable_free and conf.options.enable_solo:
-        print ("Cannot enable Lite and Solo At the Same Time")
-        exit(1)
-    if conf.options.enable_free: 
-        conf.define ('EL_FREE', 1)
-        conf.env.EL_FREE = True
-        conf.env.EL_SOLO = False
-        conf.env.EL_PRO  = False
-    if conf.options.enable_solo: 
-        conf.define ('EL_SOLO', 1)
-        conf.env.EL_SOLO = True
-        conf.env.EL_FREE = False
-        conf.env.EL_PRO  = False
-    if not conf.options.enable_free and not conf.options.enable_solo:
-        conf.define ('EL_PRO', 1)
-        conf.env.EL_SOLO = False
-        conf.env.EL_FREE = False
-        conf.env.EL_PRO  = True
-
-def configure_product_name (conf):
-    if conf.options.enable_free: 
-        return "Element LT"
-    if conf.options.enable_solo: 
-        return "Element SE"
-    if not conf.options.enable_free and not conf.options.enable_solo:
-        return "Element Pro"
-    return "Element"
+    conf.define ('EL_PRO', 1)
+    conf.env.EL_SOLO = False
+    conf.env.EL_FREE = False
+    conf.env.EL_PRO  = True
 
 def configure (conf):
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
@@ -83,22 +54,16 @@ def configure (conf):
     conf.env.DEBUG = conf.options.debug
     conf.env.EL_VERSION_STRING = VERSION
     
-    conf.define ('EL_DISABLE_UNLOCKING', 1 if conf.options.disable_unlocking else 0)
-    conf.define ('EL_USE_LOCAL_AUTH', 1 if conf.options.enable_local_auth else 0)
-
     configure_product (conf)
 
+    conf.define ('EL_USE_JACK', 0)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1)
-    conf.define ('EL_USE_JACK', 0)
-
+    
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
     conf.check(lib='curl', mandatory=False)
-
-    conf.check_cfg(package='kv-0' if not conf.options.debug else 'kv_debug-0', 
-                   uselib_store='KV', args='--libs --cflags', mandatory=True)
 
     if juce.is_linux():
         conf.check(lib='pthread', mandatory=True)
@@ -117,17 +82,12 @@ def configure (conf):
 
     print
     juce.display_header ("Element Configuration")
-    juce.display_msg (conf, "Product", configure_product_name (conf))
-    juce.display_msg (conf, "Docking Windows", conf.options.enable_docking)
-    juce.display_msg (conf, "Copy Protection", not conf.options.disable_unlocking)
-    juce.display_msg (conf, "Local authentication", conf.options.enable_local_auth)
-    juce.display_msg (conf, "Python", conf.options.enable_python)
+    juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
+    juce.display_msg (conf, "Debug", conf.options.debug)
     print
-    juce.display_msg (conf, "Installation PREFIX", conf.env.PREFIX)
-    juce.display_msg (conf, "Installation DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "Debugging Symbols", conf.options.debug)
+    juce.display_msg (conf, "PREFIX", conf.env.PREFIX)
+    juce.display_msg (conf, "DATADIR", conf.env.DATADIR)
     print
-    juce.display_header ("Compiler")
     juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
     juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
@@ -154,10 +114,6 @@ def build_desktop (bld, slug='element'):
 
         bld.install_files (element_data, 'data/element_icon.xpm')
 
-def common_use_flags():
-    return [ 'JUCE_AUDIO_UTILS', 'JUCE_GUI_EXTRA', 'JUCE_OPENGL', 'KV_GUI', \
-             'KV_ENGINE', 'KV_MODELS', 'KV_LV2', 'LILV', 'SUIL' ]
-
 def copy_mingw_libs (bld):
     return
 
@@ -183,36 +139,6 @@ def build_mingw (bld):
     )
 
     bld.add_post_fun (copy_mingw_libs)
-
-def build_plugin (bld, name):
-    bundle = '%s.element' % name
-    plugin_dir = 'plugins/%s' % bundle
-    env = bld.env.derive()
-    env.cxxshlib_PATTERN = env.cshlib_PATTERN = juce.plugin_pattern(bld)
-    lib = bld.shlib (
-        source = bld.path.ant_glob('%s/**/*.cpp' % plugin_dir),
-        includes = ['plugins', plugin_dir, 'src'],
-        name = name,
-        target = 'modules/%s/%s' % (bundle, name),
-        use = common_use_flags(),
-        env = env,
-        install_path = bld.env.LIBDIR + '/element/%s' % bundle
-    )
-
-    if bld.env.INTERNAL_MODULES:
-        lib.includes += ['libs/element', 'libs/element/element']
-
-    bld (
-        features     = 'subst',
-        source       = '%s/manifest.json' % plugin_dir,
-        target       = '%s/manifest.json' % plugin_dir,
-        install_path = bld.env.LIBDIR + '/element/%s' % bundle,
-    )
-
-def build_plugins (bld):
-    for name in 'test'.split():
-        build_plugin (bld, name)
-    bld.add_group()
 
 def build_linux (bld):
     libEnv = bld.env.derive()
@@ -263,8 +189,7 @@ def build_mac (bld):
                         'libs/JUCE/modules', \
                         'libs/kv/modules', \
                         'project/JuceLibraryCode', \
-                        'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK', \
-                        'libs/vstsdk2.4', \
+                        VST3_PATH, \
                         'src' ],
         target      = 'lib/kv',
         name        = 'KV',
@@ -279,23 +204,25 @@ def build_mac (bld):
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       [ 'libs/SQLiteCpp/sqlite3/sqlite3.c' ] + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
-        includes    = [ 'libs/compat', \
-                        '/opt/kushview/include', \
+        includes    = [ '/opt/kushview/include', \
+                        'libs/JUCE/modules', \
+                        'libs/kv/modules', \
+                        'project/JuceLibraryCode', \
                         'libs/pybind11/include', \
                         'libs/SQLiteCpp/sqlite3', \
                         'libs/SQLiteCpp/include', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+                        'src', VST3_PATH ],
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = ['KV', 'PYTHON']
+        use         = [ 'KV', 'PYTHON' ]
     )
 
     bld.add_group()
     
     app = bld.program (
         source      = [ 'project/Source/Main.cpp' ],
-        includes    = [ 'libs/compat', 'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
+        includes    = [ 'src', VST3_PATH ],
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
@@ -305,11 +232,6 @@ def build_mac (bld):
         mac_plist   = 'data/InfoPro.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
     )
-
-    if bld.env.EL_FREE:
-        app.mac_plist = 'data/Lite.plist'
-    elif bld.env.EL_SOLO:
-        app.mac_plist = 'data/Solo.plist'
     
 def build (bld):
     if cross.is_windows (bld):
