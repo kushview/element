@@ -29,12 +29,9 @@ def check_common (self):
     self.line_just = line_just
 
     # LV2 Support
-    # self.env.append_unique ('CXXFLAGS', ["-I../../libs/lv2"])
-    # self.check(header_name='lv2/lv2plug.in/ns/lv2core/lv2.h', mandatory=True)
-    self.check(header_name='lilv.h', use='LV2', mandatory=False)
-    self.check_cxx(lib = 'lilv', use='LV2', mandatory=False)
-    self.check(header_name='suil.h', use='LV2', mandatory=False)
-    self.check_cxx(lib = 'suil', use='LV2', mandatory=False)
+    self.check_cfg(package='lv2', uselib_store="LV2", args='--cflags', mandatory=False)
+    self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
+    self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
 
 @conf
 def check_mingw (self):

@@ -63,6 +63,9 @@ def configure (conf):
     juce.display_header ("Element Configuration")
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
     juce.display_msg (conf, "Debug", conf.options.debug)
+    juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
+    juce.display_msg (conf, "VST3", True)
+    juce.display_msg (conf, "LV2", bool(conf.env.HAVE_LILV))
     print
     juce.display_msg (conf, "PREFIX", conf.env.PREFIX)
     juce.display_msg (conf, "DATADIR", conf.env.DATADIR)
