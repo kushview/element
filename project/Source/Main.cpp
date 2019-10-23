@@ -192,6 +192,15 @@ private:
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();
         plugins.searchUnverifiedPlugins();
+
+        DBG("[EL] supported plugin formats:");
+        auto& audioPlugs = plugins.getAudioPluginFormats ();
+        for (int i = 0; i < audioPlugs.getNumFormats(); ++i) {
+            auto name = audioPlugs.getFormat (i)->getName();
+            if (name == "Internal" || name == "Element")
+                continue;
+            DBG("[EL]   " << name);
+        }
     }
     
     void setupAnalytics()

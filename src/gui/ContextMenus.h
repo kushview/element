@@ -37,7 +37,7 @@ inline static void addMidiDevicesToMenu (PopupMenu& menu, const bool isInput,
 inline static String getMidiDeviceForMenuResult (const int result, const bool isInput,
                                                  const int offset = 80000)
 {
-    jassert(offset > 0 && result >= offset);
+    jassert (offset > 0 && result >= offset);
     const int index = result - offset;
     const StringArray devices = isInput ? MidiInput::getDevices() : MidiOutput::getDevices();
     return isPositiveAndBelow (index, devices.size()) ? devices [index] : String();
@@ -84,7 +84,7 @@ public:
     
         PopupMenu unvMenu;
        #if JUCE_MAC
-        StringArray unvFormats = { "AudioUnit", "VST", "VST3" };
+        StringArray unvFormats = { "AudioUnit", "VST", "VST3", "LV2" };
        #else
         StringArray unvFormats = { "VST", "VST3" };
        #endif
@@ -95,10 +95,10 @@ public:
             PopupMenu menu;
             const int lastSize = unverified.size();
             plugins->getUnverifiedPlugins (name, unverified);
-            auto* format = plugins->getAudioPluginFormat (name);
-            for (int i = lastSize; i < unverified.size(); ++i)
-                menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (
-                    unverified.getUnchecked(i)->fileOrIdentifier));
+            if (auto* format = plugins->getAudioPluginFormat (name))
+                for (int i = lastSize; i < unverified.size(); ++i)
+                    menu.addItem (i + 20000, format->getNameOfPluginFromIdentifier (
+                        unverified.getUnchecked(i)->fileOrIdentifier));
             if (menu.getNumItems() > 0)
                 unvMenu.addSubMenu (name, menu);
         }
