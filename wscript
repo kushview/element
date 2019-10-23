@@ -12,12 +12,8 @@ VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
-    
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
-
-    opt.add_option ('--enable-python', default=False, action='store_true', dest='enable_python', \
-        help="Enable Python scripting support")
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
@@ -195,27 +191,23 @@ def build_mac (bld):
         name        = 'KV',
         env         = libEnv,
         use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
-                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE PYTHON'
+                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE'
     )
 
     appEnv = bld.env.derive()
 
     bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      [ 'libs/SQLiteCpp/sqlite3/sqlite3.c' ] + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
         includes    = [ '/opt/kushview/include', \
                         'libs/JUCE/modules', \
                         'libs/kv/modules', \
                         'project/JuceLibraryCode', \
-                        'libs/pybind11/include', \
-                        'libs/SQLiteCpp/sqlite3', \
-                        'libs/SQLiteCpp/include', \
                         'src', VST3_PATH ],
         target      = 'lib/element',
         name        = 'EL',
         env         = appEnv,
-        use         = [ 'KV', 'PYTHON' ]
+        use         = [ 'KV' ]
     )
 
     bld.add_group()
@@ -226,8 +218,8 @@ def build_mac (bld):
         target      = 'Applications/Element',
         name        = 'Element',
         env         = appEnv,
-        use         = [ 'KV', 'EL', 'PYTHON' ],
-        linkflags   = [ '-framework', 'Python' ],
+        use         = [ 'KV', 'EL' ],
+        linkflags   = [ ],
         mac_app     = True,
         mac_plist   = 'data/InfoPro.plist',
         mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]

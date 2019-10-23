@@ -17,8 +17,6 @@
 */
 
 #include "Tests.h"
-#include "SQLiteCpp/Database.h"
-#include "SQLiteCpp/Transaction.h"
 
 using namespace Element;
 
@@ -34,67 +32,9 @@ public:
         testJavascript();
         testUuid();
         testGmailFilter();
-        testSQLiteCpp();
     }
 
 private:
-    void testSQLiteCpp()
-    {
-        beginTest ("SQLiteCpp");
-        
-        const File file (DataPath::applicationDataDir().getChildFile ("test.db3"));
-
-        try
-        {
-            SQLite::Database db (file.getFullPathName().toUTF8(), 
-                SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE);
-
-            db.exec ("DROP TABLE IF EXISTS test");
-
-            // Begin transaction
-            SQLite::Transaction transaction (db);
-
-            db.exec(R"(
-                CREATE TABLE test (
-                    id INTEGER PRIMARY KEY,
-                    value TEXT, size INTEGER)
-                )");
-
-            for (int i = 0; i < 10000; ++i) 
-            {
-                String s = "INSERT INTO test VALUES (NULL, ";
-                s << "\"test " << i << "\", " << i + 100 << ")";
-                db.exec (s.toUTF8());
-            }
-
-            // Commit transaction
-            transaction.commit();
-
-            // Compile a SQL query, containing one parameter (index 1)
-            SQLite::Statement query (db, "SELECT * FROM test");
-            
-            // Loop to execute the query step by step, to get rows of result
-            while (query.executeStep())
-            {
-                // Demonstrate how to get some typed column value
-                int         id      = query.getColumn (0);
-                const char* value   = query.getColumn (1);
-                int         size    = query.getColumn (2);
-                
-                // DBG("row: " << id << ", " << value << ", " << size);
-            }
-
-            expect (true);
-        }
-        catch (std::exception& e)
-        {
-            expect (false, e.what());
-        }
-        
-        if (file.existsAsFile())
-            file.deleteFile();
-    }
-
     void testGmailFilter()
     {
         beginTest ("Gmail Extended Addresses");

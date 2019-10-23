@@ -6,12 +6,3 @@
 	path = libs/JUCE
 	url = https://github.com/WeAreRoli/JUCE.git
 	branch = master
-[submodule "libs/pybind11"]
-	path = libs/pybind11
-	url = https://github.com/pybind/pybind11
-[submodule "libs/vst3sdk"]
-	path = libs/vst3sdk
-	url = https://github.com/steinbergmedia/vst3sdk
-[submodule "libs/SQLiteCpp"]
-	path = libs/SQLiteCpp
-	url = https://github.com/SRombauts/SQLiteCpp.git

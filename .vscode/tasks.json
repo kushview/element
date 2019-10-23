@@ -51,14 +51,13 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure Element Pro",
+            "label": "Waf Configure",
             "type": "shell",
             "command": "python",
             "args": [
                 "waf",
                 "configure",
-                "--debug",
-                "--enable-python"
+                "--debug"
             ],
             "options": {
                 
@@ -70,27 +69,7 @@
             "problemMatcher": [ ]
         },
         {
-            "label": "Waf Configure Element Pro (Local Auth)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-python",
-                "--enable-local-auth"
-            ],
-            "options": {
-                
-                "env": {
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": [ ]
-        },
-        {
-            "label": "Waf Configure Element Pro Docking",
+            "label": "Waf Configure (workspaces)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -107,142 +86,6 @@
             },
             "problemMatcher": []
         },
-        {
-            "label": "Waf Configure Element Pro Docking (LocalAuth)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-docking",
-                "--enable-local-auth"
-            ],
-            "options": {
-                "env": {
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure Element LT",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-free"
-            ],
-            "options": {
-                "env": {
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure Element SE",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-solo"
-            ],
-            "options": {
-                "env": {
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "Waf Configure Element SE (Local Auth)",
-            "type": "shell",
-            "command": "python",
-            "args": [
-                "waf",
-                "configure",
-                "--debug",
-                "--enable-solo",
-                "--enable-local-auth"
-            ],
-            "options": {
-                "env": {
-                    "CC": "ccache clang",
-                    "CXX": "ccache clang++"
-                }
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "echo",
-            "type": "shell",
-            "command": "python waf build"
-        },
-        {
-            "label": "OSX Uninstall User",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "installers/packages/uninstall-user.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "OSX Uninstall System",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "installers/packages/uninstall.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "OSX Deploy Element Free",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "tools/build-free-osx.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "OSX Deploy Element Pro",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "tools/build-osx.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "OSX Upload",
-            "type": "shell",
-            "command": "bash",
-            "args": [
-                "tools/upload.sh"
-            ],
-            "problemMatcher": []
-        },
-        {
-            "label": "OSX Deploy",
-            "type": "shell",
-            "command": "tools/build-osx.sh && tools/build-free-osx.sh",
-            "problemMatcher": []
-        },
-        {
-            "label": "Version Bump",
-            "type": "shell",
-            "command": "python tools/versionbump.py",
-            "problemMatcher": []
-        }
     ]
 }
 

@@ -51,9 +51,6 @@ def check_mac (self):
     # VST/VST3 OSX Support
     self.define('JUCE_PLUGINHOST_VST3', 1)
     self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
-    # Python scripting
-    if (self.options.enable_python):
-        self.check_cfg(path='python-config', args='--includes', package='Python', use='PYTHON')
 
 @conf
 def check_linux (self):
