@@ -1,6 +1,6 @@
 # Element
 
-![Element Screenshot](doc/img/Element-Virtual-Keyboard-1080x468.png)
+![Element Screenshot](docs/img/Element-Virtual-Keyboard-1080x468.png)
 
 ##### ADVANCED AUDIO PLUGIN HOST
 Element is a modular AU/LV2/VST/VST3 audio plugin host.  Create powerful effects racks and instruments by connecting nodes to one another.  Load graphs on the fly for quick access to your sounds.  Integrates with your existing hardware via standard protocols such as MIDI.
