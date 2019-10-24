@@ -82,7 +82,7 @@ def build_desktop (bld, slug='element'):
     src = "data/%s.desktop.in" % (slug)
     tgt = "%s.desktop" % (slug)
 
-    element_data = '%s/element' % (bld.env.DATADIR)
+    element_data = '%s' % (bld.env.DATADIR)
     element_bin  = '%s/bin' % (bld.env.PREFIX)
 
     if os.path.exists (src):
@@ -92,10 +92,10 @@ def build_desktop (bld, slug='element'):
              name      = tgt,
              ELEMENT_BINDIR = element_bin,
              ELEMENT_DATA = element_data,
-             install_path = bld.env.DATADIR + "/applications"
+             install_path = bld.env.PREFIX + "/share/applications"
         )
 
-        bld.install_files (element_data, 'data/element_icon.xpm')
+        bld.install_files (element_data, 'data/ElementIcon.png')
 
 def copy_mingw_libs (bld):
     return
