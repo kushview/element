@@ -26,6 +26,7 @@ def check_common (self):
     line_just = self.line_just
     self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
                mandatory=False, uselib_store="VST")
+    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
     self.line_just = line_just
 
     # LV2 Support
@@ -48,16 +49,23 @@ def check_mingw (self):
 def check_mac (self):
     # VST/VST3 OSX Support
     self.define('JUCE_PLUGINHOST_VST3', 1)
-    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
 
 @conf
 def check_linux (self):
-    conf.check(lib='pthread', mandatory=True)
-    conf.check(lib='dl', mandatory=True)
-    conf.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
-    conf.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
-    conf.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
-    conf.check_cfg(package='alsa', args='--cflags --libs', mandatory=True)
+    self.check(lib='pthread', mandatory=True)
+    self.check(lib='dl', mandatory=True)
+    self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
+    self.check(lib='curl', uselib_store='CURL', mandatory=True)
+    self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)
+    self.define('JUCE_PLUGINHOST_LADSPA', bool(self.env.HAVE_LADSPA))
+    self.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='xrandr', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='xcomposite', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='xinerama', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='xcursor', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='alsa', args='--cflags --libs', mandatory=True)
 
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]

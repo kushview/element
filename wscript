@@ -126,7 +126,7 @@ def build_linux (bld):
     libEnv = bld.env.derive()
     bld.shlib (
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
+        includes    = [ 'libs/JUCE/modules', \
                         'libs/kv/modules', 'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'lib/kv',
