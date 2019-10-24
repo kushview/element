@@ -65,7 +65,8 @@ def configure (conf):
     juce.display_msg (conf, "Debug", conf.options.debug)
     juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
     juce.display_msg (conf, "VST3", True)
-    juce.display_msg (conf, "LV2", bool(conf.env.HAVE_LILV))
+    juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
+    juce.display_msg (conf, "LV2", bool(conf.env.LV2))
     print
     juce.display_msg (conf, "PREFIX", conf.env.PREFIX)
     juce.display_msg (conf, "DATADIR", conf.env.DATADIR)
@@ -132,7 +133,7 @@ def build_linux (bld):
         target      = 'lib/kv',
         name        = 'KV',
         env         = libEnv,
-        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'LILV', 'SUIL' ]
     )
 
     appEnv = bld.env.derive()

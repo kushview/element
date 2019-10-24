@@ -33,6 +33,8 @@ def check_common (self):
     self.check_cfg(package='lv2', uselib_store="LV2", args='--cflags', mandatory=False)
     self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
     self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
+    self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_LILV)
+    self.define('KV_LV2_PLUGIN_HOST', self.env.LV2)
 
 @conf
 def check_mingw (self):
