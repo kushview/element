@@ -1,0 +1,8 @@
+dist: xenial
+language: cpp
+script: python waf configure clean build
+before_install:
+  - sudo apt-get install -y python git build-essential pkg-config libboost-signals-dev libfreetype6-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev libxinerama-dev libxcursor-dev libasound2-dev lv2-dev liblilv-dev libsuil-dev ladspa-sdk libcurl4-openssl-dev
+addons:
+  apt:
+    update: true
