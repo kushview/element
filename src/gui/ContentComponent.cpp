@@ -156,7 +156,7 @@ public:
     }
     
     ~Toolbar()
-    { 
+    {
         for (const auto& conn : connections)
             conn.disconnect();
         connections.clear();

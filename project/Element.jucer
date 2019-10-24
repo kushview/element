@@ -546,36 +546,36 @@
         <CONFIGURATION name="Debug" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;" enablePluginBinaryCopyStep="1"
-                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0&#10;"
+                       enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES"/>
         <CONFIGURATION name="DebugLT" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element LT" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1" enablePluginBinaryCopyStep="1"
-                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
+                       enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "/>
         <CONFIGURATION name="DebugSE" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="1" optimisation="1" targetName="Element SE" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        cppLibType="libc++" libraryPath="" binaryPath="../build/Debug"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SOLO=1&#10;" enablePluginBinaryCopyStep="1"
-                       customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element SE&quot;,BUNDLE_NAME=&quot;Element SE&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementSE&quot; "/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SOLO=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
+                       enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element SE&quot;,BUNDLE_NAME=&quot;Element SE&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementSE&quot; "/>
         <CONFIGURATION name="Release" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1"/>
         <CONFIGURATION name="ReleaseLT" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element LT" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element LT&quot;,BUNDLE_NAME=&quot;Element LT&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementLT&quot; "
                        stripLocalSymbols="1"/>
         <CONFIGURATION name="ReleaseSE" osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel"
                        isDebug="0" optimisation="2" targetName="Element SE" codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        binaryPath="../build/Release" headerPath="/opt/kushview/include&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3&#10;../../../src&#10;"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,BUNDLE_DISPLAY_NAME=&quot;Element SE&quot;,BUNDLE_NAME=&quot;Element SE&quot;,BUNDLE_IDENTIFIER=&quot;net.kushview.ElementSE&quot; "/>
       </CONFIGURATIONS>
       <MODULEPATHS>
@@ -606,43 +606,45 @@
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath="../build/Win32/Debug"
                        headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
-                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0" debugInformationFormat="ProgramDatabase"
-                       enablePluginBinaryCopyStep="0"/>
+                       useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/Win32/Release"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1" debugInformationFormat="ProgramDatabase"
-                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
                        binaryPath="../build/x64/Debug" characterSet="MultiByte" useRuntimeLibDLL="1"
-                       defines="EL_USE_LOCAL_AUTH=0" debugInformationFormat="ProgramDatabase"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" debugInformationFormat="ProgramDatabase"
                        enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../build/x64/Release"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1" debugInformationFormat="ProgramDatabase"
-                       enablePluginBinaryCopyStep="0" linkTimeOptimisation="1"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
+                       linkTimeOptimisation="1"/>
         <CONFIGURATION name="DebugLT" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element LT" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
                        binaryPath="../build/x64/DebugLT" characterSet="MultiByte" useRuntimeLibDLL="1"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1" debugInformationFormat="ProgramDatabase"
-                       enablePluginBinaryCopyStep="0"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_LITE=1&#10;EL_FREE=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="ReleaseLT" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element LT" binaryPath="../build/x64/ReleaseLT"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_LITE=1&#10;EL_FREE=1&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
         <CONFIGURATION name="DebugSE" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Element SE" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
                        binaryPath="../build/x64/DebugSE" characterSet="MultiByte" useRuntimeLibDLL="1"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SOLO=1" debugInformationFormat="ProgramDatabase"
-                       enablePluginBinaryCopyStep="0"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SOLO=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="ReleaseSE" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element SE" binaryPath="../build/x64/ReleaseSE"
                        useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common&#10;../../../src&#10;../../../libs/lv2&#10;../../../libs/SQLiteCpp/include&#10;../../../libs/SQLiteCpp/sqlite3"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1&#10;"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;EL_SOLO=1&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
       </CONFIGURATIONS>

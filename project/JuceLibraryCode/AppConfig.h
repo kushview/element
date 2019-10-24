@@ -69,6 +69,13 @@
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
 
 //==============================================================================
+// jlv2_host flags:
+
+#ifndef    JLV2_PLUGINHOST_LV2
+ //#define JLV2_PLUGINHOST_LV2 1
+#endif
+
+//==============================================================================
 // juce_audio_devices flags:
 
 #ifndef    JUCE_USE_WINRT_MIDI
