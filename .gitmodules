@@ -6,3 +6,6 @@
 	path = libs/JUCE
 	url = https://github.com/WeAreRoli/JUCE.git
 	branch = master
+[submodule "libs/jlv2"]
+	path = libs/jlv2
+	url = https://github.com/lvtk/jlv2

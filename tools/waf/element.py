@@ -5,10 +5,10 @@ import os, platform
 from waflib.Configure import conf
 
 juce_modules = '''
-    juce_audio_basics juce_audio_devices juce_audio_formats
+    jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
     juce_data_structures juce_events juce_graphics juce_gui_basics
-    juce_gui_extra kv_core kv_engines kv_gui kv_lv2 kv_models
+    juce_gui_extra kv_core kv_engines kv_gui kv_models
 '''
 
 mingw_libs = '''
@@ -73,7 +73,7 @@ def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]
 
 def get_juce_library_code (prefix, extension='.cpp'):
-    cpp_only = [ 'juce_analytics' ]
+    cpp_only = [ 'juce_analytics', 'jlv2_host' ]
     code = []
     for f in juce_modules.split():
         e = '.cpp' if f in cpp_only else extension

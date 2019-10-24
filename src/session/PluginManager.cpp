@@ -580,10 +580,6 @@ private:
 	double sampleRate = 44100.0;
 	int    blockSize = 512;
 	ScopedPointer<PluginScanner> scanner;
-   #if KV_LV2_PLUGIN_HOST
-	OptionalPtr<LV2World> lv2;
-	OptionalPtr<SymbolMap> symbols;
-   #endif
 
 	void scanAudioPlugins (const StringArray& names)
 	{
@@ -643,10 +639,6 @@ private:
 PluginManager::PluginManager()
 {
     priv = new Private (*this);
-   #if KV_LV2_PLUGIN_HOST
-    priv->symbols.setOwned (new SymbolMap ());
-    priv->lv2.setOwned (new LV2World());
-   #endif
 }
 
 PluginManager::~PluginManager()
@@ -658,7 +650,7 @@ void PluginManager::addDefaultFormats()
 {
     getAudioPluginFormats().addDefaultFormats();
    #if KV_LV2_PLUGIN_HOST
-    addFormat (new LV2PluginFormat (*priv->lv2));
+    addFormat (new jlv2::LV2PluginFormat());
    #endif
 }
 

@@ -62,7 +62,6 @@ public:
     PresetCollection& getPresetCollection();
     Settings& getSettings();
     MediaManager& getMediaManager();
-    SymbolMap& getSymbolMap();
     SessionPtr getSession();
 
     const String& getAppName() const { return appName; }

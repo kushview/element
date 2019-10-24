@@ -48,6 +48,7 @@
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
 
 //==============================================================================
+#define JUCE_MODULE_AVAILABLE_jlv2_host                  1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics          1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices         1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats         1
@@ -63,7 +64,6 @@
 #define JUCE_MODULE_AVAILABLE_kv_core                    1
 #define JUCE_MODULE_AVAILABLE_kv_engines                 1
 #define JUCE_MODULE_AVAILABLE_kv_gui                     1
-#define JUCE_MODULE_AVAILABLE_kv_lv2                     1
 #define JUCE_MODULE_AVAILABLE_kv_models                  1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
@@ -287,13 +287,6 @@
 
 #ifndef    KV_DOCKING_WINDOWS
  #define   KV_DOCKING_WINDOWS 1
-#endif
-
-//==============================================================================
-// kv_lv2 flags:
-
-#ifndef    KV_LV2_PLUGIN_HOST
- #define   KV_LV2_PLUGIN_HOST 0
 #endif
 
 //==============================================================================

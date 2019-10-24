@@ -68,17 +68,11 @@ public:
     std::unique_ptr<MappingEngine> mapping;
     std::unique_ptr<PresetCollection> presets;
     std::unique_ptr<MidiEngine>   midi;
-   #if !ELEMENT_LV2_PLUGIN_HOST
-    ScopedPointer<SymbolMap>      symbols;
-   #endif
    
 private:
     friend class Globals;
     void init()
     {
-       #if !ELEMENT_LV2_PLUGIN_HOST
-        symbols  = new SymbolMap();
-       #endif
         plugins  = new PluginManager();
         devices  = new DeviceManager();
         media    = new MediaManager();
@@ -166,18 +160,6 @@ Settings& Globals::getSettings()
 {
     jassert (impl->settings != nullptr);
     return *impl->settings;
-}
-
-SymbolMap& Globals::getSymbolMap()
-{
-   #if ELEMENT_LV2_PLUGIN_HOST
-    auto* fmt = impl->plugins->format<LV2PluginFormat>();
-    jassert(fmt);
-    return fmt->getSymbolMap();
-   #else
-    jassert(impl->symbols);
-    return *impl->symbols;
-   #endif
 }
 
 SessionPtr Globals::getSession()

@@ -128,7 +128,9 @@ def build_linux (bld):
     bld.shlib (
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
         includes    = [ 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'libs/kv/modules', \
+                        'libs/jlv2/modules', \
+                        'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'lib/kv',
         name        = 'KV',
@@ -141,8 +143,9 @@ def build_linux (bld):
     bld.stlib (
         source      = bld.path.ant_glob ('src/**/*.cpp') + \
                       bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'libs/pybind11/include', \
+        includes    = [ 'libs/JUCE/modules', \
+                        'libs/kv/modules', \
+                        'libs/jlv2/modules', \
                         'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'lib/element',
@@ -156,7 +159,7 @@ def build_linux (bld):
     bld.program (
         source      = [ 'project/Source/Main.cpp' ],
         includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'project/JuceLibraryCode', \
+                        'libs/kv/modules', 'libs/jlv2/modules', 'project/JuceLibraryCode', \
                         'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
         target      = 'bin/element',
         name        = 'Element',
@@ -171,6 +174,7 @@ def build_mac (bld):
         source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
         includes    = [ 'libs/JUCE/modules', \
                         'libs/kv/modules', \
+                        'libs/jlv2/modules', \
                         'project/JuceLibraryCode', \
                         VST3_PATH, \
                         'src' ],
@@ -178,7 +182,7 @@ def build_mac (bld):
         name        = 'KV',
         env         = libEnv,
         use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
-                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE'
+                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE LILV SUIL'
     )
 
     appEnv = bld.env.derive()
@@ -189,6 +193,7 @@ def build_mac (bld):
         includes    = [ '/opt/kushview/include', \
                         'libs/JUCE/modules', \
                         'libs/kv/modules', \
+                        'libs/jlv2/modules', \
                         'project/JuceLibraryCode', \
                         'src', VST3_PATH ],
         target      = 'lib/element',
