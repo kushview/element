@@ -1,4 +1,4 @@
-dist: xenial
+dist: bionic
 language: cpp
 script: python waf configure clean build
 before_install:
