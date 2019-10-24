@@ -1,6 +1,6 @@
 # Element
 [![Build Status](https://travis-ci.org/kushview/element.svg?branch=master)](https://travis-ci.org/kushview/element)
-![Element Screenshot](docs/img/Element-Virtual-Keyboard-1080x468.png)
+![Element Screenshot](docs/img/Element-The-Message.png)
 
 #### ADVANCED AUDIO PLUGIN HOST
 This is the community version of Element, a modular AU/LV2/VST/VST3 audio plugin host. Create powerful effects racks and instruments by connecting nodes to one another.  Integrates with your existing hardware via standard protocols such as MIDI.
