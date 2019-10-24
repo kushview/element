@@ -126,7 +126,7 @@ void MainMenu::menuItemSelected (int index, int menu)
     }
     else if (index == 7000 && menu == Help)
     {
-        URL ("https://kushview.net/feedback/").launchInDefaultBrowser();
+        URL ("https://github.com/kushview/element/issues").launchInDefaultBrowser();
     }
     else if (index == 2000 && menu == Window)
     {
