@@ -43,7 +43,7 @@
 #include "gui/ContentComponent.h"
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../../plugins/Element/Source/PluginEditor.h"
+ #include "../../pro/Element/Source/PluginEditor.h"
 #endif
 
 #ifndef EL_USE_ACCESSORY_BUTTONS

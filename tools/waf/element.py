@@ -3,6 +3,7 @@
 
 import os, platform
 from waflib.Configure import conf
+import juce
 
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
@@ -72,7 +73,14 @@ def check_linux (self):
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]
 
-def get_juce_library_code (prefix, extension='.cpp'):
+def get_juce_library_code (prefix, ext=''):
+    extension = ext
+    if len(ext) <= 0:
+        if juce.is_mac():
+            extension = '.mm'
+        else:
+            extension = '.cpp'
+
     cpp_only = [ 'juce_analytics', 'jlv2_host' ]
     code = []
     for f in juce_modules.split():

@@ -5,9 +5,11 @@
 ### ADVANCED AUDIO PLUGIN HOST
 This is the community version of Element, a modular AU/LV2/VST/VST3 audio plugin host. Create powerful effects racks and instruments by connecting nodes to one another.  Integrates with your existing hardware via standard protocols such as MIDI.
 
-__Building__: see the `build-*.md` files in the [docs folder](./docs) for instructions
+### Building 
+See [building.md](./docs/building.md) for instructions and dependency information
 
 ### Features
+* Runs standalone or as a plugin in your DAW**
 * Route Audio and MIDI from anywhere to anywhere
 * Play virtual instruments and effects live
 * Create re-usable instrument and effect graphs

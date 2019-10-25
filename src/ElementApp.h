@@ -1,5 +1,5 @@
 /*
-    ElementApp.h - This file is part of Element
+    This file is part of Element
     Copyright (C) 2014-2018  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
@@ -14,7 +14,7 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 #pragma once
 
@@ -26,7 +26,7 @@ namespace kv { }
 using namespace kv;
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../project/JuceLibraryCode/BinaryData.h"
+ #include "../libs/compat/BinaryData.h"
 #endif
 
 namespace Element {

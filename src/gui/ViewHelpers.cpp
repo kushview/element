@@ -35,7 +35,7 @@
 #include "Messages.h"
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../../plugins/Element/Source/PluginEditor.h"
+ #include "../../pro/Element/Source/PluginEditor.h"
 #endif
 
 namespace Element {

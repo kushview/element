@@ -6,36 +6,6 @@
           bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
           transpose="0">
       <nodes>
-        <node id="1" type="plugin" format="Internal" identifier="audio.input"
-              name="Built-in Microphone" relativeX="0.25" relativeY="0.25"
-              numAudioIns="0" numAudioOuts="2" uuid="e929310c229c462c8c47d8c0404ae0c3"
-              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
-              transpose="0" enabled="1" program="0" midiProgram="0" globalMidiPrograms="0"
-              midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="">
-          <nodes/>
-          <ui/>
-          <ports>
-            <port index="0" channel="0" type="audio" name="Input 1" symbol="audio_out_1"
-                  flow="output"/>
-            <port index="1" channel="1" type="audio" name="Input 2" symbol="audio_out_2"
-                  flow="output"/>
-          </ports>
-        </node>
-        <node id="2" type="plugin" format="Internal" identifier="audio.output"
-              name="Built-in Output" relativeX="0.25" relativeY="0.75" numAudioIns="2"
-              numAudioOuts="0" uuid="5a255d5ac1b141aba726bd9d500d9761" bypass="0"
-              persistent="1" renderMode="single" keyStart="0" keyEnd="127"
-              transpose="0" enabled="1" program="0" midiProgram="0" globalMidiPrograms="0"
-              midiProgramsEnabled="0" mute="0" muteInput="0" midiProgramsState="">
-          <nodes/>
-          <ui/>
-          <ports>
-            <port index="0" channel="0" type="audio" name="Output 1" symbol="audio_in_1"
-                  flow="input"/>
-            <port index="1" channel="1" type="audio" name="Output 2" symbol="audio_in_2"
-                  flow="input"/>
-          </ports>
-        </node>
         <node id="3" type="plugin" format="Internal" identifier="midi.input"
               name="MIDI In" relativeX="0.75" relativeY="0.25" numAudioIns="0"
               numAudioOuts="0" uuid="c4a6237a7e124430999cf2a7365a8004" bypass="0"
@@ -70,5 +40,5 @@
   </graphs>
   <controllers/>
   <maps/>
-  <ui content="130.3ocCEGrCBBBF..FNzqiqsbVWaFLwbkUFIr0A1DlhF+MkEzae8c4awq7ZDFeB5zjtAOLmCNu144C5.B+bUVVxFXWo2d3H6Ns0BaimIllxf7MWZGoJ2dlxdgOMylDMQt8+u5ILkgQau1Cx5H8acXzJhhGr7pXwspjOqWRMoHzOLlqJqA"/>
+  <ui content="128.3ocAA2sBBCBF..UunWGIXwpaGqI4ZzOTYpvtHPGoyzv9X5iemyO3EXPX7on1zosPL0FCfI.bqIiviqpqIUwc8fa+Q1CpvE2VN2McuOqJdWPRkoMLk9KU4XdQpgqhyrO9qLEj8R0atXpwubIO6jE4SV6P4vsABY8REwhP+4nnpXD"/>
 </session>

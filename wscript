@@ -75,6 +75,14 @@ def configure (conf):
     juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
+def common_includes():
+    return [ 'libs/JUCE/modules', \
+             'libs/kv/modules', \
+             'libs/jlv2/modules', \
+             'libs/compat', \
+             VST3_PATH, \
+             'src' ]
+
 def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
@@ -97,135 +105,50 @@ def build_desktop (bld, slug='element'):
 
         bld.install_files (element_data, 'data/ElementIcon.png')
 
-def copy_mingw_libs (bld):
-    return
-
-def build_mingw (bld):
-    mingwEnv = bld.env.derive()
-    mingwSrc = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp")
-    mingwSrc += bld.path.ant_glob('src/**/*.cpp')
-    mingwSrc += bld.path.ant_glob('project/JuceLibraryCode/BinaryData*.cpp')
-    mingwSrc.sort()
-    
-    bld.program (
-        source      = mingwSrc,
-        includes    =  [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                         'libs/kv/modules', 'project/JuceLibraryCode', \
-                         'src', 'libs/vst3sdk', \
-                         os.path.expanduser('~') + '/SDKs/ASIOSDK/common' ],
-        cxxflags    = '',
-        target      = '%s/Element' % (mingwEnv.CROSS),
-        name        = 'Element',
-        linkflags   = [ '-mwindows', '-static-libgcc', '-static-libstdc++' ],
-        use         = element.get_mingw_libs(),
-        env         = mingwEnv
-    )
-
-    bld.add_post_fun (copy_mingw_libs)
-
-def build_linux (bld):
+def compile (bld):
     libEnv = bld.env.derive()
-    bld.shlib (
-        source      = element.get_juce_library_code ("project/JuceLibraryCode", ".cpp"),
-        includes    = [ 'libs/JUCE/modules', \
-                        'libs/kv/modules', \
-                        'libs/jlv2/modules', \
-                        'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
-        target      = 'lib/kv',
-        name        = 'KV',
-        env         = libEnv,
-        use         = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'LILV', 'SUIL' ]
-    )
-
-    appEnv = bld.env.derive()
-
-    bld.stlib (
-        source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
-        includes    = [ 'libs/JUCE/modules', \
-                        'libs/kv/modules', \
-                        'libs/jlv2/modules', \
-                        'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
-        target      = 'lib/element',
-        name        = 'EL',
-        env         = appEnv,
-        use         = [ 'KV' ]
-    )
-
-    bld.add_group()
-
-    bld.program (
-        source      = [ 'project/Source/Main.cpp' ],
-        includes    = [ '/opt/kushview/include', 'libs/JUCE/modules', \
-                        'libs/kv/modules', 'libs/jlv2/modules', 'project/JuceLibraryCode', \
-                        'src', os.path.expanduser('~') + '/SDKs/VST_SDK/VST3_SDK' ],
-        target      = 'bin/element',
-        name        = 'Element',
-        env         = appEnv,
-        use         = [ 'KV', 'EL' ],
-    )
-
-def build_mac (bld):
-    libEnv = bld.env.derive()
-    bld (
+    library = bld (
         features    = 'cxx cxxshlib',
-        source      = element.get_juce_library_code ("project/JuceLibraryCode", ".mm"),
-        includes    = [ 'libs/JUCE/modules', \
-                        'libs/kv/modules', \
-                        'libs/jlv2/modules', \
-                        'project/JuceLibraryCode', \
-                        VST3_PATH, \
-                        'src' ],
-        target      = 'lib/kv',
-        name        = 'KV',
+        source      = element.get_juce_library_code ("libs/compat") +
+                      bld.path.ant_glob ('libs/compat/BinaryData*.cpp') +
+                      bld.path.ant_glob ('src/**/*.cpp'),
+        includes    = common_includes(),
+        target      = 'lib/element-0',
+        name        = 'ELEMENT',
         env         = libEnv,
-        use         = 'ACCELERATE AUDIO_TOOLBOX AUDIO_UNIT CORE_AUDIO CORE_AUDIO_KIT \
-                       COCOA CORE_MIDI IO_KIT QUARTZ_CORE LILV SUIL'
-    )
-
-    appEnv = bld.env.derive()
-
-    bld.stlib (
-        source      = bld.path.ant_glob ('src/**/*.cpp') + \
-                      bld.path.ant_glob ('project/JuceLibraryCode/BinaryData*.cpp'),
-        includes    = [ '/opt/kushview/include', \
-                        'libs/JUCE/modules', \
-                        'libs/kv/modules', \
-                        'libs/jlv2/modules', \
-                        'project/JuceLibraryCode', \
-                        'src', VST3_PATH ],
-        target      = 'lib/element',
-        name        = 'EL',
-        env         = appEnv,
-        use         = [ 'KV', 'BOOST_SIGNALS' ]
+        use         = [ 'BOOST_SIGNALS', 'LILV', 'SUIL' ]
     )
 
     bld.add_group()
-    
-    app = bld.program (
-        source      = [ 'project/Source/Main.cpp' ],
-        includes    = [ 'src', VST3_PATH ],
-        target      = 'Applications/Element',
-        name        = 'Element',
-        env         = appEnv,
-        use         = [ 'KV', 'EL' ],
-        linkflags   = [ ],
-        mac_app     = True,
-        mac_plist   = 'data/InfoPro.plist',
-        mac_files   = [ 'project/Builds/MacOSX/Icon.icns' ]
-    )
-    
-def build (bld):
-    if cross.is_windows (bld):
-        build_mingw (bld)
-    elif juce.is_mac():
-        build_mac (bld)
-    else:
-        build_linux (bld)
-        build_desktop (bld)
 
+    appEnv = bld.env.derive()
+    app = bld.program (
+        source      = [ 'src/Main.cc' ],
+        includes    = common_includes(),
+        target      = 'bin/element',
+        name        = 'ElementApp',
+        env         = appEnv,
+        use         = [ 'ELEMENT' ],
+        linkflags   = []
+    )
+
+    if juce.is_linux():
+        build_desktop(bld)
+        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+
+    elif juce.is_mac():
+        library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX',
+                         'AUDIO_UNIT', 'CORE_AUDIO', 'CORE_AUDIO_KIT',
+                         'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE']
+        app.target      = 'Applications/Element'
+        app.mac_app     = True
+        app.mac_plist   = 'data/Info.plist'
+        app.mac_files   = [ 'data/Icon.icns' ]
+    else:
+        pass
+
+def build (bld):
+    compile(bld)
     bld.recurse ('tests')
 
 def check (ctx):

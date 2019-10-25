@@ -3,16 +3,13 @@
 bld.program (
     source = bld.path.ant_glob("**/*.cpp"),
     includes = ['.',
-                '../project/Source',
-                '../project/JuceLibraryCode',
-                '../src',
-                '/opt/kushview/include',
+                '../libs/compat',
                 '../libs/jlv2/modules',
                 '../libs/JUCE/modules',
                 '../libs/kv/modules',
-                '/opt/kushview/include' ],
+                '../src' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
-            'ALSA', 'XEXT', 'KV', 'EL', 'PYTHON' ],
+            'ALSA', 'XEXT', 'ELEMENT', 'PYTHON' ],
     install_path = None
 )
