@@ -1630,7 +1630,8 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
 
                 if (! wasHandled && node.isValid())
                 {
-                    std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph));
+                    std::unique_ptr<AddNodeMessage> message (new AddNodeMessage (node, graph, file));
+                    
                     auto& builder (message->builder);
                     if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
                     {

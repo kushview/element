@@ -38,14 +38,30 @@ public:
     AppController (Globals&);
     ~AppController();
 
+    /** Returns the CommandManager */
     inline CommandManager& getCommandManager() { return commands; }
+
+    /** Access to global data */
     inline Globals& getWorld() { return getGlobals(); }
+
+    /** Alias of getWorld() */
     inline Globals& getGlobals() { return world; }
+
+    /** Returns the undo manager */
     inline UndoManager& getUndoManager() { return undo; }
 
+    /** Child controllers should use this when files are opened and need
+        to be saved in recent files.
+    */
+    inline void addRecentFile (const File& file) { recentFiles.addFile (file); }
+
+    /** Activate this and children */
     void activate() override;
+
+    /** Deactivate this and children */
     void deactivate() override;
 
+    /** Sub controllers of the main app should inherrit this */
     class Child : public Controller,
                   protected ApplicationCommandTarget
     {

@@ -152,14 +152,16 @@ public:
 class AddNodeMessage : public Message
 {
 public:
-    AddNodeMessage (const Node& n, const Node& t = Node())
+    AddNodeMessage (const Node& n, const Node& t = Node(), const File& f = File())
         : node (Node::resetIds (n.getValueTree().createCopy()), false),
-          target (t)
+          target (t),
+          sourceFile (f)
     { }
     
     const Node node;
     const Node target;
     ConnectionBuilder builder;
+    const File sourceFile;
 };
 
 /** Send this when a plugin needs loaded into the graph */
