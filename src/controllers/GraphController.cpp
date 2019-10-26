@@ -91,6 +91,7 @@ void GraphController::openGraph (const File& file)
         }
 
         findSibling<GuiController>()->stabilizeContent();
+        getAppController().addRecentFile (file);
     }
 }
 

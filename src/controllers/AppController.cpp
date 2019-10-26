@@ -269,6 +269,9 @@ void AppController::handleMessage (const Message& msg)
             ec->addNode (anm->node, anm->target, anm->builder);
         else
             ec->addNode (anm->node);
+
+        if (anm->sourceFile.existsAsFile() && anm->sourceFile.hasFileExtension(".elg"))
+            recentFiles.addFile (anm->sourceFile);
     }
     else if (const auto* cbm = dynamic_cast<const ChangeBusesLayout*> (&msg))
     {
