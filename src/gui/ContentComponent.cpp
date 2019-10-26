@@ -187,7 +187,7 @@ public:
         const bool showExt = props->getValue ("clockSource") == "midiClock";
        #else
         const bool showExt = false;
-        ignoreUnused (props, status);
+        ignoreUnused (props);
        #endif
        
         if (session)
