@@ -31,3 +31,10 @@ LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/element
 ```
 sudo ./waf install
 ```
+
+#### Arch Linux
+Quick Start
+```
+sudo pacman -S git lilv suil lv2 ladspa boost
+```
+If you get crazy looking errors with `waf configure` then try specifying python2 e.g. `python2 waf configure` and so on.
