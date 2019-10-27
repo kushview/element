@@ -3,7 +3,7 @@ These projects are provided as a convenience to Mac/PC __developers__ who aren't
 
 Linux exporters don't exists in these projects.  If you're on Linux, please use waf. _See [building.md](../../docs/building.md)_
 
-If you're compiling for just __personal__ use of the softare... advice from developers is bare minimum.
+If you're compiling for just __personal__ use of the software... advice from developers is bare minimum.
 
 __Directories__
 * `Element` - Element plugin (instrument variety)
