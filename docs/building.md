@@ -38,3 +38,36 @@ Quick Start
 sudo pacman -S git lilv suil lv2 ladspa boost
 ```
 If you get crazy looking errors with `waf configure` then try specifying python2 e.g. `python2 waf configure` and so on.
+
+#### macOS
+Make sure you're running Python 2.
+```
+python --version
+```
+
+Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
+```
+brew install boost
+```
+
+Build
+```
+./waf configure
+./waf build
+```
+
+Test
+```
+LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/test-element
+```
+
+Release build
+```
+./waf install
+```
+
+This produces `build/Applications/Element.app`.
+
+```
+open build/Applications/Element.app
+```
