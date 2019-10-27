@@ -1,4 +1,4 @@
-# Building Element on Linux
+# Building Element with Waf
 The instructions below are for a Debian based distro such as Ubuntu. Usage of `sudo` below is optional depending on your system.
 
 #### Sub Modules
