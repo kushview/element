@@ -53,9 +53,3 @@
 #if !defined(EL_FREE) && !defined(EL_SOLO)
  #define EL_PRO 1
 #endif
-
-#if JUCE_LINUX
- #define JLV2_PLUGINHOST_LV2 1
-#else
- #define JLV2_PLUGINHOST_LV2 0
-#endif
