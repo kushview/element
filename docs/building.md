@@ -33,17 +33,15 @@ sudo ./waf install
 ```
 
 #### Arch Linux
-Quick Start
+Quick Start.
+Install these packages, then run the `waf` commands described for Ubuntu
+
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost
 ```
-If you get crazy looking errors with `waf configure` then try specifying python2 e.g. `python2 waf configure` and so on.
+
 
 #### macOS
-Make sure you're running Python 2.
-```
-python --version
-```
 
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```
@@ -58,7 +56,7 @@ Build
 
 Test
 ```
-LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/test-element
+DYLD_LIBRARY_PATH="`pwd`/build/lib" build/bin/test-element
 ```
 
 Release build

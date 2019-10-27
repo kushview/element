@@ -4,6 +4,7 @@ data/*.ai
 
 dst
 .waf-*
+.waf3-*
 .lock*
 build/
 *.pyc
