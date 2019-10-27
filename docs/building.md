@@ -1,5 +1,5 @@
 # Building Element with Waf
-The instructions below are for a Debian based distro such as Ubuntu. Usage of `sudo` below is optional depending on your system.
+The instructions below are for a Debian based distro such as Ubuntu. Usage of `sudo` below is optional depending on your system. If you're on Mac/PC and prefer Xcode/MSVC, check the [projucer projects](../tools/jucer).
 
 #### Sub Modules
 This project uses submodules
