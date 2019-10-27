@@ -782,7 +782,6 @@ bool GuiController::perform (const InvocationInfo& info)
 
         case Commands::toggleChannelStrip: {
            #if defined (EL_PRO) || defined (EL_SOLO)
-            const bool wasHidden = ! content->isNodeChannelStripVisible();
             content->setNodeChannelStripVisible (! content->isNodeChannelStripVisible());
            #else
             content->setNodeChannelStripVisible (false);

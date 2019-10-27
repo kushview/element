@@ -49,9 +49,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         : control (ctl),
           model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
-          noteNumber (message.getNoteNumber()),
           parameterIndex (_parameter),
-          parameter (nullptr)
+          parameter (nullptr),
+          noteNumber (message.getNoteNumber())
     {
         jassert (message.isNoteOn());
         jassert (node && processor);
@@ -229,9 +229,9 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                 const int _parameter)
         : control (ctl), model (_node), node (_node.getGraphNode()),
           processor (node != nullptr ? node->getAudioProcessor() : nullptr),
+          parameter (nullptr),
           controllerNumber (message.getControllerNumber()),
-          parameterIndex (_parameter),
-          parameter (nullptr)
+          parameterIndex (_parameter)
     {
         jassert (message.isController());
         jassert (node && processor);

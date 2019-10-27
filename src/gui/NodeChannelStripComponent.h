@@ -124,7 +124,6 @@ public:
     inline void timerCallback() override
     {
         auto& meter = channelStrip.getDigitalMeter();
-        const bool isAudioOut = node.isAudioIONode();
         if (GraphNodePtr ptr = node.getGraphNode())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);

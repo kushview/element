@@ -259,22 +259,22 @@ namespace Element {
 
         GeneralSettingsPage (Globals& world, GuiController& g)
             : pluginSettings (world),
-              settings (world.getSettings()),
-              engine (world.getAudioEngine()),
-              gui (g),
              #ifdef EL_PRO
               defaultSessionFile ("Default Session", File(), true, false,
                   false,        // bool isForSaving,
                   "*.els",      //const String& fileBrowserWildcard,
                   "",           //const String& enforcedSuffix,
-                  "None")       //const String& textWhenNothingSelected)
+                  "None"),      //const String& textWhenNothingSelected)
              #else
               defaultSessionFile ("Default Graph", File(), true, false,
                   false,         // bool isForSaving,
                   "*.elg",       //const String& fileBrowserWildcard,
                   "",            //const String& enforcedSuffix,
-                  "None")        //const String& textWhenNothingSelected)
+                  "None"),       //const String& textWhenNothingSelected)
              #endif
+              settings (world.getSettings()),
+              engine (world.getAudioEngine()),
+              gui (g)
         {
             addAndMakeVisible (clockSourceLabel);
             clockSourceLabel.setText ("Clock Source", dontSendNotification);
@@ -363,19 +363,14 @@ namespace Element {
            #endif
 
            #if defined (EL_PRO)
-            if (true)
-            {
-                const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
-                    ? ClockSourceInternal : ClockSourceMidiClock;
-                clockSource.setValue (source);
-                clockSource.addListener (this);
-            }
-            else
+            const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
+                ? ClockSourceInternal : ClockSourceMidiClock;
+            clockSource.setValue (source);
+            clockSource.addListener (this);
+           #else
+            clockSource.setValue ((int) ClockSourceInternal);
+            clockSourceBox.setEnabled (false);
            #endif
-            {
-                clockSource.setValue ((int) ClockSourceInternal);
-                clockSourceBox.setEnabled (false);
-            }
         }
 
         virtual ~GeneralSettingsPage() noexcept

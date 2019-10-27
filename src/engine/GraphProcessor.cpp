@@ -281,9 +281,8 @@ public:
             transpose.setNoteOffset (node->getTransposeOffset());
             const auto keyRange (node->getKeyRange());
             const auto midiChans (node->getMidiChannels());
-            const auto midiProgram (node->getMidiProgram());
             const auto useMidiProgram (node->areMidiProgramsEnabled());
-
+ 
             if (keyRange.getLength() > 0 || !midiChans.isOmni() || useMidiProgram)
             {
                 auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);

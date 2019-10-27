@@ -143,7 +143,9 @@ void DevicesController::refresh (const ControllerDevice& device)
 {
     refresh();
     return;
+   #if 0
     // TODO: handle individual re-build of device handlers and state
+    // Saved for reference.
     auto session = getWorld().getSession();
     auto& mapping = getWorld().getMappingEngine();
     mapping.refreshInput (device);
@@ -159,6 +161,7 @@ void DevicesController::refresh (const ControllerDevice& device)
             DBG("[EL] added handler in refresh: " << objects.control.getName().toString());
         }
     }
+   #endif
 }
 
 void DevicesController::refresh()

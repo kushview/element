@@ -411,7 +411,6 @@ void AppController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
 
 bool AppController::perform (const InvocationInfo& info)
 {
-	auto& settings(getGlobals().getSettings());
     bool res = true;
     switch (info.commandID)
     {
@@ -525,9 +524,7 @@ bool AppController::perform (const InvocationInfo& info)
         
         case Commands::signOut:
         {
-            {
-                auto* props = settings.getUserSettings();
-            }
+            // noop
         } break;
         
         case Commands::checkNewerVersion:

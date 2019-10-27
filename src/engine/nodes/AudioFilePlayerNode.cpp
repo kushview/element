@@ -220,7 +220,6 @@ private:
 
         loopButton.onClick = [this]()
         {
-            int index = AudioFilePlayerNode::Looping;
             processor.setLooping (! processor.isLooping());
             stabilizeComponents();
         };

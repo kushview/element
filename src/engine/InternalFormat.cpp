@@ -371,23 +371,23 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
-        base = (true ? new SubGraphProcessor() : nullptr);
+        base = new SubGraphProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
-        base = (true ? new AudioMixerProcessor (4, sampleRate, blockSize) : nullptr);
+        base = new AudioMixerProcessor (4, sampleRate, blockSize);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)
-        base = (true ? new ChannelizeProcessor() : nullptr);
+        base = new ChannelizeProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
-        base = (true ? new MidiChannelMapProcessor() : nullptr);
+        base = new MidiChannelMapProcessor();
    #endif // EL_PRO
 
    #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
-        base = (true ? new AudioFilePlayerNode() : nullptr);
+        base = new AudioFilePlayerNode();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
-        base = (true ? new MediaPlayerProcessor() : nullptr);
+        base = new MediaPlayerProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
-        base = (true ? new PlaceholderProcessor() : nullptr);
-    #endif // EL_PRO || EL_SOLO
+        base = new PlaceholderProcessor();
+   #endif // EL_PRO || EL_SOLO
 
     return base != nullptr ? base.release() : nullptr;
 }

@@ -108,7 +108,8 @@ void AudioProcessorNode::createPorts()
     const bool isMidiDevice = nullptr != midiDevice;
     const bool isMidiDeviceInput  = isMidiDevice && midiDevice->isInputDevice();
     const bool isMidiDeviceOutput = isMidiDevice && midiDevice->isOutputDevice();
-
+    ignoreUnused (isMidiDeviceOutput);
+    
     int index = 0, channel = 0, busIdx = 0;
     for (busIdx = 0; busIdx < proc->getBusCount(true); ++busIdx)
     {

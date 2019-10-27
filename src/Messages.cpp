@@ -67,7 +67,7 @@ class RemoveNodeAction : public UndoableAction
 {
 public:
     explicit RemoveNodeAction (AppController& a, const Node& node)
-        : app(a), nodeUuid (node.getUuid()), targetGraph (node.getParentGraph())
+        : app(a), targetGraph (node.getParentGraph()), nodeUuid (node.getUuid())
     {
         node.getArcs (arcs);
         Node mutableNode (node);

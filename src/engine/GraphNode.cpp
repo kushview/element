@@ -36,8 +36,8 @@ namespace Element {
 
 GraphNode::GraphNode (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
-      isPrepared (false),
       metadata (Tags::node),
+      isPrepared (false),
       enablement (*this),
       midiProgramLoader (*this)
 {

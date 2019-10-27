@@ -120,11 +120,6 @@ private:
     void valueTreeRedirected (ValueTree&) override { }
 };
 
-static String noteValueToString (double value)
-{
-    return MidiMessage::getMidiNoteName (roundToInt (value), true, true, 3);
-}
-
 NodeEditorContentView::NodeEditorContentView()
 {
     setName ("NodeEditorContentView");
