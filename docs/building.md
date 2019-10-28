@@ -1,71 +1,80 @@
 # Building Element with Waf
-The instructions below are for a Debian based distro such as Ubuntu. Usage of `sudo` below is optional depending on your system. If you're on Mac/PC and prefer Xcode/MSVC, check the [projucer projects](../tools/jucer).
+The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](../tools/jucer), if you prefer.
 
-#### Sub Modules
-This project uses submodules
+__Sub Modules__
+This project uses submodules. Be sure to do this on a fresh clone, or when pulling changes.
 ```
 git submodule update --init
 ```
 
-#### Dependencies
+__Dependencies__
 The following packages are needed...
 ```
 sudo apt-get install python git build-essential pkg-config libboost-signals-dev libfreetype6-dev libx11-dev libxext-dev libxrandr-dev libxcomposite-dev libxinerama-dev libxcursor-dev libasound2-dev lv2-dev liblilv-dev libsuil-dev ladspa-sdk libcurl4-openssl-dev
+```
 
-# Optional
+__Optional__
+```
 sudo apt-get install clang
 ```
 
-#### Compiling
+__Compiling__
 ```
 ./waf configure
 ./waf build
 ```
 
-#### Running
+__Testing__
+```
+./waf check
+```
+
+__Running__
 ```
 LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/element
 ```
 
-#### Installing
+__Installing__
 ```
 sudo ./waf install
 ```
 
-#### Arch Linux
-Quick Start.
-Install these packages, then run the `waf` commands described for Ubuntu
+### Arch Linux
+Install these packages, then run the `waf` commands described above.
 
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost
 ```
 
-
-#### macOS
-
+### Mac OSX
+__Dependencies__
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```
 brew install boost
 ```
+If you want LV2 support on OSX, you'll also need....
+```
+brew install pkg-config lilv suil
+```
 
-Build
+__Build__
 ```
 ./waf configure
 ./waf build
 ```
-
-Test
+This produces `build/Applications/Element.app`. 
 ```
-DYLD_LIBRARY_PATH="`pwd`/build/lib" build/bin/test-element
+# To run it...
+open build/Applications/Element.app
 ```
 
-Release build
+__Test__
+```
+./waf check
+```
+
+__Install__
 ```
 ./waf install
 ```
-
-This produces `build/Applications/Element.app`.
-
-```
-open build/Applications/Element.app
-```
+Install the app to `/Applications` or another prefix of your choice. see `./waf --help`

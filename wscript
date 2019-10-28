@@ -152,4 +152,5 @@ def build (bld):
     bld.recurse ('tests')
 
 def check (ctx):
-    call (["build/bin/test-element"])
+    if 0 != call (["build/bin/test-element"]):
+        ctx.fatal("Tests failed")
