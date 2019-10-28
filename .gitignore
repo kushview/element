@@ -30,3 +30,8 @@ build/
 /tools/installers/
 /plugins
 /pro/
+
+/*.gz
+/*.bz2
+/*.zip
+/element-0.*

@@ -6,6 +6,7 @@ import os, sys
 sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
+APPNAME='element'
 VERSION='0.40.0'
 
 VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
@@ -14,6 +15,9 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
+    opt.add_option('--ziptype', default='gz', \
+        dest='ziptype', type='string', 
+        help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
@@ -154,3 +158,18 @@ def build (bld):
 def check (ctx):
     if 0 != call (["build/bin/test-element"]):
         ctx.fatal("Tests failed")
+
+def dist(ctx):
+    z = ctx.options.ziptype
+    if 'zip' in z:
+        ziptype = z
+    else:
+        ziptype = "tar." + z
+
+    ctx.base_name = '%s-%s' % (APPNAME, VERSION)
+    ctx.algo = ziptype
+    ctx.excl = ' **/.waf-1* **/.waf-2* **/.waf3-* **/*~ **/*.pyc **/*.swp **/.lock-w*'
+    ctx.excl += ' **/.gitignore **/.gitmodules **/.git dist deploy pro **/Builds **/build'
+    ctx.excl += ' **/.DS_Store **/.vscode **/.travis.yml *.bz2 *.zip *.gz'
+    ctx.excl += ' tools/jucer/**/JuceLibraryCode'
+    
