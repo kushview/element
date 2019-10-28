@@ -3,7 +3,7 @@
 ![Element Screenshot](docs/img/Element-The-Message.png)
 
 ### ADVANCED AUDIO PLUGIN HOST
-This is the community version of Element, a modular AU/LV2/VST/VST3 audio plugin host. Create powerful effects racks and instruments by connecting nodes to one another.  Integrates with your existing hardware via standard protocols such as MIDI.
+This is the community version of Element, a modular AU/LV2/VST/VST3 audio plugin host. Create powerful effects, racks and instruments by connecting nodes to one another.  Integrates with your existing hardware via standard protocols such as MIDI.
 
 ### Building 
 See [building.md](./docs/building.md) for instructions and dependency information
@@ -12,7 +12,7 @@ See [building.md](./docs/building.md) for instructions and dependency informatio
 * Runs standalone or as a plugin in your DAW**
 * Route Audio and MIDI from anywhere to anywhere
 * Play virtual instruments and effects live
-* Create re-usable instrument and effect graphs
+* Create re-usable instruments and effect graphs
 * Preloaded plugin graphs
 * External Sync w/ MIDI Clock
 * MIDI Controller Mapping
@@ -35,7 +35,7 @@ Element currently loads most major plugin formats. Not seeing yours? [Check the 
 _*Ubuntu is the most tested, but should run on any major distribution_
 
 ### Sponsors
-This project is made possible by our Pro license holders & awesome [Patrons](BACKERS.md). Element never would have made it this far without you!
+This project has been made possible by our Pro license holders & awesome [Patrons](BACKERS.md). Element never would have made it this far without you!
 
 ### Contributing
 Want to help widdle down the TODO list? Please review the [code style](docs/code-style.md) and [contributor notes](docs/contributing.md) before submitting pull requests.  You may also want to join the [#element-dev](https://discord.gg/mSDmPrj) channel on the Kushview [Discord](https://discord.gg/mSDmPrj) server.
