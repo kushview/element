@@ -23,6 +23,11 @@ def check_common (self):
     self.check(header_name='stdbool.h', mandatory=True)
     self.check(header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
 
+    # JACK
+    self.check_cfg(package='jack', uselib_store="JACK", args='--cflags --libs', mandatory=False)
+    self.env.JACK = bool(self.env.HAVE_JACK) and not self.options.no_jack
+    self.define('KV_JACK_AUDIO', self.env.JACK)
+
     # VST support
     line_just = self.line_just
     self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 

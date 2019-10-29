@@ -15,6 +15,8 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
+    opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
+        help="Build without JACK support")
     opt.add_option('--ziptype', default='gz', \
         dest='ziptype', type='string', 
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
@@ -64,17 +66,18 @@ def configure (conf):
     conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
     print
-    juce.display_header ("Element Configuration")
-    juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
-    juce.display_msg (conf, "Debug", conf.options.debug)
+    juce.display_header ("Element")
+    juce.display_msg (conf, "JACK", conf.env.JACK)
     juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
     juce.display_msg (conf, "VST3", True)
     juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
+    juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
+    juce.display_msg (conf, "Debug", conf.options.debug)
+
     print
     juce.display_msg (conf, "PREFIX", conf.env.PREFIX)
     juce.display_msg (conf, "DATADIR", conf.env.DATADIR)
-    print
     juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
     juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
@@ -120,7 +123,7 @@ def compile (bld):
         target      = 'lib/element-0',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS', 'LILV', 'SUIL' ]
+        use         = [ 'BOOST_SIGNALS' ]
     )
 
     bld.add_group()
@@ -135,15 +138,17 @@ def compile (bld):
         use         = [ 'ELEMENT' ],
         linkflags   = []
     )
+    
+    if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
+    if bld.env.JACK:    library.use += [ 'JACK' ]
 
     if juce.is_linux():
         build_desktop(bld)
         library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
 
     elif juce.is_mac():
-        library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX',
-                         'AUDIO_UNIT', 'CORE_AUDIO', 'CORE_AUDIO_KIT',
-                         'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE']
+        library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+                         'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE' ]
         app.target      = 'Applications/Element'
         app.mac_app     = True
         app.mac_plist   = 'data/Info.plist'
@@ -172,4 +177,3 @@ def dist(ctx):
     ctx.excl += ' **/.gitignore **/.gitmodules **/.git dist deploy pro **/Builds **/build'
     ctx.excl += ' **/.DS_Store **/.vscode **/.travis.yml *.bz2 *.zip *.gz'
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
-    
