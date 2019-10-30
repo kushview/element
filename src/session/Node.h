@@ -278,12 +278,14 @@ public:
                 objectData.getProperty(Tags::identifier) == "midi.output");
     }
     
+    /** Returns true if a global MIDI input node. e.g */
     inline bool isMidiInputNode() const
     {
         return objectData.getProperty(Tags::format) == "Internal" &&
             objectData.getProperty(Tags::identifier) == "midi.input";
     }
 
+    /** Returns true if a global MIDI output node. e.g */
     inline bool isMidiOutputNode() const
     {
         return objectData.getProperty(Tags::format) == "Internal" &&
