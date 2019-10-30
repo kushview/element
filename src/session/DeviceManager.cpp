@@ -82,7 +82,7 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
-   #if ELEMENT_USE_JACK
+   #if KV_JACK_AUDIO
     addIfNotNull (list, Jack::createAudioIODeviceType (nullptr));
    #endif
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
