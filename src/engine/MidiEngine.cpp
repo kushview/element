@@ -283,6 +283,15 @@ void MidiEngine::processMidiBuffer (const MidiBuffer& buffer, int nframes, doubl
     }
 }
 
+int MidiEngine::getNumActiveMidiInputs() const
+{
+    int total = 0;
+    for (const auto& dev : MidiInput::getDevices())
+        if (isMidiInputEnabled (dev))
+            ++total;
+    return total;
+}
+
 //==============================================================================
 void MidiEngine::setDefaultMidiOutput (const String& deviceName)
 {
