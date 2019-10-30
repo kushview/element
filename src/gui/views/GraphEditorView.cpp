@@ -54,6 +54,10 @@ GraphEditorView::~GraphEditorView()
 
 void GraphEditorView::willBeRemoved()
 {
+    auto* world = ViewHelpers::getGlobals (this);
+    jassert (world); // something went majorly wrong...
+    if (world)
+        world->getMidiEngine().removeChangeListener (this);
     graph.setNode (Node());
 }
 
@@ -104,9 +108,15 @@ void GraphEditorView::stabilizeContent()
 
 void GraphEditorView::didBecomeActive()
 {
-    if (!getGraph().isValid() || !getGraph().isGraph())
+    auto session = ViewHelpers::getSession (this);
+    auto* world = ViewHelpers::getGlobals (this);
+    jassert (world); // something went majorly wrong...
+
+    world->getMidiEngine().addChangeListener (this);
+
+    if (! getGraph().isValid() || !getGraph().isGraph())
     {
-        if (auto session = ViewHelpers::getSession (this))
+        if (session)
             setNode (session->getCurrentGraph());
     }
     else
@@ -115,6 +125,11 @@ void GraphEditorView::didBecomeActive()
     }
 
     graph.updateComponents();
+}
+
+void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
+{
+    graph.stabilizeNodes();
 }
 
 void GraphEditorView::paint (Graphics& g)

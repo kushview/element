@@ -85,6 +85,9 @@ public:
      */
     void removeMidiInputCallback (MidiInputCallback* callback);
 
+    /** Returns the number of enabled midi inputs */
+    int getNumActiveMidiInputs() const;
+    
     //==============================================================================
     /** Sets a midi output device to use as the default.
 

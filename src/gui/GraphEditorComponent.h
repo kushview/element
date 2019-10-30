@@ -75,6 +75,10 @@ public:
     }
 
     Node getGraph() const { return graph; }
+
+    /** Stabilize all nodes without changing position */
+    void stabilizeNodes();
+
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
     void createNewPlugin (const PluginDescription* desc, int x, int y);

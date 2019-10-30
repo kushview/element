@@ -599,26 +599,37 @@ public:
         g.setColour (Colours::black);
         g.setFont (font);
         
+        auto displayName = node.getDisplayName();
+        auto subName = node.hasModifiedName() ? node.getPluginName() : String();
+        
+        if (node.isMidiInputNode())
+        {
+            auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
+            if (midi.getNumActiveMidiInputs() <= 0)
+                subName = "(no device)";
+        }
+
         if (vertical)
         {
-            g.drawFittedText (node.getDisplayName(), box.getX() + 9, box.getY() + 2, box.getWidth(),
+            g.drawFittedText (displayName, box.getX() + 9, box.getY() + 2, box.getWidth(),
                                          18, Justification::centredLeft, 2);
-            if (node.hasModifiedName())
+
+            if (subName.isNotEmpty())
             {
                 g.setFont (Font (8.f));
-                g.drawFittedText (node.getPluginName(), box.getX() + 9, box.getY() + 10, box.getWidth(),
-                                                  18, Justification::centredLeft, 2);
+                g.drawFittedText (subName, box.getX() + 9, box.getY() + 10, box.getWidth(),
+                                  18, Justification::centredLeft, 2);
             }
         }
         else
         {
-            g.drawFittedText (node.getDisplayName(), box.getX() + 20, box.getY() + 2, box.getWidth(),
-                                                     18, Justification::centredLeft, 2);
-            if (node.hasModifiedName())
+            g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(),
+                                           18, Justification::centredLeft, 2);
+            if (subName.isNotEmpty())
             {
                 g.setFont (Font (8.f));
-                g.drawFittedText (node.getPluginName(), box.getX() + 20, box.getY() + 10, box.getWidth(),
-                                                  18, Justification::centredLeft, 2);
+                g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(),
+                                  18, Justification::centredLeft, 2);
             }
         }
         
@@ -1380,6 +1391,13 @@ void GraphEditorComponent::updateFilterComponents (const bool doPosition)
     for (int i = getNumChildComponents(); --i >= 0;)
         if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
             { fc->update (doPosition); }
+}
+
+void GraphEditorComponent::stabilizeNodes()
+{
+    for (int i = getNumChildComponents(); --i >= 0;)
+        if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+            { fc->update (false); fc->repaint(); }
 }
 
 void GraphEditorComponent::updateComponents()
