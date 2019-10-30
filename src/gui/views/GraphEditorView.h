@@ -25,7 +25,8 @@
 
 namespace Element {
 
-class GraphEditorView : public GraphDisplayView
+class GraphEditorView : public GraphDisplayView,
+                        public ChangeListener
 {
 public:
     GraphEditorView();
@@ -38,6 +39,8 @@ public:
     void paint (Graphics& g) override;
 
     bool keyPressed (const KeyPress& key, Component* c) override;
+
+    void changeListenerCallback (ChangeBroadcaster*) override;
 
 protected:
     void graphDisplayResized (const Rectangle<int>& area) override;

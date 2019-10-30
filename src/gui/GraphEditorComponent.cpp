@@ -1393,6 +1393,13 @@ void GraphEditorComponent::updateFilterComponents (const bool doPosition)
             { fc->update (doPosition); }
 }
 
+void GraphEditorComponent::stabilizeNodes()
+{
+    for (int i = getNumChildComponents(); --i >= 0;)
+        if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+            { fc->update (false); fc->repaint(); }
+}
+
 void GraphEditorComponent::updateComponents()
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
