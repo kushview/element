@@ -182,7 +182,7 @@ public:
         desc.fileOrIdentifier = "AudioUnit:Synths/aumu,samp,appl";
         String msg;
 
-        if (auto* plugin = plugins.createPluginInstance (desc, 44100.0, 1024, msg))
+        if (auto* plugin = plugins.createPluginInstance (desc, 44100.0, 1024, msg).release())
         {
             beginTest ("finds MIDI port");
             GraphNodePtr node = graph->addNode (plugin);

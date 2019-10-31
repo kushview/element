@@ -129,20 +129,18 @@ WorkspaceState WorkspaceState::loadByName (const String& name)
     DBG("[EL] workspace loading: " << name);
     if (name == "Classic")
     {
-        if (auto* xml = XmlDocument::parse (String::fromUTF8 (
+        if (auto xml = XmlDocument::parse (String::fromUTF8 (
             BinaryData::Classic_elw, BinaryData::Classic_elwSize)))
         {
             state.objectData = ValueTree::fromXml (*xml);
-            delete xml;
         }
     }
     else if (name == "Editing")
     {
-        if (auto* xml = XmlDocument::parse (String::fromUTF8 (
+        if (auto xml = XmlDocument::parse (String::fromUTF8 (
             BinaryData::Editing_elw, BinaryData::Editing_elwSize)))
         {
             state.objectData = ValueTree::fromXml (*xml);
-            delete xml;
         }
     }
     

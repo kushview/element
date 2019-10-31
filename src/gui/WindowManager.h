@@ -76,7 +76,9 @@ public:
      */
     inline void push (Window* window)
     {
-        activeWindows.addIfNotAlreadyThere (window);
+        if (activeWindows.contains (window))
+            return;
+        activeWindows.add (window);
         window->addToDesktop();
         window->setVisible (true);
         window->signalClosed().connect (

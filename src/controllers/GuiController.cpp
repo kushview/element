@@ -391,10 +391,11 @@ void GuiController::run()
         Graphics g (image);
         Icon icon (getIcons().falAtomAlt, Colours::black);
         icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
-        sSystemTray->setIconImage (image);
+        sSystemTray->setIconImage (image, image);
     }
    #else
     sSystemTray->setIconImage (
+       ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
         ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize));
    #endif
     sSystemTray->addToDesktop (0);

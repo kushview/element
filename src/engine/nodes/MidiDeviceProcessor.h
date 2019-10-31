@@ -133,8 +133,8 @@ private:
     MidiEngine& midi;
     bool prepared = false;
     String deviceName;
-    ScopedPointer<MidiInput> input;
-    ScopedPointer<MidiOutput> output;
+    std::unique_ptr<MidiInput> input;
+    std::unique_ptr<MidiOutput> output;
     MidiMessageCollector inputMessages;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiDeviceProcessor);
 };

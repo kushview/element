@@ -61,7 +61,7 @@ public:
 
         DeviceManager& devices (world.getDeviceManager());
         auto* props = settings.getUserSettings();
-        if (ScopedXml dxml = props->getXmlValue ("devices"))
+        if (auto dxml = props->getXmlValue ("devices"))
         {
             devices.initialise (DeviceManager::maxAudioChannels,
                                 DeviceManager::maxAudioChannels, 
@@ -174,7 +174,7 @@ private:
         if (props && keymp)
         {
             std::unique_ptr<XmlElement> xml;
-            xml.reset (props->getXmlValue ("keymappings"));
+            xml = props->getXmlValue ("keymappings");
             if (xml != nullptr)
                 world.getCommandManager().getKeyMappings()->restoreFromXml (*xml);
             xml = nullptr;
@@ -277,9 +277,9 @@ public:
         plugins.saveUserPlugins (settings);
         midi.writeSettings (settings);
         
-        if (ScopedXml el = world->getDeviceManager().createStateXml())
-            props->setValue ("devices", el);
-        if (ScopedXml keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
+        if (auto el = world->getDeviceManager().createStateXml())
+            props->setValue ("devices", el.get());
+        if (auto keymappings = world->getCommandManager().getKeyMappings()->createXml (true))
             props->setValue ("keymappings", keymappings.get());
 
         engine = nullptr;

@@ -1591,7 +1591,7 @@ void GraphEditorComponent::itemDropped (const SourceDetails& details)
     {
         auto& plugs (ViewHelpers::getGlobals(this)->getPluginManager());
         
-        if (const auto* t = plugs.getKnownPlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
+        if (const auto t = plugs.getKnownPlugins().getTypeForIdentifierString(a->getUnchecked(1).toString()))
         {
             ScopedPointer<AddPluginMessage> message = new AddPluginMessage (graph, *t);
             auto& builder (message->builder);

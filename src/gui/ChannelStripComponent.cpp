@@ -88,8 +88,8 @@ void ChannelStripComponent::setMinMaxDecibels (double minDb, double maxDb)
 void ChannelStripComponent::addButton (Component* btn)
 {
     jassert (! extraButtons.contains (btn));
-    if (extraButtons.addIfNotAlreadyThere (btn))
-        addAndMakeVisible (btn);
+    if (! extraButtons.contains (btn))
+        addAndMakeVisible (extraButtons.add (btn));
     resized();
 }
 

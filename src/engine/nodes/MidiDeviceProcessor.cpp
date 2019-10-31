@@ -243,14 +243,14 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
          .setProperty ("deviceName", deviceName, 0);
-    if (ScopedPointer<XmlElement> xml = state.createXml())
+    if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
 
 void MidiDeviceProcessor::setStateInformation (const void* data, int size)
 {
     ValueTree state;
-    if (ScopedPointer<XmlElement> xml = getXmlFromBinary (data, size))
+    if (auto xml = getXmlFromBinary (data, size))
         state = ValueTree::fromXml (*xml);
     if (! state.isValid())
         return;

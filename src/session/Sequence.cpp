@@ -194,12 +194,11 @@ namespace Element {
 
     XmlElement* Sequence::createXml()
     {
-        XmlElement* e = node().createXml();
-
+        auto e = node().createXml();
         if (nullptr != e)
             polishXml (*e);
 
-        return e;
+        return e.release();
     }
 
     void Sequence::open()

@@ -220,7 +220,7 @@ void SessionController::loadNewSessionData()
     if (file.existsAsFile())
     {
         ValueTree data;
-        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (file))
+        if (auto xml = XmlDocument::parse (file))
             data = ValueTree::fromXml (*xml);
         if (data.isValid() && data.hasType (Tags::session))
             wasLoaded = currentSession->loadData (data);

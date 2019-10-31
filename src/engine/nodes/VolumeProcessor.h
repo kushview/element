@@ -108,13 +108,13 @@ public:
     {
         ValueTree state (Tags::state);
         state.setProperty (Tags::volume,  (float) *volume, 0);
-        if (ScopedPointer<XmlElement> e = state.createXml())
+        if (auto e = state.createXml())
             AudioProcessor::copyXmlToBinary (*e, destData);
     }
     
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-        if (ScopedPointer<XmlElement> e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
+        if (auto e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
         {
             auto state = ValueTree::fromXml (*e);
             if (state.isValid())

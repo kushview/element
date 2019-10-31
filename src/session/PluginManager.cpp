@@ -204,7 +204,7 @@ private:
 
     void updateListAndLaunchSlave()
     {
-        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
+        if (auto xml = XmlDocument::parse (PluginScanner::getSlavePluginListFile()))
             owner.list.recreateFromXml (*xml);
         
         const bool res = launchScanner();
@@ -301,7 +301,7 @@ public:
         if (! scanFile.existsAsFile())
             scanFile.create();
         
-        if (ScopedPointer<XmlElement> xml = XmlDocument::parse (scanFile))
+        if (auto xml = XmlDocument::parse (scanFile))
             pluginList.recreateFromXml (*xml);
         
         // This must happen before user settings, PluginManager will delete the deadman file
@@ -342,7 +342,7 @@ private:
     bool writePluginListNow()
     {
         applyDeadPlugins();
-        if (ScopedPointer<XmlElement> xml = pluginList.createXml())
+        if (auto xml = pluginList.createXml())
             return xml->writeToFile (scanFile, String());
         return false;
     }
@@ -707,7 +707,7 @@ bool PluginManager::isScanningAudioPlugins()
 AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& desc, String& errorMsg)
 {
     return getAudioPluginFormats().createPluginInstance (
-        desc, priv->sampleRate, priv->blockSize, errorMsg);
+        desc, priv->sampleRate, priv->blockSize, errorMsg).release();
 }
 
 Processor* PluginManager::createPlugin (const PluginDescription &desc, String &errorMsg)
@@ -771,7 +771,7 @@ const File& PluginManager::getDeadAudioPluginsFile() const { return priv->deadAu
 void PluginManager::saveUserPlugins (ApplicationProperties& settings)
 {
     setPropertiesFile (settings.getUserSettings());
-    if (ScopedXml elm = priv->allPlugins.createXml())
+    if (auto elm = priv->allPlugins.createXml())
     {
         props->setValue (pluginListKey(), elm.get());
         props->saveIfNeeded();
@@ -782,7 +782,7 @@ void PluginManager::restoreUserPlugins (ApplicationProperties& settings)
 {
     setPropertiesFile (settings.getUserSettings());
     if (props == nullptr) return;
-    if (ScopedXml xml = props->getXmlValue (pluginListKey()))
+    if (auto xml = props->getXmlValue (pluginListKey()))
 		restoreUserPlugins (*xml);
     settings.saveIfNeeded();
 }
@@ -795,7 +795,7 @@ void PluginManager::restoreUserPlugins (const XmlElement& xml)
     if (props == nullptr)
         return;
 
-    if (ScopedXml e = priv->allPlugins.createXml())
+    if (auto e = priv->allPlugins.createXml())
     {
         props->setValue (pluginListKey(), e.get());
         props->saveIfNeeded();
@@ -836,7 +836,7 @@ void PluginManager::scanInternalPlugins()
         
         for (int j = priv->allPlugins.getNumTypes(); --j >= 0;)
             if (priv->allPlugins.getType(j)->pluginFormatName == "Element")
-                priv->allPlugins.removeType (j);
+                priv->allPlugins.removeType (*priv->allPlugins.getType (j));
         
         PluginDirectoryScanner scanner (getKnownPlugins(), *format,
                                         format->getDefaultLocationsToSearch(),
@@ -867,7 +867,7 @@ void PluginManager::scanFinished()
 
 void PluginManager::restoreAudioPlugins (const File& file)
 {
-    if (ScopedPointer<XmlElement> xml = XmlDocument::parse (file))
+    if (auto xml = XmlDocument::parse (file))
         restoreUserPlugins (*xml);
 }
 
@@ -900,7 +900,7 @@ PluginDescription PluginManager::findDescriptionFor (const Node& node) const
     if (identifierString.isNotEmpty())
     {
         // fastest, find by identifer string in known plugins
-        if (const auto* type = getKnownPlugins().getTypeForIdentifierString (
+        if (const auto type = getKnownPlugins().getTypeForIdentifierString (
             node.getProperty (Tags::pluginIdentifierString).toString()))
         {
             desc = *type;

@@ -485,7 +485,7 @@ private:
 class ParametersPanel   : public Component
 {
 public:
-    ParametersPanel (AudioProcessor& processor, const OwnedArray<AudioProcessorParameter>& parameters)
+    ParametersPanel (AudioProcessor& processor, const Array<AudioProcessorParameter*>& parameters)
     {
         for (auto* param : parameters)
             if (param->isAutomatable())

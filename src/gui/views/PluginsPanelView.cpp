@@ -92,9 +92,9 @@ public:
             const auto text = panel.getSearchText();
             for (auto* folder : tree.subFolders)
                 addSubItem (new PluginFolderTreeViewItem (panel, *folder));
-            for (const auto* plugin : tree.plugins)
-                if (text.isEmpty() || plugin->name.containsIgnoreCase (text))
-                    addSubItem (new PluginTreeViewItem (*plugin));
+            for (const auto& plugin : tree.plugins)
+                if (text.isEmpty() || plugin.name.containsIgnoreCase (text))
+                    addSubItem (new PluginTreeViewItem (plugin));
         }
         else
         {
@@ -110,9 +110,7 @@ public:
         : owner(o),
             plugins (p)
     {
-        
         data = p.getKnownPlugins().createTree (KnownPluginList::sortByCategory);
-
     }
     
     bool mightContainSubItems() override { return true; }
@@ -133,7 +131,7 @@ public:
     PluginsPanelView& owner;
     PluginManager& plugins;
     
-    ScopedPointer<KnownPluginList::PluginTree> data;
+    std::unique_ptr<KnownPluginList::PluginTree> data;
 };
 
 PluginsPanelView::PluginsPanelView (PluginManager& p)

@@ -61,7 +61,7 @@ namespace Element {
             return Result::fail ("No session data target");
 
         String error;
-        if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
+        if (auto e = XmlDocument::parse (file))
         {
             ValueTree newData (ValueTree::fromXml (*e));
             if (! newData.isValid() && newData.hasType ("session"))

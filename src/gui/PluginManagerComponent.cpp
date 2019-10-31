@@ -304,6 +304,9 @@ void PluginListComponent::setTableModel (TableListBoxModel* model)
 
 bool PluginListComponent::canShowSelectedFolder() const
 {
+    if (table.getSelectedRow() < 0)
+        return false;
+        
     if (const PluginDescription* const desc = list.getType (table.getSelectedRow()))
         return File::createFileWithoutCheckingPath (desc->fileOrIdentifier).exists();
     
@@ -321,7 +324,7 @@ void PluginListComponent::removeMissingPlugins()
 {
     for (int i = list.getNumTypes(); --i >= 0;)
         if (! formatManager.doesPluginStillExist (*list.getType (i)))
-            list.removeType (i);
+            list.removeType (*list.getType (i));
 }
 
 void PluginListComponent::removePluginItem (int index)
@@ -331,7 +334,7 @@ void PluginListComponent::removePluginItem (int index)
             return;
     
     if (index < list.getNumTypes())
-        list.removeType (index);
+        list.removeType (*list.getType (index));
     else
         list.removeFromBlacklist (list.getBlacklistedFiles() [index - list.getNumTypes()]);
 }
@@ -346,7 +349,7 @@ static void removeNonElementPlugins (KnownPluginList& list)
 {
     for (int i = list.getNumTypes(); --i >= 0;) {
         if (list.getType(i)->pluginFormatName != "Element")
-            list.removeType (i);
+            list.removeType (*list.getType (i));
     }
 }
 

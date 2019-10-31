@@ -710,7 +710,7 @@ public:
             if (chooser.browseForFileToSave (true))
             {
                 DBG("[EL] save device");
-                if (ScopedPointer<XmlElement> xml = editedDevice.getValueTree().createXml())
+                if (auto xml = editedDevice.getValueTree().createXml())
                     xml->writeToFile (chooser.getResult(), String());
             }
         }

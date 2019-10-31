@@ -319,7 +319,7 @@ public:
         }
         else if (desc.isArray() && desc[0] == "plugin")
         {
-            if (auto* p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString(desc[1].toString()))
+            if (auto p = world->getPluginManager().getKnownPlugins().getTypeForIdentifierString(desc[1].toString()))
             {
                 ViewHelpers::postMessageFor (getOwnerView(),
                     new AddPluginMessage (graph, *p));

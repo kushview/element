@@ -114,7 +114,7 @@ void KeymapEditorView::saveMappings()
 {
     if (auto* const cc = ViewHelpers::findContentComponent (this))
         if (auto* const mapping = cc->getGlobals().getCommandManager().getKeyMappings())
-            if (ScopedPointer<XmlElement> xml = mapping->createXml (false))
+            if (auto xml = mapping->createXml (false))
                 cc->getGlobals().getSettings().getUserSettings()->setValue (
                     "keymappings", xml.get());
 }
