@@ -230,21 +230,18 @@ namespace Element {
         }
     }
 
-    void
-    MediaManager::registerType (DocumentType* type)
+    void MediaManager::registerType (DocumentType* type)
     {
-        types.addIfNotAlreadyThere (type);
+        if (! types.contains (type))
+            types.add (type);
     }
 
-
-    void
-    MediaManager::addListener (DocumentCloseListener* dl)
+    void MediaManager::addListener (DocumentCloseListener* dl)
     {
         listeners.add (dl);
     }
 
-    void
-    MediaManager::removeListener (DocumentCloseListener* dl)
+    void MediaManager::removeListener (DocumentCloseListener* dl)
     {
         listeners.removeAllInstancesOf (dl);
     }

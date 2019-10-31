@@ -200,7 +200,7 @@ ValueTree Node::parse (const File& file)
     ValueTree data;
     ValueTree nodeData;
     
-    if (ScopedPointer<XmlElement> e = XmlDocument::parse (file))
+    if (auto e = XmlDocument::parse (file))
     {
         data = ValueTree::fromXml (*e);
     }
@@ -250,7 +250,7 @@ bool Node::writeToFile (const File& targetFile) const
         return tempFile.overwriteTargetFileWithTemporary();
     }
     #else
-    if (ScopedPointer<XmlElement> e = data.createXml())
+    if (auto e = data.createXml())
         return e->writeToFile (targetFile, String());
     #endif
 
@@ -282,7 +282,7 @@ bool Node::savePresetTo (const DataPath& path, const String& name) const
         return tempFile.overwriteTargetFileWithTemporary();
     }
     #else
-    if (ScopedPointer<XmlElement> e = preset.createXml())
+    if (auto e = preset.createXml())
         return e->writeToFile (targetFile, String());
     #endif
     return false;

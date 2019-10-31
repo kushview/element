@@ -168,9 +168,9 @@ MidiEngine::MidiInputHolder* MidiEngine::getMidiInput (const String& deviceName,
     {
         std::unique_ptr<MidiInputHolder> holder;
         holder.reset (new MidiInputHolder (*this));
-        if (auto* midiIn = MidiInput::openDevice (index, holder.get()))
+        if (auto midiIn = MidiInput::openDevice (index, holder.get()))
         {
-            holder->input.reset (midiIn);
+            holder->input.reset (midiIn.release());
             holder->input->start();
             return openMidiInputs.add (holder.release());
         }
@@ -300,7 +300,7 @@ void MidiEngine::setDefaultMidiOutput (const String& deviceName)
         std::unique_ptr<MidiOutput> newMidiOut;
 
         if (deviceName.isNotEmpty())
-            newMidiOut.reset (MidiOutput::openDevice (MidiOutput::getDevices().indexOf (deviceName)));
+            newMidiOut= MidiOutput::openDevice (MidiOutput::getDevices().indexOf (deviceName));
 
         if (newMidiOut)
         {

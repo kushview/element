@@ -603,20 +603,18 @@ void AudioMixerProcessor::getStateInformation (juce::MemoryBlock& block)
         state.addChild (trk, -1, 0);
     }
 
-    if (auto* xml = state.createXml())
+    if (auto xml = state.createXml())
     {
         copyXmlToBinary (*xml, block);
-        deleteAndZero (xml);
     }
 }
 
 void AudioMixerProcessor::setStateInformation (const void* data, int size)
 {
     ValueTree state;
-    if (auto* xml = getXmlFromBinary (data, size))
+    if (auto xml = getXmlFromBinary (data, size))
     {
         state = ValueTree::fromXml (*xml);
-        deleteAndZero (xml);
     }
 
     if (! state.isValid())

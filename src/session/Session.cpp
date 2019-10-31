@@ -120,7 +120,7 @@ namespace Element {
     {
         ValueTree saveData = objectData.createCopy();
         Node::sanitizeProperties (saveData, true);
-        return saveData.createXml();
+        return saveData.createXml().release();
     }
 
     void Session::setMissingProperties (bool resetExisting)

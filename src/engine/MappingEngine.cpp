@@ -537,7 +537,9 @@ public:
 
     bool add (ControllerMapInput* input)
     {
-        inputs.addIfNotAlreadyThere (input);
+        if (inputs.contains (input))
+            return true;
+        inputs.add (input);
         if (isRunning())
             input->start();
         return inputs.contains (input);
@@ -597,8 +599,8 @@ public:
 
     bool isRunning() const { return running; }
 
-    ControllerMapInput** begin()  const noexcept { return inputs.begin(); }
-    ControllerMapInput** end()    const noexcept { return inputs.end(); }
+    ControllerMapInput* const* begin()  const noexcept { return inputs.begin(); }
+    ControllerMapInput* const* end()    const noexcept { return inputs.end(); }
     int size()                    const noexcept { return inputs.size(); }
 
     void swapWith (OwnedArray<ControllerMapInput>& other) { inputs.swapWith (other); }

@@ -90,7 +90,7 @@ void DevicesController::add (const ControllerDevice& device, const ControllerDev
 void DevicesController::add (const File& file)
 {
     ValueTree data;
-    if (ScopedXml xml = XmlDocument::parse (file))
+    if (auto xml = XmlDocument::parse (file))
         data = ValueTree::fromXml (*xml);
     
     if (data.isValid() && data.hasType (Tags::controller))

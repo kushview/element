@@ -131,7 +131,7 @@ PropertiesFile* Settings::getProps() const
 XmlElement* Settings::getLastGraph() const
 {
     if (auto* p = getProps())
-        return p->getXmlValue ("lastGraph");
+        return p->getXmlValue ("lastGraph").release();
     return nullptr;
 }
 
@@ -141,8 +141,8 @@ void Settings::setLastGraph (const ValueTree& data)
     if (! data.hasType (Tags::node))
         return;
     if (auto* p = getProps())
-        if (ScopedXml xml = data.createXml())
-            p->setValue ("lastGraph", xml);
+        if (auto xml = data.createXml())
+            p->setValue ("lastGraph", xml.get());
 }
     
 

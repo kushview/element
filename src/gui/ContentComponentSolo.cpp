@@ -633,14 +633,14 @@ void ContentComponentSolo::itemDropped (const SourceDetails& dragSourceDetails)
     else if (desc.isArray() && desc.size() >= 2 && desc[0] == "plugin")
     {
         auto& list (getGlobals().getPluginManager().getKnownPlugins());
-        if (auto* plugin = list.getTypeForIdentifierString (desc[1].toString()))
+        if (auto plugin = list.getTypeForIdentifierString (desc[1].toString()))
             this->post (new LoadPluginMessage (*plugin, true));
         else
             AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, "Could not load plugin",
                                               "The plugin you dropped could not be loaded for an unknown reason.");
     }
 }
-    
+
 bool ContentComponentSolo::isInterestedInFileDrag (const StringArray &files)
 {
     for (const auto& path : files)

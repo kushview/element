@@ -188,13 +188,13 @@ public:
         state.setProperty ("damping",  (float) *damping, 0);
         state.setProperty ("feedback", (float) *feedback, 0);
         state.setProperty ("length",   (float) *length, 0);
-        if (ScopedPointer<XmlElement> e = state.createXml())
+        if (auto e = state.createXml())
             AudioProcessor::copyXmlToBinary (*e, destData);
     }
     
     void setStateInformation (const void* data, int sizeInBytes) override
     {
-        if (ScopedPointer<XmlElement> e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
+        if (auto e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
         {
             auto state = ValueTree::fromXml (*e);
             if (state.isValid())

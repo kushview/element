@@ -147,11 +147,11 @@ void InternalFormat::getAllTypes (OwnedArray <PluginDescription>& results)
 }
 
 void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
-                                            int initialBufferSize, void* userData,
-                                            void (*callback) (void*, AudioPluginInstance*, const String&))
+                                           int initialBufferSize,
+                                           PluginCreationCallback callback)
 {
     if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
-        callback (userData, i, String());
+        callback (std::unique_ptr<AudioPluginInstance> (i), String());
 }
 
 bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
@@ -392,14 +392,15 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
     return base != nullptr ? base.release() : nullptr;
 }
 
-void ElementAudioPluginFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
-                                                        int initialBufferSize, void* userData,
-                                                        void (*callback) (void*, AudioPluginInstance*, const String&))
+void ElementAudioPluginFormat::createPluginInstance (const PluginDescription& d,
+                                                     double initialSampleRate,
+                                                     int initialBufferSize,
+                                                     PluginCreationCallback callback)
 {
     if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
-        callback (userData, i, String());
+        callback (std::unique_ptr<AudioPluginInstance> (i), String());
     else
-        callback (userData, nullptr, String());
+        callback (nullptr, String());
 }
 
 bool ElementAudioPluginFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept

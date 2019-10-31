@@ -104,12 +104,6 @@ void AppController::deactivate()
 
 void AppController::run()
 {
-    auto* const sessCtl = findChild<SessionController>();
-    auto* const devsCtl = findChild<DevicesController>();
-    auto* const mapsCtl = findChild<MappingController>();
-    auto* const presets = findChild<PresetsController>();
-    assert(sessCtl && devsCtl && mapsCtl && presets);
-    
     activate();
     
     // need content component parented for the following init routines
@@ -170,8 +164,6 @@ void AppController::run()
                 gui->showPluginWindowsFor (graph);
         }
     }
-
-    jassert (! sessCtl->hasSessionChanged());
 }
 
 void AppController::handleMessage (const Message& msg)

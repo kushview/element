@@ -73,10 +73,13 @@ public:
     String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
     bool pluginNeedsRescanning (const PluginDescription&) override { return false; }
     StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override { return StringArray(); }
-
+    bool isTrivialToScan() const override { return true; }
+    
 protected:
-    void createPluginInstance (const PluginDescription&, double initialSampleRate, int initialBufferSize, void* userData,
-                                void (*callback) (void*, AudioPluginInstance*, const String&)) override;
+    void createPluginInstance (const PluginDescription&,
+                               double initialSampleRate,
+                               int initialBufferSize,
+                               PluginCreationCallback) override;
     bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
 
 private:
@@ -113,10 +116,13 @@ public:
     String getNameOfPluginFromIdentifier (const String& fileOrIdentifier) override { return fileOrIdentifier; }
     bool pluginNeedsRescanning (const PluginDescription&)       override { return false; }
     StringArray searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/) override;
+    bool isTrivialToScan() const override { return true; }
     
 protected:
-    void createPluginInstance (const PluginDescription&, double initialSampleRate, int initialBufferSize, void* userData,
-                                void (*callback) (void*, AudioPluginInstance*, const String&)) override;
+    void createPluginInstance (const PluginDescription&,
+                               double initialSampleRate,
+                               int initialBufferSize,
+                               PluginCreationCallback) override;
     bool requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept override;
     
 private:

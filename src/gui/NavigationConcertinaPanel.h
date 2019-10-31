@@ -263,7 +263,7 @@ public:
     File getDirectory() { return (list) ? list->getDirectory() : File(); }
     void refresh()
     {
-        ScopedPointer<XmlElement> state = tree->getOpennessState (true);
+        auto state = tree->getOpennessState (true);
         getFileTreeComponent().refresh();
         if (state)
             tree->restoreOpennessState (*state, true);
@@ -442,13 +442,13 @@ public:
             state.addChild (item, -1, 0);
         }
 
-        if (ScopedPointer<XmlElement> xml = state.createXml())
-            props->setValue ("ccNavPanel", xml);
+        if (auto xml = state.createXml())
+            props->setValue ("ccNavPanel", xml.get());
     }
     
     void restoreState (PropertiesFile* props)
     {
-        if (auto* xml = props->getXmlValue ("ccNavPanel"))
+        if (auto xml = props->getXmlValue ("ccNavPanel"))
         {
             ValueTree state = ValueTree::fromXml (*xml);
             for (int i = 0; i < state.getNumChildren(); ++i)
@@ -461,8 +461,6 @@ public:
                         ned->setSticky ((bool) item.getProperty ("sticky", ned->isSticky()));
                 }
             }
-
-            deleteAndZero (xml);
         }
     }
     
