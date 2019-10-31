@@ -30,6 +30,9 @@ public:
     ~Private() { }
 
     EnginePtr activeEngine;
+   #if KV_JACK_AUDIO
+    kv::JackClient jackClient { "Element" };
+   #endif
 };
 
 DeviceManager::DeviceManager()
@@ -83,7 +86,7 @@ void DeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
    #if KV_JACK_AUDIO
-    addIfNotNull (list, Jack::createAudioIODeviceType (nullptr));
+    addIfNotNull (list, Jack::createAudioIODeviceType (&impl->jackClient));
    #endif
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
