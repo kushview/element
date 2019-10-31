@@ -53,7 +53,7 @@ private:
         desc.pluginFormatName = "AudioUnit";
         desc.fileOrIdentifier = "AudioUnit:Synths/aumu,samp,appl";
         String msg;
-        return plugins.createPluginInstance (desc, 44100.0, 1024, msg);
+        return plugins.createPluginInstance (desc, 44100.0, 1024, msg).release();
     }
 };
 
