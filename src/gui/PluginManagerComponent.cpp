@@ -304,6 +304,9 @@ void PluginListComponent::setTableModel (TableListBoxModel* model)
 
 bool PluginListComponent::canShowSelectedFolder() const
 {
+    if (table.getSelectedRow() < 0)
+        return false;
+        
     if (const PluginDescription* const desc = list.getType (table.getSelectedRow()))
         return File::createFileWithoutCheckingPath (desc->fileOrIdentifier).exists();
     
