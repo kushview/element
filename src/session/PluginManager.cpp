@@ -649,7 +649,7 @@ PluginManager::~PluginManager()
 void PluginManager::addDefaultFormats()
 {
     getAudioPluginFormats().addDefaultFormats();
-   #if KV_LV2_PLUGIN_HOST
+   #if JLV2_PLUGINHOST_LV2
     addFormat (new jlv2::LV2PluginFormat());
    #endif
 }
