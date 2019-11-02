@@ -122,7 +122,7 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     GraphProcessor& graph (*getParentGraph());
     AudioPluginInstance* const src = getAudioPluginInstance();
     AudioPluginInstance* const dst = other->getAudioPluginInstance();
-
+    ignoreUnused (src, dst);
     const int totalChans = jmin (getNumAudioOutputs(), other->getNumAudioInputs());
     int failed = 0;
 
