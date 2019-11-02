@@ -602,7 +602,7 @@ public:
         auto displayName = node.getDisplayName();
         auto subName = node.hasModifiedName() ? node.getPluginName() : String();
         
-        if (node.isMidiInputNode())
+        if (node.getParentGraph().isRootGraph() && node.isMidiInputNode())
         {
             auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
             if (midi.getNumActiveMidiInputs() <= 0)
