@@ -329,14 +329,18 @@ void PluginListComponent::removeMissingPlugins()
 
 void PluginListComponent::removePluginItem (int index)
 {
-    if (const auto* type = list.getType(index))
-        if (type->pluginFormatName == "Element")
-            return;
+    auto types = list.getTypes();
+    if (! isPositiveAndBelow (index, types.size()))
+    {
+        list.removeFromBlacklist (list.getBlacklistedFiles() [index - types.size()]);
+        return;
+    }
     
-    if (index < list.getNumTypes())
-        list.removeType (*list.getType (index));
-    else
-        list.removeFromBlacklist (list.getBlacklistedFiles() [index - list.getNumTypes()]);
+    const auto& type = types.getReference (index);
+    if (type.pluginFormatName == "Element")
+        return;
+    
+    list.removeType (type);
 }
 
 void PluginListComponent::optionsMenuStaticCallback (int result, PluginListComponent* pluginList)
