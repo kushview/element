@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"unicode/utf8"
 )
 
 const contribURL = "https://api.github.com/repos/kushview/element/contributors"
@@ -22,6 +23,12 @@ type User struct {
 type Contributor struct {
 	Name  string
 	Login string
+}
+
+func hasUnicode(s string) bool {
+	a := len(s)
+	b := utf8.RuneCountInString(s)
+	return a != b
 }
 
 func main() {
@@ -55,6 +62,12 @@ func main() {
 		}
 		var c Contributor
 		if nil == json.Unmarshal(bytes, &c) {
+			if hasUnicode(c.Name) {
+				c.Name = ""
+			}
+			if hasUnicode(c.Login) {
+				c.Login = ""
+			}
 			contribs = append(contribs, c)
 		}
 	}

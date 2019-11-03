@@ -38,6 +38,14 @@
 
 namespace Element {
 
+static StringArray elDevelopers() 
+{
+    const auto str = String(BinaryData::developers_txt, BinaryData::developers_txtSize);
+    StringArray devs;
+    devs.addTokens(str, newLine, {});
+    return devs;
+}
+
 class AboutCreditsPanel : public Component
 {
 public:
@@ -179,25 +187,8 @@ AboutComponent::AboutComponent()
     const auto tabc = findColour (TextEditor::backgroundColourId);
 
     auto* authors = new AboutCreditsComponent();
-    authors->getPanel().addSection ("Lead Developer", { 
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-    });
-
-    
-
+    authors->getPanel().addSection ("Lead Developer", { "Michael Fisher (mfisher31)" });
+    authors->getPanel().addSection ("Developers", elDevelopers());
     tabs.addTab ("Authors", tabc, authors, true);
 
     auto* donors = new AboutCreditsComponent();

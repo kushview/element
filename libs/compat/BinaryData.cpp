@@ -110,7 +110,7 @@ const char* Editing_elw = (const char*) temp_binary_data_2;
 
 //================== developers.txt ==================
 static const unsigned char temp_binary_data_3[] =
-"3\xce\xbbi\xc8\xaf+ (eliot-akira)\n"
+"eliot-akira\n"
 "iamvs2002\n";
 
 const char* developers_txt = (const char*) temp_binary_data_3;
@@ -353,7 +353,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x0dbee79a:  numBytes = 1153; return PowerButton_48x48_png;
         case 0x5b24ff63:  numBytes = 1631; return Classic_elw;
         case 0xe469c969:  numBytes = 1820; return Editing_elw;
-        case 0x117be71a:  numBytes = 32; return developers_txt;
+        case 0x117be71a:  numBytes = 22; return developers_txt;
         case 0x9eb8b85f:  numBytes = 11697; return ElementIcon_png;
         case 0xcd7846f9:  numBytes = 7122; return ElementIconTemplate_png;
         default: break;
