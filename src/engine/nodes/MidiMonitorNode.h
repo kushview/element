@@ -1,0 +1,101 @@
+/*
+    This file is part of Element
+    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
+#pragma once
+
+#include "engine/MidiPipe.h"
+#include "engine/nodes/BaseProcessor.h"
+#include "engine/nodes/MidiFilterNode.h"
+#include "Signals.h"
+
+namespace Element {
+
+class MidiMonitorNode : public MidiFilterNode,
+                             public AsyncUpdater,
+                             public ChangeBroadcaster
+{
+public:
+    MidiMonitorNode();
+    virtual ~MidiMonitorNode();
+
+    virtual void fillInPluginDescription (PluginDescription& desc)
+    {
+        desc.name = "MIDI Monitor";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;
+        desc.uid                = EL_INTERNAL_UID_MIDI_MONITOR;
+        desc.descriptiveName    = "MIDI Monitor";
+        desc.numInputChannels   = 0;
+        desc.numOutputChannels  = 0;
+        desc.hasSharedContainer = false;
+        desc.isInstrument       = false;
+        desc.manufacturerName   = "Element";
+        desc.pluginFormatName   = "Element";
+        desc.version            = "1.0.0";
+    }
+
+    void clear();
+
+    inline int getWidth() const { return width; }
+    inline int getHeight() const { return height; }
+
+    inline void setSize (int w, int h)
+    {
+        width  = jmax (w, (int) 1);
+        height = jmax (h, (int) 1);
+    }
+
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void releaseResources() override;
+
+    void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
+
+    void setState (const void* data, int size) override
+    {
+    }
+
+    void getState (MemoryBlock& block) override
+    {
+    }
+
+    inline void handleAsyncUpdate() override {}
+
+protected:
+
+    bool createdPorts = false;
+
+    MidiBuffer* buffers [16];
+    MidiBuffer tempMidi;
+    MidiBuffer toSendMidi;
+
+    int width = 720;
+    int height = 540;
+
+    inline void createPorts() override
+    {
+        if (createdPorts)
+            return;
+
+        ports.clearQuick();
+        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
+        createdPorts = true;
+    }
+};
+
+}
