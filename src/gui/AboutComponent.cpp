@@ -38,12 +38,14 @@
 
 namespace Element {
 
-static StringArray elDevelopers() 
+namespace About {
+static StringArray getDevelopers() 
 {
     const auto str = String(BinaryData::developers_txt, BinaryData::developers_txtSize);
     StringArray devs;
     devs.addTokens(str, newLine, {});
     return devs;
+}
 }
 
 class AboutCreditsPanel : public Component
@@ -188,30 +190,18 @@ AboutComponent::AboutComponent()
 
     auto* authors = new AboutCreditsComponent();
     authors->getPanel().addSection ("Lead Developer", { "Michael Fisher (mfisher31)" });
-    authors->getPanel().addSection ("Developers", elDevelopers());
+    authors->getPanel().addSection ("Developers", About::getDevelopers());
     tabs.addTab ("Authors", tabc, authors, true);
 
     auto* donors = new AboutCreditsComponent();
-    donors->getPanel().addSection ("Gold Donors", { 
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-        "Michael Fisher (mfisher31)",
-    });
+    donors->getPanel().addSection ("Gold Sponsors", { "None" });
+    donors->getPanel().addSection ("Silver Sponsors", { "None" });
+    donors->getPanel().addSection ("Gold Backers", { "None" });
+    donors->getPanel().addSection ("Silver Backers", { "None" });
 
     tabs.addTab ("Donors",  tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
-    setSize (520, 400);
+    setSize (510, 330);
 }
 
 void AboutComponent::resized()
@@ -219,7 +209,7 @@ void AboutComponent::resized()
     auto bounds = getLocalBounds();
     elementLogoBounds.setBounds (14, 14, 72, 72);
     auto topSlice = bounds.removeFromTop (90);
-    topSlice.removeFromTop (10);
+    topSlice.removeFromTop (6);
     titleLabel.setBounds (topSlice.removeFromTop (40));
     versionLabel.setBounds (topSlice.removeFromTop (24));
     copyrightLabel.setBounds (topSlice.removeFromTop (24));

@@ -885,7 +885,7 @@ void GuiController::toggleAboutScreen()
     else
     {
         about->addToDesktop();
-        about->centreWithSize (500, 240);
+        about->centreWithSize (about->getWidth(), about->getHeight());
         about->setVisible (true);
         about->toFront (true);
        #if EL_RUNNING_AS_PLUGIN
