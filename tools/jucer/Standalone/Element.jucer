@@ -17,6 +17,7 @@
         <FILE id="zPNZBt" name="Classic.elw" compile="0" resource="1" file="../../../data/Workspaces/Classic.elw"/>
         <FILE id="srA86o" name="Editing.elw" compile="0" resource="1" file="../../../data/Workspaces/Editing.elw"/>
       </GROUP>
+      <FILE id="TK7YJZ" name="developers.txt" compile="0" resource="1" file="../../../data/developers.txt"/>
       <FILE id="zjwu85" name="ElementIcon.png" compile="0" resource="1" file="../../../data/ElementIcon.png"/>
       <FILE id="EYsGJO" name="ElementIconTemplate.png" compile="0" resource="1"
             file="../../../data/ElementIconTemplate.png"/>
