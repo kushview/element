@@ -65,6 +65,7 @@ public:
     void clearMessages();
     void getMessages(MidiBuffer &destBuffer);
 
+    bool inputMessagesInitDone = false;
     double currentSampleRate;
     int numSamples = 0;
 

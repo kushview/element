@@ -36,8 +36,12 @@ MidiMonitorNode::~MidiMonitorNode()
 }
 
 void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize) {
+    if (inputMessagesInitDone) {
+        return;
+    }
     inputMessages.reset(sampleRate);
     currentSampleRate = sampleRate;
+    inputMessagesInitDone = true;
 };
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
