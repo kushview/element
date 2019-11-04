@@ -80,16 +80,16 @@ private:
 
 
 class MidiMonitorNodeEditor : public NodeEditorComponent,
-                              public ChangeListener
+                              private Timer
 {
 public:
 
     MidiMonitorNodeEditor (const Node& node);
-    virtual ~MidiMonitorNodeEditor() {};
+    virtual ~MidiMonitorNodeEditor();
 
     void paint (Graphics&) override {};
     void resized() override;
-    void changeListenerCallback (ChangeBroadcaster*) override;
+    void timerCallback() override;
 
 private:
     Node node;

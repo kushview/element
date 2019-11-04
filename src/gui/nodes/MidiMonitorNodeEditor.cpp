@@ -31,28 +31,32 @@ MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
 
     midiMonitorLog.setBounds (0, 0, 320, 160);
     addAndMakeVisible (midiMonitorLog);
-
     setSize (320, 160);
 
-    if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
-    {
-        node->addChangeListener (this);
-    }
+    startTimer (60);
 }
 
-void MidiMonitorNodeEditor::changeListenerCallback (ChangeBroadcaster*)
+MidiMonitorNodeEditor::~MidiMonitorNodeEditor() {
+    stopTimer();
+}
+
+void MidiMonitorNodeEditor::timerCallback ()
 {
     if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
     {
-      MidiBuffer midi = node->toSendMidi;
+      MidiBuffer midi;
+      node->getMessages(midi);
+
+      if (midi.isEmpty()) {
+          return;
+      }
+
       MidiBuffer::Iterator iter1 (midi);
       MidiMessage msg;
       int frame;
 
       while (iter1.getNextEvent (msg, frame))
         midiMonitorLog.addMessage(msg.getDescription());
-
-      node->clearMidiLog();
     }
 }
 

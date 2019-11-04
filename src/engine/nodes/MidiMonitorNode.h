@@ -52,7 +52,7 @@ public:
 
     void clear() {};
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override {};
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
@@ -60,10 +60,14 @@ public:
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
 
-    inline void handleAsyncUpdate() override;
-    void clearMidiLog();
+    inline void handleAsyncUpdate() override {};
+    void clearMessages();
+    void getMessages(MidiBuffer &destBuffer);
 
-    MidiBuffer toSendMidi;
+    double currentSampleRate;
+    int numSamples = 0;
+
+    MidiMessageCollector inputMessages;
 
 private:
 
