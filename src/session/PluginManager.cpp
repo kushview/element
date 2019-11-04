@@ -24,6 +24,7 @@
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/MidiMonitorNode.h"
+#include "engine/nodes/OSCReceiverNode.h"
 #include "DataPath.h"
 #include "Settings.h"
 
@@ -739,6 +740,10 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_MONITOR)
     {
         return new MidiMonitorNode();
+    }
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_OSC_RECEIVER)
+    {
+        return new OSCReceiverNode();
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
     {
