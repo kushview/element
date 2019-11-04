@@ -19,28 +19,41 @@
 
 #include "engine/nodes/MidiMonitorNode.h"
 #include "gui/nodes/MidiMonitorNodeEditor.h"
+#include "gui/ViewHelpers.h"
 
 namespace Element {
+
+typedef ReferenceCountedObjectPtr<MidiMonitorNode> MidiMonitorNodePtr;
 
 MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-    setSize (720, 540);
-}
 
-MidiMonitorNodeEditor::~MidiMonitorNodeEditor()
-{
+    midiMonitorLog.setBounds (0, 0, 320, 160);
+    addAndMakeVisible (midiMonitorLog);
+
+    setSize (320, 160);
+
+    if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
+    {
+        node->addChangeListener (this);
+    }
 }
 
 void MidiMonitorNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
+    if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
+    {
+      MidiBuffer midi = node->toSendMidi;
+      MidiBuffer::Iterator iter1 (midi);
+      MidiMessage msg;
+      int frame;
+
+      while (iter1.getNextEvent (msg, frame))
+        midiMonitorLog.addMessage(msg.getDescription());
+
+      node->clearMidiLog();
+    }
 }
 
-void MidiMonitorNodeEditor::paint (Graphics& g)
-{
-}
-
-void MidiMonitorNodeEditor::resized()
-{
-}
-}
+};

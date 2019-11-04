@@ -24,23 +24,76 @@
 
 namespace Element {
 
+class MidiMonitorLogListBox : public ListBox,
+                              private ListBoxModel,
+                              private AsyncUpdater
+{
+public:
+    MidiMonitorLogListBox()
+    {
+        setModel (this);
+    }
+
+    ~MidiMonitorLogListBox() override = default;
+
+    int getNumRows() override
+    {
+        return logList.size();
+    }
+
+    void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
+    {
+        ignoreUnused (rowIsSelected);
+        if (isPositiveAndBelow (row, logList.size()))
+        {
+            g.setColour (Colours::white);
+            g.drawText (logList[row],
+                        Rectangle<int> (width, height).reduced (4, 0),
+                        Justification::centredLeft, true);
+        }
+    }
+
+    void addMessage (const String& message)
+    {
+        logList.add (message);
+        triggerAsyncUpdate();
+    }
+
+    void clear()
+    {
+        logList.clear();
+        triggerAsyncUpdate();
+    }
+
+    void handleAsyncUpdate() override
+    {
+        updateContent();
+        scrollToEnsureRowIsOnscreen (logList.size() - 1);
+        repaint();
+    }
+
+private:
+    StringArray logList;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiMonitorLogListBox)
+};
+
+
 class MidiMonitorNodeEditor : public NodeEditorComponent,
-                             public ChangeListener
+                              public ChangeListener
 {
 public:
 
     MidiMonitorNodeEditor (const Node& node);
-    virtual ~MidiMonitorNodeEditor();
+    virtual ~MidiMonitorNodeEditor() {};
 
-    void paint (Graphics&) override;
-    void resized() override;
-
+    void paint (Graphics&) override {};
+    void resized() override {};
     void changeListenerCallback (ChangeBroadcaster*) override;
 
-    //bool keyPressed (const KeyPress&) override;
 private:
     Node node;
-
+    MidiMonitorLogListBox midiMonitorLog;
 };
 
 }

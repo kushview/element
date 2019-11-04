@@ -18,8 +18,6 @@
 */
 
 #include "engine/nodes/MidiMonitorNode.h"
-#include "gui/LookAndFeel.h"
-#include "Utils.h"
 
 namespace Element {
 
@@ -29,24 +27,39 @@ MidiMonitorNode::MidiMonitorNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_MONITOR, nullptr);
-
-    setSize (width, height);
 }
 
-MidiMonitorNode::~MidiMonitorNode() { }
-
-void MidiMonitorNode::clear()
+MidiMonitorNode::~MidiMonitorNode()
 {
 }
-
-void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize)
-{
-}
-
-void MidiMonitorNode::releaseResources() { }
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
+    ignoreUnused (audio, midi);
+
+    int numBuffers = midi.getNumBuffers();
+    if (numBuffers <= 0)
+    {
+        return;
+    }
+
+    auto* const midiIn = midi.getWriteBuffer (0);
+    MidiBuffer::Iterator iter1 (*midiIn);
+    MidiMessage msg;
+    int frame;
+
+    while (iter1.getNextEvent (msg, frame))
+        toSendMidi.addEvent (msg, frame);
+
+    triggerAsyncUpdate();
 }
 
+void MidiMonitorNode::handleAsyncUpdate() {
+    sendChangeMessage();
 }
+
+void MidiMonitorNode::clearMidiLog() {
+    toSendMidi.clear();
+}
+
+};

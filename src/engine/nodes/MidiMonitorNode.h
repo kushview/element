@@ -26,15 +26,16 @@
 
 namespace Element {
 
-class MidiMonitorNode : public MidiFilterNode,
-                             public AsyncUpdater,
-                             public ChangeBroadcaster
+class MidiMonitorNode   : public MidiFilterNode,
+                          public AsyncUpdater,
+                          public ChangeBroadcaster
 {
 public:
+
     MidiMonitorNode();
     virtual ~MidiMonitorNode();
 
-    virtual void fillInPluginDescription (PluginDescription& desc)
+    void fillInPluginDescription (PluginDescription& desc)
     {
         desc.name = "MIDI Monitor";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;
@@ -49,42 +50,24 @@ public:
         desc.version            = "1.0.0";
     }
 
-    void clear();
+    void clear() {};
 
-    inline int getWidth() const { return width; }
-    inline int getHeight() const { return height; }
-
-    inline void setSize (int w, int h)
-    {
-        width  = jmax (w, (int) 1);
-        height = jmax (h, (int) 1);
-    }
-
-    void prepareToRender (double sampleRate, int maxBufferSize) override;
-    void releaseResources() override;
+    void prepareToRender (double sampleRate, int maxBufferSize) override {};
+    void releaseResources() override {};
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
 
-    void setState (const void* data, int size) override
-    {
-    }
+    void setState (const void* data, int size) override {};
+    void getState (MemoryBlock& block) override {};
 
-    void getState (MemoryBlock& block) override
-    {
-    }
+    inline void handleAsyncUpdate() override;
+    void clearMidiLog();
 
-    inline void handleAsyncUpdate() override {}
-
-protected:
-
-    bool createdPorts = false;
-
-    MidiBuffer* buffers [16];
-    MidiBuffer tempMidi;
     MidiBuffer toSendMidi;
 
-    int width = 720;
-    int height = 540;
+private:
+
+    bool createdPorts = false;
 
     inline void createPorts() override
     {
@@ -96,6 +79,7 @@ protected:
         ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
         createdPorts = true;
     }
+
 };
 
 }
