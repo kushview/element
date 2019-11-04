@@ -57,7 +57,6 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     auto* const midiIn = midi.getWriteBuffer (0);
     MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
-    int bytes;
     int frame;
 
     while (iter1.getNextEvent (msg, frame)) {
