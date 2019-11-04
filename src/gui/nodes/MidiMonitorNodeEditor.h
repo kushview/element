@@ -52,7 +52,7 @@ public:
     void setMaxMessages (int newMax)
     {
         if (newMax <= 0 || newMax == maxMessages)
-            return
+            return;
         triggerAsyncUpdate();
     }
 
