@@ -31,7 +31,6 @@ class MidiMonitorNode   : public MidiFilterNode,
                           public ChangeBroadcaster
 {
 public:
-
     MidiMonitorNode();
     virtual ~MidiMonitorNode();
 
@@ -65,14 +64,12 @@ public:
     void clearMessages();
     void getMessages(MidiBuffer &destBuffer);
 
+private:
+    friend class MidiMonitorNodeEditor;
     bool inputMessagesInitDone = false;
     double currentSampleRate;
-    int numSamples = 0;
-
+    Atomic<int> numSamples = 0;
     MidiMessageCollector inputMessages;
-
-private:
-
     bool createdPorts = false;
 
     inline void createPorts() override
@@ -85,7 +82,6 @@ private:
         ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
         createdPorts = true;
     }
-
 };
 
 }

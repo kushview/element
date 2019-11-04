@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "engine/nodes/MidiMonitorNode.h"
 
@@ -45,16 +46,20 @@ public:
     {
         ignoreUnused (rowIsSelected);
         if (isPositiveAndBelow (row, logList.size()))
-        {
-            g.setColour (Colours::white);
-            g.drawText (logList[row],
-                        Rectangle<int> (width, height).reduced (4, 0),
-                        Justification::centredLeft, true);
-        }
+            ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
+    }
+
+    void setMaxMessages (int newMax)
+    {
+        if (newMax <= 0 || newMax == maxMessages)
+            return;
+        triggerAsyncUpdate();
     }
 
     void addMessage (const String& message)
     {
+        if (logList.size() > maxMessages)
+            logList.remove (0);
         logList.add (message);
         triggerAsyncUpdate();
     }
@@ -67,23 +72,21 @@ public:
 
     void handleAsyncUpdate() override
     {
-        updateContent();
+        updateContent();        
         scrollToEnsureRowIsOnscreen (logList.size() - 1);
         repaint();
     }
 
 private:
+    int maxMessages { 100 };
     StringArray logList;
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiMonitorLogListBox)
 };
-
 
 class MidiMonitorNodeEditor : public NodeEditorComponent,
                               private Timer
 {
 public:
-
     MidiMonitorNodeEditor (const Node& node);
     virtual ~MidiMonitorNodeEditor();
 
