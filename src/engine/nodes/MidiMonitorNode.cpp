@@ -48,21 +48,18 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     ignoreUnused (audio, midi);
 
-    int numBuffers = midi.getNumBuffers();
-    if (numBuffers <= 0)
-    {
-        return;
-    }
-
+    const auto nframes = audio.getNumSamples();
     auto* const midiIn = midi.getWriteBuffer (0);
     MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
+    int bytes;
     int frame;
 
     while (iter1.getNextEvent (msg, frame)) {
-        numSamples += frame;
         inputMessages.addMessageToQueue(msg);
     }
+
+    numSamples += nframes;
 }
 
 void MidiMonitorNode::getMessages(MidiBuffer &destBuffer) {
