@@ -39,15 +39,14 @@ void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize) {
     if (inputMessagesInitDone) {
         return;
     }
-    inputMessages.reset(sampleRate);
+    inputMessages.reset (sampleRate);
     currentSampleRate = sampleRate;
     inputMessagesInitDone = true;
 };
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    ignoreUnused (audio, midi);
-
+    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
 
     if (nframes == 0) {
@@ -59,20 +58,28 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     MidiMessage msg;
     int frame;
 
-    while (iter1.getNextEvent (msg, frame)) {
-        inputMessages.addMessageToQueue(msg);
+    while (iter1.getNextEvent (msg, frame))
+    {
+        // TODO: better timestamp sync with UI
+        //       updating timestamp below causes messages to be skipped in the
+        //       UI rendering
+        // timestamp += 1000.0 * static_cast<double> (frame) * currentSampleRate;
+        msg.setTimeStamp (timestamp);
+        inputMessages.addMessageToQueue (msg);
     }
 
     numSamples += nframes;
 }
 
-void MidiMonitorNode::getMessages(MidiBuffer &destBuffer) {
-    inputMessages.removeNextBlockOfMessages(destBuffer, numSamples);
+void MidiMonitorNode::getMessages (MidiBuffer& destBuffer)
+{
+    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples.get());
     numSamples = 0;
 }
 
-void MidiMonitorNode::clearMessages() {
-    inputMessages.reset(currentSampleRate);
+void MidiMonitorNode::clearMessages()
+{
+    inputMessages.reset (currentSampleRate);
     numSamples = 0;
 }
 

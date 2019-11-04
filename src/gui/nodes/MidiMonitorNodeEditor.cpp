@@ -28,15 +28,14 @@ typedef ReferenceCountedObjectPtr<MidiMonitorNode> MidiMonitorNodePtr;
 MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-
     midiMonitorLog.setBounds (0, 0, 320, 160);
     addAndMakeVisible (midiMonitorLog);
     setSize (320, 160);
-
-    startTimer (60);
+    startTimerHz (60);
 }
 
-MidiMonitorNodeEditor::~MidiMonitorNodeEditor() {
+MidiMonitorNodeEditor::~MidiMonitorNodeEditor()
+{
     stopTimer();
 }
 
@@ -44,25 +43,24 @@ void MidiMonitorNodeEditor::timerCallback ()
 {
     if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
     {
-      if (node->numSamples <= 0) {
-          return;
-      }
+        if (node->numSamples.get() <= 0)
+            return;
 
-      MidiBuffer midi;
-      node->getMessages(midi);
+        MidiBuffer midi;
+        node->getMessages(midi);
 
-      MidiBuffer::Iterator iter1 (midi);
-      MidiMessage msg;
-      int frame;
+        MidiBuffer::Iterator iter1 (midi);
+        MidiMessage msg;
+        int frame;
 
-      while (iter1.getNextEvent (msg, frame))
-        midiMonitorLog.addMessage(msg.getDescription());
+        while (iter1.getNextEvent (msg, frame))
+            midiMonitorLog.addMessage (msg.getDescription());
     }
 }
 
 void MidiMonitorNodeEditor::resized ()
 {
-    midiMonitorLog.setBounds (0, 0, getWidth(), getHeight());
+    midiMonitorLog.setBounds (getLocalBounds().reduced (4));
 }
 
 };
