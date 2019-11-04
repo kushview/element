@@ -49,6 +49,11 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     ignoreUnused (audio, midi);
 
     const auto nframes = audio.getNumSamples();
+
+    if (nframes == 0) {
+        return;
+    }
+
     auto* const midiIn = midi.getWriteBuffer (0);
     MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
