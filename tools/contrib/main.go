@@ -47,6 +47,7 @@ func main() {
 	json.Unmarshal(bytes, &users)
 
 	contribs := make([]Contributor, 0)
+	overrides := nameOverrides()
 	for _, user := range users {
 		if user.Login == "mfisher31" {
 			continue
@@ -68,6 +69,11 @@ func main() {
 			if hasUnicode(c.Login) {
 				c.Login = ""
 			}
+
+			if name, ok := overrides[c.Login]; ok {
+				c.Name = name
+			}
+
 			contribs = append(contribs, c)
 		}
 	}

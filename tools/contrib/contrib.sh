@@ -1,2 +1,4 @@
 #!/bin/bash
-go run main.go > ../../data/developers.txt
+set -x
+go build
+./contrib > ../../data/developers.txt

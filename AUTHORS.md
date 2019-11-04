@@ -4,5 +4,5 @@
     Michael Fisher (mfisher31)
 
 ## Contributors
-    eliot-akira
+    Eliot Akira (eliot-akira)
     iamvs2002
