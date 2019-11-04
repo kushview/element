@@ -39,7 +39,24 @@ def check_common (self):
     self.check_cfg(package='lv2', uselib_store="LV2", args='--cflags', mandatory=False)
     self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
     self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
-    self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_LILV)
+    if bool(self.env.HAVE_SUIL):
+        self.check_cxx(
+            msg = "Checking for suil_init(...)",
+            fragmant = '''
+                #include <suil/suil.h>
+                int main(int, char**) {
+                    suil_init (nullptr, nullptr, SUIL_ARG_NONE);
+                    return 0;
+                }
+            ''',
+            execute = False,
+            use = ['SUIL'],
+            uselib_store = 'SUIL_INIT',
+            define_name = 'HAVE_SUIL_INIT',
+            mandatory = False
+        )
+        self.define('JLV2_SUIL_INIT', bool(self.env.HAVE_SUIL_INIT))
+    self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_SUIL)
     self.define('JLV2_PLUGINHOST_LV2', self.env.LV2)
 
 @conf
