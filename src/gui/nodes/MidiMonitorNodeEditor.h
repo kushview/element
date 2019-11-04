@@ -88,7 +88,7 @@ public:
     virtual ~MidiMonitorNodeEditor() {};
 
     void paint (Graphics&) override {};
-    void resized() override {};
+    void resized() override;
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:

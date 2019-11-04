@@ -56,4 +56,9 @@ void MidiMonitorNodeEditor::changeListenerCallback (ChangeBroadcaster*)
     }
 }
 
+void MidiMonitorNodeEditor::resized ()
+{
+    midiMonitorLog.setBounds (0, 0, getWidth(), getHeight());
+}
+
 };
