@@ -17,9 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/nodes/OSCReceiverNode.h"
 #include "gui/nodes/OSCReceiverNodeEditor.h"
-#include "gui/ViewHelpers.h"
 
 namespace Element {
 

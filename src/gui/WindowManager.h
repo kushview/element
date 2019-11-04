@@ -25,7 +25,6 @@
 #include "engine/GraphProcessor.h"
 #include "engine/GraphNode.h"
 #include "engine/nodes/MidiMonitorNode.h"
-#include "engine/nodes/OSCReceiverNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"

@@ -19,10 +19,9 @@
 
 #pragma once
 
+#include "engine/nodes/OSCReceiverNode.h"
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
-#include "engine/nodes/OSCReceiverNode.h"
-#include "../../../libs/compat/JuceHeader.h"
 
 namespace Element {
 
