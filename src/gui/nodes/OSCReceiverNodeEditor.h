@@ -177,8 +177,6 @@ public:
     void paint (Graphics&) override {};
     void resized() override;
 
-    Node node;
-
 private:
     OSCReceiverLogListBox oscReceiverLog;
     OSCReceiver oscReceiver;
@@ -191,125 +189,19 @@ private:
 
     int currentPortNumber = -1;
 
-    //==============================================================================
-    void connectButtonClicked()
-    {
-        if (! isConnected())
-            connect();
-        else
-            disconnect();
+    void connectButtonClicked();
+    void clearButtonClicked();
+    void oscMessageReceived (const OSCMessage& message) override;
+    void oscBundleReceived (const OSCBundle& bundle) override;
+    void connect();
+    void disconnect();
+    void handleConnectError (int failedPort);
+    void handleDisconnectError();
+    void handleInvalidPortNumberEntered();
+    bool isConnected() const;
+    bool isValidOscPort (int port) const;
 
-        updateConnectionStatusLabel();
-    }
-
-    //==============================================================================
-    void clearButtonClicked()
-    {
-        oscReceiverLog.clear();
-    }
-
-    //==============================================================================
-    void oscMessageReceived (const OSCMessage& message) override
-    {
-        oscReceiverLog.addOSCMessage (message);
-    }
-
-    void oscBundleReceived (const OSCBundle& bundle) override
-    {
-        oscReceiverLog.addOSCBundle (bundle);
-    }
-
-    //==============================================================================
-    void connect()
-    {
-        auto portToConnect = portNumberField.getText().getIntValue();
-
-        if (! isValidOscPort (portToConnect))
-        {
-            handleInvalidPortNumberEntered();
-            return;
-        }
-
-        if (oscReceiver.connect (portToConnect))
-        {
-            currentPortNumber = portToConnect;
-            connectButton.setButtonText ("Disconnect");
-        }
-        else
-        {
-            handleConnectError (portToConnect);
-        }
-    }
-
-    //==============================================================================
-    void disconnect()
-    {
-        if (oscReceiver.disconnect())
-        {
-            currentPortNumber = -1;
-            connectButton.setButtonText ("Connect");
-        }
-        else
-        {
-            handleDisconnectError();
-        }
-    }
-
-    //==============================================================================
-    void handleConnectError (int failedPort)
-    {
-        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                          "OSC Connection error",
-                                          "Error: could not connect to port " + String (failedPort),
-                                          "OK");
-    }
-
-    //==============================================================================
-    void handleDisconnectError()
-    {
-        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                          "Unknown error",
-                                          "An unknown error occurred while trying to disconnect from UDP port.",
-                                          "OK");
-    }
-
-    //==============================================================================
-    void handleInvalidPortNumberEntered()
-    {
-        AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                                          "Invalid port number",
-                                          "Error: you have entered an invalid UDP port number.",
-                                          "OK");
-    }
-
-    //==============================================================================
-    bool isConnected() const
-    {
-        return currentPortNumber != -1;
-    }
-
-    //==============================================================================
-    bool isValidOscPort (int port) const
-    {
-        return port > 0 && port < 65536;
-    }
-
-    //==============================================================================
-    void updateConnectionStatusLabel()
-    {
-        String text; // = ""; // "Status: ";
-
-        if (isConnected())
-            text = "Connected"; //+= "Connected to UDP port " + String (currentPortNumber);
-        else
-            text = "Disconnected"; //+= "Disconnected";
-
-        auto textColour = isConnected() ? Colours::green : Colours::red;
-
-        connectionStatusLabel.setText (text, dontSendNotification);
-        connectionStatusLabel.setFont (Font (15.00f, Font::bold));
-        connectionStatusLabel.setColour (Label::textColourId, textColour);
-        connectionStatusLabel.setJustificationType (Justification::centredRight);
-    }
-
+    void updateConnectionStatusLabel();
 };
+
+}
