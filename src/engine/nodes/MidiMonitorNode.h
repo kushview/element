@@ -61,6 +61,7 @@ public:
     void getState (MemoryBlock& block) override {};
 
     inline void handleAsyncUpdate() override {};
+
     void clearMessages();
     void getMessages(MidiBuffer &destBuffer);
 

@@ -44,12 +44,12 @@ void MidiMonitorNodeEditor::timerCallback ()
 {
     if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
     {
-      MidiBuffer midi;
-      node->getMessages(midi);
-
-      if (midi.isEmpty()) {
+      if (node->numSamples <= 0) {
           return;
       }
+
+      MidiBuffer midi;
+      node->getMessages(midi);
 
       MidiBuffer::Iterator iter1 (midi);
       MidiMessage msg;
