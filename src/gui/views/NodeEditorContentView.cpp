@@ -452,6 +452,11 @@ Component* NodeEditorContentView::createEmbededEditor()
         programChangeMapEditor->setFontControlsVisible (false);
         return programChangeMapEditor;
     }
+    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_MONITOR)
+    {
+        auto* const midiMonitorEditor = new MidiMonitorNodeEditor (node);
+        return midiMonitorEditor;
+    }
     else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
     {
         auto* const audioRouterEditor = new AudioRouterEditor (node);

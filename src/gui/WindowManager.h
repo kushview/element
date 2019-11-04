@@ -24,11 +24,13 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 #include "engine/GraphNode.h"
+#include "engine/nodes/MidiMonitorNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
+#include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -181,6 +183,10 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             return createPluginWindowFor (node, new AudioRouterEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_MONITOR)
+        {
+            return createPluginWindowFor (node, new MidiMonitorNodeEditor (node));
         }
         else if (node.getIdentifier().toString().contains ("element.volume"))
         {
