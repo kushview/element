@@ -29,6 +29,8 @@ def check_common (self):
     self.define('KV_JACK_AUDIO', self.env.JACK)
 
     # VST support
+    if len(self.options.vst_sdk) > 0:
+        self.env.append_unique ('CXXFLAGS', ['-I%s' % self.options.vst_sdk])
     line_just = self.line_just
     self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
                mandatory=False, uselib_store="VST")
