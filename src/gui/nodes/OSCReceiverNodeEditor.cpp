@@ -35,49 +35,31 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
 
     connectButton.setBounds (200, 18, 100, 25);
     addAndMakeVisible (connectButton);
-    connectButton.onClick = [this] { connectButtonClicked(); };
+    connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
 
     clearButton.setBounds (310, 18, 60, 25);
     addAndMakeVisible (clearButton);
-    clearButton.onClick = [this] { clearButtonClicked(); };
+    clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
 
     connectionStatusLabel.setBounds (390, 18, 100, 25);
     updateConnectionStatusLabel();
     addAndMakeVisible (connectionStatusLabel);
 
-    oscReceiverLog.setBounds (0, 60, 700, 340);
+    oscReceiverLog.setBounds (0, 60, 500, 100);
     addAndMakeVisible (oscReceiverLog);
 
     oscReceiver.addListener (this);
+
+    setSize(500, 160);
 }
 
 OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
 {
 }
-/*
-void OSCReceiverNodeEditor::timerCallback ()
-{
-    if (OSCReceiverNodePtr node = getNodeObjectOfType<OSCReceiverNode>())
-    {
-        if (node->numSamples.get() <= 0)
-            return;
-
-        MidiBuffer midi;
-        node->getMessages(midi);
-
-        MidiBuffer::Iterator iter1 (midi);
-        MidiMessage msg;
-        int frame;
-
-        while (iter1.getNextEvent (msg, frame))
-            oscReceiverLog.addMessage (msg.getDescription());
-    }
-}
-*/
 
 void OSCReceiverNodeEditor::resized ()
 {
-    oscReceiverLog.setBounds (getLocalBounds().reduced (4));
+    //oscReceiverLog.setBounds (getLocalBounds().reduced (4));
 }
 
 void OSCReceiverNodeEditor::connectButtonClicked()

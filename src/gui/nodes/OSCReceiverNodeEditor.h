@@ -66,12 +66,12 @@ public:
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
-        addMessage (getIndentationString (level)
+        addMessage (String(getIndentationString (level)
                         + "- osc message, address = '"
                         + message.getAddressPattern().toString()
                         + "', "
                         + String (message.size())
-                        + " argument(s)");
+                        + " argument(s)"));
 
         if (! message.isEmpty())
         {
@@ -87,9 +87,9 @@ public:
     {
         OSCTimeTag timeTag = bundle.getTimeTag();
 
-        addMessage (getIndentationString (level)
+        addMessage (String(getIndentationString (level)
                         + "- osc bundle, time tag = "
-                        + timeTag.toTime().toString (true, true, true, true));
+                        + timeTag.toTime().toString (true, true, true, true)));
 
         for (auto& element : bundle)
         {
@@ -134,7 +134,7 @@ public:
             typeAsString = "(unknown)";
         }
 
-        addMessage (getIndentationString (level + 1) + "- " + typeAsString.paddedRight(' ', 12) + valueAsString);
+        addMessage (String(getIndentationString (level + 1) + "- " + typeAsString.paddedRight(' ', 12) + valueAsString));
     }
 
     void clear()
