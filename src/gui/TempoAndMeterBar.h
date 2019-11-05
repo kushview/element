@@ -45,7 +45,7 @@ public:
         
         addAndMakeVisible (meter = new TopMeter (*this));
         
-        setSize (124, 24);
+        setSize (152, 24);
     }
     
     ~TempoAndMeterBar()
@@ -68,7 +68,8 @@ public:
         tempoLabel.setBounds (r.removeFromLeft (46));
         r.removeFromLeft (2);
         
-        tapTempoButton.setBounds (r.removeFromLeft (46));
+        int w = Font(18).getStringWidth ("TAP");
+        tapTempoButton.setBounds (r.removeFromLeft (w + 4));
         r.removeFromLeft (2);
 
         meter->setBounds (r.removeFromLeft (42));
