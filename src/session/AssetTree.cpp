@@ -483,9 +483,9 @@ void AssetTree::valueTreeChildOrderChanged (ValueTree& /*parent*/, int /*oldInde
 void AssetTree::valueTreeParentChanged (ValueTree& /* child */) { }
 void AssetTree::valueTreePropertyChanged (ValueTree& /* tree */, const Identifier& /* property */) { }
 
-XmlElement* AssetTree::createXml() const
+std::unique_ptr<XmlElement> AssetTree::createXml() const
 {
-    return this->assets.createXml().release();
+    return this->assets.createXml();
 }
 
 void AssetTree::loadFromXml (const XmlElement& xml)

@@ -192,13 +192,13 @@ namespace Element {
         return true;
     }
 
-    XmlElement* Sequence::createXml()
+    std::unique_ptr<XmlElement> Sequence::createXml()
     {
-        auto e = node().createXml();
+        auto e = getValueTree().createXml();
         if (nullptr != e)
             polishXml (*e);
 
-        return e.release();
+        return e;
     }
 
     void Sequence::open()
