@@ -67,7 +67,7 @@ public:
 private:
     friend class MidiMonitorNodeEditor;
     bool inputMessagesInitDone = false;
-    double currentSampleRate;
+    double currentSampleRate = 44100.0;
     Atomic<int> numSamples = 0;
     MidiMessageCollector inputMessages;
     bool createdPorts = false;
