@@ -151,7 +151,7 @@ public:
     MediaManager::Document* getClosestPreviousDocOtherThan (MediaManager::Document* oneToAvoid) const;
 
     void restoreFromXml (Session& session, const XmlElement& xml);
-    XmlElement* createXml() const;
+    std::unique_ptr<XmlElement> createXml() const;
 
 private:
     void documentAboutToClose (MediaManager::Document*);

@@ -88,7 +88,7 @@ namespace Element {
             return Result::fail ("Nil session");
         
         session->saveGraphState();
-        if (ScopedPointer<XmlElement> e = session->createXml())
+        if (auto e = session->createXml())
         {
             Result res (e->writeToFile (file, String())
                     ? Result::ok() : Result::fail ("Error writing session file"));

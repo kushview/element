@@ -48,7 +48,7 @@ public:
     static const char* workspaceKey;
     static const char* midiEngineKey;
 
-    XmlElement* getLastGraph() const;
+    std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
 
     /** Returns true if updates shoul be checked for on launch */

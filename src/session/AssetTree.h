@@ -134,7 +134,7 @@ public:
     void clear();
 
     /** Create XML data for this tree */
-    XmlElement* createXml() const;
+    std::unique_ptr<XmlElement> createXml() const;
     void loadFromXml (const XmlElement& xml);
 
     /** Get this trees root file/directory */

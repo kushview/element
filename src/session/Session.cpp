@@ -116,11 +116,11 @@ namespace Element {
         return true;
     }
 
-    XmlElement* Session::createXml()
+    std::unique_ptr<XmlElement> Session::createXml()
     {
         ValueTree saveData = objectData.createCopy();
         Node::sanitizeProperties (saveData, true);
-        return saveData.createXml().release();
+        return saveData.createXml();
     }
 
     void Session::setMissingProperties (bool resetExisting)
