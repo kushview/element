@@ -8,7 +8,7 @@ import juce
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
-    juce_data_structures juce_events juce_graphics juce_gui_basics
+    juce_data_structures juce_dsp juce_events juce_graphics juce_gui_basics
     juce_gui_extra juce_osc kv_core kv_engines kv_gui kv_models
 '''
 

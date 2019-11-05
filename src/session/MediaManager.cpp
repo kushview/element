@@ -361,9 +361,10 @@ namespace Element {
         }
     }
 
-    XmlElement* RecentDocumentList::createXml() const
+    std::unique_ptr<XmlElement> RecentDocumentList::createXml() const
     {
-        XmlElement* xml = new XmlElement ("RECENT_DOCUMENTS");
+        std::unique_ptr<XmlElement> xml;
+        xml.reset (new XmlElement ("RECENT_DOCUMENTS"));
 
         saveDocList (previousDocs, *xml->createNewChildElement ("PREVIOUS"));
         saveDocList (nextDocs,     *xml->createNewChildElement ("NEXT"));

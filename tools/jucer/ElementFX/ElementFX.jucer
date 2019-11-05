@@ -131,6 +131,10 @@
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="O8UXWR" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
+          <FILE id="a1k7na" name="MidiMonitorNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
+          <FILE id="PzgQzB" name="MidiMonitorNode.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.h"/>
           <FILE id="vpX0nl" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
           <FILE id="WPHnmu" name="MidiProgramMapNode.h" compile="0" resource="0"
@@ -197,6 +201,10 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="NcOl1n" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
+          <FILE id="ulX32b" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
+          <FILE id="Aj1iXL" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
           <FILE id="HDLuqX" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
           <FILE id="AUpQME" name="MidiProgramMapEditor.h" compile="0" resource="0"
@@ -564,6 +572,7 @@
         <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="10.0.16299.0"
@@ -609,6 +618,7 @@
         <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -623,6 +633,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

@@ -23,6 +23,11 @@
 
 namespace Element {
 
+/* So render tasks can be friends of graph node */
+namespace GraphRender {
+class ProcessBufferOp;
+}
+
 class GraphProcessor;
 class MidiPipe;
 
@@ -144,7 +149,7 @@ public:
     void suspendProcessing (const bool);
 
     /** Get latency audio samples */
-    int getLatencySamples() const { return latencySamples; }
+    int getLatencySamples() const { return latencySamples + roundFloatToInt (osLatency); }
 
     /** Set latency samples */
     void setLatencySamples (int latency) { if (latencySamples != latency) latencySamples = latency; }
@@ -325,6 +330,10 @@ public:
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
 
+
+    void setOversamplingFactor (int osFactor);
+    int getOversamplingFactor();
+
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
@@ -341,6 +350,7 @@ protected:
 
 private:
     friend class GraphProcessor;
+    friend class GraphRender::ProcessBufferOp;
     friend class GraphManager;
     friend class EngineController;
     friend class Node;
@@ -398,6 +408,15 @@ private:
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
+    void initOversampling (int numChannels, int blockSize);
+    void prepareOversampling (int blockSize);
+    void resetOversampling();
+    dsp::Oversampling<float>* getOversamplingProcessor();
+
+    int osPow = 0;
+    float osLatency = 0.0f;
+    OwnedArray<dsp::Oversampling<float>> osProcessors;
+    const int maxOsPow = 3;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
