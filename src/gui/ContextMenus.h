@@ -361,9 +361,14 @@ public:
             const int osFactor = (int) powf(2, float (result - 40000));
             if (auto gNode = node.getGraphNode())
             {
+                auto* graph = gNode->getParentGraph();
+                // TODO: don't reload the entire graph
+                bool wasSuspended = graph->isSuspended();
+                graph->suspendProcessing (true);
+                graph->releaseResources();
                 gNode->setOversamplingFactor (osFactor);
-                gNode->getParentGraph()->releaseResources();
-                gNode->getParentGraph()->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
+                graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
+                graph->suspendProcessing (wasSuspended);
             }
         }
         

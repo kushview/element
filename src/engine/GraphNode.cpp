@@ -287,7 +287,7 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
 
-        prepareOversampling (blockSize);
+        initOversampling (jmax (getNumPorts (PortType::Audio, true), getNumPorts (PortType::Audio, false)), blockSize);
 
         const int osFactor = getOversamplingFactor();
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
@@ -327,9 +327,7 @@ void GraphNode::unprepare()
         isPrepared = false;
         inRMS.clear (true);
         outRMS.clear (true);
-
         resetOversampling();
-
         releaseResources();
     }
 }
@@ -666,6 +664,7 @@ void GraphNode::setMuted (bool muted)
 void GraphNode::initOversampling (int numChannels, int blockSize)
 {
     osProcessors.clear();
+    numChannels = jmax (1, numChannels); // avoid assertion on nodes that don't have audio
     for (int pow = 1; pow <= maxOsPow; ++pow)
         osProcessors.add (new dsp::Oversampling<float> (numChannels, pow, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
 
