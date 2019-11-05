@@ -692,8 +692,8 @@ dsp::Oversampling<float>* GraphNode::getOversamplingProcessor()
 void GraphNode::setOversamplingFactor (int osFactor)
 {
     osPow = (int) log2f ((float) osFactor);
-
-    osLatency = getOversamplingProcessor()->getLatencyInSamples();
+    if (auto* osProc = getOversamplingProcessor())
+        osLatency = osProc->getLatencyInSamples();
 }
 
 int GraphNode::getOversamplingFactor()
