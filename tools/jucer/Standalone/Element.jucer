@@ -124,6 +124,10 @@
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="hIVVLr" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
+          <FILE id="a1k7na" name="MidiMonitorNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
+          <FILE id="PzgQzB" name="MidiMonitorNode.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.h"/>
           <FILE id="FxxYNs" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
           <FILE id="vRWxQo" name="MidiProgramMapNode.h" compile="0" resource="0"
@@ -190,6 +194,10 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="aD3ttN" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
+          <FILE id="ulX32b" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
+          <FILE id="Aj1iXL" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
           <FILE id="UcdM2x" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
           <FILE id="JyUgIo" name="MidiProgramMapEditor.h" compile="0" resource="0"

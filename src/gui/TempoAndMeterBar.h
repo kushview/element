@@ -31,11 +31,14 @@ class TempoAndMeterBar : public Component,
                          public Timer
 {
 public:
-    TempoAndMeterBar()
+    TempoAndMeterBar() :
+        tapTempoButton (tempoLabel)
     {
         addAndMakeVisible (extButton);
 
         addAndMakeVisible (tempoLabel);
+
+        addAndMakeVisible (tapTempoButton);
         
         tempoLabel.tempoValue.addListener (this);
         extButton.getToggleStateValue().addListener (this);
@@ -65,6 +68,9 @@ public:
         tempoLabel.setBounds (r.removeFromLeft (46));
         r.removeFromLeft (2);
         
+        tapTempoButton.setBounds (r.removeFromLeft (46));
+        r.removeFromLeft (2);
+
         meter->setBounds (r.removeFromLeft (42));
     }
     
@@ -280,6 +286,67 @@ private:
         int lastY = 0;
     } tempoLabel;
     
+    class TapTempoButton : public Button
+    {
+    public:
+        TapTempoButton (TempoLabel& tempoLabel) :
+            Button ("TapTempoButton"),
+            tempoLabel (tempoLabel)
+        {
+            setButtonText ("TAP");
+            onClick = [this] { tempoTap(); }; 
+        }
+
+        ~TapTempoButton() { }
+
+    protected:
+
+        void paintButton (Graphics& g, bool isMouseOverButton, bool isButtonDown) override
+        {
+            g.fillAll (isButtonDown ? Colors::toggleOrange : LookAndFeel::widgetBackgroundColor.brighter());
+
+            if (getButtonText().isNotEmpty())
+            {
+                g.setFont (12.f);
+                g.setColour (Colours::black);
+                g.drawText (getButtonText(), getLocalBounds(), Justification::centred);
+            }
+
+            g.setColour (LookAndFeel::widgetBackgroundColor.brighter().brighter());
+            g.drawRect (0, 0, getWidth(), getHeight());
+        }
+
+
+    private:
+        void tempoTap()
+        {
+            const double timeNow = tapTimer.getMillisecondCounterHiRes();
+            const double interval = timeNow - tapTime;
+
+            // if it's been  a long time since the last tap, reset
+            if (interval > tapTempoMaxInterval)
+                tapNum = 0;
+            if (tapNum == 0)
+            {
+                tapTime = timeNow; 
+                tapNum++;
+                return;
+            }
+
+            // convert to BPM
+            int newTempo = roundDoubleToInt ((tapNum / interval) * 60000);
+            if (newTempo != tempoLabel.tempoValue)
+                tempoLabel.tempoValue.setValue (newTempo);
+            tapNum++;
+        }
+
+        TempoLabel& tempoLabel;
+        Time tapTimer;
+        double tapTime = 0.0;
+        int tapNum = 0;
+        const double tapTempoMaxInterval = 2000.0;
+    } tapTempoButton;
+
     class TopMeter : public TimeSignatureSetting
     {
     public:
