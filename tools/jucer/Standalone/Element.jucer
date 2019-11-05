@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.40.0"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.41.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               jucerVersion="5.4.5" companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="info@kushview.net" displaySplashScreen="0" reportAppUsage="0"
@@ -17,7 +17,10 @@
         <FILE id="zPNZBt" name="Classic.elw" compile="0" resource="1" file="../../../data/Workspaces/Classic.elw"/>
         <FILE id="srA86o" name="Editing.elw" compile="0" resource="1" file="../../../data/Workspaces/Editing.elw"/>
       </GROUP>
+      <FILE id="TK7YJZ" name="developers.txt" compile="0" resource="1" file="../../../data/developers.txt"/>
       <FILE id="zjwu85" name="ElementIcon.png" compile="0" resource="1" file="../../../data/ElementIcon.png"/>
+      <FILE id="EYsGJO" name="ElementIconTemplate.png" compile="0" resource="1"
+            file="../../../data/ElementIconTemplate.png"/>
     </GROUP>
     <GROUP id="{D101B3E9-3496-8A90-ABFF-82C76E13F94A}" name="src">
       <GROUP id="{24A4658C-1734-A8F0-571B-058D03E9385D}" name="controllers">

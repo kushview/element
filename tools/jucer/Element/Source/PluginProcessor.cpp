@@ -366,7 +366,7 @@ void ElementPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
             ppData.appendChild (data, nullptr);
         }
 
-        if (ScopedPointer<XmlElement> xml = session->createXml())
+        if (auto xml = std::unique_ptr<XmlElement> (session->createXml()))
             copyXmlToBinary (*xml, destData);
     }
 }
@@ -381,7 +381,7 @@ void ElementPluginAudioProcessor::setStateInformation (const void* data, int siz
     
     mapsctl->learn (false);
     
-    if (ScopedPointer<XmlElement> xml = getXmlFromBinary (data, sizeInBytes))
+    if (auto xml = getXmlFromBinary (data, sizeInBytes))
     {
         String error;
         ValueTree newData = ValueTree::fromXml (*xml);

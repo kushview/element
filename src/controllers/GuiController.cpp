@@ -101,6 +101,28 @@ private:
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> sGuiControllerInstances;
 static std::unique_ptr<SystemTray> sSystemTray;
+static void elSetupSystray() {
+#if ! EL_RUNNING_AS_PLUGIN
+    sSystemTray.reset (new SystemTray());
+   #define EL_USE_NEW_SYSTRAY_ICON 0
+   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
+    {
+        const auto traySize = 22.f * 4;
+        const float padding = 8.f;
+        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
+        Graphics g (image);
+        Icon icon (getIcons().falAtomAlt, Colours::black);
+        icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
+        sSystemTray->setIconImage (image, image);
+    }
+   #else
+    sSystemTray->setIconImage (
+        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
+        ImageCache::getFromMemory (BinaryData::ElementIconTemplate_png, BinaryData::ElementIcon_pngSize));
+   #endif
+    sSystemTray->addToDesktop (0);
+   #endif
+}
 
 GuiController::GuiController (Globals& w, AppController& a)
     : AppController::Child(),
@@ -379,28 +401,7 @@ void GuiController::run()
     }
     
     findSibling<SessionController>()->resetChanges();
-
-   #if ! EL_RUNNING_AS_PLUGIN
-    sSystemTray.reset (new SystemTray());
-   #define EL_USE_NEW_SYSTRAY_ICON 0
-   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
-    {
-        const auto traySize = 22.f * 4;
-        const float padding = 8.f;
-        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
-        Graphics g (image);
-        Icon icon (getIcons().falAtomAlt, Colours::black);
-        icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
-        sSystemTray->setIconImage (image, image);
-    }
-   #else
-    sSystemTray->setIconImage (
-       ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
-        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize));
-   #endif
-    sSystemTray->addToDesktop (0);
-   #endif
-
+    elSetupSystray();
     stabilizeViews();
 }
 
@@ -884,7 +885,7 @@ void GuiController::toggleAboutScreen()
     else
     {
         about->addToDesktop();
-        about->centreWithSize (500, 240);
+        about->centreWithSize (about->getWidth(), about->getHeight());
         about->setVisible (true);
         about->toFront (true);
        #if EL_RUNNING_AS_PLUGIN

@@ -149,7 +149,7 @@ public:
 protected:
     CriticalSection lock;
     OwnedArray<ProgramEntry> entries;
-    int programMap [127];
+    int programMap [128];
 
     bool assertedLowChannels = false;
     bool createdPorts = false;

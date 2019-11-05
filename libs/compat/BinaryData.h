@@ -17,11 +17,17 @@ namespace BinaryData
     extern const char*   Editing_elw;
     const int            Editing_elwSize = 1820;
 
+    extern const char*   developers_txt;
+    const int            developers_txtSize = 36;
+
     extern const char*   ElementIcon_png;
     const int            ElementIcon_pngSize = 11697;
 
+    extern const char*   ElementIconTemplate_png;
+    const int            ElementIconTemplate_pngSize = 7122;
+
     // Number of elements in the namedResourceList and originalFileNames arrays.
-    const int namedResourceListSize = 4;
+    const int namedResourceListSize = 6;
 
     // Points to the start of a list of resource names.
     extern const char* namedResourceList[];

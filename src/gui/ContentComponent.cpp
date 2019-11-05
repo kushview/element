@@ -43,7 +43,7 @@
 #include "gui/ContentComponent.h"
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../../pro/Element/Source/PluginEditor.h"
+ #include "../../tools/jucer/Element/Source/PluginEditor.h"
 #endif
 
 #ifndef EL_USE_ACCESSORY_BUTTONS

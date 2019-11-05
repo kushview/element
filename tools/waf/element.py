@@ -9,7 +9,7 @@ juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
     juce_data_structures juce_events juce_graphics juce_gui_basics
-    juce_gui_extra kv_core kv_engines kv_gui kv_models
+    juce_gui_extra juce_osc kv_core kv_engines kv_gui kv_models
 '''
 
 mingw_libs = '''
@@ -29,6 +29,8 @@ def check_common (self):
     self.define('KV_JACK_AUDIO', self.env.JACK)
 
     # VST support
+    if len(self.options.vst_sdk) > 0:
+        self.env.append_unique ('CXXFLAGS', ['-I%s' % self.options.vst_sdk])
     line_just = self.line_just
     self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
                mandatory=False, uselib_store="VST")
@@ -39,7 +41,24 @@ def check_common (self):
     self.check_cfg(package='lv2', uselib_store="LV2", args='--cflags', mandatory=False)
     self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
     self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
-    self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_LILV)
+    if bool(self.env.HAVE_SUIL):
+        self.check_cxx(
+            msg = "Checking for suil_init(...)",
+            fragmant = '''
+                #include <suil/suil.h>
+                int main(int, char**) {
+                    suil_init (nullptr, nullptr, SUIL_ARG_NONE);
+                    return 0;
+                }
+            ''',
+            execute = False,
+            use = ['SUIL'],
+            uselib_store = 'SUIL_INIT',
+            define_name = 'HAVE_SUIL_INIT',
+            mandatory = False
+        )
+        self.define('JLV2_SUIL_INIT', bool(self.env.HAVE_SUIL_INIT))
+    self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_SUIL)
     self.define('JLV2_PLUGINHOST_LV2', self.env.LV2)
 
 @conf
@@ -86,7 +105,7 @@ def get_juce_library_code (prefix, ext=''):
         else:
             extension = '.cpp'
 
-    cpp_only = [ 'juce_analytics', 'jlv2_host' ]
+    cpp_only = [ 'juce_analytics', 'juce_osc', 'jlv2_host' ]
     code = []
     for f in juce_modules.split():
         e = '.cpp' if f in cpp_only else extension

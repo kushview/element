@@ -28,6 +28,7 @@
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
+#include "engine/nodes/MidiMonitorNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/ReverbProcessor.h"
 #include "engine/nodes/SubGraphProcessor.h"
@@ -314,6 +315,11 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         PlaceholderProcessor().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_MIDI_MONITOR)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        MidiMonitorNode().fillInPluginDescription (*desc);
+    }
    #endif
 }
 
@@ -342,6 +348,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
+    results.add (EL_INTERNAL_ID_MIDI_MONITOR);
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
    #endif // product enablements
     return results;

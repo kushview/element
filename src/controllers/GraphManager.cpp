@@ -339,10 +339,8 @@ uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double
             {
                 proc->suspendProcessing (true);
                 proc->releaseResources();
-                const bool success = proc->setBusesLayout (*tryStereo);
                 proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
                 proc->suspendProcessing (false);
-                DBG("[EL] attempting stereo preference: " << String (success ? "success" : "failed"));
             }
         }
 

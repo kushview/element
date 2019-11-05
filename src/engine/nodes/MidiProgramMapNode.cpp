@@ -36,7 +36,7 @@ void MidiProgramMapNode::clear()
 {
     entries.clearQuick (true);
     ScopedLock sl (lock);
-    for (int i = 0; i <= 127; ++i)
+    for (int i = 0; i < 128; ++i)
         programMap [i] = -1;
 }
 
@@ -46,7 +46,7 @@ void MidiProgramMapNode::prepareToRender (double sampleRate, int maxBufferSize)
     
     {
         ScopedLock sl (lock);
-        for (int i = 0; i <= 127; ++i)
+        for (int i = 0; i < 128; ++i)
             programMap [i] = -1;
         for (const auto* const entry : entries)
             programMap [entry->in] = entry->out;

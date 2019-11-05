@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.40.0"
+              splashScreenColour="Dark" projectType="audioplug" version="1.41.0"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
               cppLanguageStandard="14" companyCopyright="Copyright (c) 2017-2019 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
@@ -11,7 +11,7 @@
               pluginIsSynth="1" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementAU"
               pluginRTASCategory="2048" aaxIdentifier="net.kushview.Element"
-              pluginAAXCategory="2048" jucerVersion="5.4.3" companyName="Kushview"
+              pluginAAXCategory="2048" jucerVersion="5.4.5" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
               defines="EL_RUNNING_AS_PLUGIN=1&#10;" pluginVSTCategory="kPlugCategSynth"
               pluginAUMainType="'aumu'" userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"

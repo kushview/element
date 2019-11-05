@@ -39,6 +39,7 @@
 #define EL_INTERNAL_ID_WET_DRY                  "element.wetDry"
 #define EL_INTERNAL_ID_MIDI_INPUT_DEVICE        "element.midiInputDevice"
 #define EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE       "element.midiOutputDevice"
+#define EL_INTERNAL_ID_MIDI_MONITOR             "element.midiMonitor"
 
 #define EL_INTERNAL_UID_AUDIO_FILE_PLAYER        1000
 #define EL_INTERNAL_UID_AUDIO_MIXER              1001
@@ -56,6 +57,7 @@
 #define EL_INTERNAL_UID_WET_DRY                  1013
 #define EL_INTERNAL_UID_MIDI_INPUT_DEVICE        1014
 #define EL_INTERNAL_UID_MIDI_OUTPUT_DEVICE       1015
+#define EL_INTERNAL_UID_MIDI_MONITOR             1016
 
 namespace Element
 {

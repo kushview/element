@@ -7,7 +7,7 @@ sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
 APPNAME='element'
-VERSION='0.40.0'
+VERSION='0.41.0'
 
 VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
@@ -17,8 +17,9 @@ def options (opt):
         help="Build with docking window support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
-    opt.add_option('--ziptype', default='gz', \
-        dest='ziptype', type='string', 
+    opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
+        help="Specify the VST2 SDK path")
+    opt.add_option('--ziptype', default='gz', dest='ziptype', type='string', 
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
 def silence_warnings (conf):

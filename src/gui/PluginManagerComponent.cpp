@@ -80,16 +80,18 @@ public:
             else if (columnId == descCol)
                 text = TRANS("Deactivated after failing to initialise correctly");
         }
-        else if (const PluginDescription* const desc = list.getType (row))
+        else if (isPositiveAndBelow (row, list.getNumTypes()))
         {
+            const auto types = list.getTypes();
+            const auto& desc = types.getReference (row);
             switch (columnId)
             {
-                case nameCol:         text = desc->name; break;
-                case typeCol:         text = desc->pluginFormatName; break;
-                case categoryCol:     text = desc->category.isNotEmpty() ? desc->category : "-"; break;
-                case manufacturerCol: text = desc->manufacturerName; break;
-                case descCol:         text = getPluginDescription (*desc); break;
-                case ioCol:           text = getPluginIO (*desc); break;
+                case nameCol:         text = desc.name; break;
+                case typeCol:         text = desc.pluginFormatName; break;
+                case categoryCol:     text = desc.category.isNotEmpty() ? desc.category : "-"; break;
+                case manufacturerCol: text = desc.manufacturerName; break;
+                case descCol:         text = getPluginDescription (desc); break;
+                case ioCol:           text = getPluginIO (desc); break;
                 default: jassertfalse; break;
             }
         }
@@ -304,39 +306,46 @@ void PluginListComponent::setTableModel (TableListBoxModel* model)
 
 bool PluginListComponent::canShowSelectedFolder() const
 {
-    if (table.getSelectedRow() < 0)
-        return false;
-        
-    if (const PluginDescription* const desc = list.getType (table.getSelectedRow()))
-        return File::createFileWithoutCheckingPath (desc->fileOrIdentifier).exists();
+    const auto types = list.getTypes();
+    if (isPositiveAndBelow (table.getSelectedRow(), types.size()))
+        return File::createFileWithoutCheckingPath (
+            types.getReference(table.getSelectedRow()).fileOrIdentifier).exists();
     
     return false;
 }
 
 void PluginListComponent::showSelectedFolder()
 {
-    if (canShowSelectedFolder())
-        if (const PluginDescription* const desc = list.getType (table.getSelectedRow()))
-            File (desc->fileOrIdentifier).getParentDirectory().startAsProcess();
+    if (! canShowSelectedFolder())
+        return;
+    
+    const auto types = list.getTypes();
+    const auto type = types [(table.getSelectedRow())];
+    File(type.fileOrIdentifier).getParentDirectory().startAsProcess();
 }
 
 void PluginListComponent::removeMissingPlugins()
 {
-    for (int i = list.getNumTypes(); --i >= 0;)
-        if (! formatManager.doesPluginStillExist (*list.getType (i)))
-            list.removeType (*list.getType (i));
+    const auto types = list.getTypes();
+    for (int i = types.size(); --i >= 0;)
+        if (! formatManager.doesPluginStillExist (types.getReference (i)))
+            list.removeType (types.getReference (i));
 }
 
 void PluginListComponent::removePluginItem (int index)
 {
-    if (const auto* type = list.getType(index))
-        if (type->pluginFormatName == "Element")
-            return;
+    const auto types = list.getTypes();
+    if (! isPositiveAndBelow (index, types.size()))
+    {
+        list.removeFromBlacklist (list.getBlacklistedFiles() [index - types.size()]);
+        return;
+    }
     
-    if (index < list.getNumTypes())
-        list.removeType (*list.getType (index));
-    else
-        list.removeFromBlacklist (list.getBlacklistedFiles() [index - list.getNumTypes()]);
+    const auto& type = types.getReference (index);
+    if (type.pluginFormatName == "Element")
+        return;
+    
+    list.removeType (type);
 }
 
 void PluginListComponent::optionsMenuStaticCallback (int result, PluginListComponent* pluginList)
@@ -347,10 +356,10 @@ void PluginListComponent::optionsMenuStaticCallback (int result, PluginListCompo
 
 static void removeNonElementPlugins (KnownPluginList& list)
 {
-    for (int i = list.getNumTypes(); --i >= 0;) {
-        if (list.getType(i)->pluginFormatName != "Element")
-            list.removeType (*list.getType (i));
-    }
+    const auto types = list.getTypes();
+    for (int i = types.size(); --i >= 0;)
+        if (types.getReference(i).pluginFormatName != "Element")
+            list.removeType (types.getReference (i));
 }
 
 static void saveSettings (Component* c, const bool saveUserPlugins = true)

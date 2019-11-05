@@ -31,7 +31,6 @@
 
 namespace Element {
 
-class AboutComponent;
 class AppController;
 class EngineControl;
 class Globals;
