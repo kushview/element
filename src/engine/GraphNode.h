@@ -144,7 +144,7 @@ public:
     void suspendProcessing (const bool);
 
     /** Get latency audio samples */
-    int getLatencySamples() const { return latencySamples; }
+    int getLatencySamples() const { return latencySamples + roundFloatToInt (osLatency); }
 
     /** Set latency samples */
     void setLatencySamples (int latency) { if (latencySamples != latency) latencySamples = latency; }
@@ -325,6 +325,13 @@ public:
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
 
+    void initOversampling (int numChannels, int blockSize);
+    void prepareOversampling (int blockSize);
+    void resetOversampling();
+    dsp::Oversampling<float>* getOversamplingProcessor();
+    void setOversamplingFactor (int osFactor);
+    int getOversamplingFactor();
+
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
@@ -398,6 +405,11 @@ private:
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
+
+    int osPow = 0;
+    float osLatency = 0.0f;
+    OwnedArray<dsp::Oversampling<float>> osProcessors;
+    const int maxOsPow = 3;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };

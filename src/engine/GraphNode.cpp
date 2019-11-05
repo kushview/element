@@ -286,7 +286,11 @@ void GraphNode::prepare (const double sampleRate, const int blockSize,
     {
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
-        prepareToRender (sampleRate, blockSize);
+
+        prepareOversampling (blockSize);
+
+        const int osFactor = getOversamplingFactor();
+        prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         // TODO: move model code out of engine code
         // VERIFY: this portion is actually needed. This was here to ensure
@@ -323,6 +327,9 @@ void GraphNode::unprepare()
         isPrepared = false;
         inRMS.clear (true);
         outRMS.clear (true);
+
+        resetOversampling();
+
         releaseResources();
     }
 }
@@ -654,6 +661,48 @@ void GraphNode::setMuted (bool muted)
     mute.set (muted ? 1 : 0);
     if (wasMuted != isMuted())
         muteChanged (this);
+}
+
+void GraphNode::initOversampling (int numChannels, int blockSize)
+{
+    osProcessors.clear();
+    for (int pow = 1; pow <= maxOsPow; ++pow)
+        osProcessors.add (new dsp::Oversampling<float> (numChannels, pow, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
+
+    prepareOversampling (blockSize);
+}
+
+void GraphNode::prepareOversampling (int blockSize)
+{
+    for (auto* osProcessor : osProcessors)
+        osProcessor->initProcessing (blockSize);
+}
+
+void GraphNode::resetOversampling()
+{
+    for (auto* osProcessor : osProcessors)
+        osProcessor->reset();
+}
+
+dsp::Oversampling<float>* GraphNode::getOversamplingProcessor()
+{
+    return osProcessors[osPow-1];
+}
+
+void GraphNode::setOversamplingFactor (int osFactor)
+{
+    osPow = (int) log2f ((float) osFactor);
+
+    osLatency = getOversamplingProcessor()->getLatencyInSamples();
+}
+
+int GraphNode::getOversamplingFactor()
+{
+    if (osPow > 0)
+        if (auto* osProc = getOversamplingProcessor())
+            return osProc->getOversamplingFactor();
+
+    return 1;
 }
 
 }

@@ -574,6 +574,7 @@
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
@@ -621,6 +622,7 @@
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -634,6 +636,7 @@
     <MODULES id="juce_core" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_cryptography" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_data_structures" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULES id="juce_events" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
