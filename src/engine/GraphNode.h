@@ -23,6 +23,11 @@
 
 namespace Element {
 
+/* So render tasks can be friends of graph node */
+namespace GraphRender {
+class ProcessBufferOp;
+}
+
 class GraphProcessor;
 class MidiPipe;
 
@@ -325,10 +330,7 @@ public:
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
 
-    void initOversampling (int numChannels, int blockSize);
-    void prepareOversampling (int blockSize);
-    void resetOversampling();
-    dsp::Oversampling<float>* getOversamplingProcessor();
+
     void setOversamplingFactor (int osFactor);
     int getOversamplingFactor();
 
@@ -348,6 +350,7 @@ protected:
 
 private:
     friend class GraphProcessor;
+    friend class GraphRender::ProcessBufferOp;
     friend class GraphManager;
     friend class EngineController;
     friend class Node;
@@ -405,6 +408,10 @@ private:
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
+    void initOversampling (int numChannels, int blockSize);
+    void prepareOversampling (int blockSize);
+    void resetOversampling();
+    dsp::Oversampling<float>* getOversamplingProcessor();
 
     int osPow = 0;
     float osLatency = 0.0f;
