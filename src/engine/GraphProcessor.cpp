@@ -223,8 +223,6 @@ public:
             midiBufferToUse = chans[PortType::Midi].getFirst();
 
         lastMute = node->isMuted();
-
-        node->initOversampling (totalChans, processor->getBlockSize());
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
