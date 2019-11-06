@@ -955,6 +955,95 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioDeviceSettingsPanel)
 };
 
+//==============================================================================
+
+#if KV_JACK_AUDIO
+class JackDeviceSettingsPanel : public Component,
+                                private ChangeListener
+{
+public:
+    JackDeviceSettingsPanel (AudioIODeviceType& t, AudioDeviceSetupDetails& s)
+        : type (t), setup (s)
+    {
+        addAndMakeVisible (inputPorts);
+        setupSpinBox (inputPorts);
+        addAndMakeVisible (outputPorts);
+        setupSpinBox (outputPorts);
+        updateControls();
+        setup.manager->addChangeListener (this);
+    }
+
+    ~JackDeviceSettingsPanel()
+    {
+        setup.manager->removeChangeListener (this);
+    }
+
+    void paint (Graphics& g) override
+    {
+        ignoreUnused (g);
+    }
+
+    void resized() override
+    {
+        if (auto* parent = findParentComponentOfClass<AudioDeviceSelectorComponent>())
+        {
+            Rectangle<int> r (proportionOfWidth (0.35f), 0, proportionOfWidth (0.6f), 3000);
+
+            const int maxListBoxHeight = 100;
+            const int h = parent->getItemHeight();
+            const int space = h / 4;
+
+            inputPorts.setBounds (r.removeFromTop (22));
+            r.removeFromTop (space);
+
+            outputPorts.setBounds (r.removeFromTop (22));
+            r.removeFromTop (space);
+
+            setSize (getWidth(), r.getY());
+        }
+        else
+        {
+            jassertfalse;
+        }
+    }
+
+    void updateControls()
+    {
+        if (inputPortsLabel == nullptr)
+        {    
+            inputPortsLabel.reset (new Label ({}, TRANS("Total input ports:")));
+            inputPortsLabel->setJustificationType (Justification::centredRight);
+            inputPortsLabel->attachToComponent (&inputPorts, true);
+        }
+
+        if (outputPortsLabel == nullptr)
+        {
+            outputPortsLabel.reset (new Label ({}, TRANS("Total output ports:")));
+            outputPortsLabel->setJustificationType (Justification::centredRight);
+            outputPortsLabel->attachToComponent (&outputPorts, true);
+        }
+    }
+
+private:
+    AudioIODeviceType& type;
+    AudioDeviceSetupDetails setup;
+    std::unique_ptr<Label> inputPortsLabel, outputPortsLabel;
+    Slider inputPorts, outputPorts;
+    
+    static void setupSpinBox (Slider& slider)
+    {
+        slider.setRange (0.0, 32.0, 1.0);
+        slider.setSliderStyle (Slider::IncDecButtons);
+        slider.setTextBoxStyle (Slider::TextBoxLeft, true, 90, 22);
+        slider.textFromValueFunction = [](double value) -> String { return String (roundToInt (value)); };
+    }
+
+    void changeListenerCallback (ChangeBroadcaster*) override
+    {
+
+    }
+};
+#endif
 
 //==============================================================================
 AudioDeviceSelectorComponent::AudioDeviceSelectorComponent (AudioDeviceManager& dm,
@@ -990,7 +1079,7 @@ AudioDeviceSelectorComponent::AudioDeviceSelectorComponent (AudioDeviceManager& 
         addAndMakeVisible (deviceTypeDropDown.get());
         deviceTypeDropDown->onChange = [this] { updateDeviceType(); };
 
-        deviceTypeDropDownLabel.reset (new Label ({}, TRANS("Audio device type:")));
+        deviceTypeDropDownLabel.reset (new Label ({}, TRANS("Driver:")));
         deviceTypeDropDownLabel->setJustificationType (Justification::centredRight);
         deviceTypeDropDownLabel->attachToComponent (deviceTypeDropDown.get(), true);
     }
@@ -1147,10 +1236,19 @@ void AudioDeviceSelectorComponent::updateAllControls()
             details.maxNumOutputChannels = maxOutputChannels;
             details.useStereoPairs = showChannelsAsStereoPairs;
 
-            auto* sp = new AudioDeviceSettingsPanel (*type, details, hideAdvancedOptionsWithButton);
-            audioDeviceSettingsComp.reset (sp);
-            addAndMakeVisible (sp);
-            sp->updateAllControls();
+            if (type->getTypeName() != "JACK")
+            {
+                auto* sp = new AudioDeviceSettingsPanel (*type, details, hideAdvancedOptionsWithButton);
+                audioDeviceSettingsComp.reset (sp);
+                addAndMakeVisible (sp);
+                sp->updateAllControls();
+            }
+            else
+            {
+                auto* sp = new JackDeviceSettingsPanel (*type, details);
+                audioDeviceSettingsComp.reset (sp);
+                addAndMakeVisible (sp);
+            }
         }
     }
 
