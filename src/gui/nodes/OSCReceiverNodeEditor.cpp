@@ -71,22 +71,25 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     portNumberLabel.setBounds (x, y, w, h);
     x += w;
 
-    w = 60;
+    w = 50;
     portNumberField.setBounds (x, y, w, h);
-    x += w + margin;
-
-    w = 100;
-    connectButton.setBounds (x, y, w, h);
-    x += w + margin;
-
-    w = 60;
-    clearButton.setBounds (x, y, w, h);
     x += w + margin;
 
     w = 30;
     connectionStatusLabel.setBounds (x, y, w, h);
     x += w + margin;
 
+    // Right
+
+    w = 60;
+    x = fullWidth - margin - w;
+    clearButton.setBounds (x, y, w, h);
+
+    w = 80;
+    x -= margin + w;
+    connectButton.setBounds (x, y, w, h);
+
+    // Row
     x = 0;
     y += h + margin;
     oscReceiverLog.setBounds (x, y, fullWidth, fullHeight - y);

@@ -43,28 +43,31 @@ public:
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
-        addMessage (getIndentationString (level)
-                        + "- osc message, address = '"
+        String log;
+        // message.size()
+
+        log = indent (level)
                         + message.getAddressPattern().toString()
-                        + "', "
-                        + String (message.size())
-                        + " argument(s)");
+                        + " ";
 
         if (! message.isEmpty())
         {
-            for (auto& arg : message)
-                addOSCMessageArgument (arg, level + 1);
+            int i = 0;
+            for (auto& arg : message) {
+                if (i > 0) log += ", ";
+                log += getOSCArgumentAsString (arg);
+                i++;
+            }
         }
+
+        addMessage (log);
     }
 
     //==============================================================================
     void addOSCBundle (const OSCBundle& bundle, int level = 0)
     {
-        OSCTimeTag timeTag = bundle.getTimeTag();
-
-        addMessage (String(getIndentationString (level)
-                        + "- osc bundle, time tag = "
-                        + timeTag.toTime().toString (true, true, true, true)));
+        addMessage (String(indent (level)
+                        + "Bundle"));
 
         for (auto& element : bundle)
         {
@@ -76,47 +79,49 @@ public:
     }
 
     //==============================================================================
-    void addOSCMessageArgument (const OSCArgument& arg, int level)
+    String getOSCArgumentAsString (const OSCArgument& arg)
     {
-        String typeAsString;
-        String valueAsString;
+        String type;
+        String value;
 
         if (arg.isFloat32())
         {
-            typeAsString = "float32";
-            valueAsString = String (arg.getFloat32());
+            type = "float32";
+            value = String (arg.getFloat32());
         }
         else if (arg.isInt32())
         {
-            typeAsString = "int32";
-            valueAsString = String (arg.getInt32());
+            type = "int32";
+            value = String (arg.getInt32());
         }
         else if (arg.isString())
         {
-            typeAsString = "string";
-            valueAsString = arg.getString();
+            type = "string";
+            value = arg.getString();
         }
         else if (arg.isBlob())
         {
-            typeAsString = "blob";
+            type = "blob";
             auto& blob = arg.getBlob();
-            valueAsString = String::fromUTF8 ((const char*) blob.getData(), (int) blob.getSize());
+            value = String::fromUTF8 ((const char*) blob.getData(), (int) blob.getSize());
         }
         else
         {
-            typeAsString = "(unknown)";
+            type = "unknown";
+            //addMessage (type);
+            return type;
         }
-
-        addMessage (String(getIndentationString (level + 1) + "- " + typeAsString.paddedRight(' ', 12) + valueAsString));
+        return type + " " + value;
+        //addMessage (type + " " + value);
     }
 
     void addInvalidOSCPacket (const char* /* data */, int dataSize)
     {
-        addMessage ("- (" + String(dataSize) + "bytes with invalid format)");
+        addMessage ("Invalid format of " + String(dataSize) + " bytes");
     }
 
 private:
-    static String getIndentationString (int level)
+    static String indent (int level)
     {
         return String().paddedRight (' ', 2 * level);
     }
