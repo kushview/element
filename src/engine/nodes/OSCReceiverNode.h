@@ -26,7 +26,24 @@
 
 namespace Element {
 
+class OSCInputProcessor
+{
+
+friend class OSCReceiverNode;
+
+public:
+    OSCInputProcessor() {};
+    virtual ~OSCInputProcessor() {};
+
+    void openPort(int inputPort) {};
+    void closePort(int inputPort) {};
+
+private:
+    int port;
+};
+
 class OSCReceiverNode   : public MidiFilterNode,
+                          public OSCInputProcessor,
                           public AsyncUpdater,
                           public ChangeBroadcaster
 {
@@ -65,7 +82,6 @@ public:
     void getMessages(MidiBuffer &destBuffer);
 
 private:
-//    friend class OSCReceiverNodeEditor;
     bool inputMessagesInitDone = false;
     double currentSampleRate;
     Atomic<int> numSamples = 0;
