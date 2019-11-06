@@ -26,9 +26,7 @@
 
 namespace Element {
 
-class MidiMonitorNode   : public MidiFilterNode,
-                          public AsyncUpdater,
-                          public ChangeBroadcaster
+class MidiMonitorNode   : public MidiFilterNode
 {
 public:
     MidiMonitorNode();
@@ -58,8 +56,6 @@ public:
 
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
-
-    inline void handleAsyncUpdate() override {};
 
     void clearMessages();
     void getMessages(MidiBuffer &destBuffer);
