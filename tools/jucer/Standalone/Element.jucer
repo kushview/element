@@ -124,10 +124,19 @@
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="hIVVLr" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
+          <FILE id="OFW2O7" name="MidiMonitorNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
+          <FILE id="Hr7ote" name="MidiMonitorNode.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.h"/>
           <FILE id="FxxYNs" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
           <FILE id="vRWxQo" name="MidiProgramMapNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.h"/>
+          <FILE id="mpa3dy" name="OSCProcessor.h" compile="0" resource="0" file="../../../src/engine/nodes/OSCProcessor.h"/>
+          <FILE id="RwCief" name="OSCReceiverNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/OSCReceiverNode.cpp"/>
+          <FILE id="YFLgsk" name="OSCReceiverNode.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/OSCReceiverNode.h"/>
           <FILE id="QTwZav" name="PlaceholderProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/PlaceholderProcessor.h"/>
           <FILE id="WzaRz8" name="ReverbProcessor.h" compile="0" resource="0"
@@ -190,6 +199,10 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="aD3ttN" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
+          <FILE id="VxTWbc" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
+          <FILE id="yMWvj0" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
           <FILE id="UcdM2x" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
           <FILE id="JyUgIo" name="MidiProgramMapEditor.h" compile="0" resource="0"
@@ -198,6 +211,10 @@
                 file="../../../src/gui/nodes/NodeEditorComponent.cpp"/>
           <FILE id="nNzLQm" name="NodeEditorComponent.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/NodeEditorComponent.h"/>
+          <FILE id="y9YUsG" name="OSCReceiverNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/OSCReceiverNodeEditor.cpp"/>
+          <FILE id="eU8jEe" name="OSCReceiverNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/OSCReceiverNodeEditor.h"/>
           <FILE id="es5nyJ" name="VolumeNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/VolumeNodeEditor.cpp"/>
           <FILE id="F9zhcd" name="VolumeNodeEditor.h" compile="0" resource="0"
@@ -286,6 +303,7 @@
                 file="../../../src/gui/widgets/HorizontalListBox.cpp"/>
           <FILE id="CGp99F" name="HorizontalListBox.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/HorizontalListBox.h"/>
+          <FILE id="Uy8Oxq" name="LogListBox.h" compile="0" resource="0" file="../../../src/gui/widgets/LogListBox.h"/>
           <FILE id="P3X0pU" name="MidiBlinker.cpp" compile="1" resource="0" file="../../../src/gui/widgets/MidiBlinker.cpp"/>
           <FILE id="qKR2m9" name="MidiBlinker.h" compile="0" resource="0" file="../../../src/gui/widgets/MidiBlinker.h"/>
           <FILE id="TjKRiJ" name="MidiChannelSelectComponent.h" compile="0" resource="0"
@@ -566,6 +584,7 @@
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
+        <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
@@ -613,6 +632,7 @@
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
+        <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -630,6 +650,7 @@
     <MODULES id="juce_graphics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_basics" showAllCode="1" useLocalCopy="0"/>
     <MODULES id="juce_gui_extra" showAllCode="1" useLocalCopy="0"/>
+    <MODULE id="juce_osc" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_engines" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="kv_gui" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
