@@ -35,11 +35,9 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
 
     connectButton.setBounds (200, 18, 100, 25);
     addAndMakeVisible (connectButton);
-    connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
 
     clearButton.setBounds (310, 18, 60, 25);
     addAndMakeVisible (clearButton);
-    clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
 
     connectionStatusLabel.setBounds (390, 18, 100, 25);
     updateConnectionStatusLabel();
@@ -48,13 +46,30 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     oscReceiverLog.setBounds (0, 60, 500, 100);
     addAndMakeVisible (oscReceiverLog);
 
-    oscReceiver.addListener (this);
+    bindHandlers();
 
-    setSize(500, 160);
+    setSize (640, 320);
 }
 
 OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
 {
+    unbindHandlers();
+}
+
+void OSCReceiverNodeEditor::bindHandlers()
+{
+    connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
+    clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
+
+    oscReceiver.addListener (this);
+}
+
+void OSCReceiverNodeEditor::unbindHandlers()
+{
+    connectButton.onClick = nullptr;
+    clearButton.onClick = nullptr;
+
+    oscReceiver.removeListener (this);
 }
 
 void OSCReceiverNodeEditor::resized ()
