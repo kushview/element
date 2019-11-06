@@ -976,7 +976,7 @@ public:
 
         addAndMakeVisible (outputPorts);
         setupSpinBox (outputPorts);
-        outputPorts.setValue (client.getNumMainOutputs);
+        outputPorts.setValue (client.getNumMainOutputs());
         outputPorts.setEnabled (false);
 
         updateControls();
