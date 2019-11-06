@@ -32,9 +32,12 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
 
     resetBounds(width, height);
 
+    //hostNameField.setEditable (true, true, true);
     portNumberField.setEditable (true, true, true);
     updateConnectionStatusLabel();
 
+    addAndMakeVisible (hostNameLabel);
+    addAndMakeVisible (hostNameField);
     addAndMakeVisible (portNumberLabel);
     addAndMakeVisible (portNumberField);
     addAndMakeVisible (connectButton);
@@ -66,6 +69,14 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     int h;
 
     h = 20;
+
+    w = 40;
+    hostNameLabel.setBounds (x, y, w, h);
+    x += w + margin;
+
+    w = 80;
+    hostNameField.setBounds (x, y, w, h);
+    x += w + margin;
 
     w = 40;
     portNumberLabel.setBounds (x, y, w, h);
@@ -151,8 +162,12 @@ void OSCReceiverNodeEditor::connect()
         return;
     }
 
+    auto hostToConnect = hostNameField.getText();
+
+    /** OSCReceiver doesn't accept host name - Is it possible with Datagram? */
     if (oscReceiver.connect (portToConnect))
     {
+        currentHostName = hostToConnect;
         currentPortNumber = portToConnect;
         connectButton.setButtonText ("Disconnect");
     }
@@ -167,6 +182,7 @@ void OSCReceiverNodeEditor::disconnect()
     if (oscReceiver.disconnect())
     {
         currentPortNumber = -1;
+        currentHostName = "";
         connectButton.setButtonText ("Connect");
     }
     else

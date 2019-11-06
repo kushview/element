@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "engine/nodes/OSCProcessor.h"
 #include "engine/nodes/OSCReceiverNode.h"
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
@@ -26,10 +27,13 @@
 
 namespace Element {
 
+class OSCProcessor;
+
 class OSCReceiverLogListBox : public LogListBox
 {
 public:
-    OSCReceiverLogListBox() {
+    OSCReceiverLogListBox()
+    {
 
         setOpaque (true);
 
@@ -43,17 +47,20 @@ public:
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
+        OSCAddressPattern addressPattern = message.getAddressPattern();
         String log;
-        // message.size()
+
+        DBG("[EL] Translate OSC -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
 
         log = indent (level)
-                        + message.getAddressPattern().toString()
+                        + addressPattern.toString()
                         + " ";
 
         if (! message.isEmpty())
         {
             int i = 0;
-            for (auto& arg : message) {
+            for (auto& arg : message)
+{
                 if (i > 0) log += ", ";
                 log += getOSCArgumentAsString (arg);
                 i++;
@@ -63,7 +70,6 @@ public:
         addMessage (log);
     }
 
-    //==============================================================================
     void addOSCBundle (const OSCBundle& bundle, int level = 0)
     {
         addMessage (String(indent (level)
@@ -78,7 +84,6 @@ public:
         }
     }
 
-    //==============================================================================
     String getOSCArgumentAsString (const OSCArgument& arg)
     {
         String type;
@@ -108,11 +113,9 @@ public:
         else
         {
             type = "unknown";
-            //addMessage (type);
             return type;
         }
         return type + " " + value;
-        //addMessage (type + " " + value);
     }
 
     void addInvalidOSCPacket (const char* /* data */, int dataSize)
@@ -147,13 +150,17 @@ private:
 
     OSCReceiver oscReceiver;
 
+    Label hostNameLabel      { {}, "Host" };
+    Label hostNameField      { {}, "127.0.0.1" };
     Label portNumberLabel    { {}, "Port" };
     Label portNumberField    { {}, "9000" };
+
     TextButton connectButton { "Connect" };
     TextButton clearButton   { "Clear" };
     Label connectionStatusLabel;
 
     int currentPortNumber = -1;
+    String currentHostName = "";
 
     void connectButtonClicked();
     void clearButtonClicked();
