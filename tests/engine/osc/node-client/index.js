@@ -25,7 +25,7 @@ function startSender() {
   setInterval(function() {
     i += direction
 
-    const message = new OSC.Message('/midi',  1, 1, 1, i / 100)
+    const message = new OSC.Message('/midi/noteOn',  1, 1, i / 100) // new OSC.AtomicFloat32
     osc.send(message)
 
     if (i===0 || i===99) direction *= -1
@@ -36,8 +36,9 @@ function startReceiver() {
 
   console.log(`Receiving from UDP port ${receiverPort}`)
 
-  osc.on('*', message => {
-    console.log(message.address, message.args)
+  osc.on('*', (message, rinfo) => {
+    const from = rinfo ? `${rinfo.address}:${rinfo.port} ` : ''
+    console.log(from+message.address, message.args)
   })
 
   osc.on('open', () => {
