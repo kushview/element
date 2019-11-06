@@ -27,11 +27,12 @@ typedef ReferenceCountedObjectPtr<OSCReceiverNode> OSCReceiverNodePtr;
 OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-    int width = 640;
+    int width = 540;
     int height = 320;
 
     resetBounds(width, height);
 
+    hostNameField.setText(IPAddress::getLocalAddress().toString(), NotificationType::dontSendNotification);
     //hostNameField.setEditable (true, true, true);
     portNumberField.setEditable (true, true, true);
     updateConnectionStatusLabel();
