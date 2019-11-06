@@ -1245,9 +1245,13 @@ void AudioDeviceSelectorComponent::updateAllControls()
             }
             else
             {
+               #if KV_JACK_AUDIO
                 auto* sp = new JackDeviceSettingsPanel (*type, details);
                 audioDeviceSettingsComp.reset (sp);
                 addAndMakeVisible (sp);
+               #else
+                jassertfalse; // can't setup for jack if not enabled
+               #endif
             }
         }
     }
