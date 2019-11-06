@@ -9,3 +9,6 @@
 [submodule "libs/jlv2"]
 	path = libs/jlv2
 	url = https://github.com/lvtk/jlv2
+[submodule "libs/luapp"]
+	path = libs/luapp
+	url = https://github.com/OldFisher/lua-api-pp
