@@ -25,6 +25,7 @@
 */
 
 #include "gui/widgets/AudioDeviceSelectorComponent.h"
+#include "session/DeviceManager.h"
 
 namespace Element
 {
@@ -965,10 +966,19 @@ public:
     JackDeviceSettingsPanel (AudioIODeviceType& t, AudioDeviceSetupDetails& s)
         : type (t), setup (s)
     {
+        auto& devs = *dynamic_cast<DeviceManager*> (setup.manager);
+        auto& client = devs.getJackClient();
+
         addAndMakeVisible (inputPorts);
         setupSpinBox (inputPorts);
+        inputPorts.setValue (client.getNumMainInputs());
+        inputPorts.setEnabled (false);
+
         addAndMakeVisible (outputPorts);
         setupSpinBox (outputPorts);
+        outputPorts.setValue (client.getNumMainOutputs);
+        outputPorts.setEnabled (false);
+
         updateControls();
         setup.manager->addChangeListener (this);
     }

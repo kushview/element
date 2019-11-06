@@ -31,7 +31,7 @@ public:
 
     EnginePtr activeEngine;
    #if KV_JACK_AUDIO
-    kv::JackClient jackClient { "Element" };
+    kv::JackClient jackClient { "Element", 2, "main_in_", 2, "main_out_" };
    #endif
 };
 

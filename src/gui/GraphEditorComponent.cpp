@@ -602,11 +602,20 @@ public:
         auto displayName = node.getDisplayName();
         auto subName = node.hasModifiedName() ? node.getPluginName() : String();
         
-        if (node.getParentGraph().isRootGraph() && node.isMidiInputNode())
+        if (node.getParentGraph().isRootGraph())
         {
-            auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
-            if (midi.getNumActiveMidiInputs() <= 0)
-                subName = "(no device)";
+            if (node.isAudioIONode())
+            {
+                // FIXME: uniform way to refresh node names
+                //        see https://github.com/kushview/Element/issues/109
+                subName = String();
+            }
+            else if (node.isMidiInputNode())
+            {
+                auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
+                if (midi.getNumActiveMidiInputs() <= 0)
+                    subName = "(no device)";
+            }
         }
 
         if (vertical)
