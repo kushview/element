@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "gui/LookAndFeel.h"
 #include "gui/nodes/OSCReceiverNodeEditor.h"
 
 namespace Element {
@@ -26,34 +27,74 @@ typedef ReferenceCountedObjectPtr<OSCReceiverNode> OSCReceiverNodePtr;
 OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-    portNumberLabel.setBounds (10, 18, 130, 25);
-    addAndMakeVisible (portNumberLabel);
+    int width = 640;
+    int height = 320;
+
+    resetBounds(width, height);
 
     portNumberField.setEditable (true, true, true);
-    portNumberField.setBounds (140, 18, 50, 25);
-    addAndMakeVisible (portNumberField);
-
-    connectButton.setBounds (200, 18, 100, 25);
-    addAndMakeVisible (connectButton);
-
-    clearButton.setBounds (310, 18, 60, 25);
-    addAndMakeVisible (clearButton);
-
-    connectionStatusLabel.setBounds (390, 18, 100, 25);
     updateConnectionStatusLabel();
-    addAndMakeVisible (connectionStatusLabel);
 
-    oscReceiverLog.setBounds (0, 60, 500, 100);
+    addAndMakeVisible (portNumberLabel);
+    addAndMakeVisible (portNumberField);
+    addAndMakeVisible (connectButton);
+    addAndMakeVisible (clearButton);
+    addAndMakeVisible (connectionStatusLabel);
     addAndMakeVisible (oscReceiverLog);
 
     bindHandlers();
-
-    setSize (640, 320);
+    setSize (width, height);
 }
 
 OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
 {
     unbindHandlers();
+}
+
+void OSCReceiverNodeEditor::resized ()
+{
+    resetBounds(getWidth(), getHeight());
+}
+
+void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
+{
+    int margin = 5;
+
+    int x = margin;
+    int y = margin;
+    int w;
+    int h;
+
+    h = 20;
+
+    w = 40;
+    portNumberLabel.setBounds (x, y, w, h);
+    x += w;
+
+    w = 60;
+    portNumberField.setBounds (x, y, w, h);
+    x += w + margin;
+
+    w = 100;
+    connectButton.setBounds (x, y, w, h);
+    x += w + margin;
+
+    w = 60;
+    clearButton.setBounds (x, y, w, h);
+    x += w + margin;
+
+    w = 30;
+    connectionStatusLabel.setBounds (x, y, w, h);
+    x += w + margin;
+
+    x = 0;
+    y += h + margin;
+    oscReceiverLog.setBounds (x, y, fullWidth, fullHeight - y);
+}
+
+void OSCReceiverNodeEditor::paint (Graphics& g)
+{
+    g.fillAll (LookAndFeel::backgroundColor.brighter(0.1));
 }
 
 void OSCReceiverNodeEditor::bindHandlers()
@@ -70,11 +111,6 @@ void OSCReceiverNodeEditor::unbindHandlers()
     clearButton.onClick = nullptr;
 
     oscReceiver.removeListener (this);
-}
-
-void OSCReceiverNodeEditor::resized ()
-{
-    //oscReceiverLog.setBounds (getLocalBounds().reduced (4));
 }
 
 void OSCReceiverNodeEditor::connectButtonClicked()
@@ -140,7 +176,7 @@ void OSCReceiverNodeEditor::handleConnectError (int failedPort)
 {
     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
                                         "OSC Connection error",
-                                        "Error: could not connect to port " + String (failedPort),
+                                        "Could not connect to port " + String (failedPort) + ".",
                                         "OK");
 }
 
@@ -156,7 +192,7 @@ void OSCReceiverNodeEditor::handleInvalidPortNumberEntered()
 {
     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
                                         "Invalid port number",
-                                        "Error: you have entered an invalid UDP port number.",
+                                        "You have entered an invalid UDP port number.",
                                         "OK");
 }
 
@@ -172,20 +208,11 @@ bool OSCReceiverNodeEditor::isValidOscPort (int port) const
 
 void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 {
-    String text; // = ""; // "Status: ";
-
-    if (isConnected())
-        text = "Connected"; //+= "Connected to UDP port " + String (currentPortNumber);
-    else
-        text = "Disconnected"; //+= "Disconnected";
-
+    String text = isConnected() ? "On" : "Off";
     auto textColour = isConnected() ? Colours::green : Colours::red;
 
     connectionStatusLabel.setText (text, dontSendNotification);
-    connectionStatusLabel.setFont (Font (15.00f, Font::bold));
     connectionStatusLabel.setColour (Label::textColourId, textColour);
-    connectionStatusLabel.setJustificationType (Justification::centredRight);
 }
-
 
 };

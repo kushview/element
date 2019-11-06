@@ -29,8 +29,17 @@ namespace Element {
 class OSCReceiverLogListBox : public LogListBox
 {
 public:
-    OSCReceiverLogListBox() {}
+    OSCReceiverLogListBox() {
+
+        setOpaque (true);
+
+    }
     ~OSCReceiverLogListBox() {};
+
+    void paint (Graphics& g)
+    {
+        g.fillAll (Element::LookAndFeel::backgroundColor);
+    }
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
@@ -46,8 +55,6 @@ public:
             for (auto& arg : message)
                 addOSCMessageArgument (arg, level + 1);
         }
-
-        triggerAsyncUpdate();
     }
 
     //==============================================================================
@@ -66,8 +73,6 @@ public:
             else if (element.isBundle())
                 addOSCBundle (element.getBundle(), level + 1);
         }
-
-        triggerAsyncUpdate();
     }
 
     //==============================================================================
@@ -118,24 +123,27 @@ private:
 };
 
 class OSCReceiverNodeEditor : public NodeEditorComponent,
-                              private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
+                              private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>,
+                              private ComponentBoundsConstrainer
 {
 public:
     OSCReceiverNodeEditor (const Node&);
     virtual ~OSCReceiverNodeEditor();
 
-    void paint (Graphics&) override {};
+    void paint (Graphics&) override;
     void resized() override;
+    void resetBounds (int width, int height);
 
     void bindHandlers();
     void unbindHandlers();
 
 private:
     OSCReceiverLogListBox oscReceiverLog;
+
     OSCReceiver oscReceiver;
 
-    Label portNumberLabel    { {}, "OSC Receiver Port: " };
-    Label portNumberField    { {}, "9001" };
+    Label portNumberLabel    { {}, "Port" };
+    Label portNumberField    { {}, "9000" };
     TextButton connectButton { "Connect" };
     TextButton clearButton   { "Clear" };
     Label connectionStatusLabel;
