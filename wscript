@@ -113,6 +113,63 @@ def build_desktop (bld, slug='element'):
 
         bld.install_files (element_data, 'data/ElementIcon.png')
 
+def build_lua (bld):
+    lua_src = '''
+        libs/lua/src/lauxlib.c
+        libs/lua/src/liolib.c
+        libs/lua/src/lopcodes.c
+        libs/lua/src/lstate.c
+        libs/lua/src/lobject.c
+        libs/lua/src/lmathlib.c
+        libs/lua/src/loadlib.c
+        libs/lua/src/lvm.c
+        libs/lua/src/lfunc.c
+        libs/lua/src/lstrlib.c
+        libs/lua/src/lua.c
+        libs/lua/src/linit.c
+        libs/lua/src/lstring.c
+        libs/lua/src/lundump.c
+        libs/lua/src/lctype.c
+        libs/lua/src/ltable.c
+        libs/lua/src/ldump.c
+        libs/lua/src/loslib.c
+        libs/lua/src/lgc.c
+        libs/lua/src/lzio.c
+        libs/lua/src/ldblib.c
+        libs/lua/src/lutf8lib.c
+        libs/lua/src/lmem.c
+        libs/lua/src/lcorolib.c
+        libs/lua/src/lcode.c
+        libs/lua/src/ltablib.c
+        libs/lua/src/lbitlib.c
+        libs/lua/src/lapi.c
+        libs/lua/src/lbaselib.c
+        libs/lua/src/ldebug.c
+        libs/lua/src/lparser.c
+        libs/lua/src/llex.c
+        libs/lua/src/ltm.c
+        libs/lua/src/ldo.c'''.split()
+
+    lua = bld(
+        features    = "c cstlib",
+        source      = lua_src,
+        includes    = [ 'libs/lua/src' ],
+        target      = 'lib/lua',
+        name        = 'LUA',
+        env         = bld.env.derive()
+    )
+
+    lua.env.CFLAGS = ['-std=c99', '-O2', '-Wall', '-Wextra', '-DLUA_COMPAT_5_2']
+    lua.env.CXXFLAGS = []
+
+    if juce.is_mac():
+        lua.env.append_unique('CFLAGS', [ '-DLUA_USE_MACOSX' ])
+    elif juce.is_linux():
+        lua.env.append_unique('CFLAGS', [ '-DLUA_USE_LINUX' ])
+
+    bld.add_group()
+    return lua
+
 def compile (bld):
     libEnv = bld.env.derive()
     library = bld (
@@ -158,6 +215,7 @@ def compile (bld):
         pass
 
 def build (bld):
+    build_lua(bld)
     compile(bld)
     bld.recurse ('tests')
 
