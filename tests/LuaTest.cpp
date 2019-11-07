@@ -17,9 +17,23 @@
 */
 
 #include "Tests.h"
+
+#if EL_LUA
 #include <lua.hpp>
 
 using namespace Element;
+
+class LuaEngine
+{
+public:
+    LuaEngine() {}
+    ~LuaEngine() {}
+
+    Result execute (const String& block)
+    {
+        return Result::ok();
+    }
+};
 
 class LuaTest : public UnitTestBase
 {
@@ -29,10 +43,18 @@ public:
 
     void runTest()
     {
+        beginTest ("Basic Lua");
         runSimpleScript();
+        getGlobalVars();
     }
 
 private:
+    void error (lua_State*, const char* e1, const char* e2)
+    {
+        String msg (e1); msg << ": " << e2;
+        expect (false, msg);
+    }
+
     void runSimpleScript() 
     {
         // initialization
@@ -40,7 +62,7 @@ private:
         luaL_openlibs (lua);
 
         // execute script
-        String script = "print('Hello World!')";
+        String script = "print('Hello Lua World!')";
         int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), script.toRawUTF8());
         lua_pcall (lua, 0, 0, 0);
 
@@ -48,9 +70,46 @@ private:
         lua_close (lua);
     }
 
-    void callCFunction() {
-        
+    void callCFunction()
+    {
+
+    }
+
+    void getGlobalVars()
+    {
+        auto* L = luaL_newstate();
+        luaL_openlibs (L);
+
+        String script = 
+R"abc(
+depth = 10000
+width = 100
+height = 200
+)abc";
+
+        if (LUA_OK != luaL_loadbuffer (L, script.toRawUTF8(), script.length(), "globals"))
+            return error (L, "Could not load buffer", "");
+        if (LUA_OK != lua_pcall (L, 0, 0, 0))
+            return error (L, "Could not execute script", "");
+
+        if (LUA_TNUMBER != lua_getglobal (L, "height"))
+            return error (L, "not a number", "");
+        if (LUA_TNUMBER != lua_getglobal (L, "width"))
+            return error (L, "not a number", "");            
+        if (LUA_TNUMBER != lua_getglobal (L, "depth"))
+            return error (L, "not a number", "");
+
+        auto depth  = (int) lua_tonumber (L, -1);        
+        auto width  = (int) lua_tonumber (L, -2);
+        auto height = (int) lua_tonumber (L, -3);
+
+        expect (width == 100);
+        expect (height == 200);
+        expect (depth == 10000);
+
+        lua_close (L);
     }
 };
 
 static LuaTest sLuaTest;
+#endif

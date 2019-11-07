@@ -59,6 +59,7 @@ def configure (conf):
     
     configure_product (conf)
 
+    conf.define ('EL_LUA', True)
     conf.define ('EL_USE_JACK', 0)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
