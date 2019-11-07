@@ -151,12 +151,14 @@ def build_lua (bld):
         libs/lua/src/ltm.c
         libs/lua/src/ldo.c'''.split()
 
-    lua = bld(
-        features    = "c cstlib",
+    lua = bld (
+        features    = "c cshlib",
         source      = lua_src,
         includes    = [ 'libs/lua/src' ],
-        target      = 'lib/lua',
+        target      = 'lib/lua_element',
         name        = 'LUA',
+        use         = [],
+        linkflags   = [],
         env         = bld.env.derive()
     )
 
@@ -165,8 +167,12 @@ def build_lua (bld):
 
     if juce.is_mac():
         lua.env.append_unique('CFLAGS', [ '-DLUA_USE_MACOSX' ])
+        lua.use.append('READLINE')
     elif juce.is_linux():
         lua.env.append_unique('CFLAGS', [ '-DLUA_USE_LINUX' ])
+        lua.use.append('READLINE')
+        lua.use.append('DL')
+        lua.linkflags.append('-Wl,-E')
 
     bld.add_group()
     return lua

@@ -76,11 +76,13 @@ def check_mingw (self):
 def check_mac (self):
     # VST/VST3 OSX Support
     self.define('JUCE_PLUGINHOST_VST3', 1)
+    self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
 
 @conf
 def check_linux (self):
     self.check(lib='pthread', mandatory=True)
-    self.check(lib='dl', mandatory=True)
+    self.check(lib='dl', uselib_store='DL', mandatory=True)
+    self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
     self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
     self.check(lib='curl', uselib_store='CURL', mandatory=True)
     self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)
