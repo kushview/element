@@ -55,6 +55,7 @@
             "args": [
                 "waf",
                 "configure",
+                "--enable-lua",
                 "--debug"
             ],
             "options": {

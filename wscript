@@ -15,6 +15,8 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
+    opt.add_option ('--enable-lua', default=False, action='store_true', dest='lua', \
+        help="Build with Lua scripting support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
     opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
@@ -59,7 +61,9 @@ def configure (conf):
     
     configure_product (conf)
 
-    conf.define ('EL_LUA', True)
+    conf.env.LUA = bool(conf.options.lua)
+    conf.define ('EL_LUA', conf.env.LUA)
+
     conf.define ('EL_USE_JACK', 0)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
@@ -75,6 +79,7 @@ def configure (conf):
     juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
+    juce.display_msg (conf, "Lua", conf.env.LUA)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
     print
@@ -222,7 +227,7 @@ def compile (bld):
         pass
 
 def build (bld):
-    build_lua(bld)
+    if bld.env.LUA: build_lua(bld)
     compile(bld)
     bld.recurse ('tests')
 
