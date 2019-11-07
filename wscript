@@ -19,6 +19,8 @@ def options (opt):
         help="Build with Lua scripting support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
+    opt.add_option ('--test', default=False, action='store_true', dest='test', \
+        help="Build the test suite")
     opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
         help="Specify the VST2 SDK path")
     opt.add_option('--ziptype', default='gz', dest='ziptype', type='string', 
@@ -56,6 +58,7 @@ def configure (conf):
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
+    conf.env.TEST = bool(conf.options.test)
     conf.env.DEBUG = conf.options.debug
     conf.env.EL_VERSION_STRING = VERSION
     
@@ -229,9 +232,12 @@ def compile (bld):
 def build (bld):
     if bld.env.LUA: build_lua(bld)
     compile(bld)
-    bld.recurse ('tests')
+    if bld.env.TEST: bld.recurse ('tests')
 
 def check (ctx):
+    if not os.path.exists('build/bin/test-element'):
+        ctx.fatal("Tests not compiled")
+        return
     if 0 != call (["build/bin/test-element"]):
         ctx.fatal("Tests failed")
 
