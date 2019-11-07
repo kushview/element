@@ -7,9 +7,10 @@ bld.program (
                 '../libs/jlv2/modules',
                 '../libs/JUCE/modules',
                 '../libs/kv/modules',
+                '../libs/lua/src',
                 '../src' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
-            'ALSA', 'XEXT', 'ELEMENT', 'PYTHON' ],
+            'ALSA', 'XEXT', 'ELEMENT', 'PYTHON', 'LUA' ],
     install_path = None
 )
