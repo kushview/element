@@ -61,11 +61,13 @@ CurrentVersion::~CurrentVersion()
 
 void CurrentVersion::checkAfterDelay (const int milliseconds, const bool showUpToDate)
 {
+   #if !defined(EL_SOLO) && !defined(EL_FREE)
     auto* cv = new CurrentVersion();
     cv->timeout = milliseconds;
     cv->hasChecked = false;
     cv->shouldShowUpToDateMessage = showUpToDate;
     cv->startThread();
+   #endif
 }
 
 bool CurrentVersion::isNewerVersionAvailable()
