@@ -46,9 +46,16 @@ public:
         beginTest ("Basic Lua");
         runSimpleScript();
         getGlobalVars();
+        callCFunction();
     }
 
 private:
+    static int luaSin (lua_State* state) {
+        double d = luaL_checknumber (state, 1);
+        lua_pushnumber (state, sin (d));
+        return 1;  /* number of results */
+    }
+
     void error (lua_State*, const char* e1, const char* e2)
     {
         String msg (e1); msg << ": " << e2;
@@ -72,7 +79,35 @@ private:
 
     void callCFunction()
     {
+        auto* lua = luaL_newstate();
+        luaL_openlibs (lua);
 
+        lua_pushcfunction (lua, luaSin);
+        lua_setglobal (lua, "mysin");
+
+        String script = 
+R"abc(
+print (mysin (100));
+print ("hello world 2")
+print (mysin (200))
+print (mysin ('notanumber'))
+)abc";
+        int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), "cfunc");
+        switch (lua_pcall (lua, 0, 0, 0))
+        {
+            case LUA_ERRRUN:
+                DBG("runtime error");
+                break;
+
+            case LUA_OK:
+                break;
+
+            default:
+                DBG("Unknown lua problem");
+                break;
+        }
+
+        lua_close (lua);
     }
 
     void getGlobalVars()
