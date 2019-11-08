@@ -25,10 +25,6 @@
 #include "Messages.h"
 #include "Globals.h"
 
-#ifndef EL_MIDI_MAPPING_CHANNELS
- #define EL_MIDI_MAPPING_CHANNELS   0
-#endif
-
 namespace Element {
 
 class ControllerMapsTable : public TableListBox,
@@ -299,28 +295,15 @@ public:
 
     void startListening()
     {
+        if (inputName.isEmpty())
+            return;
+
         stopListening();
         clearMessage();
         
-       #if 0
-        const auto deviceIdx = MidiInput::getDevices().indexOf (inputName);
-        if (deviceIdx >= 0)
-            input.reset (MidiInput::openDevice (deviceIdx, this));
-        
-        if (input)
-        {
-            DBG("[EL] started learning midi");
-            input->start();
-        }
-        else
-        {
-            DBG("[EL] could not start MIDI device: " << inputName);
-        }
-       #else
         jassert (ViewHelpers::getGlobals (this));
         if (auto* world = ViewHelpers::getGlobals (this))
             world->getMidiEngine().addMidiInputCallback (inputName, this, true);
-       #endif
 
         listening = true;
         updateToggleState();
@@ -879,12 +862,10 @@ public:
             else if (control.isControllerEvent())
                 eventName = "CC Number";
 
-           #if EL_MIDI_MAPPING_CHANNELS
             props.add (new ChoicePropertyComponent (control.getPropertyAsValue (Tags::midiChannel),
                 "Channel", { "Omni", "1", "2", "3", "4", "5", "6", "7", "8",
                              "9", "10", "11", "12", "13", "14", "15", "16" },
                             { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 }));
-           #endif
 
             eventId = control.getPropertyAsValue ("eventId");
             props.add (new SliderPropertyComponent (eventId, eventName, 
