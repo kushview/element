@@ -24,6 +24,7 @@
 #include "engine/nodes/AudioMixerProcessor.h"
 #include "engine/nodes/ChannelizeProcessor.h"
 #include "engine/nodes/CombFilterProcessor.h"
+#include "engine/nodes/EQFilterProcessor.h"
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -230,6 +231,23 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* desc = ds.add (new PluginDescription());
         ReverbProcessor().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == "element.eqfilt")
+    {
+        auto* desc = ds.add (new PluginDescription());
+        desc->pluginFormatName = getName();
+        desc->name = "EQ Filter (mono)";
+        desc->manufacturerName = "Element";
+        desc->category = "Effect";
+        desc->fileOrIdentifier = fileOrId + ".mono";
+        desc->numInputChannels = 1;
+        desc->numOutputChannels = 1;
+
+        desc = ds.add (new PluginDescription (*desc));
+        desc->name = "EQ Filter (stereo)";
+        desc->fileOrIdentifier = fileOrId + ".stereo";
+        desc->numInputChannels = 2;
+        desc->numOutputChannels = 2;
+    }
 
    #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
@@ -327,6 +345,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
 {
     StringArray results;
     results.add (EL_INTERNAL_ID_COMB_FILTER);
+    results.add (EL_INTERNAL_ID_EQ_FILTER);
     results.add ("element.allPass");
     results.add ("element.volume");
     results.add (EL_INTERNAL_ID_WET_DRY);
@@ -375,6 +394,10 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new WetDryProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
         base = new ReverbProcessor();
+    else if (desc.fileOrIdentifier == "element.eqfilt.mono")
+        base = new EQFilterProcessor (false);
+    else if (desc.fileOrIdentifier == "element.eqfilt.stereo")
+        base = new EQFilterProcessor (true);
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)

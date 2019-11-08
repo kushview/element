@@ -27,6 +27,7 @@
 #define EL_INTERNAL_ID_AUDIO_MIXER              "element.audioMixer"
 #define EL_INTERNAL_ID_AUDIO_ROUTER             "element.audioRouter"
 #define EL_INTERNAL_ID_COMB_FILTER              "element.comb"
+#define EL_INTERNAL_ID_EQ_FILTER                "element.eqfilt"
 #define EL_INTERNAL_ID_CHANNELIZE               "element.channelize"
 #define EL_INTERNAL_ID_GRAPH                    "element.graph"
 #define EL_INTERNAL_ID_MEDIA_PLAYER             "element.mediaPlayer"

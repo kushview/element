@@ -106,6 +106,8 @@
                 file="../../../src/engine/nodes/ChannelizeProcessor.h"/>
           <FILE id="AYQ2K6" name="CombFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
+          <FILE id="l5ggQE" name="EQFilterProcessor.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/EQFilterProcessor.h"/>
           <FILE id="B8pLW0" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MediaPlayerProcessor.cpp"/>
           <FILE id="dqOlE2" name="MediaPlayerProcessor.h" compile="0" resource="0"
