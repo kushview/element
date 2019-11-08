@@ -94,7 +94,7 @@ protected:
     {
         const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
             .getParentDirectory().getParentDirectory().getParentDirectory()
-            .getChildFile("data");
+            .getChildFile("build/data");
         jassert (thedir.exists());
         return thedir;
     }
