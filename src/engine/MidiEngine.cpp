@@ -214,6 +214,12 @@ void MidiEngine::addMidiInputCallback (const String& name, MidiInputCallback* ca
 
     if (name.isEmpty() || isMidiInputEnabled (name) || consumer)
     {
+        if (consumer)
+        {
+            if (auto* holder = getMidiInput (name, true))
+                ignoreUnused (holder);
+        }
+
         MidiCallbackInfo mc;
         mc.deviceName = name;
         mc.callback = callbackToAdd;
@@ -259,7 +265,7 @@ void MidiEngine::handleIncomingMidiMessageInt (MidiInput* source, const MidiMess
         const ScopedLock sl (midiCallbackLock);
 
         for (auto& mc : midiCallbacks)
-            if (mc.deviceName.isEmpty() || mc.deviceName == source->getName())
+            if (mc.consumer || mc.deviceName.isEmpty() || mc.deviceName == source->getName())
                 mc.callback->handleIncomingMidiMessage (source, message);
     }
 }
