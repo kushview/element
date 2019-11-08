@@ -81,15 +81,20 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     const auto& midiOut = *midi.getReadBuffer (0);
 
-    Method 1
+    // Method 1
 
     outputMidiMessages.removeNextBlockOfMessages (midiOut, nframes);
-    midiOut.swapWith(messages);
 
     // Method 2
 
     MidiBuffer messages;
     outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
+
+    // Method 2.1
+
+    midiOut.swapWith(messages);
+
+    // Method 2.2
 
     MidiBuffer::Iterator iter1 (messages);
     MidiMessage msg;
