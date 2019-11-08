@@ -46,13 +46,6 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize) {
         currentSampleRate = sampleRate;
         outputMidiMessagesInitDone = true;
     }
-
-    for (OSCMessage msg : oscMessages)
-    {
-        outputMidiMessages.addMessageToQueue ( OscProcessor::processOscToMidiMessage( msg ) );
-    }
-
-    oscMessages.clear();
 }
 
 inline void OSCReceiverNode::createPorts()
@@ -78,23 +71,11 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     auto& midiOut = *midi.getWriteBuffer (0);
 
-    /*
-
-    // Method 1
-
-    outputMidiMessages.removeNextBlockOfMessages (midiOut, nframes);
-*/
-    // Method 2
-
     MidiBuffer messages;
     outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
 
-    // Method 2.1
+    //midiOut.swapWith(messages);
 
-    midiOut.swapWith(messages);
-
-    // Method 2.2
-/*
     MidiBuffer::Iterator iter1 (messages);
     MidiMessage msg;
     int frame;
@@ -103,15 +84,21 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         midiOut.addEvent (msg, frame);
     }
-*/
-
 }
 
 /** OSCReceiver real-time callbacks */
 
 void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 {
-    DBG("[EL] Queue OSC message -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
+    if ( paused ) return;
+
+    auto timestamp = Time::getMillisecondCounterHiRes();
+
+    MidiMessage midiMsg = OscProcessor::processOscToMidiMessage( message );
+    midiMsg.setTimeStamp (timestamp);
+
+    outputMidiMessages.addMessageToQueue( midiMsg );
+
     oscMessages.push_back(message);
 };
 
