@@ -231,22 +231,10 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* desc = ds.add (new PluginDescription());
         ReverbProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == "element.eqfilt")
+    else if (fileOrId == EL_INTERNAL_ID_EQ_FILTER)
     {
         auto* desc = ds.add (new PluginDescription());
-        desc->pluginFormatName = getName();
-        desc->name = "EQ Filter (mono)";
-        desc->manufacturerName = "Element";
-        desc->category = "Effect";
-        desc->fileOrIdentifier = fileOrId + ".mono";
-        desc->numInputChannels = 1;
-        desc->numOutputChannels = 1;
-
-        desc = ds.add (new PluginDescription (*desc));
-        desc->name = "EQ Filter (stereo)";
-        desc->fileOrIdentifier = fileOrId + ".stereo";
-        desc->numInputChannels = 2;
-        desc->numOutputChannels = 2;
+        EQFilterProcessor(2).fillInPluginDescription (*desc);
     }
 
    #if defined (EL_PRO)
@@ -394,10 +382,8 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new WetDryProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
         base = new ReverbProcessor();
-    else if (desc.fileOrIdentifier == "element.eqfilt.mono")
-        base = new EQFilterProcessor (false);
-    else if (desc.fileOrIdentifier == "element.eqfilt.stereo")
-        base = new EQFilterProcessor (true);
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_EQ_FILTER)
+        base = new EQFilterProcessor();
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
