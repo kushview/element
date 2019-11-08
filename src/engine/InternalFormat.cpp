@@ -24,6 +24,7 @@
 #include "engine/nodes/AudioMixerProcessor.h"
 #include "engine/nodes/ChannelizeProcessor.h"
 #include "engine/nodes/CombFilterProcessor.h"
+#include "engine/nodes/EQFilterProcessor.h"
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -230,6 +231,11 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* desc = ds.add (new PluginDescription());
         ReverbProcessor().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_EQ_FILTER)
+    {
+        auto* desc = ds.add (new PluginDescription());
+        EQFilterProcessor(2).fillInPluginDescription (*desc);
+    }
 
    #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
@@ -327,6 +333,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
 {
     StringArray results;
     results.add (EL_INTERNAL_ID_COMB_FILTER);
+    results.add (EL_INTERNAL_ID_EQ_FILTER);
     results.add ("element.allPass");
     results.add ("element.volume");
     results.add (EL_INTERNAL_ID_WET_DRY);
@@ -375,6 +382,8 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new WetDryProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_REVERB)
         base = new ReverbProcessor();
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_EQ_FILTER)
+        base = new EQFilterProcessor();
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
