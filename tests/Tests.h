@@ -99,7 +99,10 @@ protected:
         return thedir;
     }
 
-    void runDispatchLoop (const int millisecondsToRunFor = 40) { MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); }
+    void runDispatchLoop (const int millisecondsToRunFor = 40)
+    { 
+        MessageManager::getInstance()->runDispatchLoopUntil (millisecondsToRunFor); 
+    }
     
     Globals& getWorld() { initializeWorld(); return *world; }
     AppController& getAppController() { initializeWorld(); return *app; }

@@ -160,10 +160,10 @@ def build_lua (bld):
         libs/lua/src/ldo.c'''.split()
 
     lua = bld (
-        features    = "c cshlib",
+        features    = "c cstlib",
         source      = lua_src,
         includes    = [ 'libs/lua/src' ],
-        target      = 'lib/lua_element',
+        target      = 'lib/lua',
         name        = 'LUA',
         use         = [],
         linkflags   = [],
@@ -196,7 +196,7 @@ def compile (bld):
         target      = 'lib/element-0',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS' ]
+        use         = [ 'BOOST_SIGNALS', 'LUA' ]
     )
 
     bld.add_group()
