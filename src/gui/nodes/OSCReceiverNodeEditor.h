@@ -34,14 +34,13 @@ class OSCReceiverLogListBox : public LogListBox
 public:
     OSCReceiverLogListBox()
     {
-
         setOpaque (true);
-
     }
     ~OSCReceiverLogListBox() {};
 
     void paint (Graphics& g)
     {
+        // In case parent background is different
         g.fillAll (Element::LookAndFeel::backgroundColor);
     }
 
@@ -49,8 +48,6 @@ public:
     {
         OSCAddressPattern addressPattern = message.getAddressPattern();
         String log;
-
-        DBG("[EL] Translate OSC -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
 
         log = indent (level)
                         + addressPattern.toString()
@@ -60,12 +57,14 @@ public:
         {
             int i = 0;
             for (auto& arg : message)
-{
+            {
                 if (i > 0) log += ", ";
-                log += getOSCArgumentAsString (arg);
+                log += OscProcessor::getOSCArgumentAsString (arg);
                 i++;
             }
         }
+
+DBG("[EL] GUI thread Translate OSC -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
 
         addMessage (log);
     }
@@ -84,40 +83,6 @@ public:
         }
     }
 
-    String getOSCArgumentAsString (const OSCArgument& arg)
-    {
-        String type;
-        String value;
-
-        if (arg.isFloat32())
-        {
-            type = "float32";
-            value = String (arg.getFloat32());
-        }
-        else if (arg.isInt32())
-        {
-            type = "int32";
-            value = String (arg.getInt32());
-        }
-        else if (arg.isString())
-        {
-            type = "string";
-            value = arg.getString();
-        }
-        else if (arg.isBlob())
-        {
-            type = "blob";
-            auto& blob = arg.getBlob();
-            value = String::fromUTF8 ((const char*) blob.getData(), (int) blob.getSize());
-        }
-        else
-        {
-            type = "unknown";
-            return type;
-        }
-        return type + " " + value;
-    }
-
     void addInvalidOSCPacket (const char* /* data */, int dataSize)
     {
         addMessage ("Invalid format of " + String(dataSize) + " bytes");
@@ -131,8 +96,7 @@ private:
 };
 
 class OSCReceiverNodeEditor : public NodeEditorComponent,
-                              private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>,
-                              private ComponentBoundsConstrainer
+                              private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
     OSCReceiverNodeEditor (const Node&);
@@ -142,13 +106,9 @@ public:
     void resized() override;
     void resetBounds (int width, int height);
 
-    void bindHandlers();
-    void unbindHandlers();
-
 private:
     OSCReceiverLogListBox oscReceiverLog;
-
-    OSCReceiver oscReceiver;
+    ReferenceCountedObjectPtr<OSCReceiverNode> oscReceiverNodePtr;
 
     Label hostNameLabel      { {}, "Host" };
     Label hostNameField      { {}, "127.0.0.1" };
@@ -156,25 +116,30 @@ private:
     Label portNumberField    { {}, "9000" };
 
     TextButton connectButton { "Connect" };
+    TextButton pauseButton { "Pause" };
     TextButton clearButton   { "Clear" };
     Label connectionStatusLabel;
 
+    bool isPaused = false;
     int currentPortNumber = -1;
     String currentHostName = "";
 
     void connectButtonClicked();
+    void pauseButtonClicked();
     void clearButtonClicked();
-    void oscMessageReceived (const OSCMessage& message) override;
-    void oscBundleReceived (const OSCBundle& bundle) override;
+    void updateConnectionStatusLabel();
+    void updatePauseButton();
+
     void connect();
     void disconnect();
+    bool isConnected() const;
+
+    void oscMessageReceived (const OSCMessage& message) override;
+    void oscBundleReceived (const OSCBundle& bundle) override;
+
     void handleConnectError (int failedPort);
     void handleDisconnectError();
     void handleInvalidPortNumberEntered();
-    bool isConnected() const;
-    bool isValidOscPort (int port) const;
-
-    void updateConnectionStatusLabel();
 };
 
 }

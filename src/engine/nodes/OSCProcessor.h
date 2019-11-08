@@ -24,6 +24,9 @@
 
 namespace Element {
 
+// TODO: More sensible parsing of address
+// juce_AddressPattern has private member oscSymbols which is already parsed
+
 const static std::regex oscAddressWithArity1 { "/[^/\\n\\r]+$" };
 const static std::regex oscAddressWithArity2 { "/([^/\\n\\r]+)/([^/\\n\\r]+)" };
 const static std::regex oscAddressWithArity3 { "/([^/\\n\\r]+)/([^/\\n\\r]+)/([^/\\n\\r]+)" };
@@ -87,6 +90,40 @@ public:
         }
 
         return parts;
+    }
+
+    static String getOSCArgumentAsString (const OSCArgument& arg)
+    {
+        String type;
+        String value;
+
+        if (arg.isFloat32())
+        {
+            type = "float32";
+            value = String (arg.getFloat32());
+        }
+        else if (arg.isInt32())
+        {
+            type = "int32";
+            value = String (arg.getInt32());
+        }
+        else if (arg.isString())
+        {
+            type = "string";
+            value = arg.getString();
+        }
+        else if (arg.isBlob())
+        {
+            type = "blob";
+            auto& blob = arg.getBlob();
+            value = String::fromUTF8 ((const char*) blob.getData(), (int) blob.getSize());
+        }
+        else
+        {
+            type = "unknown";
+            value = "value";
+        }
+        return type + " " + value;
     }
 
     static MidiMessage processOscToMidiMessage(const OSCMessage& message)
@@ -264,6 +301,53 @@ public:
         /** Unknown command */
         return MidiMessage();
     }
+
+    static void processMidiMessageToOsc (const MidiMessage& m)
+    {
+        // auto o = OSCMessage();
+
+        // /** /midi/{command} or /midi/{deviceName}/{command} */
+        // auto address = OSCAddress();
+
+        // const int channel = m.getChannel();
+        // String command = "";
+
+        /*if (m.isNoteOn())
+        {
+            noteOn (channel, m.getNoteNumber(), m.getFloatVelocity());
+        }
+        else if (m.isNoteOff())
+        {
+            noteOff (channel, m.getNoteNumber(), m.getFloatVelocity(), true);
+        }
+        else if (m.isAllNotesOff() || m.isAllSoundOff())
+        {
+            allNotesOff (channel, true);
+        }
+        else if (m.isPitchWheel())
+        {
+            const int wheelPos = m.getPitchWheelValue();
+            lastPitchWheelValues [channel - 1] = wheelPos;
+            handlePitchWheel (channel, wheelPos);
+        }
+        else if (m.isAftertouch())
+        {
+            handleAftertouch (channel, m.getNoteNumber(), m.getAfterTouchValue());
+        }
+        else if (m.isChannelPressure())
+        {
+            handleChannelPressure (channel, m.getChannelPressureValue());
+        }
+        else if (m.isController())
+        {
+            handleController (channel, m.getControllerNumber(), m.getControllerValue());
+        }
+        else if (m.isProgramChange())
+        {
+            handleProgramChange (channel, m.getProgramChangeNumber());
+        }*/
+    }
+
 
 };
 

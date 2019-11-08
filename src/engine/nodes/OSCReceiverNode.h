@@ -22,32 +22,15 @@
 #include "engine/MidiPipe.h"
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiFilterNode.h"
-#include "Signals.h"
+#include "engine/nodes/OSCProcessor.h"
 
 namespace Element {
 
-class OSCInputProcessor
-{
-
-friend class OSCReceiverNode;
-
-public:
-    OSCInputProcessor() {};
-    virtual ~OSCInputProcessor() {};
-
-    void openPort(int inputPort) {};
-    void closePort(int inputPort) {};
-
-private:
-    int port;
-};
-
-class OSCReceiverNode   : public MidiFilterNode,
-                          public OSCInputProcessor,
-                          public AsyncUpdater,
-                          public ChangeBroadcaster
+class OSCReceiverNode : public MidiFilterNode,
+                        public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
+
     OSCReceiverNode();
     virtual ~OSCReceiverNode();
 
@@ -66,7 +49,7 @@ public:
         desc.version            = "1.0.0";
     }
 
-    void clear() {};
+    /** MIDI **/
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
@@ -76,28 +59,43 @@ public:
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
 
-    inline void handleAsyncUpdate() override {};
+    inline void createPorts() override;
 
-    void clearMessages();
-    void getMessages(MidiBuffer &destBuffer);
+    void clearMidiMessages();
+    void getMidiMessages(MidiBuffer &destBuffer);
+
+    /** For node editor */
+
+    bool connect (int portNumber);
+    bool disconnect ();
+    bool isConnected ();
+
+    bool isValidOscPort (int port) const;
+
+    void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
+    void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
 
 private:
-    bool inputMessagesInitDone = false;
-    double currentSampleRate;
-    Atomic<int> numSamples = 0;
-    MidiMessageCollector inputMessages;
+
     bool createdPorts = false;
 
-    inline void createPorts() override
-    {
-        if (createdPorts)
-            return;
+    double currentSampleRate;
+    Atomic<int> numSamples = 0;
 
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
-        createdPorts = true;
-    }
+    bool outputMidiMessagesInitDone = false;
+    MidiMessageCollector outputMidiMessages;
+
+    std::vector<OSCMessage> oscMessages;
+    Atomic<int> numOscMessages;
+
+    OSCReceiver oscReceiver;
+    bool connected = false;
+
+    /** Real-time */
+    void oscMessageReceived(const OSCMessage& message) override;
+    void oscBundleReceived(const OSCBundle& bundle) override;
+
 };
+
 
 }

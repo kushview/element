@@ -28,33 +28,54 @@ OSCReceiverNode::OSCReceiverNode()
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_OSC_RECEIVER, nullptr);
 
+    oscReceiver.addListener (this);
 }
 
 OSCReceiverNode::~OSCReceiverNode()
 {
-    // clearMessages();
+   oscReceiver.removeListener (this);
+   oscReceiver.disconnect();
 }
 
+/** MIDI */
+
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize) {
-/*    if (inputMessagesInitDone) {
-        return;
+
+
+    if (! outputMidiMessagesInitDone) {
+        outputMidiMessages.reset (sampleRate);
+        currentSampleRate = sampleRate;
+        outputMidiMessagesInitDone = true;
     }
-    inputMessages.reset (sampleRate);
-    currentSampleRate = sampleRate;
-    inputMessagesInitDone = true;*/
-};
+
+    // TODO: Convert OSC to MIDI and add to midiMessageCollector
+
+}
+
+inline void OSCReceiverNode::createPorts()
+{
+    if (createdPorts)
+        return;
+
+    ports.clearQuick();
+
+    ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+    ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
+    createdPorts = true;
+}
+
 
 void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-/*    auto timestamp = Time::getMillisecondCounterHiRes();
+    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
-
     if (nframes == 0) {
         return;
     }
 
-    auto* const midiIn = midi.getWriteBuffer (0);
-    MidiBuffer::Iterator iter1 (*midiIn);
+    auto* const midiIn = midi.getReadBuffer (0);
+
+/*    MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
     int frame;
 
@@ -65,22 +86,56 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         //       UI rendering
         // timestamp += 1000.0 * static_cast<double> (frame) * currentSampleRate;
         msg.setTimeStamp (timestamp);
-        inputMessages.addMessageToQueue (msg);
+        outputMidiMessages.addMessageToQueue (msg);
     }
 
     numSamples += nframes;*/
 }
 
-void OSCReceiverNode::getMessages (MidiBuffer& destBuffer)
-{
-/*    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples.get());
-    numSamples = 0;*/
-}
+/* OSCReceiver real-time callbacks */
 
-void OSCReceiverNode::clearMessages()
+void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 {
-/*    inputMessages.reset (currentSampleRate);
-    numSamples = 0;*/
-}
-
 };
+
+void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
+{
+};
+
+/** For node editor */
+
+bool OSCReceiverNode::connect (int portNumber)
+{
+    connected = oscReceiver.connect (portNumber);
+    return connected;
+}
+
+bool OSCReceiverNode::disconnect ()
+{
+    connected = false;
+    return oscReceiver.disconnect();
+}
+
+bool OSCReceiverNode::isConnected ()
+{
+    return connected;
+}
+
+bool OSCReceiverNode::isValidOscPort (int port) const
+{
+    return port > 0 && port < 65536;
+}
+
+/* OSCReceiver message loop callbacks */
+
+void OSCReceiverNode::addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback)
+{
+    oscReceiver.addListener (callback);
+}
+
+void OSCReceiverNode::removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback)
+{
+    oscReceiver.removeListener (callback);
+}
+
+}
