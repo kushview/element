@@ -24,72 +24,46 @@
 
 namespace Element {
 
-// TODO: More sensible parsing of address
-// juce_AddressPattern has private member oscSymbols which is already parsed
-
-const static std::regex oscAddressWithArity1 { "/[^/\\n\\r]+$" };
-const static std::regex oscAddressWithArity2 { "/([^/\\n\\r]+)/([^/\\n\\r]+)" };
-const static std::regex oscAddressWithArity3 { "/([^/\\n\\r]+)/([^/\\n\\r]+)/([^/\\n\\r]+)" };
-
 class OscProcessor {
 public:
 
     static var castOscArgumentPrimitiveValue(const OSCArgument& arg)
     {
-        if (arg.isFloat32())
-        {
-            return arg.getFloat32();
-        }
-        if (arg.isInt32())
-        {
-            return arg.getInt32();
-        }
-        if (arg.isString())
-        {
-            return arg.getString();
-        }
+        if (arg.isFloat32()) return arg.getFloat32();
+        if (arg.isInt32())   return arg.getInt32();
+        if (arg.isString())  return arg.getString();
         return 0;
     }
 
-    static std::vector<std::string> extractOscAddressParts(const OSCMessage& message)
+    static std::vector<std::string> parseOscAddressPaths(const OSCMessage& message)
     {
+        /** AddressPattern.oscSymbols is already parsed, but it's a private member */
+        const auto& addr = message.getAddressPattern().toString().toStdString();
 
-        const auto& addressString = message.getAddressPattern().toString().toStdString();
+        /** Parts: I/O Type, Device Name, Command */
 
-        int arity = 0;
-        int maxArity = 3;
+        std::vector<std::string> paths;
 
-        std::smatch match;
+        std::string delimiter = "/";
+        std::string part = "";
+        std::size_t currentPos = 0;
+        std::size_t nextPos = 0;
 
-        /** I/O Type, Device Name, Command */
-        std::vector<std::string> parts;
-
-        if (std::regex_match(addressString, match, oscAddressWithArity1))
+        while (currentPos != std::string::npos)
         {
-            arity = 1;
-        }
-        else if (std::regex_match(addressString, match, oscAddressWithArity2))
-        {
-            arity = 2;
-        }
-        else if (std::regex_match(addressString, match, oscAddressWithArity3))
-        {
-            arity = 3;
-        }
+            currentPos = addr.find(delimiter, currentPos);
+            nextPos = addr.find(delimiter, currentPos + 1);
+            part = addr.substr(currentPos + 1, (nextPos - 1) - currentPos);
+            currentPos = nextPos;
+            if (part == "") continue;
 
-        /** Skip first element in smatch, it's the whole match */
-        for (int i = 1; i <= maxArity; i++)
-        {
-            if (arity >= i)
-            {
-                parts.push_back(match.str(i));
-            }
-            else {
-                parts.push_back("");
-            }
+            paths.push_back(part);
         }
 
-        return parts;
+        for (size_t i = paths.size(); i < 3; i++)
+            paths.push_back("");
+
+        return paths;
     }
 
     static String getOSCArgumentAsString (const OSCArgument& arg)
@@ -129,9 +103,9 @@ public:
     static MidiMessage processOscToMidiMessage(const OSCMessage& message)
     {
 
-        std::vector<std::string> addressParts = extractOscAddressParts(message);
+        std::vector<std::string> paths = parseOscAddressPaths(message);
 
-        if (addressParts[0] != "midi")
+        if (paths[0] != "midi")
         {
             return MidiMessage();
         }
@@ -141,15 +115,15 @@ public:
 
         /** /midi/{command} or /midi/{deviceName}/{command} */
 
-        if (addressParts[2] == "")
+        if (paths[2] == "")
         {
             deviceName = "";
-            command = addressParts[1];
+            command = paths[1];
         }
-        else if (addressParts[1] != "")
+        else if (paths[1] != "")
         {
-            deviceName = addressParts[1];
-            command = addressParts[2];
+            deviceName = paths[1];
+            command = paths[2];
         }
         else
         {
