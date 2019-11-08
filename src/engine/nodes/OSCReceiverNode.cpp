@@ -48,8 +48,12 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize) {
         outputMidiMessagesInitDone = true;
     }
 
-    // TODO: Convert OSC to MIDI and add to midiMessageCollector
+    for (OSCMessage msg : oscMessages)
+    {
+        outputMidiMessages.addMessageToQueue ( OscProcessor::processOscToMidiMessage( msg ) );
+    }
 
+    oscMessages.clear();
 }
 
 inline void OSCReceiverNode::createPorts()
@@ -73,23 +77,30 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         return;
     }
 
-    auto* const midiIn = midi.getReadBuffer (0);
+    /*
 
-/*    MidiBuffer::Iterator iter1 (*midiIn);
+    const auto& midiOut = *midi.getReadBuffer (0);
+
+    Method 1
+
+    outputMidiMessages.removeNextBlockOfMessages (midiOut, nframes);
+    midiOut.swapWith(messages);
+
+    // Method 2
+
+    MidiBuffer messages;
+    outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
+
+    MidiBuffer::Iterator iter1 (messages);
     MidiMessage msg;
     int frame;
 
     while (iter1.getNextEvent (msg, frame))
     {
-        // TODO: better timestamp sync with UI
-        //       updating timestamp below causes messages to be skipped in the
-        //       UI rendering
-        // timestamp += 1000.0 * static_cast<double> (frame) * currentSampleRate;
-        msg.setTimeStamp (timestamp);
-        outputMidiMessages.addMessageToQueue (msg);
+        midiOut.addEvent (msg, frame);
     }
 
-    numSamples += nframes;*/
+    */
 }
 
 /* OSCReceiver real-time callbacks */
@@ -97,6 +108,7 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 {
     DBG("[EL] Queue OSC message -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
+    oscMessages.push_back(message);
 };
 
 void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)

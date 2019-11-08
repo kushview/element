@@ -88,7 +88,7 @@ private:
     MidiMessageCollector outputMidiMessages;
 
     std::vector<OSCMessage> oscMessages;
-    Atomic<int> numOscMessages;
+    Atomic<int> numOscMessages = 0;
 
     OSCReceiver oscReceiver;
     bool connected = false;
