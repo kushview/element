@@ -171,7 +171,7 @@ def build_lua (bld):
         env         = bld.env.derive()
     )
 
-    lua.env.CFLAGS = ['-std=c99', '-O2', '-Wall', '-Wextra', '-DLUA_COMPAT_5_2']
+    lua.env.CFLAGS = ['-std=c99', '-O2', '-Wall', '-Wextra', '-DLUA_COMPAT_5_2', '-fPIC']
     lua.env.CXXFLAGS = []
 
     if juce.is_mac():
