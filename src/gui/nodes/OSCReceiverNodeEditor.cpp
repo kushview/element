@@ -25,13 +25,19 @@ namespace Element {
 OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
+    oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
+    currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
+    currentHostName = oscReceiverNodePtr->getCurrentHostName();
+    isConnected = oscReceiverNodePtr->isConnected();
+
     int width = 540;
     int height = 320;
 
     resetBounds(width, height);
 
-    hostNameField.setText(IPAddress::getLocalAddress().toString(), NotificationType::dontSendNotification);
+    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
     portNumberField.setEditable (true, true, true);
+
     updateConnectionStatusLabel();
 
     addAndMakeVisible (hostNameLabel);
@@ -51,7 +57,6 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
 
-    oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
     oscReceiverNodePtr->addMessageLoopListener (this);
 }
 
@@ -95,11 +100,7 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     portNumberField.setBounds (x, y, w, h);
     x += w + margin;
 
-    w = 30;
-    connectionStatusLabel.setBounds (x, y, w, h);
-    x += w + margin;
-
-    // Right
+    // From right side
 
     w = 60;
     x = fullWidth - margin - w;
@@ -112,6 +113,10 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     w = 80;
     x -= margin + w;
     connectButton.setBounds (x, y, w, h);
+
+    w = 30;
+    x -= margin + w;
+    connectionStatusLabel.setBounds (x, y, w, h);
 
     // Row
     x = 0;
@@ -126,7 +131,7 @@ void OSCReceiverNodeEditor::paint (Graphics& g)
 
 void OSCReceiverNodeEditor::connectButtonClicked()
 {
-    if (! isConnected())
+    if (! isConnected)
         connect();
     else
         disconnect();
@@ -137,7 +142,7 @@ void OSCReceiverNodeEditor::connectButtonClicked()
 void OSCReceiverNodeEditor::pauseButtonClicked()
 {
     isPaused = ! isPaused;
-    updateConnectionStatusLabel();
+    updatePauseButton();
 }
 
 void OSCReceiverNodeEditor::clearButtonClicked()
@@ -177,6 +182,7 @@ void OSCReceiverNodeEditor::connect()
     {
         currentHostName = hostToConnect;
         currentPortNumber = portToConnect;
+        isConnected = true;
         connectButton.setButtonText ("Disconnect");
     }
     else
@@ -191,6 +197,7 @@ void OSCReceiverNodeEditor::disconnect()
     {
         currentPortNumber = -1;
         currentHostName = "";
+        isConnected = false;
         connectButton.setButtonText ("Connect");
     }
     else
@@ -223,15 +230,15 @@ void OSCReceiverNodeEditor::handleInvalidPortNumberEntered()
                                         "OK");
 }
 
-bool OSCReceiverNodeEditor::isConnected() const
+void OSCReceiverNodeEditor::updateConnectButton()
 {
-    return currentPortNumber != -1;
+    connectButton.setButtonText ( isConnected ? "Disconnect" : "Connect" );
 }
 
 void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 {
-    String text = isConnected() ? "On" : "Off";
-    auto textColour = isConnected() ? Colours::green : Colours::red;
+    String text = isConnected ? "On" : "Off";
+    auto textColour = isConnected ? Colours::green.brighter(0.3) : Colours::red.brighter(0.3);
 
     connectionStatusLabel.setText (text, dontSendNotification);
     connectionStatusLabel.setColour (Label::textColourId, textColour);

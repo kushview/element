@@ -64,8 +64,6 @@ public:
             }
         }
 
-DBG("[EL] GUI thread Translate OSC -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
-
         addMessage (log);
     }
 
@@ -121,18 +119,21 @@ private:
     Label connectionStatusLabel;
 
     bool isPaused = false;
+    bool isConnected = false;
+
     int currentPortNumber = -1;
     String currentHostName = "";
 
     void connectButtonClicked();
     void pauseButtonClicked();
     void clearButtonClicked();
+
+    void updateConnectButton();
     void updateConnectionStatusLabel();
     void updatePauseButton();
 
     void connect();
     void disconnect();
-    bool isConnected() const;
 
     void oscMessageReceived (const OSCMessage& message) override;
     void oscBundleReceived (const OSCBundle& bundle) override;

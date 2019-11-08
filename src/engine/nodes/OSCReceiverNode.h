@@ -66,10 +66,12 @@ public:
 
     /** For node editor */
 
+
     bool connect (int portNumber);
     bool disconnect ();
     bool isConnected ();
-
+    int getCurrentPortNumber ();
+    String getCurrentHostName ();
     bool isValidOscPort (int port) const;
 
     void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
@@ -90,6 +92,8 @@ private:
 
     OSCReceiver oscReceiver;
     bool connected = false;
+    int currentPortNumber = -1;
+    String currentHostName = "";
 
     /** Real-time */
     void oscMessageReceived(const OSCMessage& message) override;

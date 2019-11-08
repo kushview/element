@@ -96,6 +96,7 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 {
+    DBG("[EL] Queue OSC message -> MIDI: " << OscProcessor::processOscToMidiMessage(message).getDescription());
 };
 
 void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
@@ -120,6 +121,19 @@ bool OSCReceiverNode::isConnected ()
 {
     return connected;
 }
+
+int OSCReceiverNode::getCurrentPortNumber ()
+{
+    return currentPortNumber;
+};
+
+String OSCReceiverNode::getCurrentHostName ()
+{
+    if (currentHostName == "")
+        currentHostName = IPAddress::getLocalAddress().toString();
+    return currentHostName;
+}
+
 
 bool OSCReceiverNode::isValidOscPort (int port) const
 {
