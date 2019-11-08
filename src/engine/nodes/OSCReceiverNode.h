@@ -69,6 +69,11 @@ public:
     bool connect (int portNumber);
     bool disconnect ();
     bool isConnected ();
+    void pause ();
+    void resume ();
+    bool togglePause ();
+    bool isPaused ();
+
     int getCurrentPortNumber ();
     String getCurrentHostName ();
     bool isValidOscPort (int port) const;
@@ -78,6 +83,7 @@ public:
 
 private:
 
+    /** MIDI */
     bool createdPorts = false;
 
     double currentSampleRate;
@@ -86,15 +92,17 @@ private:
     bool outputMidiMessagesInitDone = false;
     MidiMessageCollector outputMidiMessages;
 
+    /** OSC */
+    OSCReceiver oscReceiver;
     std::vector<OSCMessage> oscMessages;
     Atomic<int> numOscMessages = 0;
 
-    OSCReceiver oscReceiver;
     bool connected = false;
+    bool paused = false;
+
     int currentPortNumber = -1;
     String currentHostName = "";
 
-    /** Real-time */
     void oscMessageReceived(const OSCMessage& message) override;
     void oscBundleReceived(const OSCBundle& bundle) override;
 

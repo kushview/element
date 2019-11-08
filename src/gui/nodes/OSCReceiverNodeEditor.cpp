@@ -28,7 +28,8 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
     currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
     currentHostName = oscReceiverNodePtr->getCurrentHostName();
-    isConnected = oscReceiverNodePtr->isConnected();
+    connected = oscReceiverNodePtr->isConnected();
+    paused = oscReceiverNodePtr->isPaused();
 
     int width = 540;
     int height = 320;
@@ -131,7 +132,7 @@ void OSCReceiverNodeEditor::paint (Graphics& g)
 
 void OSCReceiverNodeEditor::connectButtonClicked()
 {
-    if (! isConnected)
+    if (! connected)
         connect();
     else
         disconnect();
@@ -141,7 +142,7 @@ void OSCReceiverNodeEditor::connectButtonClicked()
 
 void OSCReceiverNodeEditor::pauseButtonClicked()
 {
-    isPaused = ! isPaused;
+    paused = oscReceiverNodePtr->togglePause();
     updatePauseButton();
 }
 
@@ -152,7 +153,7 @@ void OSCReceiverNodeEditor::clearButtonClicked()
 
 void OSCReceiverNodeEditor::oscMessageReceived (const OSCMessage& message)
 {
-    if ( isPaused )
+    if ( paused )
         return;
 
     oscReceiverLog.addOSCMessage (message);
@@ -160,7 +161,7 @@ void OSCReceiverNodeEditor::oscMessageReceived (const OSCMessage& message)
 
 void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
 {
-    if ( isPaused )
+    if ( paused )
         return;
 
     oscReceiverLog.addOSCBundle (bundle);
@@ -182,7 +183,7 @@ void OSCReceiverNodeEditor::connect()
     {
         currentHostName = hostToConnect;
         currentPortNumber = portToConnect;
-        isConnected = true;
+        connected = true;
         connectButton.setButtonText ("Disconnect");
     }
     else
@@ -197,7 +198,7 @@ void OSCReceiverNodeEditor::disconnect()
     {
         currentPortNumber = -1;
         currentHostName = "";
-        isConnected = false;
+        connected = false;
         connectButton.setButtonText ("Connect");
     }
     else
@@ -232,13 +233,13 @@ void OSCReceiverNodeEditor::handleInvalidPortNumberEntered()
 
 void OSCReceiverNodeEditor::updateConnectButton()
 {
-    connectButton.setButtonText ( isConnected ? "Disconnect" : "Connect" );
+    connectButton.setButtonText ( connected ? "Disconnect" : "Connect" );
 }
 
 void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 {
-    String text = isConnected ? "On" : "Off";
-    auto textColour = isConnected ? Colours::green.brighter(0.3) : Colours::red.brighter(0.3);
+    String text = connected ? "On" : "Off";
+    auto textColour = connected ? Colours::green.brighter(0.3) : Colours::red.brighter(0.3);
 
     connectionStatusLabel.setText (text, dontSendNotification);
     connectionStatusLabel.setColour (Label::textColourId, textColour);
@@ -246,7 +247,7 @@ void OSCReceiverNodeEditor::updateConnectionStatusLabel()
 
 void OSCReceiverNodeEditor::updatePauseButton()
 {
-    pauseButton.setButtonText ( isPaused ? "Resume" : "Pause" );
+    pauseButton.setButtonText ( paused ? "Resume" : "Pause" );
 };
 
 

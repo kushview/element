@@ -125,6 +125,31 @@ bool OSCReceiverNode::isConnected ()
     return connected;
 }
 
+void OSCReceiverNode::pause ()
+{
+    paused = true;
+}
+
+void OSCReceiverNode::resume ()
+{
+    paused = false;
+}
+
+bool OSCReceiverNode::isPaused ()
+{
+    return paused;
+}
+
+bool OSCReceiverNode::togglePause ()
+{
+    if ( paused )
+        resume();
+    else
+        pause();
+
+    return paused;
+}
+
 int OSCReceiverNode::getCurrentPortNumber ()
 {
     return currentPortNumber;

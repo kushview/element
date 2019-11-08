@@ -118,8 +118,8 @@ private:
     TextButton clearButton   { "Clear" };
     Label connectionStatusLabel;
 
-    bool isPaused = false;
-    bool isConnected = false;
+    bool paused = false;
+    bool connected = false;
 
     int currentPortNumber = -1;
     String currentHostName = "";
