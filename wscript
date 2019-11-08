@@ -97,6 +97,7 @@ def common_includes():
              'libs/kv/modules', \
              'libs/jlv2/modules', \
              'libs/compat', \
+             'libs/lua/src', \
              VST3_PATH, \
              'src' ]
 
