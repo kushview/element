@@ -41,7 +41,6 @@ OSCReceiverNode::~OSCReceiverNode()
 
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize) {
 
-
     if (! outputMidiMessagesInitDone) {
         outputMidiMessages.reset (sampleRate);
         currentSampleRate = sampleRate;
@@ -77,14 +76,14 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         return;
     }
 
-    /*
+    auto& midiOut = *midi.getWriteBuffer (0);
 
-    const auto& midiOut = *midi.getReadBuffer (0);
+    /*
 
     // Method 1
 
     outputMidiMessages.removeNextBlockOfMessages (midiOut, nframes);
-
+*/
     // Method 2
 
     MidiBuffer messages;
@@ -95,7 +94,7 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     midiOut.swapWith(messages);
 
     // Method 2.2
-
+/*
     MidiBuffer::Iterator iter1 (messages);
     MidiMessage msg;
     int frame;
@@ -104,11 +103,11 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         midiOut.addEvent (msg, frame);
     }
+*/
 
-    */
 }
 
-/* OSCReceiver real-time callbacks */
+/** OSCReceiver real-time callbacks */
 
 void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 {
@@ -157,7 +156,7 @@ bool OSCReceiverNode::isValidOscPort (int port) const
     return port > 0 && port < 65536;
 }
 
-/* OSCReceiver message loop callbacks */
+/** OSCReceiver message loop callbacks */
 
 void OSCReceiverNode::addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback)
 {

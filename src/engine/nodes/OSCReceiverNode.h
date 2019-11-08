@@ -49,7 +49,7 @@ public:
         desc.version            = "1.0.0";
     }
 
-    /** MIDI **/
+    /** MIDI */
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
@@ -65,7 +65,6 @@ public:
     void getMidiMessages(MidiBuffer &destBuffer);
 
     /** For node editor */
-
 
     bool connect (int portNumber);
     bool disconnect ();
