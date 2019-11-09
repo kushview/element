@@ -232,6 +232,7 @@ void OSCSenderNodeEditor::connect()
     {
         connected = true;
         connectButton.setButtonText ("Disconnect");
+        updateConnectionStatusLabel();
     }
     else
     {
@@ -243,10 +244,9 @@ void OSCSenderNodeEditor::disconnect()
 {
     if (oscSenderNodePtr->disconnect())
     {
-        currentPortNumber = -1;
-        currentHostName = "";
         connected = false;
         connectButton.setButtonText ("Connect");
+        updateConnectionStatusLabel();
     }
     else
     {
