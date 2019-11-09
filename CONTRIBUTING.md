@@ -9,3 +9,6 @@ If you change things in the Engine layer, please thoroughly test before submitti
 
 ### Adding Features to or New Nodes
 When adding properties to Nodes or making new ones, Please make sure that the state can be saved or restored.  There's no point in adding new functions to Nodes if they can't restore state when a session is saved then opened later.
+
+### Adding New Files
+Please use Copyright 20xx.  Kushview, LLC. and below this Author Your Name <your@email.com>
