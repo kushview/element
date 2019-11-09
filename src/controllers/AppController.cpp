@@ -24,6 +24,7 @@
 #include "controllers/GraphManager.h"
 #include "controllers/GraphController.h"
 #include "controllers/MappingController.h"
+#include "controllers/OSCController.h"
 #include "controllers/SessionController.h"
 #include "controllers/PresetsController.h"
 #include "controllers/ScriptingController.h"
@@ -56,6 +57,7 @@ AppController::AppController (Globals& g)
     addChild (new GraphController());
     addChild (new ScriptingController());
     addChild (new WorkspacesController());
+    addChild (new OSCController());
 
     lastExportedGraph = DataPath::defaultGraphDir();
 
