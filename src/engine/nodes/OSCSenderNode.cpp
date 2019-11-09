@@ -246,7 +246,8 @@ void OSCSenderNode::setHostName (String hostName)
 
 std::vector<OSCMessage> OSCSenderNode::getOscMessages()
 {
-    std::vector<OSCMessage> copied = oscMessagesToLog;
+    std::vector<OSCMessage> copied;
+    std::copy ( oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter( copied ) );
     oscMessagesToLog.clear();
     return copied;
 }
