@@ -50,8 +50,11 @@ LuaState::LuaState()
 
 LuaState::~LuaState()
 {
-    lua_close (state);
-    state = nullptr;
+    if (state != nullptr)
+    {
+        lua_close (state);
+        state = nullptr;
+    }
 }
 
 }

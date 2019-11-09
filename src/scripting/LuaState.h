@@ -36,6 +36,8 @@ public:
     LuaState();
     ~LuaState();
 
+    bool isNull() const { return state == nullptr; }
+
     /** Pass as lua_State* as parameter. */
     operator lua_State*() const { return state; }
 

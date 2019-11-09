@@ -161,6 +161,17 @@ def compile (bld):
 
 def build (bld):
     compile(bld)
+
+    # for testing purposes right now. doesn't get installed
+    bld.program(
+        source = [ 'tools/lua-el/lua.cpp' ],
+        name = 'lua-el',
+        target = 'bin/lua-el',
+        includes = common_includes(),
+        use = [ 'ELEMENT', 'READLINE' ],
+        install_path = None
+    )
+
     if bld.env.TEST: bld.recurse ('tests')
 
 def check (ctx):
