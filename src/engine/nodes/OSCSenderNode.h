@@ -26,20 +26,19 @@
 
 namespace Element {
 
-class OSCReceiverNode : public MidiFilterNode,
-                        public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
+class OSCSenderNode : public MidiFilterNode
 {
 public:
 
-    OSCReceiverNode();
-    virtual ~OSCReceiverNode();
+    OSCSenderNode();
+    virtual ~OSCSenderNode();
 
     void fillInPluginDescription (PluginDescription& desc)
     {
-        desc.name               = "OSC Receiver";
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_RECEIVER;
-        desc.uid                = EL_INTERNAL_UID_OSC_RECEIVER;
-        desc.descriptiveName    = "OSC Receiver";
+        desc.name               = "OSC Sender";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_SENDER;
+        desc.uid                = EL_INTERNAL_UID_OSC_SENDER;
+        desc.descriptiveName    = "OSC Sender";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;
         desc.hasSharedContainer = false;
@@ -51,45 +50,42 @@ public:
 
     /** MIDI */
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void prepareToRender (double sampleRate, int maxBufferSize) override {};
     void releaseResources() override {};
+
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
+
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
+
     inline void createPorts() override;
 
     /** For node editor */
 
-    bool connect (int portNumber);
+    bool connect (String hostName, int portNumber);
     bool disconnect ();
     bool isConnected ();
     void pause ();
     void resume ();
     bool togglePause ();
     bool isPaused ();
+
     int getCurrentPortNumber ();
     String getCurrentHostName ();
-
-    void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
-    void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
 
 private:
 
     /** MIDI */
     bool createdPorts = false;
-    double currentSampleRate;
-    bool outputMidiMessagesInitDone = false;
-    MidiMessageCollector outputMidiMessages;
 
     /** OSC */
-    OSCReceiver oscReceiver;
+    OSCSender oscSender;
+
     bool connected = false;
     bool paused = false;
+
     int currentPortNumber = -1;
     String currentHostName = "";
-
-    void oscMessageReceived(const OSCMessage& message) override;
-    void oscBundleReceived(const OSCBundle& bundle) override;
 };
 
 

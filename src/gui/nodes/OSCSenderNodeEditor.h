@@ -20,21 +20,21 @@
 #pragma once
 
 #include "engine/nodes/OSCProcessor.h"
-#include "engine/nodes/OSCReceiverNode.h"
+#include "engine/nodes/OSCSenderNode.h"
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/widgets/LogListBox.h"
 
 namespace Element {
 
-class OSCReceiverLogListBox : public LogListBox
+class OSCSenderLogListBox : public LogListBox
 {
 public:
-    OSCReceiverLogListBox()
+    OSCSenderLogListBox()
     {
         setOpaque (true);
     }
-    ~OSCReceiverLogListBox() {};
+    ~OSCSenderLogListBox() {};
 
     void paint (Graphics& g)
     {
@@ -73,25 +73,27 @@ private:
     }
 };
 
-class OSCReceiverNodeEditor : public NodeEditorComponent,
-                              private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
+class OSCSenderNodeEditor : public NodeEditorComponent,
+                            private Timer
 {
 public:
-    OSCReceiverNodeEditor (const Node&);
-    virtual ~OSCReceiverNodeEditor();
+    OSCSenderNodeEditor (const Node&);
+    virtual ~OSCSenderNodeEditor();
 
     void paint (Graphics&) override;
     void resized() override;
     void resetBounds (int width, int height);
+    void timerCallback() override;
 
 private:
-    OSCReceiverLogListBox oscReceiverLog;
-    ReferenceCountedObjectPtr<OSCReceiverNode> oscReceiverNodePtr;
+    LogListBox oscSenderLog;
+
+    ReferenceCountedObjectPtr<OSCSenderNode> oscSenderNodePtr;
 
     Label hostNameLabel      { {}, "Host" };
     Label hostNameField      { {}, "127.0.0.1" };
     Label portNumberLabel    { {}, "Port" };
-    Label portNumberField    { {}, "9000" };
+    Label portNumberField    { {}, "9001" };
 
     TextButton connectButton { "Connect" };
     TextButton pauseButton { "Pause" };
@@ -107,6 +109,7 @@ private:
     void connectButtonClicked();
     void pauseButtonClicked();
     void clearButtonClicked();
+    void hostNameFieldChanged();
 
     void updateConnectButton();
     void updateConnectionStatusLabel();
@@ -114,9 +117,6 @@ private:
 
     void connect();
     void disconnect();
-
-    void oscMessageReceived (const OSCMessage& message) override;
-    void oscBundleReceived (const OSCBundle& bundle) override;
 
     void handleConnectError (int failedPort);
     void handleDisconnectError();

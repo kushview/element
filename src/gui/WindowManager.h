@@ -31,6 +31,7 @@
 #include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/nodes/OSCReceiverNodeEditor.h"
+#include "gui/nodes/OSCSenderNodeEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
 #include "session/Node.h"
 
@@ -192,6 +193,10 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_RECEIVER)
         {
             return createPluginWindowFor (node, new OSCReceiverNodeEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_SENDER)
+        {
+            return createPluginWindowFor (node, new OSCSenderNodeEditor (node));
         }
         else if (node.getIdentifier().toString().contains ("element.volume"))
         {

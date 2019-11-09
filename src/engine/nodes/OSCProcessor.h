@@ -71,7 +71,7 @@ public:
         return 0;
     }
 
-    static String getOSCArgumentAsString (const OSCArgument& arg)
+    static String getOscArgumentAsString (const OSCArgument& arg)
     {
         String type;
         String value;
@@ -105,7 +105,7 @@ public:
         return type + " " + value;
     }
 
-    static String getOSCMessageAsString (const OSCMessage& message)
+    static String getOscMessageAsString (const OSCMessage& message)
     {
         OSCAddressPattern addressPattern = message.getAddressPattern();
         String str = addressPattern.toString();
@@ -117,7 +117,7 @@ public:
         for (auto& arg : message)
         {
             if (i > 0) str += ", ";
-            str += getOSCArgumentAsString (arg);
+            str += getOscArgumentAsString (arg);
             i++;
         }
 
