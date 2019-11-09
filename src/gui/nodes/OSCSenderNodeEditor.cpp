@@ -86,10 +86,13 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
 OSCSenderNodeEditor::~OSCSenderNodeEditor()
 {
     /* Unbind handlers */
-    connectButton.onClick = nullptr;
-    clearButton.onClick = nullptr;
-    portNumberSlider.onValueChange = nullptr;
     stopTimer ();
+    connectButton.onClick = nullptr;
+    pauseButton.onClick = nullptr;
+    clearButton.onClick = nullptr;
+    hostNameField.onTextChange = nullptr;
+    portNumberSlider.onValueChange = nullptr;
+    oscSenderNodePtr->removeChangeListener (this);
 }
 
 void OSCSenderNodeEditor::timerCallback() {

@@ -83,8 +83,11 @@ OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
 {
     /* Unbind handlers */
     connectButton.onClick = nullptr;
+    pauseButton.onClick = nullptr;
     clearButton.onClick = nullptr;
+    hostNameField.onTextChange = nullptr;
     portNumberSlider.onValueChange = nullptr;
+    oscReceiverNodePtr->removeChangeListener (this);
     oscReceiverNodePtr->removeMessageLoopListener (this);
 }
 
