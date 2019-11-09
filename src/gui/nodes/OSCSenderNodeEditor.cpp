@@ -72,7 +72,11 @@ OSCSenderNodeEditor::~OSCSenderNodeEditor()
 }
 
 void OSCSenderNodeEditor::timerCallback() {
-
+    std::vector<OSCMessage> oscMessages = oscSenderNodePtr->getOscMessages();
+    for(auto msg : oscMessages)
+    {
+        oscSenderLog.addOSCMessage( msg );
+    }
 };
 
 void OSCSenderNodeEditor::resized ()

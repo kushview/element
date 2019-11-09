@@ -86,7 +86,7 @@ public:
     void timerCallback() override;
 
 private:
-    LogListBox oscSenderLog;
+    OSCSenderLogListBox oscSenderLog;
 
     ReferenceCountedObjectPtr<OSCSenderNode> oscSenderNodePtr;
 

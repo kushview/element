@@ -73,6 +73,8 @@ public:
     int getCurrentPortNumber ();
     String getCurrentHostName ();
 
+    std::vector<OSCMessage> getOscMessages();
+
 private:
 
     /** MIDI */
@@ -85,8 +87,10 @@ private:
     bool paused = false;
 
     int currentPortNumber = -1;
-    String currentHostName = "";
-};
+    String currentHostName = "127.0.0.1";
 
+    std::vector<OSCMessage> oscMessages;
+    int maxOscMessages = 100;
+};
 
 }

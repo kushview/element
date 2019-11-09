@@ -67,6 +67,10 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
         OSCMessage oscMsg = OSCProcessor::processMidiToOscMessage( msg );
         oscSender.send( oscMsg );
+
+        if (oscMessages.size() > maxOscMessages)
+            oscMessages.erase ( oscMessages.begin() );
+        oscMessages.push_back ( oscMsg );
     }
 
     midiIn->clear();
@@ -80,7 +84,6 @@ bool OSCSenderNode::connect (String hostName, int portNumber)
     currentPortNumber = portNumber;
 
     connected = oscSender.connect (hostName, portNumber);
-
     return connected;
 }
 
@@ -127,9 +130,14 @@ int OSCSenderNode::getCurrentPortNumber ()
 
 String OSCSenderNode::getCurrentHostName ()
 {
-    if (currentHostName == "")
-        currentHostName = IPAddress::getLocalAddress().toString();
     return currentHostName;
+}
+
+std::vector<OSCMessage> OSCSenderNode::getOscMessages()
+{
+    std::vector<OSCMessage> copied = oscMessages;
+    oscMessages.clear();
+    return copied;
 }
 
 }
