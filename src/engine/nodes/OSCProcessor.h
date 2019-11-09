@@ -27,6 +27,11 @@ namespace Element {
 class OSCProcessor {
 public:
 
+    static bool isValidOscPort (int port)
+    {
+        return port > 0 && port < 65536;
+    }
+
     static std::vector<std::string> parseOscAddressPaths(const OSCMessage& message)
     {
         /** AddressPattern.oscSymbols is already parsed, but it's a private member */

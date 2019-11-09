@@ -51,18 +51,12 @@ public:
 
     /** MIDI */
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void prepareToRender (double sampleRate, int maxBufferSize) override {};
     void releaseResources() override {};
-
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
-
     inline void createPorts() override;
-
-    void clearMidiMessages();
-    void getMidiMessages(MidiBuffer &destBuffer);
 
     /** For node editor */
 
@@ -73,10 +67,8 @@ public:
     void resume ();
     bool togglePause ();
     bool isPaused ();
-
     int getCurrentPortNumber ();
     String getCurrentHostName ();
-    bool isValidOscPort (int port) const;
 
     void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
     void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
@@ -85,25 +77,19 @@ private:
 
     /** MIDI */
     bool createdPorts = false;
-
     double currentSampleRate;
-    Atomic<int> numSamples = 0;
-
     bool outputMidiMessagesInitDone = false;
     MidiMessageCollector outputMidiMessages;
 
     /** OSC */
     OSCReceiver oscReceiver;
-
     bool connected = false;
     bool paused = false;
-
     int currentPortNumber = -1;
     String currentHostName = "";
 
     void oscMessageReceived(const OSCMessage& message) override;
     void oscBundleReceived(const OSCBundle& bundle) override;
-
 };
 
 

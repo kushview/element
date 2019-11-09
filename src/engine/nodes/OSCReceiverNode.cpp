@@ -39,15 +39,6 @@ OSCReceiverNode::~OSCReceiverNode()
 
 /** MIDI */
 
-void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize) {
-
-    if (! outputMidiMessagesInitDone) {
-        outputMidiMessages.reset (sampleRate);
-        currentSampleRate = sampleRate;
-        outputMidiMessagesInitDone = true;
-    }
-}
-
 inline void OSCReceiverNode::createPorts()
 {
     if (createdPorts)
@@ -60,6 +51,15 @@ inline void OSCReceiverNode::createPorts()
     createdPorts = true;
 }
 
+void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
+
+    if (! outputMidiMessagesInitDone) {
+        outputMidiMessages.reset (sampleRate);
+        currentSampleRate = sampleRate;
+        outputMidiMessagesInitDone = true;
+    }
+}
 
 void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
@@ -73,8 +73,6 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     MidiBuffer messages;
     outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
-
-    //midiOut.swapWith(messages);
 
     MidiBuffer::Iterator iter1 (messages);
     MidiMessage msg;
@@ -109,6 +107,10 @@ void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
 bool OSCReceiverNode::connect (int portNumber)
 {
     connected = oscReceiver.connect (portNumber);
+    if ( connected ) {
+        currentHostName = hostName;
+        currentPortNumber = portNumber;
+    }
     return connected;
 }
 
@@ -158,12 +160,6 @@ String OSCReceiverNode::getCurrentHostName ()
     if (currentHostName == "")
         currentHostName = IPAddress::getLocalAddress().toString();
     return currentHostName;
-}
-
-
-bool OSCReceiverNode::isValidOscPort (int port) const
-{
-    return port > 0 && port < 65536;
 }
 
 /** OSCReceiver message loop callbacks */

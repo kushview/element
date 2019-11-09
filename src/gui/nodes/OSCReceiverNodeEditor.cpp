@@ -171,7 +171,7 @@ void OSCReceiverNodeEditor::connect()
 {
     auto portToConnect = portNumberField.getText().getIntValue();
 
-    if (! oscReceiverNodePtr->isValidOscPort (portToConnect))
+    if (! OSCProcessor::isValidOscPort (portToConnect))
     {
         handleInvalidPortNumberEntered();
         return;
