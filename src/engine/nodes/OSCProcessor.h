@@ -24,16 +24,8 @@
 
 namespace Element {
 
-class OscProcessor {
+class OSCProcessor {
 public:
-
-    static var castOscArgumentPrimitiveValue(const OSCArgument& arg)
-    {
-        if (arg.isFloat32()) return arg.getFloat32();
-        if (arg.isInt32())   return arg.getInt32();
-        if (arg.isString())  return arg.getString();
-        return 0;
-    }
 
     static std::vector<std::string> parseOscAddressPaths(const OSCMessage& message)
     {
@@ -64,6 +56,14 @@ public:
             paths.push_back("");
 
         return paths;
+    }
+
+    static var getOscArgumentAsPrimitiveValue(const OSCArgument& arg)
+    {
+        if (arg.isFloat32()) return arg.getFloat32();
+        if (arg.isInt32())   return arg.getInt32();
+        if (arg.isString())  return arg.getString();
+        return 0;
     }
 
     static String getOSCArgumentAsString (const OSCArgument& arg)
@@ -99,6 +99,26 @@ public:
         }
         return type + " " + value;
     }
+
+    static String getOSCMessageAsString (const OSCMessage& message)
+    {
+        OSCAddressPattern addressPattern = message.getAddressPattern();
+        String str = addressPattern.toString();
+
+        if ( message.isEmpty() ) return str;
+
+        str += " ";
+        int i = 0;
+        for (auto& arg : message)
+        {
+            if (i > 0) str += ", ";
+            str += getOSCArgumentAsString (arg);
+            i++;
+        }
+
+        return str;
+    }
+
 
     static MidiMessage processOscToMidiMessage(const OSCMessage& message)
     {
@@ -146,7 +166,7 @@ public:
             }
             else
             {
-                values[i] = castOscArgumentPrimitiveValue(arg);
+                values[i] = getOscArgumentAsPrimitiveValue(arg);
             }
             i++;
         }
@@ -276,50 +296,80 @@ public:
         return MidiMessage();
     }
 
-    static void processMidiMessageToOsc (const MidiMessage& m)
+    static OSCMessage processMidiToOscMessage (const MidiMessage& m)
     {
-        // auto o = OSCMessage();
+        /** Address: /midi/{command} or /midi/{deviceName}/{command} */
 
-        // /** /midi/{command} or /midi/{deviceName}/{command} */
-        // auto address = OSCAddress();
+        String path = "/midi/";
 
-        // const int channel = m.getChannel();
-        // String command = "";
+        const int channel = m.getChannel();
 
-        /*if (m.isNoteOn())
+        if (m.isNoteOn())
         {
-            noteOn (channel, m.getNoteNumber(), m.getFloatVelocity());
+            return OSCMessage (path + "noteOn", channel, m.getNoteNumber(), m.getFloatVelocity());
         }
         else if (m.isNoteOff())
         {
-            noteOff (channel, m.getNoteNumber(), m.getFloatVelocity(), true);
-        }
-        else if (m.isAllNotesOff() || m.isAllSoundOff())
-        {
-            allNotesOff (channel, true);
-        }
-        else if (m.isPitchWheel())
-        {
-            const int wheelPos = m.getPitchWheelValue();
-            lastPitchWheelValues [channel - 1] = wheelPos;
-            handlePitchWheel (channel, wheelPos);
-        }
-        else if (m.isAftertouch())
-        {
-            handleAftertouch (channel, m.getNoteNumber(), m.getAfterTouchValue());
-        }
-        else if (m.isChannelPressure())
-        {
-            handleChannelPressure (channel, m.getChannelPressureValue());
-        }
-        else if (m.isController())
-        {
-            handleController (channel, m.getControllerNumber(), m.getControllerValue());
+            return OSCMessage (path + "noteOff", channel, m.getNoteNumber(), m.getFloatVelocity());
         }
         else if (m.isProgramChange())
         {
-            handleProgramChange (channel, m.getProgramChangeNumber());
-        }*/
+            return OSCMessage (path + "programChange", channel, m.getProgramChangeNumber());
+        }
+        else if (m.isPitchWheel())
+        {
+            return OSCMessage (path + "pitchBend", channel, m.getPitchWheelValue());
+        }
+        else if (m.isAftertouch())
+        {
+            return OSCMessage (path + "afterTouch", channel, m.getNoteNumber(), m.getAfterTouchValue());
+        }
+        else if (m.isChannelPressure())
+        {
+            return OSCMessage (path + "channelPressure", channel, m.getChannelPressureValue());
+        }
+        else if (m.isController())
+        {
+            return OSCMessage (path + "controlChange", channel, m.getControllerNumber(), m.getControllerValue());
+        }
+        else if (m.isAllNotesOff())
+        {
+            return OSCMessage (path + "allNotesOff");
+        }
+        else if (m.isAllSoundOff())
+        {
+            return OSCMessage (path + "allNotesOff");
+        }
+        else if (m.isResetAllControllers())
+        {
+            return OSCMessage (path + "allControllersOff");
+        }
+        else if (m.isMidiStart())
+        {
+            return OSCMessage (path + "start");
+        }
+        else if (m.isMidiContinue())
+        {
+            return OSCMessage (path + "continue");
+        }
+        else if (m.isMidiStop())
+        {
+            return OSCMessage (path + "stop");
+        }
+        else if (m.isMidiClock())
+        {
+            return OSCMessage (path + "clock");
+        }
+        else if (m.isSongPositionPointer ())
+        {
+            return OSCMessage (path + "songPositionPointer", m.getSongPositionPointerMidiBeat());
+        }
+        else if (m.isActiveSense ())
+        {
+            return OSCMessage (path + "activeSense");
+        }
+
+        return OSCMessage (path + "unknown");
     }
 
 

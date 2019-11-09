@@ -27,8 +27,6 @@
 
 namespace Element {
 
-class OSCProcessor;
-
 class OSCReceiverLogListBox : public LogListBox
 {
 public:
@@ -46,25 +44,7 @@ public:
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
-        OSCAddressPattern addressPattern = message.getAddressPattern();
-        String log;
-
-        log = indent (level)
-                        + addressPattern.toString()
-                        + " ";
-
-        if (! message.isEmpty())
-        {
-            int i = 0;
-            for (auto& arg : message)
-            {
-                if (i > 0) log += ", ";
-                log += OscProcessor::getOSCArgumentAsString (arg);
-                i++;
-            }
-        }
-
-        addMessage (log);
+        addMessage ( indent (level) + OSCProcessor::getOSCMessageAsString( message ) );
     }
 
     void addOSCBundle (const OSCBundle& bundle, int level = 0)

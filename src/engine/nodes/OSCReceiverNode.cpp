@@ -94,7 +94,7 @@ void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
 
     auto timestamp = Time::getMillisecondCounterHiRes();
 
-    MidiMessage midiMsg = OscProcessor::processOscToMidiMessage( message );
+    MidiMessage midiMsg = OSCProcessor::processOscToMidiMessage( message );
     midiMsg.setTimeStamp (timestamp);
 
     outputMidiMessages.addMessageToQueue( midiMsg );
