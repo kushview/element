@@ -35,7 +35,7 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     int width = 540;
     int height = 320;
 
-    resetBounds(width, height);
+    resetBounds (width, height);
 
     hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
     hostNameField.setEditable (true, true, true);
