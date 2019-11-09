@@ -131,10 +131,6 @@
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="O8UXWR" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
-          <FILE id="OFW2O7" name="MidiMonitorNode.cpp" compile="1" resource="0"
-                file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
-          <FILE id="Hr7ote" name="MidiMonitorNode.h" compile="0" resource="0"
-                file="../../../src/engine/nodes/MidiMonitorNode.h"/>
           <FILE id="vpX0nl" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
           <FILE id="WPHnmu" name="MidiProgramMapNode.h" compile="0" resource="0"
@@ -144,6 +140,9 @@
                 file="../../../src/engine/nodes/OSCReceiverNode.cpp"/>
           <FILE id="YFLgsk" name="OSCReceiverNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/OSCReceiverNode.h"/>
+          <FILE id="BtsJv2" name="OSCSenderNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/OSCSenderNode.cpp"/>
+          <FILE id="Oi63lZ" name="OSCSenderNode.h" compile="0" resource="0" file="../../../src/engine/nodes/OSCSenderNode.h"/>
           <FILE id="a0vk88" name="PlaceholderProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/PlaceholderProcessor.h"/>
           <FILE id="xAZ0vX" name="ReverbProcessor.h" compile="0" resource="0"
@@ -218,6 +217,10 @@
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.cpp"/>
           <FILE id="eU8jEe" name="OSCReceiverNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.h"/>
+          <FILE id="sAZRSY" name="OSCSenderNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/OSCSenderNodeEditor.cpp"/>
+          <FILE id="Y8Efmh" name="OSCSenderNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/OSCSenderNodeEditor.h"/>
           <FILE id="ufmHbZ" name="VolumeNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/VolumeNodeEditor.cpp"/>
           <FILE id="G6OvFx" name="VolumeNodeEditor.h" compile="0" resource="0"
