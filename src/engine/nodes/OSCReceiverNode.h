@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -85,7 +85,7 @@ private:
     OSCReceiver oscReceiver;
     bool connected = false;
     bool paused = false;
-    int currentPortNumber = -1;
+    int currentPortNumber = 9001;
     String currentHostName = "";
 
     void oscMessageReceived(const OSCMessage& message) override;

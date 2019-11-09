@@ -35,17 +35,19 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     int width = 540;
     int height = 320;
 
-    resetBounds(width, height);
-
     hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
-    portNumberField.setEditable (true, true, true);
+    portNumberSlider.setRange (1.0, 65535.0, 1.0);
+    portNumberSlider.setValue ((double) currentPortNumber);
+    portNumberSlider.setSliderStyle (Slider::IncDecButtons);
+    portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
 
     updateConnectionStatusLabel();
 
+    resetBounds(width, height);
     addAndMakeVisible (hostNameLabel);
     addAndMakeVisible (hostNameField);
     addAndMakeVisible (portNumberLabel);
-    addAndMakeVisible (portNumberField);
+    addAndMakeVisible (portNumberSlider);
     addAndMakeVisible (connectButton);
     addAndMakeVisible (pauseButton);
     addAndMakeVisible (clearButton);
@@ -58,7 +60,11 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
     pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
-
+    portNumberSlider.onValueChange = [this]()
+    {
+        disconnect();
+        currentPortNumber = roundToInt( portNumberSlider.getValue() );
+    };
     oscReceiverNodePtr->addMessageLoopListener (this);
 }
 
@@ -67,6 +73,7 @@ OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
     /* Unbind handlers */
     connectButton.onClick = nullptr;
     clearButton.onClick = nullptr;
+    portNumberSlider.onValueChange = nullptr;
     oscReceiverNodePtr->removeMessageLoopListener (this);
 }
 
@@ -98,8 +105,8 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     portNumberLabel.setBounds (x, y, w, h);
     x += w;
 
-    w = 50;
-    portNumberField.setBounds (x, y, w, h);
+    w = 100;
+    portNumberSlider.setBounds (x, y, w, h);
     x += w + margin;
 
     // From right side
@@ -170,7 +177,7 @@ void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
 
 void OSCReceiverNodeEditor::connect()
 {
-    auto portToConnect = portNumberField.getText().getIntValue();
+    auto portToConnect = roundToInt (portNumberSlider.getValue());
 
     if (! Util::isValidOscPort (portToConnect))
     {
@@ -180,10 +187,11 @@ void OSCReceiverNodeEditor::connect()
 
     auto hostToConnect = hostNameField.getText();
 
+    currentHostName = hostToConnect;
+    currentPortNumber = portToConnect;
+
     if (oscReceiverNodePtr->connect (portToConnect))
     {
-        currentHostName = hostToConnect;
-        currentPortNumber = portToConnect;
         connected = true;
         connectButton.setButtonText ("Disconnect");
     }
@@ -197,8 +205,6 @@ void OSCReceiverNodeEditor::disconnect()
 {
     if (oscReceiverNodePtr->disconnect())
     {
-        currentPortNumber = -1;
-        currentHostName = "";
         connected = false;
         connectButton.setButtonText ("Connect");
     }

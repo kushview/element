@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -92,7 +92,7 @@ private:
     Label hostNameLabel      { {}, "Host" };
     Label hostNameField      { {}, "127.0.0.1" };
     Label portNumberLabel    { {}, "Port" };
-    Label portNumberField    { {}, "9000" };
+    Slider portNumberSlider;
 
     TextButton connectButton { "Connect" };
     TextButton pauseButton { "Pause" };

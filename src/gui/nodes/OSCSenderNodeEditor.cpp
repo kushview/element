@@ -37,16 +37,20 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
 
     resetBounds (width, height);
 
-    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
+    hostNameField.setText (currentHostName, NotificationType::dontSendNotification);
     hostNameField.setEditable (true, true, true);
-    portNumberField.setEditable (true, true, true);
+
+    portNumberSlider.setRange (1.0, 65535.0, 1.0);
+    portNumberSlider.setValue ((double) currentPortNumber);
+    portNumberSlider.setSliderStyle (Slider::IncDecButtons);
+    portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
 
     updateConnectionStatusLabel();
 
     addAndMakeVisible (hostNameLabel);
     addAndMakeVisible (hostNameField);
     addAndMakeVisible (portNumberLabel);
-    addAndMakeVisible (portNumberField);
+    addAndMakeVisible (portNumberSlider);
     addAndMakeVisible (connectButton);
     addAndMakeVisible (pauseButton);
     addAndMakeVisible (clearButton);
@@ -60,6 +64,11 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     pauseButton.onClick = std::bind (&OSCSenderNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCSenderNodeEditor::clearButtonClicked, this);
     hostNameField.onTextChange = std::bind (&OSCSenderNodeEditor::hostNameFieldChanged, this);
+    portNumberSlider.onValueChange = [this]()
+    {
+        disconnect();
+        currentPortNumber = roundToInt( portNumberSlider.getValue() );
+    };
 
     startTimerHz (60);
 }
@@ -69,6 +78,7 @@ OSCSenderNodeEditor::~OSCSenderNodeEditor()
     /* Unbind handlers */
     connectButton.onClick = nullptr;
     clearButton.onClick = nullptr;
+    portNumberSlider.onValueChange = nullptr;
     stopTimer ();
 }
 
@@ -108,8 +118,8 @@ void OSCSenderNodeEditor::resetBounds (int fullWidth, int fullHeight)
     portNumberLabel.setBounds (x, y, w, h);
     x += w;
 
-    w = 50;
-    portNumberField.setBounds (x, y, w, h);
+    w = 100;
+    portNumberSlider.setBounds (x, y, w, h);
     x += w + margin;
 
     // From right side
@@ -170,7 +180,7 @@ void OSCSenderNodeEditor::hostNameFieldChanged()
 
 void OSCSenderNodeEditor::connect()
 {
-    auto portToConnect = portNumberField.getText().getIntValue();
+    auto portToConnect = roundToInt (portNumberSlider.getValue());
 
     if (! Util::isValidOscPort (portToConnect))
     {
