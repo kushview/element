@@ -75,7 +75,6 @@ def configure (conf):
     juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
-    juce.display_msg (conf, "Lua", conf.env.LUA)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
     print
