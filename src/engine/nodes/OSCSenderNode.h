@@ -86,6 +86,7 @@ public:
 private:
 
     Semaphore sem;
+    CriticalSection lock;
 
     /** MIDI */
     bool createdPorts = false;

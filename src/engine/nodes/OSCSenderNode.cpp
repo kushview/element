@@ -100,6 +100,8 @@ void OSCSenderNode::run ()
         MidiMessage msg;
         int frame;
 
+        ScopedLock sl (lock);
+
         while (iter1.getNextEvent (msg, frame))
         {
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
@@ -246,8 +248,11 @@ void OSCSenderNode::setHostName (String hostName)
 
 std::vector<OSCMessage> OSCSenderNode::getOscMessages()
 {
+    ScopedLock sl (lock);
+
     std::vector<OSCMessage> copied;
     std::copy ( oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter( copied ) );
+
     oscMessagesToLog.clear();
     return copied;
 }
