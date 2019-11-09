@@ -198,10 +198,6 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="aD3ttN" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
-          <FILE id="VxTWbc" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
-                file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
-          <FILE id="yMWvj0" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
-                file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
           <FILE id="UcdM2x" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
           <FILE id="JyUgIo" name="MidiProgramMapEditor.h" compile="0" resource="0"
