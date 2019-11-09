@@ -101,7 +101,7 @@ inline static bool isValidOscPort (int port)
 inline static std::vector<std::string> parseOscAddressPaths (const OSCMessage& message)
 {
     /** AddressPattern.oscSymbols is already parsed, but it's a private member */
-    const auto& addr = message.getAddressPattern().toString().toStdString();
+    const auto addr = message.getAddressPattern().toString().toStdString();
 
     /** Parts: I/O Type, Device Name, Command */
 
