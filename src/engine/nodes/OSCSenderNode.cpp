@@ -106,11 +106,11 @@ void OSCSenderNode::run ()
         {
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
             oscSender.send ( oscMsg );
-
-            if (oscMessagesToLog.size() > maxOscMessages)
-                oscMessagesToLog.erase ( oscMessagesToLog.begin() );
             oscMessagesToLog.push_back ( oscMsg );
         }
+
+        while (oscMessagesToLog.size() > maxOscMessages)
+            oscMessagesToLog.erase ( oscMessagesToLog.begin() );
     }
 
     DBG("[EL] OSCSenderNode: OSC -> MIDI processing thread exited");
