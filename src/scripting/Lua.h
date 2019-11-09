@@ -18,30 +18,12 @@
 
 #pragma once
 
-#include "scripting/Lua.h"
-#include "JuceHeader.h"
+#if __APPLE__
+ #define LUA_USE_MACOSX
+#elif defined(__linux__) || defined(__gnu_linux__)
+ #define LUA_USE_LINUX
+#endif
 
-namespace Element {
+#define LUA_COMPAT_5_2
 
-/** C++ RAII wrapper of a lua_State*
-    This object should be used on the stack and can be passed to functions which
-    take a lua_State* as a parameter.
-
-    @warning Do not call lua_close() on this object. Because the dtor will do it 
-    for you, you'll get a nasty crash from a double free of the C object.
-*/
-class LuaState final
-{
-public:
-    LuaState();
-    ~LuaState();
-
-    /** Pass as lua_State* as parameter. */
-    operator lua_State*() const { return state; }
-
-private:
-    lua_State* state { nullptr };
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LuaState)
-};
-
-}
+#include <lua.hpp>

@@ -17,9 +17,7 @@
 */
 
 #include "Tests.h"
-
-#if EL_LUA
-#include <lua.hpp>
+#include "scripting/LuaState.h"
 
 using namespace Element;
 
@@ -65,22 +63,17 @@ private:
     void runSimpleScript() 
     {
         // initialization
-        auto* lua = luaL_newstate();
-        luaL_openlibs (lua);
+        LuaState lua;
 
         // execute script
         String script = "print('Hello Lua World!')";
         int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), script.toRawUTF8());
         lua_pcall (lua, 0, 0, 0);
-
-        // cleanup
-        lua_close (lua);
     }
 
     void callCFunction()
     {
-        auto* lua = luaL_newstate();
-        luaL_openlibs (lua);
+        LuaState lua;
 
         lua_pushcfunction (lua, luaSin);
         lua_setglobal (lua, "mysin");
@@ -106,14 +99,11 @@ print (mysin ('notanumber'))
                 DBG("Unknown lua problem");
                 break;
         }
-
-        lua_close (lua);
     }
 
     void getGlobalVars()
     {
-        auto* L = luaL_newstate();
-        luaL_openlibs (L);
+        LuaState L;
 
         String script = 
 R"abc(
@@ -141,10 +131,7 @@ height = 200
         expect (width == 100);
         expect (height == 200);
         expect (depth == 10000);
-
-        lua_close (L);
     }
 };
 
 static LuaTest sLuaTest;
-#endif
