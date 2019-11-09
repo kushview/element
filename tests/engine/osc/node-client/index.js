@@ -19,13 +19,24 @@ function startSender() {
 
   console.log(`Sending to UDP port ${senderPort}`)
 
+  let channel = 0
+  let note = 0
+  let velocity = 0
+  let command
+
   let i = 0
   let direction = 1
 
   setInterval(function() {
+
+    channel = (i % 15) + 1 // Must be 1~16
+    note = i % 126
+    velocity = i  / 100
+    command = direction === 1 ? 'noteOn' : 'noteOff'
+
     i += direction
 
-    const message = new OSC.Message('/midi/noteOn',  1, 1, i / 100) // new OSC.AtomicFloat32
+    const message = new OSC.Message(`/midi/${command}`,  channel, note, velocity) // new OSC.AtomicFloat32
     osc.send(message)
 
     if (i===0 || i===99) direction *= -1
@@ -43,7 +54,7 @@ function startReceiver() {
 
   osc.on('open', () => {
 
-    console.log('open')
+    console.log('Receiver port open')
 
     const message = new OSC.Message('/handshake', 'hi')
     osc.send(message)
