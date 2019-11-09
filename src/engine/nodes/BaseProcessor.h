@@ -63,7 +63,7 @@
 #define EL_INTERNAL_UID_MIDI_MONITOR             1016
 #define EL_INTERNAL_UID_OSC_RECEIVER             1017
 #define EL_INTERNAL_UID_OSC_SENDER               1018
-#define EL_INTERNAL_UID_EQ_FILTER                1017
+#define EL_INTERNAL_UID_EQ_FILTER                1019
 
 namespace Element
 {
