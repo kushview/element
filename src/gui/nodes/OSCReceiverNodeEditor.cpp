@@ -27,25 +27,21 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
-    currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
-    currentHostName = oscReceiverNodePtr->getCurrentHostName();
-    connected = oscReceiverNodePtr->isConnected();
-    paused = oscReceiverNodePtr->isPaused();
 
     int width = 540;
     int height = 320;
 
+    portNumberSlider.setRange (1.0, 65535.0, 1.0);
+    portNumberSlider.setSliderStyle (Slider::IncDecButtons);
+    portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
+
+    syncUIFromNodeState ();
+
     resetBounds(width, height);
-
-    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
-    portNumberField.setEditable (true, true, true);
-
-    updateConnectionStatusLabel();
-
     addAndMakeVisible (hostNameLabel);
     addAndMakeVisible (hostNameField);
     addAndMakeVisible (portNumberLabel);
-    addAndMakeVisible (portNumberField);
+    addAndMakeVisible (portNumberSlider);
     addAndMakeVisible (connectButton);
     addAndMakeVisible (pauseButton);
     addAndMakeVisible (clearButton);
@@ -58,7 +54,28 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
     pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
+    hostNameField.onTextChange = [this]()
+    {
+        String newHostName = hostNameField.getText();
+        if (currentHostName == newHostName)
+            return;
+        if (connected)
+            disconnect();
+        currentHostName = newHostName;
+        oscReceiverNodePtr->setHostName (currentHostName);
+    };
+    portNumberSlider.onValueChange = [this]()
+    {
+        int newPortNumber = roundToInt( portNumberSlider.getValue() );
+        if (newPortNumber == currentPortNumber)
+            return;
+        if (connected)
+            disconnect();
+        currentPortNumber = newPortNumber;
+        oscReceiverNodePtr->setPortNumber (currentPortNumber);
+    };
 
+    oscReceiverNodePtr->addChangeListener (this);
     oscReceiverNodePtr->addMessageLoopListener (this);
 }
 
@@ -66,7 +83,11 @@ OSCReceiverNodeEditor::~OSCReceiverNodeEditor()
 {
     /* Unbind handlers */
     connectButton.onClick = nullptr;
+    pauseButton.onClick = nullptr;
     clearButton.onClick = nullptr;
+    hostNameField.onTextChange = nullptr;
+    portNumberSlider.onValueChange = nullptr;
+    oscReceiverNodePtr->removeChangeListener (this);
     oscReceiverNodePtr->removeMessageLoopListener (this);
 }
 
@@ -98,8 +119,8 @@ void OSCReceiverNodeEditor::resetBounds (int fullWidth, int fullHeight)
     portNumberLabel.setBounds (x, y, w, h);
     x += w;
 
-    w = 50;
-    portNumberField.setBounds (x, y, w, h);
+    w = 100;
+    portNumberSlider.setBounds (x, y, w, h);
     x += w + margin;
 
     // From right side
@@ -168,28 +189,51 @@ void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
     oscReceiverLog.addOSCBundle (bundle);
 }
 
+void OSCReceiverNodeEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    syncUIFromNodeState ();
+}
+
+void OSCReceiverNodeEditor::syncUIFromNodeState ()
+{
+    currentHostName = oscReceiverNodePtr->getCurrentHostName();
+    currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
+    connected = oscReceiverNodePtr->isConnected();
+    paused = oscReceiverNodePtr->isPaused();
+
+    updateHostNameField ();
+    updatePortNumberSlider ();
+    updateConnectionStatusLabel ();
+    updateConnectButton ();
+    updatePauseButton ();
+}
+
+void OSCReceiverNodeEditor::updateHostNameField()
+{
+    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
+}
+
+void OSCReceiverNodeEditor::updatePortNumberSlider()
+{
+    portNumberSlider.setValue ((double) currentPortNumber);
+}
+
 void OSCReceiverNodeEditor::connect()
 {
-    auto portToConnect = portNumberField.getText().getIntValue();
-
-    if (! Util::isValidOscPort (portToConnect))
+    if (! Util::isValidOscPort (currentPortNumber))
     {
         handleInvalidPortNumberEntered();
         return;
     }
 
-    auto hostToConnect = hostNameField.getText();
-
-    if (oscReceiverNodePtr->connect (portToConnect))
+    if (oscReceiverNodePtr->connect (currentPortNumber))
     {
-        currentHostName = hostToConnect;
-        currentPortNumber = portToConnect;
         connected = true;
         connectButton.setButtonText ("Disconnect");
     }
     else
     {
-        handleConnectError (portToConnect);
+        handleConnectError (currentPortNumber);
     }
 }
 
@@ -197,8 +241,6 @@ void OSCReceiverNodeEditor::disconnect()
 {
     if (oscReceiverNodePtr->disconnect())
     {
-        currentPortNumber = -1;
-        currentHostName = "";
         connected = false;
         connectButton.setButtonText ("Connect");
     }

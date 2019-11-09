@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -75,6 +75,7 @@ private:
 };
 
 class OSCSenderNodeEditor : public NodeEditorComponent,
+                            public ChangeListener,
                             private Timer
 {
 public:
@@ -85,6 +86,8 @@ public:
     void resized() override;
     void resetBounds (int width, int height);
     void timerCallback() override;
+    void changeListenerCallback (ChangeBroadcaster*) override;
+    void syncUIFromNodeState ();
 
 private:
     OSCSenderLogListBox oscSenderLog;
@@ -94,7 +97,7 @@ private:
     Label hostNameLabel      { {}, "Host" };
     Label hostNameField      { {}, "127.0.0.1" };
     Label portNumberLabel    { {}, "Port" };
-    Label portNumberField    { {}, "9001" };
+    Slider portNumberSlider;
 
     TextButton connectButton { "Connect" };
     TextButton pauseButton { "Pause" };
@@ -115,6 +118,8 @@ private:
     void updateConnectButton();
     void updateConnectionStatusLabel();
     void updatePauseButton();
+    void updateHostNameField();
+    void updatePortNumberSlider();
 
     void connect();
     void disconnect();

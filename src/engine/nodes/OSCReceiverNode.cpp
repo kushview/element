@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -37,6 +37,46 @@ OSCReceiverNode::~OSCReceiverNode()
 {
    oscReceiver.removeListener (this);
    oscReceiver.disconnect();
+}
+
+void OSCReceiverNode::setState (const void* data, int size)
+{
+    const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
+    if (! tree.isValid())
+        return;
+
+    String newHostName = tree.getProperty ("hostName", "").toString();
+    int newPortNumber = jlimit (1, 65536, (int) tree.getProperty ("portNumber", 9001));
+    bool newConnected = (bool) tree.getProperty ("connected", false);
+    bool newPaused = (bool) tree.getProperty ("paused", false);
+
+    if (newHostName != currentHostName || newPortNumber != currentPortNumber)
+        disconnect();
+    if (newConnected)
+        connect(newPortNumber);
+
+    currentHostName = newHostName;
+    currentPortNumber = newPortNumber;
+    connected = newConnected;
+    paused = newPaused;
+
+    sendChangeMessage();
+}
+
+void OSCReceiverNode::getState (MemoryBlock& block)
+{
+    ValueTree tree ("state");
+    tree.setProperty ("hostName", currentHostName, nullptr);
+    tree.setProperty ("portNumber", currentPortNumber, nullptr);
+    tree.setProperty ("connected", connected, nullptr);
+    tree.setProperty ("paused", paused, nullptr);
+
+    MemoryOutputStream stream (block, false);
+
+    {
+        GZIPCompressorOutputStream gzip (stream);
+        tree.writeToStream (gzip);
+    }
 }
 
 /** MIDI */
@@ -109,15 +149,19 @@ void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
 
 bool OSCReceiverNode::connect (int portNumber)
 {
+    if (connected && currentPortNumber == portNumber)
+        return connected;
+
+    currentPortNumber = portNumber;
     connected = oscReceiver.connect (portNumber);
-    if ( connected ) {
-        currentPortNumber = portNumber;
-    }
+
     return connected;
 }
 
 bool OSCReceiverNode::disconnect ()
 {
+    if (!connected)
+        return true;
     connected = false;
     return oscReceiver.disconnect();
 }
@@ -155,13 +199,23 @@ bool OSCReceiverNode::togglePause ()
 int OSCReceiverNode::getCurrentPortNumber ()
 {
     return currentPortNumber;
-};
+}
 
 String OSCReceiverNode::getCurrentHostName ()
 {
     if (currentHostName == "")
         currentHostName = IPAddress::getLocalAddress().toString();
     return currentHostName;
+}
+
+void OSCReceiverNode::setPortNumber (int port)
+{
+    currentPortNumber = port;
+}
+
+void OSCReceiverNode::setHostName (String hostName)
+{
+    currentHostName = hostName;
 }
 
 /** OSCReceiver message loop callbacks */

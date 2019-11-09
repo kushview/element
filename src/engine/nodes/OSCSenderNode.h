@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -26,7 +26,8 @@
 
 namespace Element {
 
-class OSCSenderNode : public MidiFilterNode
+class OSCSenderNode : public MidiFilterNode,
+                      public ChangeBroadcaster
 {
 public:
 
@@ -54,9 +55,8 @@ public:
     void releaseResources() override {};
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-
-    void setState (const void* data, int size) override {};
-    void getState (MemoryBlock& block) override {};
+    void setState (const void* data, int size) override;
+    void getState (MemoryBlock& block) override;
 
     inline void createPorts() override;
 
@@ -72,6 +72,8 @@ public:
 
     int getCurrentPortNumber ();
     String getCurrentHostName ();
+    void setPortNumber (int port);
+    void setHostName (String hostName);
 
     std::vector<OSCMessage> getOscMessages();
 
@@ -86,7 +88,7 @@ private:
     bool connected = false;
     bool paused = false;
 
-    int currentPortNumber = -1;
+    int currentPortNumber = 9002;
     String currentHostName = "127.0.0.1";
 
     std::vector<OSCMessage> oscMessages;

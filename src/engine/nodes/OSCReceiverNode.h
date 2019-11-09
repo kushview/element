@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -27,6 +27,7 @@
 namespace Element {
 
 class OSCReceiverNode : public MidiFilterNode,
+                        public ChangeBroadcaster,
                         public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
@@ -54,8 +55,8 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-    void setState (const void* data, int size) override {};
-    void getState (MemoryBlock& block) override {};
+    void setState (const void* data, int size) override;
+    void getState (MemoryBlock& block) override;
     inline void createPorts() override;
 
     /** For node editor */
@@ -69,6 +70,8 @@ public:
     bool isPaused ();
     int getCurrentPortNumber ();
     String getCurrentHostName ();
+    void setPortNumber (int port);
+    void setHostName (String hostName);
 
     void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
     void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
@@ -85,7 +88,7 @@ private:
     OSCReceiver oscReceiver;
     bool connected = false;
     bool paused = false;
-    int currentPortNumber = -1;
+    int currentPortNumber = 9001;
     String currentHostName = "";
 
     void oscMessageReceived(const OSCMessage& message) override;
