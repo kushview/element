@@ -27,25 +27,19 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     oscSenderNodePtr = getNodeObjectOfType<OSCSenderNode>();
-    currentPortNumber = oscSenderNodePtr->getCurrentPortNumber();
-    currentHostName = oscSenderNodePtr->getCurrentHostName();
-    connected = oscSenderNodePtr->isConnected();
-    paused = oscSenderNodePtr->isPaused();
 
     int width = 540;
     int height = 320;
 
     resetBounds (width, height);
 
-    hostNameField.setText (currentHostName, NotificationType::dontSendNotification);
     hostNameField.setEditable (true, true, true);
 
     portNumberSlider.setRange (1.0, 65535.0, 1.0);
-    portNumberSlider.setValue ((double) currentPortNumber);
     portNumberSlider.setSliderStyle (Slider::IncDecButtons);
     portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
 
-    updateConnectionStatusLabel();
+    syncUIFromNodeState ();
 
     addAndMakeVisible (hostNameLabel);
     addAndMakeVisible (hostNameField);
@@ -64,12 +58,28 @@ OSCSenderNodeEditor::OSCSenderNodeEditor (const Node& node)
     pauseButton.onClick = std::bind (&OSCSenderNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCSenderNodeEditor::clearButtonClicked, this);
     hostNameField.onTextChange = std::bind (&OSCSenderNodeEditor::hostNameFieldChanged, this);
+    hostNameField.onTextChange = [this]()
+    {
+        String newHostName = hostNameField.getText();
+        if (currentHostName == newHostName)
+            return;
+        if (connected)
+            disconnect();
+        currentHostName = newHostName;
+        oscSenderNodePtr->setHostName (currentHostName);
+    };
     portNumberSlider.onValueChange = [this]()
     {
-        disconnect();
-        currentPortNumber = roundToInt( portNumberSlider.getValue() );
+       int newPortNumber = roundToInt( portNumberSlider.getValue() );
+        if (newPortNumber == currentPortNumber)
+            return;
+        if (connected)
+            disconnect();
+        currentPortNumber = newPortNumber;
+        oscSenderNodePtr->setPortNumber (currentPortNumber);
     };
 
+    oscSenderNodePtr->addChangeListener (this);
     startTimerHz (60);
 }
 
@@ -178,28 +188,51 @@ void OSCSenderNodeEditor::hostNameFieldChanged()
     currentHostName = hostNameField.getText();
 }
 
+void OSCSenderNodeEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    syncUIFromNodeState ();
+}
+
+void OSCSenderNodeEditor::syncUIFromNodeState ()
+{
+    currentHostName = oscSenderNodePtr->getCurrentHostName();
+    currentPortNumber = oscSenderNodePtr->getCurrentPortNumber();
+    connected = oscSenderNodePtr->isConnected();
+    paused = oscSenderNodePtr->isPaused();
+
+    updateHostNameField ();
+    updatePortNumberSlider ();
+    updateConnectionStatusLabel ();
+    updateConnectButton ();
+    updatePauseButton ();
+}
+
+void OSCSenderNodeEditor::updateHostNameField()
+{
+    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
+}
+
+void OSCSenderNodeEditor::updatePortNumberSlider()
+{
+    portNumberSlider.setValue ((double) currentPortNumber);
+}
+
 void OSCSenderNodeEditor::connect()
 {
-    auto portToConnect = roundToInt (portNumberSlider.getValue());
-
-    if (! Util::isValidOscPort (portToConnect))
+    if (! Util::isValidOscPort (currentPortNumber))
     {
         handleInvalidPortNumberEntered();
         return;
     }
 
-    auto hostName = hostNameField.getText();
-
-    if (oscSenderNodePtr->connect (hostName, portToConnect))
+    if (oscSenderNodePtr->connect (currentHostName, currentPortNumber))
     {
-        currentHostName = hostName;
-        currentPortNumber = portToConnect;
         connected = true;
         connectButton.setButtonText ("Disconnect");
     }
     else
     {
-        handleConnectError (portToConnect);
+        handleConnectError (currentPortNumber);
     }
 }
 

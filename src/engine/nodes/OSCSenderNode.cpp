@@ -2,7 +2,7 @@
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
     Author Eliot Akira <me@eliotakira.com>
-    
+
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -35,6 +35,46 @@ OSCSenderNode::~OSCSenderNode()
 {
    oscSender.disconnect();
 }
+void OSCSenderNode::setState (const void* data, int size)
+{
+    const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
+    if (! tree.isValid())
+        return;
+
+    String newHostName = tree.getProperty ("hostName", "").toString();
+    int newPortNumber = jlimit (1, 65536, (int) tree.getProperty ("portNumber", 9001));
+    bool newConnected = (bool) tree.getProperty ("connected", false);
+    bool newPaused = (bool) tree.getProperty ("paused", false);
+
+    if (newHostName != currentHostName || newPortNumber != currentPortNumber)
+        disconnect();
+    if (newConnected)
+        connect(newHostName, newPortNumber);
+
+    currentHostName = newHostName;
+    currentPortNumber = newPortNumber;
+    connected = newConnected;
+    paused = newPaused;
+
+    sendChangeMessage();
+}
+
+void OSCSenderNode::getState (MemoryBlock& block)
+{
+    ValueTree tree ("state");
+    tree.setProperty ("hostName", currentHostName, nullptr);
+    tree.setProperty ("portNumber", currentPortNumber, nullptr);
+    tree.setProperty ("connected", connected, nullptr);
+    tree.setProperty ("paused", paused, nullptr);
+
+    MemoryOutputStream stream (block, false);
+
+    {
+        GZIPCompressorOutputStream gzip (stream);
+        tree.writeToStream (gzip);
+    }
+}
+
 
 /** MIDI */
 
@@ -82,15 +122,20 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 bool OSCSenderNode::connect (String hostName, int portNumber)
 {
+   if (connected && currentPortNumber == portNumber)
+        return connected;
+
     currentHostName = hostName;
     currentPortNumber = portNumber;
-
     connected = oscSender.connect (hostName, portNumber);
+
     return connected;
 }
 
 bool OSCSenderNode::disconnect ()
 {
+   if (!connected)
+        return true;
     connected = false;
     return oscSender.disconnect();
 }
@@ -133,6 +178,16 @@ int OSCSenderNode::getCurrentPortNumber ()
 String OSCSenderNode::getCurrentHostName ()
 {
     return currentHostName;
+}
+
+void OSCSenderNode::setPortNumber (int port)
+{
+    currentPortNumber = port;
+}
+
+void OSCSenderNode::setHostName (String hostName)
+{
+    currentHostName = hostName;
 }
 
 std::vector<OSCMessage> OSCSenderNode::getOscMessages()

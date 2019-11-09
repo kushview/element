@@ -59,7 +59,6 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
         String newHostName = hostNameField.getText();
         if (currentHostName == newHostName)
             return;
-DBG("hostNameField.onTextChange");
         if (connected)
             disconnect();
         currentHostName = newHostName;
@@ -70,7 +69,6 @@ DBG("hostNameField.onTextChange");
         int newPortNumber = roundToInt( portNumberSlider.getValue() );
         if (newPortNumber == currentPortNumber)
             return;
-DBG("portNumberSlider.onValueChange");
         if (connected)
             disconnect();
         currentPortNumber = newPortNumber;
@@ -238,7 +236,6 @@ void OSCReceiverNodeEditor::connect()
 
 void OSCReceiverNodeEditor::disconnect()
 {
-DBG("disconnect");
     if (oscReceiverNodePtr->disconnect())
     {
         connected = false;

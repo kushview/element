@@ -26,7 +26,8 @@
 
 namespace Element {
 
-class OSCSenderNode : public MidiFilterNode
+class OSCSenderNode : public MidiFilterNode,
+                      public ChangeBroadcaster
 {
 public:
 
@@ -54,9 +55,8 @@ public:
     void releaseResources() override {};
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-
-    void setState (const void* data, int size) override {};
-    void getState (MemoryBlock& block) override {};
+    void setState (const void* data, int size) override;
+    void getState (MemoryBlock& block) override;
 
     inline void createPorts() override;
 
@@ -72,6 +72,8 @@ public:
 
     int getCurrentPortNumber ();
     String getCurrentHostName ();
+    void setPortNumber (int port);
+    void setHostName (String hostName);
 
     std::vector<OSCMessage> getOscMessages();
 

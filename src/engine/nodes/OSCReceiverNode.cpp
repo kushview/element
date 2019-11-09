@@ -152,10 +152,9 @@ bool OSCReceiverNode::connect (int portNumber)
     if (connected && currentPortNumber == portNumber)
         return connected;
 
+    currentPortNumber = portNumber;
     connected = oscReceiver.connect (portNumber);
-    if ( connected ) {
-        currentPortNumber = portNumber;
-    }
+
     return connected;
 }
 

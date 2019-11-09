@@ -75,6 +75,7 @@ private:
 };
 
 class OSCSenderNodeEditor : public NodeEditorComponent,
+                            public ChangeListener,
                             private Timer
 {
 public:
@@ -85,6 +86,8 @@ public:
     void resized() override;
     void resetBounds (int width, int height);
     void timerCallback() override;
+    void changeListenerCallback (ChangeBroadcaster*) override;
+    void syncUIFromNodeState ();
 
 private:
     OSCSenderLogListBox oscSenderLog;
@@ -115,6 +118,8 @@ private:
     void updateConnectButton();
     void updateConnectionStatusLabel();
     void updatePauseButton();
+    void updateHostNameField();
+    void updatePortNumberSlider();
 
     void connect();
     void disconnect();
