@@ -31,6 +31,8 @@
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/nodes/MidiMonitorNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
+#include "engine/nodes/OSCReceiverNode.h"
+#include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ReverbProcessor.h"
 #include "engine/nodes/SubGraphProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
@@ -326,6 +328,16 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         MidiMonitorNode().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_OSC_RECEIVER)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        OSCReceiverNode().fillInPluginDescription (*desc);
+    }
+    else if (fileOrId == EL_INTERNAL_ID_OSC_SENDER)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        OSCSenderNode().fillInPluginDescription (*desc);
+    }
    #endif
 }
 
@@ -356,6 +368,8 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     results.add (EL_INTERNAL_ID_MIDI_MONITOR);
+    results.add (EL_INTERNAL_ID_OSC_RECEIVER);
+    results.add (EL_INTERNAL_ID_OSC_SENDER);
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
    #endif // product enablements
     return results;

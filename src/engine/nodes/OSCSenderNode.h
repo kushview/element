@@ -22,22 +22,23 @@
 #include "engine/MidiPipe.h"
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiFilterNode.h"
-#include "Signals.h"
+#include "engine/nodes/OSCProcessor.h"
 
 namespace Element {
 
-class MidiMonitorNode   : public MidiFilterNode
+class OSCSenderNode : public MidiFilterNode
 {
 public:
-    MidiMonitorNode();
-    virtual ~MidiMonitorNode();
+
+    OSCSenderNode();
+    virtual ~OSCSenderNode();
 
     void fillInPluginDescription (PluginDescription& desc)
     {
-        desc.name = "MIDI Monitor";
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;
-        desc.uid                = EL_INTERNAL_UID_MIDI_MONITOR;
-        desc.descriptiveName    = "MIDI Monitor";
+        desc.name               = "OSC Sender";
+        desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_SENDER;
+        desc.uid                = EL_INTERNAL_UID_OSC_SENDER;
+        desc.descriptiveName    = "OSC Sender";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;
         desc.hasSharedContainer = false;
@@ -47,9 +48,9 @@ public:
         desc.version            = "1.0.0";
     }
 
-    void clear() {};
+    /** MIDI */
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override;
+    void prepareToRender (double sampleRate, int maxBufferSize) override {};
     void releaseResources() override {};
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
@@ -57,27 +58,39 @@ public:
     void setState (const void* data, int size) override {};
     void getState (MemoryBlock& block) override {};
 
-    void clearMessages();
-    void getMessages(MidiBuffer &destBuffer);
+    inline void createPorts() override;
+
+    /** For node editor */
+
+    bool connect (String hostName, int portNumber);
+    bool disconnect ();
+    bool isConnected ();
+    void pause ();
+    void resume ();
+    bool togglePause ();
+    bool isPaused ();
+
+    int getCurrentPortNumber ();
+    String getCurrentHostName ();
+
+    std::vector<OSCMessage> getOscMessages();
 
 private:
-    friend class MidiMonitorNodeEditor;
-    bool inputMessagesInitDone = false;
-    double currentSampleRate = 44100.0;
-    Atomic<int> numSamples = 0;
-    MidiMessageCollector inputMessages;
+
+    /** MIDI */
     bool createdPorts = false;
 
-    inline void createPorts() override
-    {
-        if (createdPorts)
-            return;
+    /** OSC */
+    OSCSender oscSender;
 
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
-        createdPorts = true;
-    }
+    bool connected = false;
+    bool paused = false;
+
+    int currentPortNumber = -1;
+    String currentHostName = "127.0.0.1";
+
+    std::vector<OSCMessage> oscMessages;
+    int maxOscMessages = 100;
 };
 
 }

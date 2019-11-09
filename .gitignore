@@ -10,6 +10,7 @@ build/
 *.pyc
 .DS_Store
 *.autosave
+node_modules
 
 /.vscode/**/*.*
 !/.vscode/tasks.json

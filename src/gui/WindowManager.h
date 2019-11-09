@@ -28,9 +28,11 @@
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
-#include "gui/nodes/MidiProgramMapEditor.h"
-#include "gui/nodes/VolumeNodeEditor.h"
 #include "gui/nodes/MidiMonitorNodeEditor.h"
+#include "gui/nodes/MidiProgramMapEditor.h"
+#include "gui/nodes/OSCReceiverNodeEditor.h"
+#include "gui/nodes/OSCSenderNodeEditor.h"
+#include "gui/nodes/VolumeNodeEditor.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -187,6 +189,14 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_MONITOR)
         {
             return createPluginWindowFor (node, new MidiMonitorNodeEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_RECEIVER)
+        {
+            return createPluginWindowFor (node, new OSCReceiverNodeEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_SENDER)
+        {
+            return createPluginWindowFor (node, new OSCSenderNodeEditor (node));
         }
         else if (node.getIdentifier().toString().contains ("element.volume"))
         {

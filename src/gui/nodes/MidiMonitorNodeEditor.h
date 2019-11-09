@@ -21,67 +21,10 @@
 
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
+#include "gui/widgets/LogListBox.h"
 #include "engine/nodes/MidiMonitorNode.h"
 
 namespace Element {
-
-class MidiMonitorLogListBox : public ListBox,
-                              private ListBoxModel,
-                              private AsyncUpdater
-{
-public:
-    MidiMonitorLogListBox()
-    {
-        setModel (this);
-    }
-
-    ~MidiMonitorLogListBox() override = default;
-
-    int getNumRows() override
-    {
-        return logList.size();
-    }
-
-    void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
-    {
-        ignoreUnused (rowIsSelected);
-        if (isPositiveAndBelow (row, logList.size()))
-            ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
-    }
-
-    void setMaxMessages (int newMax)
-    {
-        if (newMax <= 0 || newMax == maxMessages)
-            return;
-        triggerAsyncUpdate();
-    }
-
-    void addMessage (const String& message)
-    {
-        if (logList.size() > maxMessages)
-            logList.remove (0);
-        logList.add (message);
-        triggerAsyncUpdate();
-    }
-
-    void clear()
-    {
-        logList.clear();
-        triggerAsyncUpdate();
-    }
-
-    void handleAsyncUpdate() override
-    {
-        updateContent();        
-        scrollToEnsureRowIsOnscreen (logList.size() - 1);
-        repaint();
-    }
-
-private:
-    int maxMessages { 100 };
-    StringArray logList;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiMonitorLogListBox)
-};
 
 class MidiMonitorNodeEditor : public NodeEditorComponent,
                               private Timer
@@ -96,7 +39,7 @@ public:
 
 private:
     Node node;
-    MidiMonitorLogListBox midiMonitorLog;
+    LogListBox midiMonitorLog;
 };
 
 }
