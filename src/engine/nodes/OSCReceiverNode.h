@@ -27,6 +27,7 @@
 namespace Element {
 
 class OSCReceiverNode : public MidiFilterNode,
+                        public ChangeBroadcaster,
                         public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
@@ -54,8 +55,8 @@ public:
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-    void setState (const void* data, int size) override {};
-    void getState (MemoryBlock& block) override {};
+    void setState (const void* data, int size) override;
+    void getState (MemoryBlock& block) override;
     inline void createPorts() override;
 
     /** For node editor */
@@ -69,6 +70,8 @@ public:
     bool isPaused ();
     int getCurrentPortNumber ();
     String getCurrentHostName ();
+    void setPortNumber (int port);
+    void setHostName (String hostName);
 
     void addMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);
     void removeMessageLoopListener (OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>* callback);

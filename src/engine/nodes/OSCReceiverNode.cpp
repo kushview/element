@@ -39,6 +39,46 @@ OSCReceiverNode::~OSCReceiverNode()
    oscReceiver.disconnect();
 }
 
+void OSCReceiverNode::setState (const void* data, int size)
+{
+    const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
+    if (! tree.isValid())
+        return;
+
+    String newHostName = tree.getProperty ("hostName", "").toString();
+    int newPortNumber = jlimit (1, 65536, (int) tree.getProperty ("portNumber", 9001));
+    bool newConnected = (bool) tree.getProperty ("connected", false);
+    bool newPaused = (bool) tree.getProperty ("paused", false);
+
+    if (newHostName != currentHostName || newPortNumber != currentPortNumber)
+        disconnect();
+    if (newConnected)
+        connect(newPortNumber);
+
+    currentHostName = newHostName;
+    currentPortNumber = newPortNumber;
+    connected = newConnected;
+    paused = newPaused;
+
+    sendChangeMessage();
+}
+
+void OSCReceiverNode::getState (MemoryBlock& block)
+{
+    ValueTree tree ("state");
+    tree.setProperty ("hostName", currentHostName, nullptr);
+    tree.setProperty ("portNumber", currentPortNumber, nullptr);
+    tree.setProperty ("connected", connected, nullptr);
+    tree.setProperty ("paused", paused, nullptr);
+
+    MemoryOutputStream stream (block, false);
+
+    {
+        GZIPCompressorOutputStream gzip (stream);
+        tree.writeToStream (gzip);
+    }
+}
+
 /** MIDI */
 
 inline void OSCReceiverNode::createPorts()
@@ -109,6 +149,9 @@ void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
 
 bool OSCReceiverNode::connect (int portNumber)
 {
+    if (connected && currentPortNumber == portNumber)
+        return connected;
+
     connected = oscReceiver.connect (portNumber);
     if ( connected ) {
         currentPortNumber = portNumber;
@@ -118,6 +161,8 @@ bool OSCReceiverNode::connect (int portNumber)
 
 bool OSCReceiverNode::disconnect ()
 {
+    if (!connected)
+        return true;
     connected = false;
     return oscReceiver.disconnect();
 }
@@ -155,13 +200,23 @@ bool OSCReceiverNode::togglePause ()
 int OSCReceiverNode::getCurrentPortNumber ()
 {
     return currentPortNumber;
-};
+}
 
 String OSCReceiverNode::getCurrentHostName ()
 {
     if (currentHostName == "")
         currentHostName = IPAddress::getLocalAddress().toString();
     return currentHostName;
+}
+
+void OSCReceiverNode::setPortNumber (int port)
+{
+    currentPortNumber = port;
+}
+
+void OSCReceiverNode::setHostName (String hostName)
+{
+    currentHostName = hostName;
 }
 
 /** OSCReceiver message loop callbacks */

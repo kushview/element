@@ -75,6 +75,7 @@ private:
 };
 
 class OSCReceiverNodeEditor : public NodeEditorComponent,
+                              public ChangeListener,
                               private OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
@@ -84,6 +85,8 @@ public:
     void paint (Graphics&) override;
     void resized() override;
     void resetBounds (int width, int height);
+    void changeListenerCallback (ChangeBroadcaster*) override;
+    void syncUIFromNodeState ();
 
 private:
     OSCReceiverLogListBox oscReceiverLog;
@@ -112,6 +115,8 @@ private:
     void updateConnectButton();
     void updateConnectionStatusLabel();
     void updatePauseButton();
+    void updateHostNameField();
+    void updatePortNumberSlider();
 
     void connect();
     void disconnect();

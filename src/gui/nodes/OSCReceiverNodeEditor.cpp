@@ -27,21 +27,15 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     oscReceiverNodePtr = getNodeObjectOfType<OSCReceiverNode>();
-    currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
-    currentHostName = oscReceiverNodePtr->getCurrentHostName();
-    connected = oscReceiverNodePtr->isConnected();
-    paused = oscReceiverNodePtr->isPaused();
 
     int width = 540;
     int height = 320;
 
-    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
     portNumberSlider.setRange (1.0, 65535.0, 1.0);
-    portNumberSlider.setValue ((double) currentPortNumber);
     portNumberSlider.setSliderStyle (Slider::IncDecButtons);
     portNumberSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 60, 22);
 
-    updateConnectionStatusLabel();
+    syncUIFromNodeState ();
 
     resetBounds(width, height);
     addAndMakeVisible (hostNameLabel);
@@ -60,11 +54,30 @@ OSCReceiverNodeEditor::OSCReceiverNodeEditor (const Node& node)
     connectButton.onClick = std::bind (&OSCReceiverNodeEditor::connectButtonClicked, this);
     pauseButton.onClick = std::bind (&OSCReceiverNodeEditor::pauseButtonClicked, this);
     clearButton.onClick = std::bind (&OSCReceiverNodeEditor::clearButtonClicked, this);
+    hostNameField.onTextChange = [this]()
+    {
+        String newHostName = hostNameField.getText();
+        if (currentHostName == newHostName)
+            return;
+DBG("hostNameField.onTextChange");
+        if (connected)
+            disconnect();
+        currentHostName = newHostName;
+        oscReceiverNodePtr->setHostName (currentHostName);
+    };
     portNumberSlider.onValueChange = [this]()
     {
-        disconnect();
-        currentPortNumber = roundToInt( portNumberSlider.getValue() );
+        int newPortNumber = roundToInt( portNumberSlider.getValue() );
+        if (newPortNumber == currentPortNumber)
+            return;
+DBG("portNumberSlider.onValueChange");
+        if (connected)
+            disconnect();
+        currentPortNumber = newPortNumber;
+        oscReceiverNodePtr->setPortNumber (currentPortNumber);
     };
+
+    oscReceiverNodePtr->addChangeListener (this);
     oscReceiverNodePtr->addMessageLoopListener (this);
 }
 
@@ -175,34 +188,57 @@ void OSCReceiverNodeEditor::oscBundleReceived (const OSCBundle& bundle)
     oscReceiverLog.addOSCBundle (bundle);
 }
 
+void OSCReceiverNodeEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    syncUIFromNodeState ();
+}
+
+void OSCReceiverNodeEditor::syncUIFromNodeState ()
+{
+    currentHostName = oscReceiverNodePtr->getCurrentHostName();
+    currentPortNumber = oscReceiverNodePtr->getCurrentPortNumber();
+    connected = oscReceiverNodePtr->isConnected();
+    paused = oscReceiverNodePtr->isPaused();
+
+    updateHostNameField ();
+    updatePortNumberSlider ();
+    updateConnectionStatusLabel ();
+    updateConnectButton ();
+    updatePauseButton ();
+}
+
+void OSCReceiverNodeEditor::updateHostNameField()
+{
+    hostNameField.setText(currentHostName, NotificationType::dontSendNotification);
+}
+
+void OSCReceiverNodeEditor::updatePortNumberSlider()
+{
+    portNumberSlider.setValue ((double) currentPortNumber);
+}
+
 void OSCReceiverNodeEditor::connect()
 {
-    auto portToConnect = roundToInt (portNumberSlider.getValue());
-
-    if (! Util::isValidOscPort (portToConnect))
+    if (! Util::isValidOscPort (currentPortNumber))
     {
         handleInvalidPortNumberEntered();
         return;
     }
 
-    auto hostToConnect = hostNameField.getText();
-
-    currentHostName = hostToConnect;
-    currentPortNumber = portToConnect;
-
-    if (oscReceiverNodePtr->connect (portToConnect))
+    if (oscReceiverNodePtr->connect (currentPortNumber))
     {
         connected = true;
         connectButton.setButtonText ("Disconnect");
     }
     else
     {
-        handleConnectError (portToConnect);
+        handleConnectError (currentPortNumber);
     }
 }
 
 void OSCReceiverNodeEditor::disconnect()
 {
+DBG("disconnect");
     if (oscReceiverNodePtr->disconnect())
     {
         connected = false;
