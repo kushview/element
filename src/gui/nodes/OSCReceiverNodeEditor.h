@@ -1,7 +1,8 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
+    Author Eliot Akira <me@eliotakira.com>
+    
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -19,11 +20,11 @@
 
 #pragma once
 
-#include "engine/nodes/OSCProcessor.h"
 #include "engine/nodes/OSCReceiverNode.h"
 #include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/widgets/LogListBox.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -44,7 +45,7 @@ public:
 
     void addOSCMessage (const OSCMessage& message, int level = 0)
     {
-        addMessage ( indent (level) + OSCProcessor::getOscMessageAsString( message ) );
+        addMessage (indent (level) + Util::getOscMessageAsString (message));
     }
 
     void addOSCBundle (const OSCBundle& bundle, int level = 0)

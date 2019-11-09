@@ -1,7 +1,8 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
-
+    Author Eliot Akira <me@eliotakira.com>
+    
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +19,7 @@
 */
 
 #include "engine/nodes/OSCReceiverNode.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -86,13 +88,14 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 /** OSCReceiver real-time callbacks */
 
-void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
+void OSCReceiverNode::oscMessageReceived (const OSCMessage& message)
 {
-    if ( paused ) return;
+    if (paused)
+        return;
 
     auto timestamp = Time::getMillisecondCounterHiRes();
 
-    MidiMessage midiMsg = OSCProcessor::processOscToMidiMessage( message );
+    MidiMessage midiMsg = Util::processOscToMidiMessage (message);
     midiMsg.setTimeStamp (timestamp);
 
     outputMidiMessages.addMessageToQueue( midiMsg );
