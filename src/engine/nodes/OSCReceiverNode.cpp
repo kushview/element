@@ -104,7 +104,6 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 
 void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
     if (nframes == 0) {
         return;

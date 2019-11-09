@@ -150,7 +150,6 @@ void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize) {
 
 void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
     auto* const midiIn = midi.getWriteBuffer (0);
 
@@ -162,6 +161,7 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
     int frame;
+    auto timestamp = Time::getMillisecondCounterHiRes();
 
     while (iter1.getNextEvent (msg, frame))
     {
