@@ -128,10 +128,10 @@ PropertiesFile* Settings::getProps() const
 }
 
     
-XmlElement* Settings::getLastGraph() const
+std::unique_ptr<XmlElement> Settings::getLastGraph() const
 {
     if (auto* p = getProps())
-        return p->getXmlValue ("lastGraph").release();
+        return p->getXmlValue ("lastGraph");
     return nullptr;
 }
 

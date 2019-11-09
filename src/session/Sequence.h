@@ -157,7 +157,7 @@ namespace Element {
 
         inline UndoManager* undoManager() { return nullptr; }
 
-        XmlElement* createXml();
+        std::unique_ptr<XmlElement> createXml();
 
     protected:
         Sequence (Globals&);

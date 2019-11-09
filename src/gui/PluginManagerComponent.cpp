@@ -550,7 +550,7 @@ public:
              const StringArray& formats,
              const String& title, const String& text)
         : owner (plc),
-          formatToScan (*plugins.getAudioPluginFormat("Element")),
+          formatToScan (*plugins.getAudioPluginFormat ("Element")),
           propertiesToUse (nullptr),
           pathChooserWindow (TRANS("Select folders to scan..."), String(), AlertWindow::NoIcon),
           progressWindow (title, text, AlertWindow::NoIcon),
@@ -767,7 +767,7 @@ private:
 
 static StringArray scanAllFormats (PluginManager& p)
 {
-    const StringArray supported ({ "AudioUnit", "VST", "VST3" });
+    const StringArray supported ({ "AudioUnit", "VST", "VST3", "LV2" });
     StringArray filtered;
     for (int i = 0; i < p.getAudioPluginFormats().getNumFormats (); ++i)
     {

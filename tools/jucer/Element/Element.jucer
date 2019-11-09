@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.41.0"
+              splashScreenColour="Dark" projectType="audioplug" version="1.41.1"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
               cppLanguageStandard="14" companyCopyright="Copyright (c) 2017-2019 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
@@ -114,6 +114,8 @@
                 file="../../../src/engine/nodes/ChannelizeProcessor.h"/>
           <FILE id="lkRxrN" name="CombFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
+          <FILE id="l5ggQE" name="EQFilterProcessor.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/EQFilterProcessor.h"/>
           <FILE id="It65e5" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MediaPlayerProcessor.cpp"/>
           <FILE id="FnaS8e" name="MediaPlayerProcessor.h" compile="0" resource="0"
@@ -132,6 +134,10 @@
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
           <FILE id="im05b9" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
+          <FILE id="a1k7na" name="MidiMonitorNode.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
+          <FILE id="PzgQzB" name="MidiMonitorNode.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/MidiMonitorNode.h"/>
           <FILE id="TkThM7" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
           <FILE id="ZD3F2H" name="MidiProgramMapNode.h" compile="0" resource="0"
@@ -206,6 +212,10 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
           <FILE id="JfXIpE" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
+          <FILE id="ulX32b" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
+          <FILE id="Aj1iXL" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
           <FILE id="CDaLwi" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
           <FILE id="LYPN7l" name="MidiProgramMapEditor.h" compile="0" resource="0"
@@ -582,6 +592,7 @@
         <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="10.0.16299.0"
@@ -633,6 +644,7 @@
         <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
   </EXPORTFORMATS>
@@ -647,6 +659,7 @@
     <MODULE id="juce_core" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_cryptography" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_data_structures" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
+    <MODULE id="juce_dsp" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_events" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_graphics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
     <MODULE id="juce_gui_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

@@ -77,7 +77,7 @@ namespace Element {
         
         inline bool notificationsFrozen()   const { return freezeChangeNotification; }
 
-        XmlElement* createXml();
+        std::unique_ptr<XmlElement> createXml();
         
         void saveGraphState();
         void restoreGraphState();

@@ -37,6 +37,10 @@ public:
     void selectAudioDriver (const String& name);
     void attach (EnginePtr engine);
 
+   #if KV_JACK_AUDIO
+    kv::JackClient& getJackClient();
+   #endif
+
     virtual void createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list) override;
 
 private:

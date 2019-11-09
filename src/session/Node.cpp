@@ -682,6 +682,8 @@ void Node::restorePluginState()
 
         if (hasProperty (Tags::transpose))
             obj->setTransposeOffset (getProperty (Tags::transpose));
+        
+        obj->setOversamplingFactor (jmax (1, (int) getProperty (Tags::oversamplingFactor, 1)));
     }
 
     // this was originally here to help reduce memory usage
@@ -743,6 +745,7 @@ void Node::savePluginState()
         setProperty ("muteInput", obj->isMutingInputs());
         String mps; obj->getMidiProgramsState (mps);
         setProperty (Tags::midiProgramsState, mps);
+        setProperty (Tags::oversamplingFactor, obj->getOversamplingFactor());
     }
 
     for (int i = 0; i < getNumNodes(); ++i)

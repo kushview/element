@@ -332,14 +332,40 @@ public:
         }
         else
         {
-            if (! processor->isSuspended ())
+            auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, bool isSuspended)
             {
-                processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                if (! isSuspended)
+                {
+                    processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                }
+                else
+                {
+                    processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                }
+            };
+
+            if (node->getOversamplingFactor() > 1)
+            {
+                auto osProcessor = node->getOversamplingProcessor();
+
+                dsp::AudioBlock<float> block (buffer);
+                dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
+
+                std::unique_ptr<float*> ptrArray;
+                ptrArray.reset (new float* [buffer.getNumChannels()]);
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                    ptrArray.get()[ch] = osBlock.getChannelPointer (ch);
+
+                AudioBuffer<float> osBuffer (ptrArray.get(), buffer.getNumChannels(), static_cast<int> (osBlock.getNumSamples()));
+                pluginProcessBlock (osBuffer, processor->isSuspended());
+
+                osProcessor->processSamplesDown (block);
             }
             else
             {
-                processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                pluginProcessBlock (buffer, processor->isSuspended());
             }
+            
         }
         
         if (muted && !muteInput)
@@ -1332,7 +1358,7 @@ void GraphProcessor::prepareToPlay (double sampleRate, int estimatedSamplesPerBl
     currentMidiInputBuffer = nullptr;
     currentMidiOutputBuffer.clear();
     clearRenderingSequence();
-    
+
     if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
     {
         setPlayConfigDetails (getTotalNumInputChannels(), getTotalNumOutputChannels(),

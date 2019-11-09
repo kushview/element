@@ -203,7 +203,27 @@ public:
         int index = 30000;
         GraphNodePtr ptr = node.getGraphNode();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
+
+        addOversamplingSubmenu (menu);
+
         addSubMenu ("Options", menu, ptr != nullptr);
+    }
+
+    inline void addOversamplingSubmenu (PopupMenu& menuToAddTo)
+    {
+        PopupMenu osMenu;
+        int index = 40000;
+        GraphNodePtr ptr = node.getGraphNode();
+
+        if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
+            return;
+
+        osMenu.addItem (index++, "1x", true, ptr->getOversamplingFactor() == 1);
+        osMenu.addItem (index++, "2x", true, ptr->getOversamplingFactor() == 2);
+        osMenu.addItem (index++, "4x", true, ptr->getOversamplingFactor() == 4);
+        osMenu.addItem (index++, "8x", true, ptr->getOversamplingFactor() == 8);
+                                                      
+        menuToAddTo.addSubMenu ("Oversample", osMenu);
     }
 
     inline void addReplaceSubmenu (PluginManager& plugins)
@@ -334,6 +354,21 @@ public:
                 case 0:
                     node.setMuteInput (! node.isMutingInputs());
                     break;
+            }
+        }
+        else if (result >= 40000 && result < 50000)
+        {
+            const int osFactor = (int) powf(2, float (result - 40000));
+            if (auto gNode = node.getGraphNode())
+            {
+                auto* graph = gNode->getParentGraph();
+                // TODO: don't reload the entire graph
+                bool wasSuspended = graph->isSuspended();
+                graph->suspendProcessing (true);
+                graph->releaseResources();
+                gNode->setOversamplingFactor (osFactor);
+                graph->prepareToPlay (gNode->getParentGraph()->getSampleRate(), gNode->getParentGraph()->getBlockSize());
+                graph->suspendProcessing (wasSuspended);
             }
         }
         

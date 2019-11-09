@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"unicode/utf8"
 )
 
@@ -78,13 +79,26 @@ func main() {
 		}
 	}
 
+	for k, v := range extraContribs() {
+		contribs = append(contribs, Contributor{Name: v, Login: k})
+	}
+
+	results := make([]string, 0)
 	for _, c := range contribs {
 		if len(c.Name) > 0 && len(c.Login) > 0 {
-			fmt.Printf("%s (%s)\n", c.Name, c.Login)
+			results = append(results, fmt.Sprintf("%s (%s)", c.Name, c.Login))
 		} else if len(c.Name) > 0 {
-			fmt.Println(c.Name)
+			results = append(results, fmt.Sprintf(c.Name))
 		} else if len(c.Login) > 0 {
-			fmt.Println(c.Login)
+			results = append(results, fmt.Sprintf(c.Login))
 		}
+	}
+
+	sort.Slice(results, func(i, j int) bool {
+		return results[i] < results[j]
+	})
+
+	for _, entry := range results {
+		fmt.Println(entry)
 	}
 }

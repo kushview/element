@@ -23,10 +23,6 @@
 #include "session/ControllerDevice.h"
 #include "session/Node.h"
 
-#ifndef EL_MIDI_MAPPING_CHANNELS
- #define EL_MIDI_MAPPING_CHANNELS   0
-#endif
-
 namespace Element {
 
 class ControllerMapHandler
@@ -56,11 +52,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         jassert (message.isNoteOn());
         jassert (node && processor);
 
-       #if EL_MIDI_MAPPING_CHANNELS
         channelObject = control.getPropertyAsValue (Tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
-       #endif
 
         momentaryObject = control.getMomentaryValue();
         momentaryObject.addListener (this);
@@ -93,7 +87,6 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         bool wants = momentary.get() == 0
             ? message.isNoteOn() && checkNoteAndChannel (message)
             : message.isNoteOnOrOff() && checkNoteAndChannel (message);
-        // DBG("momentary: " << momentary.get() << " wants: " << (int) wants << " on: " << (int) message.isNoteOn() << " off: " << (int) message.isNoteOff());
         return wants;
     }
 
@@ -248,11 +241,9 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         toggleModeObject.addListener (this);
         toggleMode.set (static_cast<int> (control.getToggleMode()));
 
-       #if EL_MIDI_MAPPING_CHANNELS
         channelObject = control.getPropertyAsValue (Tags::midiChannel);
         channelObject.addListener (this);
         valueChanged (channelObject);
-       #endif
 
         if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
         {

@@ -53,6 +53,7 @@ namespace Tags
     const Identifier node               = "node";
     const Identifier nodes              = "nodes";
     const Identifier notes              = "notes";
+    const Identifier oversamplingFactor = "oversamplingFactor";
     const Identifier persistent         = "persistent";
     const Identifier placeholder        = "placeholder";
     const Identifier port               = "port";

@@ -8,7 +8,7 @@ import juce
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
-    juce_data_structures juce_events juce_graphics juce_gui_basics
+    juce_data_structures juce_dsp juce_events juce_graphics juce_gui_basics
     juce_gui_extra juce_osc kv_core kv_engines kv_gui kv_models
 '''
 
@@ -29,6 +29,8 @@ def check_common (self):
     self.define('KV_JACK_AUDIO', self.env.JACK)
 
     # VST support
+    if len(self.options.vst_sdk) > 0:
+        self.env.append_unique ('CXXFLAGS', ['-I%s' % self.options.vst_sdk])
     line_just = self.line_just
     self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
                mandatory=False, uselib_store="VST")
@@ -74,11 +76,13 @@ def check_mingw (self):
 def check_mac (self):
     # VST/VST3 OSX Support
     self.define('JUCE_PLUGINHOST_VST3', 1)
+    self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
 
 @conf
 def check_linux (self):
     self.check(lib='pthread', mandatory=True)
-    self.check(lib='dl', mandatory=True)
+    self.check(lib='dl', uselib_store='DL', mandatory=True)
+    self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
     self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
     self.check(lib='curl', uselib_store='CURL', mandatory=True)
     self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)

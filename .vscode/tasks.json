@@ -30,14 +30,12 @@
         {
             "label": "Waf Check",
             "type": "shell",
-            "command": "python waf check",
-            "problemMatcher": []
+            "command": "python waf check"
         },
         {
             "label": "Waf Clean",
             "type": "shell",
-            "command": "python waf clean",
-            "problemMatcher": []
+            "command": "python waf clean"
         },
         {
             "label": "Waf Rebuild",
@@ -57,16 +55,18 @@
             "args": [
                 "waf",
                 "configure",
+                "--enable-lua",
+                "--test",
                 "--debug"
             ],
             "options": {
-                
                 "env": {
+                    "CXXFLAGS": "-I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
                     "CC": "ccache clang",
                     "CXX": "ccache clang++"
                 }
             },
-            "problemMatcher": [ ]
+            "problemMatcher": []
         },
         {
             "label": "Waf Configure (workspaces)",
@@ -80,12 +80,12 @@
             ],
             "options": {
                 "env": {
+                    "CXXFLAGS": "-I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
                     "CC": "ccache clang",
                     "CXX": "ccache clang++"
                 }
             },
             "problemMatcher": []
-        },
+        }
     ]
 }
-

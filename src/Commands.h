@@ -18,95 +18,136 @@
 
 #pragma once
 
-#include "ElementApp.h"
+#include "JuceHeader.h"
 
 namespace Element {
 namespace Commands {
-    using namespace StandardApplicationCommandIDs;
 
-    namespace Categories
-    {
-        static const char* const Application   = "Application";
-        static const char* const General       = "General";
-        static const char* const Editing       = "Editing";
-        static const char* const View          = "View";
-        static const char* const Windows       = "Windows";
-        static const char* const Session       = "Session";
-        static const char* const UserInterface = "User Interface";
-    }
+using namespace StandardApplicationCommandIDs;
 
-    enum AppCommands
-    {
-        showAbout              = 0x0100,
-        showLegacyView,
-        showPluginManager,
-        showPreferences,
-        showSessionConfig,
-        showGraphConfig,
-        showPatchBay,
-        showGraphEditor,
-        showLastContentView,
-        showAllPluginWindows,
-        showKeymapEditor,
-        hideAllPluginWindows,
+namespace Categories
+{
+    static const char* const Application   = "Application";
+    static const char* const General       = "General";
+    static const char* const Editing       = "Editing";
+    static const char* const View          = "View";
+    static const char* const Windows       = "Windows";
+    static const char* const Session       = "Session";
+    static const char* const UserInterface = "User Interface";
+}
 
-        toggleVirtualKeyboard,
-        rotateContentView,
+enum AppCommands
+{
+    invalid                = -1,
 
-        mediaClose,
-        mediaOpen,
-        mediaNew,
-        mediaSave,
-        mediaSaveAs,
+    showAbout              = 0x0100,
+    showLegacyView,
+    showPluginManager,
+    showPreferences,
+    showSessionConfig,
+    showGraphConfig,
+    showPatchBay,
+    showGraphEditor,
+    showLastContentView,
+    showAllPluginWindows,
+    showKeymapEditor,
+    hideAllPluginWindows,
 
-        showControllerDevices,
-        toggleUserInterface,
-        toggleChannelStrip,
-        showGraphMixer,
-        
-        sessionClose           = 0x0300,
-        sessionOpen,
-        sessionNew,
-        sessionSave,
-        sessionSaveAs,
-        sessionAddGraph,
-        sessionDuplicateGraph = 900,
-        sessionDeleteGraph    = 901,
-        sessionInsertPlugin   = 902,
+    toggleVirtualKeyboard,
+    rotateContentView,
 
-        exportAudio            = 0x0400,
-        exportMidi,
-        exportGraph,
-        importGraph,
+    mediaClose,
+    mediaOpen,
+    mediaNew,
+    mediaSave,
+    mediaSaveAs,
 
-        panic,
-        importSession,
+    showControllerDevices,
+    toggleUserInterface,
+    toggleChannelStrip,
+    showGraphMixer,
+    
+    sessionClose           = 0x0300,
+    sessionOpen,
+    sessionNew,
+    sessionSave,
+    sessionSaveAs,
+    sessionAddGraph,
+    sessionDuplicateGraph = 900,
+    sessionDeleteGraph    = 901,
+    sessionInsertPlugin   = 902,
 
-        checkNewerVersion      = 0x0500,
+    exportAudio           = 0x0400,
+    exportMidi,
+    exportGraph,
+    importGraph,
 
-        signIn,
-        signOut,
+    panic,
+    importSession,
 
-        transportRewind        = 0x0600,
-        transportForward,
-        transportPlay,
-        transportRecord,
-        transportSeekZero,
-        transportStop,
+    checkNewerVersion      = 0x0500,
 
-        graphNew               = 0x0700,
-        graphOpen,
-        graphSave,
-        graphSaveAs,
+    signIn,
+    signOut,
 
-       #if EL_DOCKING
-        workspaceSave          = 0x0800,
-        workspaceOpen,
-        workspaceResetActive,
-        workspaceSaveActive,
+    transportRewind        = 0x0600,
+    transportForward,
+    transportPlay,
+    transportRecord,
+    transportSeekZero,
+    transportStop,
 
-        workspaceClassic       = 0x0900,
-        workspaceEditing,
-       #endif
-    };
+    graphNew               = 0x0700,
+    graphOpen,
+    graphSave,
+    graphSaveAs,
+
+   #if EL_DOCKING
+    workspaceSave          = 0x0800,
+    workspaceOpen,
+    workspaceResetActive,
+    workspaceSaveActive,
+
+    workspaceClassic       = 0x0900,
+    workspaceEditing,
+   #endif
+};
+
+inline static CommandID fromString (const String& str)
+{
+    if (str == "quit")                  return Commands::quit;
+
+    if (str == "showAbout")             return Commands::showAbout;
+    if (str == "showLegacyView")        return Commands::showLegacyView;
+    if (str == "showPluginManager")     return Commands::showPluginManager;
+    if (str == "showPreferences")       return Commands::showPreferences;
+    if (str == "showSessionConfig")     return Commands::showSessionConfig;
+    if (str == "showGraphConfig")       return Commands::showGraphConfig;
+    if (str == "showPatchBay")          return Commands::showPatchBay;
+    if (str == "showGraphEditor")       return Commands::showGraphEditor;
+    if (str == "showLastContentView")   return Commands::showLastContentView;
+    if (str == "showAllPluginWindows")  return Commands::showAllPluginWindows;
+    if (str == "showKeymapEditor")      return Commands::showKeymapEditor;
+    if (str == "hideAllPluginWindows")  return Commands::hideAllPluginWindows;
+
+    if (str == "toggleVirtualKeyboard") return Commands::toggleVirtualKeyboard;
+    if (str == "rotateContentView")     return Commands::rotateContentView;
+
+    if (str == "showControllerDevices") return Commands::showControllerDevices;
+    if (str == "toggleUserInterface")   return Commands::toggleUserInterface;
+    if (str == "toggleChannelStrip")    return Commands::toggleChannelStrip;
+    if (str == "showGraphMixer")        return Commands::showGraphMixer;
+
+    if (str == "panic")                 return Commands::panic;
+
+    if (str == "graphNew")              return Commands::graphNew;
+    if (str == "graphOpen")             return Commands::graphOpen;
+    if (str == "graphSave")             return Commands::graphSave;
+    if (str == "graphSaveAs")           return Commands::graphSaveAs;
+
+   #if EL_DOCKING
+   #endif
+    return Commands::invalid;
+}
+
 }}

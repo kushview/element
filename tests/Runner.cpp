@@ -18,8 +18,26 @@
 
 #include "Tests.h"
 
+static bool copyData()
+{
+    const auto dataDir = File::getSpecialLocation (File::invokedExecutableFile)
+            .getParentDirectory().getParentDirectory().getParentDirectory()
+            .getChildFile("data");
+    const auto buildDir = File::getSpecialLocation (File::invokedExecutableFile)
+            .getParentDirectory().getParentDirectory().getParentDirectory()
+            .getChildFile("build");
+
+    const auto buildData = buildDir.getChildFile ("data");
+    if (buildData.exists())
+        buildData.deleteRecursively();
+    return dataDir.copyDirectoryTo (buildDir.getChildFile ("data"));
+}
+
 int main (int argc, char** argv)
 {
+    if (! copyData())
+        return 100;
+
     MessageManager::getInstance();
     juce::initialiseJuce_GUI();
     UnitTestRunner runner;
