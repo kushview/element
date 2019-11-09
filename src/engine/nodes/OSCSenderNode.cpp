@@ -100,18 +100,16 @@ void OSCSenderNode::run ()
         MidiMessage msg;
         int frame;
 
+        ScopedLock sl (lock);
+
         while (iter1.getNextEvent (msg, frame))
         {
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
-            oscSender.send (oscMsg);
+            oscSender.send ( oscMsg );
 
-            {
-                ScopedLock sl (lock);
-
-                if (oscMessagesToLog.size() > maxOscMessages)
-                    oscMessagesToLog.erase ( oscMessagesToLog.begin() );
-                oscMessagesToLog.push_back ( oscMsg );
-            }
+            if (oscMessagesToLog.size() > maxOscMessages)
+                oscMessagesToLog.erase ( oscMessagesToLog.begin() );
+            oscMessagesToLog.push_back ( oscMsg );
         }
     }
 
@@ -167,7 +165,7 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     while (iter1.getNextEvent (msg, frame))
     {
-        msg.setTimeStamp ( timestamp + frame );
+        msg.setTimeStamp ( timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)) );
         midiMessageQueue.addMessageToQueue ( msg );
     }
 
