@@ -110,19 +110,7 @@ void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         return;
     }
 
-    auto& midiOut = *midi.getWriteBuffer (0);
-
-    MidiBuffer messages;
-    outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
-
-    MidiBuffer::Iterator iter1 (messages);
-    MidiMessage msg;
-    int frame;
-
-    while (iter1.getNextEvent (msg, frame))
-    {
-        midiOut.addEvent (msg, frame);
-    }
+    outputMidiMessages.removeNextBlockOfMessages ( *midi.getWriteBuffer (0), nframes );
 }
 
 /** OSCReceiver real-time callbacks */
