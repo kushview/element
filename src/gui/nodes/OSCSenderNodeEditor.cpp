@@ -96,7 +96,9 @@ OSCSenderNodeEditor::~OSCSenderNodeEditor()
 }
 
 void OSCSenderNodeEditor::timerCallback() {
-    std::vector<OSCMessage> oscMessages = oscSenderNodePtr->getOscMessages();
+
+    const std::vector<OSCMessage>& oscMessages = oscSenderNodePtr->getOscMessages();
+
     for(auto msg : oscMessages)
     {
         oscSenderLog.addOSCMessage( msg );

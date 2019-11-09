@@ -35,8 +35,8 @@ OSCReceiverNode::OSCReceiverNode()
 
 OSCReceiverNode::~OSCReceiverNode()
 {
-   oscReceiver.removeListener (this);
-   oscReceiver.disconnect();
+    oscReceiver.removeListener (this);
+    oscReceiver.disconnect();
 }
 
 void OSCReceiverNode::setState (const void* data, int size)
@@ -95,7 +95,6 @@ inline void OSCReceiverNode::createPorts()
 
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
-
     if (! outputMidiMessagesInitDone) {
         outputMidiMessages.reset (sampleRate);
         currentSampleRate = sampleRate;
