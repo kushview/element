@@ -21,6 +21,7 @@
 #include "session/CommandManager.h"
 #include "Commands.h"
 #include "Globals.h"
+#include "Settings.h"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
 
@@ -111,6 +112,8 @@ public:
         application.reset();
     }
 
+    int getHostPort() const { return serverPort; }
+
 private:
     OSCController& owner;
     OSCSender sender;
@@ -135,10 +138,27 @@ OSCController::~OSCController()
     impl.reset();
 }
 
+void OSCController::refreshWithSettings (bool alertOnFail)
+{
+    auto& settings = getWorld().getSettings();
+    impl->stopServer();
+    impl->setServerPort (settings.getOscHostPort());
+    
+    if (settings.isOscHostEnabled())
+    {
+        if (! impl->startServer() && alertOnFail)
+        {
+            String msg = "Could not start OSC host on port "; msg << impl->getHostPort();
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                "OSC Host", msg);
+        }
+    }
+}
+
 void OSCController::activate()
 {
     impl->initialize();
-    impl->startServer();
+    refreshWithSettings (false);
 }
 
 void OSCController::deactivate()

@@ -38,6 +38,8 @@ const char* Settings::lastGraphKey              = "lastGraph";
 const char* Settings::legacyInterfaceKey        = "legacyInterface";
 const char* Settings::workspaceKey              = "workspace";
 const char* Settings::midiEngineKey             = "midiEngine";
+const char* Settings::oscHostPortKey            = "oscHostPortKey";
+const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
 
 enum OptionsMenuItemId
 {
@@ -317,6 +319,36 @@ File Settings::getWorkspaceFile() const
     if (name.isNotEmpty()) name << ".elw";
     return name.isNotEmpty() ? DataPath::workspacesDir().getChildFile (name)
                              : File();
+}
+
+bool Settings::isOscHostEnabled() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (oscHostEnabledKey, false);
+    return false;
+}
+
+void Settings::setOscHostEnabled (bool enabled)
+{
+    if (isOscHostEnabled() == enabled)
+        return;
+    if (auto* p = getProps())
+        p->setValue (oscHostEnabledKey, enabled);
+}
+
+int Settings::getOscHostPort() const
+{
+    if (auto* p = getProps())
+        return p->getIntValue (oscHostPortKey, 9000);
+    return 9000;
+}
+
+void Settings::setOscHostPort (int port)
+{
+    if (getOscHostPort() == port)
+        return;
+    if (auto* p = getProps())
+        p->setValue (oscHostPortKey, port);
 }
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)

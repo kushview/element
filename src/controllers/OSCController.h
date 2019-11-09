@@ -28,6 +28,13 @@ class OSCController : public AppController::Child
 public:
     OSCController();
     ~OSCController();
+
+    /** Sets the port and starts/stops the host accoding to Settings
+        
+        @param alertOnFail  If true, show an alert if the host could not start
+    */
+    void refreshWithSettings (bool alertOnFail = false);
+
     void activate() override;
     void deactivate() override;
 

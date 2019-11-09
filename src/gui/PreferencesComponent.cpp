@@ -25,12 +25,14 @@
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"
 #include "gui/ViewHelpers.h"
+#include "controllers/OSCController.h"
 #include "Globals.h"
 #include "Settings.h"
 
 #define EL_GENERAL_SETTINGS_NAME "General"
 #define EL_AUDIO_SETTINGS_NAME "Audio"
 #define EL_MIDI_SETTINGS_NAME "MIDI"
+#define EL_OSC_SETTINGS_NAME "OSC"
 #define EL_PLUGINS_PREFERENCE_NAME  "Plugins"
 //[/Headers]
 
@@ -128,6 +130,91 @@ namespace Element {
             label.setBounds (r2.removeFromLeft (getWidth() / 2));
             setting.setBounds (r2.removeFromLeft (toggleWidth)
                                  .withSizeKeepingCentre (toggleWidth, toggleHeight));
+        }
+    };
+
+    class OSCSettingsPage : public SettingsPage,
+                            private AsyncUpdater
+    {
+    public:
+        OSCSettingsPage (Globals& w, GuiController& g)
+            : world (w), gui (g)
+        {
+            auto& settings = world.getSettings();
+            addAndMakeVisible (enabledLabel);
+            enabledLabel.setFont (Font (12.0, Font::bold));
+            enabledLabel.setText ("OSC Host Enabled?", dontSendNotification);
+            addAndMakeVisible (enabledButton);
+            enabledButton.setYesNoText ("Yes", "No");
+            enabledButton.setClickingTogglesState (true);
+            enabledButton.setToggleState (settings.isOscHostEnabled(), dontSendNotification);
+            enabledButton.onClick = [this]()
+            {
+                updateEnablement();
+                triggerAsyncUpdate();
+            };
+
+            addAndMakeVisible (hostLabel);
+            hostLabel.setFont (Font (12.0, Font::bold));
+            hostLabel.setText ("OSC Host", dontSendNotification);
+            addAndMakeVisible (hostField);
+            hostField.setReadOnly (true);
+            hostField.setText (IPAddress::getLocalAddress().toString());
+
+            addAndMakeVisible (portLabel);
+            portLabel.setFont (Font (12.0, Font::bold));
+            portLabel.setText ("OSC Host Port", dontSendNotification);
+            addAndMakeVisible (portSlider);
+            portSlider.textFromValueFunction = [this](double value) -> String {
+                return String (roundToInt (value));
+            };
+            portSlider.setRange (1.0, 65535.0, 1.0);
+            portSlider.setValue ((double) settings.getOscHostPort());
+            portSlider.setSliderStyle (Slider::IncDecButtons);
+            portSlider.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
+            portSlider.onValueChange = [this]()
+            {
+                world.getSettings().setOscHostPort (roundToInt (portSlider.getValue()));
+                triggerAsyncUpdate();
+            };
+        }
+
+        ~OSCSettingsPage() { }
+
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            layoutSetting (r, enabledLabel, enabledButton);
+            layoutSetting (r, hostLabel, hostField, getWidth() / 2);
+            layoutSetting (r, portLabel, portSlider, getWidth() / 4);
+        }
+
+    private:
+        Globals& world;
+        GuiController& gui;
+        Label enabledLabel;
+        SettingButton enabledButton;
+        Label hostLabel;
+        TextEditor hostField;
+        Label portLabel;
+        Slider portSlider;
+
+        void handleAsyncUpdate() override
+        {
+            requestServerUpdate();
+        }
+
+        void requestServerUpdate()
+        {
+            if (auto* const osc = gui.findSibling<OSCController>())
+                osc->refreshWithSettings (true);
+        }
+
+        void updateEnablement()
+        {
+            world.getSettings().setOscHostEnabled (enabledButton.getToggleState());
+            hostField.setEnabled (enabledButton.getToggleState());
+            portSlider.setEnabled (enabledButton.getToggleState());
         }
     };
 
@@ -874,6 +961,7 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
     addPage (EL_GENERAL_SETTINGS_NAME);
     addPage (EL_AUDIO_SETTINGS_NAME);
     addPage (EL_MIDI_SETTINGS_NAME);
+    addPage (EL_OSC_SETTINGS_NAME);
     setPage (EL_GENERAL_SETTINGS_NAME);
     //[/Constructor]
 }
@@ -935,6 +1023,8 @@ Component* PreferencesComponent::createPageForName (const String& name)
         return new PluginSettingsComponent (world);
     } else if (name == EL_MIDI_SETTINGS_NAME) {
         return new MidiSettingsPage (world);
+    } else if (name == EL_OSC_SETTINGS_NAME) {
+        return new OSCSettingsPage (world, gui);
     }
 
     return nullptr;

@@ -47,6 +47,8 @@ public:
     static const char* legacyInterfaceKey;
     static const char* workspaceKey;
     static const char* midiEngineKey;
+    static const char* oscHostPortKey;
+    static const char* oscHostEnabledKey;
 
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -103,6 +105,11 @@ public:
     void setWorkspace (const String& name);
     String getWorkspace() const;
     File getWorkspaceFile() const;
+
+    bool isOscHostEnabled() const;
+    void setOscHostEnabled (bool);
+    int getOscHostPort() const;
+    void setOscHostPort (int);
 
 private:
     PropertiesFile* getProps() const;
