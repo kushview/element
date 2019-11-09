@@ -15,8 +15,6 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
-    opt.add_option ('--enable-lua', default=False, action='store_true', dest='lua', \
-        help="Build with Lua scripting support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
     opt.add_option ('--test', default=False, action='store_true', dest='test', \
@@ -62,11 +60,6 @@ def configure (conf):
     conf.env.DEBUG = conf.options.debug
     conf.env.EL_VERSION_STRING = VERSION
     
-    configure_product (conf)
-
-    conf.env.LUA = bool(conf.options.lua)
-    conf.define ('EL_LUA', conf.env.LUA)
-
     conf.define ('EL_USE_JACK', 0)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
@@ -82,7 +75,6 @@ def configure (conf):
     juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
-    juce.display_msg (conf, "Lua", conf.env.LUA)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
     print
@@ -123,69 +115,6 @@ def build_desktop (bld, slug='element'):
 
         bld.install_files (element_data, 'data/ElementIcon.png')
 
-def build_lua (bld):
-    lua_src = '''
-        libs/lua/src/lauxlib.c
-        libs/lua/src/liolib.c
-        libs/lua/src/lopcodes.c
-        libs/lua/src/lstate.c
-        libs/lua/src/lobject.c
-        libs/lua/src/lmathlib.c
-        libs/lua/src/loadlib.c
-        libs/lua/src/lvm.c
-        libs/lua/src/lfunc.c
-        libs/lua/src/lstrlib.c
-        libs/lua/src/lua.c
-        libs/lua/src/linit.c
-        libs/lua/src/lstring.c
-        libs/lua/src/lundump.c
-        libs/lua/src/lctype.c
-        libs/lua/src/ltable.c
-        libs/lua/src/ldump.c
-        libs/lua/src/loslib.c
-        libs/lua/src/lgc.c
-        libs/lua/src/lzio.c
-        libs/lua/src/ldblib.c
-        libs/lua/src/lutf8lib.c
-        libs/lua/src/lmem.c
-        libs/lua/src/lcorolib.c
-        libs/lua/src/lcode.c
-        libs/lua/src/ltablib.c
-        libs/lua/src/lbitlib.c
-        libs/lua/src/lapi.c
-        libs/lua/src/lbaselib.c
-        libs/lua/src/ldebug.c
-        libs/lua/src/lparser.c
-        libs/lua/src/llex.c
-        libs/lua/src/ltm.c
-        libs/lua/src/ldo.c'''.split()
-
-    lua = bld (
-        features    = "c cstlib",
-        source      = lua_src,
-        includes    = [ 'libs/lua/src' ],
-        target      = 'lib/lua',
-        name        = 'LUA',
-        use         = [],
-        linkflags   = [],
-        env         = bld.env.derive()
-    )
-
-    lua.env.CFLAGS = ['-std=c99', '-O2', '-Wall', '-Wextra', '-DLUA_COMPAT_5_2', '-fPIC']
-    lua.env.CXXFLAGS = []
-
-    if juce.is_mac():
-        lua.env.append_unique('CFLAGS', [ '-DLUA_USE_MACOSX' ])
-        lua.use.append('READLINE')
-    elif juce.is_linux():
-        lua.env.append_unique('CFLAGS', [ '-DLUA_USE_LINUX' ])
-        lua.use.append('READLINE')
-        lua.use.append('DL')
-        lua.linkflags.append('-Wl,-E')
-
-    bld.add_group()
-    return lua
-
 def compile (bld):
     libEnv = bld.env.derive()
     library = bld (
@@ -197,7 +126,7 @@ def compile (bld):
         target      = 'lib/element-0',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS', 'LUA' ]
+        use         = [ 'BOOST_SIGNALS' ]
     )
 
     bld.add_group()
@@ -231,7 +160,6 @@ def compile (bld):
         pass
 
 def build (bld):
-    if bld.env.LUA: build_lua(bld)
     compile(bld)
     if bld.env.TEST: bld.recurse ('tests')
 

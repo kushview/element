@@ -11,6 +11,6 @@ bld.program (
                 '../src' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
-            'ALSA', 'XEXT', 'ELEMENT', 'PYTHON', 'LUA' ],
+            'ALSA', 'XEXT', 'ELEMENT', 'PYTHON' ],
     install_path = None
 )
