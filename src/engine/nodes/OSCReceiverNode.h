@@ -94,8 +94,6 @@ private:
 
     /** OSC */
     OSCReceiver oscReceiver;
-    std::vector<OSCMessage> oscMessages;
-    Atomic<int> numOscMessages = 0;
 
     bool connected = false;
     bool paused = false;

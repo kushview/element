@@ -98,8 +98,6 @@ void OSCReceiverNode::oscMessageReceived(const OSCMessage& message)
     midiMsg.setTimeStamp (timestamp);
 
     outputMidiMessages.addMessageToQueue( midiMsg );
-
-    oscMessages.push_back(message);
 };
 
 void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
