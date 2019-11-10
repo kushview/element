@@ -36,7 +36,14 @@ public:
     LuaState();
     ~LuaState();
 
+    /** returns true if the state couldn't be created */
     bool isNull() const { return state == nullptr; }
+
+    /** Load a buffer (luaL_loadbuffer)
+     
+        @return Lua status code, LUA_OK on success
+    */
+    int loadBuffer (const String& script, const String& name);
 
     /** Pass as lua_State* as parameter. */
     operator lua_State*() const { return state; }

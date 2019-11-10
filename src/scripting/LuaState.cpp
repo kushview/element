@@ -57,4 +57,9 @@ LuaState::~LuaState()
     }
 }
 
+int LuaState::loadBuffer (const String& script, const String& name)
+{
+    return luaL_loadbuffer (state, script.toRawUTF8(), script.length(), name.toRawUTF8());
+}
+
 }

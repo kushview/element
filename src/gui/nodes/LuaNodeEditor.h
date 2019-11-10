@@ -1,6 +1,7 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    - Author Michael Fisher <mfisher@kushvie.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,29 +20,23 @@
 
 #pragma once
 
-#include "JuceHeader.h"
-#include "engine/GraphNode.h"
-#include "session/Node.h"
+#include "gui/nodes/NodeEditorComponent.h"
 
 namespace Element {
 
-class NodeEditorComponent : public Component
+class LuaNodeEditor : public NodeEditorComponent
 {
-protected:
-    NodeEditorComponent (const Node&) noexcept;
-
 public:
-    NodeEditorComponent() = delete;
-    virtual ~NodeEditorComponent() override;
-    inline Node getNode() const { return node; }
-    bool isRunningInPluginWindow() const;
+    explicit LuaNodeEditor (const Node&);
+    ~LuaNodeEditor() override;
 
-protected:
-    inline GraphNode* getNodeObject() const { return node.getGraphNode(); }
-    template<class T> inline T* getNodeObjectOfType() const { return dynamic_cast<T*> (getNodeObject()); }
+    void resized() override;
+    void paint (Graphics&) override;
 
 private:
-    Node node;
+    CodeDocument document;
+    LuaTokeniser tokens;
+    std::unique_ptr<CodeEditorComponent> editor;
 };
 
 }

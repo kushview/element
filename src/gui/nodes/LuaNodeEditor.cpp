@@ -1,6 +1,7 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    - Author Michael Fisher <mfisher@kushvie.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,31 +18,37 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#pragma once
-
-#include "JuceHeader.h"
-#include "engine/GraphNode.h"
-#include "session/Node.h"
+#include "engine/nodes/LuaNode.h"
+#include "gui/nodes/LuaNodeEditor.h"
+#include "gui/LookAndFeel.h"
 
 namespace Element {
 
-class NodeEditorComponent : public Component
+LuaNodeEditor::LuaNodeEditor (const Node& node)
+    : NodeEditorComponent (node)
 {
-protected:
-    NodeEditorComponent (const Node&) noexcept;
+    setOpaque (true);
+    editor.reset (new CodeEditorComponent (document, &tokens));
+    addAndMakeVisible (editor.get());
+    if (auto* const lua = getNodeObjectOfType<LuaNode>())
+        editor->loadContent (lua->getDraftScript());
+    setSize (475, 340);
+}
 
-public:
-    NodeEditorComponent() = delete;
-    virtual ~NodeEditorComponent() override;
-    inline Node getNode() const { return node; }
-    bool isRunningInPluginWindow() const;
+LuaNodeEditor::~LuaNodeEditor()
+{
+    if (auto* const lua = getNodeObjectOfType<LuaNode>())
+        lua->setDraftScript (document.getAllContent());
+}
 
-protected:
-    inline GraphNode* getNodeObject() const { return node.getGraphNode(); }
-    template<class T> inline T* getNodeObjectOfType() const { return dynamic_cast<T*> (getNodeObject()); }
+void LuaNodeEditor::paint (Graphics& g)
+{ 
+    g.fillAll (Element::LookAndFeel::backgroundColor);
+}
 
-private:
-    Node node;
-};
+void LuaNodeEditor::resized()
+{
+    editor->setBounds (getLocalBounds().reduced (4));
+}
 
 }
