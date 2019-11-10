@@ -18,6 +18,7 @@
 */
 
 #include "engine/nodes/LuaNode.h"
+#include "engine/MidiPipe.h"
 
 static const String defaultScript = R"%(--[[ 
     Lua Filter template
@@ -51,14 +52,29 @@ ports = {
     }
 }
 
+-- throttler
+sample_rate = 0
+frame_count = 0
+block_size = 0
+
 -- prepare for rendering
 function prepare(rate, block)
+    sample_rate = rate
+    frame_count = 0
     print (string.format ('prepare rate = %d block = %d', rate, block))
 end
 
 -- render audio and midi
 function render (audio, midi)
     -- render the streams
+    print (midi)
+    if frame_count % sampe_rate == 0 then
+        print (frame_count)
+        print (midi)
+    end
+
+    --- why doesn't this increment??
+    frame_count = frame_count + 1
 end
 
 -- release resources
@@ -78,6 +94,68 @@ end
 
 namespace Element {
 
+struct LuaMidiBuffer
+{
+    MidiBuffer* buffer;
+};
+
+struct LuaMidiPipe
+{
+    MidiPipe* pipe;
+};
+
+static LuaMidiPipe* lua_midi_pipe_create (lua_State* state)
+{
+    auto* pipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
+    pipe->pipe = nullptr;
+    luaL_getmetatable (state, "Element.MidiPipe");
+    lua_setmetatable (state, -2);
+    return pipe;
+}
+
+static int lua_midi_pipe_new (lua_State* state)
+{
+    auto* pipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
+    pipe->pipe = nullptr;
+    luaL_getmetatable (state, "Element.MidiPipe");
+    lua_setmetatable (state, -2);
+    return 1;
+}
+
+static int lua_midi_pipe_size (lua_State* state)
+{
+    auto* pipe = (LuaMidiPipe*) lua_touserdata (state, 1);
+    lua_pushinteger (state, pipe->pipe == nullptr
+        ? 0 : pipe->pipe->getNumBuffers());
+    return 1;
+}
+
+static int lua_midi_pipe_to_string (lua_State *state)
+{
+    lua_pushstring (state, "MidiBuffer");
+    return 1;
+}
+
+static const struct luaL_Reg midiPipeLib [] = {
+    { "new",    lua_midi_pipe_new },
+    { nullptr,  nullptr }
+};
+
+static const struct luaL_Reg midiPipeMethods [] = {
+    { "__tostring", lua_midi_pipe_to_string },
+    { "size", lua_midi_pipe_size },
+    nullptr, nullptr
+};
+
+int luaopen_MidiPipe (lua_State* state) {
+    luaL_newmetatable (state, "Element.MidiPipe");
+    lua_pushvalue (state, -1);                  /* duplicate the metatable */
+    lua_setfield (state, -2, "__index");        /* mt.__index = mt */
+    luaL_setfuncs (state, midiPipeMethods, 0);  /* register metamethods */
+    luaL_newlib (state, midiPipeLib);
+    return 1;
+}
+
 LuaNode::LuaNode()
     : GraphNode (0)
 {
@@ -87,13 +165,31 @@ LuaNode::LuaNode()
 
     script = draftScript = defaultScript;
 
+    luaL_requiref (state, "MidiPipe", luaopen_MidiPipe, 1);
+    lua_pop (state, 1);  /* remove lib */
+
     state.loadBuffer (script, "luanode");
     lua_pcall (state, 0, 0, 0);
     lua_getglobal (state, "name"); // -1
     setName (lua_tostring (state, -1));
     lua_pop (state, -1);
+
+    // get the render function
     lua_getglobal (state, "render");
     renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
+
+    DBG("Stack Size: " << lua_gettop (state));
+
+    lua_midi_pipe_new (state);
+    // if (luaMidiPipe == nullptr)
+    {
+        DBG("Stack Size: " << lua_gettop (state));
+        midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
+    }
+    
+    // luaMidiPipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
+    // luaMidiPipe->pipe = nullptr;
+    // midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
 }
 
 LuaNode::~LuaNode()
@@ -123,7 +219,7 @@ void LuaNode::prepareToRender (double sampleRate, int maxBufferSize)
     
     lua_getglobal  (state, "prepare");
     lua_pushnumber (state, sampleRate);
-    lua_pushnumber (state, maxBufferSize);    
+    lua_pushnumber (state, maxBufferSize);
     if (lua_pcall (state, 2, 0, 0) != LUA_OK)
     {
         DBG("[EL] error calling prepare()");
@@ -146,10 +242,11 @@ void LuaNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
     lua_pushnumber (state, 100);
-    lua_pushnumber (state, 101);
+//    lua_pushnumber (state, 101);
+    lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
     if (lua_pcall (state, 2, 0, 0) != LUA_OK)
     {
-        DBG("[EL] error calling render()");
+        // DBG("[EL] error calling render()");
     }
 }
 

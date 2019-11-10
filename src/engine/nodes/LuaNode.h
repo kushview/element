@@ -25,6 +25,9 @@
 
 namespace Element {
 
+struct LuaMidiBuffer;
+struct LuaMidiPipe;
+
 class LuaNode : public GraphNode
 {
 public:
@@ -61,7 +64,13 @@ private:
     bool createdPorts = false;
     LuaState state;
     String script, draftScript;
-    int renderRef = -1;
+
+    LuaMidiBuffer* luaMidiBuffer { nullptr };
+    LuaMidiPipe* luaMidiPipe { nullptr };
+
+    int renderRef { - 1 },
+        midiPipeRef { - 1},
+        audioRef { -1 };
 };
 
 }
