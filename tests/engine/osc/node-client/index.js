@@ -1,7 +1,7 @@
 const OSC = require('osc-js')
 
-const senderPort = 9000 // To Element: OSC Receiver node
-const receiverPort = 9001 // From Element: OSC Sender node
+const senderPort = 9001 // To Element: OSC Receiver node
+const receiverPort = 9002 // From Element: OSC Sender node
 
 const osc = new OSC({
   plugin: new OSC.DatagramPlugin({
