@@ -28,7 +28,8 @@ namespace Element {
 struct LuaMidiBuffer;
 struct LuaMidiPipe;
 
-class LuaNode : public GraphNode
+class LuaNode : public GraphNode,
+                public ChangeBroadcaster
 {
 public:
     explicit LuaNode();
@@ -42,7 +43,7 @@ public:
     void getState (MemoryBlock& block) override;
 
     Result loadScript (const String&);
-    
+
     const String& getScript() const { return script; }
     const String& getDraftScript() const { return draftScript; }
     void setDraftScript (const String& draft) { draftScript = draft; }
@@ -63,18 +64,14 @@ protected:
     }
 
 private:
-    bool createdPorts = false;
-    
+    bool createdPorts = false;    
     String script, draftScript;
-
+    int blockSize = 512;
+    double sampleRate = 44100.0;
+    bool prepared = false;
     CriticalSection lock;
     struct Context;
     std::unique_ptr<Context> context;
-
-    LuaState state;
-    int renderRef { - 1 },
-        midiPipeRef { - 1},
-        audioRef { -1 };
 };
 
 }

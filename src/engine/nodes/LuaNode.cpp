@@ -259,8 +259,7 @@ LuaNode::LuaNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
-    script = draftScript = defaultScript;
-    loadScript (script);
+    loadScript (defaultScript);
 }
 
 LuaNode::~LuaNode()
@@ -268,19 +267,27 @@ LuaNode::~LuaNode()
     context.reset();
 }
 
-Result LuaNode::loadScript (const String&)
+Result LuaNode::loadScript (const String& newScript)
 {
     auto newContext = std::unique_ptr<Context> (new Context());
-    auto result = newContext->load (script);
+    auto result = newContext->load (newScript);
     
     if (result.wasOk())
     {
+        script = draftScript = newScript;
         setName (newContext->getName());
+        if (prepared)
+            newContext->prepare (sampleRate, blockSize);
         ScopedLock sl (lock);
         context.swap (newContext);
     }
 
-    newContext.reset();
+    if (newContext != nullptr)
+    {
+        newContext->release();
+        newContext.reset();
+    }
+
     return result;
 }
 
@@ -299,13 +306,21 @@ void LuaNode::fillInPluginDescription (PluginDescription& desc)
     desc.version            = "1.0.0";
 }
 
-void LuaNode::prepareToRender (double sampleRate, int maxBufferSize)
+void LuaNode::prepareToRender (double rate, int block)
 {
-    context->prepare (sampleRate, maxBufferSize);
+    if (prepared)
+        return;
+    sampleRate = rate;
+    blockSize = block;
+    context->prepare (sampleRate, blockSize);
+    prepared = true;
 }
 
 void LuaNode::releaseResources()
 {
+    if (! prepared)
+        return;
+    prepared = false;
     context->release();
 }
 
@@ -317,12 +332,20 @@ void LuaNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 void LuaNode::setState (const void* data, int size)
 {
-
+    const auto state = ValueTree::readFromData (data, size);
+    if (state.isValid())
+    {
+        loadScript (state["script"].toString());
+    }
 }
 
 void LuaNode::getState (MemoryBlock& block)
 {
-
+    ValueTree state ("lua");
+    state.setProperty ("script", script, nullptr)
+         .setProperty ("draft", draftScript, nullptr);
+    MemoryOutputStream mo (block, false);
+    state.writeToStream (mo);
 }
 
 }
