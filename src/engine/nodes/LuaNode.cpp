@@ -20,7 +20,7 @@
 #include "engine/nodes/LuaNode.h"
 #include "engine/MidiPipe.h"
 
-static const String defaultScript = R"%(--[[ 
+static const String defaultScript = R"abc(--[[ 
     Lua Filter template
 
     This script came with Element and is in the public domain.
@@ -30,7 +30,7 @@ static const String defaultScript = R"%(--[[
 --]]
 
 -- The name of the node
-name = "Lua Filter"
+name = "Lua"
 
 -- Port descriptions
 ports = {
@@ -53,28 +53,35 @@ ports = {
 }
 
 -- throttler
-sample_rate = 0
-frame_count = 0
-block_size = 0
+local sample_rate = 0
+local frame_count = 0
+local block_size = 0
+local cylces_done = 0
 
 -- prepare for rendering
-function prepare(rate, block)
+function prepare (rate, block)
     sample_rate = rate
     frame_count = 0
+    block_size = block
+    cycles_done = 0 
     print (string.format ('prepare rate = %d block = %d', rate, block))
 end
 
 -- render audio and midi
 function render (audio, midi)
-    -- render the streams
-    print (midi)
-    if frame_count % sampe_rate == 0 then
-        print (frame_count)
-        print (midi)
+    local r = sample_rate
+    local b = frame_count
+    local e = frame_count + block_size - 1
+
+    for i = b, e do
+        local f = i
+        if f % r == 0 then
+            local seconds = f / r
+            print (string.format ('runtime = %d seconds', seconds))
+        end
     end
 
-    --- why doesn't this increment??
-    frame_count = frame_count + 1
+    frame_count = e
 end
 
 -- release resources
@@ -90,7 +97,7 @@ end
 function restore(memory)
 end
 
-)%";
+)abc";
 
 namespace Element {
 
@@ -156,50 +163,130 @@ int luaopen_MidiPipe (lua_State* state) {
     return 1;
 }
 
+struct LuaNode::Context 
+{
+    explicit Context () { }
+    ~Context() { }
+
+    bool ready() const { return loaded; }
+
+    Result load (const String& script)
+    {
+        if (ready())
+            return Result::fail ("Script already loaded");
+
+        // load the MidiPipe module
+        luaL_requiref (state, "MidiPipe", luaopen_MidiPipe, 1);
+        lua_pop (state, 1);  /* remove lib */
+
+        state.loadBuffer (script, "luanode");
+        lua_pcall (state, 0, 0, 0);
+        lua_getglobal (state, "name"); // -1
+        name = String::fromUTF8 (lua_tostring (state, -1));
+        lua_pop (state, -1);
+
+        // store the render function
+        lua_getglobal (state, "render");
+        renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
+
+        // allocate a MidiPipe to reference
+        lua_midi_pipe_new (state);
+        midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
+
+        loaded = true;
+        return Result::ok();
+    }
+
+    Result validate (const String& script)
+    {
+        return Result::ok();
+    }
+
+    void prepare (double rate, int block)
+    {
+        if (state.isNull())
+            return;
+    
+        lua_getglobal (state, "prepare");
+        lua_pushnumber (state,  rate);
+        lua_pushinteger (state, block);
+        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
+        {
+            DBG("[EL] error calling prepare()");
+        }
+    }
+
+    void release()
+    {
+        if (state.isNull())
+            return;
+    
+        lua_getglobal (state, "release"); /* function to be called */
+        if (lua_pcall (state, 0, 0, 0) != LUA_OK)
+        {
+            DBG("[EL] error calling release()");
+        }
+    }
+
+    void render (AudioSampleBuffer& audio, MidiPipe& midi)
+    {
+        lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
+        lua_pushnumber (state, 100);
+        lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
+        auto* pipe = (LuaMidiPipe*) lua_touserdata (state, -1);
+        pipe->pipe = &midi;
+        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
+        {
+            // DBG("[EL] error calling render()");
+        }
+        pipe->pipe = nullptr;
+    }
+
+    String getName() const { return name; }
+
+private:
+    LuaState state;
+    int renderRef { - 1 },
+        midiPipeRef { - 1},
+        audioRef { -1 };
+    bool loaded { false };
+    String name;
+};
+
 LuaNode::LuaNode()
     : GraphNode (0)
 {
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
-
     script = draftScript = defaultScript;
-
-    luaL_requiref (state, "MidiPipe", luaopen_MidiPipe, 1);
-    lua_pop (state, 1);  /* remove lib */
-
-    state.loadBuffer (script, "luanode");
-    lua_pcall (state, 0, 0, 0);
-    lua_getglobal (state, "name"); // -1
-    setName (lua_tostring (state, -1));
-    lua_pop (state, -1);
-
-    // get the render function
-    lua_getglobal (state, "render");
-    renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
-
-    DBG("Stack Size: " << lua_gettop (state));
-
-    lua_midi_pipe_new (state);
-    // if (luaMidiPipe == nullptr)
-    {
-        DBG("Stack Size: " << lua_gettop (state));
-        midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
-    }
-    
-    // luaMidiPipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
-    // luaMidiPipe->pipe = nullptr;
-    // midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
+    loadScript (script);
 }
 
 LuaNode::~LuaNode()
 { 
+    context.reset();
+}
 
+Result LuaNode::loadScript (const String&)
+{
+    auto newContext = std::unique_ptr<Context> (new Context());
+    auto result = newContext->load (script);
+    
+    if (result.wasOk())
+    {
+        setName (newContext->getName());
+        ScopedLock sl (lock);
+        context.swap (newContext);
+    }
+
+    newContext.reset();
+    return result;
 }
 
 void LuaNode::fillInPluginDescription (PluginDescription& desc)
 {
-    desc.name               = "Lua Filter";
+    desc.name               = getName();
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
     desc.uid                = EL_INTERNAL_UID_LUA;
     desc.descriptiveName    = "A user scriptable Element node";
@@ -214,40 +301,18 @@ void LuaNode::fillInPluginDescription (PluginDescription& desc)
 
 void LuaNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
-    if (state.isNull())
-        return;
-    
-    lua_getglobal  (state, "prepare");
-    lua_pushnumber (state, sampleRate);
-    lua_pushnumber (state, maxBufferSize);
-    if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-    {
-        DBG("[EL] error calling prepare()");
-    }
+    context->prepare (sampleRate, maxBufferSize);
 }
 
 void LuaNode::releaseResources()
 {
-    if (state.isNull())
-        return;
-    
-    lua_getglobal (state, "release"); /* function to be called */
-    if (lua_pcall (state, 0, 0, 0) != LUA_OK)
-    {
-        DBG("[EL] error calling release()");
-    }
+    context->release();
 }
 
 void LuaNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
-    lua_pushnumber (state, 100);
-//    lua_pushnumber (state, 101);
-    lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
-    if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-    {
-        // DBG("[EL] error calling render()");
-    }
+    ScopedLock sl (lock);
+    context->render (audio, midi);
 }
 
 void LuaNode::setState (const void* data, int size)

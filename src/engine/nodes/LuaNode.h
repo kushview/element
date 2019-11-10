@@ -41,6 +41,8 @@ public:
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
 
+    Result loadScript (const String&);
+    
     const String& getScript() const { return script; }
     const String& getDraftScript() const { return draftScript; }
     void setDraftScript (const String& draft) { draftScript = draft; }
@@ -62,12 +64,14 @@ protected:
 
 private:
     bool createdPorts = false;
-    LuaState state;
+    
     String script, draftScript;
 
-    LuaMidiBuffer* luaMidiBuffer { nullptr };
-    LuaMidiPipe* luaMidiPipe { nullptr };
+    CriticalSection lock;
+    struct Context;
+    std::unique_ptr<Context> context;
 
+    LuaState state;
     int renderRef { - 1 },
         midiPipeRef { - 1},
         audioRef { -1 };
