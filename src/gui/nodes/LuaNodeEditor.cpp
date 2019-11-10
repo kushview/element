@@ -51,14 +51,15 @@ static CodeEditorComponent::ColourScheme luaColors()
 LuaNodeEditor::LuaNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
+    auto* const lua = getNodeObjectOfType<LuaNode>();
+    jassert(lua);
+
     setOpaque (true);
     editor.reset (new CodeEditorComponent (document, &tokens));
     addAndMakeVisible (editor.get());
     editor->setTabSize (2, true);
     editor->setFont (editor->getFont().withHeight (15));
-
-    if (auto* const lua = getNodeObjectOfType<LuaNode>())
-        editor->loadContent (lua->getDraftScript());
+    editor->loadContent (lua->getDraftScript());
 
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
@@ -71,13 +72,17 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
         }
     };
 
+    lua->addChangeListener (this);
     setSize (660, 480);
 }
 
 LuaNodeEditor::~LuaNodeEditor()
 {
     if (auto* const lua = getNodeObjectOfType<LuaNode>())
+    {
+        lua->removeChangeListener (this);
         lua->setDraftScript (document.getAllContent());
+    }
 }
 
 void LuaNodeEditor::changeListenerCallback (ChangeBroadcaster*)

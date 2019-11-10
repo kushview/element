@@ -21,12 +21,13 @@
 #include "engine/MidiPipe.h"
 
 static const String defaultScript = R"abc(--[[ 
-    Lua Filter template
+    Lua template
 
     This script came with Element and is in the public domain.
 
     The Lua filter node is highly experimental and the API is subject to change 
-    without warning.  Please bear with us as we move toward a stable version.
+    without warning.  Please bear with us as we move toward a stable version. If
+    you are a developer and want to help out, see https://github.com/kushview/element
 --]]
 
 -- The name of the node
@@ -275,7 +276,6 @@ Result LuaNode::loadScript (const String& newScript)
     if (result.wasOk())
     {
         script = draftScript = newScript;
-        setName (newContext->getName());
         if (prepared)
             newContext->prepare (sampleRate, blockSize);
         ScopedLock sl (lock);
@@ -336,6 +336,7 @@ void LuaNode::setState (const void* data, int size)
     if (state.isValid())
     {
         loadScript (state["script"].toString());
+        sendChangeMessage();
     }
 }
 
