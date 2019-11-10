@@ -24,7 +24,8 @@
 
 namespace Element {
 
-class LuaNodeEditor : public NodeEditorComponent
+class LuaNodeEditor : public NodeEditorComponent,
+                      public ChangeListener
 {
 public:
     explicit LuaNodeEditor (const Node&);
@@ -33,10 +34,13 @@ public:
     void resized() override;
     void paint (Graphics&) override;
 
+    void changeListenerCallback (ChangeBroadcaster*) override;
+
 private:
     CodeDocument document;
     LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
+    TextButton compileButton;
 };
 
 }

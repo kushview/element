@@ -24,21 +24,67 @@
 
 namespace Element {
 
+static CodeEditorComponent::ColourScheme luaColors()
+{
+    static const CodeEditorComponent::ColourScheme::TokenType types[] =
+    {
+        { "Error",          Colour (0xffcc0000) },
+        { "Comment",        Colour (0xff3c3c3c) },
+        { "Keyword",        Colour (0xff0000cc) },
+        { "Operator",       Colour (0xff225500) },
+        { "Identifier",     Colour (0xff000000) },
+        { "Integer",        Colour (0xff880000) },
+        { "Float",          Colour (0xff885500) },
+        { "String",         Colour (0xff990099) },
+        { "Bracket",        Colour (0xff000055) },
+        { "Punctuation",    Colour (0xff004400) }
+    };
+
+    CodeEditorComponent::ColourScheme cs;
+
+    for (auto& t : types)
+        cs.set (t.name, Colour (t.colour));
+
+    return cs;
+}
+
 LuaNodeEditor::LuaNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
     setOpaque (true);
     editor.reset (new CodeEditorComponent (document, &tokens));
     addAndMakeVisible (editor.get());
+    editor->setTabSize (2, true);
+    editor->setFont (editor->getFont().withHeight (15));
+
     if (auto* const lua = getNodeObjectOfType<LuaNode>())
         editor->loadContent (lua->getDraftScript());
-    setSize (475, 340);
+
+    addAndMakeVisible (compileButton);
+    compileButton.setButtonText ("Compile");
+    compileButton.onClick = [this]()
+    {
+        if (auto* const lua = getNodeObjectOfType<LuaNode>())
+        {
+            const auto script = document.getAllContent();
+            auto result = lua->loadScript (script);
+        }
+    };
+
+    setSize (660, 480);
 }
 
 LuaNodeEditor::~LuaNodeEditor()
 {
     if (auto* const lua = getNodeObjectOfType<LuaNode>())
         lua->setDraftScript (document.getAllContent());
+}
+
+void LuaNodeEditor::changeListenerCallback (ChangeBroadcaster*)
+{
+    if (auto* const lua = getNodeObjectOfType<LuaNode>())
+        editor->loadContent (lua->getDraftScript());
+    resized();
 }
 
 void LuaNodeEditor::paint (Graphics& g)
@@ -48,7 +94,12 @@ void LuaNodeEditor::paint (Graphics& g)
 
 void LuaNodeEditor::resized()
 {
-    editor->setBounds (getLocalBounds().reduced (4));
+    auto r1 = getLocalBounds().reduced (4);
+    auto r2 = r1.removeFromTop (22);
+    compileButton.changeWidthToFitText (r2.getHeight());
+    compileButton.setBounds (r2.removeFromRight (compileButton.getWidth()));
+    r1.removeFromTop (2);
+    editor->setBounds (r1);
 }
 
 }
