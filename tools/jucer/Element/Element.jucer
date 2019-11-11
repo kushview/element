@@ -116,6 +116,8 @@
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
           <FILE id="l5ggQE" name="EQFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.h"/>
+          <FILE id="XiLI6p" name="FreqSplitterProcessor.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/FreqSplitterProcessor.h"/>
           <FILE id="It65e5" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MediaPlayerProcessor.cpp"/>
           <FILE id="FnaS8e" name="MediaPlayerProcessor.h" compile="0" resource="0"
