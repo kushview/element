@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sol/sol.hpp"
+#include "scripting/LuaBindings.h"
 #include "engine/nodes/LuaNode.h"
 #include "engine/MidiPipe.h"
 
@@ -78,10 +80,11 @@ function render (audio, midi)
         local f = i
         if f % r == 0 then
             local seconds = f / r
+            print (string.format ("size = %i", midi.size))
             print (string.format ('runtime = %d seconds', seconds))
         end
     end
-
+    midi:clear()
     frame_count = e
 end
 
@@ -102,68 +105,6 @@ end
 
 namespace Element {
 
-struct LuaMidiBuffer
-{
-    MidiBuffer* buffer;
-};
-
-struct LuaMidiPipe
-{
-    MidiPipe* pipe;
-};
-
-static LuaMidiPipe* lua_midi_pipe_create (lua_State* state)
-{
-    auto* pipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
-    pipe->pipe = nullptr;
-    luaL_getmetatable (state, "Element.MidiPipe");
-    lua_setmetatable (state, -2);
-    return pipe;
-}
-
-static int lua_midi_pipe_new (lua_State* state)
-{
-    auto* pipe = (LuaMidiPipe*) lua_newuserdata (state, sizeof (LuaMidiPipe));
-    pipe->pipe = nullptr;
-    luaL_getmetatable (state, "Element.MidiPipe");
-    lua_setmetatable (state, -2);
-    return 1;
-}
-
-static int lua_midi_pipe_size (lua_State* state)
-{
-    auto* pipe = (LuaMidiPipe*) lua_touserdata (state, 1);
-    lua_pushinteger (state, pipe->pipe == nullptr
-        ? 0 : pipe->pipe->getNumBuffers());
-    return 1;
-}
-
-static int lua_midi_pipe_to_string (lua_State *state)
-{
-    lua_pushstring (state, "MidiBuffer");
-    return 1;
-}
-
-static const struct luaL_Reg midiPipeLib [] = {
-    { "new",    lua_midi_pipe_new },
-    { nullptr,  nullptr }
-};
-
-static const struct luaL_Reg midiPipeMethods [] = {
-    { "__tostring", lua_midi_pipe_to_string },
-    { "size", lua_midi_pipe_size },
-    nullptr, nullptr
-};
-
-int luaopen_MidiPipe (lua_State* state) {
-    luaL_newmetatable (state, "Element.MidiPipe");
-    lua_pushvalue (state, -1);                  /* duplicate the metatable */
-    lua_setfield (state, -2, "__index");        /* mt.__index = mt */
-    luaL_setfuncs (state, midiPipeMethods, 0);  /* register metamethods */
-    luaL_newlib (state, midiPipeLib);
-    return 1;
-}
-
 struct LuaNode::Context 
 {
     explicit Context () { }
@@ -175,27 +116,19 @@ struct LuaNode::Context
     {
         if (ready())
             return Result::fail ("Script already loaded");
+        
+        try {
+            state.open_libraries();
+            Lua::registerEngine (state);
+            state.script (script.toStdString());
+            renderf = state ["render"];
+            loaded = true;
+        } catch (const std::exception& e) {
+            Logger::writeToLog (e.what());
+            loaded = false;
+        }
 
-        // load the MidiPipe module
-        luaL_requiref (state, "MidiPipe", luaopen_MidiPipe, 1);
-        lua_pop (state, 1);  /* remove lib */
-
-        state.loadBuffer (script, "luanode");
-        lua_pcall (state, 0, 0, 0);
-        lua_getglobal (state, "name"); // -1
-        name = String::fromUTF8 (lua_tostring (state, -1));
-        lua_pop (state, -1);
-
-        // store the render function
-        lua_getglobal (state, "render");
-        renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
-
-        // allocate a MidiPipe to reference
-        lua_midi_pipe_new (state);
-        midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
-
-        loaded = true;
-        return Result::ok();
+        return loaded ? Result::ok() : Result::fail ("Couldn't load Lua script");
     }
 
     Result validate (const String& script)
@@ -205,53 +138,46 @@ struct LuaNode::Context
 
     void prepare (double rate, int block)
     {
-        if (state.isNull())
+        if (! ready())
             return;
-    
-        lua_getglobal (state, "prepare");
-        lua_pushnumber (state,  rate);
-        lua_pushinteger (state, block);
-        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-        {
-            DBG("[EL] error calling prepare()");
-        }
+
+        if (auto fn = state ["prepare"])
+            fn (rate, block);
     }
 
     void release()
     {
-        if (state.isNull())
+        if (! ready())
             return;
-    
-        lua_getglobal (state, "release"); /* function to be called */
-        if (lua_pcall (state, 0, 0, 0) != LUA_OK)
-        {
-            DBG("[EL] error calling release()");
-        }
+
+        if (auto fn = state ["release"])
+            fn();
     }
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
-        lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
-        lua_pushnumber (state, 100);
-        lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
-        auto* pipe = (LuaMidiPipe*) lua_touserdata (state, -1);
-        pipe->pipe = &midi;
-        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-        {
-            // DBG("[EL] error calling render()");
-        }
-        pipe->pipe = nullptr;
+        if (loaded)
+            renderf (audio, midi);
+
+        // lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
+        // lua_pushnumber (state, 100);
+        // lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
+        // auto* pipe = (LuaMidiPipe*) lua_touserdata (state, -1);
+        // pipe->pipe = &midi;
+        // if (lua_pcall (state, 2, 0, 0) != LUA_OK)
+        // {
+        //     // DBG("[EL] error calling render()");
+        // }
+        // pipe->pipe = nullptr;
     }
 
     String getName() const { return name; }
 
 private:
-    LuaState state;
-    int renderRef { - 1 },
-        midiPipeRef { - 1},
-        audioRef { -1 };
-    bool loaded { false };
+    sol::state state;
+    sol::function renderf;
     String name;
+    bool loaded = false;
 };
 
 LuaNode::LuaNode()
@@ -293,7 +219,7 @@ Result LuaNode::loadScript (const String& newScript)
 
 void LuaNode::fillInPluginDescription (PluginDescription& desc)
 {
-    desc.name               = getName();
+    desc.name               = "Lua";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
     desc.uid                = EL_INTERNAL_UID_LUA;
     desc.descriptiveName    = "A user scriptable Element node";

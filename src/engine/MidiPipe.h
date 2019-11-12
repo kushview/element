@@ -44,6 +44,7 @@ private:
     enum { maxReferencedBuffers = 32 };
     int size = 0;
     MidiBuffer* referencedBuffers [maxReferencedBuffers];
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiPipe);
 };
 
 }

@@ -15,14 +15,11 @@
 #include <strings.h>
 
 #include "JuceHeader.h"
-#include "scripting/LuaState.h"
+#include "sol/sol.hpp"
 
 // #include "lua.h"
-
 // #include "lauxlib.h"
 // #include "lualib.h"
-
-
 
 #if !defined(LUA_PROMPT)
 #define LUA_PROMPT		"> "
@@ -604,12 +601,13 @@ static int pmain (lua_State *L) {
 int main (int argc, char **argv) {
   int status, result;
   {
-    Element::LuaState L;
+    sol::state L;
+    L.open_libraries();
 
-    if (L.isNull()) {
-      l_message(argv[0], "cannot create state: not enough memory");
-      return EXIT_FAILURE;
-    }
+    // if (L.isNull()) {
+    //   l_message(argv[0], "cannot create state: not enough memory");
+    //   return EXIT_FAILURE;
+    // }
     lua_pushcfunction(L, &pmain);  /* to call 'pmain' in protected mode */
     lua_pushinteger(L, argc);  /* 1st argument */
     lua_pushlightuserdata(L, argv); /* 2nd argument */

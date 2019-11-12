@@ -21,7 +21,6 @@
 
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphNode.h"
-#include "scripting/LuaState.h"
 
 namespace Element {
 

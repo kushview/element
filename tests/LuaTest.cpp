@@ -17,7 +17,10 @@
 */
 
 #include "Tests.h"
+
+#if 0
 #include "scripting/LuaState.h"
+
 
 using namespace Element;
 
@@ -135,3 +138,4 @@ height = 200
 };
 
 static LuaTest sLuaTest;
+#endif

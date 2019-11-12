@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "scripting/Lua.h"
+#include "sol/sol.hpp"
 
 #if defined(JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED)
  #error Cannot include JUCE before LuaLib.cpp
