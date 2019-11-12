@@ -38,7 +38,7 @@ public:
 
     void clear();
     void clear (int startSample, int numSamples);
-    void clear (int channel, int startSample, int numSamples);
+    void clear (int index, int startSample, int numSamples);
 
 private:
     enum { maxReferencedBuffers = 32 };

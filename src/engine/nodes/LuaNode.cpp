@@ -82,8 +82,13 @@ function render (audio, midi)
             local seconds = f / r
             print (string.format ("size = %i", midi.size))
             print (string.format ('runtime = %d seconds', seconds))
+            if midi:num_buffers() > 0 then
+                buffer = midi:read_buffer(0)
+                -- for m in buffer.data do print(m) end
+            end
         end
     end
+
     midi:clear()
     frame_count = e
 end
