@@ -32,6 +32,7 @@
 #include "gui/views/GraphEditorView.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/KeymapEditorView.h"
+#include "gui/views/LuaConsoleView.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"
@@ -592,7 +593,8 @@ void ContentComponentSolo::setAccessoryView (const String& name)
     if (name == "PatchBay") {
         setContentView (new ConnectionGrid(), true);
     } else if (name == EL_VIEW_GRAPH_MIXER) {
-        setContentView (new GraphMixerView(), true);
+        setContentView (new LuaConsoleView(), true);
+//        setContentView (new GraphMixerView(), true);
     }
 
     container->setShowAccessoryView (true);

@@ -6,6 +6,7 @@
 namespace Element {
 namespace Lua {
 
-void registerEngine (sol::state&);
+extern void registerUI (sol::state&);
+extern void registerEngine (sol::state&);
 
 }}

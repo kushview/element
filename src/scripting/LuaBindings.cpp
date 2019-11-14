@@ -1,31 +1,49 @@
 
-#include "sol/sol.hpp"
 #include "engine/MidiPipe.h"
-#include "scripting/LuaBindings.h"
+#include "sol/sol.hpp"
+
+using namespace sol;
 
 namespace Element {
 namespace Lua {
 
-void registerEngine (sol::state& lua)
+static auto EL (state& lua)     { return lua["EL"].get_or_create<table>(); }
+static auto JUCE (state& lua)   { return lua["JUCE"].get_or_create<table>(); }
+
+void registerUI (state& lua)
 {
+
+}
+
+void registerEngine (state& lua)
+{
+    auto j = JUCE (lua);
+    
+    // MidiMessage
+    j.new_usertype<MidiMessage> ("MidiMessage", no_constructor);
+
     // MidiBuffer
-    auto midiBufferType = lua.new_usertype<MidiBuffer> ("MidiBuffer", sol::constructors<MidiBuffer()>());
-	midiBufferType["clear"] = sol::overload (sol::resolve<void()> (&MidiBuffer::clear),
-                                             sol::resolve<void(int, int)> (&MidiBuffer::clear));
-    midiBufferType["empty"] = &MidiBuffer::isEmpty;
-    midiBufferType["num_events"] = &MidiBuffer::getNumEvents;
-    midiBufferType["swap"] = &MidiBuffer::swapWith;
-    midiBufferType["data"] = sol::readonly_property(&MidiBuffer::data);
+    j.new_usertype<MidiBuffer> ("MidiBuffer", no_constructor,
+        "clear",            overload (resolve<void()> (&MidiBuffer::clear),
+                                      resolve<void(int, int)> (&MidiBuffer::clear)),
+        "is_empty",         &MidiBuffer::isEmpty,
+        "get_num_events",   &MidiBuffer::getNumEvents,
+        "swap_with",        &MidiBuffer::swapWith,
+        "data",             readonly_property (&MidiBuffer::data)
+    );
+
+    auto e = EL (lua);
 
     // MidiPipe
-    auto midiPipeType = lua.new_usertype<MidiPipe> ("MidiPipe", sol::constructors<MidiPipe()>());
-    midiPipeType["size"] = sol::readonly_property (&MidiPipe::getNumBuffers);
-    midiPipeType["num_buffers"] = &MidiPipe::getNumBuffers;
-    midiPipeType["read_buffer"] = &MidiPipe::getReadBuffer;
-    midiPipeType["write_buffer"] = &MidiPipe::getWriteBuffer;
-    midiPipeType["clear"] = sol::overload (sol::resolve<void()> (&MidiPipe::clear),
-                                           sol::resolve<void(int,int)> (&MidiPipe::clear),
-                                           sol::resolve<void(int,int,int)> (&MidiPipe::clear));
+    e.new_usertype<MidiPipe> ("MidiPipe", no_constructor,
+        "size",             readonly_property (&MidiPipe::getNumBuffers),
+        "get_num_buffers",  &MidiPipe::getNumBuffers,
+        "get_read_buffer",  &MidiPipe::getNumBuffers,
+        "get_write_buffer", &MidiPipe::getWriteBuffer,
+        "clear",            overload (resolve<void()> (&MidiPipe::clear),
+                                      resolve<void(int,int)> (&MidiPipe::clear),
+                                      resolve<void(int,int,int)> (&MidiPipe::clear))
+    );
 }
 
 }}

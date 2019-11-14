@@ -66,7 +66,7 @@ function prepare (rate, block)
     sample_rate = rate
     frame_count = 0
     block_size = block
-    cycles_done = 0 
+    cycles_done = 0
     print (string.format ('prepare rate = %d block = %d', rate, block))
 end
 
@@ -78,12 +78,12 @@ function render (audio, midi)
 
     for i = b, e do
         local f = i
-        if f % r == 0 then
+        if (f % r) == 0 then
             local seconds = f / r
             print (string.format ("size = %i", midi.size))
             print (string.format ('runtime = %d seconds', seconds))
-            if midi:num_buffers() > 0 then
-                buffer = midi:read_buffer(0)
+            if midi:get_num_buffers() > 0 then
+                buffer = midi:get_read_buffer(0)
                 -- for m in buffer.data do print(m) end
             end
         end
