@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "gui/LuaConsole.h"
+#include "gui/LuaConsoleComponent.h"
 
 namespace Element {
 
@@ -15,7 +15,7 @@ public:
 
     void resized() override
     {
-        console.setBounds (getLocalBounds());
+        console.setBounds (getLocalBounds().reduced (4));
     }
 
 private:

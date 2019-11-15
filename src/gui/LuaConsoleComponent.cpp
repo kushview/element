@@ -18,8 +18,11 @@
 */
 
 #include "sol/sol.hpp"
-#include "gui/LuaConsole.h"
+#include "gui/LuaConsoleComponent.h"
 #include "gui/LookAndFeel.h"
+#include "gui/ViewHelpers.h"
+#include "scripting/LuaBindings.h"
+#include "Commands.h"
 
 namespace Element {
 
@@ -55,6 +58,26 @@ public:
 
 //=============================================================================
 
+static int message_handler (lua_State *L)
+{
+    const char *msg = lua_tostring (L, 1);
+
+    if (msg == NULL)
+    {                                            /* is error object not a string? */
+        if (luaL_callmeta (L, 1, "__tostring") && /* does it have a metamethod */
+            lua_type(L, -1) == LUA_TSTRING)      /* that produces a string? */
+            return 1;                            /* that is the message */
+        else
+            msg = lua_pushfstring (L, "(error object is a %s value)",
+                                      luaL_typename (L, 1));
+    }
+
+    luaL_traceback (L, L, msg, 1); /* append a standard traceback */
+    return 1;                      /* return the traceback */
+}
+
+//=============================================================================
+
 class LuaConsoleComponent::Content : public Component
 {
 public:
@@ -79,21 +102,43 @@ public:
 
             buffer.moveCaretToEnd();
 
-            try {
-                auto result = lua.safe_script (text.toRawUTF8());
-                if (result.valid())
+            lastError.clear();
+            LuaResult result = lua.safe_script (text.toRawUTF8(),
+                [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); });
+            if (result.valid())
+            {
+                String str;
+
+                switch (result.get_type())
                 {
-                    std::string str = result;
+                    case sol::type::number: str << result.get<double>(); break;
+                    case sol::type::string: str << result.get<std::string>(); break;
+                    default: break;
+                }
+
+                if (str.isNotEmpty())
+                {
                     buffer.insertTextAtCaret (str);
                     buffer.insertTextAtCaret (newLine);
                 }
-            } catch (const std::exception& e) {
-                buffer.insertTextAtCaret (e.what());
+            }
+            else if (lastError.isNotEmpty())
+            {
+                buffer.insertTextAtCaret (lastError);
                 buffer.insertTextAtCaret (newLine);
             }
         };
 
         lua.open_libraries();
+        Lua::registerUI (lua);
+        
+        lua["os"]["exit"] = sol::overload ([this]() {
+                ViewHelpers::invokeDirectly (this, Commands::quit, true);
+            },[this](int code) {
+                JUCEApplication::getInstance()->setApplicationReturnValue (code);
+                ViewHelpers::invokeDirectly (this, Commands::quit, true);
+            });
+
         setSize (100, 100);
     }
 
@@ -113,12 +158,14 @@ public:
     }
 
 private:
+    using LuaResult = sol::protected_function_result;
+    
     LuaConsoleComponent& owner;
     sol::state lua;
     LuaConsoleBuffer buffer;
     Label prefix;
     LuaConsolePrompt prompt;
-
+    String lastError {} ;
     struct Style : public Element::LookAndFeel
     {
         void fillTextEditorBackground (Graphics& g, int w, int h, TextEditor& e) override
@@ -133,6 +180,11 @@ private:
             return new CaretComponent (nullptr);
         }
     } style;
+
+    LuaResult errorHandler (lua_State* L, LuaResult pfr) {
+        lastError = pfr.get<std::string>();
+        return pfr;
+    }
 };
 
 LuaConsoleComponent::LuaConsoleComponent()
