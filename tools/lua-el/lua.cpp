@@ -639,6 +639,7 @@ int main(int argc, char **argv)
     int status, result;
     sol::state L;
     L.open_libraries();
+    Element::Lua::registerEngine (L);
 
     // if (L.isNull()) {
     //   l_message (argv[0], "cannot create state: not enough memory");

@@ -17,18 +17,18 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "sol/sol.hpp"
 #include "gui/LuaConsoleComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
 #include "scripting/LuaBindings.h"
 #include "Commands.h"
+#include "sol/sol.hpp"
 
 namespace Element {
 
 static void setupEditor (TextEditor& editor)
 {
-    editor.setFont (Font (Font::getDefaultMonospacedFontName(), 12.0f, juce::Font::plain));
+    editor.setFont (Font (Font::getDefaultMonospacedFontName(), 13.0f, juce::Font::plain));
 }
 
 class LuaConsoleBuffer : public TextEditor
@@ -58,26 +58,6 @@ public:
 
 //=============================================================================
 
-static int message_handler (lua_State *L)
-{
-    const char *msg = lua_tostring (L, 1);
-
-    if (msg == NULL)
-    {                                            /* is error object not a string? */
-        if (luaL_callmeta (L, 1, "__tostring") && /* does it have a metamethod */
-            lua_type(L, -1) == LUA_TSTRING)      /* that produces a string? */
-            return 1;                            /* that is the message */
-        else
-            msg = lua_pushfstring (L, "(error object is a %s value)",
-                                      luaL_typename (L, 1));
-    }
-
-    luaL_traceback (L, L, msg, 1); /* append a standard traceback */
-    return 1;                      /* return the traceback */
-}
-
-//=============================================================================
-
 class LuaConsoleComponent::Content : public Component
 {
 public:
@@ -92,6 +72,7 @@ public:
         prefix.setJustificationType (Justification::centred);
         addAndMakeVisible (prompt);
         prompt.setLookAndFeel (&style);
+
         prompt.onReturnKey = [this]
         {
             auto text = prompt.getText();
@@ -132,9 +113,13 @@ public:
         lua.open_libraries();
         Lua::registerUI (lua);
         
-        lua["os"]["exit"] = sol::overload ([this]() {
+        lua["os"]["exit"] = sol::overload (
+            [this]()
+            {
                 ViewHelpers::invokeDirectly (this, Commands::quit, true);
-            },[this](int code) {
+            },
+            [this](int code)
+            {
                 JUCEApplication::getInstance()->setApplicationReturnValue (code);
                 ViewHelpers::invokeDirectly (this, Commands::quit, true);
             });

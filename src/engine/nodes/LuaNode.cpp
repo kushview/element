@@ -22,75 +22,42 @@
 #include "engine/nodes/LuaNode.h"
 #include "engine/MidiPipe.h"
 
-static const String defaultScript = R"abc(--[[ 
+static const String defaultScript = R"(--[[
     Lua template
 
     This script came with Element and is in the public domain.
 
-    The Lua filter node is highly experimental and the API is subject to change 
+    The Lua filter node is highly experimental and the API is subject to change
     without warning.  Please bear with us as we move toward a stable version. If
     you are a developer and want to help out, see https://github.com/kushview/element
 --]]
 
--- The name of the node
-name = "Lua"
-
--- Port descriptions
-ports = {
-    {
-        index = 0,
-        channel = 0,
-        type = "midi",
-        input = true,
-        name = "MIDI In",
-        slug = "midi_in"
-    },
-    {
-        index = 1,
-        channel = 0,
-        type = "midi",
-        input = false,
-        name = "MIDI Out",
-        slug = "midi_out"
-    }
-}
-
--- throttler
-local sample_rate = 0
-local frame_count = 0
-local block_size = 0
-local cylces_done = 0
-
 -- prepare for rendering
 function prepare (rate, block)
-    sample_rate = rate
-    frame_count = 0
-    block_size = block
-    cycles_done = 0
     print (string.format ('prepare rate = %d block = %d', rate, block))
+end
+
+function MidiBuffer:messages()
+    local iter = MidiBufferIterator.make (self)
+    local msg = MidiMessage.make()
+    return function()
+        local ok, frame = iter:get_next_event (msg)
+        if not ok then
+            return nil
+        else
+            return msg, frame
+        end
+    end
 end
 
 -- render audio and midi
 function render (audio, midi)
-    local r = sample_rate
-    local b = frame_count
-    local e = frame_count + block_size - 1
-
-    for i = b, e do
-        local f = i
-        if (f % r) == 0 then
-            local seconds = f / r
-            print (string.format ("size = %i", midi.size))
-            print (string.format ('runtime = %d seconds', seconds))
-            if midi:get_num_buffers() > 0 then
-                buffer = midi:get_read_buffer(0)
-                -- for m in buffer.data do print(m) end
-            end
-        end
+    audio:clear()
+    local midi_buffer = midi:get_read_buffer (0)
+    for msg, _ in midi_buffer:messages() do
+        print (msg)
     end
-
-    midi:clear()
-    frame_count = e
+    midi_buffer:clear()
 end
 
 -- release resources
@@ -98,19 +65,11 @@ function release()
     print('release resources...')
 end
 
--- save state
-function save(memory)
-end
-
--- restore state
-function restore(memory)
-end
-
-)abc";
+)";
 
 namespace Element {
 
-struct LuaNode::Context 
+struct LuaNode::Context
 {
     explicit Context () { }
     ~Context() { }
@@ -121,11 +80,11 @@ struct LuaNode::Context
     {
         if (ready())
             return Result::fail ("Script already loaded");
-        
+
         try {
-            state.open_libraries();
+            state.open_libraries (sol::lib::base, sol::lib::string);
             Lua::registerEngine (state);
-            state.script (script.toStdString());
+            state.script (script.toRawUTF8());
             renderf = state ["render"];
             loaded = true;
         } catch (const std::exception& e) {
@@ -161,19 +120,30 @@ struct LuaNode::Context
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi)
     {
-        if (loaded)
-            renderf (audio, midi);
+        if (! loaded)
+            return;
 
-        // lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef);
-        // lua_pushnumber (state, 100);
-        // lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef);
-        // auto* pipe = (LuaMidiPipe*) lua_touserdata (state, -1);
-        // pipe->pipe = &midi;
-        // if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-        // {
-        //     // DBG("[EL] error calling render()");
-        // }
-        // pipe->pipe = nullptr;
+       #if 1
+        /*
+            TODO: don't call renderf directly.  Figure out how to cash metatable
+            indexes for the passed types and use lua C api directly.  this object
+            probably allocates and/or has several other function calls all of which
+            take time See below... If we can figure out how to push refs to audio/midi +
+            a direct way to specify the metatable type, then it should greatly
+            improve performance.
+        */
+        renderf (audio, midi);
+       #else
+        lua_rawgeti (state, LUA_REGISTRYINDEX, renderf.registry_index());
+        lua_pushlightuserdata (state, &audio);
+        luaL_setmetatable (state, "AudioBuffer");
+        lua_pushlightuserdata (state, &midi);
+        luaL_setmetatable (state, "MidiPipe");
+        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
+        {
+
+        }
+       #endif
     }
 
     String getName() const { return name; }
@@ -188,6 +158,7 @@ private:
 LuaNode::LuaNode()
     : GraphNode (0)
 {
+    context = std::make_unique<Context>();
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
@@ -195,7 +166,7 @@ LuaNode::LuaNode()
 }
 
 LuaNode::~LuaNode()
-{ 
+{
     context.reset();
 }
 
@@ -203,7 +174,7 @@ Result LuaNode::loadScript (const String& newScript)
 {
     auto newContext = std::unique_ptr<Context> (new Context());
     auto result = newContext->load (newScript);
-    
+
     if (result.wasOk())
     {
         script = draftScript = newScript;

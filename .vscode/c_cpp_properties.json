@@ -5,7 +5,7 @@
             "name": "Mojave",
             "includePath": [
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.1.0/include",
+                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
@@ -17,7 +17,6 @@
                 "${workspaceRoot}/libs/lua/src",
                 "${workspaceRoot}/src",
                 "${workspaceRoot}/tests",
-                "/opt/kushview/include",
                 "/usr/local/include",
                 "/usr/local/Cellar/jack/0.125.0_3/include"
             ],
@@ -39,7 +38,7 @@
             "browse": {
                 "path": [
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.1.0/include",
+                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include",
                     "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                     "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                     "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
@@ -51,7 +50,6 @@
                     "${workspaceRoot}/libs/lua/src",
                     "${workspaceRoot}/src",
                     "${workspaceRoot}/tests",
-                    "/opt/kushview/include",
                     "/usr/local/include",
                     "/usr/local/Cellar/jack/0.125.0_3/include"
                 ],
@@ -81,7 +79,7 @@
                 "${workspaceRoot}/libs/JUCE/modules",
                 "${workspaceRoot}/libs/pybind11/include",
                 "${workspaceRoot}/project/JuceLibraryCode",
-                "${workspaceRoot}/src"                
+                "${workspaceRoot}/src"
             ],
             "defines": [
                 "JUCE_PLUGINHOST_VST=1",
@@ -112,7 +110,7 @@
                     "${workspaceRoot}/libs/JUCE/modules",
                     "${workspaceRoot}/libs/pybind11/include",
                     "${workspaceRoot}/project/JuceLibraryCode",
-                    "${workspaceRoot}/src"                
+                    "${workspaceRoot}/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
@@ -140,7 +138,7 @@
                 "${workspaceRoot}/libs/JUCE/modules",
                 "${workspaceRoot}/libs/pybind11/include",
                 "${workspaceRoot}/project/JuceLibraryCode",
-                "${workspaceRoot}/src"                
+                "${workspaceRoot}/src"
             ],
             "defines": [
                 "JUCE_PLUGINHOST_VST=1",
@@ -170,7 +168,7 @@
                     "${workspaceRoot}/libs/JUCE/modules",
                     "${workspaceRoot}/libs/pybind11/include",
                     "${workspaceRoot}/project/JuceLibraryCode",
-                    "${workspaceRoot}/src"                
+                    "${workspaceRoot}/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
