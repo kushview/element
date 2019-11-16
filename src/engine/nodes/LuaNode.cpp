@@ -84,6 +84,8 @@ struct LuaNode::Context
     explicit Context () { }
     ~Context() { }
 
+    String getName() const { return name; }
+    
     bool ready() const { return loaded; }
 
     Result load (const String& script)
@@ -95,9 +97,6 @@ struct LuaNode::Context
             state.open_libraries (sol::lib::base, sol::lib::string);
             Lua::registerEngine (state);
             state.script (script.toRawUTF8());
-
-            OwnedArray<AudioProcessorParameter> ins, outs;
-            createParameters (ins, outs);
 
             renderf = state ["node_render"];
             renderstdf = renderf;
@@ -113,10 +112,6 @@ struct LuaNode::Context
         {
             renderf = nullptr;
             renderstdf = nullptr;
-        }
-        else
-        {
-            
         }
 
         return loaded ? Result::ok() : Result::fail ("Couldn't load Lua script");
@@ -134,6 +129,8 @@ struct LuaNode::Context
 
         if (auto fn = state ["node_prepare"])
             fn (rate, block);
+        
+        state.collect_garbage();
     }
 
     void release()
@@ -143,6 +140,8 @@ struct LuaNode::Context
 
         if (auto fn = state ["node_release"])
             fn();
+        
+        state.collect_garbage();
     }
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) noexcept
@@ -151,38 +150,56 @@ struct LuaNode::Context
             renderstdf (audio, midi);
     }
 
-    String getName() const { return name; }
-
-    void createParameters (OwnedArray<AudioProcessorParameter>& ins,
-                           OwnedArray<AudioProcessorParameter>& outs)
+    void createPorts (kv::PortList& ports)
     {
-        ignoreUnused (outs);
+        if (! ready())
+            return;
+        addIOPorts (ports);
+        addParameters (ports);
+    }
+
+private:
+    sol::state state;
+    sol::function renderf;
+    std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
+    String name;
+    bool loaded = false;
+
+    void addParameters (kv::PortList& ports)
+    {
         if (auto f = state ["node_params"])
         {
+            int index = ports.size();
+            int inChan = 0, outChan = 0;
+
             try {
                 sol::table params = f();
                 for (int i = 0; i < params.size(); ++i)
                 {
                     String name  = params[i + 1]["name"].get_or (std::string ("Param"));
+                    String sym   = name.trim().toLowerCase().replace(" ", "_");
                     String type  = params[i + 1]["type"].get_or (std::string ("float"));
                     String flow  = params[i + 1]["flow"].get_or (std::string ("input"));
+                    jassert (flow == "input" || flow == "output");
+                    
+                    bool isInput = flow == "input";
                     float min    = params[i + 1]["min"].get_or (0.0);
                     float max    = params[i + 1]["max"].get_or (1.0);
                     float dfault = params[i + 1]["default"].get_or (1.0);
-                    ins.add (new AudioParameterFloat (
-                        name.trim().replace(" ", "-").toLowerCase(),
-                        name, min, max, dfault));
-                    DBG("param : " << name);
+
+                    const int channel = isInput ? inChan++ : outChan++;
+                    ports.add (PortType::Control, index++, channel, sym, name, isInput);
                 }
-            } catch (const std::exception&) { }
+            }
+            catch (const std::exception&)
+            {
+
+            }
         }
     }
 
-    void createPorts (kv::PortList& ports)
-    {   
-        if (! ready())
-            return;
-        
+    void addIOPorts (kv::PortList& ports)
+    {
         auto& lua = state;
 
         if (auto f = lua ["node_ports"])
@@ -246,13 +263,6 @@ struct LuaNode::Context
             }
         }
     }
-
-private:
-    sol::state state;
-    sol::function renderf;
-    std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
-    String name;
-    bool loaded = false;
 };
 
 LuaNode::LuaNode()
