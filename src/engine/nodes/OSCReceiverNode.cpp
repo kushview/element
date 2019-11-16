@@ -35,8 +35,8 @@ OSCReceiverNode::OSCReceiverNode()
 
 OSCReceiverNode::~OSCReceiverNode()
 {
-   oscReceiver.removeListener (this);
-   oscReceiver.disconnect();
+    oscReceiver.removeListener (this);
+    oscReceiver.disconnect();
 }
 
 void OSCReceiverNode::setState (const void* data, int size)
@@ -95,7 +95,6 @@ inline void OSCReceiverNode::createPorts()
 
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
-
     if (! outputMidiMessagesInitDone) {
         outputMidiMessages.reset (sampleRate);
         currentSampleRate = sampleRate;
@@ -105,25 +104,12 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 
 void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
     if (nframes == 0) {
         return;
     }
 
-    auto& midiOut = *midi.getWriteBuffer (0);
-
-    MidiBuffer messages;
-    outputMidiMessages.removeNextBlockOfMessages (messages, nframes);
-
-    MidiBuffer::Iterator iter1 (messages);
-    MidiMessage msg;
-    int frame;
-
-    while (iter1.getNextEvent (msg, frame))
-    {
-        midiOut.addEvent (msg, frame);
-    }
+    outputMidiMessages.removeNextBlockOfMessages ( *midi.getWriteBuffer (0), nframes );
 }
 
 /** OSCReceiver real-time callbacks */

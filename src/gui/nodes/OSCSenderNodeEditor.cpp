@@ -96,7 +96,9 @@ OSCSenderNodeEditor::~OSCSenderNodeEditor()
 }
 
 void OSCSenderNodeEditor::timerCallback() {
-    std::vector<OSCMessage> oscMessages = oscSenderNodePtr->getOscMessages();
+
+    const std::vector<OSCMessage> oscMessages = oscSenderNodePtr->getOscMessages();
+
     for(auto msg : oscMessages)
     {
         oscSenderLog.addOSCMessage( msg );
@@ -232,6 +234,7 @@ void OSCSenderNodeEditor::connect()
     {
         connected = true;
         connectButton.setButtonText ("Disconnect");
+        updateConnectionStatusLabel();
     }
     else
     {
@@ -243,10 +246,9 @@ void OSCSenderNodeEditor::disconnect()
 {
     if (oscSenderNodePtr->disconnect())
     {
-        currentPortNumber = -1;
-        currentHostName = "";
         connected = false;
         connectButton.setButtonText ("Connect");
+        updateConnectionStatusLabel();
     }
     else
     {

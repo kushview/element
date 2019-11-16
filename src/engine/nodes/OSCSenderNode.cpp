@@ -24,17 +24,22 @@
 namespace Element {
 
 OSCSenderNode::OSCSenderNode()
-    : MidiFilterNode (0)
+    : MidiFilterNode (0),
+      Thread ("osc sender midi processing thread")
 {
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_OSC_SENDER, nullptr);
+
+    startThread();
 }
 
 OSCSenderNode::~OSCSenderNode()
 {
-   oscSender.disconnect();
+    stop();
+    oscSender.disconnect();
 }
+
 void OSCSenderNode::setState (const void* data, int size)
 {
     const auto tree = ValueTree::readFromGZIPData (data, (size_t) size);
@@ -75,6 +80,51 @@ void OSCSenderNode::getState (MemoryBlock& block)
     }
 }
 
+void OSCSenderNode::run ()
+{
+    while (! threadShouldExit())
+    {
+        sem.wait();
+
+        if (threadShouldExit())
+            break;
+
+        /** MIDI queue -> OSC messages */
+
+        MidiBuffer messages;
+
+        midiMessageQueue.removeNextBlockOfMessages (messages, numSamples.get());
+        numSamples = 0;
+
+        MidiBuffer::Iterator iter1 (messages);
+        MidiMessage msg;
+        int frame;
+
+        ScopedLock sl (lock);
+
+        while (iter1.getNextEvent (msg, frame))
+        {
+            OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
+            oscSender.send ( oscMsg );
+            oscMessagesToLog.push_back ( oscMsg );
+        }
+
+        while (oscMessagesToLog.size() > maxOscMessages)
+            oscMessagesToLog.erase ( oscMessagesToLog.begin() );
+    }
+
+    DBG("[EL] OSCSenderNode: OSC -> MIDI processing thread exited");
+}
+
+void OSCSenderNode::stop ()
+{
+    if (isThreadRunning())
+    {
+        signalThreadShouldExit();
+        sem.post();
+        stopThread (100);
+    }
+}
 
 /** MIDI */
 
@@ -90,9 +140,16 @@ inline void OSCSenderNode::createPorts()
     createdPorts = true;
 }
 
+void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize) {
+    if (! midiMessageQueueInitDone) {
+        midiMessageQueue.reset (sampleRate);
+        currentSampleRate = sampleRate;
+        midiMessageQueueInitDone = true;
+    }
+};
+
 void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
-    auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
     auto* const midiIn = midi.getWriteBuffer (0);
 
@@ -104,17 +161,16 @@ void OSCSenderNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     MidiBuffer::Iterator iter1 (*midiIn);
     MidiMessage msg;
     int frame;
+    auto timestamp = Time::getMillisecondCounterHiRes();
 
     while (iter1.getNextEvent (msg, frame))
     {
-        OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
-        oscSender.send (oscMsg);
-
-        if (oscMessages.size() > maxOscMessages)
-            oscMessages.erase ( oscMessages.begin() );
-        oscMessages.push_back ( oscMsg );
+        msg.setTimeStamp ( timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)) );
+        midiMessageQueue.addMessageToQueue ( msg );
     }
 
+    numSamples += nframes;
+    sem.post();
     midiIn->clear();
 }
 
@@ -192,8 +248,14 @@ void OSCSenderNode::setHostName (String hostName)
 
 std::vector<OSCMessage> OSCSenderNode::getOscMessages()
 {
-    std::vector<OSCMessage> copied = oscMessages;
-    oscMessages.clear();
+    std::vector<OSCMessage> copied;
+
+    {
+        ScopedLock sl (lock);
+        std::copy ( oscMessagesToLog.begin(), oscMessagesToLog.end(), std::back_inserter( copied ) );
+        oscMessagesToLog.clear();
+    }
+
     return copied;
 }
 

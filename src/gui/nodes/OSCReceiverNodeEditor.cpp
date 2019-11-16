@@ -230,6 +230,7 @@ void OSCReceiverNodeEditor::connect()
     {
         connected = true;
         connectButton.setButtonText ("Disconnect");
+        updateConnectionStatusLabel();
     }
     else
     {
@@ -243,6 +244,7 @@ void OSCReceiverNodeEditor::disconnect()
     {
         connected = false;
         connectButton.setButtonText ("Connect");
+        updateConnectionStatusLabel();
     }
     else
     {

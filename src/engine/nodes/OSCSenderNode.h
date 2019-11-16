@@ -26,8 +26,9 @@
 
 namespace Element {
 
-class OSCSenderNode : public MidiFilterNode,
-                      public ChangeBroadcaster
+class OSCSenderNode   : public MidiFilterNode,
+                        public ChangeBroadcaster,
+                        public Thread
 {
 public:
 
@@ -49,18 +50,23 @@ public:
         desc.version            = "1.0.0";
     }
 
+    void getState (MemoryBlock& block) override;
+    void setState (const void* data, int size) override;
+
+    /** OSC -> MIDI processing thread */
+
+    void run() override;
+    void stop();
+
     /** MIDI */
 
-    void prepareToRender (double sampleRate, int maxBufferSize) override {};
-    void releaseResources() override {};
-
+    void prepareToRender (double sampleRate, int maxBufferSize) override;
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
-    void setState (const void* data, int size) override;
-    void getState (MemoryBlock& block) override;
+    void releaseResources() override {};
 
     inline void createPorts() override;
 
-    /** For node editor */
+    /** GUI */
 
     bool connect (String hostName, int portNumber);
     bool disconnect ();
@@ -79,6 +85,9 @@ public:
 
 private:
 
+    Semaphore sem;
+    CriticalSection lock;
+
     /** MIDI */
     bool createdPorts = false;
 
@@ -91,8 +100,18 @@ private:
     int currentPortNumber = 9002;
     String currentHostName = "127.0.0.1";
 
-    std::vector<OSCMessage> oscMessages;
+    /** Max messages in queue before they start getting dropped */
     int maxOscMessages = 100;
+
+    /** GUI */
+    std::vector<OSCMessage> oscMessagesToLog;
+
+    /** To be processed and sent as OSC messages */
+    MidiMessageCollector midiMessageQueue;
+
+    Atomic<int> numSamples = 0;
+    double currentSampleRate = 0;
+    bool midiMessageQueueInitDone = false;
 };
 
 }
