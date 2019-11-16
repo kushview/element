@@ -109,6 +109,8 @@
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
           <FILE id="ZS5paU" name="EQFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.h"/>
+          <FILE id="XiLI6p" name="FreqSplitterProcessor.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/FreqSplitterProcessor.h"/>
           <FILE id="gzZ2SI" name="LuaNode.cpp" compile="1" resource="0" file="../../../src/engine/nodes/LuaNode.cpp"/>
           <FILE id="gWOSzU" name="LuaNode.h" compile="0" resource="0" file="../../../src/engine/nodes/LuaNode.h"/>
           <FILE id="myseGX" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
