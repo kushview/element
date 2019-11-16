@@ -1,6 +1,7 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    - Author Michael Fisher <mfisher@kushview.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -28,6 +29,7 @@
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
+#include "gui/nodes/LuaNodeEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
 #include "gui/nodes/MidiMonitorNodeEditor.h"
@@ -191,6 +193,10 @@ public:
         else if (node.getIdentifier().toString().contains ("element.volume"))
         {
             return createPluginWindowFor (node, new VolumeNodeEditor (node, gui));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_LUA)
+        {
+            return createPluginWindowFor (node, new LuaNodeEditor (node));
         }
         
         GraphNodePtr object = node.getGraphNode();

@@ -15,8 +15,12 @@ def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
+    
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
+    opt.add_option ('--without-lua', default=False, action='store_true', dest='no_lua', \
+        help="Build without LUA scripting")
+    
     opt.add_option ('--test', default=False, action='store_true', dest='test', \
         help="Build the test suite")
     opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
@@ -74,6 +78,7 @@ def configure (conf):
     juce.display_msg (conf, "VST3", True)
     juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
+    juce.display_msg (conf, "Lua Scripting", bool(conf.env.LUA))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
@@ -89,6 +94,7 @@ def common_includes():
              'libs/kv/modules', \
              'libs/jlv2/modules', \
              'libs/compat', \
+             'libs/lua', \
              'libs/lua/src', \
              VST3_PATH, \
              'src' ]

@@ -42,6 +42,7 @@
 #define EL_INTERNAL_ID_MIDI_MONITOR             "element.midiMonitor"
 #define EL_INTERNAL_ID_EQ_FILTER                "element.eqfilt"
 #define EL_INTERNAL_ID_FREQ_SPLITTER            "element.freqsplit"
+#define EL_INTERNAL_ID_LUA                      "element.lua"
 
 #define EL_INTERNAL_UID_AUDIO_FILE_PLAYER        1000
 #define EL_INTERNAL_UID_AUDIO_MIXER              1001
@@ -62,6 +63,7 @@
 #define EL_INTERNAL_UID_MIDI_MONITOR             1016
 #define EL_INTERNAL_UID_EQ_FILTER                1017
 #define EL_INTERNAL_UID_FREQ_SPLITTER            1018
+#define EL_INTERNAL_UID_LUA                      1019
 
 namespace Element
 {

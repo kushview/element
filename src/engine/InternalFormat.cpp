@@ -26,6 +26,7 @@
 #include "engine/nodes/CombFilterProcessor.h"
 #include "engine/nodes/EQFilterProcessor.h"
 #include "engine/nodes/FreqSplitterProcessor.h"
+#include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -332,6 +333,13 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         MidiMonitorNode().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_LUA)
+    {
+       #if EL_USE_LUA
+        auto* const desc = ds.add (new PluginDescription());
+        LuaNode().fillInPluginDescription (*desc);
+       #endif
+    }
    #endif
 }
 
@@ -363,6 +371,9 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     results.add (EL_INTERNAL_ID_MIDI_MONITOR);
+   #if EL_USE_LUA
+    results.add (EL_INTERNAL_ID_LUA);
+   #endif
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
    #endif // product enablements
     return results;

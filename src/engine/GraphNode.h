@@ -330,7 +330,6 @@ public:
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
 
-
     void setOversamplingFactor (int osFactor);
     int getOversamplingFactor();
 

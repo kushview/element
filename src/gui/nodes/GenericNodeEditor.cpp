@@ -24,13 +24,6 @@ namespace Element {
 
 namespace GenericEditorHelpers {
 
-static bool isAudioProcessorNode (const Node& node)
-{
-    if (auto* obj = node.getGraphNode())
-        return obj->getAudioProcessor() != nullptr;
-    return false;
-}
-
 static AudioProcessor* getAudioProcessor (const Node& node)
 {
     if (auto* obj = node.getGraphNode())
