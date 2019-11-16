@@ -593,8 +593,7 @@ void ContentComponentSolo::setAccessoryView (const String& name)
     if (name == "PatchBay") {
         setContentView (new ConnectionGrid(), true);
     } else if (name == EL_VIEW_GRAPH_MIXER) {
-        setContentView (new LuaConsoleView(), true);
-//        setContentView (new GraphMixerView(), true);
+        setContentView (new GraphMixerView(), true);
     }
 
     container->setShowAccessoryView (true);
