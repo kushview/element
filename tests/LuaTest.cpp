@@ -20,12 +20,13 @@
 
 #if 1
 
+#include "engine/nodes/LuaNode.h"
 #include "scripting/LuaBindings.h"
 #include "sol/sol.hpp"
 
 using namespace Element;
 
-static const std::string nodeScript = R"(
+static const String nodeScript = R"(
 if element and element.plugin then
     element.plugin ({
         type        = "node",
@@ -35,16 +36,35 @@ if element and element.plugin then
     })
 end
 
-function node_ports()
+function node_io_ports()
     return {
         audio_ins   = 2,
         audio_outs  = 2,
-        midi_ins    = 1
+        midi_ins    = 1,
+        midi_outs   = 0
     }
 end
 
-function node_prepare (sample_rate, block_size)
+-- Return parameters
+function node_params()
+    return {
+        {
+            name    = "Volume",
+            label   = "dB",
+            type    = "float",
+            flow    = "input",
+            min     = -90.0,
+            max     = 24.0,
+            default = 0.0
+        }
+    }
+end
 
+prepared_flag = false
+
+function node_prepare (sample_rate, block_size)
+    print("prepare test node")
+    prepared_flag = true
 end
 
 function node_render (audio, midi)
@@ -52,15 +72,15 @@ function node_render (audio, midi)
 end
 
 function node_release()
-
+    prepared_flag = false
 end
 )";
 
-class LuaTest : public UnitTestBase
+class LuaNodeTest : public UnitTestBase
 {
 public:
-    LuaTest() : UnitTestBase ("LuaNode", "Lua", "node") {}
-    virtual ~LuaTest() { }
+    LuaNodeTest() : UnitTestBase ("LuaNode", "Lua", "node") {}
+    virtual ~LuaNodeTest() { }
     void initialise() override
     {
         lua.open_libraries();
@@ -69,90 +89,32 @@ public:
 
     void runTest() override
     {
+        auto graph = std::make_unique<GraphProcessor>();
+        graph->prepareToPlay (44100.0, 1024);
+        auto* node = new LuaNode();
+
+        beginTest ("prepare");
+        node->loadScript (nodeScript);
+        graph->addNode (node);
+
         beginTest ("ports");
-        lua.script (nodeScript);
+        expect (node->getNumPorts() == 6);
+        expect (node->getNumPorts (kv::PortType::Audio,   true)  == 2);
+        expect (node->getNumPorts (kv::PortType::Audio,   false) == 2);
+        expect (node->getNumPorts (kv::PortType::Midi,    true)  == 1);
+        expect (node->getNumPorts (kv::PortType::Midi,    false) == 0);
+        expect (node->getNumPorts (kv::PortType::Control, true)  == 1);
+        
+        beginTest ("release");
+        graph->releaseResources();
 
-        kv::PortList ports;
-        createPorts (ports);
-
-        expect (ports.size (PortType::Audio, true) == 2);
-        expect (ports.size (PortType::Audio, false) == 2);
-        expect (ports.size (PortType::Midi,  true) == 1);
-        expect (ports.size (PortType::Midi,  false) == 0);
-        expect (ports.size() == 5);
-
-        for (const auto* port : ports.getPorts()) {
-            DBG(port->name << " : " << port->symbol << " : " << port->channel);
-        }
-    }
-
-    void createPorts (kv::PortList& ports)
-    {
-        if (auto f = lua ["node_ports"])
-        {
-            sol::table t = f();
-            int audioIns = 0, audioOuts = 0,
-                midiIns = 0, midiOuts = 0;
-
-            try {
-                if (t.size() == 0)
-                {
-                    audioIns  = t["audio_ins"].get_or (0);
-                    audioOuts = t["audio_outs"].get_or (0);
-                    midiIns   = t["midi_ins"].get_or (0);
-                    midiOuts  = t["midi_outs"].get_or (0);
-                }
-                else
-                {
-                    audioIns  = t[1]["audio_ins"].get_or (0);
-                    audioOuts = t[1]["audio_outs"].get_or (0);
-                    midiIns   = t[1]["midi_ins"].get_or (0);
-                    midiOuts  = t[1]["midi_outs"].get_or (0);
-                }
-            }
-            catch (const std::exception&) {}
-
-            int index = 0, channel = 0;
-            for (int i = 0; i < audioIns; ++i)
-            {
-                String slug = "in_"; slug << (i + 1);
-                String name = "In "; name << (i + 1);
-                ports.add (PortType::Audio, index++, channel++,
-                           slug, name, true);
-            }
-
-            channel = 0;
-            for (int i = 0; i < audioOuts; ++i)
-            {
-                String slug = "out_"; slug << (i + 1);
-                String name = "Out "; name << (i + 1);
-                ports.add (PortType::Audio, index++, channel++,
-                           slug, name, false);
-            }
-
-            channel = 0;
-            for (int i = 0; i < midiIns; ++i)
-            {
-                String slug = "midi_in_"; slug << (i + 1);
-                String name = "MIDI In "; name << (i + 1);
-                ports.add (PortType::Midi, index++, channel++,
-                           slug, name, true);
-            }
-
-            channel = 0;
-            for (int i = 0; i < midiOuts; ++i)
-            {
-                String slug = "midi_out_"; slug << (i + 1);
-                String name = "MIDI Out "; name << (i + 1);
-                ports.add (PortType::Midi, index++, channel++,
-                           slug, name, false);
-            }
-        }
+        node = nullptr;
+        graph = nullptr;
     }
 
 private:
     sol::state lua;
 };
 
-static LuaTest sLuaTest;
+static LuaNodeTest sLuaNodeTest;
 #endif

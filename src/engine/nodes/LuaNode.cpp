@@ -85,7 +85,7 @@ struct LuaNode::Context
     ~Context() { }
 
     String getName() const { return name; }
-    
+
     bool ready() const { return loaded; }
 
     Result load (const String& script)
@@ -188,7 +188,14 @@ private:
                     float dfault = params[i + 1]["default"].get_or (1.0);
 
                     const int channel = isInput ? inChan++ : outChan++;
-                    ports.add (PortType::Control, index++, channel, sym, name, isInput);
+                   #if 0
+                    DBG("index = " << index);
+                    DBG("channel = " << channel);
+                    DBG("is input = " << (int) isInput);
+                    DBG("name = " << name);
+                    DBG("symbol = " << sym);
+                   #endif
+                    ports.add (kv::PortType::Control, index++, channel, sym, name, isInput);
                 }
             }
             catch (const std::exception&)
@@ -202,7 +209,7 @@ private:
     {
         auto& lua = state;
 
-        if (auto f = lua ["node_ports"])
+        if (auto f = lua ["node_io_ports"])
         {
             sol::table t = f();
             int audioIns = 0, audioOuts = 0,
@@ -265,7 +272,7 @@ private:
     }
 };
 
-LuaNode::LuaNode()
+LuaNode::LuaNode() noexcept
     : GraphNode (0)
 {
     context = std::make_unique<Context>();
@@ -282,12 +289,11 @@ LuaNode::~LuaNode()
 
 void LuaNode::createPorts()
 {
-    if (createdPorts || context == nullptr)
+    if (context == nullptr)
         return;
 
     ports.clearQuick();
     context->createPorts (ports);
-    createdPorts = true;
 }
 
 Result LuaNode::loadScript (const String& newScript)

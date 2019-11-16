@@ -31,7 +31,7 @@ class LuaNode : public GraphNode,
                 public ChangeBroadcaster
 {
 public:
-    explicit LuaNode();
+    explicit LuaNode() noexcept;
     virtual ~LuaNode();
     
     void fillInPluginDescription (PluginDescription& desc);
@@ -53,7 +53,6 @@ protected:
     void createPorts() override;
 
 private:
-    bool createdPorts = false;    
     String script, draftScript;
     int blockSize = 512;
     double sampleRate = 44100.0;
