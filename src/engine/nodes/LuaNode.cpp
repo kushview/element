@@ -186,7 +186,7 @@ private:
                     float min    = params[i + 1]["min"].get_or (0.0);
                     float max    = params[i + 1]["max"].get_or (1.0);
                     float dfault = params[i + 1]["default"].get_or (1.0);
-
+                    ignoreUnused (min, max, dfault);
                     const int channel = isInput ? inChan++ : outChan++;
                    #if 0
                     DBG("index = " << index);

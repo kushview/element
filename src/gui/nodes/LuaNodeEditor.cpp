@@ -60,7 +60,8 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
     editor->setTabSize (2, true);
     editor->setFont (editor->getFont().withHeight (15));
     editor->loadContent (lua->getDraftScript());
-
+    editor->setColourScheme (luaColors());
+    
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
     compileButton.onClick = [this]()

@@ -102,7 +102,7 @@ private:
         auto size = sections.size() * titleHeight;
         for (auto* section : sections)
             for (auto* name : section->names)
-                size += nameHeight;
+                { size += nameHeight; ignoreUnused (name); }
         return size;
     }
 };

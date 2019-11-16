@@ -22,7 +22,6 @@
  #error Cannot include JUCE before LuaLib.cpp
 #else
 
-extern "C" {
 #include "../../libs/lua/src/lauxlib.c"
 #include "../../libs/lua/src/liolib.c"
 #include "../../libs/lua/src/lopcodes.c"
@@ -57,5 +56,5 @@ extern "C" {
 #include "../../libs/lua/src/llex.c"
 #include "../../libs/lua/src/ltm.c"
 #include "../../libs/lua/src/ldo.c"
-}
+
 #endif
