@@ -18,123 +18,140 @@
 
 #include "Tests.h"
 
-#if 0
-#include "scripting/LuaState.h"
+#if 1
 
+#include "scripting/LuaBindings.h"
+#include "sol/sol.hpp"
 
 using namespace Element;
 
-class LuaEngine
-{
-public:
-    LuaEngine() {}
-    ~LuaEngine() {}
+static const std::string nodeScript = R"(
+if element and element.plugin then
+    element.plugin ({
+        type        = "node",
+        name        = "Test Node",
+        author      = "Michael Fisher",
+        description = [[ Test script registration ]]
+    })
+end
 
-    Result execute (const String& block)
-    {
-        return Result::ok();
+function node_ports()
+    return {
+        audio_ins   = 2,
+        audio_outs  = 2,
+        midi_ins    = 1
     }
-};
+end
+
+function node_prepare (sample_rate, block_size)
+
+end
+
+function node_render (audio, midi)
+
+end
+
+function node_release()
+
+end
+)";
 
 class LuaTest : public UnitTestBase
 {
 public:
-    LuaTest() : UnitTestBase ("Lua Basics", "Lua", "lua") {}
+    LuaTest() : UnitTestBase ("LuaNode", "Lua", "node") {}
     virtual ~LuaTest() { }
-
-    void runTest()
+    void initialise() override
     {
-        beginTest ("Basic Lua");
-        runSimpleScript();
-        getGlobalVars();
-        callCFunction();
+        lua.open_libraries();
+        Element::Lua::registerEngine (lua);
     }
 
-private:
-    static int luaSin (lua_State* state) {
-        double d = luaL_checknumber (state, 1);
-        lua_pushnumber (state, sin (d));
-        return 1;  /* number of results */
-    }
-
-    void error (lua_State*, const char* e1, const char* e2)
+    void runTest() override
     {
-        String msg (e1); msg << ": " << e2;
-        expect (false, msg);
-    }
+        beginTest ("ports");
+        lua.script (nodeScript);
 
-    void runSimpleScript() 
-    {
-        // initialization
-        LuaState lua;
+        kv::PortList ports;
+        createPorts (ports);
 
-        // execute script
-        String script = "print('Hello Lua World!')";
-        int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), script.toRawUTF8());
-        lua_pcall (lua, 0, 0, 0);
-    }
+        expect (ports.size (PortType::Audio, true) == 2);
+        expect (ports.size (PortType::Audio, false) == 2);
+        expect (ports.size (PortType::Midi,  true) == 1);
+        expect (ports.size (PortType::Midi,  false) == 0);
+        expect (ports.size() == 5);
 
-    void callCFunction()
-    {
-        LuaState lua;
-
-        lua_pushcfunction (lua, luaSin);
-        lua_setglobal (lua, "mysin");
-
-        String script = 
-R"abc(
-print (mysin (100));
-print ("hello world 2")
-print (mysin (200))
-print (mysin ('notanumber'))
-)abc";
-        int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), "cfunc");
-        switch (lua_pcall (lua, 0, 0, 0))
-        {
-            case LUA_ERRRUN:
-                DBG("runtime error");
-                break;
-
-            case LUA_OK:
-                break;
-
-            default:
-                DBG("Unknown lua problem");
-                break;
+        for (const auto* port : ports.getPorts()) {
+            DBG(port->name << " : " << port->symbol << " : " << port->channel);
         }
     }
 
-    void getGlobalVars()
+    void createPorts (kv::PortList& ports)
     {
-        LuaState L;
+        if (auto f = lua ["node_ports"])
+        {
+            sol::table t = f();
+            int audioIns = 0, audioOuts = 0,
+                midiIns = 0, midiOuts = 0;
 
-        String script = 
-R"abc(
-depth = 10000
-width = 100
-height = 200
-)abc";
+            try {
+                if (t.size() == 0)
+                {
+                    audioIns  = t["audio_ins"].get_or (0);
+                    audioOuts = t["audio_outs"].get_or (0);
+                    midiIns   = t["midi_ins"].get_or (0);
+                    midiOuts  = t["midi_outs"].get_or (0);
+                }
+                else
+                {
+                    audioIns  = t[1]["audio_ins"].get_or (0);
+                    audioOuts = t[1]["audio_outs"].get_or (0);
+                    midiIns   = t[1]["midi_ins"].get_or (0);
+                    midiOuts  = t[1]["midi_outs"].get_or (0);
+                }
+            }
+            catch (const std::exception&) {}
 
-        if (LUA_OK != luaL_loadbuffer (L, script.toRawUTF8(), script.length(), "globals"))
-            return error (L, "Could not load buffer", "");
-        if (LUA_OK != lua_pcall (L, 0, 0, 0))
-            return error (L, "Could not execute script", "");
+            int index = 0, channel = 0;
+            for (int i = 0; i < audioIns; ++i)
+            {
+                String slug = "in_"; slug << (i + 1);
+                String name = "In "; name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++,
+                           slug, name, true);
+            }
 
-        if (LUA_TNUMBER != lua_getglobal (L, "height"))
-            return error (L, "not a number", "");
-        if (LUA_TNUMBER != lua_getglobal (L, "width"))
-            return error (L, "not a number", "");            
-        if (LUA_TNUMBER != lua_getglobal (L, "depth"))
-            return error (L, "not a number", "");
+            channel = 0;
+            for (int i = 0; i < audioOuts; ++i)
+            {
+                String slug = "out_"; slug << (i + 1);
+                String name = "Out "; name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++,
+                           slug, name, false);
+            }
 
-        auto depth  = (int) lua_tonumber (L, -1);        
-        auto width  = (int) lua_tonumber (L, -2);
-        auto height = (int) lua_tonumber (L, -3);
+            channel = 0;
+            for (int i = 0; i < midiIns; ++i)
+            {
+                String slug = "midi_in_"; slug << (i + 1);
+                String name = "MIDI In "; name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++,
+                           slug, name, true);
+            }
 
-        expect (width == 100);
-        expect (height == 200);
-        expect (depth == 10000);
+            channel = 0;
+            for (int i = 0; i < midiOuts; ++i)
+            {
+                String slug = "midi_out_"; slug << (i + 1);
+                String name = "MIDI Out "; name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++,
+                           slug, name, false);
+            }
+        }
     }
+
+private:
+    sol::state lua;
 };
 
 static LuaTest sLuaTest;

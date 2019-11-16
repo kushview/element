@@ -22,47 +22,57 @@
 #include "engine/nodes/LuaNode.h"
 #include "engine/MidiPipe.h"
 
-static const String defaultScript = R"(--[[
-    Lua template
+static const String defaultScript = 
+R"(--- Lua template
+--
+-- This script came with Element and is in the public domain.
+--
+-- The Lua filter node is highly experimental and the API is subject to change
+-- without warning.  Please bear with us as we move toward a stable version. If
+-- you are a developer and want to help out, see https://github.com/kushview/element
 
-    This script came with Element and is in the public domain.
+function node_io_ports()
+    return {
+        audio_ins   = 2,
+        audio_outs  = 2,
+        midi_ins    = 1,
+        midi_outs   = 1
+    }
+end
 
-    The Lua filter node is highly experimental and the API is subject to change
-    without warning.  Please bear with us as we move toward a stable version. If
-    you are a developer and want to help out, see https://github.com/kushview/element
---]]
+-- Return parameters
+function node_params()
+    return {
+        {
+            name    = "Volume",
+            label   = "dB",
+            type    = "float",
+            flow    = "input",
+            min     = -90.0,
+            max     = 24.0,
+            default = 0.0
+        }
+    }
+end
 
 -- prepare for rendering
-function prepare (rate, block)
+function node_prepare (rate, block)
     print (string.format ('prepare rate = %d block = %d', rate, block))
 end
 
-function MidiBuffer:messages()
-    local iter = MidiBufferIterator.make (self)
-    local msg = MidiMessage.make()
-    return function()
-        local ok, frame = iter:get_next_event (msg)
-        if not ok then
-            return nil
-        else
-            return msg, frame
-        end
-    end
-end
-
 -- render audio and midi
-function render (audio, midi)
+function node_render (audio, midi)
     audio:clear()
-    local midi_buffer = midi:get_read_buffer (0)
-    for msg, _ in midi_buffer:messages() do
+    local mb = midi:get_read_buffer (0)
+    for msg, _ in mb:iter() do
         print (msg)
     end
-    midi_buffer:clear()
+    mb:clear()
 end
 
--- release resources
-function release()
-    print('release resources...')
+--- Release node resources
+--  free any allocated resources in this callback
+function node_release()
 end
 
 )";
@@ -85,11 +95,28 @@ struct LuaNode::Context
             state.open_libraries (sol::lib::base, sol::lib::string);
             Lua::registerEngine (state);
             state.script (script.toRawUTF8());
-            renderf = state ["render"];
+
+            OwnedArray<AudioProcessorParameter> ins, outs;
+            createParameters (ins, outs);
+
+            renderf = state ["node_render"];
+            renderstdf = renderf;
             loaded = true;
-        } catch (const std::exception& e) {
+        }
+        catch (const std::exception& e)
+        {
             Logger::writeToLog (e.what());
             loaded = false;
+        }
+        
+        if (! loaded)
+        {
+            renderf = nullptr;
+            renderstdf = nullptr;
+        }
+        else
+        {
+            
         }
 
         return loaded ? Result::ok() : Result::fail ("Couldn't load Lua script");
@@ -105,7 +132,7 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (auto fn = state ["prepare"])
+        if (auto fn = state ["node_prepare"])
             fn (rate, block);
     }
 
@@ -114,43 +141,116 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (auto fn = state ["release"])
+        if (auto fn = state ["node_release"])
             fn();
     }
 
-    void render (AudioSampleBuffer& audio, MidiPipe& midi)
+    void render (AudioSampleBuffer& audio, MidiPipe& midi) noexcept
     {
-        if (! loaded)
-            return;
-
-       #if 1
-        /*
-            TODO: don't call renderf directly.  Figure out how to cash metatable
-            indexes for the passed types and use lua C api directly.  this object
-            probably allocates and/or has several other function calls all of which
-            take time See below... If we can figure out how to push refs to audio/midi +
-            a direct way to specify the metatable type, then it should greatly
-            improve performance.
-        */
-        renderf (audio, midi);
-       #else
-        lua_rawgeti (state, LUA_REGISTRYINDEX, renderf.registry_index());
-        lua_pushlightuserdata (state, &audio);
-        luaL_setmetatable (state, "AudioBuffer");
-        lua_pushlightuserdata (state, &midi);
-        luaL_setmetatable (state, "MidiPipe");
-        if (lua_pcall (state, 2, 0, 0) != LUA_OK)
-        {
-
-        }
-       #endif
+        if (loaded)
+            renderstdf (audio, midi);
     }
 
     String getName() const { return name; }
 
+    void createParameters (OwnedArray<AudioProcessorParameter>& ins,
+                           OwnedArray<AudioProcessorParameter>& outs)
+    {
+        ignoreUnused (outs);
+        if (auto f = state ["node_params"])
+        {
+            try {
+                sol::table params = f();
+                for (int i = 0; i < params.size(); ++i)
+                {
+                    String name  = params[i + 1]["name"].get_or (std::string ("Param"));
+                    String type  = params[i + 1]["type"].get_or (std::string ("float"));
+                    String flow  = params[i + 1]["flow"].get_or (std::string ("input"));
+                    float min    = params[i + 1]["min"].get_or (0.0);
+                    float max    = params[i + 1]["max"].get_or (1.0);
+                    float dfault = params[i + 1]["default"].get_or (1.0);
+                    ins.add (new AudioParameterFloat (
+                        name.trim().replace(" ", "-").toLowerCase(),
+                        name, min, max, dfault));
+                    DBG("param : " << name);
+                }
+            } catch (const std::exception&) { }
+        }
+    }
+
+    void createPorts (kv::PortList& ports)
+    {   
+        if (! ready())
+            return;
+        
+        auto& lua = state;
+
+        if (auto f = lua ["node_ports"])
+        {
+            sol::table t = f();
+            int audioIns = 0, audioOuts = 0,
+                midiIns = 0, midiOuts = 0;
+
+            try {
+                if (t.size() == 0)
+                {
+                    audioIns  = t["audio_ins"].get_or (0);
+                    audioOuts = t["audio_outs"].get_or (0);
+                    midiIns   = t["midi_ins"].get_or (0);
+                    midiOuts  = t["midi_outs"].get_or (0);
+                }
+                else
+                {
+                    audioIns  = t[1]["audio_ins"].get_or (0);
+                    audioOuts = t[1]["audio_outs"].get_or (0);
+                    midiIns   = t[1]["midi_ins"].get_or (0);
+                    midiOuts  = t[1]["midi_outs"].get_or (0);
+                }
+            }
+            catch (const std::exception&) {}
+
+            int index = 0, channel = 0;
+            for (int i = 0; i < audioIns; ++i)
+            {
+                String slug = "in_"; slug << (i + 1);
+                String name = "In "; name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++,
+                           slug, name, true);
+            }
+
+            channel = 0;
+            for (int i = 0; i < audioOuts; ++i)
+            {
+                String slug = "out_"; slug << (i + 1);
+                String name = "Out "; name << (i + 1);
+                ports.add (PortType::Audio, index++, channel++,
+                           slug, name, false);
+            }
+
+            channel = 0;
+            for (int i = 0; i < midiIns; ++i)
+            {
+                String slug = "midi_in_"; slug << (i + 1);
+                String name = "MIDI In "; name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++,
+                           slug, name, true);
+            }
+
+            channel = 0;
+            for (int i = 0; i < midiOuts; ++i)
+            {
+                String slug = "midi_out_"; slug << (i + 1);
+                String name = "MIDI Out "; name << (i + 1);
+                ports.add (PortType::Midi, index++, channel++,
+                           slug, name, false);
+            }
+        }
+    }
+
 private:
     sol::state state;
     sol::function renderf;
+    std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
     String name;
     bool loaded = false;
 };
@@ -170,9 +270,19 @@ LuaNode::~LuaNode()
     context.reset();
 }
 
+void LuaNode::createPorts()
+{
+    if (createdPorts || context == nullptr)
+        return;
+
+    ports.clearQuick();
+    context->createPorts (ports);
+    createdPorts = true;
+}
+
 Result LuaNode::loadScript (const String& newScript)
 {
-    auto newContext = std::unique_ptr<Context> (new Context());
+    auto newContext = std::make_unique<Context>();
     auto result = newContext->load (newScript);
 
     if (result.wasOk())

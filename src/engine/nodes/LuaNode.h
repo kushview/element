@@ -50,17 +50,7 @@ public:
 
 protected:
     inline bool wantsMidiPipe() const override { return true; }
-    
-    inline void createPorts() override
-    {
-        if (createdPorts)
-            return;
-
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
-        createdPorts = true;
-    }
+    void createPorts() override;
 
 private:
     bool createdPorts = false;    
