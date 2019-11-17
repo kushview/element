@@ -93,7 +93,7 @@ namespace Element {
             const auto totalNumInputChannels  = getTotalNumInputChannels();
             const auto totalNumOutputChannels = getTotalNumOutputChannels();
             const auto numSamples = buffer.getNumSamples();
-
+            ignoreUnused (totalNumInputChannels);
             // copy input into extra output channels
             for (int ch = 2; ch < totalNumOutputChannels; ++ch)
                 buffer.copyFrom (ch, 0, buffer.getReadPointer (ch % 2), numSamples);
