@@ -140,6 +140,7 @@ private:
         String programName;
         if (GraphNodePtr object = node.getGraphNode())
         {
+            const bool global = object->useGlobalMidiPrograms();
             // use the object because there isn't a notifaction directly back to node model
             // in all cases
             const auto programNumber = object->getMidiProgram();
@@ -147,7 +148,7 @@ private:
             if (isPositiveAndNotGreaterThan (roundToInt (program.slider.getValue()), 128))
             {
                 programName = node.getMidiProgramName (programNumber);
-                program.name.setEnabled (enabled);
+                program.name.setEnabled (global ? false : enabled);
                 program.loadButton.setEnabled (enabled);
                 program.saveButton.setEnabled (enabled);
                 program.trashButton.setEnabled (enabled);

@@ -408,6 +408,9 @@ File GraphNode::getMidiProgramFile (int program) const
 
 void GraphNode::saveMidiProgram()
 {
+    if (useGlobalMidiPrograms())
+        return; // don't save global programs here.
+    
     int progamNumber = midiProgram.get();
     if (! isPositiveAndBelow (progamNumber, 128))
         return;
@@ -519,14 +522,22 @@ void GraphNode::setMidiProgram (const int program)
 
 void GraphNode::setMidiProgramName (const int program, const String& name) 
 {
+    if (useGlobalMidiPrograms())
+        return; // names not supported with global programs yet.
+
     if (auto* pr = getMidiProgram (program))
-    {
         pr->name = name;
-    }
 }
 
 String GraphNode::getMidiProgramName (const int program) const
 {
+    if (useGlobalMidiPrograms())
+    {
+        String name ("Global ");
+        name << (program + 1);
+        return name;
+    }
+
     if (auto* pr = getMidiProgram (program))
         return pr->name;
     return {};

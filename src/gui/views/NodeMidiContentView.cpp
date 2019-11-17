@@ -76,10 +76,10 @@ void NodeMidiContentView::stabilizeContent()
 
         if (GraphNodePtr ptr = node.getGraphNode())
         {
-            #if defined (EL_PRO) || defined (EL_SOLO)
-            ptr->midiProgramChanged.connect (
+           #if defined (EL_PRO) || defined (EL_SOLO)
+            midiProgramChangedConnection = ptr->midiProgramChanged.connect (
                 std::bind (&NodeMidiContentView::updateMidiProgram, this));
-            #endif
+           #endif
         }
     }
     else
@@ -92,51 +92,16 @@ void NodeMidiContentView::stabilizeContent()
 
 void NodeMidiContentView::updateProperties()
 {
-    #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
+   #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
     props.clear();
     props.addProperties (NodeProperties (node, false, true));
     resized();
-    #endif
+   #endif
 }
 
 void NodeMidiContentView::updateMidiProgram()
 {
-   #if 0
-    const bool enabled = node.areMidiProgramsEnabled();
-    String programName;
-    if (GraphNodePtr object = node.getGraphNode())
-    {
-        // use the object because there isn't a notifaction directly back to node model
-        // in all cases
-        const auto programNumber = object->getMidiProgram();
-        midiProgram.slider.setValue (1 + object->getMidiProgram(), dontSendNotification);
-        if (isPositiveAndNotGreaterThan (roundToInt (midiProgram.slider.getValue()), 128))
-        {
-            programName = node.getMidiProgramName (programNumber);
-            midiProgram.name.setEnabled (enabled);
-            midiProgram.loadButton.setEnabled (enabled);
-            midiProgram.saveButton.setEnabled (enabled);
-            midiProgram.trashButton.setEnabled (enabled);
-            midiProgram.powerButton.setToggleState (enabled, dontSendNotification);
-        }
-        else
-        {
-            midiProgram.name.setEnabled (false);
-            midiProgram.loadButton.setEnabled (false);
-            midiProgram.saveButton.setEnabled (false);
-            midiProgram.trashButton.setEnabled (false);
-            midiProgram.powerButton.setToggleState (false, dontSendNotification);
-        }
-    }
-    
-    midiProgram.name.setText (programName.isNotEmpty() ? 
-        programName : EL_PROGRAM_NAME_PLACEHOLDER, dontSendNotification);
-    midiProgram.powerButton.setToggleState (node.areMidiProgramsEnabled(), dontSendNotification);
-    midiProgram.globalButton.setToggleState (node.useGlobalMidiPrograms(), dontSendNotification);
-    midiProgram.globalButton.setEnabled (enabled);
-    midiProgram.slider.updateText();
-    midiProgram.slider.setEnabled (enabled);
-   #endif
+    updateProperties();
 }
 
 }
