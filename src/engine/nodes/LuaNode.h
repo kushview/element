@@ -40,7 +40,7 @@ public:
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
-
+    
     Result loadScript (const String&);
 
     const String& getScript() const { return script; }

@@ -23,9 +23,14 @@
 #include "engine/MidiPipe.h"
 
 static const String defaultScript = 
-R"(--- Lua template
+R"(
+--- Lua Node template
 --
 -- This script came with Element and is in the public domain.
+--
+-- The code contained provides stereo audio in and out with one MIDI input
+-- and one MIDI output.  It clears the audio buffer and logs midi messages
+-- to the console.
 --
 -- The Lua filter node is highly experimental and the API is subject to change
 -- without warning.  Please bear with us as we move toward a stable version. If
@@ -93,24 +98,23 @@ struct LuaNode::Context
         if (ready())
             return Result::fail ("Script already loaded");
 
-        try {
+        String errorMsg;
+        try
+        {
             state.open_libraries (sol::lib::base, sol::lib::string);
             Lua::registerEngine (state);
-            state.script (script.toRawUTF8());
-
-            renderf = state ["node_render"];
-            renderstdf = renderf;
-            loaded = true;
+            auto res = state.script (script.toRawUTF8());
+            if (res.valid())
+            {
+                renderf = state ["node_render"];
+                renderstdf = renderf;
+                loaded = true;
+            }
         }
         catch (const std::exception& e)
         {
-            Logger::writeToLog (e.what());
+            errorMsg = e.what();
             loaded = false;
-        }
-        
-        if (! loaded)
-        {
-            renderf = nullptr;
             renderstdf = nullptr;
         }
 
@@ -119,6 +123,9 @@ struct LuaNode::Context
 
     static Result validate (const String& script)
     {
+        if (script.isEmpty())
+            return Result::fail ("script contains no code");
+
         auto ctx = std::make_unique<Context>();
         auto result = ctx->load (script);
         if (result.failed())
@@ -136,7 +143,6 @@ struct LuaNode::Context
             // call node_io_ports() and node_params()
             kv::PortList ports;
             ctx->createPorts (ports);
-
 
             // create a dummy audio buffer and midipipe
             auto nchans = jmax (ports.size (PT::Audio, true),
@@ -163,7 +169,7 @@ struct LuaNode::Context
                 
                 // user renderf directly so it can throw an exception
                 if (ctx->renderf)
-                    ctx->renderf (rate, block);
+                    ctx->renderf (std::ref (audio), std::ref (*midi));
 
                 ctx->release();
             }
@@ -356,11 +362,10 @@ void LuaNode::createPorts()
 
 Result LuaNode::loadScript (const String& newScript)
 {
-   #if 0
+   #if 1
     auto result = Context::validate (newScript);
-    if (! result.wasOk()) {
+    if (result.failed())
         return result;
-    }
    #else
     auto result = Result::fail ("Unknown parsing error");
    #endif
