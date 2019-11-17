@@ -21,6 +21,7 @@
 #pragma once
 
 #include "gui/nodes/NodeEditorComponent.h"
+#include "gui/LuaTokeniser.h"
 
 namespace Element {
 
@@ -38,7 +39,7 @@ public:
 
 private:
     CodeDocument document;
-    LuaTokeniser tokens;
+    kv::LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
     TextButton compileButton;
 };

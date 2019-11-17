@@ -110,11 +110,11 @@ LookAndFeel::LookAndFeel()
     setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker(0.3));
 
     // code editor. TODO
-    // setColour (CodeEditorComponent::backgroundColourId, Colour(widgetBackgroundColor.darker()));
-    // setColour (CodeEditorComponent::highlightColourId, Colour(0xFF000000));
-    // setColour (CodeEditorComponent::defaultTextColourId, textColor);
-    // setColour (CodeEditorComponent::lineNumberBackgroundId, Colour(widgetBackgroundColor.darker()));
-    // setColour (CodeEditorComponent::lineNumberTextId, textColor.darker(0.03));
+    setColour (CodeEditorComponent::backgroundColourId, Colour(0xff1e1e1e));
+    setColour (CodeEditorComponent::highlightColourId, Colour(0xff1b5381));
+    setColour (CodeEditorComponent::defaultTextColourId, Colour(0xffc4c4c4));
+    setColour (CodeEditorComponent::lineNumberBackgroundId, Colour(0xff1e1e1e));
+    setColour (CodeEditorComponent::lineNumberTextId, Colour(0xff555555));
 }
 
 //==============================================================================
