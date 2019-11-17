@@ -58,7 +58,7 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
     setOpaque (true);
     editor.reset (new CodeEditorComponent (document, &tokens));
     addAndMakeVisible (editor.get());
-    editor->setTabSize (2, true);
+    editor->setTabSize (3, true);
     editor->setFont (editor->getFont().withHeight (15));
     editor->loadContent (lua->getDraftScript());
     editor->setColourScheme (luaColors());
