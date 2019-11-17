@@ -63,12 +63,11 @@ end
 prepared_flag = false
 
 function node_prepare (sample_rate, block_size)
-    print("prepare test node")
+    print ("prepare test node")
     prepared_flag = true
 end
 
 function node_render (audio, midi)
-
 end
 
 function node_release()
@@ -79,7 +78,7 @@ end
 class LuaNodeTest : public UnitTestBase
 {
 public:
-    LuaNodeTest() : UnitTestBase ("LuaNode", "Lua", "node") {}
+    LuaNodeTest() : UnitTestBase ("Lua Node", "Lua", "node") { }
     virtual ~LuaNodeTest() { }
     void initialise() override
     {
@@ -117,4 +116,47 @@ private:
 };
 
 static LuaNodeTest sLuaNodeTest;
+
+class StaticMethodTest : public UnitTestBase
+{
+public:
+    StaticMethodTest() : UnitTestBase ("Lua Static Method", "Lua", "static") {}
+    virtual ~StaticMethodTest() { }
+    void initialise() override
+    {
+        lua.open_libraries();
+    }
+
+    void shutdown() override
+    {
+        lua.collect_garbage();
+    }
+
+    void runTest() override
+    {
+        beginTest ("static method");
+        lua.new_usertype<Object> ("Object", sol::no_constructor,
+            "one_hundred", Object::oneHundred
+        );
+
+        try {
+            lua.script (R"(
+                Object.two_hundred = function() return 200 end
+                value100 = Object:one_hundred()
+                value200 = Object:two_hundred()
+            )");
+            expect (100 == (int) lua["value100"]);
+            expect (200 == (int) lua["value200"]);
+        } catch (const std::exception& e) {
+            expect (false, e.what());
+        }
+    }
+
+private:
+    struct Object { inline static int oneHundred() { return 100; } };
+    sol::state lua;
+};
+
+static StaticMethodTest sStaticMethodTest;
+
 #endif
