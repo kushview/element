@@ -113,6 +113,123 @@ enum AppCommands
    #endif
 };
 
+inline static Array<CommandID> getAllCommands()
+{
+    return std::move (Array<CommandID> ({
+        quit,
+        undo,
+        redo,
+        showAbout,
+        showLegacyView,
+        showPluginManager,
+        showPreferences,
+        showSessionConfig,
+        showGraphConfig,
+        showPatchBay,
+        showGraphEditor,
+        showLastContentView,
+        showAllPluginWindows,
+        showKeymapEditor,
+        hideAllPluginWindows,
+
+        toggleVirtualKeyboard,
+        rotateContentView,
+
+        mediaClose,
+        mediaOpen,
+        mediaNew,
+        mediaSave,
+        mediaSaveAs,
+
+        showControllerDevices,
+        toggleUserInterface,
+        toggleChannelStrip,
+        showGraphMixer,
+        
+        sessionClose,
+        sessionOpen,
+        sessionNew,
+        sessionSave,
+        sessionSaveAs,
+        sessionAddGraph,
+        sessionDuplicateGraph,
+        sessionDeleteGraph,
+        sessionInsertPlugin,
+
+        exportAudio,
+        exportMidi,
+        exportGraph,
+        importGraph,
+
+        panic,
+        importSession,
+
+        checkNewerVersion,
+
+        signIn,
+        signOut,
+
+        transportRewind,
+        transportForward,
+        transportPlay,
+        transportRecord,
+        transportSeekZero,
+        transportStop,
+
+        graphNew,
+        graphOpen,
+        graphSave,
+        graphSaveAs,
+
+    #if EL_DOCKING
+        workspaceSave,
+        workspaceOpen,
+        workspaceResetActive,
+        workspaceSaveActive,
+        workspaceClassic,
+        workspaceEditing,
+    #endif
+    }));
+}
+
+inline static String toString (CommandID command)
+{
+    switch (command)
+    {
+        case Commands::quit:                    return "quit"; break;
+        case Commands::undo:                    return "undo"; break;
+        case Commands::redo:                    return "redo"; break;
+        case Commands::showAbout:               return "showAbout"; break;
+        case Commands::showLegacyView:          return "showLegacyView"; break;
+        case Commands::showPluginManager:       return "showPluginManager"; break;
+        case Commands::showPreferences:         return "showPreferences"; break;
+        case Commands::showSessionConfig:       return "showSessionConfig"; break;
+        case Commands::showGraphConfig:         return "showGraphConfig"; break;
+        case Commands::showPatchBay:            return "showPatchBay"; break;
+        case Commands::showGraphEditor:         return "showGraphEditor"; break;
+        case Commands::showLastContentView:     return "showLastContentView"; break;
+        case Commands::showAllPluginWindows:    return "showAllPluginWindows"; break;
+        case Commands::showKeymapEditor:        return "showKeymapEditor"; break;
+        case Commands::hideAllPluginWindows:    return "hideAllPluginWindows"; break;
+        case Commands::toggleVirtualKeyboard:   return "toggleVirtualKeyboard"; break;
+        case Commands::rotateContentView:       return "rotateContentView"; break;
+        case Commands::showControllerDevices:   return "showControllerDevices"; break;
+        case Commands::toggleUserInterface:     return "toggleUserInterface"; break;
+        case Commands::toggleChannelStrip:      return "toggleChannelStrip"; break;
+        case Commands::showGraphMixer:          return "showGraphMixer"; break;
+        case Commands::panic:                   return "panic"; break;
+        case Commands::graphNew:                return "graphNew"; break;
+        case Commands::graphOpen:               return "graphOpen"; break;
+        case Commands::graphSave:               return "graphSave"; break;
+        case Commands::graphSaveAs:             return "graphSaveAs"; break;
+       #if EL_DOCKING
+       #endif
+        default: break;
+    }
+
+    return {};
+}
+
 inline static CommandID fromString (const String& str)
 {
     if (str == "quit")                  return Commands::quit;
@@ -148,6 +265,29 @@ inline static CommandID fromString (const String& str)
    #if EL_DOCKING
    #endif
     return Commands::invalid;
+}
+
+inline static String toOSCAddress (CommandID command)
+{
+    auto commandStr = toString (command);
+    if (commandStr.isEmpty())
+        return {};
+
+    String addy = "/element/command/";
+    addy << commandStr;
+    return addy;
+}
+
+inline static StringArray getOSCAddresses()
+{
+    StringArray res;
+    for (auto command : getAllCommands())
+    {
+        const auto addy = toOSCAddress (command);
+        if (addy.isNotEmpty())
+            res.add (addy);
+    }
+    return std::move (res);
 }
 
 }}
