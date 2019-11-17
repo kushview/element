@@ -136,7 +136,6 @@ inline void OSCSenderNode::createPorts()
     ports.clearQuick();
 
     ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-    ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
     createdPorts = true;
 }
 
