@@ -70,6 +70,11 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
         {
             const auto script = document.getAllContent();
             auto result = lua->loadScript (script);
+            if (! result.wasOk())
+            {
+                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                    "Script Error", result.getErrorMessage());
+            }
         }
     };
 

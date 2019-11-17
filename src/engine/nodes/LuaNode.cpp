@@ -117,9 +117,67 @@ struct LuaNode::Context
         return loaded ? Result::ok() : Result::fail ("Couldn't load Lua script");
     }
 
-    Result validate (const String& script)
+    static Result validate (const String& script)
     {
-        return Result::ok();
+        auto ctx = std::make_unique<Context>();
+        auto result = ctx->load (script);
+        if (result.failed())
+            return result;
+        if (! ctx->ready())
+            return Result::fail ("could not parse script");
+
+        try
+        {
+            const int block = 1024;
+            const double rate = 44100.0;
+
+            using PT = kv::PortType;
+            
+            // call node_io_ports() and node_params()
+            kv::PortList ports;
+            ctx->createPorts (ports);
+
+
+            // create a dummy audio buffer and midipipe
+            auto nchans = jmax (ports.size (PT::Audio, true),
+                                ports.size (PT::Audio, false));
+            auto nmidi  = jmax (ports.size (PT::Midi, true),
+                                ports.size (PT::Midi, false));
+            AudioSampleBuffer audio (jmax (1, nchans), block);
+            OwnedArray<MidiBuffer> midiBufs;
+            Array<int> midiIdx;
+            
+            while (midiBufs.size() < nmidi)
+            {
+                midiIdx.add (midiBufs.size());
+                midiBufs.add (new MidiBuffer ());
+            }
+
+
+            // calls node_prepare(), node_render(), and node_release()
+            {
+                auto midi = midiBufs.size() > 0 
+                    ? std::make_unique<MidiPipe> (midiBufs, midiIdx)
+                    : std::make_unique<MidiPipe>();
+                ctx->prepare (rate, block);
+                
+                // user renderf directly so it can throw an exception
+                if (ctx->renderf)
+                    ctx->renderf (rate, block);
+
+                ctx->release();
+            }
+
+            midiBufs.clearQuick (true);
+            ctx.reset();
+            result = Result::ok();
+        }
+        catch (const std::exception& e)
+        {
+            result = Result::fail (e.what());
+        }
+
+        return result;
     }
 
     void prepare (double rate, int block)
@@ -298,8 +356,17 @@ void LuaNode::createPorts()
 
 Result LuaNode::loadScript (const String& newScript)
 {
+   #if 0
+    auto result = Context::validate (newScript);
+    if (! result.wasOk()) {
+        return result;
+    }
+   #else
+    auto result = Result::fail ("Unknown parsing error");
+   #endif
+    
     auto newContext = std::make_unique<Context>();
-    auto result = newContext->load (newScript);
+    result = newContext->load (newScript);
 
     if (result.wasOk())
     {
