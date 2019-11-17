@@ -118,7 +118,9 @@ struct LuaNode::Context
             renderstdf = nullptr;
         }
 
-        return loaded ? Result::ok() : Result::fail ("Couldn't load Lua script");
+        return loaded ? Result::ok() 
+            : Result::fail (errorMsg.isNotEmpty() 
+                ? errorMsg : String("unknown error in script"));
     }
 
     static Result validate (const String& script)
