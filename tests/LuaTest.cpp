@@ -17,121 +17,104 @@
 */
 
 #include "Tests.h"
-#include "scripting/LuaState.h"
+
+#if 1
+
+#include "engine/nodes/LuaNode.h"
+#include "scripting/LuaBindings.h"
+#include "sol/sol.hpp"
 
 using namespace Element;
 
-class LuaEngine
-{
-public:
-    LuaEngine() {}
-    ~LuaEngine() {}
+static const String nodeScript = R"(
+if element and element.plugin then
+    element.plugin ({
+        type        = "node",
+        name        = "Test Node",
+        author      = "Michael Fisher",
+        description = [[ Test script registration ]]
+    })
+end
 
-    Result execute (const String& block)
-    {
-        return Result::ok();
+function node_io_ports()
+    return {
+        audio_ins   = 2,
+        audio_outs  = 2,
+        midi_ins    = 1,
+        midi_outs   = 0
     }
-};
+end
 
-class LuaTest : public UnitTestBase
+-- Return parameters
+function node_params()
+    return {
+        {
+            name    = "Volume",
+            label   = "dB",
+            type    = "float",
+            flow    = "input",
+            min     = -90.0,
+            max     = 24.0,
+            default = 0.0
+        }
+    }
+end
+
+prepared_flag = false
+
+function node_prepare (sample_rate, block_size)
+    print("prepare test node")
+    prepared_flag = true
+end
+
+function node_render (audio, midi)
+
+end
+
+function node_release()
+    prepared_flag = false
+end
+)";
+
+class LuaNodeTest : public UnitTestBase
 {
 public:
-    LuaTest() : UnitTestBase ("Lua Basics", "Lua", "lua") {}
-    virtual ~LuaTest() { }
-
-    void runTest()
+    LuaNodeTest() : UnitTestBase ("LuaNode", "Lua", "node") {}
+    virtual ~LuaNodeTest() { }
+    void initialise() override
     {
-        beginTest ("Basic Lua");
-        runSimpleScript();
-        getGlobalVars();
-        callCFunction();
+        lua.open_libraries();
+        Element::Lua::registerEngine (lua);
+    }
+
+    void runTest() override
+    {
+        auto graph = std::make_unique<GraphProcessor>();
+        graph->prepareToPlay (44100.0, 1024);
+        auto* node = new LuaNode();
+
+        beginTest ("prepare");
+        node->loadScript (nodeScript);
+        graph->addNode (node);
+
+        beginTest ("ports");
+        expect (node->getNumPorts() == 6);
+        expect (node->getNumPorts (kv::PortType::Audio,   true)  == 2);
+        expect (node->getNumPorts (kv::PortType::Audio,   false) == 2);
+        expect (node->getNumPorts (kv::PortType::Midi,    true)  == 1);
+        expect (node->getNumPorts (kv::PortType::Midi,    false) == 0);
+        expect (node->getNumPorts (kv::PortType::Control, true)  == 1);
+        
+        beginTest ("release");
+        graph->releaseResources();
+
+        node = nullptr;
+        graph = nullptr;
     }
 
 private:
-    static int luaSin (lua_State* state) {
-        double d = luaL_checknumber (state, 1);
-        lua_pushnumber (state, sin (d));
-        return 1;  /* number of results */
-    }
-
-    void error (lua_State*, const char* e1, const char* e2)
-    {
-        String msg (e1); msg << ": " << e2;
-        expect (false, msg);
-    }
-
-    void runSimpleScript() 
-    {
-        // initialization
-        LuaState lua;
-
-        // execute script
-        String script = "print('Hello Lua World!')";
-        int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), script.toRawUTF8());
-        lua_pcall (lua, 0, 0, 0);
-    }
-
-    void callCFunction()
-    {
-        LuaState lua;
-
-        lua_pushcfunction (lua, luaSin);
-        lua_setglobal (lua, "mysin");
-
-        String script = 
-R"abc(
-print (mysin (100));
-print ("hello world 2")
-print (mysin (200))
-print (mysin ('notanumber'))
-)abc";
-        int load_stat = luaL_loadbuffer (lua, script.toRawUTF8(), script.length(), "cfunc");
-        switch (lua_pcall (lua, 0, 0, 0))
-        {
-            case LUA_ERRRUN:
-                DBG("runtime error");
-                break;
-
-            case LUA_OK:
-                break;
-
-            default:
-                DBG("Unknown lua problem");
-                break;
-        }
-    }
-
-    void getGlobalVars()
-    {
-        LuaState L;
-
-        String script = 
-R"abc(
-depth = 10000
-width = 100
-height = 200
-)abc";
-
-        if (LUA_OK != luaL_loadbuffer (L, script.toRawUTF8(), script.length(), "globals"))
-            return error (L, "Could not load buffer", "");
-        if (LUA_OK != lua_pcall (L, 0, 0, 0))
-            return error (L, "Could not execute script", "");
-
-        if (LUA_TNUMBER != lua_getglobal (L, "height"))
-            return error (L, "not a number", "");
-        if (LUA_TNUMBER != lua_getglobal (L, "width"))
-            return error (L, "not a number", "");            
-        if (LUA_TNUMBER != lua_getglobal (L, "depth"))
-            return error (L, "not a number", "");
-
-        auto depth  = (int) lua_tonumber (L, -1);        
-        auto width  = (int) lua_tonumber (L, -2);
-        auto height = (int) lua_tonumber (L, -3);
-
-        expect (width == 100);
-        expect (height == 200);
-        expect (depth == 10000);
-    }
+    sol::state lua;
 };
 
-static LuaTest sLuaTest;
+static LuaNodeTest sLuaNodeTest;
+#endif

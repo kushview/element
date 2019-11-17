@@ -1,6 +1,8 @@
 # Element Coding Standard
 _Adapted from [JUCE](https://juce.com/discover/stories/coding-standards). Please try to follow these guidelines as much as possible._
 
+If you're writing Lua code, please also see the [Lua Style Guide](lua-style.md), in addition to this document.
+
 ### Don't Repeat Yourself!
 This principle pretty much summarises the essence of what it means to write good code, in all languages, at all levels. Other people have explained it better than we can do here – google for D.R.Y. and you’ll find many tutorials. If you only pay attention to one piece of advice in this document, make it this one!
 

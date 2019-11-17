@@ -16,13 +16,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "scripting/Lua.h"
+#include "sol/sol.hpp"
 
 #if defined(JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED)
  #error Cannot include JUCE before LuaLib.cpp
 #else
 
-extern "C" {
+#ifdef _MSC_VER
+ #pragma warning(disable: 4244) // convert possible data loss
+ #pragma warning(disable: 4310) // cast truncates constant value
+ #pragma warning(disable: 4334) // result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+#endif
+
 #include "../../libs/lua/src/lauxlib.c"
 #include "../../libs/lua/src/liolib.c"
 #include "../../libs/lua/src/lopcodes.c"
@@ -57,5 +62,5 @@ extern "C" {
 #include "../../libs/lua/src/llex.c"
 #include "../../libs/lua/src/ltm.c"
 #include "../../libs/lua/src/ldo.c"
-}
+
 #endif

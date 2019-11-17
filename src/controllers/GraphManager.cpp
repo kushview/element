@@ -371,7 +371,10 @@ void GraphManager::removeFilter (const uint32 uid)
             // the model was probably referencing the node ptr
             GraphNodePtr obj = node.getGraphNode();
             if (obj)
+            {
                 obj->willBeRemoved();
+                obj->releaseResources();
+            }
 
             auto data = node.getValueTree();
             nodes.removeChild (data, nullptr);

@@ -31,6 +31,7 @@ protected:
     NodeEditorComponent (const Node&) noexcept;
 
 public:
+    NodeEditorComponent() = delete;
     virtual ~NodeEditorComponent() override;
     inline Node getNode() const { return node; }
     bool isRunningInPluginWindow() const;

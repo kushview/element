@@ -824,8 +824,8 @@ namespace Element
             setInterceptsMouseClicks (true, true);
         }
 
-        ValueTree newNodes = newNode.hasNodeType(Tags::graph) ? newNode.getNodesValueTree()
-                                                              : ValueTree (Tags::nodes);
+        ValueTree newNodes = newNode.hasNodeType(Tags::graph) 
+            ? newNode.getNodesValueTree() : ValueTree (Tags::nodes);
         jassert (this->matrix != nullptr);
         matrix->nodeModels = newNodes;
         if (breadcrumb)

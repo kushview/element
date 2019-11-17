@@ -25,6 +25,8 @@
 #include "engine/nodes/ChannelizeProcessor.h"
 #include "engine/nodes/CombFilterProcessor.h"
 #include "engine/nodes/EQFilterProcessor.h"
+#include "engine/nodes/FreqSplitterProcessor.h"
+#include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MediaPlayerProcessor.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -238,6 +240,11 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* desc = ds.add (new PluginDescription());
         EQFilterProcessor(2).fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_FREQ_SPLITTER)
+    {
+        auto* desc = ds.add (new PluginDescription());
+        FreqSplitterProcessor().fillInPluginDescription (*desc);
+    }
 
    #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
@@ -338,6 +345,13 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         OSCSenderNode().fillInPluginDescription (*desc);
     }
+    else if (fileOrId == EL_INTERNAL_ID_LUA)
+    {
+       #if EL_USE_LUA
+        auto* const desc = ds.add (new PluginDescription());
+        LuaNode().fillInPluginDescription (*desc);
+       #endif
+    }
    #endif
 }
 
@@ -346,6 +360,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     StringArray results;
     results.add (EL_INTERNAL_ID_COMB_FILTER);
     results.add (EL_INTERNAL_ID_EQ_FILTER);
+    results.add (EL_INTERNAL_ID_FREQ_SPLITTER);
     results.add ("element.allPass");
     results.add ("element.volume");
     results.add (EL_INTERNAL_ID_WET_DRY);
@@ -370,6 +385,9 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_MIDI_MONITOR);
     results.add (EL_INTERNAL_ID_OSC_RECEIVER);
     results.add (EL_INTERNAL_ID_OSC_SENDER);
+   #if EL_USE_LUA
+    results.add (EL_INTERNAL_ID_LUA);
+   #endif
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
    #endif // product enablements
     return results;
@@ -398,6 +416,8 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new ReverbProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_EQ_FILTER)
         base = new EQFilterProcessor();
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_FREQ_SPLITTER)
+        base = new FreqSplitterProcessor();
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)

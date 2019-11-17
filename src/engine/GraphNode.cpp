@@ -699,7 +699,7 @@ int GraphNode::getOversamplingFactor()
 {
     if (osPow > 0)
         if (auto* osProc = getOversamplingProcessor())
-            return osProc->getOversamplingFactor();
+            return static_cast<int> (osProc->getOversamplingFactor());
 
     return 1;
 }

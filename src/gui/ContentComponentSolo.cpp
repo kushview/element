@@ -32,6 +32,7 @@
 #include "gui/views/GraphEditorView.h"
 #include "gui/views/GraphMixerView.h"
 #include "gui/views/KeymapEditorView.h"
+#include "gui/views/LuaConsoleView.h"
 #include "gui/views/NodeChannelStripView.h"
 #include "gui/MainWindow.h"
 #include "gui/MainMenu.h"

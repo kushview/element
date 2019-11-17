@@ -108,6 +108,13 @@ LookAndFeel::LookAndFeel()
 
     // rotary
     setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker(0.3));
+
+    // code editor. TODO
+    // setColour (CodeEditorComponent::backgroundColourId, Colour(widgetBackgroundColor.darker()));
+    // setColour (CodeEditorComponent::highlightColourId, Colour(0xFF000000));
+    // setColour (CodeEditorComponent::defaultTextColourId, textColor);
+    // setColour (CodeEditorComponent::lineNumberBackgroundId, Colour(widgetBackgroundColor.darker()));
+    // setColour (CodeEditorComponent::lineNumberTextId, textColor.darker(0.03));
 }
 
 //==============================================================================

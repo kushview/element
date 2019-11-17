@@ -1,6 +1,7 @@
 /*
     This file is part of Element
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    - Author Michael Fisher <mfisher@kushvie.net>
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,32 +20,27 @@
 
 #pragma once
 
-#include "JuceHeader.h"
+#include "gui/nodes/NodeEditorComponent.h"
 
 namespace Element {
 
-/** A glorified array of MidiBuffers used in rendering graph nodes */
-class MidiPipe
+class LuaNodeEditor : public NodeEditorComponent,
+                      public ChangeListener
 {
 public:
-    MidiPipe();
-    MidiPipe (MidiBuffer** buffers, int numBuffers);
-    MidiPipe (const OwnedArray<MidiBuffer>& buffers, const Array<int>& channels);
-    ~MidiPipe();
+    explicit LuaNodeEditor (const Node&);
+    ~LuaNodeEditor() override;
 
-    int getNumBuffers() const { return size; }
-    const MidiBuffer* const getReadBuffer (const int index) const;
-    MidiBuffer* const getWriteBuffer (const int index) const;
+    void resized() override;
+    void paint (Graphics&) override;
 
-    void clear();
-    void clear (int startSample, int numSamples);
-    void clear (int index, int startSample, int numSamples);
+    void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:
-    enum { maxReferencedBuffers = 32 };
-    int size = 0;
-    MidiBuffer* referencedBuffers [maxReferencedBuffers];
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiPipe);
+    CodeDocument document;
+    LuaTokeniser tokens;
+    std::unique_ptr<CodeEditorComponent> editor;
+    TextButton compileButton;
 };
 
 }

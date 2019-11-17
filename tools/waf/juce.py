@@ -60,13 +60,13 @@ def check_cxx_version (self, required=False):
 
     if is_mac() and len(self.options.cross) <= 0:
         self.check_cxx (linkflags = [ "-stdlib=libc++", "-lc++" ],
-                        cxxflags = [ "-stdlib=libc++", "-std=c++14" ],
+                        cxxflags = [ "-stdlib=libc++", "-std=c++17" ],
                         mandatory = required)
-        self.env.append_unique ("CXXFLAGS", ["-stdlib=libc++", "-std=c++14"])
+        self.env.append_unique ("CXXFLAGS", ["-stdlib=libc++", "-std=c++17"])
         self.env.append_unique ("LINKFLAGS", ["-stdlib=libc++", "-lc++"])
     elif is_linux() or len(self.options.cross) > 0:
-        self.check_cxx (cxxflags = [ "-std=c++14" ], mandatory = required)
-        self.env.append_unique ("CXXFLAGS", [ "-std=c++14" ])
+        self.check_cxx (cxxflags = [ "-std=c++17" ], mandatory = required)
+        self.env.append_unique ("CXXFLAGS", [ "-std=c++17" ])
     else:
         print("setup cxx version for " + platform.system())
         exit(1)
