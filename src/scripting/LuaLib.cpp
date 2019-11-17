@@ -22,6 +22,12 @@
  #error Cannot include JUCE before LuaLib.cpp
 #else
 
+#ifdef _MSC_VER
+ #pragma warning(disable: 4244) // convert possible data loss
+ #pragma warning(disable: 4310) // cast truncates constant value
+ #pragma warning(disable: 4334) // result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+#endif
+
 #include "../../libs/lua/src/lauxlib.c"
 #include "../../libs/lua/src/liolib.c"
 #include "../../libs/lua/src/lopcodes.c"
