@@ -78,10 +78,10 @@ void registerEngine (state& lua)
         "is_soft_pedal_off",        &MidiMessage::isSoftPedalOff,
         "is_program_change",        &MidiMessage::isProgramChange,
         "get_program_change_number", &MidiMessage::getProgramChangeNumber,
-        "program_change",           &MidiMessage::programChange,
+        "program_change",           MidiMessage::programChange,
         "is_pitch_wheel",           &MidiMessage::isPitchWheel,
         "get_pitch_wheel_value",    &MidiMessage::getPitchWheelValue,
-        "pitch_wheel",              &MidiMessage::pitchWheel
+        "pitch_wheel",              MidiMessage::pitchWheel
     );
 
     // MidiBuffer
@@ -91,11 +91,7 @@ void registerEngine (state& lua)
             resolve<void(int, int)> (&MidiBuffer::clear)),
         "is_empty",         &MidiBuffer::isEmpty,
         "get_num_events",   &MidiBuffer::getNumEvents,
-        "swap_with",        &MidiBuffer::swapWith,
-        "iterator", [](const MidiBuffer& b) {
-            MidiBuffer::Iterator iter (b);
-            return std::move (iter);
-        }
+        "swap_with",        &MidiBuffer::swapWith
     );
 
     lua.new_usertype<MidiBuffer::Iterator> ("MidiBufferIterator", no_constructor,
