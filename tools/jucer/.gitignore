@@ -1,5 +1,5 @@
 Element/Builds/
-Element/JuceLibraryCode/
+Element/JuceLibraryCode/**/*.*
 !Element/JuceLibraryCode/AppConfig.h
 !Element/JuceLibraryCode/JuceHeader.h
 
