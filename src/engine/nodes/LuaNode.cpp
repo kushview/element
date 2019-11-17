@@ -159,7 +159,6 @@ struct LuaNode::Context
                 midiBufs.add (new MidiBuffer ());
             }
 
-
             // calls node_prepare(), node_render(), and node_release()
             {
                 auto midi = midiBufs.size() > 0 
