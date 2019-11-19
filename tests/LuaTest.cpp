@@ -312,4 +312,60 @@ private:
 
 static StaticMethodTest sStaticMethodTest;
 
+
+class CArrayTest : public UnitTestBase
+{
+public:
+    CArrayTest() : UnitTestBase ("Lua C-Array", "Lua", "carray") {}
+    virtual ~CArrayTest() { }
+    void initialise() override
+    {
+        lua.open_libraries();
+    }
+
+    void shutdown() override
+    {
+        lua.collect_garbage();
+    }
+
+    void runTest() override
+    {
+        beginTest ("raw");
+        int size = 100;
+       
+        values.reset (new float [size]);
+        // auto rawValues = new float [size];
+        float rawValues [100];
+        std::vector<float> vvalues (100, 0);
+        vvalues.reserve (size);
+        for (int i = 0; i < 100; ++i)
+        {
+            rawValues[i] = (float) i + 100.f;
+            vvalues[i] = rawValues[i];
+        }
+
+        lua["params"] = std::ref(rawValues); //[this]() { return &rawValues; };
+        lua["size"] = [&size]() -> int { return size; };
+        size = 10;
+        
+        try {
+            lua.script (R"(
+                for k = 1, size() do
+                    v = params[k]
+                    print(" ", k, v)
+                end
+            )");
+        } catch (const std::exception& e) {
+            expect (false, e.what());
+        }
+    }
+
+private:
+    std::unique_ptr<float []> values;
+    float* rawValues = nullptr;
+    sol::state lua;
+};
+
+static CArrayTest sCArrayTest;
+
 #endif
