@@ -113,4 +113,12 @@ void Parameter::removeListener (Parameter::Listener* listenerToRemove)
     listeners.removeFirstMatchingValue (listenerToRemove);
 }
 
+ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
+    : port (p),
+      range (p.minValue, p.maxValue),
+      value (p.defaultValue)
+{}
+
+ControlPortParameter::~ControlPortParameter() {}
+
 }

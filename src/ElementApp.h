@@ -30,6 +30,9 @@ using namespace kv;
 #endif
 
 namespace Element {
+
+using PortType = kv::PortType;
+
 namespace Tags
 {
     using namespace kv::Slugs;

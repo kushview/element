@@ -6,15 +6,23 @@
 namespace Element {
 
 /** An abstract base class for parameter objects that can be added to a Node */
-class Parameter
+class Parameter : public ReferenceCountedObject
 {
 public:
+    using Ptr = ReferenceCountedObjectPtr<Parameter>;
+
+    /** Contructor */
     Parameter() noexcept;
 
     /** Destructor. */
     virtual ~Parameter();
 
     static int defaultNumSteps() { return 0x7fffffff; }
+
+    virtual int getPortIndex() const noexcept = 0;
+
+    /** Returns the index of this parameter in its parent processor's parameter list. */
+    int getParameterIndex() const noexcept              { return parameterIndex; }
 
     /** Called by the host to find out the value of this parameter.
 
@@ -42,35 +50,11 @@ public:
     */
     virtual void setValue (float newValue) = 0;
 
-    /** A processor should call this when it needs to change one of its parameters.
-
-        This could happen when the editor or some other internal operation changes
-        a parameter. This method will call the setValue() method to change the
-        value, and will then send a message to the host telling it about the change.
-
-        Note that to make sure the host correctly handles automation, you should call
-        the beginChangeGesture() and endChangeGesture() methods to tell the host when
-        the user has started and stopped changing the parameter.
-    */
-    void setValueNotifyingHost (float newValue);
-
-    /** Sends a signal to the host to tell it that the user is about to start changing this
-        parameter.
-        This allows the host to know when a parameter is actively being held by the user, and
-        it may use this information to help it record automation.
-        If you call this, it must be matched by a later call to endChangeGesture().
-    */
-    void beginChangeGesture();
-
-    /** Tells the host that the user has finished changing this parameter.
-        This allows the host to know when a parameter is actively being held by the user,
-        and it may use this information to help it record automation.
-        A call to this method must follow a call to beginChangeGesture().
-    */
-    void endChangeGesture();
-
     /** This should return the default value for this parameter. */
     virtual float getDefaultValue() const = 0;
+
+    /** Should parse a string and return the appropriate value for it. */
+    virtual float getValueForText (const String& text) const = 0;
 
     /** Returns the name to display for this parameter, which should be made
         to fit within the given string length.
@@ -127,9 +111,6 @@ public:
     */
     virtual String getText (float normalisedValue, int /*maximumStringLength*/) const;
 
-    /** Should parse a string and return the appropriate value for it. */
-    virtual float getValueForText (const String& text) const = 0;
-
     /** This can be overridden to tell the host that this parameter operates in the
         reverse direction.
         (Not all plugin formats or hosts will actually use this information).
@@ -171,8 +152,32 @@ public:
     /** Returns the parameter's category. */
     virtual Category getCategory() const;
 
-    /** Returns the index of this parameter in its parent processor's parameter list. */
-    int getParameterIndex() const noexcept              { return parameterIndex; }
+    /** A processor should call this when it needs to change one of its parameters.
+
+        This could happen when the editor or some other internal operation changes
+        a parameter. This method will call the setValue() method to change the
+        value, and will then send a message to the host telling it about the change.
+
+        Note that to make sure the host correctly handles automation, you should call
+        the beginChangeGesture() and endChangeGesture() methods to tell the host when
+        the user has started and stopped changing the parameter.
+    */
+    void setValueNotifyingHost (float newValue);
+
+    /** Sends a signal to the host to tell it that the user is about to start changing this
+        parameter.
+        This allows the host to know when a parameter is actively being held by the user, and
+        it may use this information to help it record automation.
+        If you call this, it must be matched by a later call to endChangeGesture().
+    */
+    void beginChangeGesture();
+
+    /** Tells the host that the user has finished changing this parameter.
+        This allows the host to know when a parameter is actively being held by the user,
+        and it may use this information to help it record automation.
+        A call to this method must follow a call to beginChangeGesture().
+    */
+    void endChangeGesture();
 
     //==============================================================================
     /** Returns the current value of the parameter as a String.
@@ -258,6 +263,8 @@ public:
     void sendValueChangedMessageToListeners (float newValue);
 
 private:
+    friend class GraphNode;
+
     //==============================================================================
     int parameterIndex = -1;
     CriticalSection listenerLock;
@@ -269,6 +276,41 @@ private:
    #endif
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Parameter)
+};
+
+using ParameterArray = ReferenceCountedArray<Parameter>;
+
+class ControlPortParameter : public Parameter
+{
+public:
+    ControlPortParameter (const kv::PortDescription&);
+    ~ControlPortParameter();
+
+    int getPortIndex() const noexcept               { return port.index; }
+
+    float getValue() const                          { return range.convertTo0to1 (value); }
+    void setValue (float newValue)                  { value = range.convertFrom0to1 (newValue); }
+    float getDefaultValue() const                   { return range.convertTo0to1 (port.defaultValue); }
+    String getName (int /*maxLength*/) const        { return port.name; }
+
+    virtual String getLabel() const                 { return {}; }
+    int getNumSteps() const                         { return Parameter::defaultNumSteps(); }
+    bool isDiscrete() const                         { return false; }
+    bool isBoolean() const                          { return false; }
+    String getText (float normalisedValue, int /*maximumStringLength*/) const { return getName (1024); }
+    
+    float getValueForText (const String& text) const { return value; }
+    bool isOrientationInverted() const              { return false; }
+    bool isAutomatable() const                      { return true; }
+    bool isMetaParameter() const                    { return false; }
+    Parameter::Category getCategory() const         { return Parameter::getCategory(); }
+    String getCurrentValueAsText() const            { return getName (1024); }
+    StringArray getValueStrings() const             { return Parameter::getValueStrings(); }
+
+private:
+    const kv::PortDescription port;
+    NormalisableRange<float> range;
+    float value { 0.0 };
 };
 
 }

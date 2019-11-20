@@ -24,9 +24,6 @@
 
 namespace Element {
 
-struct LuaMidiBuffer;
-struct LuaMidiPipe;
-
 class LuaNode : public GraphNode,
                 public ChangeBroadcaster
 {
@@ -48,9 +45,17 @@ public:
     void setDraftScript (const String& draft) { draftScript = draft; }
     bool hasChanges() const { return script.hashCode64() != draftScript.hashCode64(); }
 
+    /** Set a parameter value by index
+     
+        @param index    The parameter index to set
+        @param value    The value to set
+    */
+    void setParameter (int index, float value);
+
 protected:
     inline bool wantsMidiPipe() const override { return true; }
     void createPorts() override;
+    Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:
     String script, draftScript;

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "engine/Parameter.h"
 
 namespace Element {
 
@@ -54,7 +55,10 @@ public:
     /** Create a node suitable for binding to a root graph */
     static GraphNode* createForRoot (GraphProcessor*);
     
+    /** Returns true if a parameter index is special */
     static bool isSpecialParameter (int parameter);
+
+    /** Returns the name of a special parameter */
     static String getSpecialParameterName (int parameter);
 
     /** Returns an audio processor if available */
@@ -62,6 +66,8 @@ public:
     
     String getName() const { return name; }
     
+    //=========================================================================
+
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
 
@@ -81,6 +87,12 @@ public:
     /** Returns the total number of audio ouputs */
     int getNumAudioOutputs() const;
     
+    //=========================================================================
+
+    const ParameterArray& getParameters() const    { return params; }
+
+    //=========================================================================
+
     /** Returns the type of port
         
         @param port The port to check
@@ -89,6 +101,9 @@ public:
 
     /** Returns the total number of ports on this node */
     uint32 getNumPorts() const;
+
+    /** Returns a port description by index */
+    PortDescription getPort (int index) const;
 
     /** Returns the number of ports for a given type and flow */
     int getNumPorts (const PortType type, const bool isInput) const;
@@ -317,6 +332,7 @@ public:
     bool isMutingInputs() const { return muteInput.get() == 1; }
 
     //=========================================================================
+    
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
 
@@ -344,6 +360,9 @@ protected:
             name = newName;
     }
 
+    //=========================================================================
+    virtual Parameter::Ptr getParameter (const PortDescription& port) { return nullptr; }
+
     kv::PortList ports;
     ValueTree metadata;
 
@@ -363,6 +382,8 @@ private:
 
     int latencySamples = 0;
     String name;
+
+    ParameterArray params;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;
@@ -411,6 +432,8 @@ private:
     void prepareOversampling (int blockSize);
     void resetOversampling();
     dsp::Oversampling<float>* getOversamplingProcessor();
+
+    Parameter::Ptr getOrCreateParameter (const PortDescription&);
 
     int osPow = 0;
     float osLatency = 0.0f;
