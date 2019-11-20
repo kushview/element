@@ -24,6 +24,11 @@ static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
 
 void registerEngine (state& lua)
 {
+    // Decibels
+    auto db = lua["decibels"].get_or_create<table>();
+    db["to_gain"]   = [](float input) { return Decibels::decibelsToGain (input); };
+    db["from_gain"] = [](float input) { return Decibels::gainToDecibels (input); };
+
     // AudioBuffer
     lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
         "get_num_channels", &AudioSampleBuffer::getNumChannels,
