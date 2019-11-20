@@ -447,7 +447,6 @@ private:
 
 void LuaParameter::parameterValueChanged (int index, float value)
 {
-    DBG("LuaParameter::parameterValueChanged(): " << value);
     if (ctx != nullptr)
         ctx->setParameter (index, convertFrom0to1 (value));
 }
@@ -482,27 +481,6 @@ Parameter::Ptr LuaNode::getParameter (const PortDescription& port)
     return context->getParameter (port);
 }
 
-void LuaNode::createParamsIfNeeded (const Context& ctx)
-{
-   #if 0
-    Array<PortDescription> ins, outs;
-    for (const auto* port : ctx.getPortArray())
-    {
-        if (port->type != PortType::Control)
-            continue;
-        if (port->input)
-            ins.add (*port);
-        else
-            outs.add (*port);
-    }
-
-    while (inParams.size() < ins.size())
-        inParams.add (new LuaParameter (PortDescription()));
-    while (outParams.size() < outs.size())
-        outParams.add (new LuaParameter (PortDescription()));
-   #endif
-}
-
 Result LuaNode::loadScript (const String& newScript)
 {
     auto result = Context::validate (newScript);
@@ -514,7 +492,6 @@ Result LuaNode::loadScript (const String& newScript)
 
     if (result.wasOk())
     {
-        createParamsIfNeeded (*newContext);
         script = draftScript = newScript;
         if (prepared)
             newContext->prepare (sampleRate, blockSize);

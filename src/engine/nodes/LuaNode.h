@@ -69,7 +69,6 @@ private:
     CriticalSection lock;
     std::unique_ptr<Context> context;
     ParameterArray inParams, outParams;
-    void createParamsIfNeeded (const Context&);
 };
 
 }
