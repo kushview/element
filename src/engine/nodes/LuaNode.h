@@ -33,6 +33,8 @@ public:
     explicit LuaNode() noexcept;
     virtual ~LuaNode();
     
+    struct Context;
+
     void fillInPluginDescription (PluginDescription& desc);
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
@@ -65,7 +67,6 @@ private:
     double sampleRate = 44100.0;
     bool prepared = false;
     CriticalSection lock;
-    struct Context;
     std::unique_ptr<Context> context;
     ParameterArray inParams, outParams;
     void createParamsIfNeeded (const Context&);

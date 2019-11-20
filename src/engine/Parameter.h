@@ -289,25 +289,23 @@ public:
     ControlPortParameter (const kv::PortDescription&);
     ~ControlPortParameter();
 
-    int getPortIndex() const noexcept               { return port.index; }
-    Parameter::Category getCategory() const         { return Parameter::genericParameter; }
+    int getPortIndex() const noexcept override      { return port.index; }
+    Category getCategory() const override           { return Parameter::genericParameter; }
 
-    float getValue() const                          { return range.convertTo0to1 (value); }
-    void setValue (float newValue)                  { value = range.convertFrom0to1 (newValue); }
-    float getDefaultValue() const                   { return range.convertTo0to1 (port.defaultValue); }
+    float getValue() const override                 { return range.convertTo0to1 (value); }
+    void setValue (float newValue) override         { value = range.convertFrom0to1 (newValue); }
+    float getDefaultValue() const override          { return range.convertTo0to1 (port.defaultValue); }
     
-    String getName (int maxLength) const            { return port.name.substring (0, maxLength); }
-    String getLabel() const { return {}; }
-    String getText (float normalisedValue, int /*maxLength*/) const
-    {
-        return String (convertFrom0to1 (normalisedValue), 3);
-    }
+    String getName (int maxLength) const override   { return port.name.substring (0, maxLength); }
+    String getLabel() const override                { return {}; }
+    String getText (float normalisedValue, int maxLength) const override;
     
-    float getValueForText (const String& text) const { return convertTo0to1 (text.getFloatValue()); }
+    float getValueForText (const String& text) const override { return convertTo0to1 (text.getFloatValue()); }
     
-    void setPort (const kv::PortDescription& newPort);
+    void setPort (const kv::PortDescription& newPort, bool preserveValue = false);
     float get() const { return value; }
     operator float() const { return value; }
+    void set (float newValue) { operator= (newValue); }
     ControlPortParameter& operator= (float newValue);
 
     float convertTo0to1 (float input) const { return range.convertTo0to1 (input); }

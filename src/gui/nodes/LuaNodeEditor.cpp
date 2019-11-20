@@ -69,7 +69,7 @@ public:
 
         slider.onValueChange = [this]
         {
-            param->setValue (static_cast<float> (slider.getValue()));
+            param->setValueNotifyingHost (static_cast<float> (slider.getValue()));
         };
 
         slider.valueFromTextFunction = [this](const String& text) -> double
@@ -83,13 +83,8 @@ public:
         {
             String text;
             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
-                text = cp->getText (static_cast<float> (value), 1024);
-            else
-                text = String (value, 3);
-            auto label = param->getLabel();
-            if (label.isNotEmpty())
-                text << " " << label;
-            return text;
+                return cp->getText (static_cast<float> (value), 1024);
+            return String (value, 6);
         };
 
         refresh();

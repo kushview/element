@@ -29,81 +29,116 @@
 
 static const String defaultScript = 
 R"(
---- Lua Node template
+--- Stereo Amplifier in Lua
 --
 -- This script came with Element and is in the public domain.
 --
--- The code contained provides stereo audio in and out with one MIDI input
--- and one MIDI output.  It clears the audio buffer and logs midi messages
--- to the console.
+-- The code contained implements a simple stereo amplifier plugin.
+-- It does not try to smooth the volume parameter and could cause
+-- zipper noise.
 --
--- The Lua filter node is highly experimental and the API is subject to change
--- without warning.  Please bear with us as we move toward a stable version. If
--- you are a developer and want to help out, see https://github.com/kushview/element
+-- The Lua filter node is highly experimental and the API is subject 
+-- to change without warning.  Please bear with us as we move toward 
+-- a stable version. If you are a developer and want to help out, 
+-- see https://github.com/kushview/element
 
+-- Track last applied gain value
+local last_gain = 1.0
+
+-- Return a table of audio/midi inputs and outputs
 function node_io_ports()
-    return {
-        audio_ins   = 2,
-        audio_outs  = 2,
-        midi_ins    = 1,
-        midi_outs   = 1
-    }
+   return {
+      audio_ins   = 2,
+      audio_outs  = 2,
+      midi_ins    = 0,
+      midi_outs   = 0
+   }
 end
 
 -- Return parameters
 function node_params()
-    return {
-        {
-            name    = "Volume",
-            label   = "dB",
-            type    = "float",
-            flow    = "input",
-            min     = -90.0,
-            max     = 24.0,
-            default = 0.0
-        }
-    }
+   return {
+      {
+         name    = "Volume",
+         label   = "dB",
+         type    = "float",
+         flow    = "input",
+         min     = -90.0,
+         max     = 24.0,
+         default = 0.0
+      }
+   }
 end
 
--- prepare for rendering
+--- prepare for rendering
 function node_prepare (rate, block)
-    print (string.format ('prepare rate = %d block = %d', rate, block))
+   -- nothing to do in this example
 end
 
 -- render audio and midi
 function node_render (audio, midi)
-    audio:clear()
-    local mb = midi:get_read_buffer (0)
-    for msg, _ in mb:iter() do
-        print (msg)
-    end
-    mb:clear()
+   local nframes = audio:get_num_samples()
+   local gain = decibels.to_gain (Param.values[1])
+
+   -- fade from last gain to new gain
+   audio:apply_gain_ramp (0, nframes, last_gain, gain)
+    
+   -- update last gain value
+   last_gain = gain;
+   midi:clear()
 end
 
 --- Release node resources
 --  free any allocated resources in this callback
 function node_release()
 end
-
 )";
 
 namespace Element {
 
-class LuaParameter : public ControlPortParameter
+class LuaParameter : public ControlPortParameter,
+                     public Parameter::Listener
 {
 public:
-    LuaParameter (const PortDescription& port)
-        : ControlPortParameter (port)
-    { }
+    LuaParameter (LuaNode::Context* c, const PortDescription& port)
+        : ControlPortParameter (port),
+          ctx (c)
+    { 
+        addListener (this);
+    }
 
-    ~LuaParameter() { }
+    ~LuaParameter()
+    {
+        unlink();
+    }
+
     String getLabel() const override { return {}; }
+
+    void unlink()
+    {
+        removeListener (this);
+        ctx = nullptr;
+    }
+
+    void parameterValueChanged (int parameterIndex, float newValue) override;
+    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
+    
+private:
+    LuaNode::Context* ctx { nullptr };
 };
 
 struct LuaNode::Context
 {
     explicit Context () { }
-    ~Context() { }
+    ~Context()
+    {
+        for (auto* ip : inParams)
+            dynamic_cast<LuaParameter*>(ip)->unlink();
+        for (auto* op : outParams)
+            dynamic_cast<LuaParameter*>(op)->unlink();
+        inParams.clear();
+        outParams.clear();
+    }
 
     String getName() const { return name; }
 
@@ -254,6 +289,14 @@ struct LuaNode::Context
             results.add (new PortDescription (*port));
     }
 
+    Parameter* getParameter (const PortDescription& port)
+    {
+        auto& params = port.input ? inParams : outParams;
+        auto param = params [port.channel];
+        jassert (param != nullptr);
+        return param;
+    }
+
     void setParameter (int index, float value) noexcept
     {
         jassert (isPositiveAndBelow (index, maxParams));
@@ -322,6 +365,8 @@ private:
 
                     ports.addControl (index++, channel, sym, name,
                                       min, max, dfault, isInput);
+                    auto& params = isInput ? inParams : outParams;
+                    params.add (new LuaParameter (this, ports.getPort (ports.size() - 1)));
                 }
 
                 numParams = ports.size (PortType::Control, true);
@@ -400,6 +445,15 @@ private:
     }
 };
 
+void LuaParameter::parameterValueChanged (int index, float value)
+{
+    DBG("LuaParameter::parameterValueChanged(): " << value);
+    if (ctx != nullptr)
+        ctx->setParameter (index, convertFrom0to1 (value));
+}
+
+void LuaParameter::parameterGestureChanged (int, bool) {}
+
 LuaNode::LuaNode() noexcept
     : GraphNode (0)
 {
@@ -425,24 +479,12 @@ void LuaNode::createPorts()
 
 Parameter::Ptr LuaNode::getParameter (const PortDescription& port)
 {
-    auto& params = port.input ? inParams : outParams;
-    auto param = params [port.channel];
-    auto* const luaParam = dynamic_cast<LuaParameter*> (param.get());
-
-    if (param != nullptr && luaParam != nullptr)
-    {
-        luaParam->setPort (port);
-    }
-    else
-    {
-        jassertfalse;
-    }
-    
-    return param;
+    return context->getParameter (port);
 }
 
 void LuaNode::createParamsIfNeeded (const Context& ctx)
 {
+   #if 0
     Array<PortDescription> ins, outs;
     for (const auto* port : ctx.getPortArray())
     {
@@ -458,6 +500,7 @@ void LuaNode::createParamsIfNeeded (const Context& ctx)
         inParams.add (new LuaParameter (PortDescription()));
     while (outParams.size() < outs.size())
         outParams.add (new LuaParameter (PortDescription()));
+   #endif
 }
 
 Result LuaNode::loadScript (const String& newScript)

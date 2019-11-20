@@ -121,18 +121,30 @@ ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
 
 ControlPortParameter::~ControlPortParameter() {}
 
-void ControlPortParameter::setPort (const kv::PortDescription& newPort)
+String ControlPortParameter::getText (float normalisedValue, int /*maxLength*/) const
+{
+    return String (convertFrom0to1 (normalisedValue), 6);
+}
+
+void ControlPortParameter::setPort (const kv::PortDescription& newPort, bool preserveValue)
 {
     port        = newPort;
     range.start = port.minValue;
     range.end   = port.maxValue;
-    operator= (port.defaultValue);
+    if (preserveValue)
+    {
+        operator= (jlimit (range.start, range.end, value));
+    }
+    else
+    {
+        operator= (port.defaultValue);
+    }
 }
 
 ControlPortParameter& ControlPortParameter::operator= (float newValue)
 {
     if (value != newValue)
-        setValueNotifyingHost (range.convertTo0to1 (newValue));
+        setValueNotifyingHost (convertTo0to1 (newValue));
     return *this;
 }
 
