@@ -123,7 +123,17 @@ ControlPortParameter::~ControlPortParameter() {}
 
 void ControlPortParameter::setPort (const kv::PortDescription& newPort)
 {
-    port = newPort;
+    port        = newPort;
+    range.start = port.minValue;
+    range.end   = port.maxValue;
+    operator= (port.defaultValue);
+}
+
+ControlPortParameter& ControlPortParameter::operator= (float newValue)
+{
+    if (value != newValue)
+        setValueNotifyingHost (range.convertTo0to1 (newValue));
+    return *this;
 }
 
 }

@@ -48,6 +48,65 @@ static CodeEditorComponent::ColourScheme luaColors()
     return cs;
 }
 
+class LuaNodeParameterPropertyFloat : public PropertyComponent
+{
+public:
+    LuaNodeParameterPropertyFloat (Parameter::Ptr p)
+        : PropertyComponent (p->getName (1024)),
+          param (p)
+    {
+        if (param->getLabel().isNotEmpty())
+        {
+            auto name = getName();
+            name << " (" << param->getLabel() << ")";
+            setName (name);
+        }
+
+        addAndMakeVisible (slider);
+        slider.setRange (0.0, 1.0, 0.000001);
+        slider.setSkewFactor (1.0, false);
+        slider.setSliderStyle (Slider::LinearBar);
+
+        slider.onValueChange = [this]
+        {
+            param->setValue (static_cast<float> (slider.getValue()));
+        };
+
+        slider.valueFromTextFunction = [this](const String& text) -> double
+        {
+             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+                return (double) cp->convertTo0to1 (text.getFloatValue());
+            return text.getDoubleValue();
+        };
+
+        slider.textFromValueFunction = [this](double value) -> String
+        {
+            String text;
+            if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+                text = cp->getText (static_cast<float> (value), 1024);
+            else
+                text = String (value, 3);
+            auto label = param->getLabel();
+            if (label.isNotEmpty())
+                text << " " << label;
+            return text;
+        };
+
+        refresh();
+        slider.updateText();
+    }
+
+    void refresh() override
+    {
+        if (static_cast<float> (slider.getValue()) != param->getValue())
+            slider.setValue (param->getValue(), dontSendNotification);
+    }
+
+private:
+    Slider slider;
+    Parameter::Ptr param;
+};
+
 LuaNodeEditor::LuaNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
@@ -112,9 +171,11 @@ void LuaNodeEditor::updateProperties()
 {
     props.clear();
     Array<PropertyComponent*> pcs;
-    for (const auto* param : lua->getParameters())
+    for (auto* param : lua->getParameters())
     {
-        pcs.add (new SliderPropertyComponent (Value(), param->getName (512), 0.0, 1.0, 0.001));
+        if (! param->isAutomatable())
+            continue;
+        pcs.add (new LuaNodeParameterPropertyFloat (param));
     }
     props.addProperties (pcs);
 }

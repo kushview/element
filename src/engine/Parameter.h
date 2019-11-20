@@ -5,7 +5,10 @@
 
 namespace Element {
 
-/** An abstract base class for parameter objects that can be added to a Node */
+/** An abstract base class for parameter objects that can be added to a Node
+    Based on juce::AudioProcessorParameter, but designed for GraphNodes which 
+    can change parameters.
+*/
 class Parameter : public ReferenceCountedObject
 {
 public:
@@ -21,7 +24,7 @@ public:
 
     virtual int getPortIndex() const noexcept = 0;
 
-    /** Returns the index of this parameter in its parent processor's parameter list. */
+    /** Returns the index of this parameter in its parent nodes's parameter list. */
     int getParameterIndex() const noexcept              { return parameterIndex; }
 
     /** Called by the host to find out the value of this parameter.
@@ -52,8 +55,6 @@ public:
 
     /** This should return the default value for this parameter. */
     virtual float getDefaultValue() const = 0;
-    virtual float getMinValue() const { return 0.0; }
-    virtual float getMaxValue() const { return 1.0; }
 
     /** Should parse a string and return the appropriate value for it. */
     virtual float getValueForText (const String& text) const = 0;
@@ -289,27 +290,29 @@ public:
     ~ControlPortParameter();
 
     int getPortIndex() const noexcept               { return port.index; }
+    Parameter::Category getCategory() const         { return Parameter::genericParameter; }
 
     float getValue() const                          { return range.convertTo0to1 (value); }
     void setValue (float newValue)                  { value = range.convertFrom0to1 (newValue); }
     float getDefaultValue() const                   { return range.convertTo0to1 (port.defaultValue); }
-    String getName (int /*maxLength*/) const        { return port.name; }
-
-    virtual String getLabel() const                 { return {}; }
-    int getNumSteps() const                         { return Parameter::defaultNumSteps(); }
-    bool isDiscrete() const                         { return false; }
-    bool isBoolean() const                          { return false; }
-    String getText (float normalisedValue, int /*maximumStringLength*/) const { return getName (1024); }
     
-    float getValueForText (const String& text) const { return value; }
-    bool isOrientationInverted() const              { return false; }
-    bool isAutomatable() const                      { return true; }
-    bool isMetaParameter() const                    { return false; }
-    Parameter::Category getCategory() const         { return Parameter::getCategory(); }
-    String getCurrentValueAsText() const            { return getName (1024); }
-    StringArray getValueStrings() const             { return Parameter::getValueStrings(); }
-
+    String getName (int maxLength) const            { return port.name.substring (0, maxLength); }
+    String getLabel() const { return {}; }
+    String getText (float normalisedValue, int /*maxLength*/) const
+    {
+        return String (convertFrom0to1 (normalisedValue), 3);
+    }
+    
+    float getValueForText (const String& text) const { return convertTo0to1 (text.getFloatValue()); }
+    
     void setPort (const kv::PortDescription& newPort);
+    float get() const { return value; }
+    operator float() const { return value; }
+    ControlPortParameter& operator= (float newValue);
+
+    float convertTo0to1 (float input) const { return range.convertTo0to1 (input); }
+    float convertFrom0to1 (float input) const { return range.convertFrom0to1 (input); }
+    const NormalisableRange<float>& getNormalisableRange() const { return range; }
 
 private:
     kv::PortDescription port;

@@ -97,6 +97,7 @@ public:
     { }
 
     ~LuaParameter() { }
+    String getLabel() const override { return {}; }
 };
 
 struct LuaNode::Context
@@ -250,13 +251,7 @@ struct LuaNode::Context
     void getPorts (PortList& results)
     {
         for (const auto* port : ports.getPorts())
-        {
-            EL_LUA_DBG("index = " << port->index << 
-                " channel = " << port->channel << 
-                " input = " << (int)port->input <<
-                " symbol = " << port->symbol);
             results.add (new PortDescription (*port));
-        }
     }
 
     void setParameter (int index, float value) noexcept
@@ -316,13 +311,17 @@ private:
                     EL_LUA_DBG("is input = " << (int) isInput);
                     EL_LUA_DBG("name = " << name);
                     EL_LUA_DBG("symbol = " << sym);
+                    EL_LUA_DBG("min = " << min);
+                    EL_LUA_DBG("max = " << max);
+                    EL_LUA_DBG("default = " << dfault);
 
                     if (isInput)
                     {
                         paramData[channel] = dfault;
                     }
 
-                    ports.add (PortType::Control, index++, channel, sym, name, isInput);
+                    ports.addControl (index++, channel, sym, name,
+                                      min, max, dfault, isInput);
                 }
 
                 numParams = ports.size (PortType::Control, true);
@@ -471,7 +470,7 @@ Result LuaNode::loadScript (const String& newScript)
     result = newContext->load (newScript);
 
     if (result.wasOk())
-    {   
+    {
         createParamsIfNeeded (*newContext);
         script = draftScript = newScript;
         if (prepared)
