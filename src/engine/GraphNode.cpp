@@ -39,7 +39,8 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
       metadata (Tags::node),
       isPrepared (false),
       enablement (*this),
-      midiProgramLoader (*this)
+      midiProgramLoader (*this),
+      portResetter (*this)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
@@ -743,6 +744,21 @@ int GraphNode::getOversamplingFactor()
 }
 
 //=========================================================================
+
+void GraphNode::PortResetter::handleAsyncUpdate()
+{ 
+    node.resetPorts(); 
+    node.portsChanged();
+}
+
+void GraphNode::triggerPortReset()
+{
+    portResetter.cancelPendingUpdate();
+    portResetter.triggerAsyncUpdate();
+}
+
+//=========================================================================
+
 Parameter::Ptr GraphNode::getOrCreateParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control && port.input == true);

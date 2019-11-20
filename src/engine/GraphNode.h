@@ -345,7 +345,8 @@ public:
     Signal<void()> midiProgramChanged;
     Signal<void(GraphNode*)> muteChanged;
     Signal<void()> willBeRemoved;
-
+    Signal<void()> portsChanged;
+    
     void setOversamplingFactor (int osFactor);
     int getOversamplingFactor();
 
@@ -362,6 +363,9 @@ protected:
 
     //=========================================================================
     virtual Parameter::Ptr getParameter (const PortDescription& port) { return nullptr; }
+
+    //=========================================================================
+    void triggerPortReset();
 
     kv::PortList ports;
     ValueTree metadata;
@@ -414,6 +418,15 @@ private:
         void handleAsyncUpdate() override;
         GraphNode& node;    
     } midiProgramLoader;
+
+    friend struct PortResetter;
+    struct PortResetter : public AsyncUpdater
+    {
+        PortResetter (GraphNode& n) : node (n) {}
+        ~PortResetter() { cancelPendingUpdate(); }
+        void handleAsyncUpdate() override;
+        GraphNode& node;    
+    } portResetter;
 
     struct MidiProgram
     {

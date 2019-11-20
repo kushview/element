@@ -20,6 +20,7 @@
 
 #pragma once
 
+#include "engine/nodes/LuaNode.h"
 #include "gui/nodes/NodeEditorComponent.h"
 #include "gui/LuaTokeniser.h"
 
@@ -42,6 +43,13 @@ private:
     kv::LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
     TextButton compileButton;
+    TextButton editorButton;
+    PropertyPanel props;
+    SignalConnection portsChangedConnection;
+    LuaNode::Ptr lua;
+
+    void updateProperties();
+    void onPortsChanged();
 };
 
 }

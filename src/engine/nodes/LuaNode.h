@@ -28,6 +28,8 @@ class LuaNode : public GraphNode,
                 public ChangeBroadcaster
 {
 public:
+    using Ptr = ReferenceCountedObjectPtr<LuaNode>;
+
     explicit LuaNode() noexcept;
     virtual ~LuaNode();
     
@@ -65,6 +67,8 @@ private:
     CriticalSection lock;
     struct Context;
     std::unique_ptr<Context> context;
+    ParameterArray inParams, outParams;
+    void createParamsIfNeeded (const Context&);
 };
 
 }

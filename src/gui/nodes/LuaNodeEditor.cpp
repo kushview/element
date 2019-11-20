@@ -18,7 +18,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/nodes/LuaNode.h"
 #include "gui/nodes/LuaNodeEditor.h"
 #include "gui/LookAndFeel.h"
 
@@ -52,7 +51,7 @@ static CodeEditorComponent::ColourScheme luaColors()
 LuaNodeEditor::LuaNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-    auto* const lua = getNodeObjectOfType<LuaNode>();
+    lua = getNodeObjectOfType<LuaNode>();
     jassert(lua);
 
     setOpaque (true);
@@ -79,12 +78,29 @@ LuaNodeEditor::LuaNodeEditor (const Node& node)
         }
     };
 
+    addAndMakeVisible (editorButton);
+    editorButton.setButtonText ("Params");
+    editorButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    editorButton.onClick = [this]()
+    {
+        editorButton.setToggleState (! editorButton.getToggleState(), dontSendNotification);
+        props.setVisible (editorButton.getToggleState());
+        resized();
+    };
+
+    addAndMakeVisible (props);
+    props.setVisible (editorButton.getToggleState());
+
+    updateProperties();
     lua->addChangeListener (this);
+    portsChangedConnection = lua->portsChanged.connect (
+        std::bind (&LuaNodeEditor::onPortsChanged, this));
     setSize (660, 480);
 }
 
 LuaNodeEditor::~LuaNodeEditor()
 {
+    portsChangedConnection.disconnect();
     if (auto* const lua = getNodeObjectOfType<LuaNode>())
     {
         lua->removeChangeListener (this);
@@ -92,15 +108,31 @@ LuaNodeEditor::~LuaNodeEditor()
     }
 }
 
+void LuaNodeEditor::updateProperties()
+{
+    props.clear();
+    Array<PropertyComponent*> pcs;
+    for (const auto* param : lua->getParameters())
+    {
+        pcs.add (new SliderPropertyComponent (Value(), param->getName (512), 0.0, 1.0, 0.001));
+    }
+    props.addProperties (pcs);
+}
+
+void LuaNodeEditor::onPortsChanged()
+{
+    updateProperties();
+}
+
 void LuaNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
-    if (auto* const lua = getNodeObjectOfType<LuaNode>())
-        editor->loadContent (lua->getDraftScript());
+    editor->loadContent (lua->getDraftScript());
+    updateProperties();
     resized();
 }
 
 void LuaNodeEditor::paint (Graphics& g)
-{ 
+{
     g.fillAll (Element::LookAndFeel::backgroundColor);
 }
 
@@ -108,9 +140,19 @@ void LuaNodeEditor::resized()
 {
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (22);
+    
     compileButton.changeWidthToFitText (r2.getHeight());
-    compileButton.setBounds (r2.removeFromRight (compileButton.getWidth()));
+    compileButton.setBounds (r2.removeFromLeft (compileButton.getWidth()));
+    editorButton.changeWidthToFitText (r2.getHeight());
+    editorButton.setBounds (r2.removeFromRight (editorButton.getWidth()));
+
     r1.removeFromTop (2);
+    if (props.isVisible())
+    {
+        props.setBounds (r1.removeFromRight (220));
+        r1.removeFromRight (2);
+    }
+
     editor->setBounds (r1);
 }
 

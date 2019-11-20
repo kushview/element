@@ -52,6 +52,8 @@ public:
 
     /** This should return the default value for this parameter. */
     virtual float getDefaultValue() const = 0;
+    virtual float getMinValue() const { return 0.0; }
+    virtual float getMaxValue() const { return 1.0; }
 
     /** Should parse a string and return the appropriate value for it. */
     virtual float getValueForText (const String& text) const = 0;
@@ -307,8 +309,10 @@ public:
     String getCurrentValueAsText() const            { return getName (1024); }
     StringArray getValueStrings() const             { return Parameter::getValueStrings(); }
 
+    void setPort (const kv::PortDescription& newPort);
+
 private:
-    const kv::PortDescription port;
+    kv::PortDescription port;
     NormalisableRange<float> range;
     float value { 0.0 };
 };

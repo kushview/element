@@ -121,4 +121,9 @@ ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
 
 ControlPortParameter::~ControlPortParameter() {}
 
+void ControlPortParameter::setPort (const kv::PortDescription& newPort)
+{
+    port = newPort;
+}
+
 }

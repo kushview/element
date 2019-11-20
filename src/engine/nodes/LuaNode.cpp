@@ -89,38 +89,14 @@ end
 
 namespace Element {
 
-class LuaParameter : public Parameter
+class LuaParameter : public ControlPortParameter
 {
 public:
-    LuaParameter (float min, float max, float defaultValue)
-        : def(defaultValue), value(defaultValue),
-          range (min, max) 
+    LuaParameter (const PortDescription& port)
+        : ControlPortParameter (port)
     { }
 
     ~LuaParameter() { }
-
-    float getValue() const { return range.convertTo0to1 (value); }
-    void setValue (float newValue) { value = range.convertFrom0to1 (newValue); }
-
-    float getDefaultValue() const { return def; }
-    String getName (int maximumStringLength) const { return "Name"; }
-    String getLabel() const { return "Label"; }
-    int getNumSteps() const { return Parameter::defaultNumSteps(); }
-    bool isDiscrete() const  { return false; }
-    bool isBoolean() const  { return false; }
-    String getText (float normalisedValue, int /*maximumStringLength*/) const { return getName (1024); }
-    float getValueForText (const String& text) const { return value; }
-    bool isOrientationInverted() const { return false; }
-    bool isAutomatable() const { return true; }
-    bool isMetaParameter() const { return false; }
-    Parameter::Category getCategory() const { return Parameter::getCategory(); }
-    String getCurrentValueAsText() const { return getName (1024); }
-    StringArray getValueStrings() const { return Parameter::getValueStrings(); }
-
-private:
-    float def { 0.0f };
-    float value { 0.0f };
-    NormalisableRange<float> range;
 };
 
 struct LuaNode::Context
@@ -264,6 +240,11 @@ struct LuaNode::Context
     {
         if (loaded)
             renderstdf (audio, midi);
+    }
+
+    const OwnedArray<PortDescription>& getPortArray() const noexcept
+    {
+        return ports.getPorts();
     }
 
     void getPorts (PortList& results)
@@ -445,9 +426,39 @@ void LuaNode::createPorts()
 
 Parameter::Ptr LuaNode::getParameter (const PortDescription& port)
 {
-    return nullptr;
-    // jassert (isPositiveAndBelow (port.channel, params.size()));
-    // return port.input ? inParams [port.channel] : outParams [port.channel];
+    auto& params = port.input ? inParams : outParams;
+    auto param = params [port.channel];
+    auto* const luaParam = dynamic_cast<LuaParameter*> (param.get());
+
+    if (param != nullptr && luaParam != nullptr)
+    {
+        luaParam->setPort (port);
+    }
+    else
+    {
+        jassertfalse;
+    }
+    
+    return param;
+}
+
+void LuaNode::createParamsIfNeeded (const Context& ctx)
+{
+    Array<PortDescription> ins, outs;
+    for (const auto* port : ctx.getPortArray())
+    {
+        if (port->type != PortType::Control)
+            continue;
+        if (port->input)
+            ins.add (*port);
+        else
+            outs.add (*port);
+    }
+
+    while (inParams.size() < ins.size())
+        inParams.add (new LuaParameter (PortDescription()));
+    while (outParams.size() < outs.size())
+        outParams.add (new LuaParameter (PortDescription()));
 }
 
 Result LuaNode::loadScript (const String& newScript)
@@ -460,10 +471,12 @@ Result LuaNode::loadScript (const String& newScript)
     result = newContext->load (newScript);
 
     if (result.wasOk())
-    {
+    {   
+        createParamsIfNeeded (*newContext);
         script = draftScript = newScript;
         if (prepared)
             newContext->prepare (sampleRate, blockSize);
+        triggerPortReset();
         ScopedLock sl (lock);
         context.swap (newContext);
     }
