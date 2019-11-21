@@ -88,7 +88,7 @@ public:
        #elif JUCE_WINDOWS
         StringArray unvFormats = { "VST", "VST3" };
        #else
-        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" }
+        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" };
        #endif
         
         unverified.clearQuick (true);
