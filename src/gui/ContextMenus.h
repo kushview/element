@@ -85,8 +85,10 @@ public:
         PopupMenu unvMenu;
        #if JUCE_MAC
         StringArray unvFormats = { "AudioUnit", "VST", "VST3", "LV2" };
-       #else
+       #elif JUCE_WINDOWS
         StringArray unvFormats = { "VST", "VST3" };
+       #else
+        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" }
        #endif
         
         unverified.clearQuick (true);
@@ -103,12 +105,13 @@ public:
                 unvMenu.addSubMenu (name, menu);
         }
         
-        if (unvMenu.getNumItems() > 0) {
+        if (unvMenu.getNumItems() > 0)
+        {
             addSeparator();
             addSubMenu ("Unverified", unvMenu);
         }
     }
-    
+
 private:
     OwnedArray<PluginDescription> unverified;
     Component* sender;
