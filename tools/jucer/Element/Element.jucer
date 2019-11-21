@@ -622,32 +622,32 @@
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="10.0.16299.0"
             extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
-            toolset="v140_xp" aaxFolder="C:\SDKs\AAX" vst3Folder="../../libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK"
+            toolset="v141_xp" aaxFolder="C:\SDKs\AAX" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
             vstLegacyFolder="C:/SDKs/vstsdk2.4">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="1"
                        linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_Element"
-                       binaryPath="../build/x64/Debug" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common"
+                       binaryPath="../../../build/x64/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" useRuntimeLibDLL="1"
                        vst3BinaryLocation="c:\Users\mfisher\Desktop\VST3" vstBinaryLocation="c:\Users\mfisher\Desktop\VST"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_Element"
-                       headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common"
-                       binaryPath="../build/x64/Release" defines="EL_USE_LOCAL_AUTH=0"
+                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       binaryPath="../../../build/x64/Release" defines="EL_USE_LOCAL_AUTH=0"
                        useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="Win32"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="1"
                        linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_Element"
-                       binaryPath="../build/Win32/Debug" headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common"
+                       binaryPath="../../../build/Win32/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" useRuntimeLibDLL="1"
                        vstBinaryLocation="c:\Users\mfisher\Desktop\VST" vst3BinaryLocation="c:\Users\mfisher\Desktop\VST3"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="Win32"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_Element"
-                       headerPath="C:\SDKs\boost_1_65_1&#10;C:\SDKs\ASIOSDK2.3\common"
-                       binaryPath="../build/Win32/Release" defines="EL_USE_LOCAL_AUTH=0"
+                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       binaryPath="../../../build/Win32/Release" defines="EL_USE_LOCAL_AUTH=0"
                        useRuntimeLibDLL="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
