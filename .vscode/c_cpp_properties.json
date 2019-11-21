@@ -89,7 +89,7 @@
                 "HAVE_PYTHON=1",
                 "EL_USE_LOCAL_AUTH=1",
                 "EL_PRO=1",
-                "KV_LV2_PLUGIN_HOST=1"
+                "JLV2_PLUGINHOST_LV2=1"
             ],
             "forcedInclude": [
                 "${workspaceRoot}/.vscode/vscode.h"

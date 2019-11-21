@@ -48,31 +48,34 @@ class PluginsPopupMenu : public PopupMenu
 public:
     PluginsPopupMenu (Component* sender)
     {
-        jassert (sender);
+        jassert (sender != nullptr);
         auto* cc = ViewHelpers::findContentComponent (sender);
-        jassert (cc);
+        jassert (cc != nullptr);
         plugins = &cc->getGlobals().getPluginManager();
+        jassert (plugins != nullptr);
+        available = plugins->getKnownPlugins().getTypes();
     }
     
     bool isPluginResultCode (const int resultCode)
     {
-        return (plugins->getKnownPlugins().getIndexChosenByMenu (resultCode) >= 0) ||
+        return (plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode) >= 0) ||
                (isPositiveAndBelow (int(resultCode - 20000), unverified.size()));
     }
     
-    const PluginDescription* getPluginDescription (int resultCode, bool& verified)
+    PluginDescription getPluginDescription (int resultCode, bool& verified)
     {
-        jassert (plugins);
-        int index = plugins->getKnownPlugins().getIndexChosenByMenu (resultCode);
-        if (index >= 0)
+        jassert (plugins != nullptr);
+        int index = plugins->getKnownPlugins().getIndexChosenByMenu (available, resultCode);
+        if (isPositiveAndBelow (index, available.size()))
         {
             verified = true;
-            return plugins->getKnownPlugins().getType (index);
+            return available.getReference (index);
         }
         
         verified = false;
         index = resultCode - 20000;
-        return isPositiveAndBelow(index, unverified.size()) ? unverified.getUnchecked(index) : nullptr;
+        return isPositiveAndBelow (index, unverified.size()) 
+            ? *unverified.getUnchecked (index) : PluginDescription();
     }
     
     void addPluginItems()
@@ -80,13 +83,15 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
-        plugins->getKnownPlugins().addToMenu (*this, KnownPluginList::sortByManufacturer);
+        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByManufacturer);
     
         PopupMenu unvMenu;
        #if JUCE_MAC
         StringArray unvFormats = { "AudioUnit", "VST", "VST3", "LV2" };
-       #else
+       #elif JUCE_WINDOWS
         StringArray unvFormats = { "VST", "VST3" };
+       #else
+        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" };
        #endif
         
         unverified.clearQuick (true);
@@ -103,16 +108,18 @@ public:
                 unvMenu.addSubMenu (name, menu);
         }
         
-        if (unvMenu.getNumItems() > 0) {
+        if (unvMenu.getNumItems() > 0)
+        {
             addSeparator();
             addSubMenu ("Unverified", unvMenu);
         }
     }
-    
+
 private:
+    Array<PluginDescription> available;
     OwnedArray<PluginDescription> unverified;
-    Component* sender;
-    PluginManager* plugins;
+    Component* sender { nullptr };
+    PluginManager* plugins { nullptr };
     bool hasAddedPlugins = false;
 };
 

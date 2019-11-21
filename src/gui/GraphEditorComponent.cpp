@@ -1185,8 +1185,9 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         if (menu.isPluginResultCode (result))
         {
             bool verified = false;
-            if (const auto* desc = menu.getPluginDescription (result, verified))
-                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc, verified));
+            const auto desc = menu.getPluginDescription (result, verified);
+            if (desc.fileOrIdentifier.isNotEmpty() && desc.pluginFormatName.isNotEmpty())
+                ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, desc, verified));
         }
         else if (result >= 80000 && result < 90000)
         {

@@ -287,11 +287,12 @@ public:
         if (! plugins)
             return;
         
-        for (int i = 0; i < plugins->getKnownPlugins().getNumTypes(); ++i)
-            if (auto* type = plugins->getKnownPlugins().getType (i))
-                pluginList.addType (*type);
+        auto& list = plugins->getKnownPlugins();
+        const auto types = list.getTypes();
+        for (const auto& type : types)
+            pluginList.addType (type);
         
-        for (const auto& file : plugins->getKnownPlugins().getBlacklistedFiles())
+        for (const auto& file : list.getBlacklistedFiles())
             pluginList.addToBlacklist (file);
         
         writePluginListNow();
@@ -854,9 +855,9 @@ void PluginManager::scanInternalPlugins()
         if (format->getName() != "Element")
             continue;
         
-        for (int j = priv->allPlugins.getNumTypes(); --j >= 0;)
-            if (priv->allPlugins.getType(j)->pluginFormatName == "Element")
-                priv->allPlugins.removeType (*priv->allPlugins.getType (j));
+        const auto types = priv->allPlugins.getTypesForFormat (*format);
+        for (const auto& t : types)
+            priv->allPlugins.removeType(t);;
         
         PluginDirectoryScanner scanner (getKnownPlugins(), *format,
                                         format->getDefaultLocationsToSearch(),

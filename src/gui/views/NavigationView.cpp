@@ -148,7 +148,12 @@ class PluginsNavigationItem : public TreeItemBase
 public:
     PluginManager& plugins;
     
-    PluginsNavigationItem (PluginManager& pm) : plugins(pm) { }
+    PluginsNavigationItem (PluginManager& pm)
+        : plugins (pm)
+    { 
+        types = plugins.getKnownPlugins().getTypes();
+    }
+
     ~PluginsNavigationItem() { }
     
     bool mightContainSubItems() override { return true; }
@@ -159,9 +164,8 @@ public:
     Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_KV1::elementBlue); }
     void addSubItems() override
     {
-        KnownPluginList& known (plugins.getKnownPlugins());
-        for (int i = 0; i < known.getNumTypes(); ++i)
-            addSubItem (new PluginTreeItem (*known.getType (i)));
+        for (const auto& type : types)
+            addSubItem (new PluginTreeItem (type));
     }
     
     void itemOpennessChanged (bool isOpen) override
@@ -171,6 +175,8 @@ public:
         else
             clearSubItems();
     }
+
+    Array<PluginDescription> types;
 };
 
 class SessionNavigationItem : public TreeItemBase
