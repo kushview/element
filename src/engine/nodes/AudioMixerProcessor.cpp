@@ -103,6 +103,7 @@ private:
             fader.setRange (EL_FADER_MIN_DB, EL_FADER_MAX_DB, 0.001);
             fader.setValue (0.f, dontSendNotification);
             fader.setSkewFactor (2);
+            fader.setDoubleClickReturnValue (true, 0.0);
             fader.addListener (this);
             
             addAndMakeVisible (meter);
