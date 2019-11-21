@@ -41,6 +41,7 @@ public:
 private:
     Node node;
     LogListBox midiMonitorLog;
+    MidiBuffer midi;
 };
 
 }

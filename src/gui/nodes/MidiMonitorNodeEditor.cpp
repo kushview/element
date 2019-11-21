@@ -32,6 +32,7 @@ MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
     midiMonitorLog.setBounds (0, 0, 320, 160);
     addAndMakeVisible (midiMonitorLog);
     setSize (320, 160);
+    midi.ensureSize (3 * 16);
     startTimerHz (60);
 }
 
@@ -44,17 +45,14 @@ void MidiMonitorNodeEditor::timerCallback ()
 {
     if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
     {
-        if (node->numSamples.get() <= 0)
-            return;
+        midi.clear();
+        node->getMessages (midi);
 
-        MidiBuffer midi;
-        node->getMessages(midi);
-
-        MidiBuffer::Iterator iter1 (midi);
+        MidiBuffer::Iterator iter (midi);
         MidiMessage msg;
-        int frame;
+        int frame = 0;
 
-        while (iter1.getNextEvent (msg, frame))
+        while (iter.getNextEvent (msg, frame))
             midiMonitorLog.addMessage (msg.getDescription());
     }
 }

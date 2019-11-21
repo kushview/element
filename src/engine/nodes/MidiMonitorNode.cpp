@@ -35,13 +35,10 @@ MidiMonitorNode::~MidiMonitorNode()
     clearMessages();
 }
 
-void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize) {
-    if (inputMessagesInitDone) {
-        return;
-    }
+void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
     inputMessages.reset (sampleRate);
     currentSampleRate = sampleRate;
-    inputMessagesInitDone = true;
 };
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
@@ -49,22 +46,18 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
 
-    if (nframes == 0) {
+    if (nframes == 0)
         return;
-    }
 
     auto* const midiIn = midi.getWriteBuffer (0);
-    MidiBuffer::Iterator iter1 (*midiIn);
+    MidiBuffer::Iterator iter (*midiIn);
     MidiMessage msg;
     int frame;
 
-    while (iter1.getNextEvent (msg, frame))
+    ScopedLock sl (lock);
+    while (iter.getNextEvent (msg, frame))
     {
-        // TODO: better timestamp sync with UI
-        //       updating timestamp below causes messages to be skipped in the
-        //       UI rendering
-        // timestamp += 1000.0 * static_cast<double> (frame) * currentSampleRate;
-        msg.setTimeStamp (timestamp);
+        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)));
         inputMessages.addMessageToQueue (msg);
     }
 
@@ -73,7 +66,10 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 void MidiMonitorNode::getMessages (MidiBuffer& destBuffer)
 {
-    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples.get());
+    ScopedLock sl (lock);
+    if (numSamples <= 0)
+        return;
+    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples);
     numSamples = 0;
 }
 

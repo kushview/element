@@ -59,15 +59,15 @@ public:
     void getState (MemoryBlock& block) override {};
 
     void clearMessages();
-    void getMessages(MidiBuffer &destBuffer);
+    void getMessages (MidiBuffer &destBuffer);
 
 private:
     friend class MidiMonitorNodeEditor;
-    bool inputMessagesInitDone = false;
     double currentSampleRate = 44100.0;
-    Atomic<int> numSamples = 0;
+    int numSamples = 0;
     MidiMessageCollector inputMessages;
     bool createdPorts = false;
+    CriticalSection lock;
 
     inline void createPorts() override
     {
