@@ -62,7 +62,7 @@ public:
     
     const PluginDescription* getPluginDescription (int resultCode, bool& verified)
     {
-        jassert (plugins);
+        jassert (plugins != nullptr);
         int index = plugins->getKnownPlugins().getIndexChosenByMenu (resultCode);
         if (index >= 0)
         {

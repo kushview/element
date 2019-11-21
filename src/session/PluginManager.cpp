@@ -287,11 +287,12 @@ public:
         if (! plugins)
             return;
         
-        for (int i = 0; i < plugins->getKnownPlugins().getNumTypes(); ++i)
-            if (auto* type = plugins->getKnownPlugins().getType (i))
-                pluginList.addType (*type);
+        auto& list = plugins->getKnownPlugins();
+        const auto types = list.getTypes();
+        for (const auto& type : types)
+            pluginList.addType (type);
         
-        for (const auto& file : plugins->getKnownPlugins().getBlacklistedFiles())
+        for (const auto& file : list.getBlacklistedFiles())
             pluginList.addToBlacklist (file);
         
         writePluginListNow();
