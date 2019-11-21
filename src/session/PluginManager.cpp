@@ -854,9 +854,9 @@ void PluginManager::scanInternalPlugins()
         if (format->getName() != "Element")
             continue;
         
-        for (int j = priv->allPlugins.getNumTypes(); --j >= 0;)
-            if (priv->allPlugins.getType(j)->pluginFormatName == "Element")
-                priv->allPlugins.removeType (*priv->allPlugins.getType (j));
+        const auto types = priv->allPlugins.getTypesForFormat (*format);
+        for (const auto& t : types)
+            priv->allPlugins.removeType(t);;
         
         PluginDirectoryScanner scanner (getKnownPlugins(), *format,
                                         format->getDefaultLocationsToSearch(),
