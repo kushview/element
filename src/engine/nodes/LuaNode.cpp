@@ -303,6 +303,20 @@ struct LuaNode::Context
         paramData[index] = value;
     }
 
+    void copyParameterValues (const Context& other)
+    {
+        for (int i = jmin (inParams.size(), other.inParams.size()); --i >= 0;)
+            paramData[i] = other.paramData[i];
+
+        for (auto* const ip : inParams)
+        {
+            auto* const param = dynamic_cast<LuaParameter*> (ip);
+            const auto  port  = param->getPort();
+            paramData[port.channel] = jlimit (port.minValue, port.maxValue, paramData[port.channel]);
+            param->setValue (param->convertTo0to1 (paramData[port.channel]));
+        }
+    }
+
 private:
     sol::state state;
     sol::function renderf;
@@ -316,6 +330,19 @@ private:
     int numParams = 0;
     enum { maxParams = 512 };
     float paramData [maxParams];
+    float paramDataOut [maxParams];
+
+    LuaParameter* findParameter (const PortDescription& port) const
+    {
+        for (auto* const ip : inParams)
+        {
+            auto* const param = dynamic_cast<LuaParameter*> (ip);
+            const auto port = param->getPort();
+            ignoreUnused (param, port);
+        }
+
+        return nullptr;
+    }
 
     void resetParameters() noexcept
     {
@@ -497,6 +524,8 @@ Result LuaNode::loadScript (const String& newScript)
             newContext->prepare (sampleRate, blockSize);
         triggerPortReset();
         ScopedLock sl (lock);
+        if (context != nullptr)
+            newContext->copyParameterValues (*context);
         context.swap (newContext);
     }
 

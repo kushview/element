@@ -303,6 +303,8 @@ public:
     float getValueForText (const String& text) const override { return convertTo0to1 (text.getFloatValue()); }
     
     void setPort (const kv::PortDescription& newPort, bool preserveValue = false);
+    kv::PortDescription getPort() const { return port; }
+    
     float get() const { return value; }
     operator float() const { return value; }
     void set (float newValue) { operator= (newValue); }
