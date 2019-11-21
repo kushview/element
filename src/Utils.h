@@ -221,8 +221,10 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
 
     /** Cast the rest of values to their respective types */
 
-    int numArgs = message.size();
-    var values[numArgs];
+    const int numArgs = message.size();
+    std::unique_ptr<var[]> values;
+    values.reset (new var [numArgs]);
+    
     int blobIndexInMessage = -1;
 
     int i = 0;
