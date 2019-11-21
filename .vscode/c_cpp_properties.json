@@ -184,8 +184,19 @@
             "name": "Linux",
             "includePath": [
                 "/usr/include",
+                "/usr/include/lilv-0",
+                "/usr/include/suil-0",
+                "/usr/include/serd-0",
+                "/usr/include/sord-0",
+                "/usr/include/sratom-0",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}/libs/compat",
+                "${workspaceRoot}/libs/JUCE/modules",
+                "${workspaceRoot}/libs/kv/modules",
+                "${workspaceRoot}/libs/jlv2/modules",
+                "${workspaceRoot}/libs/lua",
+                "${workspaceRoot}/libs/lua/src",
+                "${workspaceRoot}/src"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
@@ -193,7 +204,13 @@
                 "path": [
                     "/usr/include",
                     "/usr/local/include",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}/libs/compat",
+                    "${workspaceRoot}/libs/JUCE/modules",
+                    "${workspaceRoot}/libs/kv/modules",
+                    "${workspaceRoot}/libs/jlv2/modules",
+                    "${workspaceRoot}/libs/lua",
+                    "${workspaceRoot}/libs/lua/src",
+                    "${workspaceRoot}/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""

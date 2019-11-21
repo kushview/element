@@ -100,6 +100,7 @@ def check_linux (self):
     self.check_cfg(package='xinerama', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xcursor', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='alsa', args='--cflags --libs', mandatory=True)
+    self.check_cfg(package='gtk+-2.0', uselib_store='GTK',args='--cflags --libs', mandatory=True)
 
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]
