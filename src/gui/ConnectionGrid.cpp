@@ -329,9 +329,9 @@ namespace Element
             if (menu.isPluginResultCode (result))
             {
                 bool verified = false;
-                const auto* desc = menu.getPluginDescription (result, verified);
-                if (desc)
-                    ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, *desc, verified));
+                const auto desc = menu.getPluginDescription (result, verified);
+                if (desc.fileOrIdentifier.isNotEmpty() && desc.pluginFormatName.isNotEmpty())
+                    ViewHelpers::postMessageFor (this, new AddPluginMessage (graph, desc, verified));
             }
             else
             {
