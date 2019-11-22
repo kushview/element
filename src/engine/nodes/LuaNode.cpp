@@ -360,10 +360,7 @@ struct LuaNode::Context
             {
                 //DBG("data = " << data.as<const char*>());
                 MemoryOutputStream mo (block, false);
-                {
-                    // GZIPCompressorOutputStream gz (mo);
-                    mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
-                }
+                mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
             }
         }
     }
@@ -656,10 +653,12 @@ void LuaNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 void LuaNode::setState (const void* data, int size)
 {
-    const auto state = ValueTree::readFromData (data, size);
+    const auto state = ValueTree::readFromGZIPData (data, size);
     if (state.isValid())
     {
+        // May want to do this procedure async with a Message::post()
         auto result = loadScript (state["script"].toString());
+
         if (result.wasOk() && state.hasProperty ("data"))
         {
             const var& data = state.getProperty ("data");
@@ -667,15 +666,16 @@ void LuaNode::setState (const void* data, int size)
                 if (auto* block = data.getBinaryData())
                     context->setState (block->getData(), block->getSize());
         }
+
         sendChangeMessage();
     }
 }
 
 void LuaNode::getState (MemoryBlock& block)
 {
-    ValueTree state ("lua");
+    ValueTree state ("LuaNodeState");
     state.setProperty ("script", script, nullptr)
-         .setProperty ("draft", draftScript, nullptr);
+         .setProperty ("draft",  draftScript, nullptr);
 
     MemoryBlock scriptBlock;
     context->getState (scriptBlock);
@@ -683,7 +683,10 @@ void LuaNode::getState (MemoryBlock& block)
         state.setProperty ("data", scriptBlock, nullptr);
 
     MemoryOutputStream mo (block, false);
-    state.writeToStream (mo);
+    {
+        GZIPCompressorOutputStream gz (mo);
+        state.writeToStream (gz);
+    }
 }
 
 void LuaNode::setParameter (int index, float value)
