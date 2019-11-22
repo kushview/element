@@ -660,6 +660,7 @@ void GraphNode::resetPorts()
         if (port.input && port.type == PortType::Control)
             params.add (getOrCreateParameter (port));
     }
+    
     struct ParamSorter
     {
         int compareElements (Parameter* lhs, Parameter* rhs)
@@ -669,9 +670,6 @@ void GraphNode::resetPorts()
         }
     } sorter;
     params.sort (sorter, true);
-
-    for (const auto* param : params)
-        { DBG("param " << param->getParameterIndex() << " = " << param->getName (1024)); }
 
     if (auto* sub = dynamic_cast<SubGraphProcessor*> (getAudioProcessor()))
         for (int i = 0; i < sub->getNumNodes(); ++i)

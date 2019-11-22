@@ -27,7 +27,7 @@
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
 
-static const String defaultScript = 
+static const String stereoAmpScript = 
 R"(
 --- Stereo Amplifier in Lua
 --
@@ -70,12 +70,14 @@ function node_params()
    }
 end
 
---- prepare for rendering
+--- Prepare for rendering
+--  Allocate any special data needed here
 function node_prepare (rate, block)
    -- nothing to do in this example
 end
 
--- render audio and midi
+--- Render audio and midi
+--  Use the provided audio and midi objects to process your plugin
 function node_render (audio, midi)
    local nframes = audio:get_num_samples()
    local gain = decibels.to_gain (Param.values[1])
@@ -89,22 +91,23 @@ function node_render (audio, midi)
 end
 
 --- Release node resources
---  free any allocated resources in this callback
+--  Free any allocated resources in this callback
 function node_release()
 end
 
 --- Save node state
+--
 --  This is an optional function you can implement to save state.  
 --  The host will prepare the IO stream so all you have to do is 
 --  `io.write(...)` your data
+--
+--  Note: Parameter values will automatically be saved and restored,
+--  you do not need to handle them here.
 function node_save()
    io.write("some custom state data")
 end
 
 --- Restore node state
---  note: Parameter values will automatically be saved and restored,
---  you do not need to handle them here.
---
 --  This is an optional function you can implement to restore state.  
 --  The host will prepare the IO stream so all you have to do is 
 --  `io.read(...)` your data previsouly written in `node_save()`
@@ -364,7 +367,7 @@ struct LuaNode::Context
             local oo = io.output()
             io.output (tf);
             node_save()
-            tf:seek ("set", 0)
+            tf:seek ('set', 0)
             local data = tf:read ("*a")
             io.close()
             io.output (oo);
@@ -396,10 +399,10 @@ struct LuaNode::Context
         state["__state_data__"] = ud;
         state.safe_script (R"(
             local oi = io.input()
-            __state_data__:seek ("set", 0)
+            __state_data__:seek ('set', 0)
             io.input (__state_data__)
             node_restore()
-            print (io.read("*a"))
+            print (io.read ("*a"))
             io.input(oi)
             __state_data__:close()
             __state_data__ = nil
@@ -579,7 +582,7 @@ LuaNode::LuaNode() noexcept
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
-    loadScript (defaultScript);
+    loadScript (stereoAmpScript);
 }
 
 LuaNode::~LuaNode()
