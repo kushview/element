@@ -102,6 +102,9 @@ function node_save()
 end
 
 --- Restore node state
+--  note: Parameter values will automatically be saved and restored,
+--  you do not need to handle them here.
+--
 --  This is an optional function you can implement to restore state.  
 --  The host will prepare the IO stream so all you have to do is 
 --  `io.read(...)` your data previsouly written in `node_save()`
@@ -319,6 +322,21 @@ struct LuaNode::Context
     {
         jassert (isPositiveAndBelow (index, maxParams));
         paramData[index] = value;
+    }
+
+    void getParameterData (MemoryBlock& block) const
+    {
+        block.append (paramData, sizeof(float) * (size_t) inParams.size());
+    }
+
+    void setParameterData (const MemoryBlock& block)
+    {
+        jassert (block.getSize() % sizeof(float) == 0);
+        jassert (block.getSize() < sizeof(float) * maxParams);
+        memcpy (paramData, block.getData(), block.getSize());
+        for (int i = 0; i < inParams.size(); ++i)
+            if (auto* param = dynamic_cast<LuaParameter*> (inParams.getObjectPointerUnchecked (i)))
+                param->set (paramData [i]);
     }
 
     void copyParameterValues (const Context& other)
@@ -548,8 +566,8 @@ private:
 
 void LuaParameter::parameterValueChanged (int index, float value)
 {
-    if (ctx != nullptr)
-        ctx->setParameter (index, convertFrom0to1 (value));
+    if (ctx != nullptr) // index may not be set so use port channel.
+        ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
 }
 
 void LuaParameter::parameterGestureChanged (int, bool) {}
@@ -659,14 +677,24 @@ void LuaNode::setState (const void* data, int size)
         // May want to do this procedure async with a Message::post()
         auto result = loadScript (state["script"].toString());
 
-        if (result.wasOk() && state.hasProperty ("data"))
+        if (result.wasOk())
         {
-            const var& data = state.getProperty ("data");
-            if (data.isBinaryData())
-                if (auto* block = data.getBinaryData())
-                    context->setState (block->getData(), block->getSize());
-        }
+            if (state.hasProperty ("params"))
+            {
+                const var& params = state.getProperty ("params");
+                if (params.isBinaryData())
+                    if (auto* block = params.getBinaryData())
+                        context->setParameterData (*block);
+            }
 
+            if (state.hasProperty ("data"))
+            {
+                const var& data = state.getProperty ("data");
+                if (data.isBinaryData())
+                    if (auto* block = data.getBinaryData())
+                        context->setState (block->getData(), block->getSize());
+            }
+        }
         sendChangeMessage();
     }
 }
@@ -678,6 +706,11 @@ void LuaNode::getState (MemoryBlock& block)
          .setProperty ("draft",  draftScript, nullptr);
 
     MemoryBlock scriptBlock;
+    context->getParameterData (scriptBlock);
+    if (scriptBlock.getSize() > 0)
+        state.setProperty ("params", scriptBlock, nullptr);
+
+    scriptBlock.reset();
     context->getState (scriptBlock);
     if (scriptBlock.getSize() > 0)
         state.setProperty ("data", scriptBlock, nullptr);
