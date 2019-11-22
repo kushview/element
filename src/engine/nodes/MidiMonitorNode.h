@@ -60,7 +60,7 @@ public:
     void getState (MemoryBlock& block) override {};
 
     void clearMessages();
-    void getMessages (MidiBuffer &destBuffer);
+    
     const StringArray& getLog() const { return midiLog; }
 
 private:
@@ -88,6 +88,7 @@ private:
         createdPorts = true;
     }
 
+    void getMessages (MidiBuffer &destBuffer);
     void timerCallback() override;
 };
 

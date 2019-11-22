@@ -84,6 +84,9 @@ void MidiMonitorNode::getMessages (MidiBuffer& destBuffer)
 
 void MidiMonitorNode::clearMessages()
 {
+    midiLog.clearQuick();
+    messagesLogged();
+    ScopedLock sl (lock);
     inputMessages.reset (currentSampleRate);
     numSamples = 0;
 }
@@ -98,8 +101,19 @@ void MidiMonitorNode::timerCallback()
     MidiBuffer::Iterator iter (midiTemp);
     MidiMessage msg; int frame = 0;
 
+    String text;
     while (iter.getNextEvent (msg, frame))
-        midiLog.add (msg.getDescription());
+    {
+        if (msg.isMidiStart())
+            text << "Start";
+        else if (msg.isMidiStop())
+            text << "Stop";
+        else if (msg.isMidiContinue())
+            text << "Continue";
+        
+        midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
+        text.clear();
+    }
 
     if (midiLog.size() > maxLoggedMessages)
         midiLog.removeRange (0, midiLog.size() - maxLoggedMessages);
