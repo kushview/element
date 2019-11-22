@@ -20,28 +20,20 @@
 
 #pragma once
 
-#include "gui/ViewHelpers.h"
 #include "gui/nodes/NodeEditorComponent.h"
-#include "gui/widgets/LogListBox.h"
-#include "engine/nodes/MidiMonitorNode.h"
 
 namespace Element {
 
-class MidiMonitorNodeEditor : public NodeEditorComponent,
-                              private Timer
+class MidiMonitorNodeEditor : public NodeEditorComponent
 {
 public:
     MidiMonitorNodeEditor (const Node& node);
     virtual ~MidiMonitorNodeEditor();
-
-    void paint (Graphics&) override {};
+    void paint (Graphics& g) override { g.fillAll (findColour (TextEditor::backgroundColourId).darker()); }
     void resized() override;
-    void timerCallback() override;
 
 private:
-    Node node;
-    LogListBox midiMonitorLog;
-    MidiBuffer midi;
+    class Logger; std::unique_ptr<Logger> logger;
 };
 
 }

@@ -28,10 +28,12 @@ MidiMonitorNode::MidiMonitorNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_MONITOR, nullptr);
+    midiTemp.ensureSize (3 * 32);
 }
 
 MidiMonitorNode::~MidiMonitorNode()
 {
+    stopTimer();
     clearMessages();
 }
 
@@ -39,7 +41,14 @@ void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize)
 {
     inputMessages.reset (sampleRate);
     currentSampleRate = sampleRate;
+    numSamples = 0;
+    startTimerHz (refreshRateHz);
 };
+
+void MidiMonitorNode::releaseResources()
+{
+    stopTimer();
+}
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
@@ -77,6 +86,25 @@ void MidiMonitorNode::clearMessages()
 {
     inputMessages.reset (currentSampleRate);
     numSamples = 0;
+}
+
+void MidiMonitorNode::timerCallback()
+{
+    midiTemp.clear();
+    getMessages (midiTemp);
+    if (midiTemp.getNumEvents() <= 0)
+        return;
+
+    MidiBuffer::Iterator iter (midiTemp);
+    MidiMessage msg; int frame = 0;
+
+    while (iter.getNextEvent (msg, frame))
+        midiLog.add (msg.getDescription());
+
+    if (midiLog.size() > maxLoggedMessages)
+        midiLog.removeRange (0, midiLog.size() - maxLoggedMessages);
+    
+    messagesLogged();
 }
 
 };
