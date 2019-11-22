@@ -92,6 +92,24 @@ end
 --  free any allocated resources in this callback
 function node_release()
 end
+
+--- Save node state
+--  This is an optional function you can implement to save state.  
+--  The host will prepare the IO stream so all you have to do is 
+--  `io.write(...)` your data
+function node_save()
+   io.write("some custom state data")
+end
+
+--- Restore node state
+--  This is an optional function you can implement to restore state.  
+--  The host will prepare the IO stream so all you have to do is 
+--  `io.read(...)` your data previsouly written in `node_save()`
+function node_restore()
+   print ("restored data:")
+   print (io.read ("*a"));
+end
+
 )";
 
 namespace Element {
@@ -152,7 +170,7 @@ struct LuaNode::Context
         String errorMsg;
         try
         {
-            state.open_libraries (sol::lib::base, sol::lib::string);
+            state.open_libraries (sol::lib::base, sol::lib::string, sol::lib::io);
             Lua::registerEngine (state);
             auto res = state.script (script.toRawUTF8());
             if (res.valid())
@@ -315,6 +333,65 @@ struct LuaNode::Context
             paramData[port.channel] = jlimit (port.minValue, port.maxValue, paramData[port.channel]);
             param->setValue (param->convertTo0to1 (paramData[port.channel]));
         }
+    }
+
+    void getState (MemoryBlock& block)
+    {
+        sol::function save = state ["node_save"];
+        if (! save.valid())
+            return;
+        
+        auto result = state.safe_script(R"(
+            local tf = io.tmpfile()
+            local oo = io.output()
+            io.output (tf);
+            node_save()
+            tf:seek ("set", 0)
+            local data = tf:read ("*a")
+            io.close()
+            io.output (oo);
+            return data
+        )");
+
+        if (result.valid())
+        {
+            sol::object data = result;
+            if (data.is<const char*>())
+            {
+                //DBG("data = " << data.as<const char*>());
+                MemoryOutputStream mo (block, false);
+                {
+                    // GZIPCompressorOutputStream gz (mo);
+                    mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
+                }
+            }
+        }
+    }
+
+    void setState (const void* data, size_t size)
+    {
+        sol::function restore = state["node_restore"];
+        if (! restore.valid())
+            return;
+
+        sol::userdata ud = state.script ("return io.tmpfile()");
+        FILE* const file = ud.as<FILE*>(); // Lua will close this
+        fwrite (data, 1, size, file);
+
+        state["__state_data__"] = ud;
+        state.safe_script (R"(
+            local oi = io.input()
+            __state_data__:seek ("set", 0)
+            io.input (__state_data__)
+            node_restore()
+            print (io.read("*a"))
+            io.input(oi)
+            __state_data__:close()
+            __state_data__ = nil
+        )");
+
+        state["__state_data__"] = nullptr;
+        state.collect_garbage();
     }
 
 private:
@@ -582,7 +659,14 @@ void LuaNode::setState (const void* data, int size)
     const auto state = ValueTree::readFromData (data, size);
     if (state.isValid())
     {
-        loadScript (state["script"].toString());
+        auto result = loadScript (state["script"].toString());
+        if (result.wasOk() && state.hasProperty ("data"))
+        {
+            const var& data = state.getProperty ("data");
+            if (data.isBinaryData())
+                if (auto* block = data.getBinaryData())
+                    context->setState (block->getData(), block->getSize());
+        }
         sendChangeMessage();
     }
 }
@@ -592,6 +676,12 @@ void LuaNode::getState (MemoryBlock& block)
     ValueTree state ("lua");
     state.setProperty ("script", script, nullptr)
          .setProperty ("draft", draftScript, nullptr);
+
+    MemoryBlock scriptBlock;
+    context->getState (scriptBlock);
+    if (scriptBlock.getSize() > 0)
+        state.setProperty ("data", scriptBlock, nullptr);
+
     MemoryOutputStream mo (block, false);
     state.writeToStream (mo);
 }

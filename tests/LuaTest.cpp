@@ -368,4 +368,163 @@ private:
 
 static CArrayTest sCArrayTest;
 
+
+class LuaTableTest : public UnitTestBase
+{
+public:
+    LuaTableTest() : UnitTestBase ("Lua Table", "Lua", "table") {}
+    virtual ~LuaTableTest() { }
+    void initialise() override
+    {
+        lua.open_libraries();
+    }
+
+    void shutdown() override
+    {
+        lua.collect_garbage();
+    }
+
+    void runTest() override
+    {
+        // beginTest ("file");
+
+        // auto result = lua.safe_script (R"(
+        //     local function node_save()
+        //         io.write ("hello world")
+        //     end
+
+        //     local tf = io.tmpfile()
+        //     local oi = io.output()
+        //     io.output (tf);
+        //     node_save()
+        //     tf:seek ("set", 0)
+        //     local s = tf:read ("*a")
+        //     io.close()
+        //     io.output (of);
+
+        //     return s
+        // )");
+
+        // expect (result.valid());
+        // if (result.valid())
+        // {
+        //     sol::object ret = result;
+        //     if (ret.get_type() == sol::type::string)
+        //     {
+        //         DBG("got a result");
+        //         DBG(ret.as<const char*>() << " len: " << strlen(ret.as<const char*>()));
+        //     }
+        //     else
+        //     {
+        //         expect(false, "didn't get a string");
+        //     }
+        // }
+
+        beginTest("memory file");
+        const char* testData = "This is some test data";
+        // void* buffer = malloc (testData.length());
+        // memcpy (buffer, testData.toRawUTF8(), testData.length());
+
+        sol::userdata ud = lua.script ("return io.tmpfile()");
+        FILE* file = ud.as<FILE*>();
+        fwrite (testData, 1, strlen (testData), file);
+
+        lua["__state_data__"] = ud;
+        lua.script (R"(
+            local oi = io.input()
+            __state_data__:seek ("set", 0)
+            io.input (__state_data__)
+            --node_restore()
+            print (io.read("*a"))
+            io.input(oi)
+            __state_data__:close()
+            __state_data__ = nil
+        )");
+
+        lua.collect_garbage();
+
+        beginTest ("table");
+
+        auto obj = lua.script (R"(
+        function table_value_tree (e)
+            -- if e is a table, we should iterate over its elements
+            if type(e) == "table" then
+                for k,v in pairs(e) do -- for every element in the table
+                    print(k)
+                    table_value_tree (v)       -- recursively repeat the same procedure
+                end
+            else -- if not, we can just print it
+                print(e)
+            end
+        end
+
+        return {
+            100,
+            key0 = 100,
+            key1 = 200,
+            key2 = 300,
+            key3 = {
+                key1 = 100,
+                key2 = 200,
+                key3 = 300
+            }
+        } 
+        )");
+
+        lua["table_value_tree"](obj);
+
+        sol::table t = obj;
+        return;
+        DBG("size = " << t.size());
+        for (int i = 1; i <= t.size(); ++i)
+        {
+            sol::object o = t [i];
+            DBG("index = " << i);
+
+            switch (o.get_type())
+            {
+                case sol::type::table:
+                    DBG("table");
+                    break;
+                case sol::type::boolean:
+                    DBG("boolean");
+                    break;
+                case sol::type::string:
+                    DBG("string");
+                    break;
+                case sol::type::number:
+                    DBG("number");
+                    break;
+
+                case sol::type::thread:
+                    DBG("thread");
+                    break;
+                case sol::type::lua_nil:
+                    DBG("nil");
+                    break;
+                case sol::type::none:
+                    DBG("none");
+                    break;
+                case sol::type::function:
+                    DBG("function");
+                    break;
+                case sol::type::userdata:
+                    DBG("userdata");
+                    break;
+                case sol::type::lightuserdata:
+                    DBG("lightuserdata");
+                    break;
+                case sol::type::poly:
+                    DBG("poly");
+                    break;
+            }
+        }
+    }
+
+private:
+    sol::state lua;
+};
+
+static LuaTableTest sLuaTableTest;
+
 #endif
