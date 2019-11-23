@@ -24,44 +24,72 @@
 
 namespace Element {
 
-typedef ReferenceCountedObjectPtr<MidiMonitorNode> MidiMonitorNodePtr;
+using MidiMonitorNodePtr = ReferenceCountedObjectPtr<MidiMonitorNode>;
+
+class MidiMonitorNodeEditor::Logger  : public ListBox,
+                                       public ListBoxModel,
+                                       public AsyncUpdater
+{
+public:
+    /** Constructor */
+    Logger (MidiMonitorNodePtr n)
+        : node (n)
+    {
+        jassert (node != nullptr);
+        setModel (this);
+        connection = node->messagesLogged.connect (
+            std::bind (&Logger::triggerAsyncUpdate, this));
+    }
+
+    /** Destructor */
+    ~Logger()
+    {
+        connection.disconnect();
+        node = nullptr;
+    }
+
+    int getNumRows() override { return node->getLog().size(); }
+
+    void paintListBoxItem (int row, Graphics& g, int width, int height, bool rowIsSelected) override
+    {
+        const auto& logList = node->getLog();
+        ignoreUnused (rowIsSelected);
+        g.setFont (Font (Font::getDefaultMonospacedFontName(), 
+                   g.getCurrentFont().getHeight(), Font::plain));
+        if (isPositiveAndBelow (row, logList.size()))
+            ViewHelpers::drawBasicTextRow (logList[row], g, width, height, false);
+    }
+
+    void handleAsyncUpdate() override
+    {
+        const auto& logList = node->getLog();
+        updateContent();
+        scrollToEnsureRowIsOnscreen (logList.size() - 1);
+        repaint();
+    }
+
+private:
+    MidiMonitorNodePtr node;
+    SignalConnection connection;
+};
 
 MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
     : NodeEditorComponent (node)
 {
-    midiMonitorLog.setBounds (0, 0, 320, 160);
-    addAndMakeVisible (midiMonitorLog);
+    setOpaque (true);
+    logger.reset (new Logger (getNodeObjectOfType<MidiMonitorNode>()));
+    addAndMakeVisible (logger.get());
     setSize (320, 160);
-    startTimerHz (60);
 }
 
 MidiMonitorNodeEditor::~MidiMonitorNodeEditor()
 {
-    stopTimer();
-}
-
-void MidiMonitorNodeEditor::timerCallback ()
-{
-    if (MidiMonitorNodePtr node = getNodeObjectOfType<MidiMonitorNode>())
-    {
-        if (node->numSamples.get() <= 0)
-            return;
-
-        MidiBuffer midi;
-        node->getMessages(midi);
-
-        MidiBuffer::Iterator iter1 (midi);
-        MidiMessage msg;
-        int frame;
-
-        while (iter1.getNextEvent (msg, frame))
-            midiMonitorLog.addMessage (msg.getDescription());
-    }
+    logger.reset();
 }
 
 void MidiMonitorNodeEditor::resized ()
 {
-    midiMonitorLog.setBounds (getLocalBounds().reduced (4));
+    logger->setBounds (getLocalBounds().reduced (4));
 }
 
 };

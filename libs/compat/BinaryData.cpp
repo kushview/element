@@ -108,17 +108,102 @@ static const unsigned char temp_binary_data_2[] =
 
 const char* Editing_elw = (const char*) temp_binary_data_2;
 
-//================== developers.txt ==================
+//================== acknowledgements.txt ==================
 static const unsigned char temp_binary_data_3[] =
+"\n"
+"Lua v5.3.5\n"
+"----------\n"
+"Copyright (C) 1994-2018 Lua.org, PUC-Rio.\n"
+"\n"
+"Permission is hereby granted, free of charge, to any person obtaining\n"
+"a copy of this software and associated documentation files (the\n"
+"\"Software\"), to deal in the Software without restriction, including\n"
+"without limitation the rights to use, copy, modify, merge, publish,\n"
+"distribute, sublicense, and/or sell copies of the Software, and to\n"
+"permit persons to whom the Software is furnished to do so, subject to\n"
+"the following conditions:\n"
+"\n"
+"The above copyright notice and this permission notice shall be\n"
+"included in all copies or substantial portions of the Software.\n"
+"\n"
+"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND,\n"
+"EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF\n"
+"MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.\n"
+"IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY\n"
+"CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,\n"
+"TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE\n"
+"SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n"
+"\n"
+"\n"
+"sol3\n"
+"----\n"
+"The MIT License (MIT)\n"
+"\n"
+"Copyright (c) 2013-2019 Rapptz, ThePhD and contributors\n"
+"\n"
+"Permission is hereby granted, free of charge, to any person obtaining a copy of\n"
+"this software and associated documentation files (the \"Software\"), to deal in\n"
+"the Software without restriction, including without limitation the rights to\n"
+"use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of\n"
+"the Software, and to permit persons to whom the Software is furnished to do so,\n"
+"subject to the following conditions:\n"
+"\n"
+"The above copyright notice and this permission notice shall be included in all\n"
+"copies or substantial portions of the Software.\n"
+"\n"
+"THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
+"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS\n"
+"FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR\n"
+"COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER\n"
+"IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN\n"
+"CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n"
+"\n"
+"\n"
+"LV2\n"
+"---\n"
+"Copyright 2006-2019 Steve Harris, David Robillard.\n"
+"\n"
+"Based on LADSPA, Copyright 2000-2002 Richard W.E. Furse,\n"
+"Paul Barton-Davis, Stefan Westerfeld.\n"
+"\n"
+"Permission to use, copy, modify, and/or distribute this software for any\n"
+"purpose with or without fee is hereby granted, provided that the above\n"
+"copyright notice and this permission notice appear in all copies.\n"
+"\n"
+"THIS SOFTWARE IS PROVIDED \"AS IS\" AND THE AUTHOR DISCLAIMS ALL WARRANTIES\n"
+"WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF\n"
+"MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR\n"
+"ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES\n"
+"WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN\n"
+"ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF\n"
+"OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.\n"
+"\n"
+"\n"
+"JUCE (open source)\n"
+"------------------\n"
+"Copyright (c) 2017 - ROLI Ltd.\n"
+"\n"
+"JUCE is an open source library subject to commercial or open-source\n"
+"licensing. You may also use this code under the terms of the GPL v3 (see\n"
+"www.gnu.org/licenses).\n"
+"\n"
+"JUCE IS PROVIDED \"AS IS\" WITHOUT ANY WARRANTY, AND ALL WARRANTIES, WHETHER\n"
+"EXPRESSED OR IMPLIED, INCLUDING MERCHANTABILITY AND FITNESS FOR PURPOSE, ARE\n"
+"DISCLAIMED.\n";
+
+const char* acknowledgements_txt = (const char*) temp_binary_data_3;
+
+//================== developers.txt ==================
+static const unsigned char temp_binary_data_4[] =
 "Chris Ryan (digitalelements)\n"
 "Eliot Akira (eliot-akira)\n"
 "iamvs2002\n"
 "jatinchowdhury18\n";
 
-const char* developers_txt = (const char*) temp_binary_data_3;
+const char* developers_txt = (const char*) temp_binary_data_4;
 
 //================== ElementIcon.png ==================
-static const unsigned char temp_binary_data_4[] =
+static const unsigned char temp_binary_data_5[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,4,0,0,0,4,0,8,2,0,0,0,240,127,188,212,0,0,0,9,112,72,89,115,0,0,11,19,0,0,11,19,1,0,154,156,24,0,0,0,25,116,69,88,116,83,111,102,116,119,97,114,101,0,65,100,111,98,101,32,73,109,97,103,101,82,101,97,100,
 121,113,201,101,60,0,0,45,62,73,68,65,84,120,218,236,221,189,142,35,109,122,152,225,247,33,190,19,144,178,133,67,43,88,71,54,172,227,48,176,137,35,57,86,100,56,23,96,192,129,161,3,112,166,108,3,1,74,188,62,5,165,222,72,112,32,8,202,4,8,130,34,101,202,
 249,120,88,63,111,189,69,178,167,187,73,86,177,88,188,174,253,118,166,167,103,186,155,93,77,22,159,187,254,24,127,248,171,95,255,193,175,126,93,110,145,229,37,228,119,111,253,139,124,95,203,47,136,23,92,58,249,42,159,53,223,236,225,182,196,247,149,111,
@@ -263,10 +348,10 @@ static const unsigned char temp_binary_data_4[] =
 0,32,0,0,0,0,1,0,0,0,8,0,0,0,64,0,0,0,0,2,0,0,0,16,0,0,0,128,0,0,0,0,1,0,0,0,8,0,0,0,64,0,0,0,0,175,38,254,240,87,191,254,131,95,253,250,166,143,205,215,248,22,243,187,183,62,119,250,179,206,135,124,187,249,138,223,227,246,62,107,190,217,195,109,137,
 239,43,223,224,225,182,249,7,76,190,202,131,120,209,27,145,47,243,51,203,87,123,192,236,234,225,182,197,187,98,190,254,15,127,209,91,176,211,135,219,15,255,250,47,255,240,255,5,24,0,133,45,132,129,239,117,169,88,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* ElementIcon_png = (const char*) temp_binary_data_4;
+const char* ElementIcon_png = (const char*) temp_binary_data_5;
 
 //================== ElementIconTemplate.png ==================
-static const unsigned char temp_binary_data_5[] =
+static const unsigned char temp_binary_data_6[] =
 { 137,80,78,71,13,10,26,10,0,0,0,13,73,72,68,82,0,0,4,0,0,0,4,0,8,6,0,0,0,127,29,43,131,0,0,27,153,73,68,65,84,120,156,236,221,177,142,36,9,97,128,225,170,214,190,133,159,192,9,16,89,14,144,9,72,46,33,64,198,137,57,8,47,49,17,209,157,100,4,18,230,68,224,
 196,146,37,147,33,29,210,5,22,58,36,155,192,18,18,41,92,112,39,144,78,126,0,196,3,240,4,93,168,187,103,102,217,153,101,247,102,170,171,187,106,255,239,187,189,235,174,190,158,234,234,170,233,234,170,191,171,107,7,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -339,7 +424,7 @@ static const unsigned char temp_binary_data_5[] =
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,248,115,123,112,76,0,0,0,195,48,40,254,85,207,194,254,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192,60,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,128,121,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,192,95,117,159,78,199,126,169,47,242,229,0,0,0,0,73,69,78,68,174,66,96,130,0,0 };
 
-const char* ElementIconTemplate_png = (const char*) temp_binary_data_5;
+const char* ElementIconTemplate_png = (const char*) temp_binary_data_6;
 
 
 const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
@@ -355,6 +440,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x0dbee79a:  numBytes = 1153; return PowerButton_48x48_png;
         case 0x5b24ff63:  numBytes = 1631; return Classic_elw;
         case 0xe469c969:  numBytes = 1820; return Editing_elw;
+        case 0x046a62ea:  numBytes = 3461; return acknowledgements_txt;
         case 0x117be71a:  numBytes = 82; return developers_txt;
         case 0x9eb8b85f:  numBytes = 11697; return ElementIcon_png;
         case 0xcd7846f9:  numBytes = 7122; return ElementIconTemplate_png;
@@ -370,6 +456,7 @@ const char* namedResourceList[] =
     "PowerButton_48x48_png",
     "Classic_elw",
     "Editing_elw",
+    "acknowledgements_txt",
     "developers_txt",
     "ElementIcon_png",
     "ElementIconTemplate_png"
@@ -380,6 +467,7 @@ const char* originalFilenames[] =
     "PowerButton_48x48.png",
     "Classic.elw",
     "Editing.elw",
+    "acknowledgements.txt",
     "developers.txt",
     "ElementIcon.png",
     "ElementIconTemplate.png"
