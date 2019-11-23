@@ -346,7 +346,7 @@ private:
 };
 
 class ParameterListener : private Parameter::Listener,
-                              private Timer
+                          private Timer
 {
 public:
     ParameterListener (Parameter::Ptr param)
