@@ -17,6 +17,7 @@
                 "${workspaceRoot}/libs/lua/src",
                 "${workspaceRoot}/src",
                 "${workspaceRoot}/tests",
+                "/opt/kushview/include",
                 "/usr/local/include",
                 "/usr/local/Cellar/jack/0.125.0_3/include"
             ],
