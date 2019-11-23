@@ -23,18 +23,18 @@ namespace Element {
 /** Utility class that will set a boolean to a a new value, then
     reset it back when this class goes out of scope 
   */
-class ScopedFlag
+class ScopedFlag final
 {
 public:
     ScopedFlag() = delete;
-    explicit ScopedFlag (bool& value, bool newValue)
+    explicit ScopedFlag (bool& value, bool newValue) noexcept
         : valueToSet (value)
     {
         previousValue = value;
         valueToSet = newValue;
     }
 
-    ~ScopedFlag()
+    ~ScopedFlag() noexcept
     {
         valueToSet = previousValue;
     }
