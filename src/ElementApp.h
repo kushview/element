@@ -116,6 +116,8 @@ namespace Tags
     const Identifier workspace          = "workspace";
 
     const Identifier externalSync       = "externalSync";
+
+    const Identifier updater            = "updater";
 }
 
 struct Alert

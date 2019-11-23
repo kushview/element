@@ -47,23 +47,48 @@ static String denyPluginMessage (const PluginDescription& desc)
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
 {
     String header = "Plugin Instantiation Failed";
-    String message;
-    if (isFullVersionPlugin (desc))
-    {
-        message = denyPluginMessage (desc);
-        if (message.isEmpty())
-            message << desc.name << " is available in the paid version.";
-    }
-    else
-    {
-        message << desc.name << " could not be instantiated";
-    }
+    String message = desc.name;
+    message << " could not be instantiated";
 
     if (async)
         AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon, header, message);
     else
         AlertWindow::showMessageBox (AlertWindow::WarningIcon, header, message);
 }
+
+class NodeModelUpdater : public ReferenceCountedObject
+{
+public:
+    NodeModelUpdater (const ValueTree& d, GraphNode* o)
+        : data (d), object (o)
+    {
+        portsChangedConnection = object->portsChanged.connect ( 
+            std::bind (&NodeModelUpdater::onPortsChanged, this));
+    }
+
+    ~NodeModelUpdater()
+    {
+        portsChangedConnection.disconnect();
+    }
+
+private:
+    ValueTree data;
+    GraphNodePtr object;
+    SignalConnection portsChangedConnection;
+
+    void onPortsChanged()
+    {
+        const auto newPorts = object->getMetadata().getChildWithName (Tags::ports);
+        int index = data.indexOf (data.getChildWithName (Tags::ports));
+        if (index > 0 && newPorts.isValid())
+        {
+            data.removeChild (index, nullptr);
+            data.addChild (newPorts.createCopy(), index, nullptr);
+        }
+    }
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeModelUpdater);
+};
 
 /** This enforces correct IO nodes based on the graph processor's settings
     in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
@@ -299,6 +324,7 @@ uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double
         model.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
              .setProperty (Tags::name,   desc->name, nullptr)
              .setProperty (Tags::object, node, nullptr)
+             .setProperty (Tags::updater,    new NodeModelUpdater (model, node), nullptr)
              .setProperty (Tags::relativeX, rx, nullptr)
              .setProperty (Tags::relativeY, ry, nullptr)
              .setProperty (Tags::pluginIdentifierString, 
@@ -365,7 +391,7 @@ void GraphManager::removeFilter (const uint32 uid)
         return;
     for (int i = 0; i < nodes.getNumChildren(); ++i)
     {
-        const Node node (nodes.getChild(i), false);
+        const Node node (nodes.getChild (i), false);
         if (node.getNodeId() == uid)
         {
             // the model was probably referencing the node ptr
@@ -623,8 +649,9 @@ void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
 {
     jassert (obj && data.hasType (Tags::node));
     Node node (data, false);
-    node.getValueTree().setProperty (Tags::type, obj->getTypeString(), nullptr);
-    node.getValueTree().setProperty (Tags::object, obj.get(), nullptr);
+    node.setProperty (Tags::type, obj->getTypeString())
+        .setProperty (Tags::object, obj.get())
+        .setProperty (Tags::updater, new NodeModelUpdater (data, obj.get()));
 
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);
