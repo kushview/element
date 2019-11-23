@@ -135,7 +135,7 @@ VolumeNodeEditor::VolumeNodeEditor (const Node& node, GuiController& gui)
     addAndMakeVisible (strip.get());
     strip->setComboBoxesVisible (false, false);
 
-    setSize (40, 260);
+    setSize (128, 262);
     
     strip->setNode (node);
     strip->updateParameter();
