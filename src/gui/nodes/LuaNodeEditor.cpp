@@ -48,11 +48,13 @@ static CodeEditorComponent::ColourScheme luaColors()
     return cs;
 }
 
-class LuaNodeParameterPropertyFloat : public PropertyComponent
+class LuaNodeParameterPropertyFloat : public PropertyComponent,
+                                      private ParameterListener
 {
 public:
     LuaNodeParameterPropertyFloat (Parameter::Ptr p)
         : PropertyComponent (p->getName (1024)),
+          ParameterListener (p),
           param (p)
     {
         if (param->getLabel().isNotEmpty())
@@ -63,13 +65,35 @@ public:
         }
 
         addAndMakeVisible (slider);
-        slider.setRange (0.0, 1.0, 0.000001);
+        slider.setRange (0.0, 1.0, 0.0);
         slider.setSkewFactor (1.0, false);
         slider.setSliderStyle (Slider::LinearBar);
 
+        slider.onDragStart = [this]()
+        {
+            dragging = true;
+            param->beginChangeGesture();
+        };
+
+        slider.onDragEnd = [this]()
+        {
+            dragging = false;
+            param->endChangeGesture();
+        };
+
         slider.onValueChange = [this]
         {
-            param->setValueNotifyingHost (static_cast<float> (slider.getValue()));
+            auto newValue = (float) slider.getValue();
+            if (param->getValue() != newValue)
+            {
+                if (! dragging)
+                    param->beginChangeGesture();
+
+                param->setValueNotifyingHost (newValue);
+
+                if (! dragging)
+                    param->endChangeGesture();
+            }
         };
 
         slider.valueFromTextFunction = [this](const String& text) -> double
@@ -100,6 +124,14 @@ public:
 private:
     Slider slider;
     Parameter::Ptr param;
+    bool dragging = false;
+
+    void handleNewParameterValue() override
+    {
+        jassert (MessageManager::getInstance()->isThisTheMessageThread());
+        if (! dragging)
+            slider.setValue (param->getValue(), dontSendNotification);
+    }
 };
 
 LuaNodeEditor::LuaNodeEditor (const Node& node)

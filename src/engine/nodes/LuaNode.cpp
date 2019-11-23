@@ -115,7 +115,6 @@ function node_restore()
    print ("restored data:")
    print (io.read ("*a"));
 end
-
 )";
 
 namespace Element {
@@ -127,7 +126,9 @@ public:
     LuaParameter (LuaNode::Context* c, const PortDescription& port)
         : ControlPortParameter (port),
           ctx (c)
-    { 
+    {
+        const auto sp = getPort();
+        set (sp.defaultValue);
         addListener (this);
     }
 

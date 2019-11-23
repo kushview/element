@@ -33,19 +33,19 @@ static AudioProcessor* getAudioProcessor (const Node& node)
 
 }
 
-class ParameterListener   : private AudioProcessorParameter::Listener,
-                            private AudioProcessorListener,
-                            private Timer
+class GenericParameterListener   : private AudioProcessorParameter::Listener,
+                                   private AudioProcessorListener,
+                                   private Timer
 {
 public:
-    ParameterListener (AudioProcessor& proc, AudioProcessorParameter& param)
+    GenericParameterListener (AudioProcessor& proc, AudioProcessorParameter& param)
         : processor (proc), parameter (param)
     {
         parameter.addListener (this);
         startTimer (100);
     }
 
-    ~ParameterListener() override
+    ~GenericParameterListener() override
     {
         stopTimer();
         parameter.removeListener (this);
@@ -94,15 +94,15 @@ private:
     AudioProcessorParameter& parameter;
     Atomic<int> parameterValueHasChanged { 0 };
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GenericParameterListener)
 };
 
 class BooleanParameterComponent final   : public Component,
-                                          private ParameterListener
+                                          private GenericParameterListener
 {
 public:
     BooleanParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+        : GenericParameterListener (proc, param)
     {
         // Set the initial value.
         handleNewParameterValue();
@@ -151,11 +151,11 @@ private:
 };
 
 class SwitchParameterComponent final   : public Component,
-                                         private ParameterListener
+                                         private GenericParameterListener
 {
 public:
     SwitchParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+        : GenericParameterListener (proc, param)
     {
         auto* leftButton  = buttons.add (new TextButton());
         auto* rightButton = buttons.add (new TextButton());
@@ -256,11 +256,11 @@ private:
 };
 
 class ChoiceParameterComponent final   : public Component,
-                                         private ParameterListener
+                                         private GenericParameterListener
 {
 public:
     ChoiceParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param),
+        : GenericParameterListener (proc, param),
           parameterValues (getParameter().getAllValueStrings())
     {
         box.addItemList (parameterValues, 1);
@@ -318,11 +318,11 @@ private:
 };
 
 class SliderParameterComponent final   : public Component,
-                                         private ParameterListener
+                                         private GenericParameterListener
 {
 public:
     SliderParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+        : GenericParameterListener (proc, param)
     {
         if (getParameter().getNumSteps() != AudioProcessor::getDefaultNumParameterSteps())
             slider.setRange (0.0, 1.0, 1.0 / (getParameter().getNumSteps() - 1.0));

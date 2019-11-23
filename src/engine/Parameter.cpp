@@ -134,10 +134,9 @@ void Parameter::removeListener (Parameter::Listener* listenerToRemove)
 }
 
 ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
-    : port (p),
-      range (p.minValue, p.maxValue),
-      value (p.defaultValue)
-{}
+{
+    setPort (p);
+}
 
 ControlPortParameter::~ControlPortParameter() {}
 

@@ -341,4 +341,58 @@ private:
     float value { 0.0 };
 };
 
+class ParameterListener : private Parameter::Listener,
+                              private Timer
+{
+public:
+    ParameterListener (Parameter::Ptr param)
+        : parameter (param)
+    {
+        jassert (parameter != nullptr);
+        parameter->addListener (this);
+        startTimer (100);
+    }
+
+    ~ParameterListener() override
+    {
+        stopTimer();
+        parameter->removeListener (this);
+        parameter = nullptr;
+    }
+
+    Parameter* getParameter() noexcept { return parameter.get(); }
+
+    virtual void handleNewParameterValue() = 0;
+
+private:
+    //==============================================================================
+  
+    void parameterValueChanged (int, float) override
+    {
+        parameterValueHasChanged = 1;
+    }
+
+    void parameterGestureChanged (int, bool) override {}
+
+    //==============================================================================
+
+    void timerCallback() override
+    {
+        if (parameterValueHasChanged.compareAndSetBool (0, 1))
+        {
+            handleNewParameterValue();
+            startTimerHz (50);
+        }
+        else
+        {
+            startTimer (jmin (250, getTimerInterval() + 10));
+        }
+    }
+
+    Parameter::Ptr parameter;
+    Atomic<int> parameterValueHasChanged { 0 };
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
+};
+
 }
