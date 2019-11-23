@@ -54,11 +54,7 @@ void Parameter::beginChangeGesture()
     isPerformingGesture = true;
    #endif
 
-    ScopedLock lock (listenerLock);
-
-    for (int i = listeners.size(); --i >= 0;)
-        if (auto* l = listeners[i])
-            l->parameterGestureChanged (getParameterIndex(), true);
+    sendGestureChangedMessageToListeners (true);
 }
 
 void Parameter::endChangeGesture()
@@ -74,21 +70,25 @@ void Parameter::endChangeGesture()
     isPerformingGesture = false;
    #endif
 
-    ScopedLock lock (listenerLock);
-
-    for (int i = listeners.size(); --i >= 0;)
-        if (auto* l = listeners[i])
-            l->parameterGestureChanged (getParameterIndex(), false);
+    sendGestureChangedMessageToListeners (false);
 }
 
 void Parameter::sendValueChangedMessageToListeners (float newValue)
 {
     ScopedLock lock (listenerLock);
-
     for (int i = listeners.size(); --i >= 0;)
         if (auto* l = listeners [i])
-            l->parameterValueChanged (getParameterIndex(), newValue);
+            l->controlValueChanged (getParameterIndex(), newValue);
 }
+
+void Parameter::sendGestureChangedMessageToListeners (bool touched)
+{
+    ScopedLock lock (listenerLock);
+    for (int i = listeners.size(); --i >= 0;)
+        if (auto* l = listeners [i])
+            l->controlTouched (getParameterIndex(), touched);
+}
+
 
 bool Parameter::isOrientationInverted() const                      { return false; }
 bool Parameter::isAutomatable() const                              { return true; }
@@ -135,6 +135,7 @@ void Parameter::removeListener (Parameter::Listener* listenerToRemove)
 
 ControlPortParameter::ControlPortParameter (const kv::PortDescription& p)
 {
+    jassert (p.type == kv::PortType::Control);
     setPort (p);
 }
 

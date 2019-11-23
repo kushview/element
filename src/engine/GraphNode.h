@@ -89,7 +89,7 @@ public:
     
     //=========================================================================
 
-    const ParameterArray& getParameters() const    { return params; }
+    const ParameterArray& getParameters() const    { return parameters; }
 
     //=========================================================================
 
@@ -387,7 +387,7 @@ private:
     int latencySamples = 0;
     String name;
 
-    ParameterArray params;
+    ParameterArray parameters;
 
     Atomic<float> gain, lastGain, inputGain, lastInputGain;
     OwnedArray<AtomicValue<float> > inRMS, outRMS;

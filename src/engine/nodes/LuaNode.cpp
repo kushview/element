@@ -145,8 +145,8 @@ public:
         ctx = nullptr;
     }
 
-    void parameterValueChanged (int parameterIndex, float newValue) override;
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override;
+    void controlValueChanged (int parameterIndex, float newValue) override;
+    void controlTouched (int parameterIndex, bool gestureIsStarting) override;
     
 private:
     LuaNode::Context* ctx { nullptr };
@@ -568,13 +568,13 @@ private:
     }
 };
 
-void LuaParameter::parameterValueChanged (int index, float value)
+void LuaParameter::controlValueChanged (int index, float value)
 {
     if (ctx != nullptr) // index may not be set so use port channel.
         ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
 }
 
-void LuaParameter::parameterGestureChanged (int, bool) {}
+void LuaParameter::controlTouched (int, bool) {}
 
 LuaNode::LuaNode() noexcept
     : GraphNode (0)

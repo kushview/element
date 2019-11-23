@@ -42,10 +42,11 @@ public:
 
     static int defaultNumSteps() { return 0x7fffffff; }
 
+    /** Returns the port index of this parameter */
     virtual int getPortIndex() const noexcept = 0;
 
     /** Returns the index of this parameter in its parent nodes's parameter list. */
-    int getParameterIndex() const noexcept              { return parameterIndex; }
+    virtual int getParameterIndex() const noexcept = 0;
 
     /** Called by the host to find out the value of this parameter.
 
@@ -250,7 +251,7 @@ public:
             this event on your message thread, use this callback to trigger an AsyncUpdater
             or ChangeBroadcaster which you can respond to on the message thread.
         */
-        virtual void parameterValueChanged (int parameterIndex, float newValue) = 0;
+        virtual void controlValueChanged (int index, float value) = 0;
 
         /** Indicates that a parameter change gesture has started.
 
@@ -265,7 +266,7 @@ public:
             to trigger an AsyncUpdater or ChangeBroadcaster which you can respond to later on the
             message thread.
         */
-        virtual void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) = 0;
+        virtual void controlTouched (int index, bool grabbed) = 0;
     };
 
     /** Registers a listener to receive events when the parameter's state changes.
@@ -284,6 +285,8 @@ public:
     //==============================================================================
     /** @internal */
     void sendValueChangedMessageToListeners (float newValue);
+    /** @internal */
+    void sendGestureChangedMessageToListeners (bool touched);
 
 private:
     friend class GraphNode;
@@ -310,6 +313,7 @@ public:
     ~ControlPortParameter();
 
     int getPortIndex() const noexcept override      { return port.index; }
+    int getParameterIndex() const noexcept override { return port.channel; }
     Category getCategory() const override           { return Parameter::genericParameter; }
 
     float getValue() const override                 { return range.convertTo0to1 (value); }
@@ -367,12 +371,12 @@ public:
 private:
     //==============================================================================
   
-    void parameterValueChanged (int, float) override
+    void controlValueChanged (int, float) override
     {
         parameterValueHasChanged = 1;
     }
 
-    void parameterGestureChanged (int, bool) override {}
+    void controlTouched (int, bool) override {}
 
     //==============================================================================
 

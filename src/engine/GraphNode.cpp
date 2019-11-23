@@ -51,6 +51,11 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
 
 GraphNode::~GraphNode()
 {
+   #if JUCE_DEBUG
+    for (const auto* param : parameters)
+        { jassert (param->getReferenceCount() == 1); }
+   #endif
+    parameters.clear();
     enablement.cancelPendingUpdate();
     parent = nullptr;
 }
@@ -653,23 +658,22 @@ void GraphNode::resetPorts()
     metadata.addChild (portList, 1, nullptr);
     jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
     
-    params.clear();
+    parameters.clear();
     for (int i = 0; i < ports.size(); ++i)
     {
         const auto port = ports.getPort (i);
         if (port.input && port.type == PortType::Control)
-            params.add (getOrCreateParameter (port));
+            parameters.add (getOrCreateParameter (port));
     }
     
     struct ParamSorter
     {
         int compareElements (Parameter* lhs, Parameter* rhs)
         {
-            return lhs->getParameterIndex() < rhs->getParameterIndex() 
-                ? -1 : 1;
+            return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
         }
     } sorter;
-    params.sort (sorter, true);
+    parameters.sort (sorter, true);
 
     if (auto* sub = dynamic_cast<SubGraphProcessor*> (getAudioProcessor()))
         for (int i = 0; i < sub->getNumNodes(); ++i)
