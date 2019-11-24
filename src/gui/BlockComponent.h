@@ -20,11 +20,11 @@
 #pragma once
 
 #include "session/Node.h"
+#include "gui/Buttons.h"
 
 namespace Element {
 
 class GraphEditorComponent;
-class Node;
 
 //=============================================================================
 
@@ -64,29 +64,85 @@ private:
 
 //=============================================================================
 
-class BlockComponent : public Component
+class BlockComponent : public Component,
+                       public Button::Listener,
+                       private AsyncUpdater,
+                       private Value::Listener
 {
 public:
     BlockComponent() = delete;
-    BlockComponent (GraphEditorComponent& editor, const Node& node);
-    virtual ~BlockComponent();
+    BlockComponent (const Node& graph_, const Node& node_, const bool vertical_);
+    ~BlockComponent() noexcept;
 
-    uint32 getNodeId() const;
+    void setNodePosition (const int x, const int y);
+    void updatePosition();
+    void makeEditorActive();
+    void getPinPos (const int index, const bool isInput, float& x, float& y);
+    void update (const bool doPosition = true);
 
-    void paint (Graphics&) override;
-    void paintOverChildren (Graphics&) override;
-    void resized() override;
-    void mouseDown (const MouseEvent&) override;
-    void mouseDrag (const MouseEvent&) override;
-    void mouseUp (const MouseEvent&) override;
     
+    
+    /** @internal */
+    void buttonClicked (Button* b) override;
+
+    /** @internal */
+    bool hitTest (int x, int y) override;
+    /** @internal */
+    void mouseDown (const MouseEvent& e) override;
+    /** @internal */
+    void mouseDrag (const MouseEvent& e) override;
+    /** @internal */
+    void mouseUp (const MouseEvent& e) override;
+    /** @internal */
+    void paint (Graphics& g) override;
+    /** @internal */
+    void paintOverChildren (Graphics& g) override;
+    /** @internal */
+    void resized() override;
+
 private:
     friend class GraphEditorComponent;
-    friend class ConnectorComponent;
-    friend class Impl; class Impl;
-    std::unique_ptr<Impl> impl;
-    void getPortPos (int, bool, float&, float&);
-    void update (bool doPosition = true);
+
+    const uint32 filterID;
+    Node graph;
+    Node node;
+
+    Value nodeEnabled;
+    Value nodeName;
+
+    int numInputs = 0, numOutputs = 0;
+    int numIns = 0, numOuts = 0;
+
+    double relativeX = 0.5f;
+    double relativeY = 0.5f;
+
+    int pinSize = 9;    
+    Font font;
+    
+    Point<int> originalPos;
+    bool selectionMouseDownResult = false;
+    bool vertical = true;
+    bool dragging = false;
+    bool blockDrag = false;
+    bool collapsed = false;
+
+    SettingButton ioButton;
+    PowerButton powerButton;
+    SettingButton muteButton;
+
+    OptionalScopedPointer<CallOutBox> ioBox;
+
+    DropShadowEffect shadow;
+    ScopedPointer<Component> embedded;
+
+    void deleteAllPins();
+    Rectangle<int> getOpenCloseBox() const;
+    Rectangle<int> getBoxRectangle() const;
+    GraphEditorComponent* getGraphPanel() const noexcept;
+
+    void handleAsyncUpdate() override;
+    void valueChanged (Value& value) override;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlockComponent);
 };
 
 }

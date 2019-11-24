@@ -46,647 +46,6 @@
 
 namespace Element {
 
-static bool elNodeIsAudioMixer (const Node& node)
-{
-    return node.getFormat().toString() == "Element"
-        && node.getIdentifier().toString() == "element.audioMixer";
-}
-
-static bool elNodeIsMidiDevice (const Node& node)
-{
-    return node.getFormat().toString() == "Internal"
-        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
-             node.getIdentifier().toString() == "element.midiOutputDevice" );
-}
-
-static bool elNodeCanChangeIO (const Node& node)
-{
-    return !node.isIONode() 
-        && !node.isGraph()
-        && !elNodeIsAudioMixer (node)
-        && !elNodeIsMidiDevice (node);
-}
-
-class PigWhipSource : public Component {
-public:
-    PigWhipSource ()
-    {
-        int ssize = 10;
-        setSize (ssize, ssize);
-        path.addEllipse (2.0, 2.0, ssize - 2, ssize - 2);
-    }
-
-    ~PigWhipSource() { }
-
-    void paint (Graphics& g) override
-    {
-        g.setColour (LookAndFeel::widgetBackgroundColor);
-        g.fillPath (path);
-    }
-
-    void mouseDown (const MouseEvent& e) override
-    {
-        DBG("down");
-    }
-
-    void mouseDrag (const MouseEvent& e) override
-    {
-        DBG("drag");
-    }
-
-    void mouseUp (const MouseEvent& e) override
-    {
-        DBG("up");
-    }
-
-private:
-    Path path;
-    GraphEditorComponent* getGraphPanel() const {
-        return findParentComponentOfClass<GraphEditorComponent>();
-    }
-};
-
-class FilterComponent    : public Component,
-                           public Button::Listener,
-                           public AsyncUpdater,
-                           public Value::Listener
-{
-public:
-    FilterComponent (const Node& graph_, const Node& node_, const bool vertical_)
-        : filterID (node_.getNodeId()), graph (graph_), node (node_), font (11.0f)
-    {
-        setBufferedToImage (true);
-        nodeEnabled = node.getPropertyAsValue (Tags::enabled);
-        nodeEnabled.addListener (this);
-        nodeName = node.getPropertyAsValue (Tags::name);
-        nodeName.addListener (this);
-
-        shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
-        setComponentEffect (&shadow);
-        
-        addAndMakeVisible (ioButton);
-        ioButton.setPath (getIcons().fasCog);
-        ioButton.addListener (this);
-        ioButton.setVisible (elNodeCanChangeIO (node));
-
-        if (! node.isIONode() && ! node.isRootGraph())
-        {
-            addAndMakeVisible (powerButton);
-            powerButton.setColour (SettingButton::backgroundOnColourId,
-                                   findColour (SettingButton::backgroundColourId));
-            powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
-            powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
-            powerButton.setClickingTogglesState (true);
-            powerButton.addListener (this);
-
-            addAndMakeVisible (muteButton);
-            muteButton.setYesNoText ("M", "M");
-            muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
-            muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
-            muteButton.setClickingTogglesState (true);
-            muteButton.addListener (this);
-        }
-
-        setSize (170, 60);
-    }
-
-    ~FilterComponent() noexcept
-    {
-        nodeEnabled.removeListener (this);
-        nodeName.removeListener (this);
-        deleteAllPins();
-    }
-
-    void valueChanged (Value& value) override
-    {
-        if (nodeEnabled.refersToSameSourceAs (value)) {
-            repaint();
-        } else if (nodeName.refersToSameSourceAs (value)) {
-            setName (node.getName());
-            repaint();
-        }
-    }
-
-    void handleAsyncUpdate() override
-    {
-        repaint();
-    }
-
-    void buttonClicked (Button* b) override 
-    {
-        if (! isEnabled())
-            return;
-
-        GraphNodePtr obj = node.getGraphNode();
-        auto* proc = (obj) ? obj->getAudioProcessor() : 0;
-        if (! proc) return;
-
-        if (b == &ioButton && ioButton.getToggleState())
-        {
-            ioButton.setToggleState (false, dontSendNotification);
-            ioBox.clear();
-        }
-        else if (b == &ioButton && !ioButton.getToggleState())
-        {
-            auto* const component = new NodeAudioBusesComponent (node, proc,
-                    ViewHelpers::findContentComponent (this));
-            auto& box = CallOutBox::launchAsynchronously (
-                component, ioButton.getScreenBounds(), 0);
-            ioBox.setNonOwned (&box);
-        }
-        else if (b == &powerButton)
-        {
-            if (obj->isSuspended() != node.isBypassed())
-                obj->suspendProcessing (node.isBypassed());
-        }
-        else if (b == &muteButton)
-        {
-            node.setMuted (muteButton.getToggleState());
-        }
-    }
-
-    void deleteAllPins()
-    {
-        for (int i = getNumChildComponents(); --i >= 0;)
-            if (auto * c = dynamic_cast<PortComponent*> (getChildComponent(i)))
-                delete c;
-    }
-
-    void mouseDown (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-
-        bool collapsedToggled = false;
-        if (! vertical && getOpenCloseBox().contains (e.x, e.y))
-        {
-            node.setProperty (Tags::collapsed, !collapsed);
-            update (false);
-            getGraphPanel()->updateConnectorComponents();
-            collapsedToggled = true;
-            blockDrag = true;
-        }
-
-        originalPos = localPointToGlobal (Point<int>());
-        toFront (true);
-        dragging = false;
-        auto* const panel = getGraphPanel();
-        
-        selectionMouseDownResult = panel->selectedNodes.addToSelectionOnMouseDown (node.getNodeId(), e.mods);
-        if (auto* cc = ViewHelpers::findContentComponent (this))
-        {
-            ScopedFlag block (panel->ignoreNodeSelected, true);
-            cc->getAppController().findChild<GuiController>()->selectNode (node);
-        }
-
-        if (! collapsedToggled)
-        {
-            if (e.mods.isPopupMenu())
-            {
-                auto* const world = ViewHelpers::getGlobals (this);
-                auto& plugins (world->getPluginManager());
-                NodePopupMenu menu (node);
-                menu.addReplaceSubmenu (plugins);
-                menu.addSeparator();
-                menu.addOptionsSubmenu();
-                
-                if (world)
-                    menu.addPresetsMenu (world->getPresetCollection());
-                
-                const int result = menu.show();
-                if (auto* message = menu.createMessageForResultCode (result))
-                {
-                    ViewHelpers::postMessageFor (this, message);
-                    for (const auto& nodeId : getGraphPanel()->selectedNodes)
-                    {
-                        if (nodeId == node.getNodeId ())
-                            continue;
-                        const Node selectedNode = graph.getNodeById (nodeId);
-                        if (selectedNode.isValid())
-                        {
-                            if (nullptr != dynamic_cast<RemoveNodeMessage*> (message))
-                            {
-                                ViewHelpers::postMessageFor (this, new RemoveNodeMessage (selectedNode));
-                            }
-                        }
-                    }
-                }
-                else if (plugins.getKnownPlugins().getIndexChosenByMenu(result) >= 0)
-                {
-                    const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
-                    if (const auto* desc = plugins.getKnownPlugins().getType (index))
-                        ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
-                }
-            }
-        }
-
-        repaint();
-        getGraphPanel()->updateSelection();
-    }
-
-    void setNodePosition (const int x, const int y)
-    {
-        if (vertical)
-        {
-            node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
-                                      (y + getHeight() / 2) / (double) getParentHeight());
-        }
-        else
-        {
-            node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
-                                      (x + getWidth() / 2) / (double) getParentWidth());
-        }
-    }
-
-    void mouseDrag (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-
-        if (e.mods.isPopupMenu() || blockDrag)
-            return;
-        dragging = true;
-        Point<int> pos (originalPos + Point<int> (e.getDistanceFromDragStartX(), e.getDistanceFromDragStartY()));
-        
-        if (getParentComponent() != nullptr)
-            pos = getParentComponent()->getLocalPoint (nullptr, pos);
-        
-        setNodePosition (pos.getX(), pos.getY());
-        updatePosition();
-    }
-
-    void mouseUp (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-        auto* panel = getGraphPanel();
-        
-        if (panel)
-            panel->selectedNodes.addToSelectionOnMouseUp (node.getNodeId(), e.mods,
-                                                          dragging, selectionMouseDownResult);
-
-        if (e.mouseWasClicked() && e.getNumberOfClicks() == 2)
-            makeEditorActive();
-
-        dragging = selectionMouseDownResult = blockDrag = false;   
-    }
-
-    void updatePosition()
-    {
-        node.getRelativePosition (relativeX, relativeY);
-        vertical ? setCentreRelative (relativeX, relativeY)
-                 : setCentreRelative (relativeY, relativeX);
-        getGraphPanel()->updateConnectorComponents();
-    }
-
-    void makeEditorActive()
-    {
-        if (node.isGraph())
-        {
-            // TODO: this can cause a crash, do it async
-            if (auto* cc = ViewHelpers::findContentComponent (this))
-                cc->setCurrentNode (node);
-        }
-        else if (node.hasProperty (Tags::missing))
-        {
-            String message = "This node is unavailable and running as a Placeholder.\n";
-            message << node.getName() << " (" << node.getFormat().toString() 
-                    << ") could not be found for loading.";
-            AlertWindow::showMessageBoxAsync (AlertWindow::InfoIcon, 
-                node.getName(), message, "Ok");
-        }
-        else if (node.isValid())
-        {
-            ViewHelpers::presentPluginWindow (this, node);
-        }
-    }
-    
-    bool hitTest (int x, int y) override
-    {
-        for (int i = getNumChildComponents(); --i >= 0;)
-            if (getChildComponent(i)->getBounds().contains (x, y))
-                return true;
-
-        return vertical ? x >= 3 && x < getWidth() - 6 && y >= pinSize && y < getHeight() - pinSize
-                        : y >= 3 && y < getHeight() - 6 && x >= pinSize && x < getWidth() - pinSize;
-    }
-
-    Rectangle<int> getOpenCloseBox() const
-    {
-        const auto box (getBoxRectangle());
-        return { box.getX() + 5, box.getY() + 4, 16, 16 };
-    }
-
-    Rectangle<int> getBoxRectangle() const
-    {
-       #if 0
-        // for pins with stems
-        if (vertical)
-        {
-            const int x = 4;
-            const int y = pinSize;
-            const int w = getWidth() - x * 2;
-            const int h = getHeight() - pinSize * 2;
-            
-            return Rectangle<int> (x, y, w, h);
-        }
-
-        const int x = pinSize;
-        const int y = 4;
-        const int w = getWidth() - pinSize * 2;
-        const int h = getHeight() - y * 2;
-        
-        return { x, y, w, h };
-       #else
-        if (vertical)
-        {
-            return Rectangle<int> (
-                0,
-                pinSize / 2,
-                getWidth(),
-                getHeight() - pinSize
-            ).reduced (2, 0);
-        }
-
-        return Rectangle<int> (
-            pinSize / 2,
-            0,
-            getWidth() - pinSize,
-            getHeight()
-        ).reduced (0, 2);
-       #endif
-    }
-    
-    void paintOverChildren (Graphics& g) override
-    {
-        ignoreUnused (g);
-    }
-
-    void paint (Graphics& g) override
-    {
-        const float cornerSize = 2.4f;
-        const auto box (getBoxRectangle());
-
-        g.setColour (isEnabled() && node.isEnabled()
-            ? LookAndFeel::widgetBackgroundColor.brighter (0.8) 
-            : LookAndFeel::widgetBackgroundColor.brighter (0.2));
-        g.fillRoundedRectangle (box.toFloat(), cornerSize);
-
-        if (! vertical)
-        {
-            getLookAndFeel().drawTreeviewPlusMinusBox (
-                g, getOpenCloseBox().toFloat(),
-                LookAndFeel::widgetBackgroundColor.brighter (0.7), 
-                ! collapsed, false); 
-        }
-
-        if (node.getValueTree().hasProperty (Tags::missing))
-        {
-            g.setColour (Colour (0xff333333));
-            g.setFont (9.f);
-            auto pr = box; pr.removeFromTop (6);
-            g.drawFittedText ("(placeholder)", pr, Justification::centred, 2);
-        }
-
-        g.setColour (Colours::black);
-        g.setFont (font);
-        
-        auto displayName = node.getDisplayName();
-        auto subName = node.hasModifiedName() ? node.getPluginName() : String();
-        
-        if (node.getParentGraph().isRootGraph())
-        {
-            if (node.isAudioIONode())
-            {
-                // FIXME: uniform way to refresh node names
-                //        see https://github.com/kushview/Element/issues/109
-                subName = String();
-            }
-            else if (node.isMidiInputNode())
-            {
-                auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
-                if (midi.getNumActiveMidiInputs() <= 0)
-                    subName = "(no device)";
-            }
-        }
-
-        if (vertical)
-        {
-            g.drawFittedText (displayName, box.getX() + 9, box.getY() + 2, box.getWidth(),
-                                         18, Justification::centredLeft, 2);
-
-            if (subName.isNotEmpty())
-            {
-                g.setFont (Font (8.f));
-                g.drawFittedText (subName, box.getX() + 9, box.getY() + 10, box.getWidth(),
-                                  18, Justification::centredLeft, 2);
-            }
-        }
-        else
-        {
-            g.drawFittedText (displayName, box.getX() + 20, box.getY() + 2, box.getWidth(),
-                                           18, Justification::centredLeft, 2);
-            if (subName.isNotEmpty())
-            {
-                g.setFont (Font (8.f));
-                g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(),
-                                  18, Justification::centredLeft, 2);
-            }
-        }
-        
-        bool selected = getGraphPanel()->selectedNodes.isSelected (node.getNodeId());
-        g.setColour (selected ? Colors::toggleBlue : Colours::grey);
-        g.drawRoundedRectangle (box.toFloat(), cornerSize, 1.4);
-    }
-
-    void resized() override
-    {
-        const auto box (getBoxRectangle());
-        auto r = box.reduced(4, 2).removeFromBottom (14);
-        ioButton.setBounds (r.removeFromRight (16)); 
-        r.removeFromLeft (3);
-        muteButton.setBounds (r.removeFromRight (16));       
-        r.removeFromLeft (2);
-        powerButton.setBounds (r.removeFromRight (16));
-
-        const int halfPinSize = pinSize / 2;
-        if (vertical)
-        {
-            Rectangle<int> pri (box.getX() + 9, 0, getWidth(), pinSize);
-            Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
-            for (int i = 0; i < getNumChildComponents(); ++i)
-            {
-                if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
-                {
-                    pc->setBounds (pc->isInput() ? pri.removeFromLeft (pinSize) 
-                                                 : pro.removeFromLeft (pinSize));
-                    pc->isInput() ? pri.removeFromLeft (pinSize * 1.25)
-                                  : pro.removeFromLeft (pinSize * 1.25);                  
-                }
-            }
-        }
-        else
-        {
-            Rectangle<int> pri (box.getX() - halfPinSize, 
-                                box.getY() + 9, 
-                                pinSize, 
-                                box.getHeight());
-            Rectangle<int> pro (box.getWidth(),
-                                box.getY() + 9, 
-                                pinSize, 
-                                box.getHeight());
-            float scale = collapsed ? 0.25f : 1.125f;
-            int spacing = jmax (2, int (pinSize * scale));
-            for (int i = 0; i < getNumChildComponents(); ++i)
-            {
-                if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
-                {
-                    pc->setBounds (pc->isInput() ? pri.removeFromTop (pinSize) 
-                                                 : pro.removeFromTop (pinSize));
-                    pc->isInput() ? pri.removeFromTop (spacing)
-                                  : pro.removeFromTop (spacing);
-                }
-            }
-        }
-    }
-
-    void getPinPos (const int index, const bool isInput, float& x, float& y)
-    {
-        for (int i = 0; i < getNumChildComponents(); ++i)
-        {
-            if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
-            {
-                if (pc->getPortIndex() == index && isInput == pc->isInput())
-                {
-                    x = getX() + pc->getX() + pc->getWidth() * 0.5f;
-                    y = getY() + pc->getY() + pc->getHeight() * 0.5f;
-                    break;
-                }
-            }
-        }
-    }
-
-    void update (const bool doPosition = true)
-    {
-        vertical = getGraphPanel()->isLayoutVertical();
-    
-        if (! node.getValueTree().getParent().hasType (Tags::nodes))
-        {
-            delete this;
-            return;
-        }
-        collapsed = (bool) node.getProperty (Tags::collapsed, false);
-        numIns = numOuts = 0;
-        const auto numPorts = node.getPortsValueTree().getNumChildren();
-        for (int i = 0; i < numPorts; ++i)
-        {
-            const Port port (node.getPort (i));
-            if (PortType::Control == port.getType())
-                continue;
-            
-            if (port.isInput())
-                ++numIns;
-            else
-                ++numOuts;
-        }
-
-        int w = 120;
-        int h = 46;
-
-        const int maxPorts = jmax (numIns, numOuts) + 1;
-        
-        if (vertical)
-        {
-            w = jmax (w, int(maxPorts * pinSize) + int(maxPorts * pinSize * 1.25f));
-        }
-        else
-        {
-            float scale = collapsed ? 0.25f : 1.125f;
-            int endcap = collapsed ? 9 : -5;
-            h = jmax (h, int(maxPorts * pinSize) + int(maxPorts * jmax(int(pinSize * scale), 2)) + endcap);
-        }
-        
-        int textWidth = font.getStringWidth (node.getDisplayName());
-        textWidth += (vertical) ? 20 : 36;
-        setSize (jmax (w, textWidth), h);
-        setName (node.getDisplayName());
-
-        if (doPosition)
-        {
-            updatePosition();
-        }
-        else if (nullptr != getParentComponent())
-        {
-            // position is relative and parent might be resizing
-            const auto b = getBoundsInParent();
-            setNodePosition (b.getX(), b.getY());
-        }
-
-        if (numIns != numInputs || numOuts != numOutputs)
-        {
-            numInputs  = numIns;
-            numOutputs = numOuts;
-
-            deleteAllPins();
-
-            for (uint32 i = 0; i < (uint32) numPorts; ++i)
-            {
-                const Port port (node.getPort (i));
-                const PortType t (port.getType());
-                if (t == PortType::Control)
-                    continue;
-                
-                const bool isInput (port.isInput());
-                addAndMakeVisible (new PortComponent (graph, node, filterID, i, isInput, t, vertical));
-            }
-
-            resized();
-        }
-    }
-    
-    const uint32 filterID;
-
-private:
-    Node graph;
-    Node node;
-
-    Value nodeEnabled;
-    Value nodeName;
-
-    int numInputs = 0, numOutputs = 0;
-    int numIns = 0, numOuts = 0;
-
-    double relativeX = 0.5f;
-    double relativeY = 0.5f;
-
-    int pinSize = 9;    
-    Font font;
-    
-    Point<int> originalPos;
-    bool selectionMouseDownResult = false;
-    bool vertical = true;
-    bool dragging = false;
-    bool blockDrag = false;
-    bool collapsed = false;
-
-    SettingButton ioButton;
-    PowerButton powerButton;
-    SettingButton muteButton;
-
-    OptionalScopedPointer<CallOutBox> ioBox;
-    PigWhipSource pigWhip;
-
-    DropShadowEffect shadow;
-    ScopedPointer<Component> embedded;
-
-    GraphEditorComponent* getGraphPanel() const noexcept
-    {
-        return findParentComponentOfClass<GraphEditorComponent>();
-    }
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(FilterComponent);
-};
-
 class ConnectorComponent   : public Component,
                              public SettableTooltipClient
 {
@@ -774,10 +133,10 @@ public:
 
         if (GraphEditorComponent* const hostPanel = getGraphPanel())
         {
-            if (FilterComponent* srcFilterComp = hostPanel->getComponentForFilter (sourceFilterID))
+            if (BlockComponent* srcFilterComp = hostPanel->getComponentForFilter (sourceFilterID))
                 srcFilterComp->getPinPos (sourceFilterChannel, false, x1, y1);
 
-            if (FilterComponent* dstFilterComp = hostPanel->getComponentForFilter (destFilterID))
+            if (BlockComponent* dstFilterComp = hostPanel->getComponentForFilter (destFilterID))
                 dstFilterComp->getPinPos (destFilterChannel, true, x2, y2);
         }
     }
@@ -1125,7 +484,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
 
                     if (numChanges > 0)
                     {
-                        updateFilterComponents (true);
+                        updateBlockComponents (true);
                         updateConnectorComponents();
                     }
 
@@ -1134,7 +493,7 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                 
                 case 100:
                 {
-                    updateFilterComponents (true);
+                    updateBlockComponents (true);
                     updateConnectorComponents();
                     return;
                 } break;
@@ -1168,11 +527,11 @@ void GraphEditorComponent::createNewPlugin (const PluginDescription* desc, int x
     DBG("[EL] GraphEditorComponent::createNewPlugin(...)");
 }
 
-FilterComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
+BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 filterID) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        if (BlockComponent* const fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
             if (fc->filterID == filterID)
                 return fc;
     }
@@ -1199,7 +558,7 @@ PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (FilterComponent* fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        if (BlockComponent* fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
         {
             if (PortComponent* pin = dynamic_cast <PortComponent*> (fc->getComponentAt (x - fc->getX(),
                                                                                       y - fc->getY())))
@@ -1212,7 +571,7 @@ PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 
 void GraphEditorComponent::resized()
 {
-    updateFilterComponents (! areResizePositionsFrozen());
+    updateBlockComponents (! areResizePositionsFrozen());
     updateConnectorComponents();
 }
 
@@ -1248,17 +607,17 @@ void GraphEditorComponent::updateConnectorComponents()
     }
 }
 
-void GraphEditorComponent::updateFilterComponents (const bool doPosition)
+void GraphEditorComponent::updateBlockComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             { fc->update (doPosition); }
 }
 
 void GraphEditorComponent::stabilizeNodes()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (auto* const fc = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
             { fc->update (false); fc->repaint(); }
 }
 
@@ -1284,15 +643,15 @@ void GraphEditorComponent::updateComponents()
     for (int i = graph.getNumNodes(); --i >= 0;)
     {
         const Node node (graph.getNode (i));
-        FilterComponent* comp = getComponentForFilter (node.getNodeId());
+        BlockComponent* comp = getComponentForFilter (node.getNodeId());
         if (comp == nullptr)
         {
-            comp = new FilterComponent (graph, node, verticalLayout);
+            comp = new BlockComponent (graph, node, verticalLayout);
             addAndMakeVisible (comp, i + 10000);
         }
     }
 
-    updateFilterComponents (true);
+    updateBlockComponents (true);
     updateConnectorComponents();
 }
 
@@ -1543,7 +902,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
     {
         child.setProperty ("relativeX", verticalLayout ? lastDropX : lastDropY, 0);
         child.setProperty ("relativeY", verticalLayout ? lastDropY : lastDropX, 0);
-        auto* comp = new FilterComponent (graph, Node (child, false), verticalLayout);
+        auto* comp = new BlockComponent (graph, Node (child, false), verticalLayout);
         addAndMakeVisible (comp, 20000);
         comp->update();
     }
@@ -1556,7 +915,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
     {
         const Node node (parent, false);
         for (int i = 0; i < getNumChildComponents(); ++i)
-            if (auto* const filter = dynamic_cast<FilterComponent*> (getChildComponent (i)))
+            if (auto* const filter = dynamic_cast<BlockComponent*> (getChildComponent (i)))
                 filter->update();
         updateConnectorComponents();
     }
@@ -1603,7 +962,7 @@ void GraphEditorComponent::updateSelection()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (FilterComponent* const fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
+        if (BlockComponent* const fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
         { 
             fc->repaint(); 
             MessageManager::getInstance()->runDispatchLoopUntil (20);

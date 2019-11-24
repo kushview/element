@@ -25,9 +25,8 @@
 
 namespace Element {
 
+class BlockComponent;
 class ConnectorComponent;
-class FilterComponent;
-class PinComponent;
 class PortComponent;
 class PluginWindow;
 
@@ -86,8 +85,6 @@ protected:
     
 private:
     friend class ConnectorComponent;
-    friend class FilterComponent;
-    friend class PinComponent;
     friend class BlockComponent;
     friend class PortComponent;
 
@@ -112,7 +109,7 @@ private:
     AudioProcessorEditor* createEditorForNode (GraphNodePtr node, bool useGenericEditor);
     PluginWindow* getOrCreateWindowForNode (GraphNodePtr f, bool useGeneric);
     
-    void updateFilterComponents (const bool doPosition = true);
+    void updateBlockComponents (const bool doPosition = true);
     void updateConnectorComponents();
     
     void beginConnectorDrag (const uint32 sourceFilterID, const int sourceFilterChannel,
@@ -121,7 +118,7 @@ private:
     void dragConnector (const MouseEvent& e);
     void endDraggingConnector (const MouseEvent& e);
     
-    FilterComponent* getComponentForFilter (const uint32 filterID) const;
+    BlockComponent* getComponentForFilter (const uint32 filterID) const;
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
     PortComponent* findPinAt (const int x, const int y) const;
     
