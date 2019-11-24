@@ -118,7 +118,9 @@
                 file="../../../src/engine/nodes/ChannelizeProcessor.h"/>
           <FILE id="TvLmXw" name="CombFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
-          <FILE id="jC5ULK" name="EQFilterProcessor.h" compile="0" resource="0"
+          <FILE id="gV0OVJ" name="CompressorProcessor.h" compile="0" resource="0"
+                file="../../../src/engine/nodes/CompressorProcessor.h"/>
+          <FILE id="HIvxgk" name="EQFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.h"/>
           <FILE id="jLPub2" name="FreqSplitterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/FreqSplitterProcessor.h"/>
