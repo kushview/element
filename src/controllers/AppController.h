@@ -92,7 +92,7 @@ public:
     };
     
     RecentlyOpenedFilesList& getRecentlyOpenedFilesList() { return recentFiles; }
-
+    
     void checkForegroundStatus();
     
 protected:

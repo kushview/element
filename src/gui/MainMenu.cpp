@@ -243,7 +243,13 @@ void MainMenu::addRecentFiles (PopupMenu& menu)
         PopupMenu recents;
         auto& app (cc->getAppController());
         auto& list (app.getRecentlyOpenedFilesList());
-        list.createPopupMenuItems (recents, recentMenuOffset, false, true);
+        if (list.getNumFiles() > 0)
+        {
+            list.createPopupMenuItems (recents, recentMenuOffset, false, true);
+            recents.addSeparator();
+        }
+        
+        recents.addCommandItem (&cmd, Commands::recentsClear, "Clear Recent Files");
         menu.addSubMenu ("Open Recent", recents);
         menu.addSeparator();
     }

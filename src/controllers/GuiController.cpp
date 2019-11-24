@@ -449,6 +449,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
 void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo& result)
 {
     typedef ApplicationCommandInfo Info;
+    auto& app = getAppController();
+
     switch (commandID)
     {
         case Commands::exportAudio:
@@ -728,6 +730,12 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
             break;
         case Commands::transportStop:
             result.setInfo ("Stop", "Transport Stop", "Engine", 0);
+            break;
+
+        case Commands::recentsClear:
+            result.setInfo ("Clear Recent Files", "Clears the recently opened files list",
+                            Commands::Categories::Application, 0);
+            result.setActive (app.getRecentlyOpenedFilesList().getNumFiles() > 0);
             break;
     }
 }

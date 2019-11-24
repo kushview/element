@@ -111,6 +111,8 @@ enum AppCommands
     workspaceClassic       = 0x0900,
     workspaceEditing,
    #endif
+
+    recentsClear           = 0x1000
 };
 
 inline static Array<CommandID> getAllCommands()
@@ -189,6 +191,8 @@ inline static Array<CommandID> getAllCommands()
         workspaceClassic,
         workspaceEditing,
     #endif
+
+        recentsClear,
     }));
 }
 
@@ -224,6 +228,7 @@ inline static String toString (CommandID command)
         case Commands::graphSaveAs:             return "graphSaveAs"; break;
        #if EL_DOCKING
        #endif
+        case Commands::recentsClear:            return "recentsClear"; break;
         default: break;
     }
 
@@ -264,6 +269,7 @@ inline static CommandID fromString (const String& str)
 
    #if EL_DOCKING
    #endif
+    if (str == "recentsClear")          return Commands::recentsClear;
     return Commands::invalid;
 }
 

@@ -389,8 +389,10 @@ void AppController::getAllCommands (Array<CommandID>& cids)
         Commands::graphOpen,
         Commands::graphSave,
         Commands::graphSaveAs,
-        Commands::importSession
+        Commands::importSession,
        #endif
+        
+        Commands::recentsClear,
     });
     cids.addArray({ Commands::copy, Commands::paste, Commands::undo, Commands::redo });
 }
@@ -550,7 +552,14 @@ bool AppController::perform (const InvocationInfo& info)
             {
                 findChild<GraphController>()->openGraph (chooser.getResult());
                 recentFiles.addFile (chooser.getResult());
+                findChild<GuiController>()->refreshMainMenu();
             }
+        } break;
+
+        case Commands::recentsClear:
+        {
+            recentFiles.clear();
+            findChild<GuiController>()->refreshMainMenu();
         } break;
 
         default: 
