@@ -32,8 +32,23 @@ Element can be controlled by OSC.
 | `/element/command/graphSave` | Save the current graph |
 | `/element/command/graphSaveAs` | Save the current graph as |
 
-#### OSC Sender Node
-TODO...
+#### OSC Receiver/Sender Node
 
-#### OSC Receiver Node
-TODO...
+| Command  | Values | Description   |
+|----------|--------|---------------|
+| `/midi/noteOn` | `int` channel, `int` note number, `float` velocity | Note on |
+| `/midi/noteOff` | `int` channel, `int` note number, `float` velocity | Note off |
+| `/midi/programChange` | `int` channel, `int` program number | Program change |
+| `/midi/pitchBend` | `int` channel, `int` position | Pitch bend |
+| `/midi/afterTouch` | `int` channel, `int` note number, `int` aftertouch amount | Aftertouch |
+| `/midi/channelPressure` | `int` channel, `int` pressure | Channel pressure |
+| `/midi/controlChange` | `int` channel, `int` controller type, `int`  value | Control change |
+| `/midi/allNotesOff` | `int` channel | All notes off |
+| `/midi/allSoundOff` | `int` channel | All sound off |
+| `/midi/allControllersOff` | `int` channel | All controllers off |
+| `/midi/start` | &nbsp; | Transport start |
+| `/midi/continue` | &nbsp; | Transport continue |
+| `/midi/stop` | &nbsp; | Transport stop |
+| `/midi/clock` | &nbsp; | MIDI clock |
+| `/midi/songPositionPointer` | `int` position in MIDI beats | Song position pointer |
+| `/midi/activeSense` | &nbsp; | Active sense |
