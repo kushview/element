@@ -22,6 +22,7 @@
 #include "controllers/GraphManager.h"
 
 #include "gui/GuiCommon.h"
+#include "gui/BlockComponent.h"
 #include "gui/ContentComponent.h"
 #include "gui/ContextMenus.h"
 #include "gui/Icons.h"
@@ -103,155 +104,6 @@ private:
     GraphEditorComponent* getGraphPanel() const {
         return findParentComponentOfClass<GraphEditorComponent>();
     }
-};
-
-class PinComponent   : public Component,
-                       public SettableTooltipClient
-{
-public:
-    PinComponent (const Node& graph_, const Node& node_,
-                  const uint32 filterID_,
-                  const uint32 index_, const bool isInput_,
-                  const PortType type_, const bool verticle_)
-        : filterID (filterID_),
-          port (index_),
-          type (type_),
-          isInput (isInput_),
-          graph (graph_), node (node_),
-          verticle (verticle_)
-    {
-        if (const GraphNodePtr obj = node.getGraphNode())
-        {
-            const Port p (node.getPort ((int) port));
-            String tip = p.getName();
-            
-            if (tip.isEmpty())
-            {
-                if (node.isAudioInputNode())
-                {
-                    tip = "Input " + String (index_ + 1);
-                }
-                else if (node.isAudioOutputNode())
-                {
-                    tip = "Output " + String (index_ + 1);
-                }
-                else
-                {
-                    tip = (isInput ? "Input " : "Output ") + String (index_ + 1);
-                }
-            }
-
-            setTooltip (tip);
-        }
-
-        setSize (16, 16);
-    }
-
-    void paint (Graphics& g) override
-    {    
-        g.setColour (getColor());
-
-       #if 0
-        // stick with circle
-        const float w = (float) getWidth();
-        const float h = (float) getHeight();
-        Path p;
-        if (verticle)
-        {
-            p.addEllipse (w * 0.25f, h * 0.25f, w * 0.5f, h * 0.5f);
-            p.addRectangle (w * 0.4f,
-                            isInput ? (0.5f * h) : 0.0f,
-                            w * 0.2f,
-                            h * 0.5f);
-        }
-        else
-        {
-            p.addEllipse (w * 0.25f, h * 0.25f, w * 0.5f, h * 0.5f);
-            p.addRectangle (isInput ? (0.5f * w) : 0.0f,
-                            h * 0.4f,
-                            w * 0.5f,
-                            h * 0.2f);
-
-        }
-        g.fillPath (p);
-       #endif
-
-       #if 0
-        // half circles
-        Path p;
-        if (isInput)
-        {
-            p.addPieSegment (getLocalBounds().toFloat(),
-                            -juce::float_Pi * 0.5, juce::float_Pi * 0.5f,
-                            0);
-        }
-        else
-        {
-            p.addPieSegment (getLocalBounds().toFloat(),
-                            juce::float_Pi * 0.5f, juce::float_Pi * 1.5f,
-                            0);
-        }
-        
-        g.fillPath (p);
-       #else
-        // full circle
-        g.fillEllipse (getLocalBounds().toFloat());
-        g.setColour (Colours::black);
-        g.drawEllipse (getLocalBounds().toFloat(), 0.5f);
-       #endif
-    }
-
-    Colour getColor() const
-    {
-        switch (this->type)
-        {
-            case PortType::Audio:   return Colours::lightgreen; break;
-            case PortType::Control: return Colours::lightblue;  break;
-            default: break;
-        }
-        
-        return Colours::orange;
-    }
-
-    void mouseDown (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-        getGraphPanel()->beginConnectorDrag (isInput ? 0 : filterID,
-                                             port,
-                                             isInput ? filterID : 0,
-                                             port,
-                                             e);
-    }
-
-    void mouseDrag (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-        getGraphPanel()->dragConnector (e);
-    }
-
-    void mouseUp (const MouseEvent& e) override
-    {
-        if (! isEnabled())
-            return;
-        getGraphPanel()->endDraggingConnector (e);
-    }
-
-    const uint32    filterID;
-    const uint32    port;
-    const PortType  type;
-    const bool      isInput;
-
-private:
-    Node graph, node;
-    bool verticle;
-    GraphEditorComponent* getGraphPanel() const noexcept
-    {
-        return findParentComponentOfClass<GraphEditorComponent>();
-    }
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PinComponent)
 };
 
 class FilterComponent    : public Component,
@@ -356,7 +208,7 @@ public:
     void deleteAllPins()
     {
         for (int i = getNumChildComponents(); --i >= 0;)
-            if (auto * c = dynamic_cast<PinComponent*> (getChildComponent(i)))
+            if (auto * c = dynamic_cast<PortComponent*> (getChildComponent(i)))
                 delete c;
     }
 
@@ -664,12 +516,12 @@ public:
             Rectangle<int> pro (box.getX() + 9, getHeight() - pinSize, getWidth(), pinSize);
             for (int i = 0; i < getNumChildComponents(); ++i)
             {
-                if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+                if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
                 {
-                    pc->setBounds (pc->isInput ? pri.removeFromLeft (pinSize) 
-                                               : pro.removeFromLeft (pinSize));
-                    pc->isInput ? pri.removeFromLeft (pinSize * 1.25)
-                                : pro.removeFromLeft (pinSize * 1.25);                  
+                    pc->setBounds (pc->isInput() ? pri.removeFromLeft (pinSize) 
+                                                 : pro.removeFromLeft (pinSize));
+                    pc->isInput() ? pri.removeFromLeft (pinSize * 1.25)
+                                  : pro.removeFromLeft (pinSize * 1.25);                  
                 }
             }
         }
@@ -687,12 +539,12 @@ public:
             int spacing = jmax (2, int (pinSize * scale));
             for (int i = 0; i < getNumChildComponents(); ++i)
             {
-                if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+                if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
                 {
-                    pc->setBounds (pc->isInput ? pri.removeFromTop (pinSize) 
-                                               : pro.removeFromTop (pinSize));
-                    pc->isInput ? pri.removeFromTop (spacing)
-                                : pro.removeFromTop (spacing);
+                    pc->setBounds (pc->isInput() ? pri.removeFromTop (pinSize) 
+                                                 : pro.removeFromTop (pinSize));
+                    pc->isInput() ? pri.removeFromTop (spacing)
+                                  : pro.removeFromTop (spacing);
                 }
             }
         }
@@ -702,9 +554,9 @@ public:
     {
         for (int i = 0; i < getNumChildComponents(); ++i)
         {
-            if (PinComponent* const pc = dynamic_cast <PinComponent*> (getChildComponent(i)))
+            if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
             {
-                if (pc->port == index && isInput == pc->isInput)
+                if (pc->getPortIndex() == index && isInput == pc->isInput())
                 {
                     x = getX() + pc->getX() + pc->getWidth() * 0.5f;
                     y = getY() + pc->getY() + pc->getHeight() * 0.5f;
@@ -785,7 +637,7 @@ public:
                     continue;
                 
                 const bool isInput (port.isInput());
-                addAndMakeVisible (new PinComponent (graph, node, filterID, i, isInput, t, vertical));
+                addAndMakeVisible (new PortComponent (graph, node, filterID, i, isInput, t, vertical));
             }
 
             resized();
@@ -1343,13 +1195,13 @@ ConnectorComponent* GraphEditorComponent::getComponentForConnection (const Arc& 
     return nullptr;
 }
 
-PinComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
+PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (FilterComponent* fc = dynamic_cast <FilterComponent*> (getChildComponent (i)))
         {
-            if (PinComponent* pin = dynamic_cast <PinComponent*> (fc->getComponentAt (x - fc->getX(),
+            if (PortComponent* pin = dynamic_cast <PortComponent*> (fc->getComponentAt (x - fc->getX(),
                                                                                       y - fc->getY())))
                 return pin;
         }
@@ -1473,22 +1325,22 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
         int x = e2.x;
         int y = e2.y;
 
-        if (PinComponent* const pin = findPinAt (x, y))
+        if (PortComponent* const pin = findPinAt (x, y))
         {
             uint32 srcFilter = draggingConnector->sourceFilterID;
             int srcChannel   = draggingConnector->sourceFilterChannel;
             uint32 dstFilter = draggingConnector->destFilterID;
             int dstChannel   = draggingConnector->destFilterChannel;
 
-            if (srcFilter == 0 && ! pin->isInput)
+            if (srcFilter == 0 && ! pin->isInput())
             {
-                srcFilter = pin->filterID;
-                srcChannel = pin->port;
+                srcFilter = pin->getNodeId();
+                srcChannel = pin->getPortIndex();
             }
-            else if (dstFilter == 0 && pin->isInput)
+            else if (dstFilter == 0 && pin->isInput())
             {
-                dstFilter = pin->filterID;
-                dstChannel = pin->port;
+                dstFilter = pin->getNodeId();
+                dstChannel = pin->getPortIndex();
             }
             
             if (graph.canConnect (srcFilter, srcChannel, dstFilter, dstChannel))
@@ -1551,23 +1403,23 @@ void GraphEditorComponent::endDraggingConnector (const MouseEvent& e)
 
     draggingConnector = nullptr;
 
-    if (PinComponent* const pin = findPinAt (e2.x, e2.y))
+    if (PortComponent* const pin = findPinAt (e2.x, e2.y))
     {
         if (srcFilter == 0)
         {
-            if (pin->isInput)
+            if (pin->isInput())
                 return;
 
-            srcFilter  = pin->filterID;
-            srcChannel = pin->port;
+            srcFilter  = pin->getNodeId();
+            srcChannel = pin->getPortIndex();
         }
         else
         {
-            if (! pin->isInput)
+            if (! pin->isInput())
                 return;
 
-            dstFilter   = pin->filterID;
-            dstChannel  = pin->port;
+            dstFilter   = pin->getNodeId();
+            dstChannel  = pin->getPortIndex();
         }
         
         connectPorts (graph, srcFilter, (uint32)srcChannel,

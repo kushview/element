@@ -28,6 +28,7 @@ namespace Element {
 class ConnectorComponent;
 class FilterComponent;
 class PinComponent;
+class PortComponent;
 class PluginWindow;
 
 /** A panel that displays and edits a GraphProcessor. */
@@ -87,7 +88,9 @@ private:
     friend class ConnectorComponent;
     friend class FilterComponent;
     friend class PinComponent;
-    
+    friend class BlockComponent;
+    friend class PortComponent;
+
     Node graph;
     ValueTree data;
     bool resizePositionsFrozen = false;
@@ -120,7 +123,7 @@ private:
     
     FilterComponent* getComponentForFilter (const uint32 filterID) const;
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
-    PinComponent* findPinAt (const int x, const int y) const;
+    PortComponent* findPinAt (const int x, const int y) const;
     
     void updateSelection();
     
