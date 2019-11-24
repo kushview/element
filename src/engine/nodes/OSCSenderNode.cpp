@@ -106,7 +106,11 @@ void OSCSenderNode::run ()
         {
             OSCMessage oscMsg = Util::processMidiToOscMessage (msg);
             oscSender.send ( oscMsg );
-            oscMessagesToLog.push_back ( oscMsg );
+
+            if (! msg.isMidiClock())
+            {
+                oscMessagesToLog.push_back ( oscMsg );
+            }
         }
 
         while (oscMessagesToLog.size() > maxOscMessages)
