@@ -160,10 +160,10 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
     setComponentEffect (&shadow);
     
-    addAndMakeVisible (ioButton);
-    ioButton.setPath (getIcons().fasCog);
-    ioButton.addListener (this);
-    ioButton.setVisible (elNodeCanChangeIO (node));
+    addAndMakeVisible (configButton);
+    configButton.setPath (getIcons().fasCog);
+    configButton.addListener (this);
+    configButton.setVisible (elNodeCanChangeIO (node));
 
     if (! node.isIONode() && ! node.isRootGraph())
     {
@@ -193,6 +193,10 @@ BlockComponent::~BlockComponent() noexcept
     deleteAllPins();
 }
 
+void BlockComponent::setPowerButtonVisible (bool visible)   { setButtonVisible (powerButton, visible); }
+void BlockComponent::setConfigButtonVisible (bool visible)  { setButtonVisible (configButton, visible); }
+void BlockComponent::setMuteButtonVisible (bool visible)    { setButtonVisible (muteButton, visible); }
+
 void BlockComponent::valueChanged (Value& value)
 {
     if (nodeEnabled.refersToSameSourceAs (value)) {
@@ -217,17 +221,17 @@ void BlockComponent::buttonClicked (Button* b)
     auto* proc = (obj) ? obj->getAudioProcessor() : 0;
     if (! proc) return;
 
-    if (b == &ioButton && ioButton.getToggleState())
+    if (b == &configButton && configButton.getToggleState())
     {
-        ioButton.setToggleState (false, dontSendNotification);
+        configButton.setToggleState (false, dontSendNotification);
         ioBox.clear();
     }
-    else if (b == &ioButton && !ioButton.getToggleState())
+    else if (b == &configButton && !configButton.getToggleState())
     {
         auto* const component = new NodeAudioBusesComponent (node, proc,
                 ViewHelpers::findContentComponent (this));
         auto& box = CallOutBox::launchAsynchronously (
-            component, ioButton.getScreenBounds(), 0);
+            component, configButton.getScreenBounds(), 0);
         ioBox.setNonOwned (&box);
     }
     else if (b == &powerButton)
@@ -371,7 +375,7 @@ void BlockComponent::updatePosition()
 {
     node.getRelativePosition (relativeX, relativeY);
     vertical ? setCentreRelative (relativeX, relativeY)
-                : setCentreRelative (relativeY, relativeX);
+             : setCentreRelative (relativeY, relativeX);
     getGraphPanel()->updateConnectorComponents();
 }
 
@@ -539,7 +543,7 @@ void BlockComponent::resized()
 {
     const auto box (getBoxRectangle());
     auto r = box.reduced(4, 2).removeFromBottom (14);
-    ioButton.setBounds (r.removeFromRight (16)); 
+    configButton.setBounds (r.removeFromRight (16)); 
     r.removeFromLeft (3);
     muteButton.setBounds (r.removeFromRight (16));       
     r.removeFromLeft (2);
@@ -590,7 +594,7 @@ void BlockComponent::getPortPos (const int index, const bool isInput, float& x, 
 {
     for (int i = 0; i < getNumChildComponents(); ++i)
     {
-        if (PortComponent* const pc = dynamic_cast <PortComponent*> (getChildComponent(i)))
+        if (auto* const pc = dynamic_cast <PortComponent*> (getChildComponent (i)))
         {
             if (pc->getPortIndex() == index && isInput == pc->isInput())
             {
@@ -611,9 +615,10 @@ void BlockComponent::update (const bool doPosition)
         delete this;
         return;
     }
+
     collapsed = (bool) node.getProperty (Tags::collapsed, false);
     numIns = numOuts = 0;
-    const auto numPorts = node.getPortsValueTree().getNumChildren();
+    const auto numPorts = node.getNumPorts();
     for (int i = 0; i < numPorts; ++i)
     {
         const Port port (node.getPort (i));
@@ -678,6 +683,14 @@ void BlockComponent::update (const bool doPosition)
 
         resized();
     }
+}
+
+void BlockComponent::setButtonVisible (Button& b, bool v)
+{
+    if (b.isVisible() == v)
+        return;
+    b.setVisible (v);
+    resized();
 }
 
 GraphEditorComponent* BlockComponent::getGraphPanel() const noexcept

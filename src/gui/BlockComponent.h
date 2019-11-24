@@ -24,6 +24,7 @@
 
 namespace Element {
 
+class AppController;
 class GraphEditorComponent;
 
 //=============================================================================
@@ -39,10 +40,17 @@ public:
                    const bool vertical);
     virtual ~PortComponent();
 
+    /** Returns true if this is for an input port */
     bool isInput() const noexcept;
+
+    /** Returns the node ID of this port */
     uint32 getNodeId() const noexcept;
+
+    /** Returns this port's index */
     uint32 getPortIndex() const noexcept;
-    Colour getColor() const noexcept;
+
+    /** Returns the color this port is painted */
+    virtual Colour getColor() const noexcept;
 
     void paint (Graphics& g) override;
     void mouseDown (const MouseEvent& e) override;
@@ -74,6 +82,33 @@ public:
     BlockComponent (const Node& graph_, const Node& node_, const bool vertical_);
     ~BlockComponent() noexcept;
 
+    //=========================================================================
+
+    /** Change the power button's visibility */
+    void setPowerButtonVisible (bool);
+    
+    /** Returns the power button */
+    SettingButton& getPowerButton()         { return powerButton; }
+
+    //=========================================================================
+
+    /** Change the config button's visibility */
+    void setConfigButtonVisible (bool);
+
+    /** Returns the config button */
+    SettingButton& getConfigButton()        { return configButton; }
+
+    //=========================================================================
+
+    /** Change the mute button's visibility */ 
+    void setMuteButtonVisible (bool);
+
+    /** Returns the config button */
+    SettingButton& getMuteButton()          { return muteButton; }
+
+    //=========================================================================
+
+    /** Gets the coordinate of the port index */
     void getPortPos (const int index, const bool isInput, float& x, float& y);
 
     /** @internal */
@@ -119,7 +154,7 @@ private:
     bool blockDrag = false;
     bool collapsed = false;
 
-    SettingButton ioButton;
+    SettingButton configButton;
     PowerButton powerButton;
     SettingButton muteButton;
 
@@ -132,7 +167,7 @@ private:
     Rectangle<int> getOpenCloseBox() const;
     Rectangle<int> getBoxRectangle() const;
     GraphEditorComponent* getGraphPanel() const noexcept;
-
+    void setButtonVisible (Button&, bool);
     void setNodePosition (const int x, const int y);
     void updatePosition();
     void makeEditorActive();
@@ -140,6 +175,18 @@ private:
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlockComponent);
+};
+
+//=============================================================================
+
+class BlockFactory
+{
+public:
+    virtual ~BlockFactory() = default;
+    virtual BlockComponent* createBlockComponent (AppController& app, const Node& node) = 0;
+
+protected:
+    BlockFactory() = default;
 };
 
 }

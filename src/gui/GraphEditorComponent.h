@@ -26,6 +26,7 @@
 namespace Element {
 
 class BlockComponent;
+class BlockFactory;
 class ConnectorComponent;
 class PortComponent;
 class PluginWindow;
@@ -95,12 +96,12 @@ private:
     float lastDropX = 0.5f;
     float lastDropY = 0.5f;
 
-    ScopedPointer<ConnectorComponent> draggingConnector;
-    
+    std::unique_ptr<ConnectorComponent> draggingConnector;
+    std::unique_ptr<BlockFactory> factory;
+
     bool verticalLayout = true;
     
     SelectedItemSet<uint32> selectedNodes;
-
     bool ignoreNodeSelected = false;
 
     void selectNode (const Node& node, ModifierKeys mods);
@@ -118,6 +119,8 @@ private:
     void dragConnector (const MouseEvent& e);
     void endDraggingConnector (const MouseEvent& e);
     
+    BlockComponent* createBlock (const Node&);
+
     BlockComponent* getComponentForFilter (const uint32 filterID) const;
     ConnectorComponent* getComponentForConnection (const Arc& conn) const;
     PortComponent* findPinAt (const int x, const int y) const;

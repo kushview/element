@@ -46,6 +46,25 @@
 
 namespace Element {
 
+class DefaultBlockFactory : public BlockFactory
+{
+public:
+    DefaultBlockFactory (GraphEditorComponent& e)
+        : editor (e) { }
+
+    BlockComponent* createBlockComponent (AppController& app, const Node& node) override
+    {
+        ignoreUnused (app);
+        auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
+        return block;
+    }
+
+private:
+    GraphEditorComponent& editor;
+};
+
+//=============================================================================
+
 class ConnectorComponent   : public Component,
                              public SettableTooltipClient
 {
@@ -291,9 +310,12 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ConnectorComponent)
 };
 
+//=============================================================================
+
 GraphEditorComponent::GraphEditorComponent()
     : ViewHelperMixin (this)
 {
+    factory.reset (new DefaultBlockFactory (*this));
     setOpaque (true);
     data.addListener (this);
 }
@@ -306,6 +328,8 @@ GraphEditorComponent::~GraphEditorComponent()
     draggingConnector = nullptr;
     resizePositionsFrozen = false;
     deleteAllChildren();
+
+    factory.reset();
 }
 
 void GraphEditorComponent::setNode (const Node& n)
@@ -321,11 +345,11 @@ void GraphEditorComponent::setNode (const Node& n)
     resizePositionsFrozen = (bool) graph.getProperty (Tags::staticPos, false);
 
     if (draggingConnector)
-        removeChildComponent (draggingConnector);
+        removeChildComponent (draggingConnector.get());
     deleteAllChildren();
     updateComponents();
     if (draggingConnector)
-        addAndMakeVisible (draggingConnector);
+        addAndMakeVisible (draggingConnector.get());
     
     data.addListener (this);
 }
@@ -593,7 +617,7 @@ void GraphEditorComponent::updateConnectorComponents()
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         ConnectorComponent* const cc = dynamic_cast <ConnectorComponent*> (getChildComponent (i));
-        if (cc != nullptr && cc != draggingConnector)
+        if (cc != nullptr && cc != draggingConnector.get())
         {
             if (! Node::connectionExists (arcs, cc->sourceFilterID, (uint32) cc->sourceFilterChannel, 
                                                 cc->destFilterID, (uint32) cc->destFilterChannel,
@@ -648,7 +672,8 @@ void GraphEditorComponent::updateComponents()
         BlockComponent* comp = getComponentForFilter (node.getNodeId());
         if (comp == nullptr)
         {
-            comp = new BlockComponent (graph, node, verticalLayout);
+            comp = createBlock (node);
+            jassert (comp != nullptr);
             addAndMakeVisible (comp, i + 10000);
         }
     }
@@ -661,15 +686,15 @@ void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const in
                                                const uint32 destNode, const int destFilterChannel,
                                                const MouseEvent& e)
 {
-    draggingConnector = dynamic_cast <ConnectorComponent*> (e.originalComponent);
+    draggingConnector.reset (dynamic_cast <ConnectorComponent*> (e.originalComponent));
     if (draggingConnector == nullptr)
-        draggingConnector = new ConnectorComponent (graph);
+        draggingConnector.reset (new ConnectorComponent (graph));
 
     draggingConnector->setGraph (this->graph);
     draggingConnector->setInput (sourceNode, sourceFilterChannel);
     draggingConnector->setOutput (destNode, destFilterChannel);
     draggingConnector->setAlwaysOnTop (true);
-    addAndMakeVisible (draggingConnector);
+    addAndMakeVisible (draggingConnector.get());
     draggingConnector->toFront (false);
 
     dragConnector (e);
@@ -904,7 +929,7 @@ void GraphEditorComponent::valueTreeChildAdded (ValueTree& parent, ValueTree& ch
     {
         child.setProperty ("relativeX", verticalLayout ? lastDropX : lastDropY, 0);
         child.setProperty ("relativeY", verticalLayout ? lastDropY : lastDropX, 0);
-        auto* comp = new BlockComponent (graph, Node (child, false), verticalLayout);
+        auto* comp = createBlock (Node (child, false));
         addAndMakeVisible (comp, 20000);
         comp->update();
     }
@@ -964,12 +989,20 @@ void GraphEditorComponent::updateSelection()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (BlockComponent* const fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+        if (auto* const block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
         { 
-            fc->repaint(); 
+            block->repaint();
             MessageManager::getInstance()->runDispatchLoopUntil (20);
         }
     }
+}
+
+BlockComponent* GraphEditorComponent::createBlock (const Node& node)
+{
+    if (auto* cc = ViewHelpers::findContentComponent (this))
+        return factory->createBlockComponent (cc->getAppController(), node);
+    jassertfalse;
+    return nullptr;
 }
 
 }
