@@ -43,14 +43,14 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
                            const MidiMessage& message, const Node& _node, 
                            const int _parameter)
         : control (ctl),
-          model (_node), node (_node.getGraphNode()),
-          processor (node != nullptr ? node->getAudioProcessor() : nullptr),
+          model (_node), 
+          node (_node.getGraphNode()),
           parameterIndex (_parameter),
           parameter (nullptr),
           noteNumber (message.getNoteNumber())
     {
         jassert (message.isNoteOn());
-        jassert (node && processor);
+        jassert (node);
 
         channelObject = control.getPropertyAsValue (Tags::midiChannel);
         channelObject.addListener (this);
@@ -64,9 +64,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         inverseObject.addListener (this);
         valueChanged (inverseObject);
 
-        if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
+        if (isPositiveAndBelow (parameterIndex, node->getParameters().size()))
         {
-            parameter = processor->getParameters()[parameterIndex];
+            parameter = node->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
     }
@@ -176,9 +176,10 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 private:
     ControllerDevice::Control control;
     Node model;
-    GraphNodePtr node;
-    AudioProcessor* processor;
-    
+    GraphNodePtr node { nullptr };
+    Parameter::Ptr parameter { nullptr };
+    int parameterIndex = -1;
+
     Value channelObject;
     Atomic<int> channel { 0 };
 
@@ -188,8 +189,6 @@ private:
     Value inverseObject;
     Atomic<int> inverse { 0 };
 
-    int parameterIndex = -1;
-    AudioProcessorParameter* parameter;
     const int noteNumber;
 
     SpinLock eventLock;
@@ -221,13 +220,12 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                 const Node& _node,
                                 const int _parameter)
         : control (ctl), model (_node), node (_node.getGraphNode()),
-          processor (node != nullptr ? node->getAudioProcessor() : nullptr),
           parameter (nullptr),
           controllerNumber (message.getControllerNumber()),
           parameterIndex (_parameter)
     {
         jassert (message.isController());
-        jassert (node && processor);
+        jassert (node != nullptr);
 
         toggleValueObject = control.getToggleValueObject();
         toggleValueObject.addListener (this);
@@ -245,12 +243,12 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
         channelObject.addListener (this);
         valueChanged (channelObject);
 
-        if (isPositiveAndBelow (parameterIndex, processor->getParameters().size()))
+        if (isPositiveAndBelow (parameterIndex, node->getParameters().size()))
         {
-            parameter = processor->getParameters()[parameterIndex];
+            parameter = node->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
-        else if (parameterIndex == -2)
+        else if (parameterIndex == GraphNode::EnabledParameter)
         {
             lastControllerValue = model.isEnabled() ? 127 : 0;
         }
@@ -373,12 +371,11 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 private:
     ControllerDevice::Control control;
     Node model;
-    GraphNodePtr node;
-    AudioProcessor* processor;
-    AudioProcessorParameter* parameter;
+    GraphNodePtr node { nullptr };
+    Parameter::Ptr parameter { nullptr };
     
-    const int controllerNumber;
-    const int parameterIndex;
+    const int controllerNumber { -1 };
+    const int parameterIndex { -1 };
     int lastControllerValue = 0;
 
     Value toggleValueObject;
@@ -631,8 +628,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
     if (! control.isValid() || ! node.isValid())
         return false;
     auto* const object = node.getGraphNode();
-    auto* const proc   = object == nullptr ? nullptr : object->getAudioProcessor();
-    if (nullptr == object || nullptr == proc)
+    if (nullptr == object)
         return false;
     if (object->containsParameter (parameter))
     {
