@@ -126,7 +126,8 @@ public:
     /** Removes properties that can't be saved to a file. e.g. object properties */
     static void sanitizeProperties (ValueTree node, const bool recursive = false)
     {
-        node.removeProperty (Tags::object, nullptr);
+        node.removeProperty (Tags::updater, nullptr);
+        node.removeProperty (Tags::object,  nullptr);
         
         if (node.hasType (Tags::node))
         {

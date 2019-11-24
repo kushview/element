@@ -27,7 +27,8 @@
 
 namespace Element {
 
-class MidiMonitorNode   : public MidiFilterNode
+class MidiMonitorNode   : public MidiFilterNode,
+                          private Timer
 {
 public:
     MidiMonitorNode();
@@ -51,7 +52,7 @@ public:
     void clear() {};
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
-    void releaseResources() override {};
+    void releaseResources() override;
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
 
@@ -59,15 +60,22 @@ public:
     void getState (MemoryBlock& block) override {};
 
     void clearMessages();
-    void getMessages(MidiBuffer &destBuffer);
+    
+    const StringArray& getLog() const { return midiLog; }
 
 private:
     friend class MidiMonitorNodeEditor;
-    bool inputMessagesInitDone = false;
+     Signal<void()> messagesLogged;
     double currentSampleRate = 44100.0;
-    Atomic<int> numSamples = 0;
+    int numSamples = 0;
     MidiMessageCollector inputMessages;
     bool createdPorts = false;
+    CriticalSection lock;
+    
+    MidiBuffer  midiTemp;
+    StringArray midiLog;
+    int maxLoggedMessages { 100 };
+    float refreshRateHz { 60.0 };
 
     inline void createPorts() override
     {
@@ -79,6 +87,9 @@ private:
         ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
         createdPorts = true;
     }
+
+    void getMessages (MidiBuffer &destBuffer);
+    void timerCallback() override;
 };
 
 }

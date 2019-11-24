@@ -34,82 +34,66 @@ enum LearnState
     CaptureControl
 };
 
-class AudioProcessorParameterCapture : public AudioProcessorListener,
-                                       public AsyncUpdater
+class AudioProcessorParameterCapture : public AsyncUpdater
 {
 public:
-    AudioProcessorParameterCapture() { capture.set (false); }
+    AudioProcessorParameterCapture()
+    { 
+        capture.set (false);
+    }
+
     ~AudioProcessorParameterCapture() noexcept
     {
         clear();
     }
 
-    void audioProcessorParameterChanged (AudioProcessor* processorThatChanged,
-                                         int parameterIndex,
-                                         float newValue) override
-    {
-        if (capture.get() == false)
-            return;
-        capture.set (false);
-        ScopedLock sl (lock);
-        processor = processorThatChanged;
-        parameter = parameterIndex;
-        triggerAsyncUpdate();
-    }
-
     void handleAsyncUpdate() override 
     {
         AudioProcessor* capturedProcessor = nullptr;
+        GraphNodePtr capturedObject = nullptr;
+        Node capturedNode = Node();
         int capturedParameter = GraphNode::NoParameter;
 
         {
             ScopedLock sl (lock);
+            capturedNode      = node;
+            capturedObject    = object;
             capturedProcessor = processor;
             capturedParameter = parameter;
-            processor = nullptr;
-            parameter = GraphNode::NoParameter;
+
+            node        = Node();
+            object      = nullptr;
+            processor   = nullptr;
+            parameter   = GraphNode::NoParameter;
         }
 
-        const auto captured (nodeMap2 [capturedProcessor]);
-        if (auto* node = captured.getGraphNode())
+        if (capturedObject != nullptr && capturedObject.get() == capturedNode.getGraphNode())
         {
-            if (auto* proc = node->getAudioProcessor())
+            if (capturedParameter == GraphNode::EnabledParameter ||
+                capturedParameter == GraphNode::BypassParameter ||
+                capturedParameter == GraphNode::MuteParameter ||
+                isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
-                if (proc == capturedProcessor && 
-                        (capturedParameter == GraphNode::EnabledParameter || 
-                         capturedParameter == GraphNode::BypassParameter ||
-                         capturedParameter == GraphNode::MuteParameter ||
-                         isPositiveAndBelow (capturedParameter, proc->getParameters().size())))
-                {
-                    callback (captured, capturedParameter);
-                }
+                callback (capturedNode, capturedParameter);
             }
         }
 
         clear();
     }
 
-    void audioProcessorChanged (AudioProcessor*) override { }
-
     void clear()
     {
         capture.set (false);
-
-        for (auto& c : nodeConnections)
-            c.disconnect();
-        nodeConnections.clear();
-
-        for (const auto& item : nodeMap2)
-            if (auto* node = item.getGraphNode())
-                if (auto* proc = node->getAudioProcessor())
-                    proc->removeListener (this);
-
-        nodeMap2.clear();
+        for (auto* mappable : mappables)
+            mappable->clear();
+        mappables.clearQuick (true);
     }
 
     void addNodes (SessionPtr session)
     {
         clear();
+
+        capture.set (false);
 
         for (int i = 0; i < session->getNumGraphs(); ++i)
         {
@@ -123,72 +107,122 @@ public:
     CriticalSection lock;
     Signal<void(const Node&, int)> callback;
     Atomic<bool> capture        = false;
+    Node node;
+    GraphNodePtr object         = nullptr;
     AudioProcessor* processor   = nullptr;
     int parameter               = -1;
-    HashMap<AudioProcessor*, Node> nodeMap2;
 
 private:
-    Array<SignalConnection> nodeConnections;
-
-    void onEnablementChanged (GraphNode* ptr)
+    class Mappable : public Parameter::Listener
     {
-        if (capture.get() == false)
-            return;
-        capture.set (false);
-        ScopedLock sl (lock);
-        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
-        parameter = GraphNode::EnabledParameter;
-        triggerAsyncUpdate();
-    }
+    public:
+        Mappable (AudioProcessorParameterCapture& c, const Node& n)
+            : capture (c), node (n), object (n.getGraphNode())
+        {
+            connect();
+        }
 
-    void onBypassChanged (GraphNode* ptr)
-    {
-        GraphNodePtr ref = ptr;
-        if (capture.get() == false)
-            return;
-        capture.set (false);
-        ScopedLock sl (lock);
-        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
-        parameter = GraphNode::BypassParameter;
-        triggerAsyncUpdate();
-    }
+        ~Mappable() noexcept
+        {
+            clear();
+        }
 
-    void onMuteChanged (GraphNode* ptr)
-    {
-        GraphNodePtr ref = ptr;
-        if (capture.get() == false)
-            return;
-        capture.set (false);
-        ScopedLock sl (lock);
-        processor = ptr != nullptr ? ptr->getAudioProcessor() : nullptr;
-        parameter = GraphNode::MuteParameter;
-        triggerAsyncUpdate();
-    }
+        void clear()
+        {
+            for (auto* const param : object->getParameters())
+                param->removeListener (this);
+            for (auto& c : connections)
+                c.disconnect();
+        }
+
+        void connect()
+        {
+            if (connections.size() > 0)
+                clear();
+            
+            connections.add (object->enablementChanged.connect (std::bind (
+                &Mappable::onEnablementChanged, this, std::placeholders::_1)));
+            connections.add (object->bypassChanged.connect (std::bind (
+                &Mappable::onBypassChanged, this, std::placeholders::_1)));
+            connections.add (object->muteChanged.connect (std::bind (
+                &Mappable::onMuteChanged, this, std::placeholders::_1)));
+                
+            for (auto* const param : object->getParameters())
+                param->addListener (this);
+        }
+
+        void controlValueChanged (int index, float) override 
+        {
+            if (capture.capture.get() == false)
+                return;
+            ScopedLock sl (capture.lock);
+            capture.capture.set (false);
+            capture.node      = node;
+            capture.object    = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = index;
+            capture.triggerAsyncUpdate();
+        }
+
+        void controlTouched (int, bool) override {}
+
+        void onEnablementChanged (GraphNode*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node      = node;
+            capture.object    = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = GraphNode::EnabledParameter;
+            capture.triggerAsyncUpdate();
+        }
+
+        void onBypassChanged (GraphNode*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node      = node;
+            capture.object    = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = GraphNode::BypassParameter;
+            capture.triggerAsyncUpdate();
+        }
+
+        void onMuteChanged (GraphNode*)
+        {
+            if (capture.capture.get() == false)
+                return;
+            capture.capture.set (false);
+            ScopedLock sl (capture.lock);
+            capture.node      = node;
+            capture.object    = object;
+            capture.processor = object->getAudioProcessor();
+            capture.parameter = GraphNode::MuteParameter;
+            capture.triggerAsyncUpdate();
+        }
+
+    private:
+        AudioProcessorParameterCapture& capture;
+        Node node;
+        GraphNodePtr object;
+        Array<SignalConnection> connections;
+    };
+
+    OwnedArray<Mappable> mappables;
 
     void addNodesRecursive (const Node& node)
     {
         for (int j = 0; j < node.getNumNodes(); ++j)
         {
-            const auto n (node.getNode (j));
-            if (GraphNodePtr object = n.getGraphNode())
-            {
-                if (auto* proc = object->getAudioProcessor())
-                {
-                    nodeMap2.set (proc, n);
-                    nodeConnections.add (object->enablementChanged.connect (std::bind (
-                        &AudioProcessorParameterCapture::onEnablementChanged, this, 
-                        std::placeholders::_1)));
-                    nodeConnections.add (object->bypassChanged.connect (std::bind (
-                        &AudioProcessorParameterCapture::onBypassChanged, this, 
-                        std::placeholders::_1)));
-                    nodeConnections.add (object->muteChanged.connect (std::bind (
-                        &AudioProcessorParameterCapture::onMuteChanged, this, 
-                        std::placeholders::_1)));
-                    proc->addListener (this);
-                }
-            }
-            if (n.getNumChildren() > 0)
-                addNodesRecursive (n);
+            const auto child (node.getNode (j));
+            if (GraphNode* const object = child.getGraphNode())
+                mappables.add (new Mappable (*this, child));
+            if (child.getNumChildren() > 0)
+                addNodesRecursive (child);
         }
     }
 };
@@ -205,12 +239,11 @@ public:
     bool isCaptureComplete() const
     {
         GraphNodePtr object = node.getGraphNode();
-        AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-        return object && proc && 
+        return object != nullptr && 
             (parameter == GraphNode::EnabledParameter || 
              parameter == GraphNode::BypassParameter || 
              parameter == GraphNode::MuteParameter ||
-             isPositiveAndBelow (parameter, proc->getParameters().size())) &&
+             isPositiveAndBelow (parameter, object->getParameters().size())) &&
             (message.isController() || message.isNoteOn()) && 
             control.getValueTree().isValid();
     }
@@ -250,7 +283,7 @@ void MappingController::activate()
    #endif
 }
 
-void MappingController::deactivate() 
+void MappingController::deactivate()
 {
     Controller::deactivate();
    #ifndef EL_FREE

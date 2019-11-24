@@ -57,7 +57,6 @@ public:
         ignoreUnused (path);
         
         updateSettingsIfNeeded();
-        setupAnalytics();
 
         DeviceManager& devices (world.getDeviceManager());
         auto* props = settings.getUserSettings();
@@ -194,33 +193,8 @@ private:
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();
         plugins.searchUnverifiedPlugins();
-
-        DBG("[EL] supported plugin formats:");
-        auto& audioPlugs = plugins.getAudioPluginFormats ();
-        for (int i = 0; i < audioPlugs.getNumFormats(); ++i) {
-            auto name = audioPlugs.getFormat (i)->getName();
-            if (name == "Internal" || name == "Element")
-                continue;
-            DBG("[EL]   " << name);
-        }
-    }
-    
-    void setupAnalytics()
-    {
-       #if 0
-        auto* analytics (Analytics::getInstance());
-        StringPairArray userData;
-        userData.set ("group", "beta");
-        analytics->setUserId ("annonymous");
-        analytics->setUserProperties (userData);
-        analytics->addDestination (new GoogleAnalyticsDestination());
-        analytics->logEvent ("startup", {});
-       #endif
     }
 };
-
-// uncomment to clear license on load
-// #define EL_CLEAR_LICENSE    1
 
 class Application : public JUCEApplication,
                     public ActionListener

@@ -7,7 +7,7 @@ sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
 APPNAME='element'
-VERSION='0.41.1'
+VERSION='0.42.0rc1'
 
 VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
@@ -30,12 +30,15 @@ def options (opt):
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
-    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
-    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
-    conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
-    conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
     conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
+    
+    if 'clang' in conf.env.CXX[0]:
+        conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
+        conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-register'])
+        conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
+        conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
+
 
 def configure_product (conf):
     conf.define ('EL_PRO', 1)
@@ -153,7 +156,7 @@ def compile (bld):
 
     if juce.is_linux():
         build_desktop(bld)
-        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
 
     elif juce.is_mac():
         library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 

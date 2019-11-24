@@ -43,7 +43,7 @@ static StringArray getDevelopers()
 {
     const auto str = String(BinaryData::developers_txt, BinaryData::developers_txtSize);
     StringArray devs;
-    devs.addTokens(str, newLine, {});
+    devs.addTokens(str, "\n", {});
     return devs;
 }
 }
@@ -155,6 +155,30 @@ private:
 
 //=============================================================================
 
+class AckTextComponent : public Component
+{
+public:
+    AckTextComponent()
+    {
+        addAndMakeVisible (text);
+        text.setCaretVisible (false);
+        text.setMultiLine (true, false);
+        text.setFont (Font (Font::getDefaultMonospacedFontName(), 13.f, Font::plain));
+        text.setText (String (BinaryData::acknowledgements_txt, BinaryData::acknowledgements_txtSize));
+        text.setReadOnly (true);
+    }
+
+    void resized() override
+    {
+        text.setBounds (getLocalBounds());
+    }
+
+private:
+    TextEditor text;
+};
+
+//=============================================================================
+
 AboutComponent::AboutComponent()
 {
     elementLogo = Drawable::createFromImageData (
@@ -201,6 +225,7 @@ AboutComponent::AboutComponent()
 
     tabs.addTab ("Donors",  tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
+    tabs.addTab ("Credits", tabc, new AckTextComponent(), true);
     setSize (510, 330);
 }
 

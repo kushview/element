@@ -28,43 +28,45 @@ MidiMonitorNode::MidiMonitorNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_MONITOR, nullptr);
+    midiTemp.ensureSize (3 * 32);
 }
 
 MidiMonitorNode::~MidiMonitorNode()
 {
+    stopTimer();
     clearMessages();
 }
 
-void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize) {
-    if (inputMessagesInitDone) {
-        return;
-    }
+void MidiMonitorNode::prepareToRender (double sampleRate, int maxBufferSize)
+{
     inputMessages.reset (sampleRate);
     currentSampleRate = sampleRate;
-    inputMessagesInitDone = true;
+    numSamples = 0;
+    startTimerHz (refreshRateHz);
 };
+
+void MidiMonitorNode::releaseResources()
+{
+    stopTimer();
+}
 
 void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     auto timestamp = Time::getMillisecondCounterHiRes();
     const auto nframes = audio.getNumSamples();
 
-    if (nframes == 0) {
+    if (nframes == 0)
         return;
-    }
 
     auto* const midiIn = midi.getWriteBuffer (0);
-    MidiBuffer::Iterator iter1 (*midiIn);
+    MidiBuffer::Iterator iter (*midiIn);
     MidiMessage msg;
     int frame;
 
-    while (iter1.getNextEvent (msg, frame))
+    ScopedLock sl (lock);
+    while (iter.getNextEvent (msg, frame))
     {
-        // TODO: better timestamp sync with UI
-        //       updating timestamp below causes messages to be skipped in the
-        //       UI rendering
-        // timestamp += 1000.0 * static_cast<double> (frame) * currentSampleRate;
-        msg.setTimeStamp (timestamp);
+        msg.setTimeStamp (timestamp + (1000.0 * (static_cast<double> (frame) / currentSampleRate)));
         inputMessages.addMessageToQueue (msg);
     }
 
@@ -73,14 +75,50 @@ void MidiMonitorNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
 void MidiMonitorNode::getMessages (MidiBuffer& destBuffer)
 {
-    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples.get());
+    ScopedLock sl (lock);
+    if (numSamples <= 0)
+        return;
+    inputMessages.removeNextBlockOfMessages (destBuffer, numSamples);
     numSamples = 0;
 }
 
 void MidiMonitorNode::clearMessages()
 {
+    midiLog.clearQuick();
+    messagesLogged();
+    ScopedLock sl (lock);
     inputMessages.reset (currentSampleRate);
     numSamples = 0;
+}
+
+void MidiMonitorNode::timerCallback()
+{
+    midiTemp.clear();
+    getMessages (midiTemp);
+    if (midiTemp.getNumEvents() <= 0)
+        return;
+
+    MidiBuffer::Iterator iter (midiTemp);
+    MidiMessage msg; int frame = 0;
+
+    String text;
+    while (iter.getNextEvent (msg, frame))
+    {
+        if (msg.isMidiStart())
+            text << "Start";
+        else if (msg.isMidiStop())
+            text << "Stop";
+        else if (msg.isMidiContinue())
+            text << "Continue";
+        
+        midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
+        text.clear();
+    }
+
+    if (midiLog.size() > maxLoggedMessages)
+        midiLog.removeRange (0, midiLog.size() - maxLoggedMessages);
+    
+    messagesLogged();
 }
 
 };

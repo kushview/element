@@ -34,7 +34,7 @@ private:
     
 public:
     explicit VolumeProcessor (const double minDb, const double maxDb,
-                                const bool _stereo = false)
+                              const bool _stereo = false)
         : BaseProcessor(),
             stereo (_stereo)
     {

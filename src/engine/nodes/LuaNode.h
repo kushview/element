@@ -24,23 +24,24 @@
 
 namespace Element {
 
-struct LuaMidiBuffer;
-struct LuaMidiPipe;
-
 class LuaNode : public GraphNode,
                 public ChangeBroadcaster
 {
 public:
+    using Ptr = ReferenceCountedObjectPtr<LuaNode>;
+
     explicit LuaNode() noexcept;
     virtual ~LuaNode();
     
+    struct Context;
+
     void fillInPluginDescription (PluginDescription& desc);
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
-
+    
     Result loadScript (const String&);
 
     const String& getScript() const { return script; }
@@ -48,9 +49,17 @@ public:
     void setDraftScript (const String& draft) { draftScript = draft; }
     bool hasChanges() const { return script.hashCode64() != draftScript.hashCode64(); }
 
+    /** Set a parameter value by index
+     
+        @param index    The parameter index to set
+        @param value    The value to set
+    */
+    void setParameter (int index, float value);
+
 protected:
     inline bool wantsMidiPipe() const override { return true; }
     void createPorts() override;
+    Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:
     String script, draftScript;
@@ -58,8 +67,8 @@ private:
     double sampleRate = 44100.0;
     bool prepared = false;
     CriticalSection lock;
-    struct Context;
     std::unique_ptr<Context> context;
+    ParameterArray inParams, outParams;
 };
 
 }

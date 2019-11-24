@@ -2,23 +2,24 @@
     "version": 4,
     "configurations": [
         {
-            "name": "Mojave",
+            "name": "OSX",
             "includePath": [
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/11.0.0/include",
                 "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                "${workspaceRoot}/libs/kv/modules",
+                "/opt/kushview/include",
+                "/usr/local/include",
+                "/usr/local/Cellar/jack/0.125.0_3/include",
                 "${workspaceRoot}/libs/JUCE/modules",
+                "${workspaceRoot}/libs/kv/modules",
                 "${workspaceRoot}/libs/jlv2/modules",
                 "${workspaceRoot}/libs/compat",
                 "${workspaceRoot}/libs/lua",
                 "${workspaceRoot}/libs/lua/src",
                 "${workspaceRoot}/src",
-                "${workspaceRoot}/tests",
-                "/usr/local/include",
-                "/usr/local/Cellar/jack/0.125.0_3/include"
+                "${workspaceRoot}/tests"
             ],
             "defines": [
                 "JUCE_PLUGINHOST_VST=1",
@@ -64,128 +65,22 @@
             "cppStandard": "c++17"
         },
         {
-            "name": "OSX Sierra",
-            "includePath": [
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.1.0/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                "/opt/kushview/include",
-                "${workspaceRoot}/libs/SQLiteCpp/sqlite3",
-                "${workspaceRoot}/libs/SQLiteCpp/include",
-                "${workspaceRoot}/libs/kv/modules",
-                "${workspaceRoot}/libs/lv2",
-                "${workspaceRoot}/libs/JUCE/modules",
-                "${workspaceRoot}/libs/pybind11/include",
-                "${workspaceRoot}/project/JuceLibraryCode",
-                "${workspaceRoot}/src"
-            ],
-            "defines": [
-                "JUCE_PLUGINHOST_VST=1",
-                "VSCODE=1",
-                "EL_DOCKING=1",
-                "KV_DOCKING_WINDOWS=1",
-                "HAVE_PYTHON=1",
-                "EL_USE_LOCAL_AUTH=1",
-                "EL_PRO=1",
-                "JLV2_PLUGINHOST_LV2=1"
-            ],
-            "forcedInclude": [
-                "${workspaceRoot}/.vscode/vscode.h"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "browse": {
-                "path": [
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/8.1.0/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                    "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                    "/opt/kushview/include",
-                    "${workspaceRoot}/libs/SQLiteCpp/sqlite3",
-                    "${workspaceRoot}/libs/SQLiteCpp/include",
-                    "${workspaceRoot}/libs/kv/modules",
-                    "${workspaceRoot}/libs/lv2",
-                    "${workspaceRoot}/libs/JUCE/modules",
-                    "${workspaceRoot}/libs/pybind11/include",
-                    "${workspaceRoot}/project/JuceLibraryCode",
-                    "${workspaceRoot}/src"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            },
-            "macFrameworkPath": [
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
-            "compilerPath": "/usr/bin/clang",
-            "cStandard": "c11",
-            "cppStandard": "c++14"
-        },
-        {
-            "name": "Mac",
-            "includePath": [
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include",
-                "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                "/opt/kushview/include",
-                "${workspaceRoot}/libs/SQLiteCpp/sqlite3",
-                "${workspaceRoot}/libs/SQLiteCpp/include",
-                "${workspaceRoot}/libs/kv/modules",
-                "${workspaceRoot}/libs/lv2",
-                "${workspaceRoot}/libs/JUCE/modules",
-                "${workspaceRoot}/libs/pybind11/include",
-                "${workspaceRoot}/project/JuceLibraryCode",
-                "${workspaceRoot}/src"
-            ],
-            "defines": [
-                "JUCE_PLUGINHOST_VST=1",
-                "VSCODE=1",
-                "EL_DOCKING=1",
-                "KV_DOCKING_WINDOWS=1",
-                "HAVE_PYTHON=1",
-                "EL_USE_LOCAL_AUTH=1",
-                "EL_SOLO=1"
-            ],
-            "forcedInclude": [
-                "${workspaceRoot}/.vscode/vscode.h"
-            ],
-            "intelliSenseMode": "clang-x64",
-            "browse": {
-                "path": [
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/10.0.0/include",
-                    "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include",
-                    "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
-                    "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-                    "/opt/kushview/include",
-                    "${workspaceRoot}/libs/SQLiteCpp/sqlite3",
-                    "${workspaceRoot}/libs/SQLiteCpp/include",
-                    "${workspaceRoot}/libs/kv/modules",
-                    "${workspaceRoot}/libs/lv2",
-                    "${workspaceRoot}/libs/JUCE/modules",
-                    "${workspaceRoot}/libs/pybind11/include",
-                    "${workspaceRoot}/project/JuceLibraryCode",
-                    "${workspaceRoot}/src"
-                ],
-                "limitSymbolsToIncludedHeaders": true,
-                "databaseFilename": ""
-            },
-            "macFrameworkPath": [
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks"
-            ],
-            "compilerPath": "/usr/bin/clang",
-            "cStandard": "c11",
-            "cppStandard": "c++14"
-        },
-        {
             "name": "Linux",
             "includePath": [
                 "/usr/include",
+                "/usr/include/lilv-0",
+                "/usr/include/suil-0",
+                "/usr/include/serd-0",
+                "/usr/include/sord-0",
+                "/usr/include/sratom-0",
                 "/usr/local/include",
-                "${workspaceRoot}"
+                "${workspaceRoot}/libs/compat",
+                "${workspaceRoot}/libs/JUCE/modules",
+                "${workspaceRoot}/libs/kv/modules",
+                "${workspaceRoot}/libs/jlv2/modules",
+                "${workspaceRoot}/libs/lua",
+                "${workspaceRoot}/libs/lua/src",
+                "${workspaceRoot}/src"
             ],
             "defines": [],
             "intelliSenseMode": "clang-x64",
@@ -193,14 +88,20 @@
                 "path": [
                     "/usr/include",
                     "/usr/local/include",
-                    "${workspaceRoot}"
+                    "${workspaceRoot}/libs/compat",
+                    "${workspaceRoot}/libs/JUCE/modules",
+                    "${workspaceRoot}/libs/kv/modules",
+                    "${workspaceRoot}/libs/jlv2/modules",
+                    "${workspaceRoot}/libs/lua",
+                    "${workspaceRoot}/libs/lua/src",
+                    "${workspaceRoot}/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
             }
         },
         {
-            "name": "Win32",
+            "name": "Windows",
             "includePath": [
                 "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/include",
                 "${workspaceRoot}"

@@ -22,13 +22,15 @@
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "engine/AudioEngine.h"
+#include "engine/Parameter.h"
 #include "Globals.h"
 
 using namespace Element;
+using Element::Parameter;
 
 //=============================================================================
 class PerformanceParameter : public AudioProcessorParameter,
-                             public AudioProcessorParameter::Listener
+                             public Element::Parameter::Listener
 {
 public:
     std::function<void()> onCleared;
@@ -55,6 +57,7 @@ public:
     void clearNode()
     {
         GraphNodePtr oldNode;
+        Element::Parameter::Ptr oldParam;
         
         if (parameter)
             parameter->removeListener (this);
@@ -66,11 +69,13 @@ public:
             processor       = nullptr;
             oldNode         = node;
             node            = nullptr;
+            oldParam        = parameter;
             parameter       = nullptr;
             parameterIdx    = GraphNode::NoParameter;
         }
         
         oldNode.reset();
+        oldParam.reset();
         model = Node();
 
         if (onCleared)
@@ -91,15 +96,15 @@ public:
             node            = newNodeObj;
             processor       = (node != nullptr) ? node->getAudioProcessor() : nullptr;
             parameter       = nullptr;
-            if (processor && isPositiveAndBelow (parameterIdx, processor->getParameters().size()))
-                parameter = processor->getParameters()[parameterIdx];
+            if (isPositiveAndBelow (parameterIdx, node->getParameters().size()))
+                parameter = node->getParameters()[parameterIdx];
         }
         
         if (node)
             removedConnection = node->willBeRemoved.connect (
                 std::bind (&PerformanceParameter::clearNode, this));
         
-        if (parameter)
+        if (parameter != nullptr)
             parameter->addListener (this);
     }
     
@@ -229,13 +234,15 @@ public:
     
     AudioProcessorParameter::Category getCategory() const override
     {
-        return (parameter != nullptr) ? parameter->getCategory()
+        return (parameter != nullptr)
+            ? static_cast<AudioProcessorParameter::Category> (parameter->getCategory())
             : AudioProcessorParameter::getCategory();
     }
     
     String getText (float value, int length) const override
     {
-        return (parameter != nullptr) ? parameter->getText (value, length)
+        return (parameter != nullptr)
+            ? parameter->getText (value, length)
             : AudioProcessorParameter::getText (value, length);
     }
     
@@ -246,7 +253,8 @@ public:
     }
     
     //=========================================================================
-    void parameterValueChanged (int parameterIndex, float newValue) override
+    
+    void controlValueChanged (int parameterIndex, float newValue) override
     {
         if (recursionBlock)
             return;
@@ -256,14 +264,15 @@ public:
         recursionBlock = false;
     }
     
-    void parameterGestureChanged (int parameterIndex, bool gestureIsStarting) override
+    void controlTouched (int, bool touched) override
     {
-        if (gestureIsStarting)
+        if (touched)
             beginChangeGesture();
         else
             endChangeGesture();
     }
     
+    //=========================================================================
 #if 0
     
     /** This can be overridden to tell the host that this parameter operates in the
@@ -316,7 +325,7 @@ private:
     Node model;
     GraphNodePtr node;
     AudioProcessor* processor = nullptr;
-    AudioProcessorParameter* parameter = nullptr;
+    Element::Parameter::Ptr parameter = nullptr;
     int parameterIdx = -1;
     bool special = false;
     bool recursionBlock = false;

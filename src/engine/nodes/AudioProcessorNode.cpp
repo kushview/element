@@ -21,7 +21,7 @@
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
-
+#include "ScopedFlag.h"
 
 namespace Element {
 
@@ -32,6 +32,86 @@ static void setAudioProcessorNodePropertiesFrom (const PluginDescription& pd, Va
     if (pd.pluginFormatName == "Element" && pd.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
         p.setProperty (Tags::type, Tags::graph.toString(), nullptr);
 }
+
+//=============================================================================
+
+class AudioProcessorNodeParameter : public Parameter,
+                                    private AudioProcessorParameter::Listener,
+                                    private Parameter::Listener
+{
+public:
+    AudioProcessorNodeParameter (AudioProcessorParameter& p)
+        : param (p)
+    { 
+        param.addListener (this);
+        addListener (this);
+    }
+
+    ~AudioProcessorNodeParameter()
+    {
+        param.removeListener (this);
+        removeListener (this);
+    }
+
+    int getPortIndex() const noexcept override                  { return portIndex; }
+    int getParameterIndex() const noexcept override             { return param.getParameterIndex(); }
+    float getValue() const override                             { return param.getValue(); }    
+    void setValue (float newValue) override                     { param.setValue (newValue); }
+    float getDefaultValue() const override                      { return param.getDefaultValue(); }
+    float getValueForText (const String& text) const override   { return param.getValueForText (text); }
+    String getName (int maximumStringLength) const override     { return param.getName (maximumStringLength); }
+    String getLabel() const override                            { return param.getLabel(); }
+    int getNumSteps() const override                            { return param.getNumSteps(); }
+    bool isDiscrete() const override                            { return param.isDiscrete(); }
+    bool isBoolean() const override                             { return param.isBoolean(); }
+    String getText (float value, int maxLen) const  override    { return param.getText (value, maxLen); }
+    bool isOrientationInverted() const override                 { return param.isOrientationInverted(); }
+    bool isAutomatable() const override                         { return param.isAutomatable(); }
+    bool isMetaParameter() const override                       { return param.isMetaParameter(); }
+    Category getCategory() const override                       { return static_cast<Parameter::Category> (param.getCategory()); }
+    String getCurrentValueAsText() const override               { return std::move (param.getCurrentValueAsText()); }
+    StringArray getValueStrings() const override                { return std::move (param.getAllValueStrings()); }
+
+private:
+    friend class AudioProcessorNode;
+    AudioProcessorParameter& param;
+    int portIndex = -1;
+    bool ignoreChanges { false };
+
+    void controlValueChanged (int /*index*/, float value) override
+    {
+        if (ignoreChanges)
+            return;
+        ScopedFlag sf (ignoreChanges, true);
+        param.sendValueChangedMessageToListeners (value);
+    }
+
+    void controlTouched (int /*index*/, bool grabbed) override
+    {
+        if (ignoreChanges)
+            return;
+        ScopedFlag sf (ignoreChanges, true);
+        grabbed ? param.beginChangeGesture() : param.endChangeGesture();
+    }
+
+    void parameterValueChanged (int /*index*/, float value) override
+    {
+        if (ignoreChanges)
+            return;
+        ScopedFlag sf (ignoreChanges, true);
+        sendValueChangedMessageToListeners (value);
+    }
+
+    void parameterGestureChanged (int /*index*/, bool grabbed) override
+    {
+        if (ignoreChanges)
+            return;
+        ScopedFlag sf (ignoreChanges, true);
+        sendGestureChangedMessageToListeners (grabbed);
+    }
+};
+
+//=============================================================================
 
 void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize) 
 { 
@@ -71,6 +151,9 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     setLatencySamples (proc->getLatencySamples());
     setName (proc->getName());
     
+    for (auto* param : proc->getParameters())
+        params.add (new AudioProcessorNodeParameter (*param));
+    
     if (auto* instance = dynamic_cast<AudioPluginInstance*> (proc.get()))
     {
         setAudioProcessorNodePropertiesFrom (instance->getPluginDescription(), metadata);
@@ -83,6 +166,7 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
 
 AudioProcessorNode::~AudioProcessorNode()
 {
+    params.clear();
     enablement.cancelPendingUpdate();
     pluginState.reset();
     proc = nullptr;
@@ -90,13 +174,13 @@ AudioProcessorNode::~AudioProcessorNode()
 
 void AudioProcessorNode::getState (MemoryBlock& block)
 {
-    if (proc)
+    if (proc != nullptr)
         proc->getStateInformation (block);
 }
 
 void AudioProcessorNode::setState (const void* data, int size)
 {
-    if (proc)
+    if (proc != nullptr)
         proc->setStateInformation (data, size);
 }
 
@@ -170,6 +254,16 @@ void AudioProcessorNode::createPorts()
     jassert (index == newPorts.size());
     
     ports.swapWith (newPorts);
+}
+
+Parameter::Ptr AudioProcessorNode::getParameter (const PortDescription& port)
+{
+    jassert (isPositiveAndBelow (port.channel, params.size()));
+    auto* const param = dynamic_cast<AudioProcessorNodeParameter*> (
+        params.getObjectPointerUnchecked (port.channel));
+    jassert (port.channel == param->getParameterIndex());
+    param->portIndex = port.index;
+    return param;
 }
 
 }

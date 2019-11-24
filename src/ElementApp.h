@@ -30,6 +30,9 @@ using namespace kv;
 #endif
 
 namespace Element {
+
+using PortType = kv::PortType;
+
 namespace Tags
 {
     using namespace kv::Slugs;
@@ -113,6 +116,8 @@ namespace Tags
     const Identifier workspace          = "workspace";
 
     const Identifier externalSync       = "externalSync";
+
+    const Identifier updater            = "updater";
 }
 
 struct Alert

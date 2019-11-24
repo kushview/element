@@ -39,7 +39,8 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
       metadata (Tags::node),
       isPrepared (false),
       enablement (*this),
-      midiProgramLoader (*this)
+      midiProgramLoader (*this),
+      portResetter (*this)
 {
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
@@ -50,6 +51,11 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
 
 GraphNode::~GraphNode()
 {
+   #if JUCE_DEBUG
+    for (const auto* param : parameters)
+        { jassert (param->getReferenceCount() == 1); }
+   #endif
+    parameters.clear();
     enablement.cancelPendingUpdate();
     parent = nullptr;
 }
@@ -230,6 +236,13 @@ PortType GraphNode::getPortType (const uint32 port) const
 
 int GraphNode::getNumPorts (const PortType type, const bool isInput) const { return ports.size (type, isInput); }
 uint32 GraphNode::getNumPorts() const { return (uint32) ports.size(); }
+
+PortDescription GraphNode::getPort (int index) const
+{
+    auto port = ports.getPort (index);
+    jassert (index == port.index);
+    return std::move (port);
+}
 
 bool GraphNode::isPortInput (const uint32 port)  const 
 {
@@ -644,6 +657,23 @@ void GraphNode::resetPorts()
     metadata.addChild (nodeList, 0, nullptr);
     metadata.addChild (portList, 1, nullptr);
     jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
+    
+    parameters.clear();
+    for (int i = 0; i < ports.size(); ++i)
+    {
+        const auto port = ports.getPort (i);
+        if (port.input && port.type == PortType::Control)
+            parameters.add (getOrCreateParameter (port));
+    }
+    
+    struct ParamSorter
+    {
+        int compareElements (Parameter* lhs, Parameter* rhs)
+        {
+            return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
+        }
+    } sorter;
+    parameters.sort (sorter, true);
 
     if (auto* sub = dynamic_cast<SubGraphProcessor*> (getAudioProcessor()))
         for (int i = 0; i < sub->getNumNodes(); ++i)
@@ -713,6 +743,44 @@ int GraphNode::getOversamplingFactor()
             return static_cast<int> (osProc->getOversamplingFactor());
 
     return 1;
+}
+
+//=========================================================================
+
+void GraphNode::PortResetter::handleAsyncUpdate()
+{ 
+    node.resetPorts(); 
+    node.portsChanged();
+}
+
+void GraphNode::triggerPortReset()
+{
+    portResetter.cancelPendingUpdate();
+    portResetter.triggerAsyncUpdate();
+}
+
+//=========================================================================
+
+Parameter::Ptr GraphNode::getOrCreateParameter (const PortDescription& port)
+{
+    jassert (port.type == PortType::Control && port.input == true);
+    if (port.type != PortType::Control && port.input != true)
+        return nullptr;
+    
+    auto param = getParameter (port);
+    
+    if (param == nullptr)
+    {
+        param = new ControlPortParameter (port);
+    }
+
+    if (param != nullptr)
+    {
+        param->parameterIndex = port.channel;
+    }
+
+    jassert(param != nullptr);
+    return param;
 }
 
 }

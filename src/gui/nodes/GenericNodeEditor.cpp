@@ -33,82 +33,16 @@ static AudioProcessor* getAudioProcessor (const Node& node)
 
 }
 
-class ParameterListener   : private AudioProcessorParameter::Listener,
-                            private AudioProcessorListener,
-                            private Timer
-{
-public:
-    ParameterListener (AudioProcessor& proc, AudioProcessorParameter& param)
-        : processor (proc), parameter (param)
-    {
-        parameter.addListener (this);
-        startTimer (100);
-    }
-
-    ~ParameterListener() override
-    {
-        stopTimer();
-        parameter.removeListener (this);
-    }
-
-    AudioProcessorParameter& getParameter() noexcept
-    {
-        return parameter;
-    }
-
-    virtual void handleNewParameterValue() = 0;
-
-private:
-    //==============================================================================
-    void parameterValueChanged (int, float) override
-    {
-        parameterValueHasChanged = 1;
-    }
-
-    void parameterGestureChanged (int, bool) override {}
-
-    //==============================================================================
-    void audioProcessorParameterChanged (AudioProcessor*, int index, float) override
-    {
-        if (index == parameter.getParameterIndex())
-            parameterValueHasChanged = 1;
-    }
-
-    void audioProcessorChanged (AudioProcessor*) override {}
-
-    //==============================================================================
-    void timerCallback() override
-    {
-        if (parameterValueHasChanged.compareAndSetBool (0, 1))
-        {
-            handleNewParameterValue();
-            startTimerHz (50);
-        }
-        else
-        {
-            startTimer (jmin (250, getTimerInterval() + 10));
-        }
-    }
-
-    AudioProcessor& processor;
-    AudioProcessorParameter& parameter;
-    Atomic<int> parameterValueHasChanged { 0 };
-
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ParameterListener)
-};
-
 class BooleanParameterComponent final   : public Component,
                                           private ParameterListener
 {
 public:
-    BooleanParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+    BooleanParameterComponent (Parameter* param)
+        : ParameterListener (param)
     {
         // Set the initial value.
         handleNewParameterValue();
-
         button.onClick = [this]() { buttonClicked(); };
-
         addAndMakeVisible (button);
     }
 
@@ -124,7 +58,7 @@ public:
 private:
     void handleNewParameterValue() override
     {
-        auto parameterState = getParameterState (getParameter().getValue());
+        auto parameterState = getParameterState (getParameter()->getValue());
 
         if (button.getToggleState() != parameterState)
             button.setToggleState (parameterState, dontSendNotification);
@@ -132,11 +66,11 @@ private:
 
     void buttonClicked()
     {
-        if (getParameterState (getParameter().getValue()) != button.getToggleState())
+        if (getParameterState (getParameter()->getValue()) != button.getToggleState())
         {
-            getParameter().beginChangeGesture();
-            getParameter().setValueNotifyingHost (button.getToggleState() ? 1.0f : 0.0f);
-            getParameter().endChangeGesture();
+            getParameter()->beginChangeGesture();
+            getParameter()->setValueNotifyingHost (button.getToggleState() ? 1.0f : 0.0f);
+            getParameter()->endChangeGesture();
         }
     }
 
@@ -154,8 +88,8 @@ class SwitchParameterComponent final   : public Component,
                                          private ParameterListener
 {
 public:
-    SwitchParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+    SwitchParameterComponent (Parameter* param)
+        : ParameterListener (param)
     {
         auto* leftButton  = buttons.add (new TextButton());
         auto* rightButton = buttons.add (new TextButton());
@@ -166,8 +100,8 @@ public:
             button->setClickingTogglesState (true);
         }
 
-        leftButton ->setButtonText (getParameter().getText (0.0f, 16));
-        rightButton->setButtonText (getParameter().getText (1.0f, 16));
+        leftButton ->setButtonText (getParameter()->getText (0.0f, 16));
+        rightButton->setButtonText (getParameter()->getText (1.0f, 16));
 
         leftButton ->setConnectedEdges (Button::ConnectedOnRight);
         rightButton->setConnectedEdges (Button::ConnectedOnLeft);
@@ -211,11 +145,11 @@ private:
 
         if (getParameterState() != buttonState)
         {
-            getParameter().beginChangeGesture();
+            getParameter()->beginChangeGesture();
 
-            if (getParameter().getAllValueStrings().isEmpty())
+            if (getParameter()->getValueStrings().isEmpty())
             {
-                getParameter().setValueNotifyingHost (buttonState ? 1.0f : 0.0f);
+                getParameter()->setValueNotifyingHost (buttonState ? 1.0f : 0.0f);
             }
             else
             {
@@ -225,26 +159,26 @@ private:
                 // want the snapping behaviour to be consistent with what we do with
                 // a combo box.
                 String selectedText = buttonState ? buttons[1]->getButtonText() : buttons[0]->getButtonText();
-                getParameter().setValueNotifyingHost (getParameter().getValueForText (selectedText));
+                getParameter()->setValueNotifyingHost (getParameter()->getValueForText (selectedText));
             }
 
-            getParameter().endChangeGesture();
+            getParameter()->endChangeGesture();
         }
     }
 
     bool getParameterState()
     {
-        if (getParameter().getAllValueStrings().isEmpty())
-            return getParameter().getValue() > 0.5f;
+        if (getParameter()->getValueStrings().isEmpty())
+            return getParameter()->getValue() > 0.5f;
 
-        auto index = getParameter().getAllValueStrings()
-                                   .indexOf (getParameter().getCurrentValueAsText());
+        auto index = getParameter()->getValueStrings()
+            .indexOf (getParameter()->getCurrentValueAsText());
 
         if (index < 0)
         {
             // The parameter is producing some unexpected text, so we'll do
             // some linear interpolation.
-            index = roundToInt (getParameter().getValue());
+            index = roundToInt (getParameter()->getValue());
         }
 
         return index == 1;
@@ -259,9 +193,9 @@ class ChoiceParameterComponent final   : public Component,
                                          private ParameterListener
 {
 public:
-    ChoiceParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param),
-          parameterValues (getParameter().getAllValueStrings())
+    ChoiceParameterComponent (Parameter* param)
+        : ParameterListener (param),
+          parameterValues (getParameter()->getValueStrings())
     {
         box.addItemList (parameterValues, 1);
 
@@ -284,13 +218,13 @@ public:
 private:
     void handleNewParameterValue() override
     {
-        auto index = parameterValues.indexOf (getParameter().getCurrentValueAsText());
+        auto index = parameterValues.indexOf (getParameter()->getCurrentValueAsText());
 
         if (index < 0)
         {
             // The parameter is producing some unexpected text, so we'll do
             // some linear interpolation.
-            index = roundToInt (getParameter().getValue() * (parameterValues.size() - 1));
+            index = roundToInt (getParameter()->getValue() * (parameterValues.size() - 1));
         }
 
         box.setSelectedItemIndex (index);
@@ -298,16 +232,16 @@ private:
 
     void boxChanged()
     {
-        if (getParameter().getCurrentValueAsText() != box.getText())
+        if (getParameter()->getCurrentValueAsText() != box.getText())
         {
-            getParameter().beginChangeGesture();
+            getParameter()->beginChangeGesture();
 
             // When a parameter provides a list of strings we must set its
             // value using those strings, rather than a float, because VSTs can
             // have uneven spacing between the different allowed values.
-            getParameter().setValueNotifyingHost (getParameter().getValueForText (box.getText()));
+            getParameter()->setValueNotifyingHost (getParameter()->getValueForText (box.getText()));
 
-            getParameter().endChangeGesture();
+            getParameter()->endChangeGesture();
         }
     }
 
@@ -321,11 +255,11 @@ class SliderParameterComponent final   : public Component,
                                          private ParameterListener
 {
 public:
-    SliderParameterComponent (AudioProcessor& proc, AudioProcessorParameter& param)
-        : ParameterListener (proc, param)
+    SliderParameterComponent (Parameter* param)
+        : ParameterListener (param)
     {
-        if (getParameter().getNumSteps() != AudioProcessor::getDefaultNumParameterSteps())
-            slider.setRange (0.0, 1.0, 1.0 / (getParameter().getNumSteps() - 1.0));
+        if (getParameter()->getNumSteps() != AudioProcessor::getDefaultNumParameterSteps())
+            slider.setRange (0.0, 1.0, 1.0 / (getParameter()->getNumSteps() - 1.0));
         else
             slider.setRange (0.0, 1.0);
 
@@ -362,7 +296,7 @@ private:
     void updateTextDisplay()
     {
         jassert(MessageManager::getInstance()->isThisTheMessageThread());
-        valueLabel.setText (getParameter().getCurrentValueAsText(), dontSendNotification);
+        valueLabel.setText (getParameter()->getCurrentValueAsText(), dontSendNotification);
     }
 
     void handleNewParameterValue() override
@@ -370,7 +304,7 @@ private:
         jassert(MessageManager::getInstance()->isThisTheMessageThread());
         if (! isDragging)
         {
-            slider.setValue (getParameter().getValue(), dontSendNotification);
+            slider.setValue (getParameter()->getValue(), dontSendNotification);
             updateTextDisplay();
         }
     }
@@ -379,29 +313,29 @@ private:
     {
         auto newVal = (float) slider.getValue();
 
-        if (getParameter().getValue() != newVal)
+        if (getParameter()->getValue() != newVal)
         {
             if (! isDragging)
-                getParameter().beginChangeGesture();
+                getParameter()->beginChangeGesture();
 
-            getParameter().setValueNotifyingHost ((float) slider.getValue());
+            getParameter()->setValueNotifyingHost ((float) slider.getValue());
             updateTextDisplay();
 
             if (! isDragging)
-                getParameter().endChangeGesture();
+                getParameter()->endChangeGesture();
         }
     }
 
     void sliderStartedDragging()
     {
         isDragging = true;
-        getParameter().beginChangeGesture();
+        getParameter()->beginChangeGesture();
     }
 
     void sliderStoppedDragging()
     {
         isDragging = false;
-        getParameter().endChangeGesture();
+        getParameter()->endChangeGesture();
     }
 
     Slider slider { Slider::LinearHorizontal, Slider::TextEntryBoxPosition::NoTextBox };
@@ -414,41 +348,40 @@ private:
 class ParameterDisplayComponent   : public Component
 {
 public:
-    ParameterDisplayComponent (AudioProcessor& processor, AudioProcessorParameter& param)
-        : parameter (param)
+    ParameterDisplayComponent (Parameter* param)
     {
         parameterName.setFont (Font (12.f));
-        parameterName.setText (parameter.getName (128), dontSendNotification);
+        parameterName.setText (param->getName (128), dontSendNotification);
         parameterName.setJustificationType (Justification::centredRight);
         addAndMakeVisible (parameterName);
 
-        parameterLabel.setText (parameter.getLabel(), dontSendNotification);
+        parameterLabel.setText (param->getLabel(), dontSendNotification);
         addAndMakeVisible (parameterLabel);
 
-        if (param.isBoolean())
+        if (param->isBoolean())
         {
             // The AU, AUv3 and VST (only via a .vstxml file) SDKs support
             // marking a parameter as boolean. If you want consistency across
             // all  formats then it might be best to use a
             // SwitchParameterComponent instead.
-            parameterComp.reset (new BooleanParameterComponent (processor, param));
+            parameterComp.reset (new BooleanParameterComponent (param));
         }
-        else if (param.getNumSteps() == 2)
+        else if (param->getNumSteps() == 2)
         {
             // Most hosts display any parameter with just two steps as a switch.
-            parameterComp.reset (new SwitchParameterComponent (processor, param));
+            parameterComp.reset (new SwitchParameterComponent (param));
         }
-        else if (! param.getAllValueStrings().isEmpty())
+        else if (! param->getValueStrings().isEmpty())
         {
             // If we have a list of strings to represent the different states a
             // parameter can be in then we should present a dropdown allowing a
             // user to pick one of them.
-            parameterComp.reset (new ChoiceParameterComponent (processor, param));
+            parameterComp.reset (new ChoiceParameterComponent (param));
         }
         else
         {
             // Everything else can be represented as a slider.
-            parameterComp.reset (new SliderParameterComponent (processor, param));
+            parameterComp.reset (new SliderParameterComponent (param));
         }
 
         addAndMakeVisible (parameterComp.get());
@@ -468,7 +401,6 @@ public:
     }
 
 private:
-    AudioProcessorParameter& parameter;
     Label parameterName, parameterLabel;
     std::unique_ptr<Component> parameterComp;
 
@@ -478,11 +410,11 @@ private:
 class ParametersPanel   : public Component
 {
 public:
-    ParametersPanel (AudioProcessor& processor, const Array<AudioProcessorParameter*>& parameters)
+    ParametersPanel (const ParameterArray& params)
     {
-        for (auto* param : parameters)
+        for (auto* param : params)
             if (param->isAutomatable())
-                addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (processor, *param)));
+                addAndMakeVisible (paramComponents.add (new ParameterDisplayComponent (param)));
 
         if (auto* comp = paramComponents [0])
             setSize (comp->getWidth(), comp->getHeight() * paramComponents.size());
@@ -511,10 +443,10 @@ struct GenericNodeEditor::Pimpl
     Pimpl (GenericNodeEditor& parent)
         : owner (parent)
     {
-        auto* p = parent.getAudioProcessor();
-        jassert (p != nullptr);
+        GraphNodePtr ptr = parent.getNodeObject();
+        jassert (ptr != nullptr);
         owner.setOpaque (true);
-        view.setViewedComponent (new ParametersPanel (*p, p->getParameters()));
+        view.setViewedComponent (new ParametersPanel (ptr->getParameters()));
         owner.addAndMakeVisible (view);
         view.setScrollBarsShown (true, false);
     }
@@ -527,17 +459,12 @@ struct GenericNodeEditor::Pimpl
 GenericNodeEditor::GenericNodeEditor (const Node& node)
     : NodeEditorComponent (node), pimpl (new Pimpl (*this))
 {
-    jassert (nullptr != GenericEditorHelpers::getAudioProcessor(node));  // only nodes with real parameters are supported
+    jassert (nullptr != GenericEditorHelpers::getAudioProcessor (node));  // only nodes with real parameters are supported
     setSize (pimpl->view.getViewedComponent()->getWidth() + pimpl->view.getVerticalScrollBar().getWidth(),
              jmin (pimpl->view.getViewedComponent()->getHeight(), 400));
 }
 
 GenericNodeEditor::~GenericNodeEditor() { }
-
-AudioProcessor* GenericNodeEditor::getAudioProcessor() const
-{ 
-    return GenericEditorHelpers::getAudioProcessor (getNode());
-}
 
 void GenericNodeEditor::paint (Graphics& g)
 { 

@@ -24,6 +24,11 @@ static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
 
 void registerEngine (state& lua)
 {
+    // Decibels
+    auto db = lua["decibels"].get_or_create<table>();
+    db["to_gain"]   = [](float input) { return Decibels::decibelsToGain (input); };
+    db["from_gain"] = [](float input) { return Decibels::gainToDecibels (input); };
+
     // AudioBuffer
     lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
         "get_num_channels", &AudioSampleBuffer::getNumChannels,
@@ -43,7 +48,7 @@ void registerEngine (state& lua)
   
     // MidiMessage
     lua.new_usertype<MidiMessage> ("MidiMessage", no_constructor,
-        "make",                     []() { return MidiMessage(); },
+        call_constructor,           factories([]() { return std::move (MidiMessage()); }),
         meta_function::to_string,   [](MidiMessage& msg) { return msg.getDescription().toRawUTF8(); },
         "get_raw_data",             &MidiMessage::getRawData,
         "get_raw_data_size",        &MidiMessage::getRawDataSize,
@@ -78,40 +83,39 @@ void registerEngine (state& lua)
         "is_soft_pedal_off",        &MidiMessage::isSoftPedalOff,
         "is_program_change",        &MidiMessage::isProgramChange,
         "get_program_change_number", &MidiMessage::getProgramChangeNumber,
-        "program_change",           &MidiMessage::programChange,
+        "program_change",           MidiMessage::programChange,
         "is_pitch_wheel",           &MidiMessage::isPitchWheel,
         "get_pitch_wheel_value",    &MidiMessage::getPitchWheelValue,
-        "pitch_wheel",              &MidiMessage::pitchWheel
+        "pitch_wheel",              MidiMessage::pitchWheel
     );
 
     // MidiBuffer
-    lua.new_usertype<MidiBuffer> ("MidiBuffer", no_constructor,
+    auto mb = lua.new_usertype<MidiBuffer> ("MidiBuffer", no_constructor,
         "clear", overload (
             resolve<void()> (&MidiBuffer::clear),
             resolve<void(int, int)> (&MidiBuffer::clear)),
         "is_empty",         &MidiBuffer::isEmpty,
         "get_num_events",   &MidiBuffer::getNumEvents,
-        "swap_with",        &MidiBuffer::swapWith,
-        "iterator", [](const MidiBuffer& b) {
-            MidiBuffer::Iterator iter (b);
-            return std::move (iter);
-        }
+        "swap_with",        &MidiBuffer::swapWith
     );
 
-    lua.new_usertype<MidiBuffer::Iterator> ("MidiBufferIterator", no_constructor,
-        "make", midiBufferIteratorFactory,
+    mb["Iterator"] = lua.new_usertype<MidiBuffer::Iterator> ("MidiBuffer.Iterator", no_constructor,
+        call_constructor, factories ([](MidiBuffer& buffer) {
+            MidiBuffer::Iterator iter (buffer);
+            return std::move (iter); 
+        }),
         "set_next_sample_position", &MidiBuffer::Iterator::setNextSamplePosition,
         "get_next_event", [](MidiBuffer::Iterator& iter, MidiMessage& msg) {
             int frame = 0;
-            bool more = iter.getNextEvent (msg, frame);
-            return std::tuple (more, frame);
+            bool ok = iter.getNextEvent (msg, frame);
+            return std::tuple (ok, frame);
         }
     );
 
     lua.script (
 R"(function MidiBuffer:iter()
-   local iter = MidiBufferIterator.make (self)
-   local msg = MidiMessage.make()
+   local iter = MidiBuffer.Iterator (self)
+   local msg = MidiMessage()
    return function()
       local ok, frame = iter:get_next_event (msg)
       if not ok then
