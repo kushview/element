@@ -101,6 +101,7 @@ void MidiMonitorNode::timerCallback()
     MidiBuffer::Iterator iter (midiTemp);
     MidiMessage msg; int frame = 0;
 
+    int numLogged = 0;
     String text;
     while (iter.getNextEvent (msg, frame))
     {
@@ -119,12 +120,14 @@ void MidiMonitorNode::timerCallback()
         
         midiLog.add (text.isNotEmpty() ? text : msg.getDescription());
         text.clear();
+        ++numLogged;
     }
 
     if (midiLog.size() > maxLoggedMessages)
         midiLog.removeRange (0, midiLog.size() - maxLoggedMessages);
-    
-    messagesLogged();
+
+    if (numLogged > 0)
+        messagesLogged();
 }
 
 };
