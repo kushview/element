@@ -32,27 +32,6 @@
 
 namespace Element {
 
-static bool elNodeIsAudioMixer (const Node& node)
-{
-    return node.getFormat().toString() == "Element"
-        && node.getIdentifier().toString() == "element.audioMixer";
-}
-
-static bool elNodeIsMidiDevice (const Node& node)
-{
-    return node.getFormat().toString() == "Internal"
-        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
-             node.getIdentifier().toString() == "element.midiOutputDevice" );
-}
-
-static bool elNodeCanChangeIO (const Node& node)
-{
-    return !node.isIONode() 
-        && !node.isGraph()
-        && !elNodeIsAudioMixer (node)
-        && !elNodeIsMidiDevice (node);
-}
-
 //=============================================================================
 
 PortComponent::PortComponent (const Node& g, const Node& n,
@@ -163,25 +142,21 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     addAndMakeVisible (configButton);
     configButton.setPath (getIcons().fasCog);
     configButton.addListener (this);
-    configButton.setVisible (elNodeCanChangeIO (node));
 
-    if (! node.isIONode() && ! node.isRootGraph())
-    {
-        addAndMakeVisible (powerButton);
-        powerButton.setColour (SettingButton::backgroundOnColourId,
-                                findColour (SettingButton::backgroundColourId));
-        powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
-        powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
-        powerButton.setClickingTogglesState (true);
-        powerButton.addListener (this);
+    addAndMakeVisible (powerButton);
+    powerButton.setColour (SettingButton::backgroundOnColourId,
+                            findColour (SettingButton::backgroundColourId));
+    powerButton.setColour (SettingButton::backgroundColourId, Colors::toggleBlue);
+    powerButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::bypass));
+    powerButton.setClickingTogglesState (true);
+    powerButton.addListener (this);
 
-        addAndMakeVisible (muteButton);
-        muteButton.setYesNoText ("M", "M");
-        muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
-        muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
-        muteButton.setClickingTogglesState (true);
-        muteButton.addListener (this);
-    }
+    addAndMakeVisible (muteButton);
+    muteButton.setYesNoText ("M", "M");
+    muteButton.setColour (SettingButton::backgroundOnColourId, Colors::toggleRed);
+    muteButton.getToggleStateValue().referTo (node.getPropertyAsValue (Tags::mute));
+    muteButton.setClickingTogglesState (true);
+    muteButton.addListener (this);
 
     setSize (170, 60);
 }
@@ -543,12 +518,14 @@ void BlockComponent::resized()
 {
     const auto box (getBoxRectangle());
     auto r = box.reduced(4, 2).removeFromBottom (14);
-    configButton.setBounds (r.removeFromRight (16)); 
-    r.removeFromLeft (3);
-    muteButton.setBounds (r.removeFromRight (16));       
-    r.removeFromLeft (2);
-    powerButton.setBounds (r.removeFromRight (16));
-
+    
+    {
+        Component* buttons[] = { &configButton, &muteButton, &powerButton };
+        for (int i = 0; i < 3; ++i)
+            if (buttons[i]->isVisible())
+                buttons[i]->setBounds (r.removeFromRight (16));
+    }
+    
     const int halfPinSize = pinSize / 2;
     if (vertical)
     {

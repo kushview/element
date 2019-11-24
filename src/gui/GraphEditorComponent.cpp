@@ -46,6 +46,27 @@
 
 namespace Element {
 
+static bool elNodeIsAudioMixer (const Node& node)
+{
+    return node.getFormat().toString() == "Element"
+        && node.getIdentifier().toString() == "element.audioMixer";
+}
+
+static bool elNodeIsMidiDevice (const Node& node)
+{
+    return node.getFormat().toString() == "Internal"
+        && ( node.getIdentifier().toString() == "element.midiInputDevice" ||
+             node.getIdentifier().toString() == "element.midiOutputDevice" );
+}
+
+static bool elNodeCanChangeIO (const Node& node)
+{
+    return !node.isIONode() 
+        && !node.isGraph()
+        && !elNodeIsAudioMixer (node)
+        && !elNodeIsMidiDevice (node);
+}
+
 class DefaultBlockFactory : public BlockFactory
 {
 public:
@@ -56,6 +77,18 @@ public:
     {
         ignoreUnused (app);
         auto* const block = new BlockComponent (node.getParentGraph(), node, editor.isLayoutVertical());
+        
+        if (node.isIONode() || node.isRootGraph())
+        {
+            block->setMuteButtonVisible (false);
+            block->setPowerButtonVisible (false);
+        }
+        
+        if (! elNodeCanChangeIO (node))
+        {
+            block->setConfigButtonVisible (false);
+        }
+
         return block;
     }
 
