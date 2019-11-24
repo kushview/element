@@ -104,6 +104,12 @@ void MidiMonitorNode::timerCallback()
     String text;
     while (iter.getNextEvent (msg, frame))
     {
+        if (msg.isMidiClock())
+        {
+            text.clear();
+            continue;
+        }
+
         if (msg.isMidiStart())
             text << "Start";
         else if (msg.isMidiStop())
