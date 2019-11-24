@@ -50,10 +50,10 @@ class ConnectorComponent   : public Component,
                              public SettableTooltipClient
 {
 public:
-    ConnectorComponent (const Node& graph_)
+    ConnectorComponent (const Node& g)
         : sourceFilterID (0), destFilterID (0),
           sourceFilterChannel (0), destFilterChannel (0),
-          graph (graph_),
+          graph (g),
           lastInputX (0), lastInputY (0),
           lastOutputX (0), lastOutputY (0)
     { }
@@ -133,21 +133,21 @@ public:
 
         if (GraphEditorComponent* const hostPanel = getGraphPanel())
         {
-            if (BlockComponent* srcFilterComp = hostPanel->getComponentForFilter (sourceFilterID))
-                srcFilterComp->getPinPos (sourceFilterChannel, false, x1, y1);
+            if (auto* srcBlock = hostPanel->getComponentForFilter (sourceFilterID))
+                srcBlock->getPortPos (sourceFilterChannel, false, x1, y1);
 
-            if (BlockComponent* dstFilterComp = hostPanel->getComponentForFilter (destFilterID))
-                dstFilterComp->getPinPos (destFilterChannel, true, x2, y2);
+            if (auto* dstBlock = hostPanel->getComponentForFilter (destFilterID))
+                dstBlock->getPortPos (destFilterChannel, true, x2, y2);
         }
     }
 
-    void paint (Graphics& g)
+    void paint (Graphics& g) override
     {
         g.setColour (Colours::black.brighter());
         g.fillPath (linePath);
     }
 
-    bool hitTest (int x, int y)
+    bool hitTest (int x, int y) override
     {
         if (hitPath.contains ((float) x, (float) y))
         {
@@ -161,14 +161,14 @@ public:
         return false;
     }
 
-    void mouseDown (const MouseEvent&)
+    void mouseDown (const MouseEvent&) override
     {
         if (! isEnabled())
             return;
         dragging = false;
     }
 
-    void mouseDrag (const MouseEvent& e)
+    void mouseDrag (const MouseEvent& e) override
     {
         if (! isEnabled())
             return;
@@ -195,7 +195,7 @@ public:
         }
     }
 
-    void mouseUp (const MouseEvent& e)
+    void mouseUp (const MouseEvent& e) override
     {
         if (! isEnabled())
             return;
@@ -203,13 +203,13 @@ public:
             getGraphPanel()->endDraggingConnector (e);
     }
 
-    void resized()
+    void resized() override
     {
         float x1, y1, x2, y2;
         getPoints (x1, y1, x2, y2);
 
-        lastInputX = x1;
-        lastInputY = y1;
+        lastInputX  = x1;
+        lastInputY  = y1;
         lastOutputX = x2;
         lastOutputY = y2;
 
@@ -260,17 +260,19 @@ public:
 
             linePath.addPath (arrow);
         }
+
         linePath.setUsingNonZeroWinding (true);
     }
 
-    uint32 sourceFilterID, destFilterID;
+    uint32 sourceFilterID { KV_INVALID_PORT }, 
+           destFilterID   { KV_INVALID_PORT };
     int sourceFilterChannel, destFilterChannel;
 
 private:
     Node graph;
     float lastInputX, lastInputY, lastOutputX, lastOutputY;
     Path linePath, hitPath;
-    bool dragging;
+    bool dragging { false };
 
     GraphEditorComponent* getGraphPanel() const noexcept
     {

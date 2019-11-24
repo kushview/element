@@ -586,7 +586,7 @@ void BlockComponent::resized()
     }
 }
 
-void BlockComponent::getPinPos (const int index, const bool isInput, float& x, float& y)
+void BlockComponent::getPortPos (const int index, const bool isInput, float& x, float& y)
 {
     for (int i = 0; i < getNumChildComponents(); ++i)
     {

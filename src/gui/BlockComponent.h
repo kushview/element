@@ -74,17 +74,10 @@ public:
     BlockComponent (const Node& graph_, const Node& node_, const bool vertical_);
     ~BlockComponent() noexcept;
 
-    void setNodePosition (const int x, const int y);
-    void updatePosition();
-    void makeEditorActive();
-    void getPinPos (const int index, const bool isInput, float& x, float& y);
-    void update (const bool doPosition = true);
+    void getPortPos (const int index, const bool isInput, float& x, float& y);
 
-    
-    
     /** @internal */
     void buttonClicked (Button* b) override;
-
     /** @internal */
     bool hitTest (int x, int y) override;
     /** @internal */
@@ -140,6 +133,10 @@ private:
     Rectangle<int> getBoxRectangle() const;
     GraphEditorComponent* getGraphPanel() const noexcept;
 
+    void setNodePosition (const int x, const int y);
+    void updatePosition();
+    void makeEditorActive();
+    void update (const bool doPosition = true);
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlockComponent);
