@@ -46,6 +46,7 @@
 #define EL_INTERNAL_ID_FREQ_SPLITTER            "element.freqsplit"
 #define EL_INTERNAL_ID_LUA                      "element.lua"
 #define EL_INTERNAL_ID_COMPRESSOR               "element.compressor"
+#define EL_INTERNAL_ID_MIDI_ROUTER              "element.midiRouter"
 
 #define EL_INTERNAL_UID_AUDIO_FILE_PLAYER        1000
 #define EL_INTERNAL_UID_AUDIO_MIXER              1001
@@ -70,6 +71,7 @@
 #define EL_INTERNAL_UID_FREQ_SPLITTER            1020
 #define EL_INTERNAL_UID_LUA                      1021
 #define EL_INTERNAL_UID_COMPRESSOR               1022
+#define EL_INTERNAL_UID_MIDI_ROUTER              1023
 
 namespace Element {
 
