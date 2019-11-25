@@ -527,4 +527,67 @@ private:
 
 static LuaTableTest sLuaTableTest;
 
+
+class LuaGlobalsTest : public UnitTestBase
+{
+public:
+    LuaGlobalsTest() : UnitTestBase ("Lua Globals", "Lua", "globals") {}
+    virtual ~LuaGlobalsTest() { }
+    void initialise() override
+    {
+        lua.open_libraries();
+        Lua::setWorld (lua, &getWorld());
+        Lua::registerModel (lua);
+        Lua::registerElement (lua);
+        lua["expect"] = [this](bool result, const char* msg) {
+            this->expect (result, msg);
+        };
+    }
+
+    void shutdown() override
+    {
+        Lua::setWorld (lua, nullptr);
+        lua.collect_garbage();
+        shutdownWorld();
+    }
+
+    void runTest() override
+    {
+        testSession();
+    }
+
+private:
+    sol::state lua;
+
+    void testSession()
+    {
+        beginTest("session");
+        auto s = getWorld().getSession();
+        s->setName ("test session");
+        
+        try
+        {
+            auto result = lua.safe_script (R"(
+                local s = Element:session()
+                expect (s:get_name() == "test session", "incorrect session name")
+                s:set_name ("lua session")
+                expect (s:get_name() == "lua session", "wrong session name")
+                s:add_graph (Node:create_graph(), false)
+                s:add_graph (Node:create_graph(), false)
+                expect (s:get_num_graphs() == 2, "incorrect number of graphs")
+            )");
+
+            expect (result.valid());
+            expect (s->getNumGraphs() == 2);
+            expect (s->getName() == "lua session");
+        }
+        catch (const std::exception& e)
+        {
+            expect (false, e.what());
+        }
+    }
+};
+
+static LuaGlobalsTest sLuaGlobalsTest;
+
 #endif

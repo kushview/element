@@ -19,9 +19,26 @@
 
 #include "engine/MidiPipe.h"
 #include "session/Node.h"
+#include "session/Session.h"
 #include "session/PluginManager.h"
+#include "session/CommandManager.h"
 #include "Globals.h"
+#include "Settings.h"
+
 #include "sol/sol.hpp"
+
+namespace sol {
+/** Support juce::ReferenceCountedObjectPtr */
+template <typename T>
+struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
+    typedef T type;
+    typedef ReferenceCountedObjectPtr<T> actual_type;
+    static const bool value = true;
+    static bool is_null (const actual_type& ptr)    { return ptr == nullptr; }
+    static type* get (const actual_type& ptr)       { return ptr.get(); }
+};
+
+}
 
 using namespace sol;
 
@@ -45,17 +62,23 @@ void registerUI (state& lua)
 
 void registerModel (sol::state& lua)
 {
+    // Sesson
     auto session = lua.new_usertype<Session> ("Session", no_constructor,
         "get_num_graphs",           &Session::getNumGraphs,
         "get_graph",                &Session::getGraph,
         "get_active_graph",         &Session::getActiveGraph,
         "get_active_graph_index",   &Session::getActiveGraphIndex,
         "add_graph",                &Session::addGraph,
-        "set_name",                 &Session::setName,
-        "get_name",                 &Session::getName,
+        "set_name", [](Session& self, const char* name) -> void {
+            self.setName (String::fromUTF8 (name));
+        },
+        "get_name", [](const Session& self) -> std::string {
+            return std::move (self.getName().toStdString());
+        },
         "clear",                    &Session::clear
     );
 
+    // Node
     auto node = lua.new_usertype<Node> ("Node", no_constructor,
         "is_valid",             &Node::isValid,
         "get_name",             &Node::getName,
@@ -87,7 +110,9 @@ void registerModel (sol::state& lua)
         },
         "reset_ports",          &Node::resetPorts,
         "save_plugin_state",    &Node::savePluginState,
-        "restore_plugin_state", &Node::restorePluginState
+        "restore_plugin_state", &Node::restorePluginState,
+        "create_default_graph", Node::createDefaultGraph,
+        "create_graph",         []() -> Node { return Node::createGraph(); }
     );
 }
 
@@ -228,11 +253,25 @@ end
 
 void registerElement (sol::state& lua)
 {
-    auto e = NS (lua, "element");
+
+
+    auto e = NS (lua, "Element");
     e["plugins"] = [&lua]() -> PluginManager&
     {
         jassert(lua["__world__"].valid());
         return ((Globals&) lua["__world__"]).getPluginManager();
+    };
+
+    e["session"] = [&lua]() -> SessionPtr
+    {
+        jassert(lua["__world__"].valid());
+        return ((Globals&) lua["__world__"]).getSession();
+    };
+
+    e["settings"] = [&lua]() -> Settings&
+    {
+        jassert(lua["__world__"].valid());
+        return ((Globals&) lua["__world__"]).getSettings();
     };
 }
 
