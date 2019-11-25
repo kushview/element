@@ -134,7 +134,7 @@ public:
 
     /** Returns the node name defined by the user. If not set it returns the
         node name set when loaded.
-     */
+    */
     const String getDisplayName() const;
 
     /** Returns the name as defined by the loaded plugin */

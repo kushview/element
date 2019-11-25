@@ -1,11 +1,36 @@
+/*
+    This file is part of Element
+    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
 
 #include "engine/MidiPipe.h"
+#include "session/Node.h"
 #include "sol/sol.hpp"
 
 using namespace sol;
 
 namespace Element {
 namespace Lua {
+
+static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
+{
+    MidiBuffer::Iterator iter (buffer);
+    return std::move (iter);
+}
 
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
 static auto EL (state& lua)     { return lua["el"].get_or_create<table>(); }
@@ -16,10 +41,44 @@ void registerUI (state& lua)
 {
 }
 
-static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
+void registerModel (sol::state& lua)
 {
-    MidiBuffer::Iterator iter (buffer);
-    return std::move (iter);
+    auto session = lua.new_usertype<Session> ("Session", no_constructor,
+    );
+
+    auto node = lua.new_usertype<Node> ("Node", no_constructor,
+        "is_valid",             &Node::isValid,
+        "get_name",             &Node::getName,
+        "get_display_name",     &Node::getDisplayName,
+        "get_plugin_name",      &Node::getPluginName,
+        "has_modified_name",    &Node::hasModifiedName,
+        "get_node_id",          &Node::getNodeId,
+        "get_uuid_string",      &Node::getUuidString,
+        "get_uuid",             &Node::getUuid,
+        "is_graph",             &Node::isGraph,
+        "is_root_graph",        &Node::isRootGraph,
+        "get_node_type",        &Node::getNodeType,
+        "has_node_type",        &Node::hasNodeType,
+        "has_editor",           &Node::hasEditor,
+        "get_parent_graph",     &Node::getParentGraph,
+        "is_child_of_root_graph", &Node::isChildOfRootGraph,
+        "is_missing",           &Node::isMissing,
+        "is_enabled",           &Node::isEnabled,
+        // "get_midi_channels"
+        "is_bypassed",          &Node::isBypassed,
+        "is_muted",             &Node::isMuted,
+        "is_muting_inputs",     &Node::isMutingInputs,
+        "set_muted",            &Node::setMuted,
+        "set_mute_input",       &Node::setMuteInput,
+        "write_to_file",        [](const Node& node, const char* filepath) -> bool {
+            if (! File::isAbsolutePath (filepath))
+                return false;
+            return node.writeToFile (File (filepath));
+        },
+        "reset_ports",          &Node::resetPorts,
+        "save_plugin_state",    &Node::savePluginState,
+        "restore_plugin_state", &Node::restorePluginState
+    );
 }
 
 void registerEngine (state& lua)
