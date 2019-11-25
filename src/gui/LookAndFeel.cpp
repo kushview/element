@@ -20,7 +20,6 @@
 #include "LookAndFeel.h"
 #include "gui/Buttons.h"
 #include "gui/widgets/MidiBlinker.h"
-#include "gui/ActivationDialog.h"
 
 namespace Element {
 
@@ -318,25 +317,10 @@ Font LookAndFeel::getLabelFont (Label& label)
 
 //==============================================================================
 void LookAndFeel::drawProgressBar (Graphics& g, ProgressBar& progressBar,
-                                   int width, int height, double progress, const String& textToShow)
+                                   int width, int height, double progress, 
+                                   const String& textToShow)
 {
-    String theText = textToShow;
-    if (auto* const trialBar = dynamic_cast<TrialDaysProgressBar*> (&progressBar))
-    {
-        const double elapsed = trialBar->periodDays * progress;
-        const double remains = trialBar->periodDays - elapsed;
-        if (progress >= 1.0)
-        {
-            theText = "Trial Expired";
-        }
-        else
-        {
-            theText = "Trial expires in ";
-            theText << RelativeTime::days(remains).getDescription();
-        }
-    }
-
-    LookAndFeel_KV1::drawProgressBar (g, progressBar, width, height, progress, theText);
+    LookAndFeel_KV1::drawProgressBar (g, progressBar, width, height, progress, textToShow);
 }
 
 // MARK toggle button

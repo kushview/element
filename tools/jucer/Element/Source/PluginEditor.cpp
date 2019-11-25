@@ -20,7 +20,6 @@
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/PluginWindow.h"
-#include "gui/ActivationDialog.h"
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"

@@ -25,7 +25,6 @@
 #include "engine/AudioEngine.h"
 
 #include "gui/AboutComponent.h"
-#include "gui/ActivationDialog.h"
 #include "gui/ContentComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/MainWindow.h"

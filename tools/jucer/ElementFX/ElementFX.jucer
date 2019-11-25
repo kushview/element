@@ -374,10 +374,6 @@
               file="../../../src/gui/AboutComponent.cpp"/>
         <FILE id="aoYUXQ" name="AboutComponent.h" compile="0" resource="0"
               file="../../../src/gui/AboutComponent.h"/>
-        <FILE id="lpWkh7" name="ActivationDialog.cpp" compile="1" resource="0"
-              file="../../../src/gui/ActivationDialog.cpp"/>
-        <FILE id="aHJlTw" name="ActivationDialog.h" compile="0" resource="0"
-              file="../../../src/gui/ActivationDialog.h"/>
         <FILE id="uuxkmS" name="Artist.h" compile="0" resource="0" file="../../../src/gui/Artist.h"/>
         <FILE id="Lia19F" name="AssetTreeView.cpp" compile="1" resource="0"
               file="../../../src/gui/AssetTreeView.cpp"/>
