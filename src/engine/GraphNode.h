@@ -64,10 +64,11 @@ public:
     /** Returns an audio processor if available */
     JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
     
+    //=========================================================================
+    /** Returns the name of this node */
     String getName() const { return name; }
     
     //=========================================================================
-
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
 
@@ -88,11 +89,9 @@ public:
     int getNumAudioOutputs() const;
     
     //=========================================================================
-
     const ParameterArray& getParameters() const    { return parameters; }
 
     //=========================================================================
-
     /** Returns the type of port
         
         @param port The port to check
@@ -332,9 +331,12 @@ public:
     bool isMutingInputs() const { return muteInput.get() == 1; }
 
     //=========================================================================
-    
     virtual void getState (MemoryBlock&) = 0;
     virtual void setState (const void*, int sizeInBytes) = 0;
+
+    //=========================================================================
+    void setOversamplingFactor (int osFactor);
+    int getOversamplingFactor();
 
     //=========================================================================
     /** Triggered when the enabled state changes */
@@ -342,13 +344,23 @@ public:
 
     /** Triggered when the bypass state changes */
     Signal<void(GraphNode*)> bypassChanged;
+
+    /** Triggered when the current MIDI program changes */
     Signal<void()> midiProgramChanged;
+
+    /** Triggered when the mute state changes */
     Signal<void(GraphNode*)> muteChanged;
+
+    /** Triggered immediately before this node is removed from a graph */
     Signal<void()> willBeRemoved;
+
+    /** Triggered when the ports have changed */
     Signal<void()> portsChanged;
-    
-    void setOversamplingFactor (int osFactor);
-    int getOversamplingFactor();
+
+    /** Triggered when the node changes its name */
+    Signal<void()> nameChanged;
+
+
 
 protected:
     GraphNode (uint32 nodeId) noexcept;
@@ -356,9 +368,11 @@ protected:
     
     void setName (const String& newName)
     {
-        jassert (newName.isNotEmpty());
-        if (newName.isNotEmpty())
+        if (newName.isNotEmpty() && newName != name)
+        {
             name = newName;
+            nameChanged();
+        }
     }
 
     //=========================================================================
