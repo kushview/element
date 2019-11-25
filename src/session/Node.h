@@ -98,14 +98,14 @@ public:
         setMissingProperties();
     }
     
-    ~Node() noexcept { }
+    ~Node() noexcept {}
     
     /** Returns true if the connection exists in the provided ValueTree
      
         @param checkMissing  If true, will return false if found but has the missing property
-        */
+    */
     static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
-                                    const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
+                                  const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
     
     static Node createDefaultGraph (const String& name = String());
 
@@ -114,9 +114,6 @@ public:
     
     /** Returns true if the value tree is probably a graph node */
     static bool isProbablyGraphNode (const ValueTree& data);
-
-    /** Returns true if this node should be enabled */
-    inline const bool isEnabled() const { return (bool) getProperty (Tags::enabled, true); }
 
     static ValueTree resetIds (const ValueTree& data);
     
@@ -152,6 +149,10 @@ public:
 
     /** Create an Arc from a ValueTree */
     static Arc arcFromValueTree (const ValueTree& data);
+
+    //=========================================================================
+    /** Returns true if this node should be enabled */
+    inline const bool isEnabled() const     { return (bool) getProperty (Tags::enabled, true); }
 
     Node getParentGraph() const;
     bool isChildOfRootGraph() const;
