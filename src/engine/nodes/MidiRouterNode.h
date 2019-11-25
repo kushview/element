@@ -115,6 +115,9 @@ private:
     ToggleGrid toggles;
     ToggleGrid nextToggles;
     bool togglesChanged { false };
+
+    OwnedArray<MidiBuffer> midiOuts;
+    void initMidiOuts (OwnedArray<MidiBuffer>& outs);
 };
 
 }

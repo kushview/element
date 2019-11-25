@@ -38,6 +38,7 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_ROUTER, nullptr);
 
     clearPatches();
+    initMidiOuts (midiOuts);
 
     auto* program = programs.add (new Program ("Linear Stereo"));
     program->matrix.resize (ins, outs);
@@ -95,7 +96,7 @@ void MidiRouterNode::setMatrixState (const MatrixState& matrix)
 
     {
         ScopedLock sl (getLock());
-        nextToggles.swapWith (newPatches);
+        toggles.swapWith (newPatches);
         togglesChanged = true; // initiate the crossfade
     }
 
@@ -110,8 +111,29 @@ MatrixState MidiRouterNode::getMatrixState() const
 void MidiRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     jassert (midi.getNumBuffers() >= numDestinations);
+    
+    const auto nsamples = audio.getNumSamples();
+    const auto nbuffers = midi.getNumBuffers();
     audio.clear();
-    midi.clear();
+
+    ScopedLock sl (getLock());
+    for (int src = 0; src < numSources; ++src)
+    {
+        if (src >= nbuffers)
+            break;
+        
+        const auto& rb = *midi.getReadBuffer (src);
+        for (int dst = 0; dst < numDestinations; ++dst)
+            if (toggles.get (src, dst))
+                midiOuts.getUnchecked(dst)->addEvents (rb, 0, nsamples, 0);
+    }
+
+    for (int i = midiOuts.size(); --i >= 0;)
+    {
+        auto* const ob = midiOuts.getUnchecked (i);
+        ob->swapWith (*midi.getWriteBuffer (i));
+        ob->clear();
+    }
 }
 
 void MidiRouterNode::getState (MemoryBlock& block)
@@ -158,6 +180,15 @@ void MidiRouterNode::clearPatches()
     for (int r = 0; r < state.getNumRows(); ++r)
         for (int c = 0; c < state.getNumColumns(); ++c)
             state.set (r, c, false);
+}
+
+void MidiRouterNode::initMidiOuts (OwnedArray<MidiBuffer>& outs)
+{
+    while (outs.size() < numDestinations)
+    {
+        auto* const buf = outs.add (new MidiBuffer());
+        buf->ensureSize (16 * 3);
+    }
 }
 
 }
