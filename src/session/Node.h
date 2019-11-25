@@ -217,12 +217,11 @@ public:
     
     const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
 
-    
     /** Returns the user-modifiable name of this node */
     const String getName() const { return getProperty (Tags::name); }
 
     /** Returns the node name defined by the user. If not set it returns the
-        node name set when loaded. 
+        node name set when loaded.
      */
     const String getDisplayName() const;
 
@@ -234,13 +233,24 @@ public:
         return dname.isNotEmpty() && dname != getPluginName();
     }
 
+    //=========================================================================
+    /** Returns true if this node couldn't be loaded but still remains on it's
+        parenet graph */
+    bool isMissing() const          { return hasProperty (Tags::missing); }
+
+    //=========================================================================
+    /** Returns the engine-side graphnode implementation */
     GraphNode* getGraphNode() const;
-    
-    int getNumNodes() const         { return getNodesValueTree().getNumChildren(); }
-    Node getNode (const int index)  const { return Node (getNodesValueTree().getChild(index), false); }
     
     /** Returns a child graph node object by id */
     GraphNode* getGraphNodeForId (const uint32) const;
+
+    //=========================================================================
+    /** Returns the number of child nodes contained on this node */
+    int getNumNodes() const         { return getNodesValueTree().getNumChildren(); }
+
+    /** Returns a child node by index */    
+    Node getNode (const int index)  const { return Node (getNodesValueTree().getChild(index), false); }
     
     const int getNumAudioIns()  const { return (int) getProperty ("numAudioIns", 0); }
     const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }

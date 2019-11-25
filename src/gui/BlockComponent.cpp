@@ -455,7 +455,7 @@ void BlockComponent::paint (Graphics& g)
             ! collapsed, false); 
     }
 
-    if (node.getValueTree().hasProperty (Tags::missing))
+    if (node.isMissing())
     {
         g.setColour (Colour (0xff333333));
         g.setFont (9.f);
