@@ -64,6 +64,29 @@ int Port::getChannel() const
     return -1;
 }
 
+//=============================================================================
+Node::Node() : ObjectModel() {}
+    
+Node::Node (const ValueTree& data, const bool setMissing)
+    : ObjectModel (data)
+{
+    if (setMissing)
+    {
+        jassert (data.hasType (Tags::node));
+        setMissingProperties();
+    }
+}
+
+Node::Node (const Identifier& nodeType)
+    : ObjectModel (Tags::node)
+{
+    objectData.setProperty (Slugs::type, nodeType.toString(), nullptr);
+    setMissingProperties();
+}
+
+Node::~Node() noexcept {}
+
+//=============================================================================
 Node Node::createDefaultGraph (const String& name)
 {
     Node graph (Tags::graph);
@@ -234,6 +257,29 @@ ValueTree Node::parse (const File& file)
     }
     
     return ValueTree();
+}
+
+void Node::sanitizeProperties (ValueTree node, const bool recursive)
+{
+    node.removeProperty (Tags::updater, nullptr);
+    node.removeProperty (Tags::object,  nullptr);
+    
+    if (node.hasType (Tags::node))
+    {
+        Array<Identifier> properties ({ Tags::offline, 
+            Tags::placeholder, Tags::missing });
+        for (const auto& property : properties)
+            node.removeProperty (property, nullptr);
+    }
+
+    if (recursive)
+        for (int i = 0; i < node.getNumChildren(); ++i)
+            sanitizeProperties (node.getChild(i), recursive);
+}
+
+void Node::sanitizeRuntimeProperties (ValueTree node, const bool recursive)
+{
+    Node::sanitizeProperties (node, recursive);
 }
 
 bool Node::writeToFile (const File& targetFile) const

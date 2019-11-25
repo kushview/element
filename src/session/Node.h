@@ -75,38 +75,30 @@ class Node : public ObjectModel
 {
 public:
     /** Create an invalid node */
-    Node() : ObjectModel() { }
+    Node();
     
-    Node (const ValueTree& data, const bool setMissing = true)
-        : ObjectModel (data)
-    {
-        if (setMissing)
-        {
-            jassert (data.hasType (Tags::node));
-            setMissingProperties();
-        }
-        else
-        {
-            // noop
-        }
-    }
+    /** Create a node with existing data */
+    Node (const ValueTree& data, const bool setMissing = true);
     
-    Node (const Identifier& nodeType)
-        : ObjectModel (Tags::node)
-    {
-        objectData.setProperty (Slugs::type, nodeType.toString(), nullptr);
-        setMissingProperties();
-    }
+    /** Creates a node with specific type */
+    Node (const Identifier& nodeType);
     
-    ~Node() noexcept {}
+    /** Destructor */
+    ~Node() noexcept;
     
     /** Returns true if the connection exists in the provided ValueTree
-     
+
+        @param arcs          Value tree containing connections
+        @param sourceNode    The source node ID
+        @param sourcePort    The source port index
+        @param destNode      The target node ID
+        @param destPort      The target port index
         @param checkMissing  If true, will return false if found but has the missing property
     */
     static bool connectionExists (const ValueTree& arcs, const uint32 sourceNode, const uint32 sourcePort,
                                   const uint32 destNode, const uint32 destPort, const bool checkMissing = false);
-    
+
+    /** Creates a default graph structure with optional name */
     static Node createDefaultGraph (const String& name = String());
 
     /** Creates an empty graph model */
@@ -115,34 +107,17 @@ public:
     /** Returns true if the value tree is probably a graph node */
     static bool isProbablyGraphNode (const ValueTree& data);
 
+    /** Removes unused id properties and resets the uuid */
     static ValueTree resetIds (const ValueTree& data);
     
-    /** Load a node from file */
+    /** Load node data from file */
     static ValueTree parse (const File& file);
     
     /** Removes properties that can't be saved to a file. e.g. object properties */
-    static void sanitizeProperties (ValueTree node, const bool recursive = false)
-    {
-        node.removeProperty (Tags::updater, nullptr);
-        node.removeProperty (Tags::object,  nullptr);
-        
-        if (node.hasType (Tags::node))
-        {
-            Array<Identifier> properties ({ Tags::offline, 
-                Tags::placeholder, Tags::missing });
-            for (const auto& property : properties)
-                node.removeProperty (property, nullptr);
-        }
-
-        if (recursive)
-            for (int i = 0; i < node.getNumChildren(); ++i)
-                sanitizeProperties (node.getChild(i), recursive);
-    }
+    static void sanitizeProperties (ValueTree node, const bool recursive = false);
     
-    /** this is just an alias right now */
-    static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false) {
-        sanitizeProperties (node, recursive);
-    }
+    /** This is just an alias right now */
+    static void sanitizeRuntimeProperties (ValueTree node, const bool recursive = false);
 
     /** Create a value tree version of an arc */
     static ValueTree makeArc (const kv::Arc& arc);
@@ -151,14 +126,78 @@ public:
     static Arc arcFromValueTree (const ValueTree& data);
 
     //=========================================================================
+    /** Returns true if the underlying data is probably a node */
+    bool isValid() const { return objectData.hasType (Tags::node); }
+
+    /** Returns the user-modifiable name of this node */
+    const String getName() const { return getProperty (Tags::name); }
+
+    /** Returns the node name defined by the user. If not set it returns the
+        node name set when loaded.
+     */
+    const String getDisplayName() const;
+
+    /** Returns the name as defined by the loaded plugin */
+    const String getPluginName() const;
+
+    /** Returns true if the name has been user-modified */
+    bool hasModifiedName() const
+    {
+        auto dname = getName();
+        return dname.isNotEmpty() && dname != getPluginName();
+    }
+
+    //=========================================================================
+    /** Returns the nodeId as defined in the engine */
+    const uint32 getNodeId() const { return (uint32)(int64) getProperty (Tags::id); }
+
+    /** Returns this Node's UUID as a string */
+    String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
+
+    /** Returns this Node's UUID */
+    Uuid getUuid() const { return Uuid (getUuidString()); }
+    
+    //=========================================================================
+    /** Returns true if this node is probably a graph */
+    bool isGraph() const { return isProbablyGraphNode (objectData); }
+    
+    /** Returns true if this is a root graph on the session */
+    bool isRootGraph() const
+    {
+        return objectData.getParent().hasType (Tags::graphs) &&
+               objectData.getParent().getParent().hasType (Tags::session);
+    }
+
+    /** Returns an Identifier indicating this nodes type */
+    const Identifier getNodeType() const
+    {
+        auto type = getProperty(Slugs::type).toString();
+        return type.isNotEmpty() ? type : Identifier ("unknown");
+    }
+
+    /** Returns true if this node is a specific type */
+    const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
+
+    //=========================================================================
+    /** Returns true if this node has a custom editor */
+    bool hasEditor() const;
+
+    //=========================================================================
+    /** Returns the graph containing this node, if any */
+    Node getParentGraph() const;
+
+    /** Returns true if this is a direct child of a root level graph */
+    bool isChildOfRootGraph() const;
+
+    //=========================================================================
+    /** Returns true if this node couldn't be loaded but still remains on it's
+        parenet graph */
+    bool isMissing() const          { return hasProperty (Tags::missing); }
+
     /** Returns true if this node should be enabled */
     inline const bool isEnabled() const     { return (bool) getProperty (Tags::enabled, true); }
 
-    Node getParentGraph() const;
-    bool isChildOfRootGraph() const;
-    String getUuidString() const { return objectData.getProperty(Tags::uuid).toString(); }
-    Uuid getUuid() const { return Uuid (getUuidString()); }
-    
+    //=========================================================================
     inline kv::MidiChannels getMidiChannels() const
     {
         kv::MidiChannels chans;
@@ -183,68 +222,55 @@ public:
         return chans;
     }
 
-    bool isBypassed() const { return objectData.getProperty(Tags::bypass, false); }
-    Value getBypassedValue() { return getPropertyAsValue (Tags::bypass); }
+    //=========================================================================
+    /** Returns true if bypass is on for this Node */
+    bool isBypassed() const                 { return objectData.getProperty(Tags::bypass, false); }
+
+    /** Returns the Value object for the bypass property */
+    Value getBypassedValue()                { return getPropertyAsValue (Tags::bypass); }
+
+    //=========================================================================    
+    /** Returns true if this Node is muted */
+    bool isMuted() const                    { return (bool) getProperty (Tags::mute, false); }
     
-    bool isMuted() const { return (bool) getProperty (Tags::mute, false); }
+    /** Returns the Value object for the mute property */
     Value getMutedValue() { return getPropertyAsValue (Tags::mute); }
+
+    /** Returns true if inputs are muted */
     bool isMutingInputs() const { return (bool) getProperty ("muteInput", false); }
+
+    /** Change the mute status of this Node */
     void setMuted (bool);
+
+    /** Change the mute status of inputs on this Node */
     void setMuteInput (bool);
 
-    /** returns the number of connections on this node */
+    //=========================================================================
+    /** Returns the number of connections on this node */
     int getNumConnections() const;
+
+    /** Returns a Value tree containing connection information */
     ValueTree getConnectionValueTree (const int index) const;
-    
-    /** Returns true if the underlying data is probably a node */
-    bool isValid() const { return objectData.hasType (Tags::node); }
-    
-    /** Returns true if this node is probably a graph */
-    bool isGraph() const { return isProbablyGraphNode (objectData); }
-    
-    /** Returns the nodeId as defined in the engine */
-    const uint32 getNodeId() const { return (uint32)(int64) getProperty (Tags::id); }
 
-    /** Returns an Identifier indicating this nodes type */
-    const Identifier getNodeType() const
-    {
-        auto type = getProperty(Slugs::type).toString();
-        return type.isNotEmpty() ? type : Identifier ("unknown");
-    }
-
-    /** Set relative position */
-    void setRelativePosition (const double x, const double y);
-    void getRelativePosition (double& x, double& y) const;
-    
-    const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
-
-    /** Returns the user-modifiable name of this node */
-    const String getName() const { return getProperty (Tags::name); }
-
-    /** Returns the node name defined by the user. If not set it returns the
-        node name set when loaded.
-     */
-    const String getDisplayName() const;
-
-    const String getPluginName() const;
-
-    bool hasModifiedName() const
-    {
-        auto dname = getName();
-        return dname.isNotEmpty() && dname != getPluginName();
-    }
+    /** Get an array of Arcs contained on this Node (graph) */
+    void getArcs (OwnedArray<Arc>&) const;
 
     //=========================================================================
-    /** Returns true if this node couldn't be loaded but still remains on it's
-        parenet graph */
-    bool isMissing() const          { return hasProperty (Tags::missing); }
-
+    /** Set relative position */
+    void setRelativePosition (const double x, const double y);
+    
+    /** Gets the x/y relative coordinates of this node */
+    void getRelativePosition (double& x, double& y) const;
+    
     //=========================================================================
     /** Returns the engine-side graphnode implementation */
     GraphNode* getGraphNode() const;
     
     /** Returns a child graph node object by id */
     GraphNode* getGraphNodeForId (const uint32) const;
+
+    /** Returns true if this node can connect to another in any capacity */
+    const bool canConnectTo (const Node& o) const;
 
     //=========================================================================
     /** Returns the number of child nodes contained on this node */
@@ -255,8 +281,6 @@ public:
     
     const int getNumAudioIns()  const { return (int) getProperty ("numAudioIns", 0); }
     const int getNumAudioOuts() const { return (int) getProperty ("numAudioOuts", 0); }
-    
-    const bool canConnectTo (const Node& o) const;
 
     int getNumPorts() const { return getPortsValueTree().getNumChildren(); }
     void getPorts (PortArray& ports, PortType type, bool isInput) const;
@@ -304,21 +328,21 @@ public:
             objectData.getProperty(Tags::identifier) == "midi.output";
     }
 
+    inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
+
     /** Returns the format of this node */
-    inline const var& getFormat() const        { return objectData.getProperty(Tags::format); }
+    inline const var& getFormat() const        { return objectData.getProperty (Tags::format); }
 
     /** Returns this nodes identifier */
-    inline const var& getIdentifier() const    { return objectData.getProperty(Tags::identifier); }
+    inline const var& getIdentifier() const    { return objectData.getProperty (Tags::identifier); }
 
     /** Returns a file property if exists, otherwise the identifier property */
     inline const var& getFileOrIdentifier() const
     { 
-        return objectData.hasProperty(Tags::file) ? objectData.getProperty (Tags::file)
-                                                    : getIdentifier();
+        return objectData.hasProperty(Tags::file) 
+            ? objectData.getProperty (Tags::file) : getIdentifier();
     }
 
-    inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
-    
     /** returns the first node by format and identifier */
     inline Node getNodeByFormat (const var& format, const var& identifier) const
     {
@@ -356,66 +380,97 @@ public:
         return false;
     }
     
+    /** Returns true if this node contains an Audio Input node */
     bool hasAudioInputNode() const      { return hasChildNode ("Internal", "audio.input"); }
+
+    /** Returns true if this node contains an Audio Output node */
     bool hasAudioOutputNode() const     { return hasChildNode ("Internal", "audio.output"); }
+
+    /** Returns true if this node contains a MIDI Input node */
     bool hasMidiInputNode() const       { return hasChildNode ("Internal", "midi.input"); }
+
+    /** Returns true if this node contains a MIDI Output node */
     bool hasMidiOutputNode() const      { return hasChildNode ("Internal", "midi.output"); }
     
     /** Fill a plugin Description for loading with the plugin manager */
     void getPluginDescription (PluginDescription&) const;
     
+    //=========================================================================
     /** Write the contents of this node to file */
     bool writeToFile (const File& file) const;
 
+    /** Save this node as a preset to file */
     bool savePresetTo (const DataPath& path, const String& name) const;
     
-    /** Returns true if this is a root graph on the session */
-    bool isRootGraph() const
-    {
-        return objectData.getParent().hasType (Tags::graphs) &&
-                objectData.getParent().getParent().hasType (Tags::session);
-    }
-    
+    /** Get an array of possible sources that can connect to this Node */
     void getPossibleSources (NodeArray& nodes) const;
+
+    /** Get an array of possible destinations this node can connect to */
     void getPossibleDestinations (NodeArray& nodes) const;
     
+    /** Returns a child node by Node ID */
     Node getNodeById (const uint32 nodeId) const;
+
+    /** Returns a child node by UUID */
     Node getNodeByUuid (const Uuid& uuid, const bool recursive = true) const;
 
+    //=========================================================================
+    /** Rebuild this node's ports based on it's GraphNode object */
     void resetPorts();
+
+    /** Get a port by index */
     Port getPort (const int index) const;
+
+    /** Returns true if the passed in nodes and ports cann connect to one another */
     bool canConnect (const uint32 sourceNode, const uint32 sourcePort,
-                        const uint32 destNode, const uint32 destPort) const;
+                     const uint32 destNode, const uint32 destPort) const;
     
+    //=========================================================================
     /** Saves the node state from GraphNode to state property */
     void savePluginState();
     
     /** Reads state property and applies to GraphNode */
     void restorePluginState();
     
+    //=========================================================================
+    /** Get the number of factory presets */
     int getNumPrograms() const;
+
+    /** Change a factory preset's name */
     String getProgramName (const int index) const;
+
+    /** Load a factory preset */
     void setCurrentProgram (const int index);
+
+    /** Get the currently loaded factory preset */
     int getCurrentProgram() const;
     
+    //=========================================================================
     /** True if global MIDI programs should be loaded/saved */
     bool useGlobalMidiPrograms() const;
+
     /** Change whether to load/save global programs */
     void setUseGlobalMidiPrograms (bool);
+
     /** True if MIDI program functionality is on */
     bool areMidiProgramsEnabled() const;
+
     /** Turn MIDI Programs on or off */
     void setMidiProgramsEnabled (bool);
     
+    /** Returns the current MIDI program */
     int getMidiProgram() const;
+
+    /** Sets the current midi program */
     void setMidiProgram (int program);
+
+    /** Returns the name of a MIDI program */
     String getMidiProgramName (int program) const;
+
+    /** Change a MIDI program's name */
     void setMidiProgramName (int program, const String& name);
 
-    bool hasEditor() const;
-    
-    void getArcs (OwnedArray<Arc>&) const;
-
+    //=========================================================================    
     ValueTree getArcsValueTree()  const { return objectData.getChildWithName (Tags::arcs); }
     ValueTree getNodesValueTree() const { return objectData.getChildWithName (Tags::nodes); }
     ValueTree getParentArcsNode() const;
@@ -424,6 +479,7 @@ public:
     const bool operator==(const Node& o) const { return this->objectData == o.objectData; }
     const bool operator!=(const Node& o) const { return this->objectData != o.objectData; }
 
+    /** Iterate over all ValueTree's recursively */
     void forEach (std::function<void(const ValueTree& tree)>) const;
 
 private:
