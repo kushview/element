@@ -42,28 +42,28 @@ public:
     GraphEditorComponent();
     virtual ~GraphEditorComponent();
 
+    /** Set the currently displayed graph */
     void setNode (const Node& n);
-    void selectNode (const Node& n);
+
+    /** Returns the displayed graph */
+    Node getGraph() const { return graph; }
     
+    /** Selects the given node */
+    void selectNode (const Node& n);
+
+    /** Removes the selected nodes */    
     void deleteSelectedNodes();
     
+    /** Returns true if the layout is vertical */
     bool isLayoutVertical() const { return verticalLayout; }
+
+    /** Changes the layout to vertical or not */
     void setVerticalLayout (const bool isVertical);
-    
-    void paint (Graphics& g) override;
-    void resized() override;
-    void mouseDown (const MouseEvent& e) override;
 
-    void changeListenerCallback (ChangeBroadcaster*) override;
-    void onGraphChanged();
+    /** Stabilize all nodes without changing position */
+    void stabilizeNodes();
+
     void updateComponents();
-
-    bool isInterestedInDragSource (const SourceDetails&) override;
-    // void itemDragEnter (const SourceDetails& dragSourceDetails) override;
-    // void itemDragMove (const SourceDetails& dragSourceDetails) override;
-    // void itemDragExit (const SourceDetails& dragSourceDetails) override;
-    void itemDropped (const SourceDetails& details) override;
-    bool shouldDrawDragImageWhenOver() override { return true; }
 
     bool areResizePositionsFrozen() const { return resizePositionsFrozen; }
     inline void setResizePositionsFrozen (const bool shouldBeFrozen)
@@ -75,10 +75,16 @@ public:
             graph.setProperty (Tags::staticPos, resizePositionsFrozen);
     }
 
-    Node getGraph() const { return graph; }
+    void changeListenerCallback (ChangeBroadcaster*) override;
 
-    /** Stabilize all nodes without changing position */
-    void stabilizeNodes();
+    void paint (Graphics& g) override;
+    void resized() override;
+    void mouseDown (const MouseEvent& e) override;
+
+
+    bool isInterestedInDragSource (const SourceDetails&) override;
+    void itemDropped (const SourceDetails& details) override;
+    bool shouldDrawDragImageWhenOver() override { return true; }
 
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);

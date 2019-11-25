@@ -39,7 +39,6 @@ public:
 
     void resized() override;
     void didBecomeActive() override;
-    void paint (Graphics& g) override;
     void stabilizeContent() override;
     void buttonClicked (Button*) override;
 

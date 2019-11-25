@@ -252,7 +252,8 @@ namespace Element {
         bool locked;
     };
 
-    class GraphPropertyPanel : public PropertyPanel {
+    class GraphPropertyPanel : public PropertyPanel
+    {
     public:
         GraphPropertyPanel() : locked (var (true)) { }
         ~GraphPropertyPanel()
@@ -377,11 +378,6 @@ namespace Element {
                 activeGraphIndex.referTo (session->getActiveGraphIndexObject ());
             }
         }
-    }
-    
-    void GraphSettingsView::paint (Graphics& g)
-    {
-        g.fillAll(LookAndFeel::contentBackgroundColor);
     }
     
     void GraphSettingsView::resized()

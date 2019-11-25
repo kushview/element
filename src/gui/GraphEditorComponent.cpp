@@ -639,11 +639,6 @@ void GraphEditorComponent::changeListenerCallback (ChangeBroadcaster*)
     updateComponents();
 }
 
-void GraphEditorComponent::onGraphChanged()
-{
-    updateComponents();
-}
-
 void GraphEditorComponent::updateConnectorComponents()
 {
     const ValueTree arcs = graph.getArcsValueTree();
