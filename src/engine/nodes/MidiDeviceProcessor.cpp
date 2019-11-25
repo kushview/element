@@ -181,7 +181,7 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
             output->clearAllPendingMessages();
             output->startBackgroundThread();
         } 
-        else 
+        else
         {
             DBG("[EL] could not open MIDI output: " << deviceIdx << ": " << deviceName);
         }

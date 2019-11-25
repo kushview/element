@@ -375,7 +375,7 @@ void BlockComponent::makeEditorActive()
         ViewHelpers::presentPluginWindow (this, node);
     }
 }
-    
+
 bool BlockComponent::hitTest (int x, int y)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
@@ -505,7 +505,7 @@ void BlockComponent::paint (Graphics& g)
         {
             g.setFont (Font (8.f));
             g.drawFittedText (subName, box.getX() + 20, box.getY() + 10, box.getWidth(),
-                                18, Justification::centredLeft, 2);
+                              18, Justification::centredLeft, 2);
         }
     }
     
