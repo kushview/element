@@ -62,8 +62,8 @@ public:
         desc.uid                = EL_INTERNAL_UID_MIDI_ROUTER;
         desc.name               = "MIDI Router";
         desc.descriptiveName    = "A MIDI Patch Grid";
-        desc.numInputChannels   = numDestinations;
-        desc.numOutputChannels  = numSources;
+        desc.numInputChannels   = 0;
+        desc.numOutputChannels  = 0;
         desc.hasSharedContainer = false;
         desc.isInstrument       = false;
         desc.manufacturerName   = "Element";

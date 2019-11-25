@@ -40,7 +40,7 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
     clearPatches();
     initMidiOuts (midiOuts);
 
-    auto* program = programs.add (new Program ("Linear Stereo"));
+    auto* program = programs.add (new Program ("Linear"));
     program->matrix.resize (ins, outs);
     for (int i = 0; i < jmin (ins, outs); ++i)
         program->matrix.set (i, i, true);
@@ -48,13 +48,6 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
 
     if (ins == 4 && outs == 4)
     {
-        program = programs.add (new Program ("Inverse Stereo"));
-        program->matrix.resize (ins, outs);
-        program->matrix.set (0, 1, true);
-        program->matrix.set (1, 0, true);
-        program->matrix.set (2, 3, true);
-        program->matrix.set (3, 2, true);
-
         program = programs.add (new Program ("1-2 to 1-2"));
         program->matrix.resize (ins, outs);
         program->matrix.set (0, 0, true);
