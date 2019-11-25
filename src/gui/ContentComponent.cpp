@@ -77,8 +77,11 @@ ContentComponent* ContentComponent::create (AppController& controller)
    #endif
 }
 
-void ContentView::paint (Graphics& g) { g.fillAll (LookAndFeel::contentBackgroundColor); }
-    
+void ContentView::paint (Graphics& g)
+{
+    g.fillAll (LookAndFeel::backgroundColor);
+}
+
 bool ContentView::keyPressed (const KeyPress& k, Component*)
 {
     if (escapeTriggersClose && k == KeyPress::escapeKey)
