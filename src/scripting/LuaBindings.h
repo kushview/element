@@ -22,10 +22,15 @@
 #include "sol/forward.hpp"
 
 namespace Element {
+
+class Globals;
+
 namespace Lua {
 
 extern void registerUI (sol::state&);
 extern void registerModel (sol::state&);
 extern void registerEngine (sol::state&);
+extern void registerElement (sol::state&);
+extern void setWorld (sol::state&, Globals*);
 
 }}

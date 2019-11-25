@@ -19,6 +19,8 @@
 
 #include "engine/MidiPipe.h"
 #include "session/Node.h"
+#include "session/PluginManager.h"
+#include "Globals.h"
 #include "sol/sol.hpp"
 
 using namespace sol;
@@ -44,6 +46,14 @@ void registerUI (state& lua)
 void registerModel (sol::state& lua)
 {
     auto session = lua.new_usertype<Session> ("Session", no_constructor,
+        "get_num_graphs",           &Session::getNumGraphs,
+        "get_graph",                &Session::getGraph,
+        "get_active_graph",         &Session::getActiveGraph,
+        "get_active_graph_index",   &Session::getActiveGraphIndex,
+        "add_graph",                &Session::addGraph,
+        "set_name",                 &Session::setName,
+        "get_name",                 &Session::getName,
+        "clear",                    &Session::clear
     );
 
     auto node = lua.new_usertype<Node> ("Node", no_constructor,
@@ -214,6 +224,24 @@ end
     // // Session
     // lua.new_usertype<Session> ("Session", no_constructor,
     // );
+}
+
+void registerElement (sol::state& lua)
+{
+    auto e = NS (lua, "element");
+    e["plugins"] = [&lua]() -> PluginManager&
+    {
+        jassert(lua["__world__"].valid());
+        return ((Globals&) lua["__world__"]).getPluginManager();
+    };
+}
+
+void setWorld (sol::state& lua, Globals* world)
+{
+    if (world == nullptr)
+        lua["__world__"] = nullptr;
+    else
+        lua["__world__"] = std::ref (*world);
 }
 
 }}
