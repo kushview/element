@@ -32,6 +32,7 @@
 #include "gui/nodes/LuaNodeEditor.h"
 #include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
+#include "gui/nodes/MidiRouterEditor.h"
 #include "gui/nodes/OSCReceiverNodeEditor.h"
 #include "gui/nodes/OSCSenderNodeEditor.h"
 #include "gui/nodes/VolumeNodeEditor.h"
@@ -187,6 +188,10 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
             return createPluginWindowFor (node, new AudioRouterEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_ROUTER)
+        {
+            return createPluginWindowFor (node, new MidiRouterEditor (node));
         }
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_MONITOR)
         {

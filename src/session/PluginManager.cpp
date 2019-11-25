@@ -23,8 +23,9 @@
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/MidiMonitorNode.h"
+#include "engine/nodes/MidiProgramMapNode.h"
+#include "engine/nodes/MidiRouterNode.h"
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
 #include "DataPath.h"
@@ -755,6 +756,10 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
     {
         return new AudioRouterNode();
+    }
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_ROUTER)
+    {
+        return new MidiRouterNode (4, 4);
     }
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_LUA)
     {

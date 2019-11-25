@@ -33,6 +33,7 @@
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "engine/nodes/MidiMonitorNode.h"
+#include "engine/nodes/MidiRouterNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
@@ -311,6 +312,11 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->pluginFormatName   = "Element";
         desc->version            = "1.0.0";
     }
+    else if (fileOrId == EL_INTERNAL_ID_MIDI_ROUTER)
+    {
+        auto* const desc = ds.add (new PluginDescription());
+        MidiRouterNode(4,4).getPluginDescription (*desc);
+    }
     else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
@@ -388,6 +394,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
    #if defined (EL_SOLO) || defined (EL_PRO)
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
+    results.add (EL_INTERNAL_ID_MIDI_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     results.add (EL_INTERNAL_ID_MIDI_MONITOR);
     results.add (EL_INTERNAL_ID_OSC_RECEIVER);

@@ -462,6 +462,11 @@ Component* NodeEditorContentView::createEmbededEditor()
         auto* const audioRouterEditor = new AudioRouterEditor (node);
         return audioRouterEditor;
     }
+    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_ROUTER)
+    {
+        auto* const midiRouterEditor = new MidiRouterEditor (node);
+        return midiRouterEditor;
+    }
 
     return nullptr;
 }
