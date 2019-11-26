@@ -52,9 +52,6 @@ static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
 }
 
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
-static auto EL (state& lua)     { return lua["el"].get_or_create<table>(); }
-static auto KV (state& lua)     { return lua["kv"].get_or_create<table>(); }
-static auto JUCE (state& lua)   { return lua["juce"].get_or_create<table>(); }
 
 void registerUI (state& lua)
 {
