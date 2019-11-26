@@ -78,9 +78,12 @@ void registerModel (sol::state& lua)
     // Node
     auto node = lua.new_usertype<Node> ("Node", no_constructor,
         "is_valid",             &Node::isValid,
-        "get_name",             &Node::getName,
-        "get_display_name",     &Node::getDisplayName,
-        "get_plugin_name",      &Node::getPluginName,
+        "get_name",             [](const Node& self) { return std::move (self.getName().toStdString()); },
+        "get_display_name",     [](const Node& self) { return std::move (self.getDisplayName().toStdString()); },
+        "get_plugin_name",      [](const Node& self) { return std::move (self.getPluginName().toStdString()); },
+        "set_name", [](Node& self, const char* name) -> void {
+            self.setProperty (Tags::name, String::fromUTF8 (name));
+        },
         "has_modified_name",    &Node::hasModifiedName,
         "get_node_id",          &Node::getNodeId,
         "get_uuid_string",      &Node::getUuidString,

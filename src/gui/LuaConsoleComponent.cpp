@@ -58,7 +58,8 @@ public:
 
 //=============================================================================
 
-class LuaConsoleComponent::Content : public Component
+class LuaConsoleComponent::Content : public Component,
+                                     private Timer
 {
 public:
     Content (LuaConsoleComponent& o)
@@ -75,6 +76,9 @@ public:
 
         prompt.onReturnKey = [this]
         {
+            if (! haveWorld)
+                return;
+
             auto text = prompt.getText();
             prompt.setText ({}, dontSendNotification);
             buffer.moveCaretToEnd();
@@ -110,21 +114,10 @@ public:
             }
         };
 
-        lua.open_libraries();
-        Lua::registerUI (lua);
-        
-        lua["os"]["exit"] = sol::overload (
-            [this]()
-            {
-                ViewHelpers::invokeDirectly (this, Commands::quit, true);
-            },
-            [this](int code)
-            {
-                JUCEApplication::getInstance()->setApplicationReturnValue (code);
-                ViewHelpers::invokeDirectly (this, Commands::quit, true);
-            });
+       
 
         setSize (100, 100);
+        startTimerHz (60);
     }
 
     ~Content()
@@ -144,7 +137,7 @@ public:
 
 private:
     using LuaResult = sol::protected_function_result;
-    
+    bool haveWorld { false };
     LuaConsoleComponent& owner;
     sol::state lua;
     LuaConsoleBuffer buffer;
@@ -169,6 +162,37 @@ private:
     LuaResult errorHandler (lua_State* L, LuaResult pfr) {
         lastError = pfr.get<std::string>();
         return pfr;
+    }
+
+    void timerCallback() override
+    {
+        if (haveWorld)
+        {
+            stopTimer();
+            return;
+        }
+
+        if (auto* world = ViewHelpers::getGlobals (this))
+        {
+            lua.open_libraries();
+            Lua::setWorld (lua, world);
+            Lua::registerUI (lua);
+            Lua::registerModel (lua);
+            Lua::registerEngine (lua);
+            Lua::registerElement (lua);
+            lua["os"]["exit"] = sol::overload (
+                [this]()
+                {
+                    ViewHelpers::invokeDirectly (this, Commands::quit, true);
+                },
+                [this](int code)
+                {
+                    JUCEApplication::getInstance()->setApplicationReturnValue (code);
+                    ViewHelpers::invokeDirectly (this, Commands::quit, true);
+                }
+            );           
+            haveWorld = true;
+        }
     }
 };
 

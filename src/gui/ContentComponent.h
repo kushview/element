@@ -24,6 +24,7 @@
 #include "Workspace.h"
 
 #define EL_VIEW_GRAPH_MIXER "GraphMixerView"
+#define EL_VIEW_CONSOLE     "LuaConsoleViw"
 
 namespace Element {
 

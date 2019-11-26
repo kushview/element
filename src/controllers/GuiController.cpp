@@ -439,7 +439,8 @@ void GuiController::getAllCommands (Array <CommandID>& commands)
         Commands::hideAllPluginWindows,
         Commands::showKeymapEditor,
         Commands::showControllerDevices,
-        Commands::toggleUserInterface
+        Commands::toggleUserInterface,
+        Commands::showConsole
     });
     
     commands.add (Commands::quit);
@@ -599,15 +600,28 @@ void GuiController::getCommandInfo (CommandID commandID, ApplicationCommandInfo&
                 Commands::Categories::UserInterface, flags);
         } break;
 
+
+
        #if defined (EL_PRO)
         case Commands::showGraphMixer: {
             int flags = (content != nullptr) ? 0 : Info::isDisabled;
             if (content && content->showAccessoryView() && 
-                content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER) 
+                content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
             {
                 flags |= Info::isTicked;
             }
             result.setInfo ("Graph Mixer", "Show/hide the graph mixer", 
+                Commands::Categories::UserInterface, flags);
+        } break;
+        
+        case Commands::showConsole: {
+            int flags = (content != nullptr) ? 0 : Info::isDisabled;
+            if (content && content->showAccessoryView() && 
+                content->getAccessoryViewName() == EL_VIEW_CONSOLE)
+            {
+                flags |= Info::isTicked;
+            }
+            result.setInfo ("Console", "Show the scripting console", 
                 Commands::Categories::UserInterface, flags);
         } break;
        #endif
@@ -775,12 +789,27 @@ bool GuiController::perform (const InvocationInfo& info)
         {
             bool showedIt = false;
             
-            if (content->showAccessoryView()) {
+            if (content->showAccessoryView())
+            {
                 content->setShowAccessoryView (false);
             }
             else
             {
                 content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
+                showedIt = true;
+            }
+        } break;
+        case Commands::showConsole:
+        {
+            bool showedIt = false;
+            
+            if (content->showAccessoryView())
+            {
+                content->setShowAccessoryView (false);
+            }
+            else
+            {
+                content->setAccessoryView (EL_VIEW_CONSOLE);
                 showedIt = true;
             }
         } break;

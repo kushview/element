@@ -66,6 +66,7 @@ enum AppCommands
     toggleUserInterface,
     toggleChannelStrip,
     showGraphMixer,
+    showConsole,
     
     sessionClose           = 0x0300,
     sessionOpen,
@@ -147,7 +148,8 @@ inline static Array<CommandID> getAllCommands()
         toggleUserInterface,
         toggleChannelStrip,
         showGraphMixer,
-        
+        showConsole,
+
         sessionClose,
         sessionOpen,
         sessionNew,
@@ -183,14 +185,14 @@ inline static Array<CommandID> getAllCommands()
         graphSave,
         graphSaveAs,
 
-    #if EL_DOCKING
+       #if EL_DOCKING
         workspaceSave,
         workspaceOpen,
         workspaceResetActive,
         workspaceSaveActive,
         workspaceClassic,
         workspaceEditing,
-    #endif
+       #endif
 
         recentsClear,
     }));
@@ -221,6 +223,7 @@ inline static String toString (CommandID command)
         case Commands::toggleUserInterface:     return "toggleUserInterface"; break;
         case Commands::toggleChannelStrip:      return "toggleChannelStrip"; break;
         case Commands::showGraphMixer:          return "showGraphMixer"; break;
+        case Commands::showConsole:             return "showConsole"; break;
         case Commands::panic:                   return "panic"; break;
         case Commands::graphNew:                return "graphNew"; break;
         case Commands::graphOpen:               return "graphOpen"; break;
@@ -259,6 +262,7 @@ inline static CommandID fromString (const String& str)
     if (str == "toggleUserInterface")   return Commands::toggleUserInterface;
     if (str == "toggleChannelStrip")    return Commands::toggleChannelStrip;
     if (str == "showGraphMixer")        return Commands::showGraphMixer;
+    if (str == "showConsole")           return Commands::showConsole;
 
     if (str == "panic")                 return Commands::panic;
 

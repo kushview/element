@@ -381,7 +381,6 @@ const String Node::getDisplayName() const
     String name = getName();
     if (name.isEmpty())
         name = getPluginName();
-    jassert (name.isNotEmpty());
     return name;
 }
 

@@ -402,6 +402,7 @@ void MainMenu::buildViewMenu (CommandManager& cmd, PopupMenu& menu)
     menu.addCommandItem (&cmd, Commands::showGraphEditor, "Graph Editor");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showGraphMixer, "Graph Mixer");
+    menu.addCommandItem (&cmd, Commands::showConsole, "Console");
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::rotateContentView, "Rotate View...");
     menu.addSeparator();

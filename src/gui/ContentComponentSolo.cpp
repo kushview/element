@@ -594,6 +594,8 @@ void ContentComponentSolo::setAccessoryView (const String& name)
         setContentView (new ConnectionGrid(), true);
     } else if (name == EL_VIEW_GRAPH_MIXER) {
         setContentView (new GraphMixerView(), true);
+    } else if (name == EL_VIEW_CONSOLE) {
+        setContentView (new LuaConsoleView(), true);
     }
 
     container->setShowAccessoryView (true);
