@@ -49,7 +49,7 @@ public:
     
     enum ColourIds
     {
-        textColourId  =  0x90000000,
+        textColourId            =  0x30000100,
         textDisabledColourId,
         backgroundColourId,
         backgroundOnColourId

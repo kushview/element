@@ -110,18 +110,18 @@ namespace Element
             if (useHighlighting &&
                     (mouseIsOverCell (row, column) && ! matrix.connected (row, column)))
             {
-                g.setColour (LookAndFeel::elementBlue.withAlpha (0.4f));
+                g.setColour (Colors::elemental.withAlpha (0.4f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
             else if ((mouseIsOverRow(row) || mouseIsOverColumn(column)) && !matrix.connected (row, column))
             {
-                g.setColour (LookAndFeel::elementBlue.withAlpha (0.3f));
+                g.setColour (Colors::elemental.withAlpha (0.3f));
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);
             }
             else
             {
                 g.setColour (matrix.connected (row, column) ?
-                             Colour (kv::LookAndFeel_KV1::elementBlue.brighter()) :
+                             Colour (kv::Colors::elemental.brighter()) :
                              Colour (kv::LookAndFeel_KV1::defaultMatrixCellOffColor));
         
                 g.fillRect (0, 0, width - gridPadding, height - gridPadding);

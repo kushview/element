@@ -161,7 +161,7 @@ public:
     String getDisplayName() const override { return "Plugins"; }
     void setName (const String&) override { }
     bool isMissing() override { return false; }
-    Icon getIcon() const override { return Icon(getIcons().jigsaw , LookAndFeel_KV1::elementBlue); }
+    Icon getIcon() const override { return Icon(getIcons().jigsaw , Colors::elemental); }
     void addSubItems() override
     {
         for (const auto& type : types)
@@ -189,7 +189,7 @@ public:
     String getDisplayName() const override { return "Session"; }
     virtual void setName (const String&) override { }
     virtual bool isMissing() override { return false; }
-    virtual Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
+    virtual Icon getIcon() const override { return Icon(getIcons().document, Colors::elemental); }
     virtual void addSubItems() override
     {
         addSubItem (new EngineItem());
@@ -215,7 +215,7 @@ private:
         String getDisplayName()  const override { return "Engine"; }
         void setName (const String&)  override { }
         bool isMissing() override { return false; }
-        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
+        Icon getIcon() const override { return Icon(getIcons().document, Colors::elemental); }
     
         void addSubItems() override
         {
@@ -261,7 +261,7 @@ private:
         String getDisplayName()  const override { return getRenamingName(); }
         void setName (const String&)  override { }
         bool isMissing() override { return false; }
-        Icon getIcon() const override { return Icon(getIcons().document, LookAndFeel_KV1::elementBlue); }
+        Icon getIcon() const override { return Icon(getIcons().document, Colors::elemental); }
     
         void itemDoubleClicked (const MouseEvent& ev) override
         {
