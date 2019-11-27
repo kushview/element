@@ -43,7 +43,7 @@ void RackView::paint (Graphics& g)
 {
     g.fillAll (LookAndFeel_KV1::backgroundColor);
     
-    g.setColour (LookAndFeel_KV1::elementBlue);
+    g.setColour (Colors::elemental);
     g.setFont (14.0f);
     g.drawText ("No Selection...", getLocalBounds(),
                 Justification::centred, true);

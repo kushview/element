@@ -23,19 +23,24 @@
 
 namespace Element {
 
-const Colour Colors::elemental      = Colour (0xff4765a0);  // LookAndFeel_KV1::elementBlue;
-const Colour Colors::toggleBlue     = Colour (0xff33aaf9);
-const Colour Colors::toggleGreen    = Colour (0xff92e75e);
-const Colour Colors::toggleOrange   = Colour (0xfffaa63a);
-const Colour Colors::toggleRed      = Colour (0xffff0000);
-
 LookAndFeel::LookAndFeel()
 {
+    // Element Colors
+    setColour (Style::backgroundColorId,            Colour (0xff16191a));
+    setColour (Style::backgroundHighlightColorId,   Colour (0xffcccccc).darker(0.6000006).withAlpha(0.6f));
+
+    setColour (Style::widgetBackgroundColorId,      Colour (0xff3b3b3b));
+    setColour (Style::contentBackgroundColorId,     Colour (0xff3b3b3b).darker (0.6));
+
+    setColour (Style::textColorId,                  Colour (0xffcccccc));
+    setColour (Style::textActiveColorId,            Colour (0xffe5e5e5));
+    setColour (Style::textBoldColorId,              Colour (0xffe4e4e4));
+
     // setColour (ResizableWindow::backgroundColourId, widgetBackgroundColor.darker(.3));
     // setColour (CaretComponent::caretColourId, Colors::toggleOrange.brighter (0.20f));
 
     // Property Component
-    setColour (PropertyComponent::labelTextColourId, LookAndFeel::textColor);
+    setColour (PropertyComponent::labelTextColourId,  LookAndFeel::textColor);
     setColour (PropertyComponent::backgroundColourId, LookAndFeel::backgroundColor.brighter(0.02));
     
     // // Text Editor
@@ -109,11 +114,11 @@ LookAndFeel::LookAndFeel()
     setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker(0.3));
 
     // code editor. TODO
-    setColour (CodeEditorComponent::backgroundColourId, Colour(0xff1e1e1e));
-    setColour (CodeEditorComponent::highlightColourId, Colour(0xff1b5381));
-    setColour (CodeEditorComponent::defaultTextColourId, Colour(0xffc4c4c4));
-    setColour (CodeEditorComponent::lineNumberBackgroundId, Colour(0xff1e1e1e));
-    setColour (CodeEditorComponent::lineNumberTextId, Colour(0xff555555));
+    setColour (CodeEditorComponent::backgroundColourId,     findColour (Style::widgetBackgroundColorId).darker (0.6));
+    setColour (CodeEditorComponent::highlightColourId,      Colour(0xff1b5381));
+    setColour (CodeEditorComponent::defaultTextColourId,    Colour(0xffc4c4c4));
+    setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55));
+    setColour (CodeEditorComponent::lineNumberTextId,       Colour(0xff555555));
 }
 
 //==============================================================================

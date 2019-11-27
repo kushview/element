@@ -23,20 +23,29 @@
 
 namespace Element {
 
-struct Colors
+struct Style
 {
-    static const Colour elemental;
-    static const Colour toggleBlue;
-    static const Colour toggleGreen;
-    static const Colour toggleOrange;
-    static const Colour toggleRed;
+    enum ColorID
+    {
+        backgroundColorId               = 0x30000000,
+        backgroundHighlightColorId,
+
+        contentBackgroundColorId,
+
+        widgetBackgroundColorId,       
+        textColorId,
+        textActiveColorId,
+        textBoldColorId,
+    };
 };
+
+struct Colors : kv::Colors { };
 
 class LookAndFeel : public LookAndFeel_KV1
 {
 public:
     LookAndFeel();
-    ~LookAndFeel() { }
+    ~LookAndFeel() { int s = Style::widgetBackgroundColorId; }
     
     int getDefaultScrollbarWidth() override;
 

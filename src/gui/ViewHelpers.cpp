@@ -21,16 +21,19 @@
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
 
-#include "engine/AudioEngine.h"
 #include "engine/nodes/SubGraphProcessor.h"
-
+#include "engine/AudioEngine.h"
 #include "engine/GraphProcessor.h"
-#include "gui/ViewHelpers.h"
+
 #include "gui/ContentComponent.h"
+#include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
+#include "gui/ViewHelpers.h"
+
 #include "session/Node.h"
 #include "session/CommandManager.h"
+
 #include "Globals.h"
 #include "Messages.h"
 
@@ -41,7 +44,7 @@
 namespace Element {
 namespace ViewHelpers {
 
-typedef LookAndFeel_KV1 LF;
+typedef Element::LookAndFeel LF;
 
 void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selected, 
                        int padding, Justification alignment)
@@ -50,7 +53,7 @@ void drawBasicTextRow (const String& text, Graphics& g, int w, int h, bool selec
     
     if (selected)
     {
-        g.setColour (LF::elementBlue.darker (0.6000006f));
+        g.setColour (Colors::elemental.darker (0.6000006f));
         g.setOpacity (1.0f);
         g.fillRect (0, 0, w, h);
     }

@@ -128,7 +128,7 @@ Colour TreeItemBase::getBackgroundColour() const
     Colour background (LookAndFeel_KV1::backgroundColor);
 
     if (isSelected())
-        background = background.overlaidWith (LookAndFeel_KV1::elementBlue.darker(0.600006f));
+        background = background.overlaidWith (Colors::elemental.darker(0.600006f));
 #else
     const Colour background (0x000000);
 #endif

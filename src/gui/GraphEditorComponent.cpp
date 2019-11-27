@@ -403,7 +403,7 @@ void GraphEditorComponent::setVerticalLayout (const bool isVertical)
 
 void GraphEditorComponent::paint (Graphics& g)
 {
-   g.fillAll (LookAndFeel::widgetBackgroundColor.darker(0.6));
+   g.fillAll (findColour (Style::contentBackgroundColorId));
 }
 
 void GraphEditorComponent::mouseDown (const MouseEvent& e)
