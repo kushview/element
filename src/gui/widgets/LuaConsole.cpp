@@ -17,52 +17,40 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "gui/LuaConsoleComponent.h"
+#include "gui/widgets/LuaConsole.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ViewHelpers.h"
 #include "scripting/LuaBindings.h"
 #include "Commands.h"
+
 #include "sol/sol.hpp"
+
+static int message_handler (lua_State* L)
+{
+    const char *msg = lua_tostring (L, 1);
+    if (msg == NULL)
+    {                                             /* is error object not a string? */
+        if (luaL_callmeta (L, 1, "__tostring") && /* does it have a metamethod */
+            lua_type(L, -1) == LUA_TSTRING)       /* that produces a string? */
+            return 1;                             /* that is the message */
+        else
+            msg = lua_pushfstring (L, "(error object is a %s value)",
+                                      luaL_typename(L, 1));
+    }
+    luaL_traceback (L, L, msg, 1); /* append a standard traceback */
+    return 1;                      /* return the traceback */
+}
 
 namespace Element {
 
-static void setupEditor (TextEditor& editor)
-{
-    editor.setFont (Font (Font::getDefaultMonospacedFontName(), 13.0f, juce::Font::plain));
-}
-
-class LuaConsoleBuffer : public TextEditor
-{
-public:
-    LuaConsoleBuffer()
-    {
-        setupEditor (*this);
-        setReadOnly (true);
-        setMultiLine (true, false);
-        setReturnKeyStartsNewLine (false);
-        setJustification (Justification::bottomLeft);
-        setWantsKeyboardFocus (false);
-    }
-};
-
 //=============================================================================
 
-class LuaConsolePrompt : public TextEditor
-{
-public:
-    LuaConsolePrompt()
-    {
-        setupEditor (*this);
-    }
-};
-
-//=============================================================================
-
-class LuaConsoleComponent::Content : public Component,
+#if 0
+class LuaConsole::Content : public Component,
                                      private Timer
 {
 public:
-    Content (LuaConsoleComponent& o)
+    Content (LuaConsole& o)
         : owner (o)
     {
         addAndMakeVisible (buffer);
@@ -138,7 +126,7 @@ public:
 private:
     using LuaResult = sol::protected_function_result;
     bool haveWorld { false };
-    LuaConsoleComponent& owner;
+    LuaConsole& owner;
     sol::state lua;
     LuaConsoleBuffer buffer;
     Label prefix;
@@ -195,29 +183,121 @@ private:
         }
     }
 };
+#endif
 
-LuaConsoleComponent::LuaConsoleComponent()
+LuaConsole::LuaConsole()
+    : Console ("Lua Console")
 {
-    setName ("Lua Console");
-    setOpaque (true);
-    content.reset (new Content (*this));
-    addAndMakeVisible (content.get());
     setSize (100, 100);
 }
 
-LuaConsoleComponent::~LuaConsoleComponent()
+LuaConsole::~LuaConsole() {}
+
+static int exceptionHandler (lua_State* L, sol::optional<const std::exception&>, sol::string_view)
 {
-    content.reset();
+    return message_handler (L);
 }
 
-void LuaConsoleComponent::resized()
+void LuaConsole::textEntered (const String& text)
 {
-    content->setBounds (getLocalBounds());
+    if (text.isEmpty() || env == nullptr)
+        return;
+    Console::textEntered (text);
+    auto& lua = env->getState();
+    auto e = env->get();
+    
+   #if 1
+    lua.set_exception_handler (exceptionHandler);
+   
+    try
+    {
+        // auto buffer = lua.load_buffer (text.toRawUTF8() ,text.length());
+        // buffer.call();
+        lua.safe_script (text.toRawUTF8(), env->get(),
+            [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); });
+        
+        if (lastError.isNotEmpty())
+            addText (lastError);
+    }
+    catch (const sol::error& e)
+    {
+        addText (e.what());
+    }
+   #else
+    auto* L = e.lua_state();
+    int status = luaL_loadbuffer (L, text.toRawUTF8(), text.length(), "console");
+
+    if (status == LUA_OK)
+    {
+        int narg = 0;
+        int nres = LUA_MULTRET;
+        
+        int base = lua_gettop (L) - narg;       /* function index */
+        lua_pushcfunction (L, message_handler);  /* push message handler */
+        lua_insert (L, base);                   /* put it under function and args */
+        // globalL = L;                            /* to be available to 'laction' */
+        // signal (SIGINT, laction);               /* set C-signal handler */
+        status = lua_pcall (L, narg, nres, base);
+        // signal (SIGINT, SIG_DFL); /* reset C-signal handler */
+        lua_remove (L, base);     /* remove message handler from the stack */
+
+        if (status == LUA_OK)
+        {
+            l_print (L);
+        }
+    }
+   #endif
+    lua.set_exception_handler (sol::detail::default_exception_handler);
+    lastError.clear();
 }
 
-void LuaConsoleComponent::paint (Graphics& g)
+void LuaConsole::setEnvironment (LuaEngine::Environment* newEnv)
 {
-    g.fillAll (Colours::black);
+    env.reset (newEnv);
+    if (env != nullptr)
+    {
+        auto e = env->get();
+        jassert (e.valid());
+
+        e["os"]["exit"] = sol::overload (
+            [this]()
+            {
+                ViewHelpers::invokeDirectly (this, Commands::quit, true);
+            },
+            [this](int code)
+            {
+                JUCEApplication::getInstance()->setApplicationReturnValue (code);
+                ViewHelpers::invokeDirectly (this, Commands::quit, true);
+            }
+        );
+
+        e["print"] = [this](sol::variadic_args va)
+        {
+            auto e = env->get();
+            String msg;
+            for (auto v : va)
+            {
+                sol::function ts = e["tostring"];
+                if (ts.valid())
+                {
+                    sol::object str = ts ((sol::object) v);
+                    if (str.valid())
+                        if (const char* sstr = str.as<const char*>())
+                            msg << sstr << "\t";
+                }
+            }
+
+            addText (msg.trimEnd());
+        };
+    }
+}
+
+LuaConsole::LuaResult LuaConsole::errorHandler (lua_State* L, LuaResult pfr)
+{
+    sol::error err = pfr;
+    lastError = err.what();
+    throw err;
+    return pfr;
 }
 
 }

@@ -2,9 +2,11 @@
 #pragma once
 
 #include "gui/ContentComponent.h"
-#include "gui/LuaConsoleComponent.h"
+#include "gui/widgets/LuaConsole.h"
 
 namespace Element {
+
+class AppController;
 
 class LuaConsoleView : public ContentView
 {
@@ -15,13 +17,15 @@ public:
         addAndMakeVisible (console);
     }
 
+    void initializeView (AppController&) override;
+
     void resized() override
     {
-        console.setBounds (getLocalBounds().reduced (4));
+        console.setBounds (getLocalBounds().reduced (2));
     }
 
 private:
-    LuaConsoleComponent console;
+    LuaConsole console;
 };
 
 }

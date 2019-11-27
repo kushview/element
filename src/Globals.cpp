@@ -18,6 +18,7 @@
 
 #include "ElementApp.h"
 #include "engine/InternalFormat.h"
+#include "scripting/LuaEngine.h"
 #include "session/DeviceManager.h"
 #include "session/MediaManager.h"
 #include "session/PluginManager.h"
@@ -68,9 +69,11 @@ public:
     std::unique_ptr<MappingEngine> mapping;
     std::unique_ptr<PresetCollection> presets;
     std::unique_ptr<MidiEngine>   midi;
+    std::unique_ptr<LuaEngine>    lua;
    
 private:
     friend class Globals;
+    
     void init()
     {
         plugins  = new PluginManager();
@@ -82,6 +85,8 @@ private:
         mapping.reset (new MappingEngine());
         midi.reset (new MidiEngine());
         presets.reset (new PresetCollection());
+        lua.reset (new LuaEngine());
+        lua->setWorld (owner);
     }
     
     void freeAll()
@@ -95,6 +100,7 @@ private:
         devices  = nullptr;
         midi     = nullptr;
         presets  = nullptr;
+        lua      = nullptr;
     }
 };
 
@@ -140,6 +146,12 @@ MediaManager& Globals::getMediaManager()
 {
     jassert (impl->media != nullptr);
     return *impl->media;
+}
+
+LuaEngine& Globals::getLuaEngine()
+{
+    jassert (impl->lua != nullptr);
+    return *impl->lua;
 }
 
 AudioEnginePtr Globals::getAudioEngine() const { return impl->engine; }

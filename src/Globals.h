@@ -30,6 +30,7 @@ namespace Element {
 
 class CommandManager;
 class DeviceManager;
+class LuaEngine;
 class MediaManager;
 class PluginManager;
 class PresetCollection;
@@ -62,6 +63,7 @@ public:
     PresetCollection& getPresetCollection();
     Settings& getSettings();
     MediaManager& getMediaManager();
+    LuaEngine& getLuaEngine();
     SessionPtr getSession();
 
     const String& getAppName() const { return appName; }

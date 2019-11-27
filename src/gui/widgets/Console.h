@@ -23,18 +23,23 @@
 
 namespace Element {
 
-class LuaConsoleComponent : public Component
+class Console : public Component
 {
 public:
-    LuaConsoleComponent();
-    virtual ~LuaConsoleComponent();
+    explicit Console (const String& name = String());
+    virtual ~Console();
+
+    void addText (const String& text, bool prefix = false);
+
+    virtual void textEntered (const String& text);
 
     void resized() override;
     void paint (Graphics&) override;
 
 private:
-    class Content;
+    friend class Content; class Content;
     std::unique_ptr<Content> content;
+    void handleTextEntry (const String& text);
 };
 
 }
