@@ -50,6 +50,18 @@ public:
     {
         setupEditor (*this);
     }
+
+    bool keyPressed (const KeyPress& k) override
+    {
+        if (k.getKeyCode() == KeyPress::upKey && onUpKey != nullptr)
+            return onUpKey();
+        else if (k.getKeyCode() == KeyPress::downKey && onDownKey != nullptr)
+            return onDownKey();
+        return TextEditor::keyPressed (k);
+    }
+
+    std::function<bool()> onUpKey;
+    std::function<bool()> onDownKey;
 };
 
 //=============================================================================
@@ -65,16 +77,51 @@ public:
         
         addAndMakeVisible (prefixLabel);
         prefixLabel.setText (prefixText, dontSendNotification);
-        prefixLabel.setFont (prompt.getFont().withHeight (13.f));
+        prefixLabel.setFont (prompt.getFont().withHeight (12.f));
         prefixLabel.setJustificationType (Justification::centred);
         
         addAndMakeVisible (prompt);
         prompt.setLookAndFeel (&style);
 
+        prompt.onUpKey = [this]() -> bool
+        {
+            DBG("delta: " << historyPos - historyLast);
+            
+            if (isPositiveAndBelow (historyPos, history.size()))
+            {
+                prompt.setText (history[historyPos], dontSendNotification);
+                prompt.moveCaretToEnd();
+            }
+            
+            historyLast = historyPos;
+            historyPos = jmax (0, historyPos - 1);
+            
+            return true;
+        };
+
+        prompt.onDownKey = [this]() -> bool
+        {
+            DBG("delta: " << historyPos - historyLast);
+
+            if (isPositiveAndBelow (historyPos, history.size()))
+            {
+                prompt.setText (history[historyPos], dontSendNotification);
+                prompt.moveCaretToEnd();
+            }
+            
+            historyLast = historyPos;
+            historyPos = jmin (history.size() - 1, historyPos + 1);
+            
+            return true;
+        };
+
         prompt.onReturnKey = [this]
         {
             auto text = prompt.getText();
+            if (text.isEmpty())
+                return;
             prompt.setText ({}, dontSendNotification);
+            addToHistory (text);
             owner.handleTextEntry (text);
         };
     }
@@ -83,6 +130,12 @@ public:
     {
         buffer.setLookAndFeel (nullptr);
         prompt.setLookAndFeel (nullptr);
+    }
+
+    void clear()
+    {
+        buffer.clear();
+        buffer.moveCaretToEnd();
     }
 
     void addText (const String& text, bool prefix)
@@ -102,7 +155,7 @@ public:
     {
         auto r1 = getLocalBounds();
         auto r2 = r1.removeFromBottom (23);
-        prefixLabel.setBounds (r2.removeFromLeft (30));
+        prefixLabel.setBounds (r2.removeFromLeft (24));
         prompt.setBounds (r2);
         buffer.setBounds (r1);
     }
@@ -113,7 +166,19 @@ private:
     Label prefixLabel;
     String prefixText { ">" };
     ConsolePrompt prompt;
-    
+    StringArray history;
+    int historyPos { -1 };
+    int historyLast { -1 };
+
+    void addToHistory (const String& text)
+    {
+        if (history.isEmpty() || (history.size() > 0 && text != history[history.size() - 1]))
+           history.add (text);
+        if (history.size() > 100)
+            history.remove (0);
+        historyPos = historyLast = history.size() - 1;
+    }
+
     struct Style : public Element::LookAndFeel
     {
         void fillTextEditorBackground (Graphics& g, int w, int h, TextEditor& e) override
@@ -144,6 +209,11 @@ Console::~Console()
     content.reset();
 }
 
+void Console::clear()
+{
+    content->clear();
+}
+
 void Console::addText (const String& text, bool prefix)
 {
     content->addText (text, prefix);
@@ -161,7 +231,7 @@ void Console::resized()
 
 void Console::paint (Graphics& g)
 {
-    g.fillAll (Colours::black);
+    g.fillAll (findColour (Style::contentBackgroundColorId));
 }
 
 void Console::handleTextEntry (const String& text)

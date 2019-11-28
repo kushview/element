@@ -29,6 +29,7 @@ public:
     explicit Console (const String& name = String());
     virtual ~Console();
 
+    void clear();
     void addText (const String& text, bool prefix = false);
 
     virtual void textEntered (const String& text);

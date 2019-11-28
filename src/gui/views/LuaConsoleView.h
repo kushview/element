@@ -18,7 +18,11 @@ public:
     }
 
     void initializeView (AppController&) override;
-
+    void didBecomeActive() override
+    {
+        console.grabKeyboardFocus();
+    }
+    
     void resized() override
     {
         console.setBounds (getLocalBounds().reduced (2));

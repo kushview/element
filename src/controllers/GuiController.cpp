@@ -787,30 +787,24 @@ bool GuiController::perform (const InvocationInfo& info)
             break;
         case Commands::showGraphMixer:
         {
-            bool showedIt = false;
-            
-            if (content->showAccessoryView())
+            if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_GRAPH_MIXER)
             {
                 content->setShowAccessoryView (false);
             }
             else
             {
                 content->setAccessoryView (EL_VIEW_GRAPH_MIXER);
-                showedIt = true;
             }
         } break;
         case Commands::showConsole:
-        {
-            bool showedIt = false;
-            
-            if (content->showAccessoryView())
+        {            
+            if (content->showAccessoryView() && content->getAccessoryViewName() == EL_VIEW_CONSOLE)
             {
                 content->setShowAccessoryView (false);
             }
             else
             {
                 content->setAccessoryView (EL_VIEW_CONSOLE);
-                showedIt = true;
             }
         } break;
         
