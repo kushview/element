@@ -86,6 +86,10 @@ void registerModel (sol::state& lua)
             str << self.getName();
             return std::move (str.toStdString());
         },
+        meta_function::length,  &Node::getNumNodes,
+        meta_function::index,   [](const Node& self, int index) -> Node {
+            return self.getNode (index - 1);
+        },
         "is_valid",             &Node::isValid,
         "get_name",             [](const Node& self) { return std::move (self.getName().toStdString()); },
         "get_display_name",     [](const Node& self) { return std::move (self.getDisplayName().toStdString()); },
@@ -112,6 +116,8 @@ void registerModel (sol::state& lua)
         "is_muting_inputs",     &Node::isMutingInputs,
         "set_muted",            &Node::setMuted,
         "set_mute_input",       &Node::setMuteInput,
+        "get_num_nodes",        &Node::getNumNodes,
+        "get_node",             &Node::getNode,
         "write_to_file",        [](const Node& node, const char* filepath) -> bool {
             if (! File::isAbsolutePath (filepath))
                 return false;
@@ -119,7 +125,13 @@ void registerModel (sol::state& lua)
         },
         "reset_ports",          &Node::resetPorts,
         "save_plugin_state",    &Node::savePluginState,
-        "restore_plugin_state", &Node::restorePluginState
+        "restore_plugin_state", &Node::restorePluginState,
+        "create_default_graph", overload (
+            []() { return Node::createDefaultGraph(); },
+            [](const char* name) { return Node::createDefaultGraph (name); }),
+        "create_graph", overload (
+            []() { return Node::createGraph(); },
+            [](const char* name) { return Node::createGraph (name); })
     );
 }
 
