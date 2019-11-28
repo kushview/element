@@ -61,6 +61,10 @@ void registerModel (sol::state& lua)
 {
     // Sesson
     auto session = lua.new_usertype<Session> ("Session", no_constructor,
+        meta_function::to_string, [](const Session& self) -> std::string {
+            String str = "Session: "; str << self.getName();
+            return std::move (str.toStdString());
+        },
         "get_num_graphs",           &Session::getNumGraphs,
         "get_graph",                &Session::getGraph,
         "get_active_graph",         &Session::getActiveGraph,
@@ -77,6 +81,11 @@ void registerModel (sol::state& lua)
 
     // Node
     auto node = lua.new_usertype<Node> ("Node", no_constructor,
+        meta_function::to_string, [](const Node& self) -> std::string {
+            String str = self.isGraph() ? "Graph: " : "Node: ";
+            str << self.getName();
+            return std::move (str.toStdString());
+        },
         "is_valid",             &Node::isValid,
         "get_name",             [](const Node& self) { return std::move (self.getName().toStdString()); },
         "get_display_name",     [](const Node& self) { return std::move (self.getDisplayName().toStdString()); },
@@ -110,9 +119,7 @@ void registerModel (sol::state& lua)
         },
         "reset_ports",          &Node::resetPorts,
         "save_plugin_state",    &Node::savePluginState,
-        "restore_plugin_state", &Node::restorePluginState,
-        "create_default_graph", Node::createDefaultGraph,
-        "create_graph",         []() -> Node { return Node::createGraph(); }
+        "restore_plugin_state", &Node::restorePluginState
     );
 }
 
@@ -241,20 +248,10 @@ end
                       ports.add (type, index, channel, symbol, name, input);
                   }
     );
-
-    // Node
-    // lua.new_usertype<Node> ("Node", no_constructor,
-    // );
-
-    // // Session
-    // lua.new_usertype<Session> ("Session", no_constructor,
-    // );
 }
 
 void registerElement (sol::state& lua)
 {
-
-
     auto e = NS (lua, "Element");
     e["plugins"] = [&lua]() -> PluginManager&
     {
