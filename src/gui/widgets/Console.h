@@ -29,12 +29,24 @@ public:
     explicit Console (const String& name = String());
     virtual ~Console();
 
-    void clear();
+    /** Clears the console and/or history
+        @param  buffer     If true, clears the display buffer
+        @param  history    If true, clears the command history
+    */
+    void clear (bool buffer = true, bool history = false);
+
+    /** Add some text to the display buffer
+        @param  text       The text to add
+        @param  prefix     If true, appends the comand prefix before adding
+    */
     void addText (const String& text, bool prefix = false);
 
+    /** Override this to handle when text is entered on the prompt */
     virtual void textEntered (const String& text);
 
+    /** @internal */
     void resized() override;
+    /** @internal */
     void paint (Graphics&) override;
 
 private:

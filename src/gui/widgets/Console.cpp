@@ -84,36 +84,20 @@ public:
         prompt.setLookAndFeel (&style);
 
         prompt.onUpKey = [this]() -> bool
-        {
-            DBG("delta: " << historyPos - historyLast);
-            
-            if (isPositiveAndBelow (historyPos, history.size()))
-            {
-                prompt.setText (history[historyPos], dontSendNotification);
-                prompt.moveCaretToEnd();
-            }
-            
-            historyLast = historyPos;
+        {   
             historyPos = jmax (0, historyPos - 1);
-            
+            loadHistoryItem (historyPos);
             return true;
         };
 
         prompt.onDownKey = [this]() -> bool
         {
-            DBG("delta: " << historyPos - historyLast);
-
-            if (isPositiveAndBelow (historyPos, history.size()))
-            {
-                prompt.setText (history[historyPos], dontSendNotification);
-                prompt.moveCaretToEnd();
-            }
-            
-            historyLast = historyPos;
-            historyPos = jmin (history.size() - 1, historyPos + 1);
-            
+            historyPos = jmin (history.size(), historyPos + 1);
+            loadHistoryItem (historyPos);
             return true;
         };
+
+        prompt.onTextChange = [this]() {};
 
         prompt.onReturnKey = [this]
         {
@@ -132,10 +116,16 @@ public:
         prompt.setLookAndFeel (nullptr);
     }
 
-    void clear()
+    void clearBuffer()
     {
         buffer.clear();
         buffer.moveCaretToEnd();
+    }
+
+    void clearHistory()
+    {
+        history.clear();
+        historyPos = history.size();
     }
 
     void addText (const String& text, bool prefix)
@@ -167,16 +157,25 @@ private:
     String prefixText { ">" };
     ConsolePrompt prompt;
     StringArray history;
-    int historyPos { -1 };
-    int historyLast { -1 };
+    int historyPos { 0 };
 
     void addToHistory (const String& text)
     {
-        if (history.isEmpty() || (history.size() > 0 && text != history[history.size() - 1]))
+        if (history.isEmpty() || (history.size() > 0 && text != history.getReference (history.size() - 1)))
            history.add (text);
         if (history.size() > 100)
             history.remove (0);
-        historyPos = historyLast = history.size() - 1;
+        historyPos = history.size();
+    }
+
+    void loadHistoryItem (int index)
+    {
+        if (! isPositiveAndBelow (index, history.size()))
+            return;
+        if (prompt.getText() == history.getReference (index))
+            return;
+        prompt.setText (history.getReference (index), dontSendNotification);
+        prompt.moveCaretToEnd();
     }
 
     struct Style : public Element::LookAndFeel
@@ -209,9 +208,10 @@ Console::~Console()
     content.reset();
 }
 
-void Console::clear()
+void Console::clear (bool buffer, bool history)
 {
-    content->clear();
+    if (buffer)     content->clearBuffer();
+    if (history)    content->clearHistory();
 }
 
 void Console::addText (const String& text, bool prefix)

@@ -52,7 +52,6 @@ void LuaConsole::textEntered (const String& text)
     auto& lua = env->getState();
     auto e = env->get();
     
-
     lua.set_exception_handler (exceptionHandler);
    
     try
@@ -89,43 +88,56 @@ void LuaConsole::textEntered (const String& text)
 void LuaConsole::setEnvironment (LuaEngine::Environment* newEnv)
 {
     env.reset (newEnv);
-    if (env != nullptr)
+    if (env == nullptr)
+        return;
+
+    auto e = env->get();
+    jassert (e.valid());
+
+    e["os"]["exit"] = sol::overload (
+        [this]() { ViewHelpers::invokeDirectly (this, Commands::quit, true); },
+        [this](int code)
+        {
+            JUCEApplication::getInstance()->setApplicationReturnValue (code);
+            ViewHelpers::invokeDirectly (this, Commands::quit, true);
+        }
+    );
+
+    e["clear"] = [this](sol::variadic_args va)
+    {
+        if (va.size() == 1 && va.get_type(0) == sol::type::boolean)
+        {
+            clear (va.get<bool> (0));
+        }
+        else if (va.size() >= 2 && va.get_type(0) == sol::type::boolean && va.get_type(1) == sol::type::boolean)
+        {
+            clear (va.get<bool> (0), va.get<bool> (1));
+        }
+        else
+        {
+            clear();
+        }
+    };
+
+    e["print"] = [this](sol::variadic_args va) -> std::string
     {
         auto e = env->get();
-        jassert (e.valid());
-
-        e["os"]["exit"] = sol::overload (
-            [this]()
-            {
-                ViewHelpers::invokeDirectly (this, Commands::quit, true);
-            },
-            [this](int code)
-            {
-                JUCEApplication::getInstance()->setApplicationReturnValue (code);
-                ViewHelpers::invokeDirectly (this, Commands::quit, true);
-            }
-        );
-
-        e["print"] = [this](sol::variadic_args va) -> std::string
+        String msg;
+        for (auto v : va)
         {
-            auto e = env->get();
-            String msg;
-            for (auto v : va)
+            sol::function ts = e["tostring"];
+            if (ts.valid())
             {
-                sol::function ts = e["tostring"];
-                if (ts.valid())
-                {
-                    sol::object str = ts ((sol::object) v);
-                    if (str.valid())
-                        if (const char* sstr = str.as<const char*>())
-                            msg << sstr << "  ";
-                }
+                sol::object str = ts ((sol::object) v);
+                if (str.valid())
+                    if (const char* sstr = str.as<const char*>())
+                        msg << sstr << "  ";
             }
+        }
 
-            addText (msg.trimEnd());
-            return {};
-        };
-    }
+        addText (msg.trimEnd());
+        return {};
+    };
 }
 
 LuaConsole::LuaResult LuaConsole::errorHandler (lua_State* L, LuaResult pfr)
