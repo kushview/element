@@ -27,6 +27,7 @@ static void setupEditor (TextEditor& editor)
     editor.setFont (Font (Font::getDefaultMonospacedFontName(), 13.0f, juce::Font::plain));
 }
 
+//=============================================================================
 class ConsoleBuffer : public TextEditor
 {
 public:
@@ -42,7 +43,6 @@ public:
 };
 
 //=============================================================================
-
 class ConsolePrompt : public TextEditor
 {
 public:
@@ -65,7 +65,6 @@ public:
 };
 
 //=============================================================================
-
 class Console::Content : public Component
 {
 public:
@@ -84,7 +83,7 @@ public:
         prompt.setLookAndFeel (&style);
 
         prompt.onUpKey = [this]() -> bool
-        {   
+        {
             historyPos = jmax (0, historyPos - 1);
             loadHistoryItem (historyPos);
             return true;
@@ -194,6 +193,7 @@ private:
     } style;
 };
 
+//=============================================================================
 Console::Console (const String& name)
 {
     setName (name);

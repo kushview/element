@@ -41,7 +41,8 @@ public:
     */
     void addText (const String& text, bool prefix = false);
 
-    /** Override this to handle when text is entered on the prompt */
+    /** Override this to handle when text is entered on the prompt. The default
+        implementation just adds entered text to the display buffer */
     virtual void textEntered (const String& text);
 
     /** @internal */
