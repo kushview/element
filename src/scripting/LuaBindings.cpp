@@ -78,17 +78,32 @@ void registerModel (sol::state& lua)
         },
         "clear",                    &Session::clear
     );
+    
+    // automagic_enrollments enrollments;
+    // enrollments.default_constructor = false;
+    // enrollments.pairs_operator = false;
 
     // Node
+    
     auto node = lua.new_usertype<Node> ("Node", no_constructor,
         meta_function::to_string, [](const Node& self) -> std::string {
-            String str = self.isGraph() ? "Graph: " : "Node: ";
-            str << self.getName();
+            String str = self.isGraph() ? "Graph" : "Node";
+            if (self.getName().isNotEmpty())
+                str << ": " << self.getName();
             return std::move (str.toStdString());
         },
         meta_function::length,  &Node::getNumNodes,
-        meta_function::index,   [](const Node& self, int index) -> Node {
-            return self.getNode (index - 1);
+        meta_function::index,   [](const Node& self, int index)
+        {
+            const auto child = self.getNode (index - 1);
+            return child.isValid() ? std::make_unique<Node> (child.getValueTree(), false)
+                                   : std::unique_ptr<Node>();
+        },
+        "to_xml_string", [](const Node& self) -> std::string
+        {
+            auto copy = self.getValueTree().createCopy();
+            Node::sanitizeRuntimeProperties (copy, true);
+            return std::move (copy.toXmlString().toStdString());
         },
         "is_valid",             &Node::isValid,
         "get_name",             [](const Node& self) { return std::move (self.getName().toStdString()); },
