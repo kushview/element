@@ -57,6 +57,23 @@ public:
             return onUpKey();
         else if (k.getKeyCode() == KeyPress::downKey && onDownKey != nullptr)
             return onDownKey();
+        
+        const auto mods = k.getModifiers();
+
+        if (mods.isCtrlDown())
+        {
+            if (k.getKeyCode() == 'A')
+            {
+                moveCaretToTop (false);
+                return true;
+            }
+            else if (k.getKeyCode() == 'E')
+            {
+                moveCaretToEnd (false);
+                return true;
+            }
+        }
+
         return TextEditor::keyPressed (k);
     }
 
