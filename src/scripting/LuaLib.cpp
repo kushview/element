@@ -63,4 +63,6 @@
 #include "../../libs/lua/src/ltm.c"
 #include "../../libs/lua/src/ldo.c"
 
+#include "../../libs/lua/modules/decibels.c"
+
 #endif

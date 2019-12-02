@@ -67,7 +67,12 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (audio, midi)
+function node_render (details)
+    local d = RenderDetails.new()
+    print(d)
+    print(d:nframes())
+    print(d:nchannels())
+    print(d:sample())
 end
 
 function node_release()
@@ -110,7 +115,8 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (audio, midi)
+function node_render (details)
+    print (details)
 end
 
 function node_release()
@@ -151,7 +157,8 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (audio, midi)
+function node_render (details)
+    print(details)
 end
 
 function node_release()
@@ -181,15 +188,15 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (audio, midi)
-    local mb = midi:get_write_buffer (2)
-    mb:clear()
+function node_render (details)
+    print(details)
 end
 
 function node_release()
 end
 )";
 
+//=============================================================================
 class LuaNodeLifecycleTest : public UnitTestBase
 {
 public:
@@ -208,8 +215,11 @@ public:
         auto* node = new LuaNode();
         
         beginTest ("validate");
-        node->loadScript (nodeScript);
-        
+        auto result = node->loadScript (nodeScript);
+        expect (result.wasOk());
+        if (! result.wasOk())
+            return;
+
         beginTest ("prepare");
         graph->addNode (node);
 
@@ -234,6 +244,7 @@ private:
 
 static LuaNodeLifecycleTest sLuaNodeLifecycleTest;
 
+//=============================================================================
 class LuaNodeValidateTest : public UnitTestBase
 {
 public:
@@ -244,8 +255,14 @@ public:
     void runTest() override
     {
         auto node = std::make_unique<LuaNode>();
+
+        beginTest ("validation ok");
+        auto result = node->loadScript (nodeScript);
+        expect (result.wasOk());
+        return;
+
         beginTest ("global syntax error");
-        auto result = node->loadScript (globalSyntaxError);
+        result = node->loadScript (globalSyntaxError);
         expect (result.failed());
 
         beginTest ("runtime syntax error");
@@ -589,5 +606,68 @@ private:
 };
 
 static LuaGlobalsTest sLuaGlobalsTest;
+
+//=============================================================================
+
+namespace Element {
+extern int audiobuffer_new (lua_State* L);
+extern int luaopen_audiobuffer (lua_State* L);
+}
+
+class LuaAudioBufferTest : public UnitTestBase
+{
+public:
+    LuaAudioBufferTest() : UnitTestBase ("Lua Globals", "Lua", "audiobuffer") {}
+    virtual ~LuaAudioBufferTest() { }
+    
+    void initialise() override
+    {
+        lua.open_libraries();
+        auto* L = lua.lua_state();
+        jassert (lua_gettop (L) == 0);
+        lua_settop (L, 0);
+       #if 1
+        lua_newtable (L);
+        lua_setglobal (L, "audio");
+        lua_getglobal (L, "audio");
+        jassert(lua_gettop(L) == 1);
+        // DBG("stack = " << lua_gettop (L));
+        luaopen_audiobuffer (L);
+        // DBG("stack = " << lua_gettop (L));
+        lua_pushcfunction (L, audiobuffer_new);
+        lua_setfield (L, 1, "Buffer");
+        // DBG("stack = " << lua_gettop (L));
+        for (int i = lua_gettop(L); --i > 0;)
+            lua_pop (L, i);
+        
+       #else
+        luaL_requiref (L, "AudioBuffer", luaopen_audiobuffer, 1);
+        lua_pop (L, 1);
+        DBG("stack = " << lua_gettop (L));
+       #endif
+        lua.collect_garbage();
+    }
+
+    void shutdown() override
+    {
+        lua.collect_garbage();
+    }
+
+    void runTest() override
+    {
+        beginTest ("buffer");
+        lua.script (R"(
+            print ("audio.Buffer", audio.Buffer)
+            local b = audio.Buffer()
+            print(string.format ("type: %s", tostring (b)))
+            print("nframes: ", b:length())
+        )");
+    }
+
+private:
+    sol::state lua;
+};
+
+static LuaAudioBufferTest sLuaAudioBufferTest;
 
 #endif

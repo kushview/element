@@ -160,10 +160,10 @@ namespace Element {
         JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(Session);
     
     public:
-        boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceAdded;
-        boost::signals2::signal<void(const ControllerDevice&)> controllerDeviceRemoved;
-        boost::signals2::signal<void(const ControllerDevice::Control&)> controlAdded;
-        boost::signals2::signal<void(const ControllerDevice::Control&)> controlRemoved;
+        Signal<void(const ControllerDevice&)> controllerDeviceAdded;
+        Signal<void(const ControllerDevice&)> controllerDeviceRemoved;
+        Signal<void(const ControllerDevice::Control&)> controlAdded;
+        Signal<void(const ControllerDevice::Control&)> controlRemoved;
     };
     
     typedef ReferenceCountedObjectPtr<Session> SessionPtr;

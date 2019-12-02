@@ -18,15 +18,23 @@
 */
 
 #include "engine/MidiPipe.h"
+#include "session/CommandManager.h"
+#include "session/MediaManager.h"
 #include "session/Node.h"
 #include "session/Session.h"
 #include "session/PluginManager.h"
-#include "session/CommandManager.h"
+#include "session/Presets.h"
 #include "Globals.h"
 #include "Settings.h"
 
+#include "scripting/LuaIterators.h"
+
 #include "sol/sol.hpp"
 
+//=============================================================================
+extern int luaopen_decibels (lua_State*);
+
+//=============================================================================
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
 template <typename T>
@@ -37,21 +45,18 @@ struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
     static bool is_null (const actual_type& ptr)    { return ptr == nullptr; }
     static type* get (const actual_type& ptr)       { return ptr.get(); }
 };
-
 }
+
+#define CALL(x) sol::c_call<decltype(x), x>
+#define WRAP(x) sol::wrap<decltype(x), x>
 
 using namespace sol;
 
 namespace Element {
 namespace Lua {
 
-static MidiBuffer::Iterator midiBufferIteratorFactory (MidiBuffer& buffer)
-{
-    MidiBuffer::Iterator iter (buffer);
-    return std::move (iter);
-}
-
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
+
 
 void registerUI (state& lua)
 {
@@ -59,33 +64,40 @@ void registerUI (state& lua)
 
 void registerModel (sol::state& lua)
 {
+    auto e = NS (lua, "element");
     // Sesson
-    auto session = lua.new_usertype<Session> ("Session", no_constructor,
-        meta_function::to_string, [](const Session& self) -> std::string {
-            String str = "Session: "; str << self.getName();
+    auto session = e.new_usertype<Session> ("Session", no_constructor,
+        meta_function::to_string, [](Session* self) {
+            String str = "Session"; 
+            if (self->getName().isNotEmpty())
+                str << ": " << self->getName();
             return std::move (str.toStdString());
+        },
+        meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
+        meta_function::index,       [](Session* self, int index) {
+            return isPositiveAndBelow (--index, self->getNumGraphs())
+                ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
+                : std::shared_ptr<Node>();
         },
         "get_num_graphs",           &Session::getNumGraphs,
         "get_graph",                &Session::getGraph,
         "get_active_graph",         &Session::getActiveGraph,
         "get_active_graph_index",   &Session::getActiveGraphIndex,
         "add_graph",                &Session::addGraph,
-        "set_name", [](Session& self, const char* name) -> void {
-            self.setName (String::fromUTF8 (name));
+        "set_name", [](Session* self, const char* name) -> void {
+            self->setName (String::fromUTF8 (name));
         },
         "get_name", [](const Session& self) -> std::string {
             return std::move (self.getName().toStdString());
         },
-        "clear",                    &Session::clear
+        "clear",                    &Session::clear,
+
+        "save_graph_state",         &Session::saveGraphState,
+        "restore_graph_state",      &Session::restoreGraphState
     );
-    
-    // automagic_enrollments enrollments;
-    // enrollments.default_constructor = false;
-    // enrollments.pairs_operator = false;
 
     // Node
-    
-    auto node = lua.new_usertype<Node> ("Node", no_constructor,
+    auto node = e.new_usertype<Node> ("Node", no_constructor,
         meta_function::to_string, [](const Node& self) -> std::string {
             String str = self.isGraph() ? "Graph" : "Node";
             if (self.getName().isNotEmpty())
@@ -93,24 +105,24 @@ void registerModel (sol::state& lua)
             return std::move (str.toStdString());
         },
         meta_function::length,  &Node::getNumNodes,
-        meta_function::index,   [](const Node& self, int index)
+        meta_function::index,   [](Node* self, int index)
         {
-            const auto child = self.getNode (index - 1);
-            return child.isValid() ? std::make_unique<Node> (child.getValueTree(), false)
-                                   : std::unique_ptr<Node>();
+            const auto child = self->getNode (index - 1);
+            return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
+                                   : std::shared_ptr<Node>();
         },
-        "to_xml_string", [](const Node& self) -> std::string
+        "to_xml_string", [](Node* self) -> std::string
         {
-            auto copy = self.getValueTree().createCopy();
+            auto copy = self->getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (copy, true);
             return std::move (copy.toXmlString().toStdString());
         },
         "is_valid",             &Node::isValid,
-        "get_name",             [](const Node& self) { return std::move (self.getName().toStdString()); },
-        "get_display_name",     [](const Node& self) { return std::move (self.getDisplayName().toStdString()); },
-        "get_plugin_name",      [](const Node& self) { return std::move (self.getPluginName().toStdString()); },
-        "set_name", [](Node& self, const char* name) -> void {
-            self.setProperty (Tags::name, String::fromUTF8 (name));
+        "get_name",             [](Node* self) { return std::move (self->getName().toStdString()); },
+        "get_display_name",     [](Node* self) { return std::move (self->getDisplayName().toStdString()); },
+        "get_plugin_name",      [](Node* self) { return std::move (self->getPluginName().toStdString()); },
+        "set_name", [](Node* self, const char* name) -> void {
+            self->setProperty (Tags::name, String::fromUTF8 (name));
         },
         "has_modified_name",    &Node::hasModifiedName,
         "get_node_id",          &Node::getNodeId,
@@ -148,34 +160,16 @@ void registerModel (sol::state& lua)
             []() { return Node::createGraph(); },
             [](const char* name) { return Node::createGraph (name); })
     );
+    e.set_function ("create_graph", []() { return Node::createGraph(); });
+    e.set_function ("create_default_graph", []() { return Node::createDefaultGraph(); });
 }
 
-void registerEngine (state& lua)
+static void openMidi (state& lua)
 {
-    // Decibels
-    auto db = lua["decibels"].get_or_create<table>();
-    db["to_gain"]   = [](float input) { return Decibels::decibelsToGain (input); };
-    db["from_gain"] = [](float input) { return Decibels::gainToDecibels (input); };
-
-    // AudioBuffer
-    lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
-        "get_num_channels", &AudioSampleBuffer::getNumChannels,
-        "get_num_samples",  &AudioSampleBuffer::getNumSamples,
-        "clear", overload (
-            resolve<void()> (&AudioSampleBuffer::clear),
-            resolve<void(int,int)> (&AudioSampleBuffer::clear),
-            resolve<void(int,int,int)> (&AudioSampleBuffer::clear)),
-        "apply_gain", overload (
-            resolve<void(int,int,int,float)> (&AudioSampleBuffer::applyGain),
-            resolve<void(int,int,float)> (&AudioSampleBuffer::applyGain),
-            resolve<void(float)> (&AudioSampleBuffer::applyGain)),
-        "apply_gain_ramp", overload (
-            resolve<void(int,int,int,float,float)> (&AudioSampleBuffer::applyGainRamp),
-            resolve<void(int,int,float,float)> (&AudioSampleBuffer::applyGainRamp))
-    );
-  
+    auto midi = NS (lua, "midi");
+    
     // MidiMessage
-    lua.new_usertype<MidiMessage> ("MidiMessage", no_constructor,
+    midi.new_usertype<MidiMessage> ("Message", no_constructor,
         call_constructor,           factories([]() { return std::move (MidiMessage()); }),
         meta_function::to_string,   [](MidiMessage& msg) { return msg.getDescription().toRawUTF8(); },
         "get_raw_data",             &MidiMessage::getRawData,
@@ -191,11 +185,11 @@ void registerEngine (state& lua)
         "get_sys_ex_data",          &MidiMessage::getSysExData,
         "get_sys_ex_data_size",     &MidiMessage::getSysExDataSize,
         "is_note_on",               overload (&MidiMessage::isNoteOn),
-        "note_on",                  resolve<MidiMessage(int,int,uint8)> (MidiMessage::noteOn),
-        "note_on_float",            resolve<MidiMessage(int,int,float)> (MidiMessage::noteOn),
+        "note_on",                  resolve<MidiMessage(int, int, uint8)> (MidiMessage::noteOn),
+        "note_on_float",            resolve<MidiMessage(int, int, float)> (MidiMessage::noteOn),
         "is_note_off",              overload (&MidiMessage::isNoteOff),
-        "note_off",                 resolve<MidiMessage(int,int,uint8)> (MidiMessage::noteOff),
-        "note_off_float",           resolve<MidiMessage(int,int,float)> (MidiMessage::noteOff),
+        "note_off",                 resolve<MidiMessage (int, int, uint8)> (MidiMessage::noteOff),
+        "note_off_float",           resolve<MidiMessage (int, int, float)> (MidiMessage::noteOff),
         "is_note_on_or_off",        &MidiMessage::isNoteOnOrOff,
         "get_note_number",          &MidiMessage::getNoteNumber,
         "set_note_number",          &MidiMessage::setNoteNumber,
@@ -214,62 +208,283 @@ void registerEngine (state& lua)
         "program_change",           MidiMessage::programChange,
         "is_pitch_wheel",           &MidiMessage::isPitchWheel,
         "get_pitch_wheel_value",    &MidiMessage::getPitchWheelValue,
-        "pitch_wheel",              MidiMessage::pitchWheel
+        "pitch_wheel",              MidiMessage::pitchWheel,
+        "is_after_touch",           &MidiMessage::isAftertouch,
+        "get_after_touch_value",    &MidiMessage::getAfterTouchValue,
+        "after_touch_change",       MidiMessage::aftertouchChange,
+        "is_channel_pressure",      &MidiMessage::isChannelPressure,
+        "get_channel_pressure_value", &MidiMessage::getChannelPressureValue,
+        "channel_pressure_change",  MidiMessage::channelPressureChange,
+        "is_controller",            &MidiMessage::isController,
+        "get_controller_number",    &MidiMessage::getControllerNumber,
+        "get_controller_value",     &MidiMessage::getControllerValue,
+        "is_controller_of_type",    &MidiMessage::isControllerOfType,
+        "controller_event",         MidiMessage::controllerEvent,
+        "is_all_notes_off",         &MidiMessage::isAllNotesOff,
+        "is_all_sound_off",         &MidiMessage::isAllSoundOff,
+        "is_reset_all_controllers", &MidiMessage::isResetAllControllers,
+        "all_notes_off",            MidiMessage::allNotesOff,
+        "all_sounds_off",           MidiMessage::allSoundOff,
+        "all_controllers_off",      MidiMessage::allControllersOff,
+        "is_meta_event",            &MidiMessage::isMetaEvent,
+        "get_meta_event_type",      &MidiMessage::getMetaEventType,
+        "get_meta_event_data",      &MidiMessage::getMetaEventData,
+        "get_meta_event_length",    &MidiMessage::getMetaEventLength,
+        "is_track_meta_event",      &MidiMessage::isTrackMetaEvent,
+        "is_end_of_track_meta_event", &MidiMessage::isEndOfTrackMetaEvent,
+        "end_of_track",             MidiMessage::endOfTrack,
+        "is_track_name_event",      &MidiMessage::isTrackNameEvent,
+        "is_text_meta_event",       &MidiMessage::isTextMetaEvent,
+        "text_meta_event",          MidiMessage::textMetaEvent,
+        "is_tempo_meta_event",      &MidiMessage::isTempoMetaEvent,
+        "get_tempo_meta_event_tick_length",     &MidiMessage::getTempoMetaEventTickLength,
+        "get_tempo_seconds_per_quarter_note",   &MidiMessage::getTempoSecondsPerQuarterNote,
+        "tempo_meta_event",         MidiMessage::tempoMetaEvent,
+        "is_time_signature_meta_event", &MidiMessage::isTimeSignatureMetaEvent,
+        "get_time_signature_info",      [](const MidiMessage& self) {
+            int numerator = 0, denominator = 0;
+            self.getTimeSignatureInfo (numerator, denominator);
+            return std::make_tuple (numerator, denominator);
+        },
+        "time_signature_meta_event",    MidiMessage::timeSignatureMetaEvent,
+        "is_key_signature_meta_event",  &MidiMessage::isKeySignatureMetaEvent,
+        "get_key_signature_number_of_sharps_or_flats", &MidiMessage::getKeySignatureNumberOfSharpsOrFlats,
+        "is_key_signature_major_key",   &MidiMessage::isKeySignatureMetaEvent,
+        "key_signature_meta_event",     MidiMessage::keySignatureMetaEvent,
+        "is_midi_channel_meta_event",   &MidiMessage::isMidiChannelMetaEvent,
+        "get_midi_channel_meta_event_channel", &MidiMessage::getMidiChannelMetaEventChannel,
+        "midi_channel_meta_event",      MidiMessage::midiChannelMetaEvent,
+        "is_active_sense",              &MidiMessage::isActiveSense,
+        "is_midi_start",                &MidiMessage::isMidiStart,
+        "midi_start",                   MidiMessage::midiStart,
+        "is_midi_continue",             &MidiMessage::isMidiContinue,
+        "midi_continue",                MidiMessage::midiContinue,
+        "is_midi_stop",                 &MidiMessage::isMidiStop,
+        "midi_stop",                    MidiMessage::midiStop,  
+        "is_midi_clock",                &MidiMessage::isMidiClock,
+        "midi_clock",                   MidiMessage::midiClock,
+        "is_song_position_pointer",     &MidiMessage::isSongPositionPointer,
+        "get_song_position_pointer_midi_beat", &MidiMessage::getSongPositionPointerMidiBeat,
+        "song_position_pointer",        MidiMessage::songPositionPointer,
+        "is_quarter_frame",             &MidiMessage::isQuarterFrame,
+        "get_quarter_frame_sequence_number", &MidiMessage::getQuarterFrameSequenceNumber,
+        "get_quarter_frame_value",      &MidiMessage::getQuarterFrameValue,
+        "quarter_frame",                MidiMessage::quarterFrame,
+        "is_full_frame",                &MidiMessage::isFullFrame,
+        "get_full_frame_parameters", [](const MidiMessage& self) {
+            int hours, minutes, seconds, frames;
+            MidiMessage::SmpteTimecodeType stype;
+            self.getFullFrameParameters (hours, minutes, seconds, frames, stype);
+            return std::make_tuple (hours, minutes, seconds, frames, static_cast<int> (stype));
+        },
+        "full_frame",                       MidiMessage::fullFrame,
+        "is_midi_machine_control_message",  &MidiMessage::isMidiMachineControlMessage,
+        "get_midi_machine_control_command", &MidiMessage::getMidiMachineControlCommand,
+        "midi_machine_control_command",     MidiMessage::midiMachineControlCommand,
+        "is_midi_machine_control_goto",     [](const MidiMessage& self) {
+            int hours = 0, minutes = 0, seconds = 0, frames = 0;
+            bool ok = self.isMidiMachineControlGoto (hours, minutes, seconds, frames);
+            return std::make_tuple (ok, hours, minutes, seconds, frames);
+        },
+        "midi_machine_control_goto",        MidiMessage::midiMachineControlGoto,
+        "master_volume",                    MidiMessage::masterVolume,
+        "create_sysex_message",             MidiMessage::createSysExMessage,
+        "read_variable_length_val",         [](const uint8* data) {
+            int nbytes = 0;
+            int value = MidiMessage::readVariableLengthVal (data, nbytes);
+            return std::make_tuple (nbytes, value);
+        },
+        "get_message_length_from_first_byte", MidiMessage::getMessageLengthFromFirstByte,
+        "get_midi_note_name",               MidiMessage::getMidiNoteName,
+        "get_midi_note_in_hertz",           MidiMessage::getMidiNoteInHertz,
+        "is_midi_note_black",               MidiMessage::isMidiNoteBlack,
+        "get_gm_instrument_name",           MidiMessage::getGMInstrumentName,
+        "get_gm_instrument_bank_name",      MidiMessage::getGMInstrumentBankName,
+        "get_rhythm_instrument_name",       MidiMessage::getRhythmInstrumentName,
+        "get_controller_name",              MidiMessage::getControllerName,
+        "float_value_to_midi_byte",         MidiMessage::floatValueToMidiByte,
+        "pitchbend_to_pitchwheel_pos",      MidiMessage::pitchbendToPitchwheelPos
     );
 
     // MidiBuffer
-    auto mb = lua.new_usertype<MidiBuffer> ("MidiBuffer", no_constructor,
+    midi.new_usertype<MidiBuffer> ("Buffer", no_constructor,
+        call_constructor, factories (
+            []() { return std::move (MidiBuffer()); },
+            [](MidiMessage* message) { return std::move (MidiBuffer (*message)); }),
+        meta_method::length,        &MidiBuffer::getNumEvents,
+        "empty",                    readonly_property (&MidiBuffer::isEmpty),
+        "first",                    readonly_property (&MidiBuffer::getFirstEventTime),
+        "last",                     readonly_property (&MidiBuffer::getLastEventTime),
+        "data",                     readonly_property (&MidiBuffer::data),
+        "swap",                     &MidiBuffer::swapWith,
+        "reserve",                  &MidiBuffer::ensureSize,
         "clear", overload (
-            resolve<void()> (&MidiBuffer::clear),
-            resolve<void(int, int)> (&MidiBuffer::clear)),
-        "is_empty",         &MidiBuffer::isEmpty,
-        "get_num_events",   &MidiBuffer::getNumEvents,
-        "swap_with",        &MidiBuffer::swapWith
-    );
-
-    mb["Iterator"] = lua.new_usertype<MidiBuffer::Iterator> ("MidiBuffer.Iterator", no_constructor,
-        call_constructor, factories ([](MidiBuffer& buffer) {
-            MidiBuffer::Iterator iter (buffer);
-            return std::move (iter); 
-        }),
-        "set_next_sample_position", &MidiBuffer::Iterator::setNextSamplePosition,
-        "get_next_event", [](MidiBuffer::Iterator& iter, MidiMessage& msg) {
-            int frame = 0;
-            bool ok = iter.getNextEvent (msg, frame);
-            return std::tuple (ok, frame);
+            resolve<void()> (&MidiBuffer::clear),               
+            resolve<void(int, int)> (&MidiBuffer::clear)),        
+        "add", overload (
+            resolve<void(const MidiMessage&, int)> (&MidiBuffer::addEvent),
+            resolve<void(const void*, int, int)> (&MidiBuffer::addEvent),
+            resolve<void(const MidiBuffer&, int, int, int)> (&MidiBuffer::addEvents)),              
+        "foreach", [](MidiBuffer* self) {
+            MidiBufferForeach fe (*self);
+            return std::move (fe);
         }
     );
 
-    lua.script (
-R"(function MidiBuffer:iter()
-   local iter = MidiBuffer.Iterator (self)
-   local msg = MidiMessage()
-   return function()
-      local ok, frame = iter:get_next_event (msg)
-      if not ok then
-         return nil
-      else
-          return msg, frame
-      end
-   end
-end
-)");
-
-    // MidiPipe
-    lua.new_usertype<MidiPipe> ("MidiPipe", no_constructor,
-        "size",             readonly_property (&MidiPipe::getNumBuffers),
-        "get_num_buffers",  &MidiPipe::getNumBuffers,
-        "get_read_buffer",  &MidiPipe::getReadBuffer,
-        "get_write_buffer", &MidiPipe::getWriteBuffer,
-        "clear",            overload (resolve<void()> (&MidiPipe::clear),
-                                      resolve<void(int,int)> (&MidiPipe::clear),
-                                      resolve<void(int,int,int)> (&MidiPipe::clear))
+    midi.new_usertype<MidiBufferForeach> ("Iterator", no_constructor,
+        meta_method::to_string, [](MidiBufferForeach*) { return "midi.Iterator"; }
     );
 
-    lua.new_usertype<kv::PortList> ("PortList",
+    midi.set_function ("noteon",    [](int c, int n, uint8 v) { return MidiMessage::noteOn (c, n, v); });
+    midi.set_function ("noteonf",   [](int c, int n, float v) { return MidiMessage::noteOn (c, n, v); });
+    midi.set_function ("noteoff",   [](int channel, int note) { return MidiMessage::noteOff (channel, note); });
+    midi.set_function ("noteoffv",  [](int channel, int note, uint8_t velocity) { return MidiMessage::noteOff (channel, note, velocity); });
+    midi.set_function ("noteoffvf", [](int channel, int note, float velocity)   { return MidiMessage::noteOff (channel, note, velocity); });
+}
+
+static void openDecibels (state& lua)
+{
+    luaL_requiref (lua, "decibels", luaopen_decibels, 0);
+    lua_pop (lua, lua_gettop (lua));
+}
+
+template<typename T>
+static auto addRange (state_view& view, const char* name)
+{
+    using R = Range<T>;
+    return view.new_usertype<R> (name, no_constructor,
+        call_constructor, factories (
+            []() { return R(); },
+            [] (T start, T end) { return R (start, end); }
+        ),
+        "empty",            readonly_property (&R::isEmpty),
+        "start",            property (&R::getStart,  &R::setStart),
+        "length",           property (&R::getLength, &R::setLength),
+        "end",              property (&R::getEnd,    &R::setEnd),
+        "clip",             &R::clipValue,
+        "contains",         [](R* self, R* other) { return self->contains (*other); },
+        "intersects",       [](R* self, R* other) { return self->intersects (*other); },
+        "expanded",         &R::expanded
+    );
+}
+
+template<typename T>
+static auto addRectangle (state& lua, const char* ns, const char* name)
+{
+    using R = Rectangle<T>;
+    auto view = NS (lua, ns);
+    return view.new_usertype<R> (name, no_constructor,
+        call_constructor, factories (
+            []() { return R(); },
+            [] (T w, T h) { return R (w, h); },
+            [] (T x, T y, T w, T h) { return R (x, y, w, h); }
+        ),
+        meta_method::to_string, [](R* self) {
+            return std::move (self->toString().toStdString());
+        },
+        "empty",            readonly_property (&R::isEmpty),
+        "x",                property (&R::getX,  &R::setX),
+        "y",                property (&R::getY,  &R::setY),
+        "w",                property (&R::getWidth, &R::setWidth),
+        "h",                property (&R::getHeight, &R::setHeight)
+    );
+}
+
+static void openJUCE (state& lua)
+{
+    addRange<float>     (lua, "Range");
+    addRange<int>       (lua, "Span");
+    addRectangle<float> (lua, "element", "Rectangle");
+    addRectangle<int>   (lua, "ui", "Bounds");
+    
+    // AudioBuffer
+    lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
+        "cleared",      readonly_property (&AudioSampleBuffer::hasBeenCleared),
+        "nchannels",    readonly_property (&AudioSampleBuffer::getNumChannels),
+        "nframes",      readonly_property (&AudioSampleBuffer::getNumSamples),
+        "resize", overload (
+            [](AudioSampleBuffer& self, int nc, int ns) { self.setSize (nc, ns); },
+            [](AudioSampleBuffer& self, int nc, int ns, bool keep) { self.setSize (nc, ns, keep); },
+            [](AudioSampleBuffer& self, int nc, int ns, bool keep, bool clear) { self.setSize (nc, ns, keep, clear); },
+            [](AudioSampleBuffer& self, int nc, int ns, bool keep, bool clear, bool avoid) { self.setSize (nc, ns, keep, clear, avoid); }),
+        "duplicate", overload (
+            [](AudioSampleBuffer& self, const AudioSampleBuffer& other) { self.makeCopyOf (other); },
+            [](AudioSampleBuffer& self, const AudioSampleBuffer& other, bool avoidReallocate) { self.makeCopyOf (other, avoidReallocate); }),
+        "clear", overload (
+            resolve<void()> (&AudioSampleBuffer::clear),
+            resolve<void(int,int)> (&AudioSampleBuffer::clear),
+            resolve<void(int,int,int)> (&AudioSampleBuffer::clear)),
+        "get_sample",       &AudioSampleBuffer::getSample,
+        "set_sample",       CALL(&AudioSampleBuffer::setSample),
+        "add_sample",       &AudioSampleBuffer::addSample,
+        "apply_gain", overload (
+            resolve<void(int,int,int,float)> (&AudioSampleBuffer::applyGain),
+            resolve<void(int,int,float)> (&AudioSampleBuffer::applyGain),
+            resolve<void(float)> (&AudioSampleBuffer::applyGain)),
+        "apply_gain_ramp", overload (
+            resolve<void(int,int,int,float,float)> (&AudioSampleBuffer::applyGainRamp),
+            resolve<void(int,int,float,float)> (&AudioSampleBuffer::applyGainRamp)),
+        "add_from", overload (
+            [](AudioSampleBuffer& self, int dc, int dss, AudioSampleBuffer& src, int sc, int sss, int ns) {
+                self.addFrom (dc, dss, src, sc, sss, ns);
+            },
+            [](AudioSampleBuffer& self, int dc, int dss, AudioSampleBuffer& src, int sc, int sss, int ns, float gain) {
+                self.addFrom (dc, dss, src, sc, sss, ns, gain);
+            }),
+        "add_from_with_ramp",   &AudioSampleBuffer::addFromWithRamp,
+        "copy_from", overload (
+            resolve<void(int,int,const AudioSampleBuffer&,int,int,int)> (&AudioSampleBuffer::copyFrom),
+            resolve<void(int,int,const float*, int)> (&AudioSampleBuffer::copyFrom),
+            resolve<void(int,int,const float*, int, float)> (&AudioSampleBuffer::copyFrom)),
+        "copy_from_with_ramp",  &AudioSampleBuffer::copyFromWithRamp,
+        "find_min_max",         &AudioSampleBuffer::findMinMax,
+        "magnitude", overload (
+            [](const AudioSampleBuffer& self, int c, int s, int n) { return self.getMagnitude (c, s, n); },
+            [](const AudioSampleBuffer& self, int s, int n) { return self.getMagnitude (s, n); }),
+        "rms",                  &AudioSampleBuffer::getRMSLevel,
+        "reverse",overload (
+            [](const AudioSampleBuffer& self, int c, int s, int n) { return self.reverse (c, s, n); },
+            [](const AudioSampleBuffer& self, int s, int n) { return self.reverse (s, n); })
+    );
+    
+    auto midi = NS (lua, "midi");
+
+}
+
+static void openEngine (state& lua)
+{
+    auto midi = NS (lua, "midi");
+    auto e    = NS (lua, "element");
+    auto kv   = NS (lua, "kv");
+
+    // MidiPipe
+    midi.new_usertype<MidiPipe> ("Pipe", no_constructor,
+        meta_method::to_string, [](MidiPipe*) { return "midi.Pipe"; },
+        meta_method::index, [](MidiPipe* self, int index) -> MidiBuffer* {
+            return isPositiveAndBelow(--index, self->getNumBuffers())
+                ? self->getWriteBuffer(index) : nullptr; 
+        },
+        meta_method::length,    &MidiPipe::getNumBuffers,
+        "get_num_buffers",      &MidiPipe::getNumBuffers,
+        "get_read_buffer",      &MidiPipe::getReadBuffer,
+        "get_write_buffer",     &MidiPipe::getWriteBuffer,
+        "buffer",               &MidiPipe::getWriteBuffer,
+        "clear", overload (
+            resolve<void()> (&MidiPipe::clear),
+            resolve<void(int, int)> (&MidiPipe::clear),
+            resolve<void(int, int, int)> (&MidiPipe::clear))
+    );
+
+    kv.new_usertype<kv::PortType> ("PortType", no_constructor,
+        meta_method::to_string, [](PortType*) { return "kv.PortType"; }
+    );
+
+    // PortList
+    kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
-        "add", [](kv::PortList& ports, int type, int index, int channel, 
-                  const std::string& symbol, const std::string& name,
+        meta_method::to_string, [](MidiPipe*) { return "kv.PortList"; },
+        "add", [](kv::PortList& ports, int type, int index, int channel,
+                  const char* symbol, const char* name,
                   const bool input)
                   {
                       ports.add (type, index, channel, symbol, name, input);
@@ -277,34 +492,59 @@ end
     );
 }
 
-void registerElement (sol::state& lua)
+void registerEngine (state& lua)
 {
-    auto e = NS (lua, "Element");
-    e["plugins"] = [&lua]() -> PluginManager&
-    {
-        jassert(lua["__world__"].valid());
-        return ((Globals&) lua["__world__"]).getPluginManager();
-    };
-
-    e["session"] = [&lua]() -> SessionPtr
-    {
-        jassert(lua["__world__"].valid());
-        return ((Globals&) lua["__world__"]).getSession();
-    };
-
-    e["settings"] = [&lua]() -> Settings&
-    {
-        jassert(lua["__world__"].valid());
-        return ((Globals&) lua["__world__"]).getSettings();
-    };
+    openMidi (lua);
+    openDecibels (lua);
+    openJUCE (lua);
+    openEngine (lua);
 }
 
-void setWorld (sol::state& lua, Globals* world)
+void registerElement (state& lua)
 {
-    if (world == nullptr)
-        lua["__world__"] = nullptr;
+    auto e = NS (lua, "element");
+    
+    e.new_usertype<Globals> ("World", no_constructor,
+        "audio_engine",     &Globals::getAudioEngine,
+        "commands",         &Globals::getCommandManager,
+        "devices",          &Globals::getDeviceManager,
+        "mappings",         &Globals::getMappingEngine,
+        "media",            &Globals::getMediaManager,
+        "midi_engine",      &Globals::getMidiEngine,
+        "plugins",          &Globals::getPluginManager,
+        "presets",          &Globals::getPresetCollection,
+        "session",          &Globals::getSession,
+        "settings",         &Globals::getSettings
+    );
+}
+
+void setWorld (state& lua, Globals* world)
+{
+    auto e = NS (lua, "element");
+    
+    if (world != nullptr)
+    {
+        e.set_function ("world",            [world]() -> Globals&           { return *world; });
+        e.set_function ("audio_engine",     [world]() -> AudioEnginePtr     { return world->getAudioEngine(); });
+        e.set_function ("commands",         [world]() -> CommandManager&    { return world->getCommandManager(); });
+        e.set_function ("devices",          [world]() -> DeviceManager&     { return world->getDeviceManager(); });
+        e.set_function ("mapping_engine",   [world]() -> MappingEngine&     { return world->getMappingEngine(); });
+        e.set_function ("media",            [world]() -> MediaManager&      { return world->getMediaManager(); });
+        e.set_function ("midi_engine",      [world]() -> MidiEngine&        { return world->getMidiEngine(); });
+        e.set_function ("plugins",          [world]() -> PluginManager&     { return world->getPluginManager(); });
+        e.set_function ("presets",          [world]() -> PresetCollection&  { return world->getPresetCollection(); });
+        e.set_function ("session",          [world]() -> SessionPtr         { return world->getSession(); });
+        e.set_function ("settings",         [world]() -> Settings&          { return world->getSettings(); });
+    }
     else
-        lua["__world__"] = std::ref (*world);
+    {
+        for (const auto& f : StringArray{ "world", "audio_engine", "commands", "devices",
+                                          "mapping_engine", "media", "midi_engine", "plugins", 
+                                          "presets", "session", "settings" })
+        {
+            e.set_function (f.toRawUTF8(), []() { return sol::lua_nil; });
+        }
+    }
 }
 
 }}

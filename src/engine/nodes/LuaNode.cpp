@@ -42,6 +42,9 @@ R"(
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
+-- Include decibel conversion lib
+local db = require ('decibels')
+
 -- Track last applied gain value
 local last_gain = 1.0
 
@@ -78,16 +81,16 @@ end
 
 --- Render audio and midi
 --  Use the provided audio and midi objects to process your plugin
-function node_render (audio, midi)
-   local nframes = audio:get_num_samples()
-   local gain = decibels.to_gain (Param.values[1])
-
+function node_render (details)
+   local gain = db.togain (Param.values[1])
+   
+   --[[
    -- fade from last gain to new gain
-   audio:apply_gain_ramp (0, nframes, last_gain, gain)
-    
+   audio:apply_gain_ramp (0, audio.nframes, last_gain, gain)
    -- update last gain value
    last_gain = gain;
    midi:clear()
+   --]]
 end
 
 --- Release node resources
@@ -117,8 +120,204 @@ function node_restore()
 end
 )";
 
+#include <math.h>
 namespace Element {
 
+struct LAudioBuffer
+{
+    AudioSampleBuffer* buffer;
+    bool isref;
+};
+
+int audiobuffer_new (lua_State* L) {
+    auto* obj = (LAudioBuffer*) lua_newuserdata (L, sizeof (LAudioBuffer));
+    obj->buffer = new AudioSampleBuffer();
+    obj->isref = false;
+    luaL_getmetatable (L, "Element.AudioBuffer");
+    lua_setmetatable (L, -2);
+    return 1;
+}
+
+static int audiobuffer_gc (lua_State* L) {
+    auto* obj = (LAudioBuffer*) lua_touserdata (L, 1);
+    if (! obj->isref)
+        delete obj->buffer;
+    obj->buffer = nullptr;
+    return 1;
+}
+
+static int audiobuffer_tostring (lua_State* L) {
+    lua_pushstring (L, "AudioBuffer");
+    return 1;
+}
+
+static int audiobuffer_length (lua_State* L) {
+    auto* obj = (LAudioBuffer*) lua_touserdata (L, 1);
+    lua_pushinteger (L, obj->buffer->getNumSamples());
+    return 1;
+}
+
+static int audiobuffer_channels (lua_State* L) {
+    auto* obj = (LAudioBuffer*) lua_touserdata (L, 1);
+    lua_pushinteger (L, obj->buffer->getNumChannels());
+    return 1;
+}
+
+static int audiobuffer_resize (lua_State* L) {
+    auto* obj = (LAudioBuffer*) lua_touserdata (L, 1);
+    // obj->buffer->setSize()
+    return 0;
+}
+
+static luaL_Reg audiobuffer_f[] = {
+    { "__call",    audiobuffer_new },
+    { "new",       audiobuffer_new },
+    { nullptr,  nullptr }
+};
+
+static luaL_Reg audiobuffer_m[] = {
+    { "__gc",       audiobuffer_gc },
+    { "__tostring", audiobuffer_tostring },
+    { "length",     audiobuffer_length },
+    { "channels",   audiobuffer_channels },
+    { "resize",     audiobuffer_resize },
+    { nullptr, nullptr }
+};
+
+int luaopen_audiobuffer (lua_State* L) {
+    DBG("stack = " << lua_gettop(L));
+    luaL_newmetatable (L, "Element.AudioBuffer");
+    DBG("stack = " << lua_gettop(L));
+    lua_pushvalue (L, -1);                  /* duplicate the metatable */
+    DBG("stack = " << lua_gettop(L));
+    lua_setfield (L, -2, "__index");        /* mt.__index = mt */
+    DBG("stack = " << lua_gettop(L));
+    luaL_setfuncs (L, audiobuffer_m, 0);
+    DBG("stack = " << lua_gettop(L));
+    luaL_newlib (L, audiobuffer_f);
+    DBG("stack = " << lua_gettop(L));
+    return 1;
+}
+
+//=============================================================================
+class RenderDetails
+{
+public:
+    constexpr static const char* metatable = "Element.RenderDetails";
+
+    RenderDetails()
+    {
+        dummyAudio.setSize (1, 512, false, true, false);
+        reset();
+    }
+
+    ~RenderDetails() { DBG ("~RenderDetails()"); }
+
+    void reset()
+    {
+        audio = &dummyAudio;
+        midi  = &dummyMidi;
+    }
+    
+    int getNumSamples() const { return 0; }
+
+    static int open (lua_State* L)
+    {
+        static luaL_Reg classMethods[] = {
+            { "new",    RenderDetails::construct },
+            { nullptr,  nullptr }
+        };
+
+        static luaL_Reg instanceMethods[] = {
+            { "__gc",       RenderDetails::destroy },
+            { "__tostring", RenderDetails::tostring },
+            { "nframes",    RenderDetails::nframes },
+            { "nchannels",  RenderDetails::nchannels },
+            { "nmidi",      RenderDetails::nmidi },
+            { "sample",     RenderDetails::sample },
+            { nullptr, nullptr }
+        };
+
+        luaL_newmetatable (L, metatable);
+        lua_pushvalue (L, -1);  /* duplicate the metatable */
+        lua_setfield (L, -2, "__index");  /* mt.__index = mt */
+        luaL_setfuncs (L, instanceMethods, 0);
+        luaL_newlib (L, classMethods);
+        return 1;
+    }
+
+    static int construct (lua_State* L)
+    {
+        auto** details = (RenderDetails**) lua_newuserdata (L, sizeof (RenderDetails*));
+        *details = new RenderDetails();
+        luaL_getmetatable (L, metatable);
+        lua_setmetatable (L, -2);
+        return 1;
+    }
+
+    static int destroy (lua_State* L)
+    {
+        auto** details = (RenderDetails**) lua_touserdata (L, 1);
+        if (*details != nullptr)
+            deleteAndZero (*details);
+        return 1;
+    }
+
+    static int sample (lua_State* L)
+    {
+        auto* details = get (L);
+        auto s = details->audio->getSample (0, 0);
+        lua_pushnumber (L, static_cast<lua_Number> (s));
+        return 1;
+    }
+
+    static int tostring (lua_State* L)
+    {
+        auto* details = get (L);
+        String str = "RenderDetails: ";
+        str << " nframes=" << details->audio->getNumSamples() <<
+               " nchannels=" << details->audio->getNumChannels() <<
+               " nmidi=" << details->midi->getNumBuffers();
+        lua_pushstring (L, str.toRawUTF8());
+        return 1;
+    }
+
+    static int nframes (lua_State* L)
+    {
+        auto* details = get (L);
+        lua_pushinteger (L, details->audio->getNumSamples());
+        return 1;
+    }
+
+    static int nchannels (lua_State* L)
+    {
+        auto* details = get (L);
+        lua_pushinteger (L, details->audio->getNumChannels());
+        return 1;
+    }
+
+    static int nmidi (lua_State* L)
+    {
+        auto* details = get (L);
+        lua_pushinteger (L, details->midi->getNumBuffers());
+        return 1;
+    }
+
+    static RenderDetails* get (lua_State* L, int index = 1)
+    {
+        return *static_cast<RenderDetails**> (lua_touserdata (L, index));
+    }
+
+private:
+    friend class LuaNode::Context;
+    AudioSampleBuffer* audio { nullptr };
+    MidiPipe* midi { nullptr };
+    AudioSampleBuffer dummyAudio;
+    MidiPipe dummyMidi;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RenderDetails)
+};
+
+//=============================================================================
 class LuaParameter : public ControlPortParameter,
                      public Parameter::Listener
 {
@@ -152,6 +351,7 @@ private:
     LuaNode::Context* ctx { nullptr };
 };
 
+//=============================================================================
 struct LuaNode::Context
 {
     explicit Context () { }
@@ -163,6 +363,10 @@ struct LuaNode::Context
             dynamic_cast<LuaParameter*>(op)->unlink();
         inParams.clear();
         outParams.clear();
+
+        luaL_unref (state, LUA_REGISTRYINDEX, renderRef);
+        luaL_unref (state, LUA_REGISTRYINDEX, detailsRef);
+        state.collect_garbage();
     }
 
     String getName() const { return name; }
@@ -177,14 +381,34 @@ struct LuaNode::Context
         String errorMsg;
         try
         {
-            state.open_libraries (sol::lib::base, sol::lib::string, sol::lib::io);
+            state.open_libraries (sol::lib::base, sol::lib::string,
+                                  sol::lib::io, sol::lib::package);
+            luaL_requiref (state, "RenderDetails", RenderDetails::open, 1);
+            lua_pop (state, 1);
+
             Lua::registerEngine (state);
             auto res = state.script (script.toRawUTF8());
+            
             if (res.valid())
             {
-                renderf = state ["node_render"];
-                renderstdf = renderf;
-                loaded = true;
+                // renderf = state ["node_render"];
+                // renderstdf = renderf;
+
+                bool ok = false;
+                if (lua_getglobal (state, "node_render") == LUA_TFUNCTION)
+                {
+                    renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
+                    ok = renderRef != LUA_REFNIL && renderRef != LUA_NOREF;
+                }
+
+                if (ok)
+                {
+                    RenderDetails::construct (state);
+                    detailsRef = luaL_ref (state, LUA_REGISTRYINDEX);
+                    ok = detailsRef != LUA_REFNIL && detailsRef != LUA_NOREF;
+                }
+                
+                loaded = ok;
             }
         }
         catch (const std::exception& e)
@@ -257,9 +481,9 @@ struct LuaNode::Context
                 ctx->prepare (rate, block);
                 
                 // user renderf directly so it can throw an exception
-                if (ctx->renderf)
-                    ctx->renderf (std::ref (audio), std::ref (*midi));
-
+                // if (ctx->renderf)
+                //     ctx->renderf (std::ref (audio), std::ref (*midi));
+                ctx->render (audio, *midi);
                 ctx->release();
             }
 
@@ -299,8 +523,23 @@ struct LuaNode::Context
 
     void render (AudioSampleBuffer& audio, MidiPipe& midi) noexcept
     {
-        if (loaded)
-            renderstdf (audio, midi);
+        if (! loaded)
+            return;
+        // renderstdf (audio, midi);
+        if (lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef) == LUA_TFUNCTION)
+        {
+            if (lua_rawgeti (state, LUA_REGISTRYINDEX, detailsRef) == LUA_TUSERDATA)
+            {
+                auto* const details = RenderDetails::get (state, -1);
+                details->audio = &audio;
+                details->midi  = &midi;
+                lua_call (state, 1, 0);
+            }
+        }
+        else
+        {
+            DBG("didn't get render fucntion in callback");
+        }
     }
 
     const OwnedArray<PortDescription>& getPortArray() const noexcept
@@ -419,7 +658,9 @@ private:
     std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
     String name;
     bool loaded = false;
-    
+    int renderRef  = LUA_NOREF;
+    int detailsRef = LUA_NOREF;
+
     PortList ports;
     ParameterArray inParams, outParams;
 
