@@ -127,6 +127,8 @@ def build_desktop (bld, slug='element'):
 
 def compile (bld):
     libEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        libEnv.append_unique (k, [ '-fPIC' ])
     library = bld (
         features    = 'cxx cxxshlib',
         source      = element.get_juce_library_code ("libs/compat") +
