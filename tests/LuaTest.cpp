@@ -67,12 +67,7 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (details)
-    local d = RenderDetails.new()
-    print(d)
-    print(d:nframes())
-    print(d:nchannels())
-    print(d:sample())
+function node_render (audio, midi)
 end
 
 function node_release()
@@ -585,12 +580,12 @@ private:
         try
         {
             auto result = lua.safe_script (R"(
-                local s = Element:session()
+                local s = element:session()
                 expect (s:get_name() == "test session", "incorrect session name")
                 s:set_name ("lua session")
                 expect (s:get_name() == "lua session", "wrong session name")
-                s:add_graph (Node:create_graph(), false)
-                s:add_graph (Node:create_graph(), false)
+                s:add_graph (element:create_graph(), false)
+                s:add_graph (element:create_graph(), false)
                 expect (s:get_num_graphs() == 2, "incorrect number of graphs")
             )");
 
@@ -609,11 +604,6 @@ static LuaGlobalsTest sLuaGlobalsTest;
 
 //=============================================================================
 
-namespace Element {
-extern int audiobuffer_new (lua_State* L);
-extern int luaopen_audiobuffer (lua_State* L);
-}
-
 class LuaAudioBufferTest : public UnitTestBase
 {
 public:
@@ -623,28 +613,7 @@ public:
     void initialise() override
     {
         lua.open_libraries();
-        auto* L = lua.lua_state();
-        jassert (lua_gettop (L) == 0);
-        lua_settop (L, 0);
-       #if 1
-        lua_newtable (L);
-        lua_setglobal (L, "audio");
-        lua_getglobal (L, "audio");
-        jassert(lua_gettop(L) == 1);
-        // DBG("stack = " << lua_gettop (L));
-        luaopen_audiobuffer (L);
-        // DBG("stack = " << lua_gettop (L));
-        lua_pushcfunction (L, audiobuffer_new);
-        lua_setfield (L, 1, "Buffer");
-        // DBG("stack = " << lua_gettop (L));
-        for (int i = lua_gettop(L); --i > 0;)
-            lua_pop (L, i);
-        
-       #else
-        luaL_requiref (L, "AudioBuffer", luaopen_audiobuffer, 1);
-        lua_pop (L, 1);
-        DBG("stack = " << lua_gettop (L));
-       #endif
+        Lua::registerEngine (lua);
         lua.collect_garbage();
     }
 

@@ -80,17 +80,19 @@ function node_prepare (rate, block)
 end
 
 --- Render audio and midi
---  Use the provided audio and midi objects to process your plugin
-function node_render (details)
+-- Use the provided audio and midi objects to process your plugin
+-- @param a     The source audio.Buffer
+-- @param m     The source midi.Pipe
+function node_render (a, m)
    local gain = audio.dbtogain (Param.values[1])
-   
-   --[[
-   -- fade from last gain to new gain
-   audio:apply_gain_ramp (0, audio.nframes, last_gain, gain)
-   -- update last gain value
-   last_gain = gain;
-   midi:clear()
-   --]]
+
+   for c = 1, a:channels() do
+      for f = 1, a:length() do
+         a:set(c, f, a:get(c, f) * gain)
+      end
+   end
+
+   last_gain = gain
 end
 
 --- Release node resources
@@ -539,6 +541,14 @@ struct LuaNode::Context
                 if (lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef) == LUA_TUSERDATA)
                 {
                     lua_call (state, 2, 0);
+                }
+
+                lrt_sample_t** src = lrt_audio_buffer_array (audioBuffer);
+                auto** dst = audio.getArrayOfWritePointers();
+                for (int c = 0; c < audio.getNumChannels(); ++c)
+                {
+                    for (int f = 0; f < audio.getNumSamples(); ++f)
+                        dst[c][f] = static_cast<float> (src[c][f]);
                 }
             }
         }
