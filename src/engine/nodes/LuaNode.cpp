@@ -17,7 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include <math.h>
 #include "sol/sol.hpp"
+#include "lrt/lrt.h"
+
 #include "ElementApp.h"
 #include "engine/nodes/LuaNode.h"
 #include "engine/MidiPipe.h"
@@ -41,9 +44,6 @@ R"(
 -- to change without warning.  Please bear with us as we move toward 
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
-
--- Include decibel conversion lib
-local db = require ('decibels')
 
 -- Track last applied gain value
 local last_gain = 1.0
@@ -82,7 +82,7 @@ end
 --- Render audio and midi
 --  Use the provided audio and midi objects to process your plugin
 function node_render (details)
-   local gain = db.togain (Param.values[1])
+   local gain = audio.dbtogain (Param.values[1])
    
    --[[
    -- fade from last gain to new gain
@@ -120,7 +120,6 @@ function node_restore()
 end
 )";
 
-#include <math.h>
 namespace Element {
 
 struct LAudioBuffer
@@ -383,9 +382,6 @@ struct LuaNode::Context
         {
             state.open_libraries (sol::lib::base, sol::lib::string,
                                   sol::lib::io, sol::lib::package);
-            luaL_requiref (state, "RenderDetails", RenderDetails::open, 1);
-            lua_pop (state, 1);
-
             Lua::registerEngine (state);
             auto res = state.script (script.toRawUTF8());
             
@@ -403,9 +399,16 @@ struct LuaNode::Context
 
                 if (ok)
                 {
-                    RenderDetails::construct (state);
-                    detailsRef = luaL_ref (state, LUA_REGISTRYINDEX);
-                    ok = detailsRef != LUA_REFNIL && detailsRef != LUA_NOREF;
+                    audioBuffer = lrt_audio_buffer_new (state, 0, 0);
+                    audioBufRef = luaL_ref (state, LUA_REGISTRYINDEX);
+                    ok = audioBufRef != LUA_REFNIL && audioBufRef != LUA_NOREF;
+                }
+
+                if (ok)
+                {
+                    midiPipe = lrt_midi_pipe_new (state, 0);
+                    midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
+                    ok = midiPipeRef != LUA_REFNIL && midiPipeRef != LUA_NOREF;
                 }
                 
                 loaded = ok;
@@ -525,15 +528,18 @@ struct LuaNode::Context
     {
         if (! loaded)
             return;
-        // renderstdf (audio, midi);
+
         if (lua_rawgeti (state, LUA_REGISTRYINDEX, renderRef) == LUA_TFUNCTION)
         {
-            if (lua_rawgeti (state, LUA_REGISTRYINDEX, detailsRef) == LUA_TUSERDATA)
+            if (lua_rawgeti (state, LUA_REGISTRYINDEX, audioBufRef) == LUA_TUSERDATA)
             {
-                auto* const details = RenderDetails::get (state, -1);
-                details->audio = &audio;
-                details->midi  = &midi;
-                lua_call (state, 1, 0);
+                lrt_audio_buffer_duplicate_32 (audioBuffer, audio.getArrayOfReadPointers(),
+                                                            audio.getNumChannels(),
+                                                            audio.getNumSamples());
+                if (lua_rawgeti (state, LUA_REGISTRYINDEX, midiPipeRef) == LUA_TUSERDATA)
+                {
+                    lua_call (state, 2, 0);
+                }
             }
         }
         else
@@ -658,8 +664,13 @@ private:
     std::function<void(AudioSampleBuffer&, MidiPipe&)> renderstdf;
     String name;
     bool loaded = false;
+
     int renderRef  = LUA_NOREF;
     int detailsRef = LUA_NOREF;
+    int audioBufRef = LUA_NOREF;
+    int midiPipeRef = LUA_NOREF;
+    lrt_midi_pipe_t* midiPipe { nullptr };
+    lrt_audio_buffer_t* audioBuffer { nullptr };
 
     PortList ports;
     ParameterArray inParams, outParams;

@@ -30,9 +30,7 @@
 #include "scripting/LuaIterators.h"
 
 #include "sol/sol.hpp"
-
-//=============================================================================
-extern int luaopen_decibels (lua_State*);
+#include "lrt/lrt.h"
 
 //=============================================================================
 namespace sol {
@@ -344,8 +342,9 @@ static void openMidi (state& lua)
 
 static void openDecibels (state& lua)
 {
-    luaL_requiref (lua, "decibels", luaopen_decibels, 0);
-    lua_pop (lua, lua_gettop (lua));
+    // luaL_requiref (lua, "decibels", luaopen_decibels, 0);
+    // lua_pop (lua, lua_gettop (lua));
+    lrt_openlibs (lua.lua_state(), 1);
 }
 
 template<typename T>

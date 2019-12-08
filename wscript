@@ -99,6 +99,7 @@ def common_includes():
              'libs/compat', \
              'libs/lua', \
              'libs/lua/src', \
+             'libs/lua-rt', \
              VST3_PATH, \
              'src' ]
 
@@ -130,7 +131,8 @@ def compile (bld):
         features    = 'cxx cxxshlib',
         source      = element.get_juce_library_code ("libs/compat") +
                       bld.path.ant_glob ('libs/compat/BinaryData*.cpp') +
-                      bld.path.ant_glob ('src/**/*.cpp'),
+                      bld.path.ant_glob ('src/**/*.cpp') +
+                      bld.path.ant_glob ('libs/lua-rt/src/*.c'),
         includes    = common_includes(),
         target      = 'lib/element-0',
         name        = 'ELEMENT',
