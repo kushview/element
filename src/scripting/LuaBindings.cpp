@@ -66,10 +66,10 @@ void registerModel (sol::state& lua)
     // Sesson
     auto session = e.new_usertype<Session> ("Session", no_constructor,
         meta_function::to_string, [](Session* self) {
-            String str = "Session"; 
+            String str = "Session";
             if (self->getName().isNotEmpty())
                 str << ": " << self->getName();
-            return std::move (str.toStdString());
+            return str.toStdString();
         },
         meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
         meta_function::index,       [](Session* self, int index) {
@@ -77,21 +77,19 @@ void registerModel (sol::state& lua)
                 ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
                 : std::shared_ptr<Node>();
         },
+        "name", property ([](Session* self, const char* name) -> void {
+                self->setName (String::fromUTF8 (name));
+            },[](const Session& self) -> std::string {
+                return self.getName().toStdString();
+            }),
+        "clear",                    &Session::clear,
         "get_num_graphs",           &Session::getNumGraphs,
         "get_graph",                &Session::getGraph,
         "get_active_graph",         &Session::getActiveGraph,
         "get_active_graph_index",   &Session::getActiveGraphIndex,
         "add_graph",                &Session::addGraph,
-        "set_name", [](Session* self, const char* name) -> void {
-            self->setName (String::fromUTF8 (name));
-        },
-        "get_name", [](const Session& self) -> std::string {
-            return std::move (self.getName().toStdString());
-        },
-        "clear",                    &Session::clear,
-
-        "save_graph_state",         &Session::saveGraphState,
-        "restore_graph_state",      &Session::restoreGraphState
+        "save_state",               &Session::saveGraphState,
+        "restore_state",            &Session::restoreGraphState
     );
 
     // Node
@@ -115,7 +113,7 @@ void registerModel (sol::state& lua)
             Node::sanitizeRuntimeProperties (copy, true);
             return std::move (copy.toXmlString().toStdString());
         },
-        "is_valid",             &Node::isValid,
+        "valid",                &Node::isValid,
         "get_name",             [](Node* self) { return std::move (self->getName().toStdString()); },
         "get_display_name",     [](Node* self) { return std::move (self->getDisplayName().toStdString()); },
         "get_plugin_name",      [](Node* self) { return std::move (self->getPluginName().toStdString()); },
@@ -162,10 +160,11 @@ void registerModel (sol::state& lua)
     e.set_function ("create_default_graph", []() { return Node::createDefaultGraph(); });
 }
 
-static void openMidi (state& lua)
+static void openMidi (state&)
 {
+   #if 0 
     auto midi = NS (lua, "midi");
-    
+
     // MidiMessage
     midi.new_usertype<MidiMessage> ("Message", no_constructor,
         call_constructor,           factories([]() { return std::move (MidiMessage()); }),
@@ -338,12 +337,11 @@ static void openMidi (state& lua)
     midi.set_function ("noteoff",   [](int channel, int note) { return MidiMessage::noteOff (channel, note); });
     midi.set_function ("noteoffv",  [](int channel, int note, uint8_t velocity) { return MidiMessage::noteOff (channel, note, velocity); });
     midi.set_function ("noteoffvf", [](int channel, int note, float velocity)   { return MidiMessage::noteOff (channel, note, velocity); });
+   #endif
 }
 
-static void openDecibels (state& lua)
+static void openLRT (state& lua)
 {
-    // luaL_requiref (lua, "decibels", luaopen_decibels, 0);
-    // lua_pop (lua, lua_gettop (lua));
     lrt_openlibs (lua.lua_state(), 1);
 }
 
@@ -445,34 +443,11 @@ static void openJUCE (state& lua)
             [](const AudioSampleBuffer& self, int c, int s, int n) { return self.reverse (c, s, n); },
             [](const AudioSampleBuffer& self, int s, int n) { return self.reverse (s, n); })
     );
-    
-    auto midi = NS (lua, "midi");
-
 }
 
-static void openEngine (state& lua)
+static void openKV (state& lua)
 {
-    auto midi = NS (lua, "midi");
-    auto e    = NS (lua, "element");
     auto kv   = NS (lua, "kv");
-
-    // MidiPipe
-    midi.new_usertype<MidiPipe> ("Pipe", no_constructor,
-        meta_method::to_string, [](MidiPipe*) { return "midi.Pipe"; },
-        meta_method::index, [](MidiPipe* self, int index) -> MidiBuffer* {
-            return isPositiveAndBelow(--index, self->getNumBuffers())
-                ? self->getWriteBuffer(index) : nullptr; 
-        },
-        meta_method::length,    &MidiPipe::getNumBuffers,
-        "get_num_buffers",      &MidiPipe::getNumBuffers,
-        "get_read_buffer",      &MidiPipe::getReadBuffer,
-        "get_write_buffer",     &MidiPipe::getWriteBuffer,
-        "buffer",               &MidiPipe::getWriteBuffer,
-        "clear", overload (
-            resolve<void()> (&MidiPipe::clear),
-            resolve<void(int, int)> (&MidiPipe::clear),
-            resolve<void(int, int, int)> (&MidiPipe::clear))
-    );
 
     kv.new_usertype<kv::PortType> ("PortType", no_constructor,
         meta_method::to_string, [](PortType*) { return "kv.PortType"; }
@@ -495,8 +470,8 @@ void registerEngine (state& lua)
 {
     // openJUCE (lua);
     // openMidi (lua);
-    // openEngine (lua);
-    openDecibels (lua);
+    openKV (lua);
+    openLRT (lua);
 }
 
 void registerElement (state& lua)
