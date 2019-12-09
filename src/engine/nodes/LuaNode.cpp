@@ -281,31 +281,30 @@ struct LuaNode::Context
                                 validatePorts.size (PT::Audio, false));
             auto nmidi  = jmax (validatePorts.size (PT::Midi, true),
                                 validatePorts.size (PT::Midi, false));
-            AudioSampleBuffer audio (jmax (1, nchans), block);
-            OwnedArray<MidiBuffer> midiBufs;
-            Array<int> midiIdx;
             
-            while (midiBufs.size() < nmidi)
-            {
-                midiIdx.add (midiBufs.size());
-                midiBufs.add (new MidiBuffer ());
-            }
-
             // calls node_prepare(), node_render(), and node_release()
             {
-                auto midi = midiBufs.size() > 0 
-                    ? std::make_unique<MidiPipe> (midiBufs, midiIdx)
-                    : std::make_unique<MidiPipe>();
                 ctx->prepare (rate, block);
-                
-                // user renderf directly so it can throw an exception
-                // if (ctx->renderf)
-                //     ctx->renderf (std::ref (audio), std::ref (*midi));
-                ctx->render (audio, *midi);
+                ctx->state["__ln_validate_rate"]    = rate;
+                ctx->state["__ln_validate_nmidi"]   = nmidi;
+                ctx->state["__ln_validate_nchans"]  = nchans;
+                ctx->state["__ln_validate_nframes"] = block;
+                ctx->state.script (R"(
+                    local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
+                    local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
+                    for i = 1,#__ln_midi_pipe do
+                        local b = m:get(i)
+                        b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
+                        b:insert (10, midi.noteoff (1, 60, 0))
+                    end
+                    node_render (__ln_audio_buffer, __ln_midi_pipe)
+                    __ln_audio_buffer = nil
+                    __ln_midi_pipe = nil
+                )");
+
                 ctx->release();
             }
 
-            midiBufs.clearQuick (true);
             ctx.reset();
             result = Result::ok();
         }
@@ -367,7 +366,7 @@ struct LuaNode::Context
                     
                     int bytes = 0, frame = 0;
                     const uint8* data = nullptr;
-                    for (int i = 0; i < nmidi; ++i) 
+                    for (int i = 0; i < nmidi; ++i)
                     {
                         auto* src = midi.getWriteBuffer (i);
                         auto* dst = lrt_midi_pipe_get (midiPipe, i);
@@ -376,6 +375,7 @@ struct LuaNode::Context
                         MidiBuffer::Iterator iter (*src);
                         while (iter.getNextEvent (data, bytes, frame))
                             lrt_midi_buffer_insert (dst, data, bytes, frame);
+                        src->clear();
                     }
 
                     lua_call (L, 2, 0);
@@ -395,7 +395,7 @@ struct LuaNode::Context
                     }
 
                    #if ! LRT_FORCE_FLOAT32
-                    lrt_sample_t** src = lrt_audio_buffer_array (audioBuffer);
+                    const lrt_sample_t* const* src = lrt_audio_buffer_array (audioBuffer);
                     auto** dst = audio.getArrayOfWritePointers();
                     for (int c = 0; c < nchans; ++c)
                     {
@@ -411,7 +411,7 @@ struct LuaNode::Context
             DBG("didn't get render fucntion in callback");
         }
     }
-
+    
     const OwnedArray<PortDescription>& getPortArray() const noexcept
     {
         return ports.getPorts();
@@ -489,7 +489,6 @@ struct LuaNode::Context
             sol::object data = result;
             if (data.is<const char*>())
             {
-                //DBG("data = " << data.as<const char*>());
                 MemoryOutputStream mo (block, false);
                 mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
             }
@@ -531,7 +530,6 @@ private:
     bool loaded = false;
 
     int renderRef  = LUA_NOREF;
-    int detailsRef = LUA_NOREF;
     int audioBufRef = LUA_NOREF;
     int midiPipeRef = LUA_NOREF;
     lrt_midi_pipe_t* midiPipe { nullptr };

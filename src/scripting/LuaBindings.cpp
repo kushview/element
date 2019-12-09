@@ -493,10 +493,10 @@ static void openEngine (state& lua)
 
 void registerEngine (state& lua)
 {
-    openMidi (lua);
+    // openJUCE (lua);
+    // openMidi (lua);
+    // openEngine (lua);
     openDecibels (lua);
-    openJUCE (lua);
-    openEngine (lua);
 }
 
 void registerElement (state& lua)
