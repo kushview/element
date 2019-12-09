@@ -67,7 +67,7 @@ function node_prepare (sample_rate, block_size)
     prepared_flag = true
 end
 
-function node_render (audio, midi)
+function node_render (a, m)
 end
 
 function node_release()

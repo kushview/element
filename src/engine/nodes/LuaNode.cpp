@@ -196,15 +196,13 @@ struct LuaNode::Context
         try
         {
             state.open_libraries (sol::lib::base, sol::lib::string,
-                                  sol::lib::io, sol::lib::package);
+                                  sol::lib::io, sol::lib::package,
+                                  sol::lib::math);
             Lua::registerEngine (state);
             auto res = state.script (script.toRawUTF8());
             
             if (res.valid())
             {
-                // renderf = state ["node_render"];
-                // renderstdf = renderf;
-
                 bool ok = false;
                 if (lua_getglobal (state, "node_render") == LUA_TFUNCTION)
                 {
@@ -293,7 +291,7 @@ struct LuaNode::Context
                     local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
                     local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
                     for i = 1,#__ln_midi_pipe do
-                        local b = m:get(i)
+                        local b = __ln_midi_pipe:get(i)
                         b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
                         b:insert (10, midi.noteoff (1, 60, 0))
                     end
@@ -324,6 +322,24 @@ struct LuaNode::Context
         if (auto fn = state ["node_prepare"])
             fn (rate, block);
         
+        using PT = kv::PortType;
+        auto nchans = jmax (ports.size (PT::Audio, true),
+                            ports.size (PT::Audio, false));
+        auto nmidi  = jmax (ports.size (PT::Midi, true),
+                            ports.size (PT::Midi, false));
+
+        if (audioBuffer != nullptr)
+        {
+            lrt_audio_buffer_resize (audioBuffer, nchans, block,
+                                     false, true, false);
+        }
+
+        if (midiPipe != nullptr)
+        {
+            lrt_midi_pipe_resize (L, midiPipe, nmidi);
+            lrt_midi_pipe_clear (midiPipe, -1);
+        }
+
         state.collect_garbage();
     }
 
@@ -335,6 +351,17 @@ struct LuaNode::Context
         if (auto fn = state ["node_release"])
             fn();
         
+        if (audioBuffer != nullptr)
+        {
+            lrt_audio_buffer_resize (audioBuffer, 1, 1,
+                                     false, true, false);
+        }
+
+        if (midiPipe != nullptr)
+        {
+            lrt_midi_pipe_resize (L, midiPipe, 0);
+        }
+
         state.collect_garbage();
     }
 
