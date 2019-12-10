@@ -31,8 +31,7 @@
 // #define EL_LUA_DBG(x) DBG(x)
 
 static const String stereoAmpScript = 
-R"(
---- Stereo Amplifier in Lua
+R"(--- Stereo Amplifier in Lua
 --
 -- This script came with Element and is in the public domain.
 --
@@ -46,7 +45,8 @@ R"(
 -- see https://github.com/kushview/element
 
 -- Track last applied gain value
-local last_gain = 1.0
+local start_gain = 1.0
+local end_gain = 1.0
 
 -- Return a table of audio/midi inputs and outputs
 function node_io_ports()
@@ -84,38 +84,41 @@ end
 -- @param a     The source audio.Buffer
 -- @param m     The source midi.Pipe
 function node_render (a, m)
-   local gain = audio.dbtogain (Param.values[1])
-
+   end_gain = audio.dbtogain (Param.values[1])
+   local increment = (end_gain - start_gain) / a:length()
    for c = 1, a:channels() do
+      local vec = a:vector (c)
+      local gain = start_gain
       for f = 1, a:length() do
-         a:set(c, f, a:get(c, f) * gain)
+         vec[f] = gain * vec[f]
+         gain = gain + increment
       end
    end
 
-   last_gain = gain
+   start_gain = end_gain
 end
 
 --- Release node resources
---  Free any allocated resources in this callback
+-- Free any allocated resources in this callback
 function node_release()
 end
 
 --- Save node state
 --
---  This is an optional function you can implement to save state.  
---  The host will prepare the IO stream so all you have to do is 
---  `io.write(...)` your data
+-- This is an optional function you can implement to save state.  
+-- The host will prepare the IO stream so all you have to do is 
+-- `io.write(...)` your data
 --
---  Note: Parameter values will automatically be saved and restored,
---  you do not need to handle them here.
+-- Note: Parameter values will automatically be saved and restored,
+-- you do not need to handle them here.
 function node_save()
    io.write("some custom state data")
 end
 
 --- Restore node state
---  This is an optional function you can implement to restore state.  
---  The host will prepare the IO stream so all you have to do is 
---  `io.read(...)` your data previsouly written in `node_save()`
+-- This is an optional function you can implement to restore state.  
+-- The host will prepare the IO stream so all you have to do is 
+-- `io.read(...)` your data previsouly written in `node_save()`
 function node_restore()
    print ("restored data:")
    print (io.read ("*a"));
