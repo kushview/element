@@ -292,6 +292,7 @@ struct LuaNode::Context
             ctx->state.script (R"(
                 local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
                 local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
+                
                 for _ = 1,4 do
                     for i = 1,#__ln_midi_pipe do
                         local b = __ln_midi_pipe:get(i)
