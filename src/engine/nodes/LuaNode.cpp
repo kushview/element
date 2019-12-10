@@ -280,29 +280,26 @@ struct LuaNode::Context
             auto nmidi  = jmax (validatePorts.size (PT::Midi, true),
                                 validatePorts.size (PT::Midi, false));
             
-            // calls node_prepare(), node_render(), and node_release()
-            {
-                ctx->prepare (rate, block);
-                ctx->state["__ln_validate_rate"]    = rate;
-                ctx->state["__ln_validate_nmidi"]   = nmidi;
-                ctx->state["__ln_validate_nchans"]  = nchans;
-                ctx->state["__ln_validate_nframes"] = block;
-                ctx->state.script (R"(
-                    local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
-                    local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
-                    for i = 1,#__ln_midi_pipe do
-                        local b = __ln_midi_pipe:get(i)
-                        b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
-                        b:insert (10, midi.noteoff (1, 60, 0))
-                    end
-                    node_render (__ln_audio_buffer, __ln_midi_pipe)
-                    __ln_audio_buffer = nil
-                    __ln_midi_pipe = nil
-                )");
+            ctx->prepare (rate, block);
 
-                ctx->release();
-            }
+            ctx->state["__ln_validate_rate"]    = rate;
+            ctx->state["__ln_validate_nmidi"]   = nmidi;
+            ctx->state["__ln_validate_nchans"]  = nchans;
+            ctx->state["__ln_validate_nframes"] = block;
+            ctx->state.script (R"(
+                local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
+                local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
+                for i = 1,#__ln_midi_pipe do
+                    local b = __ln_midi_pipe:get(i)
+                    b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
+                    b:insert (10, midi.noteoff (1, 60, 0))
+                end
+                node_render (__ln_audio_buffer, __ln_midi_pipe)
+                __ln_audio_buffer = nil
+                __ln_midi_pipe = nil
+            )");
 
+            ctx->release();
             ctx.reset();
             result = Result::ok();
         }
