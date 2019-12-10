@@ -44,7 +44,7 @@ R"(--- Stereo Amplifier in Lua
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
--- Track last applied gain value
+-- Our gain parameters. Used for fading between changes in volume
 local start_gain = 1.0
 local end_gain = 1.0
 
@@ -85,6 +85,9 @@ end
 -- @param m     The source midi.Pipe
 function node_render (a, m)
    end_gain = audio.dbtogain (Param.values[1])
+
+   --[[
+   -- process a fade frame by frame
    local increment = (end_gain - start_gain) / a:length()
    for c = 1, a:channels() do
       local vec = a:vector (c)
@@ -94,6 +97,19 @@ function node_render (a, m)
          gain = gain + increment
       end
    end
+   --]]
+
+   ---[[
+   -- same as frame by frame but faster
+   a:fade (start_gain, end_gain)
+   --]]
+   
+   --[[
+   -- same as above specifying channel and range
+   for c = 1, a:channels() do
+      a:fade (c, 1, a:length(), start_gain, end_gain)
+   end
+   --]]
 
    start_gain = end_gain
 end
