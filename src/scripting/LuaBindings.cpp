@@ -156,7 +156,26 @@ void registerModel (sol::state& lua)
             []() { return Node::createGraph(); },
             [](const char* name) { return Node::createGraph (name); })
     );
-    e.set_function ("create_graph", []() { return Node::createGraph(); });
+
+    e.set_function ("newgraph", [](sol::variadic_args args) {
+        String name;
+        bool defaultGraph = false;
+        int argIdx = 0;
+        
+        for (const auto arg : args)
+        {
+            if (arg.get_type() == sol::type::string && name.isNotEmpty())
+                name = String::fromUTF8 (arg.as<const char*>());
+            else if (arg.get_type() == sol::type::boolean)
+                defaultGraph = arg.as<bool>();
+            if (++argIdx == 2)
+                break;
+        }
+
+        return defaultGraph ? Node::createDefaultGraph (name)
+                            : Node::createGraph (name);
+    });
+
     e.set_function ("create_default_graph", []() { return Node::createDefaultGraph(); });
 }
 
