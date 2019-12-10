@@ -81,7 +81,8 @@ void registerModel (sol::state& lua)
                 self->setName (String::fromUTF8 (name));
             },[](const Session& self) -> std::string {
                 return self.getName().toStdString();
-            }),
+            })
+       #if 0
         "clear",                    &Session::clear,
         "get_num_graphs",           &Session::getNumGraphs,
         "get_graph",                &Session::getGraph,
@@ -90,6 +91,7 @@ void registerModel (sol::state& lua)
         "add_graph",                &Session::addGraph,
         "save_state",               &Session::saveGraphState,
         "restore_state",            &Session::restoreGraphState
+       #endif 
     );
 
     // Node
@@ -107,54 +109,50 @@ void registerModel (sol::state& lua)
             return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
                                    : std::shared_ptr<Node>();
         },
-        "to_xml_string", [](Node* self) -> std::string
+        "valid",                readonly_property (&Node::isValid),
+        "name", property (
+            [](Node* self) { return self->getName().toStdString(); },
+            [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
+        ),
+        "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
+        "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
+        "missing",              readonly_property (&Node::isMissing),
+        "enabled",              readonly_property (&Node::isEnabled),
+        "graph",                readonly_property (&Node::isGraph),
+        "root",                 readonly_property (&Node::isRootGraph),
+        "nodeid",               readonly_property (&Node::getNodeId),
+        "uuid",                 readonly_property (&Node::getUuid),
+        "uuidstring",           readonly_property (&Node::getUuidString),
+        "type",                 readonly_property (&Node::getNodeType),
+        "muted",                property (&Node::isMuted, &Node::setMuted),
+        "bypassed",             readonly_property (&Node::isBypassed),
+        "editor",               readonly_property (&Node::hasEditor),
+
+        "toxmlstring", [](Node* self) -> std::string
         {
             auto copy = self->getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (copy, true);
-            return std::move (copy.toXmlString().toStdString());
+            return copy.toXmlString().toStdString();
         },
-        "valid",                &Node::isValid,
-        "get_name",             [](Node* self) { return std::move (self->getName().toStdString()); },
-        "get_display_name",     [](Node* self) { return std::move (self->getDisplayName().toStdString()); },
-        "get_plugin_name",      [](Node* self) { return std::move (self->getPluginName().toStdString()); },
-        "set_name", [](Node* self, const char* name) -> void {
-            self->setProperty (Tags::name, String::fromUTF8 (name));
-        },
+        "resetports",           &Node::resetPorts,
+        "savestate",            &Node::savePluginState,
+        "restoretate",          &Node::restorePluginState,
+        "writefile", [](const Node& node, const char* filepath) -> bool {
+            if (! File::isAbsolutePath (filepath))
+                return false;
+            return node.writeToFile (File (String::fromUTF8 (filepath)));
+        }
+        
+       #if 0
         "has_modified_name",    &Node::hasModifiedName,
-        "get_node_id",          &Node::getNodeId,
-        "get_uuid_string",      &Node::getUuidString,
-        "get_uuid",             &Node::getUuid,
-        "is_graph",             &Node::isGraph,
-        "is_root_graph",        &Node::isRootGraph,
-        "get_node_type",        &Node::getNodeType,
         "has_node_type",        &Node::hasNodeType,
-        "has_editor",           &Node::hasEditor,
         "get_parent_graph",     &Node::getParentGraph,
         "is_child_of_root_graph", &Node::isChildOfRootGraph,
-        "is_missing",           &Node::isMissing,
-        "is_enabled",           &Node::isEnabled,
-        // "get_midi_channels"
-        "is_bypassed",          &Node::isBypassed,
-        "is_muted",             &Node::isMuted,
         "is_muting_inputs",     &Node::isMutingInputs,
-        "set_muted",            &Node::setMuted,
         "set_mute_input",       &Node::setMuteInput,
         "get_num_nodes",        &Node::getNumNodes,
         "get_node",             &Node::getNode,
-        "write_to_file",        [](const Node& node, const char* filepath) -> bool {
-            if (! File::isAbsolutePath (filepath))
-                return false;
-            return node.writeToFile (File (filepath));
-        },
-        "reset_ports",          &Node::resetPorts,
-        "save_plugin_state",    &Node::savePluginState,
-        "restore_plugin_state", &Node::restorePluginState,
-        "create_default_graph", overload (
-            []() { return Node::createDefaultGraph(); },
-            [](const char* name) { return Node::createDefaultGraph (name); }),
-        "create_graph", overload (
-            []() { return Node::createGraph(); },
-            [](const char* name) { return Node::createGraph (name); })
+       #endif
     );
 
     e.set_function ("newgraph", [](sol::variadic_args args) {
@@ -175,8 +173,6 @@ void registerModel (sol::state& lua)
         return defaultGraph ? Node::createDefaultGraph (name)
                             : Node::createGraph (name);
     });
-
-    e.set_function ("create_default_graph", []() { return Node::createDefaultGraph(); });
 }
 
 static void openMidi (state&)
