@@ -137,9 +137,9 @@ public:
 
         float a0 = 1.0f + alpha;
 
-        b[0] = 1.0f / a0;
-        b[1] = -2.0f * wC / a0;
-        b[2] = 1.0f / a0;
+        b[0] = newGain / a0;
+        b[1] = -2.0f * wC * b[0];
+        b[2] = b[0];
 
         a[1] = -2.0f * wC / a0;
         a[2] = (1.0f - alpha) / a0;
@@ -242,6 +242,79 @@ public:
         calcCoefs (freq.skip (smoothSteps), Q.skip (smoothSteps), gain.skip (smoothSteps));
     }
 
+    /** Get the magnitude of the filter at this frequency, in units of linear gain */
+    float getMagnitudeAtFreq (float f)
+    {
+        std::complex<float> s (0.0f, f / freq.getTargetValue()); // s = j (w  / w0)
+        std::complex<float> numerator (1.0f, 0.0f);
+        std::complex<float> denominator (1.0f, 0.0f);
+
+        if (eqShape == Bell)
+        {
+            //         s^2 + s * (A / Q) + 1
+            // H(s) = -----------------------
+            //         s^2 + s / (A * Q) + 1
+
+            auto A = powf (10.0f, Decibels::gainToDecibels (gain.getTargetValue()) / 40.0f);
+            numerator = s * s + s * A / Q.getTargetValue() + 1.0f;
+            denominator = s * s + s / (A * Q.getTargetValue()) + 1.0f;
+        }
+        else if (eqShape == Notch)
+        {
+            //             s^2 + 1
+            // H(s) = -----------------
+            //         s^2 + s / Q + 1
+
+            numerator = s * s + 1.0f;
+            denominator = s * s + s / Q.getTargetValue() + 1.0f;
+            numerator *= gain.getTargetValue();
+        }
+        else if (eqShape == LowShelf)
+        {
+            //           s^2 + s * (sqrt(A) / Q) + A
+            // H(s) = ---------------------------------
+            //         A * s^2 + s * (sqrt(A) / Q) + 1
+
+            auto A = powf (10.0f, Decibels::gainToDecibels (gain.getTargetValue()) / 40.0f);
+            numerator = s * s + s * sqrtf (A) / Q.getTargetValue() + A;
+            denominator = A * s * s + s * sqrtf(A) / Q.getTargetValue() + 1.0f;
+            numerator *= A;
+        }
+        else if (eqShape == HighShelf)
+        {
+            //         A * s^2 + s * (sqrt(A) / Q) + 1
+            // H(s) = ---------------------------------
+            //           s^2 + s * (sqrt(A) / Q) + A
+
+            auto A = powf (10.0f, Decibels::gainToDecibels (gain.getTargetValue()) / 40.0f);
+            numerator = A  * s * s + s * sqrtf (A) / Q.getTargetValue() + 1.0f;
+            denominator = s * s + s * sqrtf(A) / Q.getTargetValue() + A;
+            numerator *= A;
+        }
+        else if (eqShape == LowPass)
+        {
+            //               1
+            // H(s) = -----------------
+            //         s^2 + s / Q + 1
+
+            numerator = 1.0f;
+            denominator = s * s + s / Q.getTargetValue() + 1.0f;
+            numerator *= gain.getTargetValue();
+        }
+        else if (eqShape == HighPass)
+        {
+            //              s^2
+            // H(s) = -----------------
+            //         s^2 + s / Q + 1
+
+            numerator = s * s;
+            denominator = s * s + s / Q.getTargetValue() + 1.0f;
+            numerator *= gain.getTargetValue();
+        }
+
+        return abs (numerator / denominator); // |H(s)|
+    }
+
 private:
     SmoothedValue<float, ValueSmoothingTypes::Linear> freq;
     SmoothedValue<float, ValueSmoothingTypes::Linear> Q;
@@ -261,84 +334,24 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EQFilter)
 };
 
-// AudioProcessor (BusesProperties()
-//        #if JucePlugin_IsSynth
-//         .withInput  ("Main",  AudioChannelSet::stereo(), false)
 class EQFilterProcessor : public BaseProcessor
 {
 public:
-    explicit EQFilterProcessor (const int _numChannels = 2)
-        : BaseProcessor (BusesProperties()
-            .withInput ("Main", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))
-            .withOutput ("Main", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))),
-            numChannels (jlimit (1, 2, _numChannels))
-    {
-        setPlayConfigDetails (numChannels, numChannels, 44100.0, 1024);
-
-        NormalisableRange<float> freqRange (20.0f, 22000.0f);
-        freqRange.setSkewForCentre (1000.0f);
-
-        NormalisableRange<float> qRange (0.1f, 18.0f);
-        qRange.setSkewForCentre (0.707f);
-
-        addParameter (freq    = new AudioParameterFloat ("freq", "Cutoff Frequency [Hz]", freqRange, 1000.0f));
-        addParameter (q       = new AudioParameterFloat ("q",    "Filter Q",              qRange,    0.707f));
-        addParameter (gainDB  = new AudioParameterFloat ("gain", "Filter Gain [dB]",      -15.0f, 15.0f, 0.0f));
-        addParameter (eqShape = new AudioParameterChoice ("shape", "EQ Shape", {"Bell", "Notch", "Hi Shelf", "Low Shelf", "HPF", "LPF"}, 0));
-    }
+    explicit EQFilterProcessor (const int _numChannels = 2);
 
     const String getName() const override { return "EQ Filter"; }
 
-    void fillInPluginDescription (PluginDescription& desc) const override
-    {
-        desc.name = getName();
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_EQ_FILTER;
-        desc.descriptiveName    = "EQ Filter";
-        desc.numInputChannels   = 2;
-        desc.numOutputChannels  = 2;
-        desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
-        desc.uid                = EL_INTERNAL_UID_EQ_FILTER;
-    }
+    void fillInPluginDescription (PluginDescription& desc) const override;
 
-    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
-    {
-        for (int ch = 0; ch < 2; ++ch)
-        {
-            eqFilter[ch].setFrequency (*freq);
-            eqFilter[ch].setQ (*q);
-            eqFilter[ch].setGain (Decibels::decibelsToGain ((float) *gainDB));
-            eqFilter[ch].setShape ((EQFilter::Shape) eqShape->getIndex());
+    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
+    void releaseResources() override {}
 
-            eqFilter[ch].reset (sampleRate);
-        }
+    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override;
 
-        setPlayConfigDetails (numChannels, numChannels, sampleRate, maximumExpectedSamplesPerBlock);
-    }
+    void updateParams();
+    float getMagnitudeAtFreq (float freq) { return eqFilter[0].getMagnitudeAtFreq (freq); }
 
-    void releaseResources() override
-    {
-    }
-
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
-    {
-        const int numChans = jmin (2, buffer.getNumChannels());
-        auto** output = buffer.getArrayOfWritePointers();
-        for (int c = 0; c < numChans; ++c)
-        {
-            eqFilter[c].setFrequency (*freq);
-            eqFilter[c].setQ (*q);
-            eqFilter[c].setGain (Decibels::decibelsToGain ((float) *gainDB));
-            eqFilter[c].setShape ((EQFilter::Shape) eqShape->getIndex());
-
-            eqFilter[c].processBlock (output[c], buffer.getNumSamples());
-        }
-    }
-
-    AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
+    AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override                 { return true; }
 
     double getTailLengthSeconds() const override    { return 0.0; };
@@ -351,36 +364,10 @@ public:
     const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
-    void getStateInformation (juce::MemoryBlock& destData) override
-    {
-        ValueTree state (Tags::state);
-        state.setProperty ("freq",   (float) *freq,   0);
-        state.setProperty ("q",      (float) *q,      0);
-        state.setProperty ("gainDB", (float) *gainDB, 0);
-        state.setProperty ("shape",  (int) eqShape->getIndex(), 0);
-        if (auto e = state.createXml())
-            AudioProcessor::copyXmlToBinary (*e, destData);
-    }
+    void getStateInformation (juce::MemoryBlock& destData) override;
+    void setStateInformation (const void* data, int sizeInBytes) override;
 
-    void setStateInformation (const void* data, int sizeInBytes) override
-    {
-        if (auto e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
-        {
-            auto state = ValueTree::fromXml (*e);
-            if (state.isValid())
-            {
-                *freq    = (float) state.getProperty ("freq",   (float) *freq);
-                *q       = (float) state.getProperty ("q",      (float) *q);
-                *gainDB  = (float) state.getProperty ("gainDB", (float) *gainDB);
-                *eqShape = (int)   state.getProperty ("shape",  (int)   *eqShape);
-            }
-        }
-    }
-
-    void numChannelsChanged() override
-    {
-        numChannels = getTotalNumInputChannels();
-    }
+    void numChannelsChanged() override;
 
 protected:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
