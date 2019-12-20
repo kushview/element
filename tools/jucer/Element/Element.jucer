@@ -120,6 +120,8 @@
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
           <FILE id="b6sriR" name="CompressorProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CompressorProcessor.h"/>
+          <FILE id="ZPlzuE" name="EQFilterProcessor.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/EQFilterProcessor.cpp"/>
           <FILE id="cm0l3B" name="EQFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.h"/>
           <FILE id="jeykx9" name="FreqSplitterProcessor.h" compile="0" resource="0"
@@ -221,6 +223,10 @@
                 file="../../../src/gui/nodes/AudioRouterEditor.cpp"/>
           <FILE id="abgn4X" name="AudioRouterEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/AudioRouterEditor.h"/>
+          <FILE id="u19H9U" name="EQFilterNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/EQFilterNodeEditor.cpp"/>
+          <FILE id="V2rjXJ" name="EQFilterNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/EQFilterNodeEditor.h"/>
           <FILE id="cj3LWs" name="GenericNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/GenericNodeEditor.cpp"/>
           <FILE id="D7sKYL" name="GenericNodeEditor.h" compile="0" resource="0"
