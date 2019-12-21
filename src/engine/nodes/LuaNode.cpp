@@ -44,6 +44,8 @@ R"(--- Stereo Amplifier in Lua
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
+local dsp = require ('dsp')
+
 -- Our gain parameters. Used for fading between changes in volume
 local start_gain = 1.0
 local end_gain = 1.0
@@ -81,10 +83,10 @@ end
 
 --- Render audio and midi
 -- Use the provided audio and midi objects to process your plugin
--- @param a     The source audio.Buffer
--- @param m     The source midi.Pipe
+-- @param a     The source dsp.audio.Buffer
+-- @param m     The source dsp.midi.Pipe
 function node_render (a, m)
-   end_gain = audio.dbtogain (Param.values[1])
+   end_gain = dsp.dbtogain (Param.values[1])
 
    --[[
    -- process a fade frame by frame
@@ -217,7 +219,7 @@ struct LuaNode::Context
             state.open_libraries (sol::lib::base, sol::lib::string,
                                   sol::lib::io, sol::lib::package,
                                   sol::lib::math);
-            Lua::openLibs (state);
+            Lua::openDSP (state);
             auto res = state.script (script.toRawUTF8());
             
             if (res.valid())
@@ -306,22 +308,29 @@ struct LuaNode::Context
             ctx->state["__ln_validate_nchans"]  = nchans;
             ctx->state["__ln_validate_nframes"] = block;
             ctx->state.script (R"(
-                local __ln_audio_buffer = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
-                local __ln_midi_pipe = midi.Pipe (__ln_validate_nmidi)
-                
-                for _ = 1,4 do
-                    for i = 1,#__ln_midi_pipe do
-                        local b = __ln_midi_pipe:get(i)
-                        b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
-                        b:insert (10, midi.noteoff (1, 60, 0))
+                function __ln_validate_render()
+                    local audio = require ('dsp.audio')
+                    local midi  = require ('dsp.midi')
+
+                    local a = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
+                    local m = midi.Pipe (__ln_validate_nmidi)
+                    
+                    for _ = 1,4 do
+                        for i = 1,#m do
+                            local b = m:get(i)
+                            b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
+                            b:insert (10, midi.noteoff (1, 60, 0))
+                        end
+                        node_render (a, m)
+                        a:clear()
+                        m:clear()
                     end
-                    node_render (__ln_audio_buffer, __ln_midi_pipe)
-                    __ln_audio_buffer:clear()
-                    __ln_midi_pipe:clear()
+                    
+                    a = nil
+                    m = nil
                 end
-                
-                __ln_audio_buffer = nil
-                __ln_midi_pipe = nil
+
+                __ln_validate_render()
             )");
 
             ctx->release();
