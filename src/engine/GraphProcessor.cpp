@@ -1079,7 +1079,7 @@ bool GraphProcessor::canConnect (const uint32 sourceNode, const uint32 sourcePor
 
     if (! source->isPortOutput (sourcePort))
     {
-        DBG("[EL] " << source->getAudioProcessor()->getName() << " source port is not an output port: total: " << (int) source->getNumPorts());
+        DBG("[EL] " << source->getName() << " source port is not an output port: total: " << (int) source->getNumPorts());
         return false;
     }
     
