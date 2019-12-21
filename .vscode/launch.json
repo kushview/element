@@ -49,7 +49,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/test-element",
-            "args": [ "Lua" ],
+            "args": [ "Lua", "globals" ],
             "cwd": "${workspaceRoot}/build",
             "preLaunchTask": "Waf Build",
             "linux": {
