@@ -217,7 +217,7 @@ struct LuaNode::Context
             state.open_libraries (sol::lib::base, sol::lib::string,
                                   sol::lib::io, sol::lib::package,
                                   sol::lib::math);
-            Lua::registerEngine (state);
+            Lua::openLibs (state);
             auto res = state.script (script.toRawUTF8());
             
             if (res.valid())

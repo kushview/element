@@ -59,8 +59,8 @@ static void showFailedInstantiationAlert (const PluginDescription& desc, const b
 class NodeModelUpdater : public ReferenceCountedObject
 {
 public:
-    NodeModelUpdater (const ValueTree& d, GraphNode* o)
-        : data (d), object (o)
+    NodeModelUpdater (GraphManager& m, const ValueTree& d, GraphNode* o)
+        : manager (m), data (d), object (o)
     {
         portsChangedConnection = object->portsChanged.connect ( 
             std::bind (&NodeModelUpdater::onPortsChanged, this));
@@ -72,6 +72,7 @@ public:
     }
 
 private:
+    GraphManager& manager;
     ValueTree data;
     GraphNodePtr object;
     SignalConnection portsChangedConnection;
@@ -84,6 +85,7 @@ private:
         {
             data.removeChild (index, nullptr);
             data.addChild (newPorts.createCopy(), index, nullptr);
+            manager.removeIllegalConnections();
         }
     }
 
@@ -324,7 +326,7 @@ uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double
         model.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
              .setProperty (Tags::name,   desc->name, nullptr)
              .setProperty (Tags::object, node, nullptr)
-             .setProperty (Tags::updater,    new NodeModelUpdater (model, node), nullptr)
+             .setProperty (Tags::updater,    new NodeModelUpdater (*this, model, node), nullptr)
              .setProperty (Tags::relativeX, rx, nullptr)
              .setProperty (Tags::relativeY, ry, nullptr)
              .setProperty (Tags::pluginIdentifierString, 
@@ -651,7 +653,7 @@ void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
     Node node (data, false);
     node.setProperty (Tags::type, obj->getTypeString())
         .setProperty (Tags::object, obj.get())
-        .setProperty (Tags::updater, new NodeModelUpdater (data, obj.get()));
+        .setProperty (Tags::updater, new NodeModelUpdater (*this, data, obj.get()));
 
     PortArray ins, outs;
     node.getPorts (ins, outs, PortType::Audio);

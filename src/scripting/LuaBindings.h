@@ -27,10 +27,8 @@ class Globals;
 
 namespace Lua {
 
-extern void registerUI (sol::state&);
-extern void registerModel (sol::state&);
-extern void registerEngine (sol::state&);
-extern void registerElement (sol::state&);
+extern void openDSP  (sol::state&);
+extern void openLibs (sol::state&);
 extern void setWorld (sol::state&, Globals*);
 
 }}

@@ -55,311 +55,6 @@ namespace Lua {
 
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
 
-
-void registerUI (state& lua)
-{
-}
-
-void registerModel (sol::state& lua)
-{
-    auto e = NS (lua, "element");
-    // Sesson
-    auto session = e.new_usertype<Session> ("Session", no_constructor,
-        meta_function::to_string, [](Session* self) {
-            String str = "Session";
-            if (self->getName().isNotEmpty())
-                str << ": " << self->getName();
-            return str.toStdString();
-        },
-        meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
-        meta_function::index,       [](Session* self, int index) {
-            return isPositiveAndBelow (--index, self->getNumGraphs())
-                ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
-                : std::shared_ptr<Node>();
-        },
-        "name", property ([](Session* self, const char* name) -> void {
-                self->setName (String::fromUTF8 (name));
-            },[](const Session& self) -> std::string {
-                return self.getName().toStdString();
-            })
-       #if 0
-        "clear",                    &Session::clear,
-        "get_num_graphs",           &Session::getNumGraphs,
-        "get_graph",                &Session::getGraph,
-        "get_active_graph",         &Session::getActiveGraph,
-        "get_active_graph_index",   &Session::getActiveGraphIndex,
-        "add_graph",                &Session::addGraph,
-        "save_state",               &Session::saveGraphState,
-        "restore_state",            &Session::restoreGraphState
-       #endif 
-    );
-
-    // Node
-    auto node = e.new_usertype<Node> ("Node", no_constructor,
-        meta_function::to_string, [](const Node& self) -> std::string {
-            String str = self.isGraph() ? "Graph" : "Node";
-            if (self.getName().isNotEmpty())
-                str << ": " << self.getName();
-            return std::move (str.toStdString());
-        },
-        meta_function::length,  &Node::getNumNodes,
-        meta_function::index,   [](Node* self, int index)
-        {
-            const auto child = self->getNode (index - 1);
-            return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
-                                   : std::shared_ptr<Node>();
-        },
-        "valid",                readonly_property (&Node::isValid),
-        "name", property (
-            [](Node* self) { return self->getName().toStdString(); },
-            [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
-        ),
-        "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
-        "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
-        "missing",              readonly_property (&Node::isMissing),
-        "enabled",              readonly_property (&Node::isEnabled),
-        "graph",                readonly_property (&Node::isGraph),
-        "root",                 readonly_property (&Node::isRootGraph),
-        "nodeid",               readonly_property (&Node::getNodeId),
-        "uuid",                 readonly_property (&Node::getUuid),
-        "uuidstring",           readonly_property (&Node::getUuidString),
-        "type",                 readonly_property (&Node::getNodeType),
-        "muted",                property (&Node::isMuted, &Node::setMuted),
-        "bypassed",             readonly_property (&Node::isBypassed),
-        "editor",               readonly_property (&Node::hasEditor),
-
-        "toxmlstring", [](Node* self) -> std::string
-        {
-            auto copy = self->getValueTree().createCopy();
-            Node::sanitizeRuntimeProperties (copy, true);
-            return copy.toXmlString().toStdString();
-        },
-        "resetports",           &Node::resetPorts,
-        "savestate",            &Node::savePluginState,
-        "restoretate",          &Node::restorePluginState,
-        "writefile", [](const Node& node, const char* filepath) -> bool {
-            if (! File::isAbsolutePath (filepath))
-                return false;
-            return node.writeToFile (File (String::fromUTF8 (filepath)));
-        }
-        
-       #if 0
-        "has_modified_name",    &Node::hasModifiedName,
-        "has_node_type",        &Node::hasNodeType,
-        "get_parent_graph",     &Node::getParentGraph,
-        "is_child_of_root_graph", &Node::isChildOfRootGraph,
-        "is_muting_inputs",     &Node::isMutingInputs,
-        "set_mute_input",       &Node::setMuteInput,
-        "get_num_nodes",        &Node::getNumNodes,
-        "get_node",             &Node::getNode,
-       #endif
-    );
-
-    e.set_function ("newgraph", [](sol::variadic_args args) {
-        String name;
-        bool defaultGraph = false;
-        int argIdx = 0;
-        
-        for (const auto arg : args)
-        {
-            if (arg.get_type() == sol::type::string && name.isNotEmpty())
-                name = String::fromUTF8 (arg.as<const char*>());
-            else if (arg.get_type() == sol::type::boolean)
-                defaultGraph = arg.as<bool>();
-            if (++argIdx == 2)
-                break;
-        }
-
-        return defaultGraph ? Node::createDefaultGraph (name)
-                            : Node::createGraph (name);
-    });
-}
-
-static void openMidi (state&)
-{
-   #if 0 
-    auto midi = NS (lua, "midi");
-
-    // MidiMessage
-    midi.new_usertype<MidiMessage> ("Message", no_constructor,
-        call_constructor,           factories([]() { return std::move (MidiMessage()); }),
-        meta_function::to_string,   [](MidiMessage& msg) { return msg.getDescription().toRawUTF8(); },
-        "get_raw_data",             &MidiMessage::getRawData,
-        "get_raw_data_size",        &MidiMessage::getRawDataSize,
-        "get_description",          [](MidiMessage& msg) { return msg.getDescription().toRawUTF8(); },
-        "get_time_stamp",           &MidiMessage::getTimeStamp,
-        "add_to_time_stamp",        &MidiMessage::addToTimeStamp,
-        "with_time_stamp",          &MidiMessage::withTimeStamp,
-        "get_channel",              &MidiMessage::getChannel,
-        "is_for_channel",           &MidiMessage::isForChannel,
-        "set_channel",              &MidiMessage::setChannel,
-        "is_sys_ex",                &MidiMessage::isSysEx,
-        "get_sys_ex_data",          &MidiMessage::getSysExData,
-        "get_sys_ex_data_size",     &MidiMessage::getSysExDataSize,
-        "is_note_on",               overload (&MidiMessage::isNoteOn),
-        "note_on",                  resolve<MidiMessage(int, int, uint8)> (MidiMessage::noteOn),
-        "note_on_float",            resolve<MidiMessage(int, int, float)> (MidiMessage::noteOn),
-        "is_note_off",              overload (&MidiMessage::isNoteOff),
-        "note_off",                 resolve<MidiMessage (int, int, uint8)> (MidiMessage::noteOff),
-        "note_off_float",           resolve<MidiMessage (int, int, float)> (MidiMessage::noteOff),
-        "is_note_on_or_off",        &MidiMessage::isNoteOnOrOff,
-        "get_note_number",          &MidiMessage::getNoteNumber,
-        "set_note_number",          &MidiMessage::setNoteNumber,
-        "get_velocity",             &MidiMessage::getVelocity,
-        "get_float_velocity",       &MidiMessage::getFloatVelocity,
-        "set_velocity",             &MidiMessage::setVelocity,
-        "multiply_velocity",        &MidiMessage::multiplyVelocity,
-        "is_sustain_pedal_on",      &MidiMessage::isSustainPedalOn,
-        "is_sustain_pedal_off",     &MidiMessage::isSustainPedalOff,
-        "is_sostenuto_pedal_on",    &MidiMessage::isSostenutoPedalOn,
-        "is_sostenuto_pedal_off",   &MidiMessage::isSostenutoPedalOff,
-        "is_soft_pedal_on",         &MidiMessage::isSoftPedalOn,
-        "is_soft_pedal_off",        &MidiMessage::isSoftPedalOff,
-        "is_program_change",        &MidiMessage::isProgramChange,
-        "get_program_change_number", &MidiMessage::getProgramChangeNumber,
-        "program_change",           MidiMessage::programChange,
-        "is_pitch_wheel",           &MidiMessage::isPitchWheel,
-        "get_pitch_wheel_value",    &MidiMessage::getPitchWheelValue,
-        "pitch_wheel",              MidiMessage::pitchWheel,
-        "is_after_touch",           &MidiMessage::isAftertouch,
-        "get_after_touch_value",    &MidiMessage::getAfterTouchValue,
-        "after_touch_change",       MidiMessage::aftertouchChange,
-        "is_channel_pressure",      &MidiMessage::isChannelPressure,
-        "get_channel_pressure_value", &MidiMessage::getChannelPressureValue,
-        "channel_pressure_change",  MidiMessage::channelPressureChange,
-        "is_controller",            &MidiMessage::isController,
-        "get_controller_number",    &MidiMessage::getControllerNumber,
-        "get_controller_value",     &MidiMessage::getControllerValue,
-        "is_controller_of_type",    &MidiMessage::isControllerOfType,
-        "controller_event",         MidiMessage::controllerEvent,
-        "is_all_notes_off",         &MidiMessage::isAllNotesOff,
-        "is_all_sound_off",         &MidiMessage::isAllSoundOff,
-        "is_reset_all_controllers", &MidiMessage::isResetAllControllers,
-        "all_notes_off",            MidiMessage::allNotesOff,
-        "all_sounds_off",           MidiMessage::allSoundOff,
-        "all_controllers_off",      MidiMessage::allControllersOff,
-        "is_meta_event",            &MidiMessage::isMetaEvent,
-        "get_meta_event_type",      &MidiMessage::getMetaEventType,
-        "get_meta_event_data",      &MidiMessage::getMetaEventData,
-        "get_meta_event_length",    &MidiMessage::getMetaEventLength,
-        "is_track_meta_event",      &MidiMessage::isTrackMetaEvent,
-        "is_end_of_track_meta_event", &MidiMessage::isEndOfTrackMetaEvent,
-        "end_of_track",             MidiMessage::endOfTrack,
-        "is_track_name_event",      &MidiMessage::isTrackNameEvent,
-        "is_text_meta_event",       &MidiMessage::isTextMetaEvent,
-        "text_meta_event",          MidiMessage::textMetaEvent,
-        "is_tempo_meta_event",      &MidiMessage::isTempoMetaEvent,
-        "get_tempo_meta_event_tick_length",     &MidiMessage::getTempoMetaEventTickLength,
-        "get_tempo_seconds_per_quarter_note",   &MidiMessage::getTempoSecondsPerQuarterNote,
-        "tempo_meta_event",         MidiMessage::tempoMetaEvent,
-        "is_time_signature_meta_event", &MidiMessage::isTimeSignatureMetaEvent,
-        "get_time_signature_info",      [](const MidiMessage& self) {
-            int numerator = 0, denominator = 0;
-            self.getTimeSignatureInfo (numerator, denominator);
-            return std::make_tuple (numerator, denominator);
-        },
-        "time_signature_meta_event",    MidiMessage::timeSignatureMetaEvent,
-        "is_key_signature_meta_event",  &MidiMessage::isKeySignatureMetaEvent,
-        "get_key_signature_number_of_sharps_or_flats", &MidiMessage::getKeySignatureNumberOfSharpsOrFlats,
-        "is_key_signature_major_key",   &MidiMessage::isKeySignatureMetaEvent,
-        "key_signature_meta_event",     MidiMessage::keySignatureMetaEvent,
-        "is_midi_channel_meta_event",   &MidiMessage::isMidiChannelMetaEvent,
-        "get_midi_channel_meta_event_channel", &MidiMessage::getMidiChannelMetaEventChannel,
-        "midi_channel_meta_event",      MidiMessage::midiChannelMetaEvent,
-        "is_active_sense",              &MidiMessage::isActiveSense,
-        "is_midi_start",                &MidiMessage::isMidiStart,
-        "midi_start",                   MidiMessage::midiStart,
-        "is_midi_continue",             &MidiMessage::isMidiContinue,
-        "midi_continue",                MidiMessage::midiContinue,
-        "is_midi_stop",                 &MidiMessage::isMidiStop,
-        "midi_stop",                    MidiMessage::midiStop,  
-        "is_midi_clock",                &MidiMessage::isMidiClock,
-        "midi_clock",                   MidiMessage::midiClock,
-        "is_song_position_pointer",     &MidiMessage::isSongPositionPointer,
-        "get_song_position_pointer_midi_beat", &MidiMessage::getSongPositionPointerMidiBeat,
-        "song_position_pointer",        MidiMessage::songPositionPointer,
-        "is_quarter_frame",             &MidiMessage::isQuarterFrame,
-        "get_quarter_frame_sequence_number", &MidiMessage::getQuarterFrameSequenceNumber,
-        "get_quarter_frame_value",      &MidiMessage::getQuarterFrameValue,
-        "quarter_frame",                MidiMessage::quarterFrame,
-        "is_full_frame",                &MidiMessage::isFullFrame,
-        "get_full_frame_parameters", [](const MidiMessage& self) {
-            int hours, minutes, seconds, frames;
-            MidiMessage::SmpteTimecodeType stype;
-            self.getFullFrameParameters (hours, minutes, seconds, frames, stype);
-            return std::make_tuple (hours, minutes, seconds, frames, static_cast<int> (stype));
-        },
-        "full_frame",                       MidiMessage::fullFrame,
-        "is_midi_machine_control_message",  &MidiMessage::isMidiMachineControlMessage,
-        "get_midi_machine_control_command", &MidiMessage::getMidiMachineControlCommand,
-        "midi_machine_control_command",     MidiMessage::midiMachineControlCommand,
-        "is_midi_machine_control_goto",     [](const MidiMessage& self) {
-            int hours = 0, minutes = 0, seconds = 0, frames = 0;
-            bool ok = self.isMidiMachineControlGoto (hours, minutes, seconds, frames);
-            return std::make_tuple (ok, hours, minutes, seconds, frames);
-        },
-        "midi_machine_control_goto",        MidiMessage::midiMachineControlGoto,
-        "master_volume",                    MidiMessage::masterVolume,
-        "create_sysex_message",             MidiMessage::createSysExMessage,
-        "read_variable_length_val",         [](const uint8* data) {
-            int nbytes = 0;
-            int value = MidiMessage::readVariableLengthVal (data, nbytes);
-            return std::make_tuple (nbytes, value);
-        },
-        "get_message_length_from_first_byte", MidiMessage::getMessageLengthFromFirstByte,
-        "get_midi_note_name",               MidiMessage::getMidiNoteName,
-        "get_midi_note_in_hertz",           MidiMessage::getMidiNoteInHertz,
-        "is_midi_note_black",               MidiMessage::isMidiNoteBlack,
-        "get_gm_instrument_name",           MidiMessage::getGMInstrumentName,
-        "get_gm_instrument_bank_name",      MidiMessage::getGMInstrumentBankName,
-        "get_rhythm_instrument_name",       MidiMessage::getRhythmInstrumentName,
-        "get_controller_name",              MidiMessage::getControllerName,
-        "float_value_to_midi_byte",         MidiMessage::floatValueToMidiByte,
-        "pitchbend_to_pitchwheel_pos",      MidiMessage::pitchbendToPitchwheelPos
-    );
-
-    // MidiBuffer
-    midi.new_usertype<MidiBuffer> ("Buffer", no_constructor,
-        call_constructor, factories (
-            []() { return std::move (MidiBuffer()); },
-            [](MidiMessage* message) { return std::move (MidiBuffer (*message)); }),
-        meta_method::length,        &MidiBuffer::getNumEvents,
-        "empty",                    readonly_property (&MidiBuffer::isEmpty),
-        "first",                    readonly_property (&MidiBuffer::getFirstEventTime),
-        "last",                     readonly_property (&MidiBuffer::getLastEventTime),
-        "data",                     readonly_property (&MidiBuffer::data),
-        "swap",                     &MidiBuffer::swapWith,
-        "reserve",                  &MidiBuffer::ensureSize,
-        "clear", overload (
-            resolve<void()> (&MidiBuffer::clear),               
-            resolve<void(int, int)> (&MidiBuffer::clear)),        
-        "add", overload (
-            resolve<void(const MidiMessage&, int)> (&MidiBuffer::addEvent),
-            resolve<void(const void*, int, int)> (&MidiBuffer::addEvent),
-            resolve<void(const MidiBuffer&, int, int, int)> (&MidiBuffer::addEvents)),              
-        "foreach", [](MidiBuffer* self) {
-            MidiBufferForeach fe (*self);
-            return std::move (fe);
-        }
-    );
-
-    midi.new_usertype<MidiBufferForeach> ("Iterator", no_constructor,
-        meta_method::to_string, [](MidiBufferForeach*) { return "midi.Iterator"; }
-    );
-
-    midi.set_function ("noteon",    [](int c, int n, uint8 v) { return MidiMessage::noteOn (c, n, v); });
-    midi.set_function ("noteonf",   [](int c, int n, float v) { return MidiMessage::noteOn (c, n, v); });
-    midi.set_function ("noteoff",   [](int channel, int note) { return MidiMessage::noteOff (channel, note); });
-    midi.set_function ("noteoffv",  [](int channel, int note, uint8_t velocity) { return MidiMessage::noteOff (channel, note, velocity); });
-    midi.set_function ("noteoffvf", [](int channel, int note, float velocity)   { return MidiMessage::noteOff (channel, note, velocity); });
-   #endif
-}
-
-static void openLRT (state& lua)
-{
-    lrt_openlibs (lua.lua_state(), 1);
-}
-
 template<typename T>
 static auto addRange (state_view& view, const char* name)
 {
@@ -460,6 +155,126 @@ static void openJUCE (state& lua)
     );
 }
 
+static void openUI (state& lua)
+{
+}
+
+static void openModel (sol::state& lua)
+{
+    auto e = NS (lua, "element");
+    // Sesson
+    auto session = e.new_usertype<Session> ("Session", no_constructor,
+        meta_function::to_string, [](Session* self) {
+            String str = "Session";
+            if (self->getName().isNotEmpty())
+                str << ": " << self->getName();
+            return str.toStdString();
+        },
+        meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
+        meta_function::index,       [](Session* self, int index) {
+            return isPositiveAndBelow (--index, self->getNumGraphs())
+                ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
+                : std::shared_ptr<Node>();
+        },
+        "name", property ([](Session* self, const char* name) -> void {
+                self->setName (String::fromUTF8 (name));
+            },[](const Session& self) -> std::string {
+                return self.getName().toStdString();
+            })
+        
+       #if 0
+        "clear",                    &Session::clear,
+        "get_num_graphs",           &Session::getNumGraphs,
+        "get_graph",                &Session::getGraph,
+        "get_active_graph",         &Session::getActiveGraph,
+        "get_active_graph_index",   &Session::getActiveGraphIndex,
+        "add_graph",                &Session::addGraph,
+        "save_state",               &Session::saveGraphState,
+        "restore_state",            &Session::restoreGraphState
+       #endif 
+    );
+
+    // Node
+    auto node = e.new_usertype<Node> ("Node", no_constructor,
+        meta_function::to_string, [](const Node& self) -> std::string {
+            String str = self.isGraph() ? "Graph" : "Node";
+            if (self.getName().isNotEmpty())
+                str << ": " << self.getName();
+            return std::move (str.toStdString());
+        },
+        meta_function::length,  &Node::getNumNodes,
+        meta_function::index,   [](Node* self, int index)
+        {
+            const auto child = self->getNode (index - 1);
+            return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
+                                   : std::shared_ptr<Node>();
+        },
+        "valid",                readonly_property (&Node::isValid),
+        "name", property (
+            [](Node* self) { return self->getName().toStdString(); },
+            [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
+        ),
+        "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
+        "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
+        "missing",              readonly_property (&Node::isMissing),
+        "enabled",              readonly_property (&Node::isEnabled),
+        "graph",                readonly_property (&Node::isGraph),
+        "root",                 readonly_property (&Node::isRootGraph),
+        "nodeid",               readonly_property (&Node::getNodeId),
+        "uuid",                 readonly_property (&Node::getUuid),
+        "uuidstring",           readonly_property (&Node::getUuidString),
+        "type",                 readonly_property (&Node::getNodeType),
+        "muted",                property (&Node::isMuted, &Node::setMuted),
+        "bypassed",             readonly_property (&Node::isBypassed),
+        "editor",               readonly_property (&Node::hasEditor),
+
+        "toxmlstring", [](Node* self) -> std::string
+        {
+            auto copy = self->getValueTree().createCopy();
+            Node::sanitizeRuntimeProperties (copy, true);
+            return copy.toXmlString().toStdString();
+        },
+        "resetports",           &Node::resetPorts,
+        "savestate",            &Node::savePluginState,
+        "restoretate",          &Node::restorePluginState,
+        "writefile", [](const Node& node, const char* filepath) -> bool {
+            if (! File::isAbsolutePath (filepath))
+                return false;
+            return node.writeToFile (File (String::fromUTF8 (filepath)));
+        }
+        
+       #if 0
+        "has_modified_name",    &Node::hasModifiedName,
+        "has_node_type",        &Node::hasNodeType,
+        "get_parent_graph",     &Node::getParentGraph,
+        "is_child_of_root_graph", &Node::isChildOfRootGraph,
+        "is_muting_inputs",     &Node::isMutingInputs,
+        "set_mute_input",       &Node::setMuteInput,
+        "get_num_nodes",        &Node::getNumNodes,
+        "get_node",             &Node::getNode,
+       #endif
+    );
+
+    e.set_function ("newgraph", [](sol::variadic_args args) {
+        String name;
+        bool defaultGraph = false;
+        int argIdx = 0;
+        
+        for (const auto arg : args)
+        {
+            if (arg.get_type() == sol::type::string && name.isNotEmpty())
+                name = String::fromUTF8 (arg.as<const char*>());
+            else if (arg.get_type() == sol::type::boolean)
+                defaultGraph = arg.as<bool>();
+            if (++argIdx == 2)
+                break;
+        }
+
+        return defaultGraph ? Node::createDefaultGraph (name)
+                            : Node::createGraph (name);
+    });
+}
+
 static void openKV (state& lua)
 {
     auto kv   = NS (lua, "kv");
@@ -481,30 +296,36 @@ static void openKV (state& lua)
     );
 }
 
-void registerEngine (state& lua)
-{
-    // openJUCE (lua);
-    // openMidi (lua);
-    openKV (lua);
-    openLRT (lua);
-}
-
-void registerElement (state& lua)
+static void openWorld (state& lua)
 {
     auto e = NS (lua, "element");
     
     e.new_usertype<Globals> ("World", no_constructor,
-        "audio_engine",     &Globals::getAudioEngine,
+        "audioengine",      &Globals::getAudioEngine,
         "commands",         &Globals::getCommandManager,
         "devices",          &Globals::getDeviceManager,
         "mappings",         &Globals::getMappingEngine,
         "media",            &Globals::getMediaManager,
-        "midi_engine",      &Globals::getMidiEngine,
+        "midiengine",       &Globals::getMidiEngine,
         "plugins",          &Globals::getPluginManager,
         "presets",          &Globals::getPresetCollection,
         "session",          &Globals::getSession,
         "settings",         &Globals::getSettings
     );
+}
+
+void openDSP (state& lua)
+{
+    lrt_openlibs (lua.lua_state(), 0);
+}
+
+void openLibs (sol::state& lua)
+{
+    openWorld (lua);
+    openModel (lua);
+    openKV (lua);
+    openDSP (lua);
+    openUI (lua);
 }
 
 void setWorld (state& lua, Globals* world)
@@ -513,22 +334,22 @@ void setWorld (state& lua, Globals* world)
     
     if (world != nullptr)
     {
-        e.set_function ("world",            [world]() -> Globals&           { return *world; });
-        e.set_function ("audio_engine",     [world]() -> AudioEnginePtr     { return world->getAudioEngine(); });
-        e.set_function ("commands",         [world]() -> CommandManager&    { return world->getCommandManager(); });
-        e.set_function ("devices",          [world]() -> DeviceManager&     { return world->getDeviceManager(); });
-        e.set_function ("mapping_engine",   [world]() -> MappingEngine&     { return world->getMappingEngine(); });
-        e.set_function ("media",            [world]() -> MediaManager&      { return world->getMediaManager(); });
-        e.set_function ("midi_engine",      [world]() -> MidiEngine&        { return world->getMidiEngine(); });
-        e.set_function ("plugins",          [world]() -> PluginManager&     { return world->getPluginManager(); });
-        e.set_function ("presets",          [world]() -> PresetCollection&  { return world->getPresetCollection(); });
-        e.set_function ("session",          [world]() -> SessionPtr         { return world->getSession(); });
-        e.set_function ("settings",         [world]() -> Settings&          { return world->getSettings(); });
+        e.set_function ("world",         [world]() -> Globals&           { return *world; });
+        e.set_function ("audioengine",   [world]() -> AudioEnginePtr     { return world->getAudioEngine(); });
+        e.set_function ("commands",      [world]() -> CommandManager&    { return world->getCommandManager(); });
+        e.set_function ("devices",       [world]() -> DeviceManager&     { return world->getDeviceManager(); });
+        e.set_function ("mappings",      [world]() -> MappingEngine&     { return world->getMappingEngine(); });
+        e.set_function ("media",         [world]() -> MediaManager&      { return world->getMediaManager(); });
+        e.set_function ("midiengine",    [world]() -> MidiEngine&        { return world->getMidiEngine(); });
+        e.set_function ("plugins",       [world]() -> PluginManager&     { return world->getPluginManager(); });
+        e.set_function ("presets",       [world]() -> PresetCollection&  { return world->getPresetCollection(); });
+        e.set_function ("session",       [world]() -> SessionPtr         { return world->getSession(); });
+        e.set_function ("settings",      [world]() -> Settings&          { return world->getSettings(); });
     }
     else
     {
-        for (const auto& f : StringArray{ "world", "audio_engine", "commands", "devices",
-                                          "mapping_engine", "media", "midi_engine", "plugins", 
+        for (const auto& f : StringArray{ "world", "audioengine", "commands", "devices",
+                                          "mappings", "media", "midiengine", "plugins", 
                                           "presets", "session", "settings" })
         {
             e.set_function (f.toRawUTF8(), []() { return sol::lua_nil; });

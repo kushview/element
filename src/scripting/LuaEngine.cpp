@@ -33,10 +33,7 @@ LuaEngine::Environment::~Environment() { }
 LuaEngine::LuaEngine()
 {
     lua.open_libraries();
-    Lua::registerElement (lua);
-    Lua::registerEngine (lua);
-    Lua::registerModel (lua);
-    Lua::registerUI (lua);
+    Lua::openLibs (lua);
 }
 
 LuaEngine::~LuaEngine()
