@@ -13,6 +13,11 @@ VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx cross juce")
+    opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
+        help="Disable LADSPA plugin hosting")
+    opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
+        help="Disable LV2 plugin hosting")
+    
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
     
@@ -79,7 +84,7 @@ def configure (conf):
     juce.display_msg (conf, "JACK", conf.env.JACK)
     juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
     juce.display_msg (conf, "VST3", True)
-    juce.display_msg (conf, "LADSPA", bool(conf.env.HAVE_LADSPA))
+    juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
     juce.display_msg (conf, "LV2", bool(conf.env.LV2))
     juce.display_msg (conf, "Lua Scripting", bool(conf.env.LUA))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
