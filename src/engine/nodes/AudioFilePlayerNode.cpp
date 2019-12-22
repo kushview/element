@@ -51,6 +51,9 @@ public:
                                               TRANS("Select Audio File")));
         addAndMakeVisible (chooser.get());
 
+        addAndMakeVisible (watchButton); 
+        watchButton.setIcon (Icon (getIcons().fasFolderOpen, Colours::black));
+        
         addAndMakeVisible (playButton);
         playButton.setButtonText ("Play");
 
@@ -85,10 +88,33 @@ public:
         chooser = nullptr;
     }
 
+    void onStateRestored()
+    {
+        auto watchDir = processor.getWatchDir();
+        if (! watchDir.exists() || ! watchDir.isDirectory())
+            return;
+        addRecentsFrom (watchDir, true);
+    }
+
+    void addRecentsFrom (const File& recentsDir, bool recursive = true)
+    {
+        if (recentsDir.isDirectory())
+        {
+            DirectoryIterator iter (recentsDir, recursive, processor.getWildcard(), File::findFiles);
+            while (iter.next())
+            {
+                chooser->addRecentlyUsedFile (iter.getFile());
+            }
+        }
+    }
+
     void timerCallback() override { stabilizeComponents(); }
     void changeListenerCallback (ChangeBroadcaster*) override { stabilizeComponents(); }
     void stabilizeComponents()
     {
+        if (processor.getWatchDir().isDirectory())
+            addRecentsFrom (processor.getWatchDir());
+
         if (chooser->getCurrentFile() != processor.getAudioFile())
             chooser->setCurrentFile (processor.getAudioFile(), dontSendNotification);
 
@@ -127,7 +153,11 @@ public:
     void resized() override
     {
         auto r (getLocalBounds().reduced (4));
-        chooser->setBounds (r.removeFromTop (18));
+        auto r2 = r.removeFromTop (18);
+
+        watchButton.setBounds (r2.removeFromRight (22));
+        chooser->setBounds (r2);
+
         r.removeFromTop (4);
         playButton.setBounds (r.removeFromTop (18));
         r.removeFromTop (4);
@@ -199,6 +229,7 @@ private:
     Slider volume;
     TextButton playButton;
     TextButton loopButton;
+    IconButton watchButton;
     ToggleButton startStopContinueToggle;
     Atomic<int> startStopContinue { 0 };
 
@@ -206,8 +237,20 @@ private:
 
     void bindHandlers()
     {
-        chooser->addListener (this);
         processor.getPlayer().addChangeListener (this);
+        processor.restoredState.connect (std::bind(
+            &AudioFilePlayerEditor::onStateRestored, this
+        ));
+
+        chooser->addListener (this);
+        watchButton.onClick = [this]() {
+            FileChooser fc ("Select a folder to watch", File(), "*", true, false, nullptr);
+            if (fc.browseForDirectory()) 
+            {
+                processor.setWatchDir (fc.getResult());
+                addRecentsFrom (processor.getWatchDir());
+            }
+        };
 
         playButton.onClick = [this]() {
             int index = AudioFilePlayerNode::Playing;
@@ -252,7 +295,6 @@ private:
                 startStopContinueToggle.getToggleState() ? 1 : 0);
             startStopContinueToggle.setToggleState (
                 processor.respondsToStartStopContinue(), dontSendNotification);
-            DBG("enabled: " << (int) processor.respondsToStartStopContinue());
         };
     }
 
@@ -267,6 +309,7 @@ private:
         startStopContinueToggle.onClick = nullptr;
         processor.getPlayer().removeChangeListener (this);
         chooser->removeListener (this);
+        watchButton.onClick = nullptr;
     }
 };
 
@@ -492,6 +535,10 @@ void AudioFilePlayerNode::getStateInformation (juce::MemoryBlock& destData)
          .setProperty ("slave", (bool)*slave, nullptr)
          .setProperty ("loop", (bool)*looping, nullptr)
          .setProperty ("midiStartStopContinue", midiStartStopContinue.get() == 1, nullptr);
+    
+    if (watchDir.exists())
+        state.setProperty ("watchDir", watchDir.getFullPathName(), nullptr);
+
     MemoryOutputStream stream (destData, false);
     state.writeToStream (stream);
 }
@@ -507,6 +554,13 @@ void AudioFilePlayerNode::setStateInformation (const void* data, int sizeInBytes
         *slave = (bool) state.getProperty ("slave", false);
         *looping = (bool) state.getProperty ("loop", true);
         midiStartStopContinue.set ((bool) state.getProperty ("midiStartStopContinue", false) ? 1 : 0);
+        if (state.hasProperty ("watchDir"))
+        {
+            auto watchPath = state["watchDir"].toString();
+            if (File::isAbsolutePath (watchPath))
+                watchDir = File (watchPath);
+        }
+        restoredState();
     }
 }
 

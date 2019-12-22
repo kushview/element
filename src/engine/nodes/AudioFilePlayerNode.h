@@ -20,6 +20,7 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
+#include "Signals.h"
 
 namespace Element {
 
@@ -34,6 +35,10 @@ public:
     AudioFilePlayerNode ();
     virtual ~AudioFilePlayerNode();
 
+    AudioFormatManager& getAudioFormatManager() { return formats; }
+    void setWatchDir (const File& newWatchDir) { watchDir = newWatchDir; jassert (newWatchDir.isDirectory()); }
+    File getWatchDir() const { return watchDir; }
+
     void handleAsyncUpdate() override;
 
     void setLooping (const bool shouldLoop);
@@ -42,6 +47,7 @@ public:
     void openFile (const File& file);
     const File& getAudioFile() const { return audioFile; }
     String getWildcard() const { return formats.getWildcardForAllFormats(); }
+    
     bool canLoad (const File& file)
     {
         std::unique_ptr<AudioFormatReader> reader (formats.createReaderFor (file));
@@ -84,6 +90,8 @@ public:
 
     AudioTransportSource& getPlayer() { return player; }
     
+    Signal<void()> restoredState;
+
 protected:
     bool isBusesLayoutSupported (const BusesLayout&) const override;
     
@@ -136,6 +144,8 @@ private:
     bool wasPlaying { false };
     double lastTransportPos { 0.0 };
     
+    File watchDir;
+
     void clearPlayer();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioFilePlayerNode)
 };
