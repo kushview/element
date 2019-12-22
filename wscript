@@ -44,7 +44,6 @@ def silence_warnings (conf):
         conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
         conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
 
-
 def configure_product (conf):
     conf.define ('EL_PRO', 1)
     conf.env.EL_SOLO = False
