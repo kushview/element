@@ -68,6 +68,9 @@ def check_common (self):
         self.env.LV2 = bool(self.env.HAVE_LILV) and bool(self.env.HAVE_SUIL)
     self.define('JLV2_PLUGINHOST_LV2', self.env.LV2)
 
+    # ALSA
+    self.env.ALSA = False
+
     # LADSPA
     self.env.LADSPA = False
 
@@ -102,6 +105,12 @@ def check_linux (self):
         self.env.LADSPA = bool(self.env.HAVE_LADSPA)
     self.define('JUCE_PLUGINHOST_LADSPA', self.env.LADSPA)
 
+    self.env.ALSA = not bool (self.options.no_alsa)
+    if self.env.ALSA:
+        self.check_cfg(package='alsa', uselib_store='ALSA', args='--cflags --libs', mandatory=False)
+        self.env.ALSA = bool(self.env.HAVE_ALSA)
+    self.define ('JUCE_ALSA', self.env.ALSA)
+
     self.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
@@ -109,7 +118,7 @@ def check_linux (self):
     self.check_cfg(package='xcomposite', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xinerama', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xcursor', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='alsa', args='--cflags --libs', mandatory=True)
+    
     self.check_cfg(package='gtk+-2.0', uselib_store='GTK',args='--cflags --libs', mandatory=True)
 
 def get_mingw_libs():

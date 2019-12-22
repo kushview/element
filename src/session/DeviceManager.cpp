@@ -78,16 +78,22 @@ static void addIfNotNull (OwnedArray <AudioIODeviceType>& list, AudioIODeviceTyp
 
 void DeviceManager::createAudioDeviceTypes (OwnedArray <AudioIODeviceType>& list)
 {
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (true));
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (false));
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
-    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
+    #if JUCE_ALSA
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ALSA());
+   #endif
    #if KV_JACK_AUDIO
     addIfNotNull (list, Jack::createAudioIODeviceType (&impl->jackClient));
    #endif
+
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_ASIO());
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (true));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_WASAPI (false));
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_DirectSound());
+   
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_CoreAudio());
+      
+    addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_iOSAudio());
+    
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_OpenSLES());
     addIfNotNull (list, AudioIODeviceType::createAudioIODeviceType_Android());
 }
