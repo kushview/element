@@ -195,7 +195,10 @@ public:
 
     void paint (Graphics& g) override
     {
-        g.setColour (Colours::black.brighter());
+        auto c = Colours::black.brighter();
+        if (hover || dragging)
+            c = c.brighter (0.2);
+        g.setColour (c);
         g.fillPath (linePath);
     }
 
@@ -213,6 +216,22 @@ public:
         return false;
     }
 
+    void mouseEnter (const MouseEvent&) override
+    {
+        if (hover)
+            return;
+        hover = true;
+        repaint();
+    }
+
+    void mouseExit (const MouseEvent&) override
+    {
+        if (! hover)
+            return;
+        hover = false;
+        repaint();
+    }
+
     void mouseDown (const MouseEvent&) override
     {
         if (! isEnabled())
@@ -228,7 +247,8 @@ public:
         if ((! dragging) && ! e.mouseWasClicked())
         {
             dragging = true;
-            
+            repaint();
+
             double distanceFromStart, distanceFromEnd;
             getDistancesFromEnds (e.x, e.y, distanceFromStart, distanceFromEnd);
             const bool isNearerSource = (distanceFromStart < distanceFromEnd);
@@ -325,6 +345,7 @@ private:
     float lastInputX, lastInputY, lastOutputX, lastOutputY;
     Path linePath, hitPath;
     bool dragging { false };
+    bool hover { false };
 
     GraphEditorComponent* getGraphPanel() const noexcept
     {
