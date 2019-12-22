@@ -287,12 +287,12 @@ static void openKV (state& lua)
     kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
         meta_method::to_string, [](MidiPipe*) { return "kv.PortList"; },
-        "add", [](kv::PortList& ports, int type, int index, int channel,
-                  const char* symbol, const char* name,
-                  const bool input)
-                  {
-                      ports.add (type, index, channel, symbol, name, input);
-                  }
+        "add", [](kv::PortList* self, int type, int index, int channel,
+                                      const char* symbol, const char* name,
+                                      const bool input)
+        {
+            self->add (type, index, channel, symbol, name, input);
+        }
     );
 }
 
