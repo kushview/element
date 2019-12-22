@@ -99,7 +99,7 @@ def check_linux (self):
     self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
     self.check(lib='curl', uselib_store='CURL', mandatory=True)
     
-    self.env.LADSPA = not bool(self.no_ladspa)
+    self.env.LADSPA = not bool(self.options.no_ladspa)
     if self.env.LADSPA:
         self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)
         self.env.LADSPA = bool(self.env.HAVE_LADSPA)
