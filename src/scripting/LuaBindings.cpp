@@ -303,6 +303,10 @@ static void openWorld (state& lua)
 {
     auto e = NS (lua, "element");
     
+    e.new_usertype<PluginManager> ("PluginManager", no_constructor);
+
+    e.new_usertype<Settings> ("Settings", no_constructor);
+
     e.new_usertype<Globals> ("World", no_constructor,
         "audioengine",      &Globals::getAudioEngine,
         "commands",         &Globals::getCommandManager,
