@@ -659,10 +659,8 @@ public:
     {
         beginTest ("buffer");
         lua.script (R"(
-            print ("audio.Buffer", audio.Buffer)
+            local audio = require ('dsp.audio')
             local b = audio.Buffer()
-            print(string.format ("type: %s", tostring (b)))
-            print("nframes: ", b:length())
         )");
     }
 
