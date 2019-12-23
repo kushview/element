@@ -548,6 +548,30 @@ private:
         }
     };
 
+    struct RenameNodeOp : public ResultOp
+    {
+        RenameNodeOp (const Node& n)
+            : node (n) {}
+        Node node;
+        bool perform() override
+        {
+            AlertWindow win ("Rename Node", "Enter a new node name:", 
+                             AlertWindow::NoIcon, nullptr);
+            win.addTextEditor ("name", node.getName(), "", false);
+            win.addButton ("Rename", 1, KeyPress (KeyPress::returnKey));
+            win.addButton ("Cancel", 0, KeyPress (KeyPress::escapeKey));
+
+            if (1 == win.runModalLoop())
+            {
+                if (auto* const ed = win.getTextEditor ("name"))
+                    if (ed->getText().isNotEmpty())
+                        node.setProperty (Tags::name, ed->getText());
+            }
+            
+            return true;
+        }
+    };
+
     HashMap<int, ResultOp*> resultMap;
     OwnedArray<ResultOp> deleter;
     
@@ -557,6 +581,7 @@ private:
             addSectionHeader (node.getName());
 
         addItemInternal (*this, node.isEnabled() ? "Disable" : "Enable", new EnableNodeOp (node));
+        addItemInternal (*this, "Rename", new RenameNodeOp (node));
         addSeparator();
 
         {
