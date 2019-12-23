@@ -23,6 +23,9 @@ def check_common (self):
     self.check(header_name='stdbool.h', mandatory=True)
     self.check(header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
 
+    # Web Browser
+    self.define ('JUCE_WEB_BROWSER', 0)
+
     # LUA
     self.env.LUA = not bool(self.options.no_lua)
     self.define ('EL_USE_LUA', self.env.LUA)
