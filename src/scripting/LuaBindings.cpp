@@ -87,7 +87,7 @@ static auto addRectangle (state& lua, const char* ns, const char* name)
             [] (T x, T y, T w, T h) { return R (x, y, w, h); }
         ),
         meta_method::to_string, [](R* self) {
-            return std::move (self->toString().toStdString());
+            return self->toString().toStdString();
         },
         "empty",            readonly_property (&R::isEmpty),
         "x",                property (&R::getX,  &R::setX),
@@ -101,7 +101,6 @@ static void openJUCE (state& lua)
 {
     addRange<float>     (lua, "Range");
     addRange<int>       (lua, "Span");
-    addRectangle<float> (lua, "element", "Rectangle");
     addRectangle<int>   (lua, "ui", "Bounds");
     
     // AudioBuffer
@@ -170,8 +169,8 @@ static void openModel (sol::state& lua)
                 str << ": " << self->getName();
             return str.toStdString();
         },
-        meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
-        meta_function::index,       [](Session* self, int index) {
+        meta_function::length, [](Session* self) { return self->getNumGraphs(); },
+        meta_function::index, [](Session* self, int index) {
             return isPositiveAndBelow (--index, self->getNumGraphs())
                 ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
                 : std::shared_ptr<Node>();
@@ -278,9 +277,11 @@ static void openModel (sol::state& lua)
 static void openKV (state& lua)
 {
     auto kv   = NS (lua, "kv");
-
-    kv.new_usertype<kv::PortType> ("PortType", no_constructor,
-        meta_method::to_string, [](PortType*) { return "kv.PortType"; }
+    kv.new_enum ("PortType",
+        meta_method::to_string, []() {
+            return "TO STRING";
+        },
+        "CV", kv::PortType::CV
     );
 
     // PortList
@@ -294,6 +295,8 @@ static void openKV (state& lua)
             self->add (type, index, channel, symbol, name, input);
         }
     );
+
+    addRectangle<double> (lua, "kv", "Rect");
 }
 
 static void openWorld (state& lua)

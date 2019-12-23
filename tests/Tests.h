@@ -90,6 +90,15 @@ protected:
         world.reset (nullptr);
     }
 
+    const File getTestsDir() const
+    {
+        const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
+            .getParentDirectory().getParentDirectory().getParentDirectory()
+            .getChildFile ("tests");
+        jassert (thedir.exists());
+        return thedir;
+    }
+
     const File getDataDir() const
     {
         const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
