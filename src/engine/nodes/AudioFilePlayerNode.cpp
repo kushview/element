@@ -237,7 +237,7 @@ private:
         chooser->addListener (this);
         watchButton.onClick = [this]() {
             FileChooser fc ("Select a folder to watch", File(), "*", true, false, nullptr);
-            if (fc.browseForDirectory()) 
+            if (fc.browseForDirectory())
             {
                 processor.setWatchDir (fc.getResult());
                 addRecentsFrom (processor.getWatchDir());
