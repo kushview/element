@@ -88,14 +88,6 @@ public:
         chooser = nullptr;
     }
 
-    void onStateRestored()
-    {
-        auto watchDir = processor.getWatchDir();
-        if (! watchDir.exists() || ! watchDir.isDirectory())
-            return;
-        addRecentsFrom (watchDir, true);
-    }
-
     void addRecentsFrom (const File& recentsDir, bool recursive = true)
     {
         if (recentsDir.isDirectory())
@@ -310,6 +302,14 @@ private:
         processor.getPlayer().removeChangeListener (this);
         chooser->removeListener (this);
         watchButton.onClick = nullptr;
+    }
+
+    void onStateRestored()
+    {
+        auto watchDir = processor.getWatchDir();
+        if (! watchDir.exists() || ! watchDir.isDirectory())
+            return;
+        addRecentsFrom (watchDir, true);
     }
 };
 
