@@ -43,6 +43,12 @@ int main (int argc, char** argv)
     UnitTestRunner runner;
     runner.setAssertOnFailure (true);
 
+   #if JUCE_LINUX
+    auto comp = std::make_unique<Component>();
+    comp->setSize (1,1);
+    comp->addToDesktop (0);
+   #endif
+
     if (argc <= 1)
     {
         runner.runAllTests();
@@ -82,6 +88,10 @@ int main (int argc, char** argv)
         totalFails += result->failures;
         totalPass += result->passes;
     }
+
+   #if JUCE_LINUX
+    comp.reset();
+   #endif
 
     juce::shutdownJuce_GUI();
     Logger::writeToLog ("-----------------------------------------------------------------");

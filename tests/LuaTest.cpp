@@ -573,6 +573,7 @@ public:
     virtual ~LuaGlobalsTest() { }
     void initialise() override
     {
+        initializeWorld();
         lua.open_libraries();
         Lua::openLibs (lua);
         Lua::setWorld (lua, &getWorld());
