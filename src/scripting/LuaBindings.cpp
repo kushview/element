@@ -17,13 +17,19 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "controllers/AppController.h"
+#include "controllers/GuiController.h"
+
+#include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
+
 #include "session/CommandManager.h"
 #include "session/MediaManager.h"
 #include "session/Node.h"
-#include "session/Session.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
+#include "session/Session.h"
+
 #include "Globals.h"
 #include "Settings.h"
 
@@ -303,8 +309,16 @@ static void openWorld (state& lua)
 {
     auto e = NS (lua, "element");
     
-    e.new_usertype<PluginManager> ("PluginManager", no_constructor);
+    e.new_usertype<AppController> ("AppController", no_constructor);
+    e.new_usertype<GuiController> ("GuiController", no_constructor);
 
+    e.new_usertype<AudioEngine> ("AudioEngine", no_constructor);
+    e.new_usertype<CommandManager> ("CommandManager", no_constructor);
+    e.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
+    e.new_usertype<MappingEngine> ("MappingEngine", no_constructor);
+    e.new_usertype<MidiEngine> ("MidiEngine", no_constructor);
+    e.new_usertype<PluginManager> ("PluginManager", no_constructor);
+    e.new_usertype<PresetCollection> ("PresetCollection", no_constructor);
     e.new_usertype<Settings> ("Settings", no_constructor);
 
     e.new_usertype<Globals> ("World", no_constructor,
@@ -321,7 +335,7 @@ static void openWorld (state& lua)
     );
 }
 
-void openDSP (state& lua)
+void openDSP (sol::state& lua)
 {
     lrt_openlibs (lua.lua_state(), 0);
 }
