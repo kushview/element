@@ -107,7 +107,6 @@ static void openJUCE (state& lua)
 {
     addRange<float>     (lua, "Range");
     addRange<int>       (lua, "Span");
-    addRectangle<int>   (lua, "ui", "Bounds");
     
     // AudioBuffer
     lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
@@ -160,8 +159,9 @@ static void openJUCE (state& lua)
     );
 }
 
-static void openUI (state& lua)
+void openUI (state& lua)
 {
+    addRectangle<int> (lua, "ui", "Bounds");
 }
 
 static void openModel (sol::state& lua)
@@ -280,16 +280,33 @@ static void openModel (sol::state& lua)
     });
 }
 
-static void openKV (state& lua)
+void openKV (state& lua)
 {
     auto kv   = NS (lua, "kv");
-    kv.new_enum ("PortType",
-        meta_method::to_string, []() {
-            return "TO STRING";
+    
+    // PortType
+    kv.new_usertype<kv::PortType> ("PortType", no_constructor,
+        call_constructor, factories (
+            [](int t) {
+                if (t < 0 || t > kv::PortType::Unknown)
+                    t = kv::PortType::Unknown;
+                return kv::PortType (t);
+            },
+            [](const char* slug) {
+                return kv::PortType (String::fromUTF8 (slug));
+            }
+        ),
+        meta_method::to_string, [](PortType* self) {
+            return self->getName().toStdString();
         },
-        "CV", kv::PortType::CV
+
+        "name", readonly_property ([](kv::PortType* self) { return self->getName().toStdString(); }),
+        "slug", readonly_property ([](kv::PortType* self) { return self->getSlug().toStdString(); }),
+        "uri",  readonly_property ([](kv::PortType* self) { return self->getURI().toStdString(); })
     );
 
+    kv.new_usertype<kv::PortDescription> ("PortDescription", no_constructor);
+    
     // PortList
     kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
