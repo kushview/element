@@ -21,46 +21,24 @@
 
 #pragma once
 
-#include "engine/nodes/EQFilterProcessor.h"
-#include "KnobsComponent.h"
+#include "JuceHeader.h"
 
 namespace Element {
 
-class EQFilterNodeEditor : public AudioProcessorEditor
+class KnobsComponent : public Component
 {
 public:
-    EQFilterNodeEditor (EQFilterProcessor& proc);
-    ~EQFilterNodeEditor();
+    KnobsComponent (AudioProcessor& proc, std::function<void()> paramLambda = {});
+    ~KnobsComponent() {}
 
     void paint (Graphics& g) override;
     void resized() override;
 
 private:
-    EQFilterProcessor& proc; // reference to processor for this editor
-    KnobsComponent knobs;
+    OwnedArray<Slider> sliders;
+    OwnedArray<ComboBox> boxes;
 
-    class FreqViz : public Component
-    {
-    public:
-        FreqViz (EQFilterProcessor& proc);
-        ~FreqViz() {}
-
-        void updateCurve();
-        float getFreqForX (float xPos);
-        float getXForFreq (float freq);
-
-        void paint (Graphics & g) override;
-        void resized() override;
-
-    private:
-        EQFilterProcessor& proc;
-        Path curvePath; // path for frequency response curve
-
-        const float lowFreq = 10.0f;
-        const float highFreq = 22000.0f;
-        const float dashLengths[2] = {4, 1};
-    };
-    FreqViz viz;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (KnobsComponent)
 };
 
 }

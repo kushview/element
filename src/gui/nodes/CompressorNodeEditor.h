@@ -21,46 +21,57 @@
 
 #pragma once
 
-#include "engine/nodes/EQFilterProcessor.h"
+#include "engine/nodes/CompressorProcessor.h"
 #include "KnobsComponent.h"
 
 namespace Element {
 
-class EQFilterNodeEditor : public AudioProcessorEditor
+class CompressorNodeEditor : public AudioProcessorEditor
 {
 public:
-    EQFilterNodeEditor (EQFilterProcessor& proc);
-    ~EQFilterNodeEditor();
+    CompressorNodeEditor (CompressorProcessor& proc);
+    ~CompressorNodeEditor();
 
-    void paint (Graphics& g) override;
+    void paint (Graphics&) override;
     void resized() override;
 
 private:
-    EQFilterProcessor& proc; // reference to processor for this editor
+    CompressorProcessor& proc;
     KnobsComponent knobs;
 
-    class FreqViz : public Component
+    class CompViz : public Component,
+                    private CompressorProcessor::Listener,
+                    private Timer
     {
     public:
-        FreqViz (EQFilterProcessor& proc);
-        ~FreqViz() {}
+        CompViz (CompressorProcessor& proc);
+        ~CompViz();
+
+        void updateInGainDB (float inDB) override;
+        void timerCallback() override;
 
         void updateCurve();
-        float getFreqForX (float xPos);
-        float getXForFreq (float freq);
+        float getDBForX (float xPos);
+        float getYForDB (float db);
 
         void paint (Graphics & g) override;
-        void resized() override;
+        void resized() override {}
 
     private:
-        EQFilterProcessor& proc;
-        Path curvePath; // path for frequency response curve
+        CompressorProcessor& proc;
+        Path curvePath; // path for compression response curve
 
-        const float lowFreq = 10.0f;
-        const float highFreq = 22000.0f;
+        // Dot coordinates
+        std::atomic<float> dotX = 0.0f;
+        std::atomic<float> dotY = 0.0f;
+
+        const float lowDB = -36.0f;
+        const float highDB = 6.0f;
         const float dashLengths[2] = {4, 1};
     };
-    FreqViz viz;
+    CompViz compViz;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorNodeEditor)
 };
 
 }
