@@ -139,11 +139,8 @@ public:
         ratio.skip (numSteps);
     }
 
-    inline float process (float x)
+    inline float calcGain (float x, float curThresh, float curRatio)
     {
-        auto curThresh = thresh.getNextValue();
-        auto curRatio = ratio.getNextValue();
-
         auto xAbs = fabsf (x);
         if (xAbs <= kneeLower) // below thresh
             return 1.0f;
@@ -155,6 +152,11 @@ public:
         auto gainCorr = Decibels::gainToDecibels (xAbs) - Decibels::gainToDecibels (curThresh) + 0.5f * kneeDB;
         auto gainDB = -1.0f * aFF * gainCorr * gainCorr;
         return Decibels::decibelsToGain (gainDB);
+    }
+
+    inline float process (float x)
+    {
+        return calcGain (x, thresh.getNextValue(), ratio.getNextValue());
     }
 
 private:
@@ -182,6 +184,8 @@ private:
     float kneeLower = 1.0f;
     float aFF = 0.0f;
 
+    friend class CompressorProcessor;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GainComputer)
 };
 
@@ -189,93 +193,19 @@ private:
 class CompressorProcessor : public BaseProcessor
 {
 public:
-    explicit CompressorProcessor (const int _numChannels = 2)
-        : BaseProcessor (BusesProperties()
-            .withInput ("Main", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))
-            .withOutput ("Main", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))),
-        numChannels (jlimit (1, 2, _numChannels))
-    {
-        setPlayConfigDetails (numChannels, numChannels, 44100.0, 1024);
-
-        NormalisableRange<float> ratioRange (0.5f, 10.0f);
-        ratioRange.setSkewForCentre (2.0f);
-
-        NormalisableRange<float> attackRange (0.1f, 1000.0f);
-        attackRange.setSkewForCentre (10.0f);
-
-        NormalisableRange<float> releaseRange (10.0f, 3000.0f);
-        releaseRange.setSkewForCentre (100.0f);
-
-        addParameter (threshDB  = new AudioParameterFloat ("thresh",  "Threshold [dB]", -30.0f, 0.0f, 0.0f));
-        addParameter (ratio     = new AudioParameterFloat ("ratio",   "Ratio",          ratioRange, 1.0f));
-        addParameter (kneeDB    = new AudioParameterFloat ("knee",    "Knee [dB]",      0.0f, 12.0f, 6.0f));
-        addParameter (attackMs  = new AudioParameterFloat ("attack",  "Attack [ms]",    attackRange, 10.0f));
-        addParameter (releaseMs = new AudioParameterFloat ("release", "Release [ms]",   releaseRange, 100.0f));
-        addParameter (makeupDB  = new AudioParameterFloat ("makeup",  "Makeup [dB]",    -18.0f, 18.0f, 0.0f));
-
-        makeupGain.reset (numSteps);
-    }
+    explicit CompressorProcessor (const int _numChannels = 2);
 
     const String getName() const override { return "Compressor"; }
 
-    void fillInPluginDescription (PluginDescription& desc) const override
-    {
-        desc.name = getName();
-        desc.fileOrIdentifier   = EL_INTERNAL_ID_COMPRESSOR;
-        desc.descriptiveName    = "Compressor";
-        desc.numInputChannels   = 2;
-        desc.numOutputChannels  = 2;
-        desc.hasSharedContainer = false;
-        desc.isInstrument       = false;
-        desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
-        desc.version            = "1.0.0";
-        desc.uid                = EL_INTERNAL_UID_COMPRESSOR;
-    }
+    void fillInPluginDescription (PluginDescription& desc) const override;
 
-    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override
-    {
-        detector.reset ((float) sampleRate);
-        gainComputer.reset();
+    void updateParams();
+    void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override;
+    void releaseResources() override;
+    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override;
+    float calcGainDB (float db);
 
-        setPlayConfigDetails (numChannels, numChannels, sampleRate, maximumExpectedSamplesPerBlock);
-    }
-
-    void releaseResources() override
-    {
-    }
-
-    void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
-    {
-        auto numBuffChannels = buffer.getNumChannels();
-        
-        // update params
-        detector.setAttackMs (*attackMs);
-        detector.setReleaseMs (*releaseMs);
-        gainComputer.setThreshold (*threshDB);
-        gainComputer.setRatio (*ratio);
-        gainComputer.setKnee (*kneeDB);
-
-        makeupGain.setTargetValue (Decibels::decibelsToGain ((float) *makeupDB));
-
-        for (int n = 0; n < buffer.getNumSamples(); ++n)
-        {
-            // Sum input from channels
-            float detectorInput = 0.0f;
-            for (int ch = 0; ch < numBuffChannels; ++ch)
-                detectorInput += buffer.getSample (ch, n);
-            detectorInput /= (float) numBuffChannels;
-
-            // Get level estimate, and compute gain
-            float level = detector.process (detectorInput);
-            float gain = gainComputer.process (level);
-
-            // Apply gain
-            buffer.applyGain (n, 1, gain * makeupGain.getNextValue());
-        }
-    }
-
-    AudioProcessorEditor* createEditor() override   { return new GenericAudioProcessorEditor (this); }
+    AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override                 { return true; }
 
     double getTailLengthSeconds() const override    { return 0.0; };
@@ -288,40 +218,20 @@ public:
     const String getProgramName (int index) override                   { ignoreUnused (index); return "Parameter"; }
     void changeProgramName (int index, const String& newName) override { ignoreUnused (index, newName); }
 
-    void getStateInformation (juce::MemoryBlock& destData) override
-    {
-        ValueTree state (Tags::state);
-        state.setProperty ("thresh",  (float) *threshDB,  0);
-        state.setProperty ("ratio",   (float) *ratio,     0);
-        state.setProperty ("knee",    (float) *kneeDB,    0);
-        state.setProperty ("attack",  (float) *attackMs,  0);
-        state.setProperty ("release", (float) *releaseMs, 0);
-        state.setProperty ("makeup",  (float) *makeupDB,  0);
-        if (auto e = state.createXml())
-            AudioProcessor::copyXmlToBinary (*e, destData);
-    }
+    void getStateInformation (juce::MemoryBlock& destData) override;
 
-    void setStateInformation (const void* data, int sizeInBytes) override
-    {
-        if (auto e = AudioProcessor::getXmlFromBinary (data, sizeInBytes))
-        {
-            auto state = ValueTree::fromXml (*e);
-            if (state.isValid())
-            {
-                *threshDB  = (float) state.getProperty ("thresh",  (float) *threshDB);
-                *ratio     = (float) state.getProperty ("ratio",   (float) *ratio);
-                *kneeDB    = (float) state.getProperty ("knee",    (float) *kneeDB);
-                *attackMs  = (float) state.getProperty ("attack",  (float) *attackMs);
-                *releaseMs = (float) state.getProperty ("release", (float) *releaseMs);
-                *makeupDB  = (float) state.getProperty ("makeup",  (float) *makeupDB);
-            }
-        }
-    }
+    void setStateInformation (const void* data, int sizeInBytes) override;
+    void numChannelsChanged() override;
 
-    void numChannelsChanged() override
+    class Listener
     {
-        numChannels = getTotalNumInputChannels();
-    }
+    public:
+        virtual ~Listener() {}
+        virtual void updateInGainDB (float /*inDB*/) {}
+    };
+
+    void addListener (Listener* l) { listeners.add (l); }
+    void removeListener (Listener* l) { listeners.remove (l); }
 
 protected:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
@@ -359,6 +269,8 @@ private:
 
     LevelDetector detector;
     GainComputer gainComputer;
+
+    ListenerList<Listener> listeners;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CompressorProcessor)
 };
