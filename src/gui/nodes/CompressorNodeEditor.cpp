@@ -125,7 +125,7 @@ CompressorNodeEditor::CompressorNodeEditor (CompressorProcessor& proc) :
     knobs (proc, [this, &proc] { proc.updateParams(); compViz.updateCurve(); }),
     compViz (proc)
 {
-    setSize (550, 420);
+    setSize (610, 420);
 
     addAndMakeVisible (knobs);
     addAndMakeVisible (compViz);

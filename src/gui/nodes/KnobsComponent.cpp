@@ -122,7 +122,7 @@ void KnobsComponent::resized()
     bool first = true;
     for (auto* s : sliders)
     {
-        int offset = first ? -5 : -10;
+        int offset = first ? -3 : -15;
         s->setBounds (x + offset, 20, 100, 75);
         x = s->getRight();
         first = false;
@@ -130,7 +130,7 @@ void KnobsComponent::resized()
 
     for (auto* b : boxes)
     {
-        int offset = first ? 5 : 10;
+        int offset = first ? 5 : 0;
         b->setBounds (x + offset, 40, 90, 25);
         x = b->getRight();
         first = false;
