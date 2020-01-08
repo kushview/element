@@ -44,7 +44,7 @@ R"(--- Stereo Amplifier in Lua
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
-local dsp = require ('kv')
+local kv = require ('kv')
 
 -- Our gain parameters. Used for fading between changes in volume
 local start_gain = 1.0

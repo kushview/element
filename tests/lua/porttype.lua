@@ -1,4 +1,6 @@
+local el = element
+
 function run()
     begintest ("PortType")
-    print(kv.PortType("cv"))
+    print(el.PortType ("cv"))
 end

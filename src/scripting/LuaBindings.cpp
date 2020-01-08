@@ -282,7 +282,7 @@ static void openModel (sol::state& lua)
 
 void openKV (state& lua)
 {
-    auto kv   = NS (lua, "kv");
+    auto kv   = NS (lua, "element");
     
     // PortType
     kv.new_usertype<kv::PortType> ("PortType", no_constructor,
@@ -310,7 +310,7 @@ void openKV (state& lua)
     // PortList
     kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
-        meta_method::to_string, [](MidiPipe*) { return "kv.PortList"; },
+        meta_method::to_string, [](MidiPipe*) { return "element.PortList"; },
         "add", [](kv::PortList* self, int type, int index, int channel,
                                       const char* symbol, const char* name,
                                       const bool input)
@@ -319,7 +319,7 @@ void openKV (state& lua)
         }
     );
 
-    addRectangle<double> (lua, "kv", "Rect");
+    addRectangle<double> (lua, "element", "Rect");
 }
 
 static void openWorld (state& lua)
@@ -361,8 +361,8 @@ void openLibs (sol::state& lua)
 {
     openWorld (lua);
     openModel (lua);
-    openKV (lua);
     openDSP (lua);
+    openKV (lua);
     openUI (lua);
 }
 
