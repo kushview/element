@@ -660,7 +660,7 @@ public:
     {
         beginTest ("buffer");
         lua.script (R"(
-            local audio = require ('dsp.audio')
+            local audio = require ('kv.audio')
             local b = audio.Buffer()
         )");
     }

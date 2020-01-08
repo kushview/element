@@ -19,7 +19,7 @@
 
 #include <math.h>
 #include "sol/sol.hpp"
-#include "lrt/lrt.h"
+#include "lua-kv.h"
 
 #include "ElementApp.h"
 #include "engine/nodes/LuaNode.h"
@@ -44,7 +44,7 @@ R"(--- Stereo Amplifier in Lua
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
-local dsp = require ('dsp')
+local dsp = require ('kv')
 
 -- Our gain parameters. Used for fading between changes in volume
 local start_gain = 1.0
@@ -83,10 +83,10 @@ end
 
 --- Render audio and midi
 -- Use the provided audio and midi objects to process your plugin
--- @param a     The source dsp.audio.Buffer
--- @param m     The source dsp.midi.Pipe
+-- @param a     The source kv.audio.Buffer
+-- @param m     The source kv.midi.Pipe
 function node_render (a, m)
-   end_gain = dsp.dbtogain (Param.values[1])
+   end_gain = kv.dbtogain (Param.values[1])
 
    --[[
    -- process a fade frame by frame
@@ -233,14 +233,14 @@ struct LuaNode::Context
 
                 if (ok)
                 {
-                    audioBuffer = lrt_audio_buffer_new (state, 0, 0);
+                    audioBuffer = kv_audio_buffer_new (state, 0, 0);
                     audioBufRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = audioBufRef != LUA_REFNIL && audioBufRef != LUA_NOREF;
                 }
 
                 if (ok)
                 {
-                    midiPipe = lrt_midi_pipe_new (state, 0);
+                    midiPipe = kv_midi_pipe_new (state, 0);
                     midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = midiPipeRef != LUA_REFNIL && midiPipeRef != LUA_NOREF;
                 }
@@ -309,8 +309,8 @@ struct LuaNode::Context
             ctx->state["__ln_validate_nframes"] = block;
             ctx->state.script (R"(
                 function __ln_validate_render()
-                    local audio = require ('dsp.audio')
-                    local midi  = require ('dsp.midi')
+                    local audio = require ('kv.audio')
+                    local midi  = require ('kv.midi')
 
                     local a = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
                     local m = midi.Pipe (__ln_validate_nmidi)
@@ -361,14 +361,14 @@ struct LuaNode::Context
 
         if (audioBuffer != nullptr)
         {
-            lrt_audio_buffer_resize (audioBuffer, nchans, block,
+            kv_audio_buffer_resize (audioBuffer, nchans, block,
                                      false, true, false);
         }
 
         if (midiPipe != nullptr)
         {
-            lrt_midi_pipe_resize (L, midiPipe, nmidi);
-            lrt_midi_pipe_clear (midiPipe, -1);
+            kv_midi_pipe_resize (L, midiPipe, nmidi);
+            kv_midi_pipe_clear (midiPipe, -1);
         }
 
         state.collect_garbage();
@@ -384,13 +384,13 @@ struct LuaNode::Context
         
         if (audioBuffer != nullptr)
         {
-            lrt_audio_buffer_resize (audioBuffer, 1, 1,
+            kv_audio_buffer_resize (audioBuffer, 1, 1,
                                      false, true, false);
         }
 
         if (midiPipe != nullptr)
         {
-            lrt_midi_pipe_resize (L, midiPipe, 0);
+            kv_midi_pipe_resize (L, midiPipe, 0);
         }
 
         state.collect_garbage();
@@ -412,27 +412,27 @@ struct LuaNode::Context
                 if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiPipeRef) == LUA_TUSERDATA)
                 {
                    #if ! LRT_FORCE_FLOAT32
-                    lrt_audio_buffer_duplicate_32 (audioBuffer,
+                    kv_audio_buffer_duplicate_32 (audioBuffer,
                         audio.getArrayOfReadPointers(), nchans, nframes);
                    #else
-                    lrt_audio_buffer_refer_to (audioBuffer,
+                    kv_audio_buffer_refer_to (audioBuffer,
                         audio.getArrayOfWritePointers(), nchans, nframes);
                    #endif
                 
-                    lrt_midi_pipe_resize (L, midiPipe, midi.getNumBuffers());
-                    lrt_midi_pipe_clear (midiPipe, -1);
+                    kv_midi_pipe_resize (L, midiPipe, midi.getNumBuffers());
+                    kv_midi_pipe_clear (midiPipe, -1);
                     
                     int bytes = 0, frame = 0;
                     const uint8* data = nullptr;
                     for (int i = 0; i < nmidi; ++i)
                     {
                         auto* src = midi.getWriteBuffer (i);
-                        auto* dst = lrt_midi_pipe_get (midiPipe, i);
+                        auto* dst = kv_midi_pipe_get (midiPipe, i);
                         if (src->isEmpty())
                             continue;
                         MidiBuffer::Iterator iter (*src);
                         while (iter.getNextEvent (data, bytes, frame))
-                            lrt_midi_buffer_insert (dst, data, bytes, frame);
+                            kv_midi_buffer_insert (dst, data, bytes, frame);
                         src->clear();
                     }
 
@@ -440,20 +440,20 @@ struct LuaNode::Context
                     
                     for (int i = 0; i < nmidi; ++i) 
                     {
-                        auto* src = lrt_midi_pipe_get (midiPipe, i);
+                        auto* src = kv_midi_pipe_get (midiPipe, i);
                         auto* dst = midi.getWriteBuffer (i);
-                        lrt_midi_buffer_foreach (src, iter)
+                        kv_midi_buffer_foreach (src, iter)
                         {
                             dst->addEvent (
-                                lrt_midi_buffer_iter_data (iter),
-                                lrt_midi_buffer_iter_size (iter),
-                                lrt_midi_buffer_iter_frame (iter)
+                                kv_midi_buffer_iter_data (iter),
+                                kv_midi_buffer_iter_size (iter),
+                                kv_midi_buffer_iter_frame (iter)
                             );
                         }
                     }
 
                    #if ! LRT_FORCE_FLOAT32
-                    const lrt_sample_t* const* src = lrt_audio_buffer_array (audioBuffer);
+                    const kv_sample_t* const* src = kv_audio_buffer_array (audioBuffer);
                     auto** dst = audio.getArrayOfWritePointers();
                     for (int c = 0; c < nchans; ++c)
                     {
@@ -590,8 +590,8 @@ private:
     int renderRef  = LUA_NOREF;
     int audioBufRef = LUA_NOREF;
     int midiPipeRef = LUA_NOREF;
-    lrt_midi_pipe_t* midiPipe { nullptr };
-    lrt_audio_buffer_t* audioBuffer { nullptr };
+    kv_midi_pipe_t* midiPipe { nullptr };
+    kv_audio_buffer_t* audioBuffer { nullptr };
 
     PortList ports;
     ParameterArray inParams, outParams;

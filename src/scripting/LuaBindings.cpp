@@ -36,7 +36,7 @@
 #include "scripting/LuaIterators.h"
 
 #include "sol/sol.hpp"
-#include "lrt/lrt.h"
+#include "lua-kv.h"
 
 //=============================================================================
 namespace sol {
@@ -354,7 +354,7 @@ static void openWorld (state& lua)
 
 void openDSP (sol::state& lua)
 {
-    lrt_openlibs (lua.lua_state(), 0);
+    kv_openlibs (lua.lua_state(), 0);
 }
 
 void openLibs (sol::state& lua)
