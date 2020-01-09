@@ -27,18 +27,20 @@ namespace Element {
     class FreqSplitterProcessor : public BaseProcessor
     {
     public:
-        explicit FreqSplitterProcessor()
+        explicit FreqSplitterProcessor (const int _numChannels = 2)
             : BaseProcessor (BusesProperties()
-                .withInput ("Main", AudioChannelSet::canonicalChannelSet (2))
-                .withOutput ("Main", AudioChannelSet::canonicalChannelSet (6))),
-            numChannelsIn (2),
-            numChannelsOut (6)
+                .withInput ("Main", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))
+                .withOutput ("Low", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))
+                .withOutput ("Mid", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))
+                .withOutput ("High", AudioChannelSet::canonicalChannelSet (jlimit (1, 2, _numChannels)))),
+            numChannelsIn (jlimit (1, 2, _numChannels)),
+            numChannelsOut (3 * numChannelsIn)
         {
-            setPlayConfigDetails (numChannelsIn, numChannelsOut, 44100.0, 1024);
+            setBusesLayout (getBusesLayout());
+            setRateAndBufferSizeDetails (44100.0, 1024);
 
             NormalisableRange<float> freqRange (20.0f, 22000.0f);
             freqRange.setSkewForCentre (1000.0f);
-
 
             addParameter (lowFreq  = new AudioParameterFloat ("lowFreq",  "Low Frequency [Hz]",  freqRange, 500.0f));
             addParameter (highFreq = new AudioParameterFloat ("highFreq", "High Frequency [Hz]", freqRange, 2000.0f));
@@ -51,8 +53,8 @@ namespace Element {
             desc.name = getName();
             desc.fileOrIdentifier   = EL_INTERNAL_ID_FREQ_SPLITTER;
             desc.descriptiveName    = "Frequency Band Splitter";
-            desc.numInputChannels   = 2;
-            desc.numOutputChannels  = 6;
+            desc.numInputChannels   = numChannelsIn;
+            desc.numOutputChannels  = numChannelsOut;
             desc.hasSharedContainer = false;
             desc.isInstrument       = false;
             desc.manufacturerName   = "Element";
@@ -81,7 +83,8 @@ namespace Element {
                 setupFilter (highHPF[ch], *highFreq, EQFilter::Shape::HighPass);
             }
 
-            setPlayConfigDetails (numChannelsIn, numChannelsOut, sampleRate, maximumExpectedSamplesPerBlock);
+            setBusesLayout (getBusesLayout());
+            setRateAndBufferSizeDetails (sampleRate, maximumExpectedSamplesPerBlock);
         }
 
         void releaseResources() override
@@ -90,13 +93,21 @@ namespace Element {
 
         void processBlock (AudioBuffer<float>& buffer, MidiBuffer&) override
         {
-            const auto totalNumInputChannels  = getTotalNumInputChannels();
-            const auto totalNumOutputChannels = getTotalNumOutputChannels();
+            auto inBuffer = getBusBuffer (buffer, true, 0);
+            auto lowBuffer = getBusBuffer (buffer, false, 0);
+            auto midBuffer = getBusBuffer (buffer, false, 1);
+            auto highBuffer = getBusBuffer (buffer, false, 2);
+
+            const auto numChannels = inBuffer.getNumChannels();
             const auto numSamples = buffer.getNumSamples();
-            ignoreUnused (totalNumInputChannels);
+
             // copy input into extra output channels
-            for (int ch = 2; ch < totalNumOutputChannels; ++ch)
-                buffer.copyFrom (ch, 0, buffer.getReadPointer (ch % 2), numSamples);
+            for (int ch = 0; ch < numChannels; ++ch)
+            {
+                lowBuffer.copyFrom (ch, 0, inBuffer.getReadPointer (ch), numSamples);
+                midBuffer.copyFrom (ch, 0, inBuffer.getReadPointer (ch), numSamples);
+                highBuffer.copyFrom (ch, 0, inBuffer.getReadPointer (ch), numSamples);
+            }
 
             // update filter parameters
             for (int c = 0; c < 2; ++c)
@@ -107,23 +118,17 @@ namespace Element {
                 highHPF[c].setFrequency (*highFreq);
             }
 
-            // Low freq band
-            for (int ch = 0; ch < 2; ++ch)
+            for (int ch = 0; ch < numChannels; ++ch)
             {
-                lowLPF[ch].processBlock (buffer.getWritePointer (ch), numSamples);
-            }
+                // Low freq band
+                lowLPF[ch].processBlock (lowBuffer.getWritePointer (ch), numSamples);
 
-            // Mid freq band
-            for (int ch = 2; ch < 4; ++ch)
-            {
-                lowHPF[ch-2].processBlock (buffer.getWritePointer (ch), numSamples);
-                highLPF[ch-2].processBlock (buffer.getWritePointer (ch), numSamples);
-            }
+                // Mid freq band
+                lowHPF[ch].processBlock  (midBuffer.getWritePointer (ch), numSamples);
+                highLPF[ch].processBlock (midBuffer.getWritePointer (ch), numSamples);
 
-            // High freq band
-            for (int ch = 4; ch < 6; ++ch)
-            {
-                highHPF[ch-4].processBlock (buffer.getWritePointer (ch), numSamples);
+                // High freq band
+                highHPF[ch].processBlock (highBuffer.getWritePointer (ch), numSamples);
             }
         }
 
@@ -171,17 +176,19 @@ namespace Element {
     protected:
         inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
         {
-            // supports single bus only
-            if (layout.inputBuses.size() != 1 && layout.outputBuses.size() != 1)
+            // supports single input bus, three output busses
+            if (layout.inputBuses.size() != 1 && layout.outputBuses.size() != 3)
                 return false;
 
             // ins must equal outs
-            // if (layout.getMainInputChannels() != layout.getMainOutputChannels())
-            //     return false;
+            for (int bus = 0; bus < 3; ++bus)
+            {
+                if (layout.getMainInputChannels() != layout.outputBuses[bus].size())
+                    return false;
+            }
 
-            const auto nchansIn = layout.getMainInputChannels();
-            const auto nchansOut = layout.getMainOutputChannels();
-            return nchansIn == 2 && nchansOut == 6;
+            const auto nchans = layout.getMainInputChannels();
+            return nchans >= 1 && nchans <= 2;
         }
 
         inline bool canApplyBusesLayout (const BusesLayout& layouts) const override { return isBusesLayoutSupported (layouts); }

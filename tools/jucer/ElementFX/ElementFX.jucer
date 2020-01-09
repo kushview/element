@@ -117,6 +117,8 @@
                 file="../../../src/engine/nodes/ChannelizeProcessor.h"/>
           <FILE id="HKeGjm" name="CombFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
+          <FILE id="HKUnFD" name="CompressorProcessor.cpp" compile="1" resource="0"
+                file="../../../src/engine/nodes/CompressorProcessor.cpp"/>
           <FILE id="gGyXoe" name="CompressorProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CompressorProcessor.h"/>
           <FILE id="ZPlzuE" name="EQFilterProcessor.cpp" compile="1" resource="0"
@@ -222,6 +224,10 @@
                 file="../../../src/gui/nodes/AudioRouterEditor.cpp"/>
           <FILE id="vtZ5le" name="AudioRouterEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/AudioRouterEditor.h"/>
+          <FILE id="OMY6mI" name="CompressorNodeEditor.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/CompressorNodeEditor.cpp"/>
+          <FILE id="Fn1C12" name="CompressorNodeEditor.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/CompressorNodeEditor.h"/>
           <FILE id="u19H9U" name="EQFilterNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/EQFilterNodeEditor.cpp"/>
           <FILE id="V2rjXJ" name="EQFilterNodeEditor.h" compile="0" resource="0"
@@ -230,6 +236,10 @@
                 file="../../../src/gui/nodes/GenericNodeEditor.cpp"/>
           <FILE id="rBLbMG" name="GenericNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
+          <FILE id="zbj99F" name="KnobsComponent.cpp" compile="1" resource="0"
+                file="../../../src/gui/nodes/KnobsComponent.cpp"/>
+          <FILE id="IpEOMp" name="KnobsComponent.h" compile="0" resource="0"
+                file="../../../src/gui/nodes/KnobsComponent.h"/>
           <FILE id="y9Lplz" name="LuaNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/LuaNodeEditor.cpp"/>
           <FILE id="ABbNiq" name="LuaNodeEditor.h" compile="0" resource="0" file="../../../src/gui/nodes/LuaNodeEditor.h"/>
