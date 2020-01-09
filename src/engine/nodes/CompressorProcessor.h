@@ -236,12 +236,16 @@ public:
 protected:
     inline bool isBusesLayoutSupported (const BusesLayout& layout) const override 
     {
-        // supports single bus only
-        if (layout.inputBuses.size() != 1 && layout.outputBuses.size() != 1)
+        // supports two input buses, one output
+        if (layout.inputBuses.size() != 2 && layout.outputBuses.size() != 1)
             return false;
 
         // ins must equal outs
         if (layout.getMainInputChannels() != layout.getMainOutputChannels())
+            return false;
+
+        // check sidechain input channels is equal to main
+        if (layout.getMainInputChannels() != layout.inputBuses[1].size())
             return false;
 
         const auto nchans = layout.getMainInputChannels();
@@ -256,6 +260,14 @@ protected:
     }
 
 private:
+    inline float getSummedMonoSample (AudioBuffer<float>& buffer, int idx, int numChans)
+    {
+        float sum = 0.0f;
+        for (int ch = 0; ch < numChans; ++ch)
+            sum += buffer.getSample (ch, idx);
+        return sum / (float) numChans;
+    };
+
     int numChannels = 0;
     AudioParameterFloat* threshDB  = nullptr;
     AudioParameterFloat* ratio     = nullptr;
@@ -263,11 +275,13 @@ private:
     AudioParameterFloat* attackMs  = nullptr;
     AudioParameterFloat* releaseMs = nullptr;
     AudioParameterFloat* makeupDB  = nullptr;
+    AudioParameterFloat* sideChain = nullptr;
 
     SmoothedValue<float, ValueSmoothingTypes::Multiplicative> makeupGain = 1.0f;
     const int numSteps = 200;
 
     LevelDetector detector;
+    LevelDetector sideDetector;
     GainComputer gainComputer;
 
     ListenerList<Listener> listeners;
