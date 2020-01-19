@@ -218,10 +218,12 @@ AboutComponent::AboutComponent()
     tabs.addTab ("Authors", tabc, authors, true);
 
     auto* donors = new AboutCreditsComponent();
-    donors->getPanel().addSection ("Gold Sponsors", { "None" });
-    donors->getPanel().addSection ("Silver Sponsors", { "None" });
-    donors->getPanel().addSection ("Gold Backers", { "None" });
-    donors->getPanel().addSection ("Silver Backers", { "None" });
+    // donors->getPanel().addSection ("Gold Sponsors", { "None" });
+    // donors->getPanel().addSection ("Silver Sponsors", { "None" });
+    // donors->getPanel().addSection ("Gold Backers", { "None" });
+    donors->getPanel().addSection ("Sponsors", { 
+        "Kent Kingery" 
+    });
 
     tabs.addTab ("Donors",  tabc, donors, true);
     tabs.addTab ("License", tabc, new LicenseTextComponent(), true);
