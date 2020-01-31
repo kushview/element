@@ -33,70 +33,122 @@ static bool copyData()
     return dataDir.copyDirectoryTo (buildDir.getChildFile ("data"));
 }
 
-int main (int argc, char** argv)
+
+class TestApp : public JUCEApplication,
+                public AsyncUpdater
 {
-    if (! copyData())
-        return 100;
+    String commandLine;
+    std::unique_ptr<Component> comp;
 
-    MessageManager::getInstance();
-    juce::initialiseJuce_GUI();
-    UnitTestRunner runner;
-    runner.setAssertOnFailure (true);
+public:
+    TestApp() { }
+    virtual ~TestApp() { }
 
-   #if JUCE_LINUX
-    auto comp = std::make_unique<Component>();
-    comp->setSize (1,1);
-    comp->addToDesktop (0);
-   #endif
+    const String getApplicationName()    override      { return "Element Tests"; }
+    const String getApplicationVersion() override      { return ProjectInfo::versionString; }
+    bool moreThanOneInstanceAllowed()    override      { return false; }
 
-    if (argc <= 1)
+    void handleAsyncUpdate() override
     {
-        runner.runAllTests();
+        runUnitTests();
+        comp.reset();
     }
-    else if (argc == 2 && UnitTest::getAllCategories().contains (String::fromUTF8 (argv[1])))
+
+    void initialise (const String& cli ) override
     {
-        runner.runTestsInCategory (String::fromUTF8 (argv[1]));
-    }
-    else if (argc == 3)
-    {
-        const String category (String::fromUTF8 (argv[1]));
-        const String slug (String::fromUTF8 (argv[2]));
-        Array<UnitTest*> testsToRun;
-        for (auto* const unitTest : UnitTest::getAllTests())
-            if (auto* const test = dynamic_cast<Element::UnitTestBase*> (unitTest))
-                if (category == test->getCategory() && slug == test->getSlug())
-                    testsToRun.add (unitTest);
-        if (testsToRun.isEmpty())
+        commandLine = cli;
+        if (! copyData()) 
         {
-            Logger::writeToLog ("test(s) not found");
+            setApplicationReturnValue (100);
+            quit();
+            return;
+        }
+
+        MessageManager::getInstance();
+        juce::initialiseJuce_GUI();
+        triggerAsyncUpdate();
+    }
+
+    void runUnitTests()
+    {
+        auto opts = StringArray::fromTokens (commandLine, true);
+        opts.trim();
+
+        
+        UnitTestRunner runner;
+        runner.setAssertOnFailure (true);
+
+        DBG("command line: " << commandLine);
+
+    #if JUCE_LINUX
+        comp = std::make_unique<Component>();
+        comp->setSize (2,2);
+        comp->addToDesktop (0);
+    #endif
+
+        if (opts.size() <= 0)
+        {
+            runner.runAllTests();
+        }
+        else if (opts.size() == 1 && UnitTest::getAllCategories().contains (opts [0]))
+        {
+            runner.runTestsInCategory (opts[0]);
+        }
+        else if (opts.size() == 2)
+        {
+            const String category (opts [0]);
+            const String slug (opts [1]);
+            Array<UnitTest*> testsToRun;
+            for (auto* const unitTest : UnitTest::getAllTests())
+                if (auto* const test = dynamic_cast<Element::UnitTestBase*> (unitTest))
+                    if (category == test->getCategory() && slug == test->getSlug())
+                        testsToRun.add (unitTest);
+            if (testsToRun.isEmpty())
+            {
+                Logger::writeToLog ("test(s) not found");
+            }
+            else
+            {
+                runner.runTests (testsToRun);
+            }
         }
         else
         {
-            runner.runTests (testsToRun);
+            String notfound ("category not found: "); 
+            notfound << opts [0];
+            Logger::writeToLog (notfound);
         }
+
+        int totalFails = 0, totalPass = 0;
+        for (int i = 0; i < runner.getNumResults(); ++i)
+        {
+            const auto* const result = runner.getResult (i);
+            totalFails += result->failures;
+            totalPass += result->passes;
+        }
+
+        Logger::writeToLog ("-----------------------------------------------------------------");
+        Logger::writeToLog ("Test Results");
+        String message = "pass: "; message << totalPass << " fail: " << totalFails << newLine;
+        Logger::writeToLog (message);
+        setApplicationReturnValue (totalFails);
+        systemRequestedQuit();
     }
-    else
+    
+    
+    void shutdown() override {}
+
+    void systemRequestedQuit() override
     {
-        String notfound ("category not found: "); notfound << String::fromUTF8 (argv[1]);
-        Logger::writeToLog (notfound);
+        TestApp::quit();
     }
 
-    int totalFails = 0, totalPass = 0;
-    for (int i = 0; i < runner.getNumResults(); ++i)
+    void anotherInstanceStarted (const String& commandLine) override
     {
-        const auto* const result = runner.getResult (i);
-        totalFails += result->failures;
-        totalPass += result->passes;
+       ignoreUnused (commandLine);
     }
 
-   #if JUCE_LINUX
-    comp.reset();
-   #endif
+    void resumed() override {}
+};
 
-    juce::shutdownJuce_GUI();
-    Logger::writeToLog ("-----------------------------------------------------------------");
-    Logger::writeToLog ("Test Results");
-    String message = "pass: "; message << totalPass << " fail: " << totalFails << newLine;
-    Logger::writeToLog (message);
-    return totalFails;
-}
+START_JUCE_APPLICATION (TestApp)
