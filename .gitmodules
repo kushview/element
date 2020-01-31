@@ -10,5 +10,5 @@
 	path = libs/jlv2
 	url = https://github.com/lvtk/jlv2
 [submodule "libs/lua-rt"]
-	path = libs/lua-rt
+	path = libs/lua-kv
 	url = https://github.com/kushview/lua-rt
