@@ -281,6 +281,11 @@ public:
         
         settings->saveIfNeeded();
         sendState ("finished");
+
+       #if JUCE_LINUX
+        // workaround to get the background process to quit
+        handleConnectionLost();
+       #endif
     }
     
     void updateScanFileWithSettings()
@@ -404,6 +409,9 @@ private:
             sendString ("progress", String (scanner->getProgress()));
         
         writePluginListNow();
+        #if JUCE_LINUX
+        Thread::sleep (1000);
+        #endif
     }
 };
 
