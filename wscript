@@ -107,7 +107,7 @@ def common_includes():
              'libs/compat', \
              'libs/lua', \
              'libs/lua/src', \
-             'libs/lua-rt', \
+             'libs/lua-rt/src', \
              VST3_PATH, \
              'src' ]
 

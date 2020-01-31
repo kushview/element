@@ -192,6 +192,31 @@ end
 )";
 
 //=============================================================================
+class LuaUnitTest : public UnitTestBase
+{
+public:
+    LuaUnitTest (const String& n, const String& c, const String& s)
+        : UnitTestBase (n, c, s) {}
+
+    void initialise() override
+    {
+        lua.open_libraries();
+        Element::Lua::openLibs (lua);
+        Element::Lua::setWorld (lua, &getWorld());
+    }
+
+    void shutdown() override
+    {
+        lua.collect_garbage();
+        Element::Lua::setWorld (lua, nullptr);
+        shutdownWorld();
+    }
+
+protected:
+    sol::state lua;
+};
+
+//=============================================================================
 class LuaNodeLifecycleTest : public UnitTestBase
 {
 public:
@@ -385,7 +410,8 @@ class LuaTableTest : public UnitTestBase
 {
 public:
     LuaTableTest() : UnitTestBase ("Lua Table", "Lua", "table") {}
-    virtual ~LuaTableTest() { }
+    virtual ~LuaTableTest() {}
+
     void initialise() override
     {
         lua.open_libraries();
@@ -547,6 +573,7 @@ public:
     virtual ~LuaGlobalsTest() { }
     void initialise() override
     {
+        initializeWorld();
         lua.open_libraries();
         Lua::openLibs (lua);
         Lua::setWorld (lua, &getWorld());
@@ -633,10 +660,8 @@ public:
     {
         beginTest ("buffer");
         lua.script (R"(
-            print ("audio.Buffer", audio.Buffer)
+            local audio = require ('kv.audio')
             local b = audio.Buffer()
-            print(string.format ("type: %s", tostring (b)))
-            print("nframes: ", b:length())
         )");
     }
 
@@ -645,5 +670,124 @@ private:
 };
 
 static LuaAudioBufferTest sLuaAudioBufferTest;
+
+//=============================================================================
+class LuaScriptsTest : public LuaUnitTest
+{
+public:
+    LuaScriptsTest() : LuaUnitTest ("Lua", "Lua", "kv") {}
+    virtual ~LuaScriptsTest() {}
+
+    void initialise() override
+    {
+        LuaUnitTest::initialise();
+        DirectoryIterator iter (getTestsDir().getChildFile("lua"), true, "*.lua", File::findFiles);
+        while (iter.next())
+        {
+            auto* const t = cases.add (new TestCase (*this, lua, iter.getFile()));
+            t->init();
+        }
+    }
+
+    void shutdown() override
+    {
+        for (auto* t : cases)
+            t->shutdown();
+        cases.clearQuick (true);
+        LuaUnitTest::shutdown();
+    }
+
+    void runTest() override
+    {
+        for (auto* t : cases)
+            t->run();
+    }
+
+private:
+    class TestCase
+    {
+    public:
+        TestCase (LuaScriptsTest& t, sol::state& l, const File& f)
+            : script (f), test(t), lua (l), env (l, sol::create, l.globals())
+        {
+            env.set_function ("begintest", [this](const char* m) { test.beginTest (String::fromUTF8 (m)); });
+            env.set_function ("expect", sol::overload (
+                [this](bool r) { test.expect (r, String()); },
+                [this](bool r, const char* m) { test.expect (r, m != nullptr ? String::fromUTF8 (m) : String()); }
+            ));
+        }
+
+        void init()
+        {
+            lua.script_file (script.getFullPathName().toRawUTF8(), env);
+            if (sol::function f = env ["init"])
+                f();
+        }
+
+        void run()
+        {
+            if (sol::function f = env ["run"])
+                f();
+            lua.collect_garbage();
+        }
+
+        void shutdown()
+        {
+            if (sol::function f = env ["shutdown"])
+                f();
+        }
+
+    private:
+        File script;
+        LuaScriptsTest& test;
+        sol::state& lua;
+        sol::environment env;
+    };
+
+    OwnedArray<TestCase> cases;
+
+    void testScript (const String& name, const String& script)
+    {
+        beginTest (name);
+        try {
+            lua.script (script.toRawUTF8());
+        } catch (const std::exception& e) {
+            expect (false, e.what());
+        }
+    }
+
+    void testScript (const String& name, const File& script)
+    {
+        if (script.existsAsFile())
+        {
+            try {
+                sol::environment env (lua, sol::create, lua.globals());
+                env.set_function ("begintest", [this](const char* m) { this->beginTest (String::fromUTF8 (m)); });
+                env.set_function ("expect", sol::overload (
+                    [this](bool r) { this->expect (r, String()); },
+                    [this](bool r, const char* m) { this->expect (r, m != nullptr ? String::fromUTF8 (m) : String()); }
+                ));
+
+                lua.script_file (script.getFullPathName().toRawUTF8(), env);
+
+                if (sol::function f = env ["init"])
+                    f();
+                if (sol::function f = env ["run"])
+                    f();
+                if (sol::function f = env ["shutdown"])
+                    f();
+
+            } catch (const std::exception& e) {
+                ignoreUnused (e);
+            }
+        }
+    }
+
+    File resolveScript (const String& leaf) {
+        return getTestsDir().getChildFile("lua").getChildFile (leaf);
+    }
+};
+
+static LuaScriptsTest sLuaScriptsTest;
 
 #endif

@@ -17,20 +17,26 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "controllers/AppController.h"
+#include "controllers/GuiController.h"
+
+#include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
+
 #include "session/CommandManager.h"
 #include "session/MediaManager.h"
 #include "session/Node.h"
-#include "session/Session.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
+#include "session/Session.h"
+
 #include "Globals.h"
 #include "Settings.h"
 
 #include "scripting/LuaIterators.h"
 
 #include "sol/sol.hpp"
-#include "lrt/lrt.h"
+#include "lua-kv.h"
 
 //=============================================================================
 namespace sol {
@@ -87,7 +93,7 @@ static auto addRectangle (state& lua, const char* ns, const char* name)
             [] (T x, T y, T w, T h) { return R (x, y, w, h); }
         ),
         meta_method::to_string, [](R* self) {
-            return std::move (self->toString().toStdString());
+            return self->toString().toStdString();
         },
         "empty",            readonly_property (&R::isEmpty),
         "x",                property (&R::getX,  &R::setX),
@@ -101,8 +107,6 @@ static void openJUCE (state& lua)
 {
     addRange<float>     (lua, "Range");
     addRange<int>       (lua, "Span");
-    addRectangle<float> (lua, "element", "Rectangle");
-    addRectangle<int>   (lua, "ui", "Bounds");
     
     // AudioBuffer
     lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
@@ -155,8 +159,9 @@ static void openJUCE (state& lua)
     );
 }
 
-static void openUI (state& lua)
+void openUI (state& lua)
 {
+    addRectangle<int> (lua, "ui", "Bounds");
 }
 
 static void openModel (sol::state& lua)
@@ -170,8 +175,8 @@ static void openModel (sol::state& lua)
                 str << ": " << self->getName();
             return str.toStdString();
         },
-        meta_function::length,      [](Session* self) { return self->getNumGraphs(); },
-        meta_function::index,       [](Session* self, int index) {
+        meta_function::length, [](Session* self) { return self->getNumGraphs(); },
+        meta_function::index, [](Session* self, int index) {
             return isPositiveAndBelow (--index, self->getNumGraphs())
                 ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
                 : std::shared_ptr<Node>();
@@ -275,18 +280,37 @@ static void openModel (sol::state& lua)
     });
 }
 
-static void openKV (state& lua)
+void openKV (state& lua)
 {
-    auto kv   = NS (lua, "kv");
-
+    auto kv   = NS (lua, "element");
+    
+    // PortType
     kv.new_usertype<kv::PortType> ("PortType", no_constructor,
-        meta_method::to_string, [](PortType*) { return "kv.PortType"; }
+        call_constructor, factories (
+            [](int t) {
+                if (t < 0 || t > kv::PortType::Unknown)
+                    t = kv::PortType::Unknown;
+                return kv::PortType (t);
+            },
+            [](const char* slug) {
+                return kv::PortType (String::fromUTF8 (slug));
+            }
+        ),
+        meta_method::to_string, [](PortType* self) {
+            return self->getName().toStdString();
+        },
+
+        "name", readonly_property ([](kv::PortType* self) { return self->getName().toStdString(); }),
+        "slug", readonly_property ([](kv::PortType* self) { return self->getSlug().toStdString(); }),
+        "uri",  readonly_property ([](kv::PortType* self) { return self->getURI().toStdString(); })
     );
 
+    kv.new_usertype<kv::PortDescription> ("PortDescription", no_constructor);
+    
     // PortList
     kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
-        meta_method::to_string, [](MidiPipe*) { return "kv.PortList"; },
+        meta_method::to_string, [](MidiPipe*) { return "element.PortList"; },
         "add", [](kv::PortList* self, int type, int index, int channel,
                                       const char* symbol, const char* name,
                                       const bool input)
@@ -294,12 +318,26 @@ static void openKV (state& lua)
             self->add (type, index, channel, symbol, name, input);
         }
     );
+
+    addRectangle<double> (lua, "element", "Rect");
 }
 
 static void openWorld (state& lua)
 {
     auto e = NS (lua, "element");
     
+    e.new_usertype<AppController> ("AppController", no_constructor);
+    e.new_usertype<GuiController> ("GuiController", no_constructor);
+
+    e.new_usertype<AudioEngine> ("AudioEngine", no_constructor);
+    e.new_usertype<CommandManager> ("CommandManager", no_constructor);
+    e.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
+    e.new_usertype<MappingEngine> ("MappingEngine", no_constructor);
+    e.new_usertype<MidiEngine> ("MidiEngine", no_constructor);
+    e.new_usertype<PluginManager> ("PluginManager", no_constructor);
+    e.new_usertype<PresetCollection> ("PresetCollection", no_constructor);
+    e.new_usertype<Settings> ("Settings", no_constructor);
+
     e.new_usertype<Globals> ("World", no_constructor,
         "audioengine",      &Globals::getAudioEngine,
         "commands",         &Globals::getCommandManager,
@@ -314,17 +352,17 @@ static void openWorld (state& lua)
     );
 }
 
-void openDSP (state& lua)
+void openDSP (sol::state& lua)
 {
-    lrt_openlibs (lua.lua_state(), 0);
+    kv_openlibs (lua.lua_state(), 0);
 }
 
 void openLibs (sol::state& lua)
 {
     openWorld (lua);
     openModel (lua);
-    openKV (lua);
     openDSP (lua);
+    openKV (lua);
     openUI (lua);
 }
 
