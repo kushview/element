@@ -17,7 +17,7 @@
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
               pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;">
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua-kv/src">
   <MAINGROUP id="SKUipM" name="Element FX">
     <GROUP id="{79158675-9931-4F98-C7A8-52C82F095CAA}" name="Source">
       <FILE id="vePspm" name="ElementFXConfig.h" compile="0" resource="0"

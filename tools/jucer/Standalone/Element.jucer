@@ -7,7 +7,7 @@
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2019 Kushview, LLC"
               defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_VERSION_STRING=&quot;0.43.0&quot;&#10;"
               userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;"
-              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua">
+              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
       <GROUP id="{ABE6AB65-908D-580A-65CC-8CB15CFABA76}" name="Assets">
