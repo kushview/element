@@ -25,6 +25,31 @@
       <FILE id="EYsGJO" name="ElementIconTemplate.png" compile="0" resource="1"
             file="../../../data/ElementIconTemplate.png"/>
     </GROUP>
+    <GROUP id="{673C919F-33AE-A122-4B55-133029ACFB0C}" name="libs">
+      <GROUP id="{5927D2E9-90D3-66D3-D213-8B4993377134}" name="lua-kv">
+        <GROUP id="{81ECF68D-2A72-B720-4B15-6AB59380F09A}" name="src">
+          <FILE id="fBW89c" name="audio.c" compile="1" resource="0" file="../../../libs/lua-kv/src/audio.c"/>
+          <FILE id="aQRRq8" name="kvlib.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvlib.c"/>
+          <FILE id="NUaRRc" name="kvmod.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvmod.c"/>
+          <FILE id="muwwxR" name="lua-kv.h" compile="0" resource="0" file="../../../libs/lua-kv/src/lua-kv.h"/>
+          <FILE id="dy3fHI" name="luainc.h" compile="0" resource="0" file="../../../libs/lua-kv/src/luainc.h"/>
+          <FILE id="lPia0C" name="midi.c" compile="1" resource="0" file="../../../libs/lua-kv/src/midi.c"/>
+          <FILE id="i8i1DJ" name="util.h" compile="0" resource="0" file="../../../libs/lua-kv/src/util.h"/>
+          <FILE id="hG0Mv6" name="vector.c" compile="1" resource="0" file="../../../libs/lua-kv/src/vector.c"/>
+          <FILE id="v4ve6V" name="vector.h" compile="0" resource="0" file="../../../libs/lua-kv/src/vector.h"/>
+        </GROUP>
+        <GROUP id="{DC9E0B69-85AE-9CEB-A731-FB807EB1271B}" name="tests">
+          <FILE id="xQ4jKn" name="test.c" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.c"/>
+          <FILE id="RJqi9e" name="test.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.lua"/>
+          <FILE id="Zst0eq" name="testmods" compile="0" resource="0" file="../../../libs/lua-kv/tests/testmods"/>
+        </GROUP>
+        <FILE id="iY4dsJ" name="AUTHORS" compile="0" resource="0" file="../../../libs/lua-kv/AUTHORS"/>
+        <FILE id="KKjzH6" name="LICENSE" compile="0" resource="0" file="../../../libs/lua-kv/LICENSE"/>
+        <FILE id="Ubz7gk" name="README.md" compile="0" resource="0" file="../../../libs/lua-kv/README.md"/>
+        <FILE id="XPxbka" name="waf" compile="0" resource="0" file="../../../libs/lua-kv/waf"/>
+        <FILE id="eVs0Tb" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
+      </GROUP>
+    </GROUP>
     <GROUP id="{D101B3E9-3496-8A90-ABFF-82C76E13F94A}" name="src">
       <GROUP id="{C3BD9CD0-92F9-3853-4717-7BBE1280153C}" name="controllers">
         <FILE id="e8u12q" name="AppController.cpp" compile="1" resource="0"

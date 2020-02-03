@@ -20,6 +20,29 @@
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
               headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua-kv/src">
   <MAINGROUP id="SKUipM" name="Element">
+    <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
+      <GROUP id="{62C1DB42-24AC-1BEF-C5A1-87EE68F8EAE4}" name="src">
+        <FILE id="fPgFuI" name="audio.c" compile="1" resource="0" file="../../../libs/lua-kv/src/audio.c"/>
+        <FILE id="jyzQOK" name="kvlib.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvlib.c"/>
+        <FILE id="NRPROE" name="kvmod.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvmod.c"/>
+        <FILE id="ivUsqb" name="lua-kv.h" compile="0" resource="0" file="../../../libs/lua-kv/src/lua-kv.h"/>
+        <FILE id="XQYMlW" name="luainc.h" compile="0" resource="0" file="../../../libs/lua-kv/src/luainc.h"/>
+        <FILE id="aFjwot" name="midi.c" compile="1" resource="0" file="../../../libs/lua-kv/src/midi.c"/>
+        <FILE id="UpaZLk" name="util.h" compile="0" resource="0" file="../../../libs/lua-kv/src/util.h"/>
+        <FILE id="cIrqDn" name="vector.c" compile="1" resource="0" file="../../../libs/lua-kv/src/vector.c"/>
+        <FILE id="V7EQvA" name="vector.h" compile="0" resource="0" file="../../../libs/lua-kv/src/vector.h"/>
+      </GROUP>
+      <GROUP id="{2471B734-2C45-6D3D-A0B5-6363A21F763E}" name="tests">
+        <FILE id="vANLrZ" name="test.c" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.c"/>
+        <FILE id="wpH1N1" name="test.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.lua"/>
+        <FILE id="HXdaqW" name="testmods" compile="0" resource="0" file="../../../libs/lua-kv/tests/testmods"/>
+      </GROUP>
+      <FILE id="f5LR50" name="AUTHORS" compile="0" resource="0" file="../../../libs/lua-kv/AUTHORS"/>
+      <FILE id="xYbQSP" name="LICENSE" compile="0" resource="0" file="../../../libs/lua-kv/LICENSE"/>
+      <FILE id="sNPQEl" name="README.md" compile="0" resource="0" file="../../../libs/lua-kv/README.md"/>
+      <FILE id="beW9Zm" name="waf" compile="0" resource="0" file="../../../libs/lua-kv/waf"/>
+      <FILE id="EoYIxK" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
+    </GROUP>
     <GROUP id="{79158675-9931-4F98-C7A8-52C82F095CAA}" name="Source">
       <FILE id="oYFN9D" name="ElementFXConfig.h" compile="0" resource="0"
             file="Source/ElementFXConfig.h"/>
