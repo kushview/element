@@ -221,7 +221,8 @@ AboutComponent::AboutComponent()
     // donors->getPanel().addSection ("Gold Sponsors", { "None" });
     // donors->getPanel().addSection ("Silver Sponsors", { "None" });
     // donors->getPanel().addSection ("Gold Backers", { "None" });
-    donors->getPanel().addSection ("Sponsors", { 
+    donors->getPanel().addSection ("Sponsors", {
+        "Greg Gibbs",
         "Kent Kingery" 
     });
 
