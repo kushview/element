@@ -47,6 +47,8 @@ public:
     LookAndFeel();
     ~LookAndFeel() { int s = Style::widgetBackgroundColorId; }
     
+    Typeface::Ptr getTypefaceForFont (const Font&) override;
+
     int getDefaultScrollbarWidth() override;
 
     //==============================================================================
@@ -118,6 +120,9 @@ public:
 
     // MARK: Treeview
     void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
+
+private:
+    String defaultSansSerifName;
 };
 
 }

@@ -120,6 +120,30 @@ LookAndFeel::LookAndFeel()
     setColour (CodeEditorComponent::lineNumberBackgroundId, findColour (Style::widgetBackgroundColorId).darker (0.55));
     setColour (CodeEditorComponent::lineNumberTextId,       Colour(0xff555555));
 }
+//==============================================================================
+Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
+{
+   #if JUCE_LINUX
+    if (font.getTypefaceName() == Font::getDefaultSansSerifFontName())
+    {
+        Font f (font);
+        if (defaultSansSerifName.isEmpty())
+        {
+            const StringArray possible ("Roboto", "FreeSans", "Arial");
+            const auto names = Font::findAllTypefaceNames();
+            for (const auto& name : possible)
+                if (names.contains (name))
+                    { defaultSansSerifName = name; break; }
+            if (defaultSansSerifName.isEmpty())
+                defaultSansSerifName = names[0];
+        }
+
+        f.setTypefaceName (defaultSansSerifName);
+        return Typeface::createSystemTypefaceFor (f);
+    }
+   #endif
+    return LookAndFeel_V2::getTypefaceForFont (font);
+}
 
 //==============================================================================
 // MARK: default sizes
