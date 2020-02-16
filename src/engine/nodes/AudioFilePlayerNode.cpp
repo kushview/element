@@ -95,6 +95,8 @@ public:
             DirectoryIterator iter (recentsDir, recursive, processor.getWildcard(), File::findFiles);
             while (iter.next())
             {
+                if (iter.getFile().isDirectory())
+                    continue;
                 chooser->addRecentlyUsedFile (iter.getFile());
             }
         }
@@ -102,13 +104,16 @@ public:
 
     void timerCallback() override { stabilizeComponents(); }
     void changeListenerCallback (ChangeBroadcaster*) override { stabilizeComponents(); }
+    
     void stabilizeComponents()
     {
         if (processor.getWatchDir().isDirectory())
-            addRecentsFrom (processor.getWatchDir());
+            if (chooser->getRecentlyUsedFilenames().isEmpty())
+                addRecentsFrom (processor.getWatchDir());
 
         if (chooser->getCurrentFile() != processor.getAudioFile())
-            chooser->setCurrentFile (processor.getAudioFile(), dontSendNotification);
+            if (processor.getAudioFile().existsAsFile())
+                chooser->setCurrentFile (processor.getAudioFile(), dontSendNotification);
 
         playButton.setToggleState (processor.getPlayer().isPlaying(), dontSendNotification);
         playButton.setButtonText (playButton.getToggleState() ? "Pause" : "Play");
@@ -139,7 +144,10 @@ public:
 
     void filenameComponentChanged (FilenameComponent*) override
     {
-        processor.openFile (chooser->getCurrentFile());
+        const auto f1 = chooser->getCurrentFile();
+        const auto f2 = processor.getAudioFile();
+        if (! f1.isDirectory() && f1 != f2)
+            processor.openFile (chooser->getCurrentFile());
     }
 
     void resized() override
@@ -240,7 +248,7 @@ private:
             if (fc.browseForDirectory())
             {
                 processor.setWatchDir (fc.getResult());
-                addRecentsFrom (processor.getWatchDir());
+                // addRecentsFrom (processor.getWatchDir());
             }
         };
 
