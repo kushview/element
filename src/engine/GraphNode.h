@@ -366,6 +366,11 @@ protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
     
+    /** Clear the top level referenced parameters. Some node types
+        can use this in their destructor if deletion order is important
+        for processors/parameters */
+    void clearParameters();
+
     void setName (const String& newName)
     {
         if (newName.isNotEmpty() && newName != name)

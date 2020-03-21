@@ -696,9 +696,10 @@
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
             smallIcon="zjwu85" bigIcon="zjwu85" toolset="v141_xp" cppLanguageStandard="stdcpp14"
-            windowsTargetPlatformVersion="10.0.16299.0" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK">
+            windowsTargetPlatformVersion="10.0.16299.0" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
+            extraCompilerFlags="/bigobj">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
+        <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="Win32"
                        isDebug="1" optimisation="1" targetName="Element" binaryPath="../../../build/Win32/Debug"
                        useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"

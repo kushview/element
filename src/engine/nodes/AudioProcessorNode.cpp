@@ -167,6 +167,7 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
 AudioProcessorNode::~AudioProcessorNode()
 {
     params.clear();
+    GraphNode::clearParameters();
     enablement.cancelPendingUpdate();
     pluginState.reset();
     proc = nullptr;

@@ -661,8 +661,8 @@ private:
 
                     ports.addControl (index++, channel, sym, name,
                                       min, max, dfault, isInput);
-                    auto& params = isInput ? inParams : outParams;
-                    params.add (new LuaParameter (this, ports.getPort (ports.size() - 1)));
+                    auto& lparams = isInput ? inParams : outParams;
+                    lparams.add (new LuaParameter (this, ports.getPort (ports.size() - 1)));
                 }
 
                 numParams = ports.size (PortType::Control, true);

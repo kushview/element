@@ -51,13 +51,18 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
 
 GraphNode::~GraphNode()
 {
-   #if JUCE_DEBUG
-    for (const auto* param : parameters)
-        { jassert (param->getReferenceCount() == 1); }
-   #endif
-    parameters.clear();
+    clearParameters();
     enablement.cancelPendingUpdate();
     parent = nullptr;
+}
+
+void GraphNode::clearParameters()
+{
+   #if JUCE_DEBUG
+    for (const auto* param : parameters)
+        jassert(param->getReferenceCount() == 1);
+   #endif
+    parameters.clear();
 }
 
 bool GraphNode::isSpecialParameter (int parameter)

@@ -45,7 +45,7 @@ class LookAndFeel : public LookAndFeel_KV1
 {
 public:
     LookAndFeel();
-    ~LookAndFeel() { int s = Style::widgetBackgroundColorId; }
+    ~LookAndFeel() {}
     
     Typeface::Ptr getTypefaceForFont (const Font&) override;
 
