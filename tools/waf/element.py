@@ -32,7 +32,7 @@ def check_common (self):
 
     # JACK
     self.check_cfg(package='jack', uselib_store="JACK", args='--cflags --libs', mandatory=False)
-    self.env.JACK = bool(self.env.HAVE_JACK) and not self.options.no_jack
+    self.env.JACK = bool(self.env.HAVE_JACK) and not bool(self.options.no_jack)
     self.define('KV_JACK_AUDIO', self.env.JACK)
     self.define('EL_USE_JACK', self.env.JACK)
 
