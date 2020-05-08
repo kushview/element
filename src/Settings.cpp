@@ -399,7 +399,7 @@ void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
     for (const auto& device : MidiOutput::getDevices())
         sub.addItem (MidiOutputDevice + index++, device, true, 
             device == midi.getDefaultMidiOutputName());
-    menu.addSubMenu ("MIDI Ouptut Device", sub);
+    menu.addSubMenu ("MIDI Output Device", sub);
 
     if (auto* type = devices.getCurrentDeviceTypeObject())
     {
