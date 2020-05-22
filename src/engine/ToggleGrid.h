@@ -94,6 +94,8 @@ public:
     inline void swapWith (ToggleGrid& other) noexcept
     {
         std::swap (toggles, other.toggles);
+        std::swap (numIns, other.numIns);
+        std::swap (numOuts, other.numOuts);
     }
 
     ToggleGrid& operator= (const ToggleGrid& other)
