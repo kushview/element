@@ -92,19 +92,67 @@ void AudioRouterNode::setCurrentProgram (int index)
     }
 }
 
-void AudioRouterNode::setMatrixState (const MatrixState& matrix)
+void AudioRouterNode::applyMatrix (const MatrixState& matrix)
 {
-    jassert (state.sameSizeAs (matrix));
-    state = matrix;
-    ToggleGrid newPatches (state);
-
+    ToggleGrid newPatches (matrix);
     {
         ScopedLock sl (getLock());
+        numSources = matrix.getNumRows();
+        numDestinations = matrix.getNumColumns();
         nextToggles.swapWith (newPatches);
         togglesChanged = true; // initiate the crossfade
     }
 
     sendChangeMessage();
+}
+
+String AudioRouterNode::getSizeString() const
+{
+    int s = 0, d = 0;
+    {
+        ScopedLock sl (lock);
+        s = numSources;
+        d = numDestinations;
+    }
+
+    String result (s);
+    result << "x" << d;
+    return result;
+}
+
+void AudioRouterNode::updateSize (int newIns, int newOuts)
+{
+    newIns  = jmax (1, newIns);
+    newOuts = jmax (1, newOuts);
+
+    ScopedLock sl1 (getLock());
+    if (newIns != numSources || newOuts != numDestinations)
+    {
+        numSources = newIns;
+        numDestinations = newOuts;
+    }   
+}
+
+void AudioRouterNode::setSize (int newIns, int newOuts)
+{
+    newIns  = jmax (1, newIns);
+    newOuts = jmax (1, newOuts);
+    
+    {
+        ScopedLock sl1 (getLock());
+        if (newIns == numSources && newOuts == numDestinations)
+            return;
+    }
+
+    state.resize (newIns, newOuts);
+    applyMatrix (state);
+}
+
+void AudioRouterNode::setMatrixState (const MatrixState& matrix)
+{
+    jassert (state.sameSizeAs (matrix));
+    state = matrix;
+    applyMatrix (state);
 }
 
 MatrixState AudioRouterNode::getMatrixState() const
@@ -273,8 +321,12 @@ void AudioRouterNode::setState (const void* data, int sizeInBytes)
     {
         kv::MatrixState matrix;
         matrix.restoreFromValueTree (tree);
-        jassert (matrix.getNumRows() == numSources && matrix.getNumColumns() == numDestinations);
-        setMatrixState (matrix);
+        jassert (matrix.getNumRows() > 0 && matrix.getNumColumns() > 0);
+        if (matrix.getNumRows() > 0 && matrix.getNumColumns() > 0)
+        {
+            state = matrix;
+            applyMatrix (state);
+        }
     }
 }
 

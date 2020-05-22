@@ -90,6 +90,58 @@ private:
     AudioRouterEditor& editor;
 };
 
+
+class AudioRouterSizeButton : public TextButton
+{
+public:
+    AudioRouterSizeButton (AudioRouterEditor& o)
+        : owner (o)
+    {
+        stabilizeContent();
+
+        onClick = [this]() {
+            PopupMenu menu;
+            menu.addItem (2, "2x2", true, false);
+            menu.addItem (4, "4x4", true, false);
+            menu.addItem (8, "8x8", true, false);
+            menu.addItem (16, "16x16", true, false);
+            menu.showMenuAsync (PopupMenu::Options()
+                    .withTargetComponent (this),
+                ModalCallbackFunction::create (sizeChosen, WeakReference<AudioRouterSizeButton> (this)));
+        };
+    }
+
+    ~AudioRouterSizeButton()
+    {
+        masterReference.clear();
+    }
+
+    std::function<void(int)> onAudioRouterSizeChanged;
+
+    void stabilizeContent()
+    {
+        setButtonText (owner.getSizeString());
+    }
+
+private:
+    JUCE_DECLARE_WEAK_REFERENCEABLE(AudioRouterSizeButton)
+    
+    AudioRouterEditor& owner;
+    void handleSizeResult (int r)
+    {
+        // owner.setRouterSize (r, r);
+        if (onAudioRouterSizeChanged)
+            onAudioRouterSizeChanged(r);
+        stabilizeContent();
+    }
+
+    static void sizeChosen (int code, WeakReference<AudioRouterSizeButton> me)
+    {
+        if (me != nullptr)
+            me->handleSizeResult (code);
+    }
+};
+
 class AudioRouterEditor::Content : public Component
 {
     int padding = 10;
@@ -102,6 +154,15 @@ public:
         setOpaque (true);
         matrix.reset (new AudioRouterMatrix (o));
         addAndMakeVisible (matrix.get());
+
+        sizeButton.reset (new AudioRouterSizeButton (o));
+        addAndMakeVisible (sizeButton.get());
+        sizeButton->onAudioRouterSizeChanged = [this](int size) {
+            if (auto* n = owner.getNodeObjectOfType<AudioRouterNode>())
+            {
+                n->setSize (size, size);
+            }
+        };
 
         // addAndMakeVisible (slider);
         slider.setSliderStyle (Slider::RotaryHorizontalVerticalDrag);
@@ -133,6 +194,10 @@ public:
         matrix->setBounds (matrixArea);
         if (slider.isVisible())
             slider.setBounds (matrixArea.getX() - size + 2, matrixArea.getBottom() + 4, size - 2, size - 2);
+
+        auto r1 = getLocalBounds();
+        sizeButton->changeWidthToFitText (24);
+        sizeButton->setBounds (6, 6, sizeButton->getWidth(), sizeButton->getHeight() );
     }
 
     void paint (Graphics& g) override
@@ -162,6 +227,7 @@ private:
     friend class AudioRouterEditor;
     AudioRouterEditor& owner;
     Slider slider;
+    std::unique_ptr<AudioRouterSizeButton> sizeButton;
     std::unique_ptr<AudioRouterMatrix> matrix;
 };
 
@@ -199,12 +265,21 @@ void AudioRouterEditor::applyMatrix()
         node->setMatrixState (matrix);
 }
 
+String AudioRouterEditor::getSizeString() const
+{
+    if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
+        return node->getSizeString();
+    return {};
+}
+
 void AudioRouterEditor::changeListenerCallback (ChangeBroadcaster*)
 {
     if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
     {
         matrix = node->getMatrixState();
         content->matrix->repaint();
+        content->sizeButton->stabilizeContent();
+        resized();
     }
 }
 

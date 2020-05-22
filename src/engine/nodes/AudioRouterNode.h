@@ -41,6 +41,8 @@ public:
     void getState (MemoryBlock&) override;
     void setState (const void*, int sizeInBytes) override;
 
+    void setSize (int newIns, int newOuts);
+    String getSizeString() const;
     void setMatrixState (const MatrixState&);
     MatrixState getMatrixState() const;
     void setWithoutLocking (int src, int dst, bool set);
@@ -83,29 +85,39 @@ public:
 protected:
     inline void createPorts() override
     {
-        if (ports.size() > 0)
+        if (ports.size() > 0 && !rebuildPorts)
             return;
+        
         int index = 0;
+        int channel = 0;
+        ports.clearQuick();
+        for (int i = 0; i < numSources; ++i)
+        {
+            ports.add (PortType::Audio, index++, channel++,
+                       String ("audio_in_XX").replace ("XX", String(i)),
+                       String ("Input XX").replace ("XX", String (i + 1)),
+                       true);
+        }
 
-        ports.add (PortType::Audio, index++, 0, "audio_in_0", "Input 1", true);
-        ports.add (PortType::Audio, index++, 1, "audio_in_1", "Input 2", true);
-        ports.add (PortType::Audio, index++, 2, "audio_in_2", "Input 3", true);
-        ports.add (PortType::Audio, index++, 3, "audio_in_3", "Input 4", true);
-
-        ports.add (PortType::Audio, index++, 0, "audio_out_0", "Output 1", false);
-        ports.add (PortType::Audio, index++, 1, "audio_out_1", "Output 2", false);
-        ports.add (PortType::Audio, index++, 2, "audio_out_2", "Output 3", false);
-        ports.add (PortType::Audio, index++, 3, "audio_out_3", "Output 4", false);
+        channel = 0;
+        for (int i = 0; i < numSources; ++i)
+        {
+            ports.add (PortType::Audio, index++, channel++,
+                       String ("audio_out_XX").replace("XX", String(i)),
+                       String ("Output XX").replace("XX", String (i +1)), 
+                       false);
+        }
 
         ports.add (PortType::Midi, index++, 0, "midi_in",  "MIDI In",  true);
     }
 
 private:
     CriticalSection lock;
-    const int numSources;
-    const int numDestinations;
+    int numSources;
+    int numDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
-    
+    bool rebuildPorts = false;
+
     struct Program
     {
         Program (const String& programName, int midiProgramNumber = -1)
@@ -130,6 +142,9 @@ private:
     ToggleGrid toggles;
     ToggleGrid nextToggles;
     bool togglesChanged { false };
+
+    void updateSize (int, int);
+    void applyMatrix (const MatrixState&);
 };
 
 }

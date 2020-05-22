@@ -34,6 +34,7 @@ public:
     void resized() override;
     void paint (Graphics& g) override;
 
+    String getSizeString() const;
     MatrixState& getMatrixState() { return matrix; }
     void applyMatrix();
     void setFadeLength (double length);
