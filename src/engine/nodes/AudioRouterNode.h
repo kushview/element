@@ -113,8 +113,8 @@ protected:
 
 private:
     CriticalSection lock;
-    int numSources;
-    int numDestinations;
+    int numSources, nextNumSources;
+    int numDestinations, nextNumDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
     bool rebuildPorts = false;
 
@@ -141,9 +141,9 @@ private:
     LinearFade fadeOut;
     ToggleGrid toggles;
     ToggleGrid nextToggles;
-    bool togglesChanged { false };
+    bool togglesChanged { false },
+         sizeChanged { false };
 
-    void updateSize (int, int);
     void applyMatrix (const MatrixState&);
 };
 

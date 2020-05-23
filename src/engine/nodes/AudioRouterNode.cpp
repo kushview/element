@@ -94,11 +94,10 @@ void AudioRouterNode::setCurrentProgram (int index)
 
 void AudioRouterNode::applyMatrix (const MatrixState& matrix)
 {
+    jassert (matrix.sameSizeAs (state));
     ToggleGrid newPatches (matrix);
     {
         ScopedLock sl (getLock());
-        numSources = matrix.getNumRows();
-        numDestinations = matrix.getNumColumns();
         nextToggles.swapWith (newPatches);
         togglesChanged = true; // initiate the crossfade
     }
@@ -120,19 +119,6 @@ String AudioRouterNode::getSizeString() const
     return result;
 }
 
-void AudioRouterNode::updateSize (int newIns, int newOuts)
-{
-    newIns  = jmax (1, newIns);
-    newOuts = jmax (1, newOuts);
-
-    ScopedLock sl1 (getLock());
-    if (newIns != numSources || newOuts != numDestinations)
-    {
-        numSources = newIns;
-        numDestinations = newOuts;
-    }   
-}
-
 void AudioRouterNode::setSize (int newIns, int newOuts)
 {
     newIns  = jmax (1, newIns);
@@ -145,12 +131,20 @@ void AudioRouterNode::setSize (int newIns, int newOuts)
     }
 
     state.resize (newIns, newOuts);
-    applyMatrix (state);
+    ToggleGrid newPatches (state);
+    ToggleGrid newNextPatches (state);
+    {
+        ScopedLock sl (getLock());
+        nextToggles.swapWith (newNextPatches);
+        toggles.swapWith (newPatches);
+        numSources = newIns;
+        numDestinations = newOuts;
+        sizeChanged = true; // initiate the crossfade
+    }
 }
 
 void AudioRouterNode::setMatrixState (const MatrixState& matrix)
 {
-    jassert (state.sameSizeAs (matrix));
     state = matrix;
     applyMatrix (state);
 }
@@ -166,7 +160,6 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
     const auto& midiBuffer = *midi.getReadBuffer (0);
 
     MidiBuffer::Iterator iter (midiBuffer);
-    ignoreUnused (iter);
     MidiMessage msg; int midiFrame = 0;
     
     while (iter.getNextEvent (msg, midiFrame))
@@ -182,6 +175,14 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 
     tempAudio.setSize (numChannels, numFrames, false, false, true);
     tempAudio.clear (0, numFrames);
+
+    if (sizeChanged)
+    {
+        fadeIn.reset();
+        fadeOut.reset();
+        sizeChanged = false;
+        TRACE_AUDIO_ROUTER("size changed");
+    }
 
     if (togglesChanged)
     {
@@ -325,7 +326,19 @@ void AudioRouterNode::setState (const void* data, int sizeInBytes)
         if (matrix.getNumRows() > 0 && matrix.getNumColumns() > 0)
         {
             state = matrix;
-            applyMatrix (state);
+
+            ToggleGrid newPatches (state);
+            ToggleGrid newNextPatches (state);
+            {
+                ScopedLock sl (getLock());
+                numSources = matrix.getNumRows();
+                numDestinations = matrix.getNumColumns();
+                nextToggles.swapWith (newNextPatches);
+                toggles.swapWith (newPatches);
+                sizeChanged = true;
+            }
+
+            sendChangeMessage();
         }
     }
 }
