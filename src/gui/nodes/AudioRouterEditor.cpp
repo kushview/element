@@ -196,8 +196,12 @@ public:
             slider.setBounds (matrixArea.getX() - size + 2, matrixArea.getBottom() + 4, size - 2, size - 2);
 
         auto r1 = getLocalBounds();
-        sizeButton->changeWidthToFitText (24);
-        sizeButton->setBounds (6, 6, sizeButton->getWidth(), sizeButton->getHeight() );
+        int btnH = 24;
+        int btnW = 32;
+        sizeButton->changeWidthToFitText (btnH);
+        sizeButton->setBounds ((labelWidth / 2) - (btnW / 2),
+                               matrixArea.getBottom() + (labelWidth / 2) - (btnH / 2), 
+                               btnW /*sizeButton->getWidth()*/, btnH);
     }
 
     void paint (Graphics& g) override
