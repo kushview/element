@@ -109,6 +109,7 @@ protected:
         }
 
         ports.add (PortType::Midi, index++, 0, "midi_in",  "MIDI In",  true);
+        rebuildPorts = false;
     }
 
 private:
@@ -116,7 +117,7 @@ private:
     int numSources, nextNumSources;
     int numDestinations, nextNumDestinations;
     AudioSampleBuffer tempAudio { 1, 1 };
-    bool rebuildPorts = false;
+    bool rebuildPorts = true;
 
     struct Program
     {

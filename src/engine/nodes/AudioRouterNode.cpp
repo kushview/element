@@ -133,14 +133,19 @@ void AudioRouterNode::setSize (int newIns, int newOuts)
     state.resize (newIns, newOuts);
     ToggleGrid newPatches (state);
     ToggleGrid newNextPatches (state);
+    
     {
         ScopedLock sl (getLock());
         nextToggles.swapWith (newNextPatches);
         toggles.swapWith (newPatches);
         numSources = newIns;
         numDestinations = newOuts;
-        sizeChanged = true; // initiate the crossfade
+        sizeChanged = true; // initiate the size change
     }
+
+    rebuildPorts = true;
+    triggerPortReset();
+    sendChangeMessage();
 }
 
 void AudioRouterNode::setMatrixState (const MatrixState& matrix)
@@ -192,6 +197,13 @@ void AudioRouterNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
         fadeOut.startFading();
         togglesChanged = false;
         TRACE_AUDIO_ROUTER("fade start");
+    }
+
+    if (numSources > numChannels || numDestinations > numChannels)
+    {
+        audio.clear();
+        midi.clear();
+        return;
     }
 
     if (fadeIn.isActive() || fadeOut.isActive())
