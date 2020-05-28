@@ -277,6 +277,8 @@ void AudioRouterEditor::changeListenerCallback (ChangeBroadcaster*)
     if (auto* const node = getNodeObjectOfType<AudioRouterNode>())
     {
         matrix = node->getMatrixState();
+        content->resized();
+        content->repaint();
         content->matrix->repaint();
         content->sizeButton->stabilizeContent();
         resized();
