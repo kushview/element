@@ -197,11 +197,11 @@ public:
 
         auto r1 = getLocalBounds();
         int btnH = 24;
-        int btnW = 32;
+        int btnW = 36;
         sizeButton->changeWidthToFitText (btnH);
         sizeButton->setBounds ((labelWidth / 2) - (btnW / 2),
                                matrixArea.getBottom() + (labelWidth / 2) - (btnH / 2), 
-                               btnW /*sizeButton->getWidth()*/, btnH);
+                               btnW, btnH);
     }
 
     void paint (Graphics& g) override
