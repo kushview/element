@@ -258,7 +258,7 @@ bool GraphNode::isPortInput (const uint32 port)  const
 bool GraphNode::isPortOutput (const uint32 port) const
 {
     jassert (port < getNumPorts());
-    return ports.isOutput (static_cast<int> (port), true); 
+    return ports.isOutput (static_cast<int> (port), true);
 }
 
 uint32 GraphNode::getPortForChannel (const PortType type, const int channel, const bool isInput) const
