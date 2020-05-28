@@ -200,7 +200,7 @@ public:
         int btnW = 36;
         sizeButton->changeWidthToFitText (btnH);
         sizeButton->setBounds ((labelWidth / 2) - (btnW / 2),
-                               matrixArea.getBottom() + (labelWidth / 2) - (btnH / 2), 
+                               matrixArea.getBottom() + (labelWidth / 2) - (btnH / 2),
                                btnW, btnH);
     }
 

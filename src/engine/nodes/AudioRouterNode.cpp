@@ -130,7 +130,7 @@ void AudioRouterNode::setSize (int newIns, int newOuts)
             return;
     }
 
-    state.resize (newIns, newOuts);
+    state.resize (newIns, newOuts, true);
     ToggleGrid newPatches (state);
     ToggleGrid newNextPatches (state);
     
