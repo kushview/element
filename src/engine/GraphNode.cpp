@@ -754,7 +754,7 @@ int GraphNode::getOversamplingFactor()
 
 void GraphNode::PortResetter::handleAsyncUpdate()
 { 
-    node.resetPorts(); 
+    node.resetPorts();
     node.portsChanged();
 }
 

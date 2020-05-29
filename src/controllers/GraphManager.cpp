@@ -543,6 +543,10 @@ void GraphManager::setNodeModel (const Node& node)
     // If you hit this, then failed nodes didn't get handled properly
     jassert (nodes.getNumChildren() == processor.getNumNodes());
     
+    // Cheap way to refresh engine-side nodes
+    processor.triggerAsyncUpdate();
+    processor.handleUpdateNowIfNeeded();
+
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
         ValueTree arc (arcs.getChild (i));
@@ -580,6 +584,8 @@ void GraphManager::setNodeModel (const Node& node)
             arcs.removeChild (n, nullptr);
 
     loaded = true;
+    const int numArcs = arcs.getNumChildren();
+    const int numConns = processor.getNumConnections();
     jassert (arcs.getNumChildren() == processor.getNumConnections());
     failed.clearQuick();
 
@@ -687,11 +693,12 @@ void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
         resetPorts = true;
     }
 
+    node.restorePluginState();
+
     if (resetPorts || node.getNumPorts() != static_cast<int> (obj->getNumPorts()))
         node.resetPorts();
     
     jassert (node.getNumPorts() == static_cast<int> (obj->getNumPorts()));
-    node.restorePluginState();
 }
 
 // MARK: Root Graph Controller
