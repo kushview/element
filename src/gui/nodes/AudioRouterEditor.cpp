@@ -147,9 +147,6 @@ private:
 
 class AudioRouterEditor::Content : public Component
 {
-    int padding = 10;
-    int labelWidth = 60;
-    Rectangle<int> matrixArea;
 public:
     Content (AudioRouterEditor& o)
         : owner (o)
@@ -160,13 +157,14 @@ public:
 
         sizeButton.reset (new AudioRouterSizeButton (o));
         addAndMakeVisible (sizeButton.get());
-        sizeButton->onAudioRouterSizeChanged = [this](int size) {
+        sizeButton->onAudioRouterSizeChanged = [this](int size)
+        {
             if (auto* node = owner.getNodeObjectOfType<AudioRouterNode>())
             {
                 node->setSize (size, size);
-                // matrix needs to be correct before adjusting overall size
                 if (owner.autoResize)
                 {
+                    // matrix needs to be correct before adjusting overall size
                     owner.matrix = node->getMatrixState();
                     owner.adjustBoundsToMatrixSize (32);
                 }
@@ -248,6 +246,9 @@ public:
 private:
     friend class AudioRouterEditor;
     AudioRouterEditor& owner;
+    int padding = 10;
+    int labelWidth = 60;
+    Rectangle<int> matrixArea;
     Slider slider;
     std::unique_ptr<AudioRouterSizeButton> sizeButton;
     std::unique_ptr<AudioRouterMatrix> matrix;
