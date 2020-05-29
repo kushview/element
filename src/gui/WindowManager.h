@@ -187,7 +187,10 @@ public:
         }
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
         {
-            return createPluginWindowFor (node, new AudioRouterEditor (node));
+            auto* ared = new AudioRouterEditor (node);
+            ared->setAutoResize (true);
+            ared->adjustBoundsToMatrixSize (32);
+            return createPluginWindowFor (node, ared);
         }
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_ROUTER)
         {

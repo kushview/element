@@ -104,6 +104,8 @@ public:
             menu.addItem (2, "2x2", true, false);
             menu.addItem (4, "4x4", true, false);
             menu.addItem (8, "8x8", true, false);
+            menu.addItem (10, "10x10", true, false);
+            menu.addItem (10, "12x12", true, false);
             menu.addItem (16, "16x16", true, false);
             menu.showMenuAsync (PopupMenu::Options()
                     .withTargetComponent (this),
@@ -120,7 +122,8 @@ public:
 
     void stabilizeContent()
     {
-        setButtonText (owner.getSizeString());
+        setButtonText ("Size");
+        // setButtonText (owner.getSizeString());
     }
 
 private:
@@ -130,8 +133,8 @@ private:
     void handleSizeResult (int r)
     {
         // owner.setRouterSize (r, r);
-        if (onAudioRouterSizeChanged)
-            onAudioRouterSizeChanged(r);
+        if (r > 1 && onAudioRouterSizeChanged)
+            onAudioRouterSizeChanged (r);
         stabilizeContent();
     }
 
@@ -158,9 +161,15 @@ public:
         sizeButton.reset (new AudioRouterSizeButton (o));
         addAndMakeVisible (sizeButton.get());
         sizeButton->onAudioRouterSizeChanged = [this](int size) {
-            if (auto* n = owner.getNodeObjectOfType<AudioRouterNode>())
+            if (auto* node = owner.getNodeObjectOfType<AudioRouterNode>())
             {
-                n->setSize (size, size);
+                node->setSize (size, size);
+                // matrix needs to be correct before adjusting overall size
+                if (owner.autoResize)
+                {
+                    owner.matrix = node->getMatrixState();
+                    owner.adjustBoundsToMatrixSize (32);
+                }
             }
         };
 
@@ -180,7 +189,16 @@ public:
     {
         slider.onValueChange = nullptr;
     }
-    
+
+    void adjustBoundsToMatrixSize (int cellSize = 0)
+    {
+        cellSize = cellSize > 0 ? cellSize : 36;
+        matrix->setMatrixCellSize (cellSize, cellSize);
+        
+        setSize (padding + labelWidth + (matrix->getNumColumns() * matrix->getColumnThickness()), 
+                 padding + labelWidth +  (matrix->getNumRows() * matrix->getRowThickness()));
+    }
+
     void resized() override
     {
         auto size = jlimit (24, 36, 
@@ -247,7 +265,7 @@ AudioRouterEditor::AudioRouterEditor (const Node& node)
         node->addChangeListener (this);
     }
 
-    setSize (content->getWidth(), content->getHeight());
+    adjustBoundsToMatrixSize (32);
 }
 
 AudioRouterEditor::~AudioRouterEditor()
@@ -287,6 +305,12 @@ void AudioRouterEditor::changeListenerCallback (ChangeBroadcaster*)
         content->sizeButton->stabilizeContent();
         resized();
     }
+}
+
+void AudioRouterEditor::adjustBoundsToMatrixSize (int cellSize)
+{
+    content->adjustBoundsToMatrixSize (cellSize);
+    setSize (content->getWidth(), content->getHeight());
 }
 
 void AudioRouterEditor::resized()
