@@ -658,7 +658,7 @@
                        targetName="Element" binaryPath="../../../build/Release" headerPath="/opt/kushview/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LUA=0&#10;EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;&#10;"
-                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES&#10;MACOSX_DEPLOYMENT_TARGET=10.8&#10;"
+                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO&#10;"
                        osxCompatibility="10.8 SDK"/>
         <CONFIGURATION name="Debug_SE" osxArchitecture="64BitIntel" isDebug="1" optimisation="1"
                        targetName="Element SE" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
@@ -669,7 +669,7 @@
                        targetName="Element SE" binaryPath="../../../build/Release" headerPath="/opt/kushview/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LUA=0&#10;EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;EL_SOLO=1&#10;"
-                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES&#10;MACOSX_DEPLOYMENT_TARGET=10.8&#10;"
+                       fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
                        osxCompatibility="10.8 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>

@@ -641,7 +641,7 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
                extraDefs="" postbuildCommand="" prebuildCommand="" hardenedRuntime="1"
-               hardenedRuntimeOptions="com.apple.security.device.audio-input"
+               hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                extraCompilerFlags="-Wno-deprecated-declarations">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
@@ -653,7 +653,7 @@
                        linkTimeOptimisation="1" targetName="KV_Element" cppLibType="libc++"
                        osxArchitecture="64BitIntel" osxCompatibility="10.8 SDK" headerPath="/opt/kushview/include&#10;"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
-                       customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"/>
+                       customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
