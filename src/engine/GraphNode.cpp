@@ -752,9 +752,58 @@ int GraphNode::getOversamplingFactor()
 
 //=========================================================================
 
+struct ChannelConnectionMap {
+    ChannelConnectionMap() {}
+    ~ChannelConnectionMap() {}
+    int channel;
+    PortType type { PortType::Unknown };
+    uint32 otherNodeId;
+    uint32 otherNodePort;
+};
+
 void GraphNode::PortResetter::handleAsyncUpdate()
-{ 
+{
+    auto* const graph = node.getParentGraph();
+    jassert (graph != nullptr);
+
+    // Cache existing connections by channel.
+    OwnedArray<ChannelConnectionMap> sources, destinations;
+    for (int i = graph->getNumConnections(); --i >= 0;)
+    {
+        const auto* const c = graph->getConnection (i);
+        if (c->destNode == node.nodeId)
+        {
+            auto* m = sources.add (new ChannelConnectionMap());
+            m->type = node.getPortType (c->destPort);
+            m->channel = node.getChannelPort (c->destPort);
+            m->otherNodeId = c->sourceNode;
+            m->otherNodePort = c->sourcePort;
+        }
+        else if (c->sourceNode == node.nodeId)
+        {
+            auto* d = destinations.add (new ChannelConnectionMap());
+            d->type = node.getPortType (c->sourcePort);
+            d->channel = node.getChannelPort (c->sourcePort);
+            d->otherNodeId = c->destNode;
+            d->otherNodePort = c->destPort;
+        }
+    }
+
     node.resetPorts();
+
+    // Re-apply connections by channel
+    for (const auto* ccs : sources) {
+        graph->addConnection (ccs->otherNodeId, ccs->otherNodePort, node.nodeId,
+                              node.getPortForChannel (ccs->type, ccs->channel, true));
+    }
+
+    for (const auto* dss : destinations) {
+        graph->addConnection (node.nodeId, node.getPortForChannel (dss->type, dss->channel, false),
+                              dss->otherNodeId, dss->otherNodePort);
+    }
+    graph->removeIllegalConnections();
+
+    // notify others
     node.portsChanged();
 }
 
