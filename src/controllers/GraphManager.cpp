@@ -87,6 +87,8 @@ private:
             data.addChild (newPorts.createCopy(), index, nullptr);
             manager.removeIllegalConnections();
         }
+
+        manager.syncArcsModel();
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeModelUpdater);
