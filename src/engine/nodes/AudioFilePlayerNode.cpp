@@ -99,12 +99,14 @@ public:
                     continue;
                 chooser->addRecentlyUsedFile (iter.getFile());
             }
+
+            sortRecents();
         }
     }
 
     void timerCallback() override { stabilizeComponents(); }
     void changeListenerCallback (ChangeBroadcaster*) override { stabilizeComponents(); }
-    
+
     void stabilizeComponents()
     {
         if (processor.getWatchDir().isDirectory())
@@ -235,6 +237,13 @@ private:
 
     bool draggingPos = false;
 
+    void sortRecents()
+    {
+        auto names = chooser->getRecentlyUsedFilenames();
+        names.sort (false);
+        chooser->setRecentlyUsedFilenames (names);
+    }
+
     void bindHandlers()
     {
         processor.getPlayer().addChangeListener (this);
@@ -248,7 +257,7 @@ private:
             if (fc.browseForDirectory())
             {
                 processor.setWatchDir (fc.getResult());
-                // addRecentsFrom (processor.getWatchDir());
+                addRecentsFrom (processor.getWatchDir());
             }
         };
 
