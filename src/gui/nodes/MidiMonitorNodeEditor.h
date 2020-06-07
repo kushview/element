@@ -34,6 +34,7 @@ public:
 
 private:
     class Logger; std::unique_ptr<Logger> logger;
+    TextButton clearButton;
 };
 
 }

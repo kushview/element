@@ -85,10 +85,12 @@ void MidiMonitorNode::getMessages (MidiBuffer& destBuffer)
 void MidiMonitorNode::clearMessages()
 {
     midiLog.clearQuick();
+    {
+        ScopedLock sl (lock);
+        inputMessages.reset (currentSampleRate);
+        numSamples = 0;
+    }
     messagesLogged();
-    ScopedLock sl (lock);
-    inputMessages.reset (currentSampleRate);
-    numSamples = 0;
 }
 
 void MidiMonitorNode::timerCallback()

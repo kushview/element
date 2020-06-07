@@ -79,6 +79,14 @@ MidiMonitorNodeEditor::MidiMonitorNodeEditor (const Node& node)
     setOpaque (true);
     logger.reset (new Logger (getNodeObjectOfType<MidiMonitorNode>()));
     addAndMakeVisible (logger.get());
+
+    addAndMakeVisible (clearButton);
+    clearButton.setButtonText ("Clear");
+    clearButton.onClick = [this]() {
+        if (auto* n = getNodeObjectOfType<MidiMonitorNode>())
+            n->clearMessages();
+    };
+
     setSize (320, 160);
 }
 
@@ -89,7 +97,11 @@ MidiMonitorNodeEditor::~MidiMonitorNodeEditor()
 
 void MidiMonitorNodeEditor::resized ()
 {
-    logger->setBounds (getLocalBounds().reduced (4));
+    auto r1 = getLocalBounds().reduced (4);
+    clearButton.changeWidthToFitText (24);
+    clearButton.setBounds (r1.getX(), r1.getY(), clearButton.getWidth(), clearButton.getHeight());
+    r1.removeFromTop (24 + 2);
+    logger->setBounds (r1);
 }
 
 };
