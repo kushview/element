@@ -49,7 +49,7 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure",
+            "label": "Waf Configure (no jack, no lua)",
             "type": "shell",
             "command": "python",
             "args": [
@@ -70,14 +70,13 @@
             "problemMatcher": []
         },
         {
-            "label": "Waf Configure (Lua)",
+            "label": "Waf Configure",
             "type": "shell",
             "command": "python",
             "args": [
                 "waf",
                 "configure",
                 "--test",
-                "--without-jack",
                 "--debug"
             ],
             "options": {
