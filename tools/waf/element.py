@@ -114,6 +114,10 @@ def check_linux (self):
         self.env.ALSA = bool(self.env.HAVE_ALSA)
     self.define ('JUCE_ALSA', self.env.ALSA)
 
+    # Lua setup
+    if self.env.LUA:
+        self.define ('LUA_USE_LINUX', True)
+
     self.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
