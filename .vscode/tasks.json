@@ -70,6 +70,26 @@
             "problemMatcher": []
         },
         {
+            "label": "Waf Configure (no jack)",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "configure",
+                "--test",
+                "--without-jack",
+                "--debug"
+            ],
+            "options": {
+                "env": {
+                    "CXXFLAGS": "-I/usr/local/include -I/opt/kushview/include -I/opt/kushview/vstsdk2.4",
+                    "CC": "ccache clang",
+                    "CXX": "ccache clang++"
+                }
+            },
+            "problemMatcher": []
+        },
+        {
             "label": "Waf Configure",
             "type": "shell",
             "command": "python",
