@@ -49,6 +49,7 @@ public:
     static const char* midiEngineKey;
     static const char* oscHostPortKey;
     static const char* oscHostEnabledKey;
+    static const char* systrayKey;
 
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -111,6 +112,9 @@ public:
     int getOscHostPort() const;
     void setOscHostPort (int);
 
+    bool isSystrayEnabled() const;
+    void setSystrayEnabled (bool);
+    
 private:
     PropertiesFile* getProps() const;
 };

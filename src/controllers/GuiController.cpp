@@ -400,7 +400,10 @@ void GuiController::run()
     }
     
     findSibling<SessionController>()->resetChanges();
-    elSetupSystray();
+    
+    if (settings.isSystrayEnabled())
+        elSetupSystray();
+
     stabilizeViews();
 }
 

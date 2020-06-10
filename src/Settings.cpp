@@ -40,6 +40,9 @@ const char* Settings::workspaceKey              = "workspace";
 const char* Settings::midiEngineKey             = "midiEngine";
 const char* Settings::oscHostPortKey            = "oscHostPortKey";
 const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
+const char* Settings::systrayKey                = "systrayKey";
+
+//=============================================================================
 
 enum OptionsMenuItemId
 {
@@ -108,7 +111,8 @@ Settings::Settings()
 
 Settings::~Settings() { }
 
-    
+//=============================================================================
+
 bool Settings::checkForUpdates() const
 {
     if (auto* props = getProps())
@@ -123,13 +127,14 @@ void Settings::setCheckForUpdates (const bool shouldCheck)
     if (auto* p = getProps())
         p->setValue (checkForUpdatesKey, shouldCheck);
 }
-    
+
+//=============================================================================
+
 PropertiesFile* Settings::getProps() const
 {
     return (const_cast<Settings*> (this))->getUserSettings();
 }
 
-    
 std::unique_ptr<XmlElement> Settings::getLastGraph() const
 {
     if (auto* p = getProps())
@@ -147,6 +152,7 @@ void Settings::setLastGraph (const ValueTree& data)
             p->setValue ("lastGraph", xml.get());
 }
     
+//=============================================================================
 
 bool Settings::scanForPluginsOnStartup() const
 {
@@ -163,6 +169,8 @@ void Settings::setScanForPluginsOnStartup (const bool shouldScan)
         p->setValue (scanForPluginsOnStartKey, shouldScan);
 }
 
+//=============================================================================
+
 bool Settings::showPluginWindowsWhenAdded() const
 {
     if (auto* p = getProps())
@@ -178,6 +186,8 @@ void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)
         p->setValue (showPluginWindowsKey, shouldShow);
 }
 
+//=============================================================================
+
 bool Settings::openLastUsedSession() const
 {
     if (auto* p = getProps())
@@ -192,6 +202,8 @@ void Settings::setOpenLastUsedSession (const bool shouldOpen)
     if (auto* p = getProps())
         p->setValue (openLastUsedSessionKey, shouldOpen);
 }
+
+//=============================================================================
 
 void Settings::setGenerateMidiClock (const bool generate)
 {
@@ -336,6 +348,8 @@ void Settings::setOscHostEnabled (bool enabled)
         p->setValue (oscHostEnabledKey, enabled);
 }
 
+//=============================================================================
+
 int Settings::getOscHostPort() const
 {
     if (auto* p = getProps())
@@ -350,6 +364,25 @@ void Settings::setOscHostPort (int port)
     if (auto* p = getProps())
         p->setValue (oscHostPortKey, port);
 }
+
+//=============================================================================
+
+bool Settings::isSystrayEnabled() const
+{
+    if (auto* p = getProps())
+        return p->getBoolValue (systrayKey, true);
+    return true;
+}
+
+void Settings::setSystrayEnabled (bool enabled)
+{
+    if (isSystrayEnabled() == enabled)
+        return;
+    if (auto* p = getProps())
+        p->setValue (systrayKey, enabled);
+}
+
+//=============================================================================
 
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 {
