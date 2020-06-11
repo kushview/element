@@ -83,6 +83,9 @@ public:
     /** Stabilize Views Only */
     void stabilizeViews();
 
+    /** Refershes the system tray based on Settings */
+    void refreshSystemTray();
+    
     bool haveActiveWindows() const;
     
     /* Command manager... */

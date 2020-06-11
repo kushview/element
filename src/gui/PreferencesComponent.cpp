@@ -437,6 +437,14 @@ namespace Element {
             askToSaveSession.setToggleState (settings.askToSaveSession(), dontSendNotification);
             askToSaveSession.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible (systrayLabel);
+            systrayLabel.setText ("Show system tray", dontSendNotification);
+            systrayLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (systray);
+            systray.setClickingTogglesState (true);
+            systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
+            systray.getToggleStateValue().addListener (this);
+
            #ifdef EL_PRO
             addAndMakeVisible (defaultSessionFileLabel);
             defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
@@ -513,7 +521,8 @@ namespace Element {
             layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
             layoutSetting (r, openLastSessionLabel, openLastSession);
             layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
-            
+            layoutSetting (r, systrayLabel, systray);
+
            #ifdef EL_PRO
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
             defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
@@ -572,6 +581,11 @@ namespace Element {
             {
                 settings.setHidePluginWindowsWhenFocusLost (hidePluginWindows.getToggleState());
             }
+            else if (value.refersToSameSourceAs (systray.getToggleStateValue()))
+            {
+                settings.setSystrayEnabled (systray.getToggleState());
+                gui.refreshSystemTray();
+            }
 
             settings.saveIfNeeded();
             gui.stabilizeViews();
@@ -609,6 +623,9 @@ namespace Element {
         Label defaultSessionFileLabel;
         FilenameComponent defaultSessionFile;
         TextButton defaultSessionClearButton;
+
+        Label systrayLabel;
+        SettingButton systray;
 
         Settings& settings;
         AudioEnginePtr engine;

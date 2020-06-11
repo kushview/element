@@ -100,8 +100,11 @@ private:
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> sGuiControllerInstances;
 static std::unique_ptr<SystemTray> sSystemTray;
+
 static void elSetupSystray() {
 #if ! EL_RUNNING_AS_PLUGIN
+    if (sSystemTray != nullptr)
+        return;
     sSystemTray.reset (new SystemTray());
    #define EL_USE_NEW_SYSTRAY_ICON 0
    #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
@@ -121,6 +124,14 @@ static void elSetupSystray() {
    #endif
     sSystemTray->addToDesktop (0);
    #endif
+}
+
+static void elClearSystray()
+{
+    if (sSystemTray == nullptr)
+        return;
+    sSystemTray->removeFromDesktop();
+    sSystemTray.reset (nullptr);
 }
 
 GuiController::GuiController (Globals& w, AppController& a)
@@ -187,11 +198,7 @@ void GuiController::deactivate()
     
     closeAllPluginWindows (true);
 
-    if (sSystemTray != nullptr)
-    {
-        sSystemTray->removeFromDesktop();
-        sSystemTray.reset(nullptr);
-    }
+    elClearSystray();
 
     if (mainWindow)
     {
@@ -893,6 +900,16 @@ void GuiController::stabilizeViews()
             cc->setEnabled (shouldBeEnabled);
         cc->stabilizeViews();
     }
+}
+
+void GuiController::refreshSystemTray()
+{
+    // stabilize systray
+    auto& settings = getWorld().getSettings();
+    if (settings.isSystrayEnabled())
+        elSetupSystray();
+    else
+        elClearSystray();
 }
 
 void GuiController::refreshMainMenu()
