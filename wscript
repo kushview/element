@@ -2,7 +2,7 @@
 
 from subprocess import call, Popen, PIPE
 import os, sys
-
+import string
 sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
@@ -53,7 +53,33 @@ def configure_product (conf):
     conf.env.EL_FREE = False
     conf.env.EL_PRO  = True
 
+gitversion_template = \
+'''// Generated file
+#pragma once
+#define EL_GIT_VERSION "XXXX"
+'''
+def configure_git_version (conf):
+    if os.path.exists('.git'):
+        process = Popen(["git", "rev-parse", "--short", "HEAD"], stdout=PIPE)
+        (githash, err) = process.communicate()
+        githash = githash.strip()
+        exit_code = process.wait()
+
+        process = Popen(["bash", "tools/nchanges.sh"], stdout=PIPE)
+        (nchanges, err) = process.communicate()
+        process.wait()
+        nchanges = string.atoi(nchanges.strip())
+
+        out = githash
+        if nchanges > 0: out = out + '-dirty'
+        if not os.path.exists("build/include"):
+            os.mkdir("build/include")
+        hf = open("build/include/GitVersion.h", "w")
+        hf.write (gitversion_template.replace ("XXXX", out.strip()))
+        hf.close()
+
 def configure (conf):
+    configure_git_version (conf)
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     
     conf.check_ccache()
