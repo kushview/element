@@ -22,11 +22,10 @@
 #include "Common.h"
 
 #ifndef EL_GRAPH_EDITOR_VIEWPORT
- #define EL_GRAPH_EDITOR_VIEWPORT 0
+ #define EL_GRAPH_EDITOR_VIEWPORT 1
 #endif
 
-namespace Element
-{
+namespace Element {
 
 GraphEditorView::GraphEditorView()
 {
