@@ -1,6 +1,9 @@
 import os, string
 from subprocess import Popen, PIPE
 
+# Generates build/include/GitVersion.h
+# must be run from the top level source dir
+
 template_file_data = \
 '''// Generated file
 #pragma once
