@@ -113,6 +113,7 @@ def common_includes():
              'libs/lua', \
              'libs/lua/src', \
              'libs/lua-kv/src', \
+             'build/include', \
              VST3_PATH, \
              'src' ]
 
