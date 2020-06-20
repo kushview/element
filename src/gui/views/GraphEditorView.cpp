@@ -92,16 +92,6 @@ void GraphEditorView::stabilizeContent()
     }
     
     const auto g = getGraph();
-    
-    if (g.isGraph() && !g.isRootGraph())
-    {
-        disableIfNotUnlocked();
-    }
-    else 
-    {
-        setEnabled (true); 
-        setInterceptsMouseClicks (true, true);
-    }
 
     graph.setNode (g);
 }
@@ -141,7 +131,8 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 {
    #if EL_GRAPH_EDITOR_VIEWPORT
     view.setBounds (area);
-    graph.setBounds (area);
+    if (graph.getWidth() < view.getWidth() || graph.getHeight() < view.getHeight())
+        graph.setBounds (view.getBounds());
    #else
     graph.setBounds (area);
    #endif
