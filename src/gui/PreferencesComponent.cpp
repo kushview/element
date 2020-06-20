@@ -427,9 +427,9 @@ namespace Element {
 
             addAndMakeVisible (askToSaveSessionLabel);
            #ifdef EL_PRO
-            askToSaveSessionLabel.setText ("Ask to save sessions", dontSendNotification);
+            askToSaveSessionLabel.setText ("Ask to save sessions on exit", dontSendNotification);
            #else
-            askToSaveSessionLabel.setText ("Ask to save graphs", dontSendNotification);
+            askToSaveSessionLabel.setText ("Ask to save graphs on exit", dontSendNotification);
            #endif
             askToSaveSessionLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (askToSaveSession);

@@ -38,7 +38,9 @@ public:
     void openFile (const File& file);
     const File getSessionFile() const { return document != nullptr ? document->getFile() : File(); }
     void closeSession();
-    void saveSession (const bool saveAs = false);
+    void saveSession (const bool saveAs = false,
+                      const bool askForFile = true,
+                      const bool showError = true);
     void newSession();
     bool hasSessionChanged() { return (document) ? document->hasChangedSinceSaved() : false; }
 
