@@ -15,8 +15,9 @@
               defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.41.1&quot;&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
-              pluginFormats="buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include">
+              pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
+              pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include">
   <MAINGROUP id="SKUipM" name="Element FX">
     <GROUP id="{9C95AAF2-091D-90F2-8252-0716A4C35CDF}" name="libs">
       <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
