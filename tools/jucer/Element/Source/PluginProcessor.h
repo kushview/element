@@ -402,7 +402,10 @@ private:
     ScopedPointer<Globals> world;
     ScopedPointer<AppController> controller;
     AudioEnginePtr engine;
+    
     bool prepared = false;
+    int preparedCount = 0;
+    
     double sampleRate = 44100.0;
     int bufferSize = 512;
     int numIns = 0;

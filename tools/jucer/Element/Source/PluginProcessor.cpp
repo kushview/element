@@ -213,10 +213,10 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
 {
     DBG("[EL] prepare to play: " << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize <<
 		"numIns: " << numIns << " numOuts: " << numOuts);
-
-    const bool detailsChanged = sampleRate != sr || bufferSize != bs
-        || numIns != getTotalNumInputChannels()
-        || numOuts != getTotalNumOutputChannels();
+    
+    const bool channelCountsChanged = numIns != getTotalNumInputChannels()
+                                   || numOuts != getTotalNumOutputChannels();
+    const bool detailsChanged = sampleRate != sr || bufferSize != bs || channelCountsChanged;
     
 	numIns		= getTotalNumInputChannels();
 	numOuts		= getTotalNumOutputChannels();
@@ -234,7 +234,19 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
         {
             DBG("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " <<
                  getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+            
+            if (channelCountsChanged && preparedCount <= 0)
+            {
+                engine->releaseExternalResources();
+                engine->prepareExternalPlayback (sampleRate, bufferSize,
+                                                 getTotalNumInputChannels(),
+                                                 getTotalNumOutputChannels());
+
+                setLatencySamples (engine->getExternalLatencySamples());
+            }
+            
             triggerAsyncUpdate();
+            preparedCount++;
         }
     }
 
@@ -329,6 +341,7 @@ void ElementPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
     // clear garbage in extra output channels.
     for (int i = getTotalNumInputChannels(); i < getTotalNumOutputChannels(); ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
+
     engine->processExternalBuffers (buffer, midi);
 }
 
