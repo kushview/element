@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,13 +19,31 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "GitVersion.h"
+
+#ifndef EL_GIT_VERSION
+ #define EL_GIT_VERSION ""
+#endif
+
+namespace Element {
+
+
 
 /** Representation of a version number */
 struct Version
 {
     Version();
     ~Version();
-    
+
+    /** Returns the version string with git hash appended */    
+    inline static String withGitHash()
+    {
+        String result = ProjectInfo::versionString;
+        if (strlen (EL_GIT_VERSION) > 0)
+            result << "-" << EL_GIT_VERSION;
+        return result;
+    }
+
     /** Split a version string into an array of segments */
     static StringArray segments (const String& versionString);
     
@@ -59,3 +77,4 @@ private:
     friend class Timer;
     void timerCallback() override;
 };
+}

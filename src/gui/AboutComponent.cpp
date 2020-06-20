@@ -18,6 +18,7 @@
 */
 
 #include "gui/AboutComponent.h"
+#include "Version.h"
 
 #define EL_LICENSE_TEXT \
 "Copyright (C) 2014-%YEAR%  Kushview, LLC.  All rights reserved.\r\n\r\n" \
@@ -190,7 +191,7 @@ AboutComponent::AboutComponent()
 
     auto buildDate = Time::getCompilationDate();
     addAndMakeVisible (versionLabel);
-    versionLabel.setText (String(" v") + ProjectInfo::versionString
+    versionLabel.setText (String("Version: ") + Version::withGitHash()
                             + "\nBuild date: " + String (buildDate.getDayOfMonth())
                                                 + " " + Time::getMonthName (buildDate.getMonth(), true)
                                                 + " " + String (buildDate.getYear()),
