@@ -3,7 +3,7 @@
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" projectType="audioplug" version="1.44.0"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
-              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2019 Kushview, LLC"
+              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element"
               pluginDesc="Element Modular Instrument" pluginManufacturer="Kushview"

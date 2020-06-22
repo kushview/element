@@ -3,7 +3,7 @@
 <JUCERPROJECT id="pjYkKA" name="Element FX" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" projectType="audioplug" version="1.44.0"
               bundleIdentifier="net.kushview.plugins.ElementFX" includeBinaryInAppConfig="1"
-              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2019 Kushview, LLC"
+              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element FX"
               pluginDesc="Element Modular Effects Rack" pluginManufacturer="Kushview"
@@ -16,8 +16,10 @@
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
-              pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include">
+              pluginCharacteristicsValue="pluginProducesMidiOut,pluginWantsMidiIn"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
+              pluginAAXDisableMultiMono="0">
   <MAINGROUP id="SKUipM" name="Element FX">
     <GROUP id="{9C95AAF2-091D-90F2-8252-0716A4C35CDF}" name="libs">
       <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
