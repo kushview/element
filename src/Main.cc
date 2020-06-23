@@ -300,10 +300,9 @@ public:
                     sc->saveSession();
                 }
             }
-
-            Application::quit();
         }
 
+        Application::quit();
        #else // lite and solo
         auto* gc = controller->findChild<GraphController>();
         if (world->getSettings().askToSaveSession())
