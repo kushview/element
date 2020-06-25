@@ -53,7 +53,7 @@ def configure_product (conf):
     conf.env.EL_FREE = False
     conf.env.EL_PRO  = True
 
-def configure_git_version (conf):
+def configure_git_version (ctx):
     if os.path.exists('.git'):
         call(["python", "tools/gitversion.py"], stdout=PIPE)
 
@@ -187,7 +187,8 @@ def compile (bld):
         pass
 
 def build (bld):
-    compile(bld)
+    bld.add_pre_fun (configure_git_version)
+    compile (bld)
 
     # for testing purposes right now. doesn't get installed
     if bld.env.LUA and bool(bld.env.HAVE_READLINE):
