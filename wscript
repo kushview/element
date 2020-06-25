@@ -67,7 +67,6 @@ def configure (conf):
         conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx ar cross juce")
     conf.check_cxx_version()
-
     silence_warnings (conf)
 
     conf.check_common()
