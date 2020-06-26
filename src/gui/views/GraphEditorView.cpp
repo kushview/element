@@ -149,7 +149,15 @@ void GraphEditorView::onNodeSelected()
     {
         auto& gui = *cc->getAppController().findChild<GuiController>();
         const auto selected = gui.getSelectedNode();
-        graph.selectNode (selected);
+        if (selected.isGraph())
+        {
+            setNode (selected);
+            graph.setNode (getGraph());
+        } 
+        else
+        {
+            graph.selectNode (selected);
+        }
     }
 }
 

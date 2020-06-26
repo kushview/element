@@ -568,34 +568,31 @@ void EngineController::removeNode (const Node& node)
     if (! graph.isGraph())
         return;
     
-    if (auto* controller = graphs->findGraphManagerFor (graph))
+    auto* const gui = findSibling<GuiController>();
+    if (auto* manager = graphs->findGraphManagerFor (graph))
     {
-        if (auto* gui = findSibling<GuiController>())
+        gui->closePluginWindowsFor (node, true);
+
+        if (node.isGraph() && (node == gui->getSelectedNode() || gui->getSelectedNode().descendsFrom (node)))
         {
-            gui->closePluginWindowsFor (node, true);
-            if (gui->getSelectedNode() == node)
-                gui->selectNode (Node());
+            gui->selectNode (node.getParentGraph());
+        }
+        else if (gui->getSelectedNode() == node)
+        {
+            gui->selectNode (Node());
         }
 
-        controller->removeFilter (node.getNodeId());
+        manager->removeFilter (node.getNodeId());
     }
 }
 
 void EngineController::removeNode (const Uuid& uuid)
 {
     auto session = getWorld().getSession();
-    Node nodeToRemove = Node();
-
-    for (int i = 0; i < session->getNumGraphs(); ++i)
+    const auto node = session->findNodeById (uuid);
+    if (node.isValid())
     {
-        nodeToRemove = session->getGraph(i).getNodeByUuid (uuid, true);
-        if (nodeToRemove.isValid())
-            break;
-    }
-
-    if (nodeToRemove.isValid())
-    {
-        removeNode (nodeToRemove);
+        removeNode (node);
     }
     else
     {
