@@ -163,7 +163,7 @@ public:
     /** This is recursive! */
     GraphManager* findSubGraphManager (GraphManager* parent, const Node& n)
     {
-        for (int i = parent->getNumFilters(); --i >= 0;)
+        for (int i = parent->getNumNodes(); --i >= 0;)
         {
             if (GraphNodePtr node = parent->getNode (i))
             {
@@ -189,7 +189,7 @@ public:
         {
             if (auto* controller = h->getController())
             {
-                for (int i = controller->getNumFilters(); --i >= 0;)
+                for (int i = controller->getNumNodes(); --i >= 0;)
                 {
                     if (GraphNodePtr node = controller->getNode (i))
                         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
@@ -547,7 +547,7 @@ void EngineController::addPlugin (const PluginDescription& desc, const bool veri
     
     if (plugs.size() > 0)
     {
-        const auto nodeId = root->addFilter (plugs.getFirst(), rx, ry);
+        const auto nodeId = root->addNode (plugs.getFirst(), rx, ry);
         if (KV_INVALID_NODE != nodeId)
         {
             const Node node (root->getNodeModelForId (nodeId));
@@ -575,7 +575,7 @@ void EngineController::removeNode (const Node& node)
         gui->closePluginWindowsFor (node, true);
         if (gui->getSelectedNode() == node)
             gui->selectNode (Node());
-        manager->removeFilter (node.getNodeId());
+        manager->removeNode (node.getNodeId());
         nodeRemoved (node);
     }
 }
@@ -601,7 +601,7 @@ void EngineController::removeNode (const uint32 nodeId)
         return;
     if (auto* gui = findSibling<GuiController>())
         gui->closePluginWindowsFor (nodeId, true);
-    root->removeFilter (nodeId);
+    root->removeNode (nodeId);
 }
 
 void EngineController::disconnectNode (const Node& node, const bool inputs, const bool outputs,
@@ -609,7 +609,7 @@ void EngineController::disconnectNode (const Node& node, const bool inputs, cons
 {
     const auto graph (node.getParentGraph());
     if (auto* controller = graphs->findGraphManagerFor (graph))
-        controller->disconnectFilter (node.getNodeId(), inputs, outputs, audio, midi);
+        controller->disconnectNode (node.getNodeId(), inputs, outputs, audio, midi);
 }
 
 void EngineController::activate()
@@ -865,7 +865,7 @@ void EngineController::sessionReloaded()
 Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc)
 {
     auto& plugins (getWorld().getPluginManager());
-    const auto nodeId = c.addFilter (&desc, 0.5f, 0.5f, 0);
+    const auto nodeId = c.addNode (&desc, 0.5f, 0.5f, 0);
     
     if (KV_INVALID_NODE != nodeId)
     {
@@ -902,7 +902,7 @@ void EngineController::addMidiDeviceNode (const String& device, const bool isInp
         PluginDescription desc;
         desc.pluginFormatName = "Internal";
         desc.fileOrIdentifier = isInput ? "element.midiInputDevice" : "element.midiOutputDevice";
-        ptr = root->getNodeForId (root->addFilter (&desc, 0.5, 0.5));
+        ptr = root->getNodeForId (root->addNode (&desc, 0.5, 0.5));
     }
 
     MidiDeviceProcessor* const proc = (ptr == nullptr) ? nullptr 
@@ -979,7 +979,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
         node.getRelativePosition (x, y);
         const auto oldNodeId = node.getNodeId();
         const auto wasWindowOpen = (bool) node.getProperty ("windowVisible");
-        const auto nodeId = ctl->addFilter (&desc, x, y);
+        const auto nodeId = ctl->addNode (&desc, x, y);
         if (nodeId != KV_INVALID_NODE)
         {
             GraphNodePtr newptr = ctl->getNodeForId (nodeId);

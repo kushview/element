@@ -71,7 +71,7 @@ public:
         jassert(graphFile.existsAsFile());
         Node model (Node::parse (graphFile), false);
         controller->setNodeModel (model);
-        for (int i = 0; i < controller->getNumFilters(); ++i)
+        for (int i = 0; i < controller->getNumNodes(); ++i)
         {
             auto object = controller->getNode (i);
             if (nullptr != object->processor<MidiDeviceProcessor>())

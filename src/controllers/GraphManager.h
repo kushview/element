@@ -26,8 +26,6 @@
 
 namespace Element {
 
-class FilterInGraph;
-class GraphManager;
 class PluginManager;
 
 class GraphManager : public ChangeBroadcaster,
@@ -36,40 +34,47 @@ class GraphManager : public ChangeBroadcaster,
 public:
     static const uint32 invalidNodeId   = KV_INVALID_PORT;
     static const int invalidChannel     = -1;
-    typedef GraphNodePtr NodePtr;
 
     GraphManager (GraphProcessor&, PluginManager&);
     ~GraphManager();
 
+    /** Returns the controlled graph */
     GraphProcessor& getGraph() noexcept { return processor; }
 
-    bool isControlling (const Node& g) const { return graph == g.getValueTree(); }
+    /** Returns true if controlling the given graph model */
+    bool isControlling (const Node& model) const { return graph == model.getValueTree(); }
 
-    int getNumFilters() const noexcept;
+    /** Returns the number of nodes on the controlled graph */
+    int getNumNodes() const noexcept;
 
-    const NodePtr getNode (const int index) const noexcept;
-    const NodePtr getNodeForId (const uint32 uid) const noexcept;
-    const Node getNodeModelForId (const uint32 nodeId) const noexcept {
-        return Node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
-    }
+    /** Returns a node by index */
+    const GraphNodePtr getNode (const int index) const noexcept;
+
+    /** Returns a node by NodeId */
+    const GraphNodePtr getNodeForId (const uint32 uid) const noexcept;
+
+    /** Returns a node model by Node ID */
+    const Node getNodeModelForId (const uint32 nodeId) const noexcept;
     
-    inline bool contains (const uint32 nodeId) const {
-        return processor.getNodeForId (nodeId) != nullptr;
-    }
+    /** Returns true if this manager contains a node by ID */
+    bool contains (const uint32 nodeId) const;
 
+    /** Adds a node for processing */
     uint32 addNode (const Node& node);
-    uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
-                      uint32 nodeId = 0);
 
-    void removeFilter (const uint32 uid) { removeNode (uid); }
+    /** Adss a node with a plugin description */
+    uint32 addNode (const PluginDescription* desc, double x = 0.0f, double y = 0.0f, uint32 nodeId = 0);
+
+    /** Remove a node by ID */
     void removeNode (const uint32 nodeId);
 
-    void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true,
-                                                   const bool audio = true, const bool midi = true);
+    /** Disconnect a node from other nodes */
+    void disconnectNode (const uint32 nodeId, const bool inputs = true, const bool outputs = true,
+                                              const bool audio = true, const bool midi = true);
 
     /** Returns the number of connections on the graph
         DOES NOT include connections tagged as "missing"
-      */
+     */
     int getNumConnections() const noexcept;
     const GraphProcessor::Connection* getConnection (const int index) const noexcept;
 
