@@ -186,6 +186,9 @@ public:
     /** Returns the graph containing this node, if any */
     Node getParentGraph() const;
 
+    /** Returns true if descendent of */
+    bool descendsFrom (const Node& graph) const;
+
     /** Returns true if this is a direct child of a root level graph */
     bool isChildOfRootGraph() const;
 

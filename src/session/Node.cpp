@@ -622,6 +622,18 @@ Node Node::getParentGraph() const
                                         : Node();
 }
 
+bool Node::descendsFrom (const Node& graph) const
+{
+    auto parent = getParentGraph();
+    while (graph.isValid() && parent.isValid())
+    {
+        if (graph == parent)
+            return true;
+        parent = parent.getParentGraph();
+    }
+    return false;
+}
+
 bool Node::isChildOfRootGraph() const
 {
     const auto graph (getParentGraph());
