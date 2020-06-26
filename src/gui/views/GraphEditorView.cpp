@@ -47,6 +47,7 @@ GraphEditorView::GraphEditorView()
 GraphEditorView::~GraphEditorView()
 {
     nodeSelectedConnection.disconnect();
+    nodeRemovedConnection.disconnect();
    #if EL_GRAPH_EDITOR_VIEWPORT
     view.setViewedComponent (nullptr, false);
    #endif
