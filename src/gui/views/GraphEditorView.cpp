@@ -75,13 +75,17 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
 
 void GraphEditorView::stabilizeContent()
 {
-    if (! nodeSelectedConnection.connected())
+    if (! nodeSelectedConnection.connected() ||
+        ! nodeRemovedConnection.connected())
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {
             auto& gui = *cc->getAppController().findChild<GuiController>();
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&GraphEditorView::onNodeSelected, this));
+            auto& eng = *cc->getAppController().findChild<EngineController>();
+            nodeRemovedConnection = eng.nodeRemoved.connect (
+                std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
         }
     }
 
@@ -149,15 +153,19 @@ void GraphEditorView::onNodeSelected()
     {
         auto& gui = *cc->getAppController().findChild<GuiController>();
         const auto selected = gui.getSelectedNode();
-        if (selected.isGraph())
-        {
-            setNode (selected);
-            graph.setNode (getGraph());
-        } 
-        else
-        {
+        if (selected.descendsFrom (getGraph()))
             graph.selectNode (selected);
-        }
+    }
+}
+
+void GraphEditorView::onNodeRemoved (const Node& node)
+{
+    if (node.isGraph() && node == getGraph())
+    {
+        auto nextGraph = Node();
+        if (auto session = ViewHelpers::getSession (this))
+            nextGraph = session->getActiveGraph();
+        setNode (nextGraph);
     }
 }
 

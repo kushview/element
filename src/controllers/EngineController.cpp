@@ -571,18 +571,12 @@ void EngineController::removeNode (const Node& node)
     auto* const gui = findSibling<GuiController>();
     if (auto* manager = graphs->findGraphManagerFor (graph))
     {
+        jassert (manager->contains (node.getNodeId()));
         gui->closePluginWindowsFor (node, true);
-
-        if (node.isGraph() && (node == gui->getSelectedNode() || gui->getSelectedNode().descendsFrom (node)))
-        {
-            gui->selectNode (node.getParentGraph());
-        }
-        else if (gui->getSelectedNode() == node)
-        {
+        if (gui->getSelectedNode() == node)
             gui->selectNode (Node());
-        }
-
         manager->removeFilter (node.getNodeId());
+        nodeRemoved (node);
     }
 }
 

@@ -52,12 +52,18 @@ public:
     const Node getNodeModelForId (const uint32 nodeId) const noexcept {
         return Node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
     }
+    
+    inline bool contains (const uint32 nodeId) const {
+        return processor.getNodeForId (nodeId) != nullptr;
+    }
 
     uint32 addNode (const Node& node);
     uint32 addFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
                       uint32 nodeId = 0);
 
-    void removeFilter (const uint32 filterUID);
+    void removeFilter (const uint32 uid) { removeNode (uid); }
+    void removeNode (const uint32 nodeId);
+
     void disconnectFilter (const uint32 filterUID, const bool inputs = true, const bool outputs = true,
                                                    const bool audio = true, const bool midi = true);
 

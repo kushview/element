@@ -389,7 +389,7 @@ uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double
     return nodeId;
 }
 
-void GraphManager::removeFilter (const uint32 uid)
+void GraphManager::removeNode (const uint32 uid)
 {
     if (! processor.removeNode (uid))
         return;
