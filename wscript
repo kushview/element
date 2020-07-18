@@ -120,8 +120,8 @@ def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
 
-    src = "data/%s.desktop.in" % (slug)
-    tgt = "%s.desktop" % (slug)
+    src = "data/net.kushview.%s.desktop.in" % (slug)
+    tgt = "net.kushview.%s.desktop" % (slug)
 
     element_data = '%s' % (bld.env.DATADIR)
     element_bin  = '%s/bin' % (bld.env.PREFIX)
