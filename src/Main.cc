@@ -131,11 +131,13 @@ private:
     {
         Settings& settings (world.getSettings());
         
+       #if ! defined (EL_PRO)
         {
             auto* props = settings.getUserSettings();
             props->setValue ("clockSource", "internal");
             settings.saveIfNeeded();
         }
+       #endif
     }
     
 

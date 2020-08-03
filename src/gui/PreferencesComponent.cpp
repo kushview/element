@@ -460,6 +460,7 @@ namespace Element {
            #if defined (EL_PRO)
             const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
                 ? ClockSourceInternal : ClockSourceMidiClock;
+            clockSourceBox.setSelectedId (source, dontSendNotification);
             clockSource.setValue (source);
             clockSource.addListener (this);
            #else
@@ -545,11 +546,8 @@ namespace Element {
             }
 
             // clock source
-            else if (value.refersToSameSourceAs (clockSource) && true)
+            else if (value.refersToSameSourceAs (clockSource))
             {
-                if (! true)
-                    return;
-
                 const var val = ClockSourceInternal == (int)clockSource.getValue() ? "internal" : "midiClock";
                 settings.getUserSettings()->setValue ("clockSource", val);
                 engine->applySettings (settings);
