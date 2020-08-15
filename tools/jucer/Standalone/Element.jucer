@@ -653,9 +653,9 @@
                        targetName="Element" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES&#10;MACOSX_DEPLOYMENT_TARGET=10.8&#10;"
-                       headerPath="/opt/kushview/include" osxCompatibility="10.8 SDK"/>
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" osxCompatibility="10.8 SDK"/>
         <CONFIGURATION name="Release" osxArchitecture="64BitIntel" isDebug="0" optimisation="2"
-                       targetName="Element" binaryPath="../../../build/Release" headerPath="/opt/kushview/include"
+                       targetName="Element" binaryPath="../../../build/Release" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO&#10;"
@@ -664,9 +664,9 @@
                        targetName="Element SE" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0&#10;EL_SOLO=1"
                        enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES&#10;MACOSX_DEPLOYMENT_TARGET=10.8&#10;"
-                       headerPath="/opt/kushview/include" osxCompatibility="10.8 SDK"/>
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" osxCompatibility="10.8 SDK"/>
         <CONFIGURATION name="Release_SE" osxArchitecture="64BitIntel" isDebug="0" optimisation="2"
-                       targetName="Element SE" binaryPath="../../../build/Release" headerPath="/opt/kushview/include"
+                       targetName="Element SE" binaryPath="../../../build/Release" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;EL_SOLO=1&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"

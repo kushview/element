@@ -622,10 +622,46 @@ Node Node::getParentGraph() const
                                         : Node();
 }
 
+bool Node::descendsFrom (const Node& graph) const
+{
+    auto parent = getParentGraph();
+    while (graph.isValid() && parent.isValid())
+    {
+        if (graph == parent)
+            return true;
+        parent = parent.getParentGraph();
+    }
+    return false;
+}
+
 bool Node::isChildOfRootGraph() const
 {
     const auto graph (getParentGraph());
     return graph.isRootGraph();
+}
+
+kv::MidiChannels Node::getMidiChannels() const
+{
+    kv::MidiChannels chans;
+    #ifndef EL_FREE
+    if (objectData.hasProperty (Tags::midiChannels))
+    {
+        if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
+        {
+            BigInteger data; data.loadFromMemoryBlock (*block);
+            chans.setChannels (data);
+        }
+    }
+    else
+    #endif
+    {
+        const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
+        if (channel > 0)
+            chans.setChannel (channel);
+        else
+            chans.setOmni (true);
+    }
+    return chans;
 }
 
 void Node::restorePluginState()

@@ -94,6 +94,12 @@ def check_mac (self):
     self.define('JUCE_PLUGINHOST_VST3', 1)
     self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
 
+    # JACK OSX
+    if self.env.JACK:
+        # C++17 and JackOSX do not get along. This avoids compile
+        # errors. TODO: base this on jack version instead of OS
+        self.env.append_unique ('CXXFLAGS', ['-Wno-register'])
+
 @conf
 def check_linux (self):
     self.check(lib='pthread', mandatory=True)

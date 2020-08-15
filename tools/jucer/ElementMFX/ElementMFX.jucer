@@ -1,26 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="pjYkKA" name="Element FX" displaySplashScreen="0" reportAppUsage="0"
+<JUCERPROJECT id="kKApjY" name="Element MFX" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" projectType="audioplug" version="1.44.0"
-              bundleIdentifier="net.kushview.plugins.ElementFX" includeBinaryInAppConfig="1"
+              bundleIdentifier="net.kushview.plugins.ElementMFX" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
-              buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element FX"
+              buildVST="0" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
+              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element MFX"
               pluginDesc="Element Modular Effects Rack" pluginManufacturer="Kushview"
-              pluginManufacturerCode="KshV" pluginCode="ElFX" pluginChannelConfigs=""
+              pluginManufacturerCode="KshV" pluginCode="ElMX" pluginChannelConfigs=""
               pluginIsSynth="0" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
-              pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementFX"
-              aaxIdentifier="net.kushview.ElementFX" jucerVersion="5.4.5" companyName="Kushview"
-              companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=\&quot;0.44.0\&quot;&#10;EL_USE_LUA=1"
-              pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
+              pluginIsMidiEffectPlugin="1" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementMFX"
+              aaxIdentifier="net.kushview.ElementMFX" jucerVersion="5.4.5"
+              companyName="Kushview" companyWebsite="https://kushview.net"
+              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
+              pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumi'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
-              pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
-              pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
               pluginAAXDisableMultiMono="0">
-  <MAINGROUP id="SKUipM" name="Element FX">
+  <MAINGROUP id="SKUipM" name="Element MFX">
     <GROUP id="{9C95AAF2-091D-90F2-8252-0716A4C35CDF}" name="libs">
       <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
         <GROUP id="{62C1DB42-24AC-1BEF-C5A1-87EE68F8EAE4}" name="src">
@@ -648,12 +647,12 @@
                prebuildCommand="export MACOSX_DEPLOYMENT_TARGET=10.8&#10;cd ../../../../.. &amp;&amp; python tools/gitversion.py&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
-                       linkTimeOptimisation="0" targetName="KV_ElementFX" headerPath="/opt/kushview/include&#10;/usr/local/include"
+                       linkTimeOptimisation="0" targetName="KV_ElementMFX" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"/>
         <CONFIGURATION name="Release" enablePluginBinaryCopyStep="1" isDebug="0" optimisation="3"
-                       linkTimeOptimisation="1" targetName="KV_ElementFX" aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
+                       linkTimeOptimisation="1" targetName="KV_ElementMFX" aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        cppLibType="libc++" osxArchitecture="64BitIntel" osxCompatibility="10.8 SDK"
                        headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"/>
@@ -687,22 +686,22 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementFX"
+                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementMFX"
                        headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        binaryPath="../../../build/x64/Release" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="Win32"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementFX"
+                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementMFX"
                        binaryPath="../../../build/Win32/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        useRuntimeLibDLL="1"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="Win32"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementFX"
+                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementMFX"
                        headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        binaryPath="../../../build/Win32/Release" useRuntimeLibDLL="0"/>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementFX"
+                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementMFX"
                        binaryPath="../../../build/x64/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        useRuntimeLibDLL="1"/>
       </CONFIGURATIONS>
@@ -728,33 +727,6 @@
         <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;">
-      <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
-        <CONFIGURATION isDebug="0" name="Release"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="kv_models" path="../../juce"/>
-        <MODULEPATH id="kv_gui" path="../../juce"/>
-        <MODULEPATH id="kv_engines" path="../../juce"/>
-        <MODULEPATH id="kv_core" path="../../juce"/>
-        <MODULEPATH id="juce_osc" path="../../juce"/>
-        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
-        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
-        <MODULEPATH id="juce_graphics" path="../../juce"/>
-        <MODULEPATH id="juce_events" path="../../juce"/>
-        <MODULEPATH id="juce_dsp" path="../../juce"/>
-        <MODULEPATH id="juce_data_structures" path="../../juce"/>
-        <MODULEPATH id="juce_cryptography" path="../../juce"/>
-        <MODULEPATH id="juce_core" path="../../juce"/>
-        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
-        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
-        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
-        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
-        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
-      </MODULEPATHS>
-    </LINUX_MAKE>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
@@ -783,6 +755,5 @@
   <LIVE_SETTINGS>
     <OSX/>
     <WINDOWS/>
-    <LINUX/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>

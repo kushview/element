@@ -125,7 +125,7 @@ private:
         const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.producesMidi();
         
         GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
-        for (int i = 0; i < root->getNumFilters(); ++i)
+        for (int i = 0; i < root->getNumNodes(); ++i)
         {
             GraphNodePtr node = root->getNode (i);
             if (node->isMidiIONode() || node->isAudioIONode())
@@ -180,13 +180,13 @@ private:
                     break;
             }
             
-            auto nodeId = root->addFilter (&desc, rx, ry);
+            auto nodeId = root->addNode (&desc, rx, ry);
             ioNodes[t] = root->getNodeForId (nodeId);
             jassert(ioNodes[t] != nullptr);
         }
 
         for (const auto& nodeId : nodesToRemove)
-            root->removeFilter (nodeId);
+            root->removeNode (nodeId);
     }
 };
 
@@ -209,19 +209,20 @@ uint32 GraphManager::getNextUID() noexcept
     return ++lastUID;
 }
 
-int GraphManager::getNumFilters() const noexcept
-{
-    return processor.getNumNodes();
-}
-
-const GraphNodePtr GraphManager::getNode (const int index) const noexcept
-{
-    return processor.getNode (index);
-}
+int GraphManager::getNumNodes() const noexcept { return processor.getNumNodes(); }
+const GraphNodePtr GraphManager::getNode (const int index) const noexcept { return processor.getNode (index); }
 
 const GraphNodePtr GraphManager::getNodeForId (const uint32 uid) const noexcept
 {
     return processor.getNodeForId (uid);
+}
+
+const Node GraphManager::getNodeModelForId (const uint32 nodeId) const noexcept {
+    return Node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
+}
+    
+bool GraphManager::contains (const uint32 nodeId) const {
+    return processor.getNodeForId (nodeId) != nullptr;
 }
 
 GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
@@ -311,7 +312,7 @@ uint32 GraphManager::addNode (const Node& newNode)
     return nodeId;
 }
     
-uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double ry, uint32 nodeId)
+uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double ry, uint32 nodeId)
 {
     if (! desc)
     {
@@ -389,7 +390,7 @@ uint32 GraphManager::addFilter (const PluginDescription* desc, double rx, double
     return nodeId;
 }
 
-void GraphManager::removeFilter (const uint32 uid)
+void GraphManager::removeNode (const uint32 uid)
 {
     if (! processor.removeNode (uid))
         return;
@@ -415,11 +416,11 @@ void GraphManager::removeFilter (const uint32 uid)
         }
     }
     
-    jassert(nodes.getNumChildren() == getNumFilters());
+    jassert(nodes.getNumChildren() == getNumNodes());
     processorArcsChanged();
 }
 
-void GraphManager::disconnectFilter (const uint32 nodeId, const bool inputs, const bool outputs,
+void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const bool outputs,
                                                              const bool audio, const bool midi)
 {
     jassert (inputs || outputs);

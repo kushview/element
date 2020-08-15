@@ -50,8 +50,10 @@ private:
     Node node;
     GraphEditorComponent graph;
     Viewport view;
-    SignalConnection nodeSelectedConnection;
+    SignalConnection nodeSelectedConnection,
+                     nodeRemovedConnection;
     void onNodeSelected();
+    void onNodeRemoved (const Node&);
 };
 
 }

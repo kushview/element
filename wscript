@@ -53,7 +53,7 @@ def configure_product (conf):
     conf.env.EL_FREE = False
     conf.env.EL_PRO  = True
 
-def configure_git_version (conf):
+def configure_git_version (ctx):
     if os.path.exists('.git'):
         call(["python", "tools/gitversion.py"], stdout=PIPE)
 
@@ -67,7 +67,6 @@ def configure (conf):
         conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx ar cross juce")
     conf.check_cxx_version()
-
     silence_warnings (conf)
 
     conf.check_common()
@@ -121,8 +120,8 @@ def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
 
-    src = "data/%s.desktop.in" % (slug)
-    tgt = "%s.desktop" % (slug)
+    src = "data/net.kushview.%s.desktop.in" % (slug)
+    tgt = "net.kushview.%s.desktop" % (slug)
 
     element_data = '%s' % (bld.env.DATADIR)
     element_bin  = '%s/bin' % (bld.env.PREFIX)
@@ -187,7 +186,8 @@ def compile (bld):
         pass
 
 def build (bld):
-    compile(bld)
+    bld.add_pre_fun (configure_git_version)
+    compile (bld)
 
     # for testing purposes right now. doesn't get installed
     if bld.env.LUA and bool(bld.env.HAVE_READLINE):

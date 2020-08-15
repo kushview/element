@@ -131,11 +131,13 @@ private:
     {
         Settings& settings (world.getSettings());
         
+       #if ! defined (EL_PRO)
         {
             auto* props = settings.getUserSettings();
             props->setValue ("clockSource", "internal");
             settings.saveIfNeeded();
         }
+       #endif
     }
     
 
@@ -278,25 +280,31 @@ public:
         
         if (world->getSettings().askToSaveSession())
         {
-            // - 0 if the third button was pressed ('cancel')
-            // - 1 if the first button was pressed ('yes')
-            // - 2 if the middle button was pressed ('no')
-
-            const int res = !sc->hasSessionChanged() ? 2
-                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Session",
-                    "This session may have changes. Would you like to save before exiting?");
-            if (res == 1)
+            if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "Save Session",
+                    "This session may have changes.\nWould you like to save before exiting?",
+                    "Yes", "No"))
+            {
                 sc->saveSession();
-            
-            if (res != 0)
-                Application::quit();
+            }
         }
         else
         {
-            sc->saveSession();
-            Application::quit();
+            if (sc->getSessionFile().existsAsFile())
+            {
+                sc->saveSession (false, false, false);
+            }
+            else
+            {
+                if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "Save Session",
+                        "This session has not been saved to disk yet.\nWould you like to before exiting?",
+                        "Yes", "No"))
+                {
+                    sc->saveSession();
+                }
+            }
         }
 
+        Application::quit();
        #else // lite and solo
         auto* gc = controller->findChild<GraphController>();
         if (world->getSettings().askToSaveSession())

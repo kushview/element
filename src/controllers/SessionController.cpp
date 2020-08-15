@@ -38,7 +38,6 @@ void SessionController::activate()
     auto* app = dynamic_cast<AppController*> (getRoot());
     currentSession = app->getWorld().getSession();
     document = new SessionDocument (currentSession);
-    document->setLastDocumentOpened (DataPath::defaultSessionDir().getChildFile ("Untitled.els"));
 }
 
 void SessionController::deactivate()
@@ -62,11 +61,11 @@ void SessionController::openDefaultSession()
 {
     if (auto* gc = findSibling<GuiController>())
         gc->closeAllPluginWindows();
-        
+
     loadNewSessionData();
     refreshOtherControllers();
     findSibling<GuiController>()->stabilizeContent();
-    resetChanges();
+    resetChanges (true);
 }
 
 void SessionController::openFile (const File& file)
@@ -155,7 +154,7 @@ void SessionController::resetChanges (const bool resetDocumentFile)
     jassert (! document->hasChangedSinceSaved());
 }
 
-void SessionController::saveSession (const bool saveAs)
+void SessionController::saveSession (const bool saveAs, const bool askForFile, const bool showError)
 {
     jassert (document && currentSession);
     auto result = FileBasedDocument::userCancelledSave;
@@ -170,9 +169,9 @@ void SessionController::saveSession (const bool saveAs)
     }
 
     if (saveAs) {
-        result = document->saveAs (File(), true, true, true);
+        result = document->saveAs (File(), true, askForFile, showError);
     } else {
-        result = document->save (true, true);
+        result = document->save (askForFile, showError);
     }
 
     if (result == FileBasedDocument::userCancelledSave)

@@ -46,6 +46,7 @@ GraphEditorView::GraphEditorView()
 GraphEditorView::~GraphEditorView()
 {
     nodeSelectedConnection.disconnect();
+    nodeRemovedConnection.disconnect();
    #if EL_GRAPH_EDITOR_VIEWPORT
     view.setViewedComponent (nullptr, false);
    #endif
@@ -74,13 +75,17 @@ bool GraphEditorView::keyPressed (const KeyPress& key, Component* c)
 
 void GraphEditorView::stabilizeContent()
 {
-    if (! nodeSelectedConnection.connected())
+    if (! nodeSelectedConnection.connected() ||
+        ! nodeRemovedConnection.connected())
     {
         if (auto* const cc = ViewHelpers::findContentComponent (this))
         {
             auto& gui = *cc->getAppController().findChild<GuiController>();
             nodeSelectedConnection = gui.nodeSelected.connect (
                 std::bind (&GraphEditorView::onNodeSelected, this));
+            auto& eng = *cc->getAppController().findChild<EngineController>();
+            nodeRemovedConnection = eng.nodeRemoved.connect (
+                std::bind (&GraphEditorView::onNodeRemoved, this, std::placeholders::_1));
         }
     }
 
@@ -114,6 +119,10 @@ void GraphEditorView::didBecomeActive()
     }
 
     graph.updateComponents();
+
+    auto gev = getGraph().getUIValueTree().getOrCreateChildWithName ("GraphEditorView", nullptr);
+    graph.setSize (gev.getProperty ("width",  graph.getWidth()),
+                   gev.getProperty ("height", graph.getHeight()));
 }
 
 void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
@@ -148,7 +157,19 @@ void GraphEditorView::onNodeSelected()
     {
         auto& gui = *cc->getAppController().findChild<GuiController>();
         const auto selected = gui.getSelectedNode();
-        graph.selectNode (selected);
+        if (selected.descendsFrom (getGraph()))
+            graph.selectNode (selected);
+    }
+}
+
+void GraphEditorView::onNodeRemoved (const Node& node)
+{
+    if (node.isGraph() && node == getGraph())
+    {
+        auto nextGraph = Node();
+        if (auto session = ViewHelpers::getSession (this))
+            nextGraph = session->getActiveGraph();
+        setNode (nextGraph);
     }
 }
 

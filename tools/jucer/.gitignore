@@ -8,6 +8,11 @@ ElementFX/JuceLibraryCode/**/*.*
 !ElementFX/JuceLibraryCode/AppConfig.h
 !ElementFX/JuceLibraryCode/JuceHeader.h
 
+ElementMFX/Builds/
+ElementMFX/JuceLibraryCode/**/*.*
+!ElementMFX/JuceLibraryCode/AppConfig.h
+!ElementMFX/JuceLibraryCode/JuceHeader.h
+
 Standalone/Builds/
 Standalone/JuceLibraryCode/**/*.*
 !Standalone/JuceLibraryCode/AppConfig.h

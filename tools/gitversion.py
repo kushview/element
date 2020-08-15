@@ -17,11 +17,13 @@ if os.path.exists('.git'):
     exit_code = process.wait()
 
     process = Popen(["bash", "tools/nchanges.sh"], stdout=PIPE)
-    (nchanges, err) = process.communicate()
+    (nchangesstr, err) = process.communicate()
     process.wait()
-    nchanges = string.atoi(nchanges.strip())
+    nchanges = 0
+    if len(nchangesstr.strip()) > 0:
+        nchanges = int(nchangesstr.strip())
 
-    out = githash
+    out = str(githash)
     if nchanges > 0: out = out + '-dirty'
     if not os.path.exists("build/include"):
         os.mkdir("build/include")

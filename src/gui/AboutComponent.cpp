@@ -38,8 +38,8 @@
 "Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\r\n"
 
 namespace Element {
-
 namespace About {
+
 static StringArray getDevelopers() 
 {
     const auto str = String(BinaryData::developers_txt, BinaryData::developers_txtSize);
@@ -203,6 +203,10 @@ AboutComponent::AboutComponent()
     addAndMakeVisible (copyrightLabel);
     copyrightLabel.setJustificationType (Justification::centred);
     copyrightLabel.setFont (Font (13.f));
+    String copyrightText = "Copyright ";
+    copyrightText << String(CharPointer_UTF8 ("\xc2\xa9")) << " XXX Kushview, LLC.";
+    copyrightLabel.setText (copyrightText.replace ("XXX", String (buildDate.getYear())),
+                            dontSendNotification);
 
     addAndMakeVisible (aboutButton);
     aboutButton.setTooltip ({});
