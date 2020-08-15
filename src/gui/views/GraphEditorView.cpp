@@ -22,11 +22,10 @@
 #include "Common.h"
 
 #ifndef EL_GRAPH_EDITOR_VIEWPORT
- #define EL_GRAPH_EDITOR_VIEWPORT 0
+ #define EL_GRAPH_EDITOR_VIEWPORT 1
 #endif
 
-namespace Element
-{
+namespace Element {
 
 GraphEditorView::GraphEditorView()
 {
@@ -120,6 +119,10 @@ void GraphEditorView::didBecomeActive()
     }
 
     graph.updateComponents();
+
+    auto gev = getGraph().getUIValueTree().getOrCreateChildWithName ("GraphEditorView", nullptr);
+    graph.setSize (gev.getProperty ("width",  graph.getWidth()),
+                   gev.getProperty ("height", graph.getHeight()));
 }
 
 void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
