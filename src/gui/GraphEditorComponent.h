@@ -81,7 +81,6 @@ public:
     void resized() override;
     void mouseDown (const MouseEvent& e) override;
 
-
     bool isInterestedInDragSource (const SourceDetails&) override;
     void itemDropped (const SourceDetails& details) override;
     bool shouldDrawDragImageWhenOver() override { return true; }

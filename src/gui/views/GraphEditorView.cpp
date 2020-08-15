@@ -96,7 +96,6 @@ void GraphEditorView::stabilizeContent()
     }
     
     const auto g = getGraph();
-
     graph.setNode (g);
 }
 
@@ -107,22 +106,10 @@ void GraphEditorView::didBecomeActive()
     jassert (world); // something went majorly wrong...
 
     world->getMidiEngine().addChangeListener (this);
+    stabilizeContent();
 
-    if (! getGraph().isValid() || !getGraph().isGraph())
-    {
-        if (session)
-            setNode (session->getCurrentGraph());
-    }
-    else
-    {
-        stabilizeContent();
-    }
-
+    restoreSettings();
     graph.updateComponents();
-
-    auto gev = getGraph().getUIValueTree().getOrCreateChildWithName ("GraphEditorView", nullptr);
-    graph.setSize (gev.getProperty ("width",  graph.getWidth()),
-                   gev.getProperty ("height", graph.getHeight()));
 }
 
 void GraphEditorView::changeListenerCallback (ChangeBroadcaster*)
@@ -144,6 +131,13 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
    #else
     graph.setBounds (area);
    #endif
+
+    auto s = getSettings();
+    if (s.isValid())
+    {
+        s.setProperty ("width",  graph.getWidth(),  nullptr)
+         .setProperty ("height", graph.getHeight(), nullptr); 
+    }
 }
 
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
@@ -171,6 +165,31 @@ void GraphEditorView::onNodeRemoved (const Node& node)
             nextGraph = session->getActiveGraph();
         setNode (nextGraph);
     }
+}
+
+ValueTree GraphEditorView::getSettings() const
+{
+    ValueTree uivt = getNode().getUIValueTree();
+    return uivt.isValid() ? uivt.getOrCreateChildWithName ("GraphEditorView", nullptr)
+                          : ValueTree();
+}
+
+void GraphEditorView::restoreSettings()
+{
+    auto s = getSettings();
+    if (! s.isValid())
+        return;
+    setSize (s.getProperty ("width", getWidth()),
+             s.getProperty ("height", getHeight()));
+}
+
+void GraphEditorView::saveSettings()
+{
+    auto s = getSettings();
+    if (! s.isValid())
+        return;
+    s.setProperty ("width", getWidth(), nullptr);
+    s.setProperty ("height", getHeight(), nullptr);
 }
 
 } /* namespace Element */

@@ -35,11 +35,13 @@ public:
     void didBecomeActive() override;
     void stabilizeContent() override;
     void willBeRemoved() override;
-    
+
+    ValueTree getSettings() const;
+    void saveSettings();
+    void restoreSettings();
+
     void paint (Graphics& g) override;
-
     bool keyPressed (const KeyPress& key, Component* c) override;
-
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 protected:
