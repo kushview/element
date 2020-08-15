@@ -640,6 +640,30 @@ bool Node::isChildOfRootGraph() const
     return graph.isRootGraph();
 }
 
+kv::MidiChannels Node::getMidiChannels() const
+{
+    kv::MidiChannels chans;
+    #ifndef EL_FREE
+    if (objectData.hasProperty (Tags::midiChannels))
+    {
+        if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
+        {
+            BigInteger data; data.loadFromMemoryBlock (*block);
+            chans.setChannels (data);
+        }
+    }
+    else
+    #endif
+    {
+        const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
+        if (channel > 0)
+            chans.setChannel (channel);
+        else
+            chans.setOmni (true);
+    }
+    return chans;
+}
+
 void Node::restorePluginState()
 {
     if (! isValid())

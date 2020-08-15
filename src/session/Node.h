@@ -201,29 +201,8 @@ public:
     inline const bool isEnabled() const     { return (bool) getProperty (Tags::enabled, true); }
 
     //=========================================================================
-    inline kv::MidiChannels getMidiChannels() const
-    {
-        kv::MidiChannels chans;
-       #ifndef EL_FREE
-        if (objectData.hasProperty (Tags::midiChannels))
-        {
-            if (auto* const block = objectData.getProperty(Tags::midiChannels).getBinaryData())
-            {
-                BigInteger data; data.loadFromMemoryBlock (*block);
-                chans.setChannels (data);
-            }
-        }
-        else
-       #endif
-        {
-            const auto channel = (int) objectData.getProperty (Tags::midiChannel, 0);
-            if (channel > 0)
-                chans.setChannel (channel);
-            else
-                chans.setOmni (true);
-        }
-        return chans;
-    }
+    /** Returns the enabled MIDI channels on this Node */
+    kv::MidiChannels getMidiChannels() const;
 
     //=========================================================================
     /** Returns true if bypass is on for this Node */
