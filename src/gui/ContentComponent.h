@@ -66,9 +66,7 @@ public:
     /** Apply state attached to session */
     virtual void setState (const String&) {}
 
-    /** Call this to disable the entire view if the app isn't unlocked */
-    void disableIfNotUnlocked();
-
+    /** Set true if pressing escape should close the view */
     inline void setEscapeTriggersClose (const bool shouldClose) { escapeTriggersClose = shouldClose; }
     
     virtual void getAllCommands (Array<CommandID>&) override { }

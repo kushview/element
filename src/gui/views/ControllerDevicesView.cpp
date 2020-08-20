@@ -1125,7 +1125,6 @@ void ControllerDevicesView::resized()
 
 void ControllerDevicesView::stabilizeContent()
 {
-    disableIfNotUnlocked();
     content->stabilizeContent();
 }
 

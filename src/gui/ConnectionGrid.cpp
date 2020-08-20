@@ -816,7 +816,7 @@ namespace Element
     {
         if (newNode.isGraph() && !newNode.isRootGraph())
         {
-            disableIfNotUnlocked();
+            // noop
         }
         else 
         {

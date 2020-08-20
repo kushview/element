@@ -69,7 +69,6 @@ void NodeChannelStripView::stabilizeContent()
 {
     if (content)
         content->nodeSelected();
-    disableIfNotUnlocked();
 }
 
 void NodeChannelStripView::initializeView (AppController& app)

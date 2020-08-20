@@ -101,24 +101,7 @@ void ContentComponent::setExtraView (Component* c)
     resized();
 }
 
-void ContentView::disableIfNotUnlocked()
-{
-    if (auto* w = ViewHelpers::getGlobals (this))
-    {
-        setEnabled (true);
-    }
-    else
-    {
-        // jassertfalse;
-        DBG("[EL] ContentView::disableIfNotUnlocked() didn't get world object");
-        setEnabled (false);
-    }
-
-    setInterceptsMouseClicks (isEnabled(), isEnabled());
-}
-
-// MARK: Toolbar
-    
+//=============================================================================
 class ContentComponent::Toolbar : public Component,
                                   public Button::Listener,
                                   public Timer
