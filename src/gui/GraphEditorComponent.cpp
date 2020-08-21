@@ -61,7 +61,7 @@ static bool elNodeIsMidiDevice (const Node& node)
 
 static bool elNodeCanChangeIO (const Node& node)
 {
-    return !node.isIONode() 
+    return !node.isIONode()
         && !node.isGraph()
         && !elNodeIsAudioMixer (node)
         && !elNodeIsMidiDevice (node);
@@ -97,7 +97,6 @@ private:
 };
 
 //=============================================================================
-
 class ConnectorComponent   : public Component,
                              public SettableTooltipClient
 {
@@ -365,7 +364,6 @@ private:
 };
 
 //=============================================================================
-
 GraphEditorComponent::GraphEditorComponent()
     : ViewHelperMixin (this)
 {

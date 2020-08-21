@@ -220,6 +220,44 @@ void BlockComponent::buttonClicked (Button* b)
     }
 }
 
+void BlockComponent::setPositionFromNode()
+{
+    if (! node.isValid())
+        return;
+    
+    double x = 0.0, y = 0.0;
+    auto* const panel = getGraphPanel();
+    if (! node.hasPosition() && nullptr != panel)
+    {
+        node.getRelativePosition (x, y);
+        x = x * (panel->getWidth() - (getWidth() / 2));
+        y = y * (panel->getHeight() - (getHeight() / 2));
+        node.setPosition (x, y);
+    }
+    else
+    {
+        node.getPosition (x, y);
+    }
+
+    setBounds ({ roundDoubleToInt (x),
+                 roundDoubleToInt (y), 
+                 getWidth(), getHeight() });
+}
+
+void BlockComponent::setNodePosition (const int x, const int y)
+{
+    if (vertical)
+    {
+        node.setProperty (Tags::x, (double) x);
+        node.setProperty (Tags::y, (double) y);
+    }
+    else
+    {
+        node.setProperty (Tags::y, (double) x);
+        node.setProperty (Tags::x, (double) y);
+    }
+}
+
 void BlockComponent::deleteAllPins()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
@@ -299,20 +337,6 @@ void BlockComponent::mouseDown (const MouseEvent& e)
     getGraphPanel()->updateSelection();
 }
 
-void BlockComponent::setNodePosition (const int x, const int y)
-{
-    if (vertical)
-    {
-        node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
-                                    (y + getHeight() / 2) / (double) getParentHeight());
-    }
-    else
-    {
-        node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
-                                    (x + getWidth() / 2) / (double) getParentWidth());
-    }
-}
-
 void BlockComponent::mouseDrag (const MouseEvent& e)
 {
     if (! isEnabled())
@@ -327,7 +351,7 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
         pos = getParentComponent()->getLocalPoint (nullptr, pos);
     
     setNodePosition (pos.getX(), pos.getY());
-    updatePosition();
+    setPositionFromNode();
 }
 
 void BlockComponent::mouseUp (const MouseEvent& e)
@@ -631,7 +655,7 @@ void BlockComponent::update (const bool doPosition)
 
     if (doPosition)
     {
-        updatePosition();
+        setPositionFromNode();
     }
     else if (nullptr != getParentComponent())
     {

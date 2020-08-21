@@ -21,24 +21,17 @@
 #include "gui/views/GraphEditorView.h"
 #include "Common.h"
 
-#ifndef EL_GRAPH_EDITOR_VIEWPORT
- #define EL_GRAPH_EDITOR_VIEWPORT 1
-#endif
-
 namespace Element {
 
 GraphEditorView::GraphEditorView()
 {
     setName ("GraphEditor");
-   #if EL_GRAPH_EDITOR_VIEWPORT
+
     addAndMakeVisible (view);
     view.setViewedComponent (&graph, false);
     view.setScrollBarsShown (true, true, false, false);
     view.setScrollOnDragEnabled (false);
     view.setBounds (graph.getLocalBounds());
-   #else
-    addAndMakeVisible (graph);
-   #endif
 
     setWantsKeyboardFocus (true);
 }
@@ -47,9 +40,7 @@ GraphEditorView::~GraphEditorView()
 {
     nodeSelectedConnection.disconnect();
     nodeRemovedConnection.disconnect();
-   #if EL_GRAPH_EDITOR_VIEWPORT
     view.setViewedComponent (nullptr, false);
-   #endif
 }
 
 void GraphEditorView::willBeRemoved()
@@ -124,19 +115,15 @@ void GraphEditorView::paint (Graphics& g)
 
 void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 {
-   #if EL_GRAPH_EDITOR_VIEWPORT
     view.setBounds (area);
     if (graph.getWidth() < view.getWidth() || graph.getHeight() < view.getHeight())
         graph.setBounds (view.getBounds());
-   #else
-    graph.setBounds (area);
-   #endif
 
     auto s = getSettings();
     if (s.isValid())
     {
-        s.setProperty ("width",  graph.getWidth(),  nullptr)
-         .setProperty ("height", graph.getHeight(), nullptr); 
+        s.setProperty (Tags::width,  graph.getWidth(),  nullptr)
+         .setProperty (Tags::height, graph.getHeight(), nullptr); 
     }
 }
 
@@ -173,14 +160,14 @@ ValueTree GraphEditorView::getSettings() const
     return uivt.isValid() ? uivt.getOrCreateChildWithName ("GraphEditorView", nullptr)
                           : ValueTree();
 }
-
+ 
 void GraphEditorView::restoreSettings()
 {
     auto s = getSettings();
     if (! s.isValid())
         return;
-    setSize (s.getProperty ("width", getWidth()),
-             s.getProperty ("height", getHeight()));
+    setSize (s.getProperty (Tags::width,  getWidth()),
+             s.getProperty (Tags::height, getHeight()));
 }
 
 void GraphEditorView::saveSettings()
@@ -188,8 +175,8 @@ void GraphEditorView::saveSettings()
     auto s = getSettings();
     if (! s.isValid())
         return;
-    s.setProperty ("width", getWidth(), nullptr);
-    s.setProperty ("height", getHeight(), nullptr);
+    s.setProperty (Tags::width,  getWidth(),  nullptr);
+    s.setProperty (Tags::height, getHeight(), nullptr);
 }
 
 } /* namespace Element */

@@ -28,7 +28,6 @@ class AppController;
 class GraphEditorComponent;
 
 //=============================================================================
-
 class PortComponent : public Component,
                       public SettableTooltipClient
 {
@@ -71,7 +70,6 @@ private:
 };
 
 //=============================================================================
-
 class BlockComponent : public Component,
                        public Button::Listener,
                        private AsyncUpdater,
@@ -163,6 +161,7 @@ private:
     DropShadowEffect shadow;
     ScopedPointer<Component> embedded;
 
+    void setPositionFromNode();
     void deleteAllPins();
     Rectangle<int> getOpenCloseBox() const;
     Rectangle<int> getBoxRectangle() const;
