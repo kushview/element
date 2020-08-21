@@ -244,6 +244,15 @@ public:
     /** Gets the x/y relative coordinates of this node */
     void getRelativePosition (double& x, double& y) const;
     
+    /** Returns true if properties "x" and "y" are present */
+    bool hasPosition() const;
+
+    /** Gets the x/y coordinates of this node in the editor */
+    void getPosition (double& x, double& y) const;
+
+    /** Set the x/y position of this node in the editor */
+    void setPosition (double x, double y);
+    
     //=========================================================================
     /** Returns the engine-side graphnode implementation */
     GraphNode* getGraphNode() const;

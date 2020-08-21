@@ -111,14 +111,14 @@ Node Node::createDefaultGraph (const String& name)
 
         if (t == "audio.input")
         {
-            ioNode.setProperty ("relativeX", 0.25f, 0)
-                    .setProperty ("relativeY", 0.25f, 0)
-                    .setProperty ("numAudioIns", 0, 0)
-                    .setProperty ("numAudioOuts", 2, 0);
+            ioNode.setProperty (Tags::relativeX, 0.25f, 0)
+                   .setProperty (Tags::relativeY, 0.25f, 0)
+                   .setProperty ("numAudioIns", 0, 0)
+                   .setProperty ("numAudioOuts", 2, 0);
 
             ValueTree port (Tags::port);
             port.setProperty ("name", "Port", 0)
-                .setProperty("index", portIdx++, 0)
+                .setProperty ("index", portIdx++, 0)
                 .setProperty ("type", "audio", 0)
                 .setProperty ("flow", "output", 0);
             ports.addChild (port, -1, 0);
@@ -132,8 +132,8 @@ Node Node::createDefaultGraph (const String& name)
         }
         else if (t == "audio.output")
         {
-            ioNode.setProperty ("relativeX", 0.25f, 0)
-                    .setProperty ("relativeY", 0.75f, 0)
+            ioNode.setProperty (Tags::relativeX, 0.25f, 0)
+                    .setProperty (Tags::relativeY, 0.75f, 0)
                     .setProperty ("numAudioIns", 2, 0)
                     .setProperty ("numAudioOuts", 0, 0);
             
@@ -153,8 +153,8 @@ Node Node::createDefaultGraph (const String& name)
         }
         else if (t == "midi.input")
         {
-            ioNode.setProperty ("relativeX", 0.75f, 0)
-                    .setProperty ("relativeY", 0.25f, 0)
+            ioNode.setProperty (Tags::relativeX, 0.75f, 0)
+                    .setProperty (Tags::relativeY, 0.25f, 0)
                     .setProperty ("numAudioIns", 0, 0)
                     .setProperty ("numAudioOuts", 0, 0);
             ValueTree port (Tags::port);
@@ -166,8 +166,8 @@ Node Node::createDefaultGraph (const String& name)
         }
         else if (t == "midi.output")
         {
-            ioNode.setProperty ("relativeX", 0.75f, 0)
-                    .setProperty ("relativeY", 0.75f, 0)
+            ioNode.setProperty (Tags::relativeX, 0.75f, 0)
+                    .setProperty (Tags::relativeY, 0.75f, 0)
                     .setProperty ("numAudioIns", 0, 0)
                     .setProperty ("numAudioOuts", 0, 0);
             ValueTree port (Tags::port);
@@ -597,14 +597,31 @@ bool Node::canConnect (const uint32 sourceNode, const uint32 sourcePort,
 
 void Node::setRelativePosition (const double x, const double y)
 {
-    setProperty ("relativeX", x);
-    setProperty ("relativeY", y);
+    setProperty (Tags::relativeX, x);
+    setProperty (Tags::relativeY, y);
 }
 
 void Node::getRelativePosition (double& x, double& y) const
 {
-    x = (double) getProperty ("relativeX", 0.5f);
-    y = (double) getProperty ("relativeY", 0.5f);
+    x = (double) getProperty (Tags::relativeX, 0.5f);
+    y = (double) getProperty (Tags::relativeY, 0.5f);
+}
+
+bool Node::hasPosition() const
+{
+    return hasProperty (Tags::x) && hasProperty (Tags::y);
+}
+
+void Node::getPosition (double& x, double& y) const
+{
+    x = (double) getProperty (Tags::x, 0.0);
+    y = (double) getProperty (Tags::y, 0.0);
+}
+
+void Node::setPosition (double x, double y)
+{
+    setProperty (Tags::x, x);
+    setProperty (Tags::y, y);
 }
 
 Node Node::getParentGraph() const
