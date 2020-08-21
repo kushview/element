@@ -227,11 +227,17 @@ void BlockComponent::setPositionFromNode()
     
     double x = 0.0, y = 0.0;
     auto* const panel = getGraphPanel();
-    if (! node.hasPosition() && nullptr != panel)
+    Component* parent = nullptr;
+    if (panel != nullptr)
+        parent = panel->findParentComponentOfClass<Viewport>();
+    if (parent == nullptr)
+        parent = panel;
+    
+    if (! node.hasPosition() && nullptr != parent)
     {
         node.getRelativePosition (x, y);
-        x = x * (panel->getWidth() - (getWidth() / 2));
-        y = y * (panel->getHeight() - (getHeight() / 2));
+        x = x * (parent->getWidth())  - (getWidth() / 2);
+        y = y * (parent->getHeight()) - (getHeight() / 2);
         node.setPosition (x, y);
     }
     else
