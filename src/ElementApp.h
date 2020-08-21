@@ -97,10 +97,14 @@ namespace Tags
 
     const Identifier windowOnTop        = "windowOnTop";
     const Identifier windowVisible      = "windowVisible";
+    const Identifier x                  = "x";
+    const Identifier y                  = "y";
     const Identifier windowX            = "windowX";
     const Identifier windowY            = "windowY";
     const Identifier relativeX          = "relativeX";
     const Identifier relativeY          = "relativeY";
+    const Identifier width              = "width";
+    const Identifier height             = "height";
     const Identifier pluginName         = "pluginName";
     const Identifier pluginIdentifierString = "pluginIdentifierString";
     const Identifier uuid               = "uuid";
