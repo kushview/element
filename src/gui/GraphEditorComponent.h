@@ -60,6 +60,8 @@ public:
     /** Changes the layout to vertical or not */
     void setVerticalLayout (const bool isVertical);
 
+    Rectangle<int> getRequiredSpace() const;
+
     /** Stabilize all nodes without changing position */
     void stabilizeNodes();
 
@@ -84,6 +86,9 @@ public:
     bool isInterestedInDragSource (const SourceDetails&) override;
     void itemDropped (const SourceDetails& details) override;
     bool shouldDrawDragImageWhenOver() override { return true; }
+
+    //=========================================================================
+    std::function<void(BlockComponent&)> onBlockMoved;
 
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);

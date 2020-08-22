@@ -358,6 +358,10 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     
     setNodePosition (pos.getX(), pos.getY());
     setPositionFromNode();
+
+    if (auto* const panel = getGraphPanel())
+        if (panel->onBlockMoved)
+            panel->onBlockMoved (*this);
 }
 
 void BlockComponent::mouseUp (const MouseEvent& e)

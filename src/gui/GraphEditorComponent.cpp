@@ -729,6 +729,22 @@ void GraphEditorComponent::updateComponents()
     updateConnectorComponents();
 }
 
+Rectangle<int> GraphEditorComponent::getRequiredSpace() const
+{
+    Rectangle<int> r;
+    for (int i = getNumChildComponents(); --i >= 0;)
+    {
+        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+        { 
+            if (fc->getRight() > r.getWidth())
+                r.setWidth (fc->getRight());
+            if (fc->getBottom() > r.getHeight())
+                r.setHeight (fc->getBottom());
+        }
+    }
+    return r;
+}
+
 void GraphEditorComponent::beginConnectorDrag (const uint32 sourceNode, const int sourceFilterChannel,
                                                const uint32 destNode, const int destFilterChannel,
                                                const MouseEvent& e)

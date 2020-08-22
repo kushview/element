@@ -18,6 +18,7 @@
 */
 
 #include "gui/GuiCommon.h"
+#include "gui/BlockComponent.h"
 #include "gui/views/GraphEditorView.h"
 #include "Common.h"
 
@@ -26,6 +27,12 @@ namespace Element {
 GraphEditorView::GraphEditorView()
 {
     setName ("GraphEditor");
+
+    graph.onBlockMoved = [this](BlockComponent& block) {
+        if (block.getRight() <= graph.getWidth() && block.getBottom() <= graph.getHeight())
+            return;
+        updateSizeInternal();
+    };
 
     addAndMakeVisible (view);
     view.setViewedComponent (&graph, false);
@@ -130,6 +137,7 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
 {
     stabilizeContent();
+    updateSizeInternal();
 }
 
 void GraphEditorView::onNodeSelected()
@@ -152,6 +160,16 @@ void GraphEditorView::onNodeRemoved (const Node& node)
             nextGraph = session->getActiveGraph();
         setNode (nextGraph);
     }
+}
+
+void GraphEditorView::updateSizeInternal()
+{
+    auto r = graph.getRequiredSpace();
+    if (r.getWidth() <= view.getWidth())
+        r.setWidth (view.getWidth());
+    if (r.getHeight() <= view.getHeight())
+        r.setHeight (view.getHeight());
+    graph.setBounds (r);
 }
 
 ValueTree GraphEditorView::getSettings() const

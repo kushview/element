@@ -73,6 +73,8 @@ public:
     virtual void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }
     virtual bool perform (const InvocationInfo&) override { return false; }
 
+    Signal<void()> nodeMoved;
+
     /** @internal */
     ApplicationCommandTarget* getNextCommandTarget() override { return nextCommandTarget; }
     /** @internal */
