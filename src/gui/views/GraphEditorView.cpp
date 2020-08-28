@@ -29,9 +29,13 @@ GraphEditorView::GraphEditorView()
     setName ("GraphEditor");
 
     graph.onBlockMoved = [this](BlockComponent& block) {
-        if (block.getRight() <= graph.getWidth() && block.getBottom() <= graph.getHeight())
-            return;
-        updateSizeInternal();
+        const auto pos = block.getBounds().getCentre();
+        auto gb = graph.getBounds();
+        bool sizeShouldChange = false;
+        if (pos.x > gb.getWidth())      { gb.setWidth (pos.x);  sizeShouldChange = true; }
+        if (pos.y > gb.getHeight())     { gb.setHeight (pos.y); sizeShouldChange = true; }
+        if (sizeShouldChange)           { graph.setBounds (gb); return; }
+        view.autoScroll (pos.x, pos.y, 5, 5);
     };
 
     addAndMakeVisible (view);
