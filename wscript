@@ -89,6 +89,7 @@ def configure (conf):
     juce.display_header ("Element")
     juce.display_msg (conf, "ALSA", conf.env.ALSA)
     juce.display_msg (conf, "JACK", conf.env.JACK)
+    juce.display_msg (conf, "AU",   juce.is_mac())
     juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
     juce.display_msg (conf, "VST3", True)
     juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
