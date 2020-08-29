@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -360,8 +360,11 @@ void BlockComponent::mouseDrag (const MouseEvent& e)
     setPositionFromNode();
 
     if (auto* const panel = getGraphPanel())
+    {
         if (panel->onBlockMoved)
             panel->onBlockMoved (*this);
+        panel->updateConnectorComponents();
+    }
 }
 
 void BlockComponent::mouseUp (const MouseEvent& e)

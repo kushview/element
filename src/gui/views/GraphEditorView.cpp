@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,15 +29,17 @@ GraphEditorView::GraphEditorView()
     setName ("GraphEditor");
 
     graph.onBlockMoved = [this](BlockComponent& block) {
+        const int resizeBy = 15;
+        const int maxSpeed = 10;
         auto pos = block.getBounds().getCentre();
         auto gb = graph.getBounds();
         bool sizeShouldChange = false;
-        if (pos.x > gb.getWidth())  { gb.setWidth (pos.x + 2);  sizeShouldChange = true; }
-        if (pos.y > gb.getHeight()) { gb.setHeight (pos.y + 2); sizeShouldChange = true; }
+        if (pos.x > gb.getWidth())  { gb.setWidth (pos.x + resizeBy);  sizeShouldChange = true; }
+        if (pos.y > gb.getHeight()) { gb.setHeight (pos.y + resizeBy); sizeShouldChange = true; }
         if (sizeShouldChange)       { graph.setBounds (gb); }
 
         pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
-        view.autoScroll (pos.x, pos.y, 5, 5);
+        view.autoScroll (pos.x, pos.y, 5, maxSpeed);
     };
 
     addAndMakeVisible (view);
