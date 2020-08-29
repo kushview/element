@@ -254,11 +254,15 @@ void BlockComponent::setNodePosition (const int x, const int y)
 {
     if (vertical)
     {
+        node.setRelativePosition ((x + getWidth() / 2) / (double) getParentWidth(),
+                                  (y + getHeight() / 2) / (double) getParentHeight());
         node.setProperty (Tags::x, (double) x);
         node.setProperty (Tags::y, (double) y);
     }
     else
     {
+        node.setRelativePosition ((y + getHeight() / 2) / (double) getParentHeight(),
+                                  (x + getWidth() / 2) / (double) getParentWidth());
         node.setProperty (Tags::y, (double) x);
         node.setProperty (Tags::x, (double) y);
     }
