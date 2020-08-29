@@ -32,11 +32,11 @@ GraphEditorView::GraphEditorView()
         auto pos = block.getBounds().getCentre();
         auto gb = graph.getBounds();
         bool sizeShouldChange = false;
-        if (pos.x > gb.getWidth())      { gb.setWidth (pos.x + 2);  sizeShouldChange = true; }
-        if (pos.y > gb.getHeight())     { gb.setHeight (pos.y + 2); sizeShouldChange = true; }
-        if (sizeShouldChange)           { graph.setBounds (gb); }
-        pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
+        if (pos.x > gb.getWidth())  { gb.setWidth (pos.x + 2);  sizeShouldChange = true; }
+        if (pos.y > gb.getHeight()) { gb.setHeight (pos.y + 2); sizeShouldChange = true; }
+        if (sizeShouldChange)       { graph.setBounds (gb); }
 
+        pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
         view.autoScroll (pos.x, pos.y, 5, 5);
     };
 
@@ -62,6 +62,7 @@ void GraphEditorView::willBeRemoved()
     jassert (world); // something went majorly wrong...
     if (world)
         world->getMidiEngine().removeChangeListener (this);
+    saveSettings();
     graph.setNode (Node());
 }
 
@@ -105,13 +106,10 @@ void GraphEditorView::stabilizeContent()
 
 void GraphEditorView::didBecomeActive()
 {
-    auto session = ViewHelpers::getSession (this);
     auto* world = ViewHelpers::getGlobals (this);
     jassert (world); // something went majorly wrong...
-
     world->getMidiEngine().addChangeListener (this);
     stabilizeContent();
-
     restoreSettings();
     graph.updateComponents();
 }
@@ -140,10 +138,16 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
     }
 }
 
+void GraphEditorView::graphNodeWillChange()
+{
+    saveSettings();
+}
+
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
 {
     stabilizeContent();
     updateSizeInternal();
+    restoreSettings();
 }
 
 void GraphEditorView::onNodeSelected()
@@ -180,18 +184,21 @@ void GraphEditorView::updateSizeInternal()
 
 ValueTree GraphEditorView::getSettings() const
 {
-    ValueTree uivt = getNode().getUIValueTree();
+    ValueTree uivt = getGraph().getUIValueTree();
     return uivt.isValid() ? uivt.getOrCreateChildWithName ("GraphEditorView", nullptr)
                           : ValueTree();
 }
- 
+
 void GraphEditorView::restoreSettings()
 {
     auto s = getSettings();
     if (! s.isValid())
         return;
-    setSize (s.getProperty (Tags::width,  getWidth()),
-             s.getProperty (Tags::height, getHeight()));
+
+    graph.setSize (s.getProperty (Tags::width,  getWidth()),
+                   s.getProperty (Tags::height, getHeight()));
+    view.getHorizontalScrollBar().setCurrentRangeStart (s.getProperty ("horizontalRangeStart", 0.0));
+    view.getVerticalScrollBar().setCurrentRangeStart (s.getProperty ("verticalRangeStart", 0.0));
 }
 
 void GraphEditorView::saveSettings()
@@ -199,8 +206,11 @@ void GraphEditorView::saveSettings()
     auto s = getSettings();
     if (! s.isValid())
         return;
-    s.setProperty (Tags::width,  getWidth(),  nullptr);
-    s.setProperty (Tags::height, getHeight(), nullptr);
+    
+    s.setProperty (Tags::width,  graph.getWidth(),  nullptr);
+    s.setProperty (Tags::height, graph.getHeight(), nullptr);
+    s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
+    s.setProperty ("verticalRangeStart",   view.getVerticalScrollBar().getCurrentRangeStart(),   nullptr);
 }
 
 } /* namespace Element */

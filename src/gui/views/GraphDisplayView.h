@@ -83,23 +83,25 @@ public:
 
     inline void setNode (const Node& n)
     {
-        Node oldGraph = graph;
-        Node oldNode  = node;
+        Node newGraph = n.isGraph() ? n : n.getParentGraph();
+        Node newNode  = n.isGraph() ? Node() : n;
 
-        graph = n.isGraph() ? n : n.getParentGraph();
-        node  = n.isGraph() ? Node() : n;
+        if (newGraph != graph || newNode != node)
+        {
+            graphNodeWillChange();
 
-       if (oldGraph != graph || oldNode != node)
-       {
-           if (node.isValid())
-               breadcrumb.setNode (node);
-           else if (graph.isValid())
-               breadcrumb.setNode (graph);
-           else
-               breadcrumb.setNode (Node());
-           
-           graphNodeChanged (graph, node);
-       }
+            graph = newGraph;
+            node  = newNode;
+            
+            if (node.isValid())
+                breadcrumb.setNode (node);
+            else if (graph.isValid())
+                breadcrumb.setNode (graph);
+            else
+                breadcrumb.setNode (Node());
+            
+            graphNodeChanged (graph, node);
+        }
     }
 
     inline void resized() override
@@ -127,6 +129,7 @@ public:
 
 protected:
     virtual void graphDisplayResized (const Rectangle<int>& area) =0;
+    virtual void graphNodeWillChange() { }
     virtual void graphNodeChanged (const Node&, const Node&) { }
 
 private:

@@ -46,6 +46,7 @@ public:
 
 protected:
     void graphDisplayResized (const Rectangle<int>& area) override;
+    void graphNodeWillChange() override;
     void graphNodeChanged (const Node& g, const Node&) override;
 
 private:
