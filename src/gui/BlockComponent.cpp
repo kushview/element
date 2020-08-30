@@ -245,8 +245,8 @@ void BlockComponent::setPositionFromNode()
         node.getPosition (x, y);
     }
 
-    setBounds ({ roundDoubleToInt (x),
-                 roundDoubleToInt (y), 
+    setBounds ({ roundDoubleToInt (vertical ? x : y),
+                 roundDoubleToInt (vertical ? y : x), 
                  getWidth(), getHeight() });
 }
 
