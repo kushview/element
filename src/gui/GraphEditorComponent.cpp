@@ -464,8 +464,6 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         menu.addItem (100, "Misc testing item...");
        #endif
         menu.addSeparator();
-        menu.addItem (6, "Fixed node positions", true, areResizePositionsFrozen());
-        menu.addSeparator();
         
         menu.addSectionHeader ("Plugins");
         menu.addPluginItems();
@@ -515,10 +513,6 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                     break;
                 case 5:
                     setVerticalLayout (! isLayoutVertical());
-                    return;
-                    break;
-                case 6:
-                    setResizePositionsFrozen (! areResizePositionsFrozen());
                     return;
                     break;
                 
