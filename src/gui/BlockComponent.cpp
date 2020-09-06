@@ -232,7 +232,7 @@ void BlockComponent::setPositionFromNode()
         parent = panel->findParentComponentOfClass<Viewport>();
     if (parent == nullptr)
         parent = panel;
-    
+
     if (! node.hasPosition() && nullptr != parent)
     {
         node.getRelativePosition (x, y);

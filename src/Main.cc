@@ -221,7 +221,6 @@ public:
             return;
         }
 
-        loadLicense();
         initializeModulePath();
         printCopyNotice();
         launchApplication();
@@ -396,11 +395,6 @@ private:
     ScopedPointer<AppController>    controller;
     ScopedPointer<Startup>          startup;
     OwnedArray<kv::ChildProcessSlave>   slaves;
-    
-    void loadLicense()
-    {
-    
-    }
 
     void printCopyNotice()
     {
