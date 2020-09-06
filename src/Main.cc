@@ -140,7 +140,6 @@ private:
        #endif
     }
     
-
     void run() override
     {
         Settings& settings (world.getSettings());
@@ -262,8 +261,6 @@ public:
         world->setEngine (nullptr);
         world->unloadModules();
         world = nullptr;
-        
-        // Analytics::getInstance()->deleteInstance();
     }
 
     void systemRequestedQuit() override
@@ -342,7 +339,7 @@ public:
                 const File file (path);
                 if (file.hasFileExtension ("els"))
                     sc->openFile (file);
-                else if (file.hasFileExtension("elg"))
+                else if (file.hasFileExtension ("elg"))
                     sc->importGraph (file);
             }
         }
@@ -391,48 +388,18 @@ public:
     
 private:
     String launchCommandLine;
-    ScopedPointer<Globals>          world;
-    ScopedPointer<AppController>    controller;
-    ScopedPointer<Startup>          startup;
+    ScopedPointer<Globals>              world;
+    ScopedPointer<AppController>        controller;
+    ScopedPointer<Startup>              startup;
     OwnedArray<kv::ChildProcessSlave>   slaves;
 
     void printCopyNotice()
     {
         String appName = Util::appName();
-        appName << " v" << getApplicationVersion();
-    #if 0
-       #if defined (EL_PRO) || defined (EL_SOLO)
-        if (EL_IS_NOT_ACTIVATED (world->getUnlockStatus()))
-        {
-            appName << " (unauthorized)";
-        }
-        else if (EL_IS_ACTIVATED (world->getUnlockStatus()))
-        {
-            appName << " (authorized)";
-        }
-        else if (EL_IS_TRIAL_EXPIRED (world->getUnlockStatus()))
-        {
-            appName << " (trial expired)";
-        }
-        else if (EL_IS_TRIAL_NOT_EXPIRED (world->getUnlockStatus()))
-        {
-            appName << " (trial)";
-        }
-        else
-        {
-            jassertfalse; // this is most likely a wrong product.  e.g. SE license used for Pro
-            appName << " (unkown activation state)";
-        }
-       #else
-            appName << " (lite)";
-       #endif
-       
+        appName << " v" << getApplicationVersion() << " (GPL v3)";
         Logger::writeToLog (appName);
-        Logger::writeToLog ("Copyright (c) 2017-2019 Kushview, LLC.  All rights reserved.\n");
-       #if EL_USE_LOCAL_AUTH
-        Logger::writeToLog ("[EL] using local authentication");
-       #endif
-       #endif
+        Logger::writeToLog (String ("Copyright (c) 2017-%YEAR% Kushview, LLC.  All rights reserved.\n")
+                                .replace ("%YEAR%", String (Time::getCurrentTime().getYear())));
     }
 
     bool maybeLaunchSlave (const String& commandLine)
