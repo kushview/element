@@ -35,8 +35,8 @@ namespace Element {
 //=============================================================================
 
 PortComponent::PortComponent (const Node& g, const Node& n,
-                              const uint32 nid, const uint32 i, 
-                              const bool dir, const PortType t, 
+                              const uint32 nid, const uint32 i,
+                              const bool dir, const PortType t,
                               const bool v)
     : graph (g), node (n), nodeID (nid), port (i), 
       input (dir), type (t), vertical (v)
@@ -694,7 +694,7 @@ void BlockComponent::update (const bool doPosition)
             const PortType t (port.getType());
             if (t == PortType::Control)
                 continue;
-            
+
             const bool isInput (port.isInput());
             addAndMakeVisible (new PortComponent (graph, node, filterID, i, isInput, t, vertical));
         }
