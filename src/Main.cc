@@ -351,7 +351,7 @@ public:
             {
                 const File file (path);
                 if (file.hasFileExtension ("elg"))
-                    gc->open (file);
+                    gc->openGraph (file);
             }
         }
        #endif
