@@ -343,6 +343,17 @@ public:
                     sc->importGraph (file);
             }
         }
+       #else
+        if (auto* gc = controller->findChild<GraphController>())
+        {
+            const auto path = commandLine.unquoted().trim();
+            if (File::isAbsolutePath (path))
+            {
+                const File file (path);
+                if (file.hasFileExtension ("elg"))
+                    gc->open (file);
+            }
+        }
        #endif
     }
 
