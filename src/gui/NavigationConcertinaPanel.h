@@ -228,12 +228,14 @@ class DataPathTreeComponent : public Component,
 public:
     DataPathTreeComponent()
         : thread ("EL_DataPath"),
-          renameWindow ("Rename","Enter a new file name.", AlertWindow::NoIcon)
+          renameWindow ("Rename", "Enter a new file name.", AlertWindow::NoIcon)
     {
         thread.startThread();
-        list = new DirectoryContentsList (0, thread);
+        list.reset (new DirectoryContentsList (0, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
-        addAndMakeVisible (tree = new FileTreeComponent (*list));
+
+        tree.reset (new FileTreeComponent (*list));
+        addAndMakeVisible (tree.get());
         tree->addListener (this);
         tree->setItemHeight (20);
         tree->setIndentSize (10);
@@ -248,9 +250,9 @@ public:
     ~DataPathTreeComponent()
     {
         tree->removeListener (this);
-		renameWindow.setVisible(false);
-		tree = nullptr;
-		list = nullptr;
+		renameWindow.setVisible (false);
+		tree.reset();
+		list.reset();
     }
     
     void resized() override
@@ -261,6 +263,7 @@ public:
     FileTreeComponent& getFileTreeComponent() {  jassert(tree != nullptr); return *tree; }
     File getSelectedFile() { return getFileTreeComponent().getSelectedFile(); }
     File getDirectory() { return (list) ? list->getDirectory() : File(); }
+    
     void refresh()
     {
         auto state = tree->getOpennessState (true);
@@ -270,6 +273,7 @@ public:
     }
 
     virtual void selectionChanged() override { }
+
     virtual void fileClicked (const File& file, const MouseEvent& e) override
     {
         if (e.mods.isPopupMenu() && ! file.isDirectory())
@@ -277,7 +281,7 @@ public:
     }
     
     void fileDoubleClicked (const File& file) override
-    {   
+    {
         auto session = ViewHelpers::getSession (this);
         auto* const cc = ViewHelpers::findContentComponent (this);
 
@@ -300,8 +304,8 @@ public:
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
     
 private:
-    ScopedPointer<FileTreeComponent> tree;
-    ScopedPointer<DirectoryContentsList> list;
+    std::unique_ptr<FileTreeComponent> tree;
+    std::unique_ptr<DirectoryContentsList> list;
     TimeSliceThread thread;
     
     AlertWindow renameWindow;
