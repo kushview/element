@@ -168,6 +168,12 @@ BlockComponent::~BlockComponent() noexcept
     deleteAllPins();
 }
 
+void BlockComponent::moveBlockTo (double x, double y)
+{
+    node.setPosition (x, y);
+    setPositionFromNode();
+}
+
 void BlockComponent::setPowerButtonVisible (bool visible)   { setButtonVisible (powerButton, visible); }
 void BlockComponent::setConfigButtonVisible (bool visible)  { setButtonVisible (configButton, visible); }
 void BlockComponent::setMuteButtonVisible (bool visible)    { setButtonVisible (muteButton, visible); }

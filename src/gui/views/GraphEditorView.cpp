@@ -29,9 +29,10 @@ GraphEditorView::GraphEditorView()
     setName ("GraphEditor");
 
     graph.onBlockMoved = [this](BlockComponent& block) {
-        const int resizeBy = 15;
+        const int resizeBy = 12;
         const int maxSpeed = 10;
-        auto pos = block.getBounds().getCentre();
+        auto pos = block.getBounds().getBottomRight();
+
         auto gb = graph.getBounds();
         bool sizeShouldChange = false;
         if (pos.x > gb.getWidth())  { gb.setWidth (pos.x + resizeBy);  sizeShouldChange = true; }
@@ -39,7 +40,7 @@ GraphEditorView::GraphEditorView()
         if (sizeShouldChange)       { graph.setBounds (gb); }
 
         pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
-        view.autoScroll (pos.x, pos.y, 5, maxSpeed);
+        view.autoScroll (pos.x, pos.y, 6, maxSpeed);
     };
 
     addAndMakeVisible (view);
@@ -148,8 +149,7 @@ void GraphEditorView::graphNodeWillChange()
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
 {
     stabilizeContent();
-    updateSizeInternal();
-    restoreSettings();
+    restoreSettings();   
 }
 
 void GraphEditorView::onNodeSelected()
@@ -195,7 +195,10 @@ void GraphEditorView::restoreSettings()
 {
     auto s = getSettings();
     if (! s.isValid())
+    {
+        updateSizeInternal();
         return;
+    }
 
     graph.setSize (s.getProperty (Tags::width,  getWidth()),
                    s.getProperty (Tags::height, getHeight()));

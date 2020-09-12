@@ -518,38 +518,45 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                 
                 case 7:
                 {
+                    int width  = getWidth();
+                    int height = getHeight();
                     int numChanges = 0;
-                    for (int i = 0; i < graph.getNumNodes(); ++i)
+                    int numEditorChanges = 0;
+                    for (int i = 0; i < getNumChildComponents(); ++i)
                     {
-                        Node node = graph.getNode (i);
-                        double x = 0, y = 0;
-                        node.getRelativePosition (x, y);
+                        auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i));
+                        if (nullptr == block)
+                            continue;
+
+                        auto r = block->getBounds();
+                        // auto x = r.getX(), y = r.getY();
+                        // if (! isLayoutVertical())
                         bool changed = false;
-                        if (x < 0.0)
+                        if (r.getX() < 0)
                         {
                             changed = true;
-                            x = 0.05;
+                            r = r.withX (0);
                         }
-                        else if (x > 1.0)
+                        else if (r.getRight() > width)
                         {
-                            changed = true;
-                            x = 0.95;
+                            numEditorChanges++;
+                            width = r.getRight();
                         }
 
-                        if (y < 0.0)
+                        if (r.getY() < 0)
                         {
                             changed = true;
-                            y = 0.05;
+                            r = r.withY (0);
                         }
-                        else if (y > 1.0)
+                        else if (r.getBottom() > height)
                         {
-                            changed = true;
-                            y = 0.95;
+                            numEditorChanges++;
+                            height = r.getBottom();
                         }
 
                         if (changed)
                         {
-                            node.setRelativePosition (x, y);
+                            block->moveBlockTo (r.getX(), r.getY());
                             ++numChanges;
                         }
                     }
@@ -560,6 +567,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                         updateConnectorComponents();
                     }
 
+                    if (numEditorChanges > 0)
+                        setSize (width, height);
                     return;
                 } break;
                 
@@ -726,6 +735,8 @@ void GraphEditorComponent::updateComponents()
 Rectangle<int> GraphEditorComponent::getRequiredSpace() const
 {
     Rectangle<int> r;
+    r.setX (0);
+    r.setY (0);
     for (int i = getNumChildComponents(); --i >= 0;)
     {
         if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))

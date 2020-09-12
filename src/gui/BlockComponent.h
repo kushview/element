@@ -81,6 +81,7 @@ public:
     ~BlockComponent() noexcept;
 
     //=========================================================================
+    void moveBlockTo (double x, double y);
 
     /** Change the power button's visibility */
     void setPowerButtonVisible (bool);
