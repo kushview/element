@@ -430,7 +430,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
     if (! isEnabled())
         return;
 
-    if (selectedNodes.getNumSelected() > 0) {
+    if (selectedNodes.getNumSelected() > 0)
+    {
         selectedNodes.deselectAll();
         updateSelection();
     }
