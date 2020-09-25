@@ -26,7 +26,7 @@
 namespace Element {
 
 /** Responsible for creating new, opening, and saving graph files in
-    Element Lite and Solo */
+    Element SE */
 class GraphController final : public AppController::Child
 {
 public:
