@@ -29,10 +29,23 @@ GraphEditorView::GraphEditorView()
     setName ("GraphEditor");
 
     graph.onBlockMoved = [this](BlockComponent& block) {
-        const int resizeBy = 12;
-        const int maxSpeed = 10;
-        auto pos = block.getBounds().getBottomRight();
+        const int resizeBy  = 12;
+        const int edgeSpeed = 6;
+        const int maxSpeed  = 10;
 
+        // restrict top/left out of bounds scroll
+        auto pos = block.getBounds().getTopLeft();
+        if (block.getX() < 0)
+            pos.setX (0);
+        if (block.getY() < 0)
+            pos.setY (0);
+
+        // save top left
+        const auto revertTopLeftPos = pos;
+        const bool revertTopLeft = pos.getX() != block.getX() || pos.getY() != block.getY();
+        
+        // expand and scroll bottom/right
+        pos = block.getBounds().getBottomRight();
         auto gb = graph.getBounds();
         bool sizeShouldChange = false;
         if (pos.x > gb.getWidth())  { gb.setWidth (pos.x + resizeBy);  sizeShouldChange = true; }
@@ -40,7 +53,10 @@ GraphEditorView::GraphEditorView()
         if (sizeShouldChange)       { graph.setBounds (gb); }
 
         pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
-        view.autoScroll (pos.x, pos.y, 6, maxSpeed);
+        view.autoScroll (pos.x, pos.y, edgeSpeed, maxSpeed);
+
+        if (revertTopLeft)
+            block.setTopLeftPosition (revertTopLeftPos);
     };
 
     addAndMakeVisible (view);
