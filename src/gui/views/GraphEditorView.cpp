@@ -149,7 +149,8 @@ void GraphEditorView::graphNodeWillChange()
 void GraphEditorView::graphNodeChanged (const Node& g, const Node&)
 {
     stabilizeContent();
-    restoreSettings();   
+    restoreSettings();
+    updateSizeInternal (false);
 }
 
 void GraphEditorView::onNodeSelected()
@@ -174,14 +175,16 @@ void GraphEditorView::onNodeRemoved (const Node& node)
     }
 }
 
-void GraphEditorView::updateSizeInternal()
+void GraphEditorView::updateSizeInternal (const bool force)
 {
     auto r = graph.getRequiredSpace();
+    const auto rc = r;
     if (r.getWidth() <= view.getWidth())
         r.setWidth (view.getWidth());
     if (r.getHeight() <= view.getHeight())
         r.setHeight (view.getHeight());
-    graph.setBounds (r);
+    if (force || r != rc)
+        graph.setBounds (r);
 }
 
 ValueTree GraphEditorView::getSettings() const

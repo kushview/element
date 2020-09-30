@@ -57,7 +57,7 @@ private:
                      nodeRemovedConnection;
     void onNodeSelected();
     void onNodeRemoved (const Node&);
-    void updateSizeInternal();
+    void updateSizeInternal (const bool force = true);
 };
 
 }
