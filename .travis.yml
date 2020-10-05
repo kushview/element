@@ -5,7 +5,7 @@ os:
   - osx
 
 dist: bionic
-osx_image: xcode12u
+osx_image: xcode11.6
 
 addons:
   apt:
