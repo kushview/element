@@ -207,6 +207,7 @@ def check (ctx):
     if not os.path.exists('build/bin/test-element'):
         ctx.fatal("Tests not compiled")
         return
+    os.environ["LD_LIBRARY_PATH"] = "build/lib"
     if 0 != call (["build/bin/test-element"]):
         ctx.fatal("Tests failed")
 
