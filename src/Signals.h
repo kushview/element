@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <unistd.h>
 #include <boost/signals2.hpp>
 
 namespace Element
