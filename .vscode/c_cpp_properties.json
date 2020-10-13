@@ -74,27 +74,32 @@
                 "/usr/include/sord-0",
                 "/usr/include/sratom-0",
                 "/usr/local/include",
-                "${workspaceRoot}/libs/compat",
                 "${workspaceRoot}/libs/JUCE/modules",
                 "${workspaceRoot}/libs/kv/modules",
                 "${workspaceRoot}/libs/jlv2/modules",
+                "${workspaceRoot}/libs/compat",
                 "${workspaceRoot}/libs/lua",
                 "${workspaceRoot}/libs/lua/src",
-                "${workspaceRoot}/src"
+                "${workspaceRoot}/src",
+                "${workspaceRoot}/tests"
             ],
             "defines": [],
+            "forcedInclude": [
+                "${workspaceRoot}/.vscode/vscode.h"
+            ],
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": [
                     "/usr/include",
                     "/usr/local/include",
-                    "${workspaceRoot}/libs/compat",
                     "${workspaceRoot}/libs/JUCE/modules",
                     "${workspaceRoot}/libs/kv/modules",
                     "${workspaceRoot}/libs/jlv2/modules",
+                    "${workspaceRoot}/libs/compat",
                     "${workspaceRoot}/libs/lua",
                     "${workspaceRoot}/libs/lua/src",
-                    "${workspaceRoot}/src"
+                    "${workspaceRoot}/src",
+                    "${workspaceRoot}/tests"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
