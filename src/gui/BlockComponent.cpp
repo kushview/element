@@ -205,15 +205,16 @@ void BlockComponent::buttonClicked (Button* b)
     if (b == &configButton && configButton.getToggleState())
     {
         configButton.setToggleState (false, dontSendNotification);
-        ioBox.clear();
+        // ioBox.clear();
     }
     else if (b == &configButton && !configButton.getToggleState())
     {
-        auto* const component = new NodeAudioBusesComponent (node, proc,
+        auto* component = new NodeAudioBusesComponent (node, proc,
                 ViewHelpers::findContentComponent (this));
-        auto& box = CallOutBox::launchAsynchronously (
-            component, configButton.getScreenBounds(), 0);
-        ioBox.setNonOwned (&box);
+        CallOutBox::launchAsynchronously (
+            std::unique_ptr<Component> (component),
+            configButton.getScreenBounds(), nullptr);
+        // ioBox.setNonOwned (&box);
     }
     else if (b == &powerButton)
     {

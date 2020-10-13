@@ -10,7 +10,7 @@
               pluginManufacturerCode="KshV" pluginCode="ElFX" pluginChannelConfigs=""
               pluginIsSynth="0" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementFX"
-              aaxIdentifier="net.kushview.ElementFX" jucerVersion="5.4.5" companyName="Kushview"
+              aaxIdentifier="net.kushview.ElementFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
               defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
@@ -19,7 +19,7 @@
               pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
               pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
-              pluginAAXDisableMultiMono="0">
+              pluginAAXDisableMultiMono="0" jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element FX">
     <GROUP id="{9C95AAF2-091D-90F2-8252-0716A4C35CDF}" name="libs">
       <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
@@ -734,25 +734,25 @@
         <CONFIGURATION isDebug="0" name="Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="kv_models" path="../../juce"/>
-        <MODULEPATH id="kv_gui" path="../../juce"/>
-        <MODULEPATH id="kv_engines" path="../../juce"/>
-        <MODULEPATH id="kv_core" path="../../juce"/>
-        <MODULEPATH id="juce_osc" path="../../juce"/>
-        <MODULEPATH id="juce_gui_extra" path="../../juce"/>
-        <MODULEPATH id="juce_gui_basics" path="../../juce"/>
-        <MODULEPATH id="juce_graphics" path="../../juce"/>
-        <MODULEPATH id="juce_events" path="../../juce"/>
-        <MODULEPATH id="juce_dsp" path="../../juce"/>
-        <MODULEPATH id="juce_data_structures" path="../../juce"/>
-        <MODULEPATH id="juce_cryptography" path="../../juce"/>
-        <MODULEPATH id="juce_core" path="../../juce"/>
-        <MODULEPATH id="juce_audio_utils" path="../../juce"/>
-        <MODULEPATH id="juce_audio_processors" path="../../juce"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../juce"/>
-        <MODULEPATH id="juce_audio_formats" path="../../juce"/>
-        <MODULEPATH id="juce_audio_devices" path="../../juce"/>
-        <MODULEPATH id="juce_audio_basics" path="../../juce"/>
+        <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_core" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </LINUX_MAKE>
   </EXPORTFORMATS>

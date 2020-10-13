@@ -50,10 +50,11 @@ public:
             }
             else
             {
-                auto* const component = new NodeAudioBusesComponent (node, proc,
+                auto* component = new NodeAudioBusesComponent (node, proc,
                         ViewHelpers::findContentComponent (this));
                 auto& box = CallOutBox::launchAsynchronously (
-                    component, ioButton->getScreenBounds(), 0);
+                    std::unique_ptr<Component> (component), 
+                    ioButton->getScreenBounds(), 0);
                 ioBox.setNonOwned (&box);
             }
         };

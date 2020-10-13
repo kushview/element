@@ -11,14 +11,14 @@
               pluginIsSynth="1" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementAU"
               pluginRTASCategory="2048" aaxIdentifier="net.kushview.Element"
-              pluginAAXCategory="2048" jucerVersion="5.4.5" companyName="Kushview"
-              companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
+              pluginAAXCategory="2048" companyName="Kushview" companyWebsite="https://kushview.net"
+              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
-              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include">
+              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element">
     <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
       <GROUP id="{62C1DB42-24AC-1BEF-C5A1-87EE68F8EAE4}" name="src">
