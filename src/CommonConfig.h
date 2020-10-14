@@ -18,6 +18,11 @@
 
 #pragma once
 
+#if __APPLE__
+ // make sure uuid_t gets defined before juce headers included
+ #include <uuid/uuid.h>
+#endif
+
 #ifndef EL_USE_DATA_PATH_TREE
  #define EL_USE_DATA_PATH_TREE 1
 #endif
