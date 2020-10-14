@@ -403,6 +403,7 @@ private:
     ScopedPointer<AppController> controller;
     AudioEnginePtr engine;
     
+    bool initialized = false;
     bool prepared = false;
     int preparedCount = 0;
     
@@ -421,6 +422,7 @@ private:
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;
     void reloadEngine();
+    void initialize();
     
     var hasCheckedLicense { 0 };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ElementPluginAudioProcessor)

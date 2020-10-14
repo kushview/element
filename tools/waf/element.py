@@ -132,7 +132,10 @@ def check_linux (self):
     self.check_cfg(package='xinerama', args='--cflags --libs', mandatory=True)
     self.check_cfg(package='xcursor', args='--cflags --libs', mandatory=True)
     
-    self.check_cfg(package='gtk+-2.0', uselib_store='GTK',args='--cflags --libs', mandatory=True)
+    if not self.options.no_gtkui:
+        self.check_cfg(package='gtk+-2.0', uselib_store='GTK',args='--cflags --libs', mandatory=False)
+    self.env.GTKUI = bool(self.env.HAVE_GTK) and not bool(self.options.no_gtkui)
+    self.define ('JLV2_GTKUI', self.env.GTKUI)
 
 def get_mingw_libs():
     return [ l.upper() for l in mingw_libs.split() ]

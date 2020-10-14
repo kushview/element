@@ -46,6 +46,7 @@
 #define JUCE_PROJUCER_VERSION 0x60003
 
 //==============================================================================
+#define JUCE_MODULE_AVAILABLE_jlv2_host                     1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics             1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices            1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats            1
@@ -68,6 +69,21 @@
 #define JUCE_MODULE_AVAILABLE_kv_models                     1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
+
+//==============================================================================
+// jlv2_host flags:
+
+#ifndef    JLV2_PLUGINHOST_LV2
+ #define   JLV2_PLUGINHOST_LV2 0
+#endif
+
+#ifndef    JLV2_SUIL_INIT
+ //#define JLV2_SUIL_INIT 1
+#endif
+
+#ifndef    JLV2_GTKUI
+ //#define JLV2_GTKUI 0
+#endif
 
 //==============================================================================
 // juce_audio_devices flags:
@@ -93,7 +109,7 @@
 #endif
 
 #ifndef    JUCE_JACK
- //#define JUCE_JACK 0
+ #define   JUCE_JACK 0
 #endif
 
 #ifndef    JUCE_BELA
@@ -327,7 +343,7 @@
 // juce_gui_extra flags:
 
 #ifndef    JUCE_WEB_BROWSER
- //#define JUCE_WEB_BROWSER 1
+ #define   JUCE_WEB_BROWSER 0
 #endif
 
 #ifndef    JUCE_USE_WIN_WEBVIEW2

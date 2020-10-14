@@ -99,7 +99,7 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
     world->setEngine (engine);
     SessionPtr session = world->getSession();
 
-    // if ((bool) world->getUnlockStatus().isFullVersion())
+    if (true)
     {
         Settings& settings (world->getSettings());
         PluginManager& plugins (world->getPluginManager());
@@ -117,14 +117,15 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
                                          getTotalNumInputChannels(),
                                          getTotalNumOutputChannels());
         session->clear();
-        session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
+        if (MessageManager::getInstance()->isThisTheMessageThread())
+            session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
         controller->activate();
         controllerActive = true;
 
         enginectl->sessionReloaded();
         mapsctl->learn (false);
         devsctl->refresh();
-        shouldProcess = true;
+        shouldProcess.set (true);
     }
 }
 

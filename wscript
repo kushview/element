@@ -18,6 +18,8 @@ def options (opt):
         help="Disable LADSPA plugin hosting")
     opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
         help="Disable LV2 plugin hosting")
+    opt.add_option ('--disable-gtkui', default=False, action='store_true', dest='no_gtkui', \
+        help="Disable GtkUI plugin hosting")
     
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
@@ -87,14 +89,15 @@ def configure (conf):
 
     print
     juce.display_header ("Element")
-    juce.display_msg (conf, "ALSA", conf.env.ALSA)
-    juce.display_msg (conf, "JACK", conf.env.JACK)
-    juce.display_msg (conf, "AU",   juce.is_mac())
-    juce.display_msg (conf, "VST2", bool(conf.env.HAVE_VST))
-    juce.display_msg (conf, "VST3", True)
+    juce.display_msg (conf, "ALSA",   conf.env.ALSA)
+    juce.display_msg (conf, "JACK",   conf.env.JACK)
+    juce.display_msg (conf, "AU",     juce.is_mac())
+    juce.display_msg (conf, "VST2",   bool(conf.env.HAVE_VST))
+    juce.display_msg (conf, "VST3",   True)
     juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
-    juce.display_msg (conf, "LV2", bool(conf.env.LV2))
-    juce.display_msg (conf, "Lua Scripting", bool(conf.env.LUA))
+    juce.display_msg (conf, "LV2",    bool(conf.env.LV2))
+    juce.display_msg (conf, "GtkUI",  bool(conf.env.GTKUI))
+    juce.display_msg (conf, "Lua",    bool(conf.env.LUA))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
@@ -116,6 +119,12 @@ def common_includes():
              'build/include', \
              VST3_PATH, \
              'src' ]
+
+def common_sources (ctx):
+    return element.get_juce_library_code ("libs/compat") + \
+        ctx.path.ant_glob ('libs/compat/BinaryData*.cpp') + \
+        ctx.path.ant_glob ('src/**/*.cpp') + \
+        ctx.path.ant_glob ('libs/lua-kv/src/*.c')
 
 def build_desktop (bld, slug='element'):
     if not juce.is_linux():
@@ -139,16 +148,36 @@ def build_desktop (bld, slug='element'):
 
         bld.install_files (element_data, 'data/ElementIcon.png')
 
+def compile_vst_linux (bld):
+    libEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        libEnv.append_unique (k, [ '-fPIC' ])
+    vst = bld (
+        features    = 'cxx cxxshlib',
+        source      = common_sources (bld),
+        includes    = common_includes(),
+        target      = 'lib/vst/Element',
+        name        = 'ELEMENT_VST',
+        env         = libEnv,
+        use         = [ 'BOOST_SIGNALS' ]
+    )
+    if bld.env.LV2:     vst.use += [ 'SUIL', 'LILV', 'LV2' ]
+    if bld.env.JACK:    vst.use += [ 'JACK' ]
+
+    if juce.is_linux():
+        build_desktop (bld)
+        vst.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
+
+def compile_vst (bld):
+    if juce.is_linux(): compile_vst_linux (bld)
+
 def compile (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
     library = bld (
         features    = 'cxx cxxshlib',
-        source      = element.get_juce_library_code ("libs/compat") +
-                      bld.path.ant_glob ('libs/compat/BinaryData*.cpp') +
-                      bld.path.ant_glob ('src/**/*.cpp') +
-                      bld.path.ant_glob ('libs/lua-kv/src/*.c'),
+        source      = common_sources (bld),
         includes    = common_includes(),
         target      = 'lib/element-0',
         name        = 'ELEMENT',
@@ -173,7 +202,7 @@ def compile (bld):
     if bld.env.JACK:    library.use += [ 'JACK' ]
 
     if juce.is_linux():
-        build_desktop(bld)
+        build_desktop (bld)
         library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
 
     elif juce.is_mac():
@@ -189,6 +218,7 @@ def compile (bld):
 def build (bld):
     bld.add_pre_fun (configure_git_version)
     compile (bld)
+    # compile_vst (bld)
 
     # for testing purposes right now. doesn't get installed
     if bld.env.LUA and bool(bld.env.HAVE_READLINE):
