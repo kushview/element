@@ -16,11 +16,29 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#pragma once
+#if defined(__MINGW32__) || defined(_MSC_VER)
+ #include <Windows.h>
+#elif defined(__APPLE__)
+ #include <CoreGraphics/CoreGraphics.h>
+#else
+ #pragma warning "Linux not yet supported caps lock"
+#endif
+
+#include "CapsLock.h"
 
 namespace Element {
 
-/** Returns true if caps lock is currently down */
-bool isCapsLockOn();
+bool isCapsLockOn()
+{
+   #if defined(__MINGW32__) || defined(_MSC_VER)
+    return (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
+   #elif defined(__APPLE__)
+    CGEventFlags flags = CGEventSourceFlagsState (kCGEventSourceStateHIDSystemState);
+    return (kCGEventFlagMaskAlphaShift & flags) != 0;
+   #else
+    // linux
+   #endif
+    return false;
+}
 
 }

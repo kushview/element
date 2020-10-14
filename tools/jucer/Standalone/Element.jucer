@@ -607,6 +607,7 @@
         <FILE id="lBLd3N" name="TempoMap.h" compile="0" resource="0" file="../../../src/session/TempoMap.h"/>
         <FILE id="aEmf2k" name="TrackModel.h" compile="0" resource="0" file="../../../src/session/TrackModel.h"/>
       </GROUP>
+      <FILE id="imeiZQ" name="CapsLock.cpp" compile="1" resource="0" file="../../../src/CapsLock.cpp"/>
       <FILE id="srzkBH" name="CapsLock.h" compile="0" resource="0" file="../../../src/CapsLock.h"/>
       <FILE id="s9sfnR" name="Commands.cpp" compile="1" resource="0" file="../../../src/Commands.cpp"/>
       <FILE id="TInt2X" name="Commands.h" compile="0" resource="0" file="../../../src/Commands.h"/>
