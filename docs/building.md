@@ -37,6 +37,7 @@ LD_LIBRARY_PATH="`pwd`/build/lib" build/bin/element
 __Installing__
 ```
 sudo ./waf install
+sudo ldconfig
 ```
 
 ### Arch Linux
