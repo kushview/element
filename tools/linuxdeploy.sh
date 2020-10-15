@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 
-
 appdir="build/AppDir"
 rm -rf build
 ./waf configure --prefix=/usr
