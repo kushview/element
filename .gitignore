@@ -36,5 +36,6 @@ node_modules
 /*.bz2
 /*.zip
 /element-0.*
+/*.AppImage
 
 /tools/contrib/contrib

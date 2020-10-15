@@ -138,15 +138,17 @@ def build_desktop (bld, slug='element'):
 
     if os.path.exists (src):
         bld (features = "subst",
-             source    = src,
-             target    = tgt,
-             name      = tgt,
-             ELEMENT_BINDIR = element_bin,
-             ELEMENT_DATA = element_data,
-             install_path = bld.env.PREFIX + "/share/applications"
+             source         = src,
+             target         = tgt,
+             name           = tgt,
+             ELEMENT_EXE    = 'element',
+             ELEMENT_ICON   = 'ElementIcon_512x512',
+             install_path   = bld.env.PREFIX + "/share/applications"
         )
 
         bld.install_files (element_data, 'data/ElementIcon.png')
+        bld.install_files (os.path.join (bld.env.PREFIX, 'share/icons/hicolor/512x512/apps'),
+                           'data/ElementIcon_512x512.png')
 
 def compile_vst_linux (bld):
     libEnv = bld.env.derive()
