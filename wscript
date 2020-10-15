@@ -70,7 +70,7 @@ def configure (conf):
     conf.load ("compiler_c compiler_cxx ar cross juce")
     conf.check_cxx_version()
     silence_warnings (conf)
-
+    conf.find_program('convert', mandatory=False)
     conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
@@ -130,11 +130,25 @@ def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
 
-    src = "data/net.kushview.%s.desktop.in" % (slug)
-    tgt = "net.kushview.%s.desktop" % (slug)
+    if len (bld.env.CONVERT[0]) > 0:
+        for size in '16 32 64 128 256 512'.split():
+            geometry = '%sx%s' % (size, size)
+            bld (
+                rule   = '%s ${SRC} -resize %s ${TGT}' % (bld.env.CONVERT[0], geometry),
+                source = 'data/ElementIcon.png',
+                target = 'share/icons/hicolor/%s/apps/net.kushview.element.png' % geometry,
+                install_path = bld.env.PREFIX + '/share/icons/hicolor/%s/apps' % geometry
+            )
+    else:
+        bld (
+            rule = 'cp -f ${SRC} ${TGT}',
+            source = 'data/ElementIcon_512x512.png',
+            target = 'share/icons/hicolor/512x512/apps/net.kushview.element.png',
+            install_path = bld.env.PREFIX + '/share/icons/hicolor/512x512/apps'
+        )
 
-    element_data = '%s' % (bld.env.DATADIR)
-    element_bin  = '%s/bin' % (bld.env.PREFIX)
+    src = "data/net.kushview.%s.desktop.in" % (slug)
+    tgt = "share/applications/net.kushview.%s.desktop" % (slug)
 
     if os.path.exists (src):
         bld (features = "subst",
@@ -142,13 +156,11 @@ def build_desktop (bld, slug='element'):
              target         = tgt,
              name           = tgt,
              ELEMENT_EXE    = 'element',
-             ELEMENT_ICON   = 'ElementIcon_512x512',
+             ELEMENT_ICON   = 'net.kushview.element',
              install_path   = bld.env.PREFIX + "/share/applications"
         )
 
-        bld.install_files (element_data, 'data/ElementIcon.png')
-        bld.install_files (os.path.join (bld.env.PREFIX, 'share/icons/hicolor/512x512/apps'),
-                           'data/ElementIcon_512x512.png')
+    bld.install_files (bld.env.DATADIR, 'data/ElementIcon.png')
 
 def compile_vst_linux (bld):
     libEnv = bld.env.derive()
