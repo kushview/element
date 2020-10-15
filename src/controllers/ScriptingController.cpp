@@ -23,7 +23,7 @@ namespace Element {
 
 ScriptingController::ScriptingController() {}
 ScriptingController::~ScriptingController() {}
-void ScriptingController::activate() { }
-void ScriptingController::deactivate() { }
+void ScriptingController::activate() {}
+void ScriptingController::deactivate() {}
 
 }
