@@ -4,14 +4,14 @@ set -ex
 appdir="build/AppDir"
 
 rm -rf build
-./waf configure --prefix=/usr
+./waf configure --prefix=/usr $@
 ./waf build
 ./waf install --destdir="${appdir}"
 
 export LD_LIBRARY_PATH="build/lib"
 /mnt/workspace/apps/linuxdeploy-x86_64.AppImage \
     --appdir ${appdir} --output appimage \
-    --desktop-file="build/net.kushview.element.desktop" \
+    --desktop-file="build/share/applications/net.kushview.element.desktop" \
     --icon-file="build/share/icons/hicolor/16x16/apps/net.kushview.element.png" \
     --icon-file="build/share/icons/hicolor/32x32/apps/net.kushview.element.png" \
     --icon-file="build/share/icons/hicolor/64x64/apps/net.kushview.element.png" \
