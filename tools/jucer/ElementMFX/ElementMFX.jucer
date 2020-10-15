@@ -756,5 +756,6 @@
   <LIVE_SETTINGS>
     <OSX/>
     <WINDOWS/>
+    <LINUX/>
   </LIVE_SETTINGS>
 </JUCERPROJECT>

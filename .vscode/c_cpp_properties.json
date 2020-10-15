@@ -73,6 +73,7 @@
                 "/usr/include/serd-0",
                 "/usr/include/sord-0",
                 "/usr/include/sratom-0",
+                "/usr/include/gtk-2.0",
                 "/usr/local/include",
                 "${workspaceRoot}/libs/JUCE/modules",
                 "${workspaceRoot}/libs/kv/modules",
@@ -103,7 +104,9 @@
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
-            }
+            },
+            "cStandard": "c11",
+            "cppStandard": "c++17"
         },
         {
             "name": "Windows",
