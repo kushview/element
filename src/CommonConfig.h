@@ -18,7 +18,7 @@
 
 #pragma once
 
-#if __APPLE__
+#if defined(__APPLE__)
  // make sure uuid_t gets defined before juce headers included
  #include <uuid/uuid.h>
 #endif
