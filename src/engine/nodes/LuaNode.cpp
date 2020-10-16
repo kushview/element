@@ -628,7 +628,7 @@ private:
             try
             {
                 sol::table params = f();
-                for (int i = 0; i < params.size(); ++i)
+                for (size_t i = 0; i < params.size(); ++i)
                 {
                     auto param = params [i + 1];
 

@@ -113,7 +113,7 @@ void OSCSenderNode::run ()
             }
         }
 
-        while (oscMessagesToLog.size() > maxOscMessages)
+        while (oscMessagesToLog.size() > (size_t) maxOscMessages)
             oscMessagesToLog.erase ( oscMessagesToLog.begin() );
     }
 

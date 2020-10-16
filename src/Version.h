@@ -27,8 +27,6 @@
 
 namespace Element {
 
-
-
 /** Representation of a version number */
 struct Version
 {
