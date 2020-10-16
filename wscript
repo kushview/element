@@ -71,6 +71,7 @@ def configure (conf):
     conf.check_cxx_version()
     silence_warnings (conf)
     conf.find_program('convert', mandatory=False)
+    
     conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
@@ -130,7 +131,7 @@ def build_desktop (bld, slug='element'):
     if not juce.is_linux():
         return
 
-    if len (bld.env.CONVERT[0]) > 0:
+    if bool(bld.env.CONVERT):
         for size in '16 32 64 128 256 512'.split():
             geometry = '%sx%s' % (size, size)
             bld (
