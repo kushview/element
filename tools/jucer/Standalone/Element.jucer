@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.44.0"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.45.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2020 Kushview, LLC"
-              defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1&#10;"
+              defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_VERSION_STRING=&quot;0.45.0&quot;&#10;EL_USE_LUA=1&#10;"
               userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;"
               headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
