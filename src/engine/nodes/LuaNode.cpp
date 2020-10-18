@@ -44,7 +44,7 @@ R"(--- Stereo Amplifier in Lua
 -- a stable version. If you are a developer and want to help out, 
 -- see https://github.com/kushview/element
 
-local kv = require ('kv')
+local audio = require ('kv.audio')
 
 -- Our gain parameters. Used for fading between changes in volume
 local start_gain = 1.0
@@ -86,7 +86,7 @@ end
 -- @param a     The source kv.audio.Buffer
 -- @param m     The source kv.midi.Pipe
 function node_render (a, m)
-   end_gain = kv.dbtogain (Param.values[1])
+   end_gain = audio.togain (Param.values[1])
 
    --[[
    -- process a fade frame by frame
