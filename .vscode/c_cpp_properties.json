@@ -82,7 +82,8 @@
                 "${workspaceRoot}/libs/lua",
                 "${workspaceRoot}/libs/lua/src",
                 "${workspaceRoot}/src",
-                "${workspaceRoot}/tests"
+                "${workspaceRoot}/tests",
+                "${workspaceFolder}/libs/lua-kv/src"
             ],
             "defines": [],
             "forcedInclude": [
@@ -100,7 +101,8 @@
                     "${workspaceRoot}/libs/lua",
                     "${workspaceRoot}/libs/lua/src",
                     "${workspaceRoot}/src",
-                    "${workspaceRoot}/tests"
+                    "${workspaceRoot}/tests",
+                    "${workspaceFolder}/libs/lua-kv/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,
                 "databaseFilename": ""
