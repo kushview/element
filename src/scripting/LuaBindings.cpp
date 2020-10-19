@@ -17,6 +17,9 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/// Element Lua Bindings 
+// @module element
+
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 
@@ -167,20 +170,28 @@ void openUI (state& lua)
 static void openModel (sol::state& lua)
 {
     auto e = NS (lua, "element");
-    // Sesson
+    /// Sesson
+    // @type Session
     auto session = e.new_usertype<Session> ("Session", no_constructor,
+        /// @function __tostring
         meta_function::to_string, [](Session* self) {
             String str = "Session";
             if (self->getName().isNotEmpty())
                 str << ": " << self->getName();
             return str.toStdString();
         },
+
+        /// @function __len
         meta_function::length, [](Session* self) { return self->getNumGraphs(); },
+
+        /// @function __index
         meta_function::index, [](Session* self, int index) {
             return isPositiveAndBelow (--index, self->getNumGraphs())
                 ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
                 : std::shared_ptr<Node>();
         },
+
+        /// @field name The session's name
         "name", property ([](Session* self, const char* name) -> void {
                 self->setName (String::fromUTF8 (name));
             },[](const Session& self) -> std::string {
@@ -196,11 +207,13 @@ static void openModel (sol::state& lua)
         "add_graph",                &Session::addGraph,
         "save_state",               &Session::saveGraphState,
         "restore_state",            &Session::restoreGraphState
-       #endif 
+       #endif
     );
 
-    // Node
+    /// Node
+    // @type Node
     auto node = e.new_usertype<Node> ("Node", no_constructor,
+        /// @function __tostring
         meta_function::to_string, [](const Node& self) -> std::string {
             String str = self.isGraph() ? "Graph" : "Node";
             if (self.getName().isNotEmpty())
@@ -214,13 +227,23 @@ static void openModel (sol::state& lua)
             return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
                                    : std::shared_ptr<Node>();
         },
+
+        /// @field valid (readonly)
         "valid",                readonly_property (&Node::isValid),
+
+        /// @field name
         "name", property (
             [](Node* self) { return self->getName().toStdString(); },
             [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
         ),
+        
+        /// @field displayname (readonly)
         "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
+        
+        /// @field pluginname (readonly)
         "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
+        
+        /// @field missing (readonly)
         "missing",              readonly_property (&Node::isMissing),
         "enabled",              readonly_property (&Node::isEnabled),
         "graph",                readonly_property (&Node::isGraph),
