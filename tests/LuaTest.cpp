@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2018-2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2018-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -215,98 +215,6 @@ public:
 protected:
     sol::state lua;
 };
-
-//=============================================================================
-const static String sLuaLoadScript = 
-R"(--- Example Action Script
--- @name Example Action Script
--- @author Michael R. Fisher
--- hi there, this is some dummy text 
--- that should be skipped
-
-function somefunc()
-    print("not parsed")
-end
-)";
-
-const static String sLuaBlockScript = 
-R"(--[[
-Example Action Script
-@name BLOCK Example Action Script
-@author Michael R. Fisher
-hi there, this is some dummy text 
-that should be skipped
---]]
-
-function somefunc()
-    print("not parsed")
-end
-)";
-
-class LuaDummyTest : public LuaUnitTest
-{
-public:
-    LuaDummyTest ()
-        : LuaUnitTest ("Lua Dummy", "Lua", "luadummy") {}
-
-    void scan (const String& script)
-    {
-        const StringArray tags = { "@author", "@name", "@trigger", "@description" };
-        const StringArray required = { "@name", "@trigger" };
-
-        const auto lines = StringArray::fromLines (script);
-        int index = 0;
-        bool inBlock = false;
-        bool finished = false;
-        for (int index = 0; index < lines.size(); ++index)
-        {
-            const auto line = lines[index].trim();
-            
-            if (! inBlock)
-                inBlock = line.startsWith ("--[[");
-            
-            if (inBlock || line.startsWith ("--"))
-            {
-                for (const auto& tag : tags)
-                {
-                    if (line.contains (tag))
-                    {
-                        DBG (tag.replace("@","") << " = " << 
-                                line.fromFirstOccurrenceOf (tag, false, false).trimStart()
-                                    .upToFirstOccurrenceOf ("--]]", false, false).trimEnd());
-                    }
-                }
-
-                if (inBlock)
-                {
-                    inBlock  = ! line.contains ("--]]");
-                    finished = ! inBlock;
-                }
-            }
-            else if (! inBlock && ! line.startsWith ("--"))
-            {
-                finished = true;
-            }
-
-            if (finished) {
-                DBG("finihed at line index: " << index);
-                DBG("LINE: " << lines[index]);
-                break;
-            }
-        }
-    }
-
-    void runTest() override
-    {
-        beginTest ("lua dummy test");
-        scan (sLuaLoadScript);
-        Logger::writeToLog ("\n\n");
-        scan (sLuaBlockScript);
-    }
-};
-
-static LuaDummyTest sLuaDummyTest;
-
 
 //=============================================================================
 class LuaNodeLifecycleTest : public UnitTestBase
