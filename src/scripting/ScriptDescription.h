@@ -14,6 +14,7 @@ struct ScriptDescription
 
     ScriptDescription() = default;
     ScriptDescription (const ScriptDescription& o) { operator= (o); }
+    ~ScriptDescription() = default;
     ScriptDescription& operator= (const ScriptDescription& o)
     {
         this->format        = o.format;
