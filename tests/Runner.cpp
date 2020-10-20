@@ -74,7 +74,6 @@ public:
         auto opts = StringArray::fromTokens (commandLine, true);
         opts.trim();
 
-        
         UnitTestRunner runner;
         runner.setAssertOnFailure (true);
 
