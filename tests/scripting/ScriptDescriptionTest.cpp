@@ -18,7 +18,6 @@
 
 #include "Tests.h"
 #include "scripting/ScriptDescription.h"
-#include "scripting/ScriptManager.h"
 
 using namespace Element;
 

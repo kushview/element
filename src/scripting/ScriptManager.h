@@ -30,6 +30,8 @@ public:
     void scanDirectory (File dir);
 
 private:
+    // class Registry;
+    // std::unique_ptr<Registry> scripts;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptManager);
 };
 

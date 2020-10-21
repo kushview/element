@@ -28,7 +28,7 @@ void ScriptManager::scanDirectory (File dir)
     sol::state lua;
     lua.open_libraries();
     Lua::openLibs (lua);
-    
+
     DBG("[EL] scanning: " << dir.getFullPathName());
     for (DirectoryEntry entry : RangedDirectoryIterator (dir, false, "*.lua"))
     {
