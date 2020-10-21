@@ -48,6 +48,9 @@ public:
 
     void runTest() override
     {
+        if (MidiInput::getAvailableDevices().isEmpty())
+            return;
+
         beginTest ("Processor Channels");
         std::unique_ptr<MidiDeviceProcessor> proc;
         proc.reset (new MidiDeviceProcessor (true, getWorld().getMidiEngine()));
