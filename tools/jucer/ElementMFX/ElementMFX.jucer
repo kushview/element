@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="kKApjY" name="Element MFX" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.44.0"
+              splashScreenColour="Dark" projectType="audioplug" version="1.45.1"
               bundleIdentifier="net.kushview.plugins.ElementMFX" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
               buildVST="0" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
@@ -12,11 +12,11 @@
               pluginIsMidiEffectPlugin="1" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementMFX"
               aaxIdentifier="net.kushview.ElementMFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
+              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.45.0&quot;&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumi'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
               pluginAAXDisableMultiMono="0" jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element MFX">
@@ -680,54 +680,6 @@
         <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </XCODE_MAC>
-    <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="10.0.16299.0"
-            extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
-            toolset="v141_xp" aaxFolder="C:\SDKs\AAX" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
-            extraCompilerFlags="/bigobj">
-      <CONFIGURATIONS>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementMFX"
-                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
-                       binaryPath="../../../build/x64/Release" useRuntimeLibDLL="0"/>
-        <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="Win32"
-                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementMFX"
-                       binaryPath="../../../build/Win32/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
-                       useRuntimeLibDLL="1"/>
-        <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="Win32"
-                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_ElementMFX"
-                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
-                       binaryPath="../../../build/Win32/Release" useRuntimeLibDLL="0"/>
-        <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
-                       debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_ElementMFX"
-                       binaryPath="../../../build/x64/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
-                       useRuntimeLibDLL="1"/>
-      </CONFIGURATIONS>
-      <MODULEPATHS>
-        <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_events" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_graphics" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_data_structures" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_basics" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_gui_extra" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_cryptography" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_basics" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_devices" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_formats" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_processors" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_plugin_client" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_audio_utils" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="kv_core" path="../../../libs/kv/modules"/>
-        <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
-        <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
-        <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
-        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
-        <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
-      </MODULEPATHS>
-    </VS2017>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="juce_audio_basics" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>

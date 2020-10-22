@@ -64,24 +64,72 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
         .withInput  ("Aux 2", AudioChannelSet::stereo(), false)
         .withInput  ("Aux 3", AudioChannelSet::stereo(), false)
         .withInput  ("Aux 4", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 5", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 6", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 7", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 8", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 9", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 10", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 11", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 12", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 13", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 14", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 15", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 16", AudioChannelSet::stereo(), false)
         
         .withOutput ("Main",  AudioChannelSet::stereo(), true)
-        .withOutput ("Aux 1", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 2", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 3", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 4", AudioChannelSet::stereo(), false))
+        .withOutput  ("Aux 1", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 2", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 3", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 4", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 5", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 6", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 7", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 8", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 9", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 10", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 11", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 12", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 13", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 14", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 15", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 16", AudioChannelSet::stereo(), false))
        #else
         .withInput  ("Main",  AudioChannelSet::stereo(), true)
         .withInput  ("Aux 1", AudioChannelSet::stereo(), false)
         .withInput  ("Aux 2", AudioChannelSet::stereo(), false)
         .withInput  ("Aux 3", AudioChannelSet::stereo(), false)
         .withInput  ("Aux 4", AudioChannelSet::stereo(), false)
-
+        .withInput  ("Aux 5", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 6", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 7", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 8", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 9", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 10", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 11", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 12", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 13", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 14", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 15", AudioChannelSet::stereo(), false)
+        .withInput  ("Aux 16", AudioChannelSet::stereo(), false)
+        
         .withOutput ("Main",  AudioChannelSet::stereo(), true)
-        .withOutput ("Aux 1", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 2", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 3", AudioChannelSet::stereo(), false)
-        .withOutput ("Aux 4", AudioChannelSet::stereo(), false))
+        .withOutput  ("Aux 1", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 2", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 3", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 4", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 5", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 6", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 7", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 8", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 9", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 10", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 11", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 12", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 13", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 14", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 15", AudioChannelSet::stereo(), false)
+        .withOutput  ("Aux 16", AudioChannelSet::stereo(), false))
        #endif
 {
     for (int i = 0; i < 8; ++i)
@@ -118,7 +166,14 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
                                          getTotalNumOutputChannels());
         session->clear();
         if (MessageManager::getInstance()->isThisTheMessageThread())
+        {
             session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
+            DBG("[EL] default graph created");
+        }
+        else
+        {
+            DBG("[EL] couldn't create default graph");
+        }
         controller->activate();
         controllerActive = true;
 
@@ -212,8 +267,11 @@ void ElementPluginAudioProcessor::changeProgramName (int index, const String& ne
 
 void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
 {
-    DBG("[EL] prepare to play: " << (int) prepared << " sampleRate: " << sampleRate << " buff: " << bufferSize <<
-		"numIns: " << numIns << " numOuts: " << numOuts);
+    DBG("[EL] prepare to play: prepared=" << (int) prepared <<
+        " sampleRate: " << sampleRate <<
+        " buff: " << bufferSize <<
+		" numIns: " << numIns <<
+        " numOuts: " << numOuts);
     
     const bool channelCountsChanged = numIns != getTotalNumInputChannels()
                                    || numOuts != getTotalNumOutputChannels();
@@ -236,7 +294,7 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
             DBG("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " <<
                  getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
             
-            if (channelCountsChanged && preparedCount <= 0)
+            if (channelCountsChanged) // && preparedCount <= 0)
             {
                 engine->releaseExternalResources();
                 engine->prepareExternalPlayback (sampleRate, bufferSize,
@@ -435,12 +493,14 @@ void ElementPluginAudioProcessor::setStateInformation (const void* data, int siz
 
 void ElementPluginAudioProcessor::numChannelsChanged()
 {
-//     DBG("[EL] num channels changed >> " << getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
+    DBG("[EL] num channels changed: " <<
+        getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 }
 
 void ElementPluginAudioProcessor::numBusesChanged()
 {
-//     DBG("[EL] num buses changed: " << getBusCount (true) << "/" << getBusCount(false));
+    DBG("[EL] num buses changed: " <<
+        getBusCount (true) << "/" << getBusCount (false));
 }
 
 void ElementPluginAudioProcessor::processorLayoutsChanged()
