@@ -266,6 +266,6 @@ def dist(ctx):
     ctx.base_name = '%s-%s' % (APPNAME, VERSION)
     ctx.algo = ziptype
     ctx.excl = ' **/.waf-1* **/.waf-2* **/.waf3-* **/*~ **/*.pyc **/*.swp **/.lock-w*'
-    ctx.excl += ' **/.gitignore **/.gitmodules **/.git dist deploy pro **/Builds **/build'
+    ctx.excl += ' **/.gitignore **/.gitmodules **/.git dist deploy element* pro **/Builds **/build'
     ctx.excl += ' **/.DS_Store **/.vscode **/.travis.yml *.bz2 *.zip *.gz'
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
