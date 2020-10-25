@@ -23,6 +23,9 @@
 #include "Commands.h"
 #include "session/CommandManager.h"
 
+#define EL_USE_NEW_SYSTRAY_ICON 0
+#define EL_SYSTRAY_MIN_SIZE 22
+
 namespace Element {
 
 enum SystemTrayMouseAction
@@ -45,9 +48,54 @@ static MainWindow* getMainWindow()
     return nullptr;
 }
 
+SystemTray* SystemTray::instance = nullptr;
 SystemTray::SystemTray()
 {
-    Path path;
+   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
+    {
+        const auto traySize = 22.f * 4;
+        const float padding = 8.f;
+        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
+        Graphics g (image);
+        Icon icon (getIcons().falAtomAlt, Colours::black);
+        icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
+        instance->setIconImage (image, image);
+    }
+   #else
+    setIconImage (
+        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
+        ImageCache::getFromMemory (BinaryData::ElementIconTemplate_png, BinaryData::ElementIcon_pngSize));
+   #endif
+   #if JUCE_LINUX
+    setSize (EL_SYSTRAY_MIN_SIZE, EL_SYSTRAY_MIN_SIZE);
+   #endif
+}
+
+void SystemTray::setEnabled (bool enabled)
+{
+   #if EL_RUNNING_AS_PLUGIN
+    ignoreUnused (enabled);
+   #else
+    if (enabled)
+    {
+        if (instance == nullptr)
+        {
+            instance = new SystemTray();
+            if (! instance->isOnDesktop())
+                instance->addToDesktop (0);
+        }
+    }
+    else
+    {
+        if (instance != nullptr)
+        {
+            if (instance->isOnDesktop())
+                instance->removeFromDesktop();
+            delete instance;
+            instance = nullptr;
+        }
+    }
+   #endif
 }
 
 void SystemTray::mouseUp (const MouseEvent& ev)

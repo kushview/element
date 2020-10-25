@@ -99,40 +99,6 @@ private:
 
 static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> sGuiControllerInstances;
-static std::unique_ptr<SystemTray> sSystemTray;
-
-static void elSetupSystray() {
-#if ! EL_RUNNING_AS_PLUGIN
-    if (sSystemTray != nullptr)
-        return;
-    sSystemTray.reset (new SystemTray());
-   #define EL_USE_NEW_SYSTRAY_ICON 0
-   #if JUCE_MAC && EL_USE_NEW_SYSTRAY_ICON
-    {
-        const auto traySize = 22.f * 4;
-        const float padding = 8.f;
-        Image image (Image::ARGB, roundToInt(traySize), roundToInt(traySize), true);
-        Graphics g (image);
-        Icon icon (getIcons().falAtomAlt, Colours::black);
-        icon.draw (g, { padding, padding, traySize - padding - padding, traySize - padding - padding }, false);
-        sSystemTray->setIconImage (image, image);
-    }
-   #else
-    sSystemTray->setIconImage (
-        ImageCache::getFromMemory (BinaryData::ElementIcon_png, BinaryData::ElementIcon_pngSize),
-        ImageCache::getFromMemory (BinaryData::ElementIconTemplate_png, BinaryData::ElementIcon_pngSize));
-   #endif
-    sSystemTray->addToDesktop (0);
-   #endif
-}
-
-static void elClearSystray()
-{
-    if (sSystemTray == nullptr)
-        return;
-    sSystemTray->removeFromDesktop();
-    sSystemTray.reset (nullptr);
-}
 
 GuiController::GuiController (Globals& w, AppController& a)
     : AppController::Child(),
@@ -197,8 +163,7 @@ void GuiController::deactivate()
     saveProperties (settings.getUserSettings());
     
     closeAllPluginWindows (true);
-
-    elClearSystray();
+    SystemTray::setEnabled (false);
 
     if (mainWindow)
     {
@@ -407,10 +372,7 @@ void GuiController::run()
     }
     
     findSibling<SessionController>()->resetChanges();
-    
-    if (settings.isSystrayEnabled())
-        elSetupSystray();
-
+    refreshSystemTray();
     stabilizeViews();
 }
 
@@ -906,10 +868,7 @@ void GuiController::refreshSystemTray()
 {
     // stabilize systray
     auto& settings = getWorld().getSettings();
-    if (settings.isSystrayEnabled())
-        elSetupSystray();
-    else
-        elClearSystray();
+    SystemTray::setEnabled (settings.isSystrayEnabled());
 }
 
 void GuiController::refreshMainMenu()
