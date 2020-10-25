@@ -59,19 +59,21 @@ public:
 
     void runTest() override
     {
-        // beginTest ("scanning");
-        // ScriptManager scripts;
-        // scripts.scanDirectory (scriptsDir());
+        beginTest ("scanning");
+        ScriptManager scripts;
+        scripts.scanDirectory (scriptsDir());
 
         beginTest ("loading");
         sol::state lua;
         lua.open_libraries();
         Lua::openLibs (lua);
-        Element::Lua::openLibs (lua);
-        Element::Lua::setWorld (lua, &getWorld());
+        Lua::setWorld (lua, &getWorld());
 
-        auto buffer = scriptsDir().getChildFile("element/sub/test.lua").loadFileAsString();
-        auto result = lua.load_buffer (buffer.toRawUTF8(), buffer.length());
+        sol::table tbl;
+        tbl.new_enum ("Commands");
+
+        auto file   = scriptsDir().getChildFile ("closepluginwindows.lua");
+        auto result = lua.load_file (file.getFullPathName().toStdString());
         
         switch (result.status()) {
             case sol::load_status::file:
@@ -91,18 +93,17 @@ public:
                 break;
         }
 
-        lua.script (sScript1.toRawUTF8());
-        sol::function f = lua["func1"];
-        f();
+        try {
+            lua.script (file.loadFileAsString().toRawUTF8());
+        } catch (const std::exception&) { }
 
-        lua.script (sScript2.toRawUTF8());
-        f = lua["func1"];
-        f();
-        
-        // if (result.get_type() == sol::type::none)
-        //     Logger::writeToLog ("no value");
-        // else
-        //     lua["print"] (result);
+        // sol::state_view lua2 (lua.lua_state());
+        // DBG("stack: " << lua2.stack_top());
+        // {
+        //     sol::table M = lua2.require();
+        //     DBG("stack: " << lua2.stack_top());
+        // }
+        // DBG("stack: " << lua2.stack_top());
 
         lua.collect_garbage();
         Element::Lua::setWorld (lua, nullptr);

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "scripting/ScriptDescription.h"
+
 namespace Element {
 
 class ScriptManager final
@@ -27,11 +29,12 @@ public:
     ScriptManager();
     ~ScriptManager();
 
-    void scanDirectory (File dir);
+    Array<ScriptDescription> scanDirectory (File dir);
 
 private:
     // class Registry;
     // std::unique_ptr<Registry> scripts;
+    FileSearchPath locations;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptManager);
 };
 

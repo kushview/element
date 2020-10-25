@@ -6,34 +6,33 @@ namespace Element {
 
 struct ScriptDescription
 {
-    String format;
     String name;
+    String type;
     String author;
-    String trigger;
     String description;
 
     ScriptDescription() = default;
     ScriptDescription (const ScriptDescription& o) { operator= (o); }
     ~ScriptDescription() = default;
+    
     ScriptDescription& operator= (const ScriptDescription& o)
     {
-        this->format        = o.format;
         this->name          = o.name;
+        this->type          = o.type;
         this->author        = o.author;
-        this->trigger       = o.trigger;
         this->description   = o.description;
         return *this;
     }
 
     bool isValid() const
     {
-        return name.isNotEmpty();
+        return name.isNotEmpty() && type.isNotEmpty();
     }
 
     static ScriptDescription parse (const String& buffer)
     {
-        static const StringArray tags = { "@author", "@name", "@trigger", "@description" };
-        static const StringArray required = { "@name", "@trigger" };
+        static const StringArray tags = { "@author", "@name", "@description" };
+        static const StringArray required = { "@name", "@element" };
 
         ScriptDescription desc;
         const auto lines = StringArray::fromLines (buffer);
@@ -58,15 +57,19 @@ struct ScriptDescription
                         
                         // DBG (tag.replace("@","") << " = " << value);
                         
-                        if (tag == "@name")
+                        if (tag == "@name" && desc.name.isEmpty())
                         {
                             desc.name = value;
                         }
-                        else if (tag == "@author")
+                        if (tag == "@element" && desc.type.isEmpty())
+                        {
+                            desc.type = value;
+                        }
+                        else if (tag == "@author" && desc.author.isEmpty())
                         {
                             desc.author = value;
                         }
-                        else if (tag == "@description")
+                        else if (tag == "@description" && desc.description.isEmpty())
                         {
                             desc.description = value;
                         }

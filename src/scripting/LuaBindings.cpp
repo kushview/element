@@ -26,6 +26,8 @@
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
 
+#include "gui/SystemTray.h"
+
 #include "session/CommandManager.h"
 #include "session/MediaManager.h"
 #include "session/Node.h"
@@ -106,6 +108,27 @@ static auto addRectangle (state& lua, const char* ns, const char* name)
     );
 }
 
+template<typename T>
+static auto addRect (sol::table view, const char* name)
+{
+    using R = Rectangle<T>;
+    return view.new_usertype<R> (name, no_constructor,
+        call_constructor, factories (
+            []() { return R(); },
+            [] (T w, T h) { return R (w, h); },
+            [] (T x, T y, T w, T h) { return R (x, y, w, h); }
+        ),
+        meta_method::to_string, [](R* self) {
+            return self->toString().toStdString();
+        },
+        "empty",            readonly_property (&R::isEmpty),
+        "x",                property (&R::getX,  &R::setX),
+        "y",                property (&R::getY,  &R::setY),
+        "w",                property (&R::getWidth, &R::setWidth),
+        "h",                property (&R::getHeight, &R::setHeight)
+    );
+}
+
 static void openJUCE (state& lua)
 {
     addRange<float>     (lua, "Range");
@@ -164,7 +187,11 @@ static void openJUCE (state& lua)
 
 void openUI (state& lua)
 {
-    addRectangle<int> (lua, "ui", "Bounds");
+    // addRectangle<int> (lua, "ui", "Bounds");
+    auto systray = lua.new_usertype<SystemTray> ("systray", no_constructor,
+        "enabled", sol::property (
+            []() -> bool { return SystemTray::getInstance() != nullptr; },
+            SystemTray::setEnabled));
 }
 
 static void openModel (sol::state& lua)
@@ -380,8 +407,87 @@ void openDSP (sol::state& lua)
     kv_openlibs (lua.lua_state(), 0);
 }
 
+#ifdef __cplusplus
+ #define EL_EXTERN extern "C"
+#else
+ #define EL_EXTERN
+#endif
+
+#ifdef _WIN32
+ #define EL_EXPORT EL_EXTERN __declspec(dllexport)
+#else
+ #define EL_EXPORT EL_EXTERN __attribute__((visibility("default")))
+#endif
+
+//=============================================================================
+EL_EXPORT int luaopen_element_ui (lua_State* L)
+{
+    sol::state_view lua (L);
+    sol::table M = lua.create_table();
+    M.set_function ("test", []() { DBG("hello world"); });
+    addRect<int> (M, "Rect");
+    sol::stack::push (L, M);
+    return 1;
+}
+
+static File scriptsDir()
+{
+    return File::getSpecialLocation (File::invokedExecutableFile)
+                        .getParentDirectory().getParentDirectory().getParentDirectory()
+                        .getChildFile ("libs/element");
+}
+
+static int requireElement (lua_State* L)
+{
+    const String mod = sol::stack::get<std::string> (L);
+
+    #if 0
+	if (path == "element.ui")
+	{
+        DBG("found");
+		sol::stack::push (L, luaopen_element_ui);
+		return 1;
+	}
+    #else
+    
+    auto path = mod.replaceCharacter('.', '/');
+    path << ".lua";
+    auto file = scriptsDir().getChildFile(path);
+    DBG(file.getFullPathName());
+    if (file.existsAsFile()) {
+        luaL_loadfile (L, file.getFullPathName().toRawUTF8());
+        return 1;
+    }
+
+    #endif
+
+	sol::stack::push (L, "Not found");
+	return 1;
+}
+
+static int element_wrap (lua_State* L) {
+    sol::state_view lua (L);
+    sol::table M = lua.create_table();
+    
+    const auto module = sol::stack::get<std::string> (L);
+
+    if (module.size() > 0)
+    {
+        M.set_function ("test", []() { DBG("hello world"); });
+        addRect<int> (M, "Rect");
+    }
+
+    sol::stack::push (L, M);
+    return 1;
+}
+
+//=============================================================================
 void openLibs (sol::state& lua)
 {
+    auto e = NS (lua, "element");
+    e["wrap"] = element_wrap;
+
+    sol::table(lua["package"]["searchers"]).add (requireElement);
     openWorld (lua);
     openModel (lua);
     openDSP (lua);

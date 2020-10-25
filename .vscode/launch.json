@@ -1,7 +1,6 @@
 {
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "Element",
             "type": "cppdbg",
@@ -15,6 +14,14 @@
             "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
+                "logging": {
+                    "engineLogging": false,
+                    "exceptions": false,
+                    "moduleLoad": false,
+                    "programOutput": true,
+                    "trace": false,
+                    "traceResponse": false
+                },
                 "program": "${workspaceRoot}/build/bin/element",
                 "setupCommands": [
                     {
@@ -49,14 +56,18 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/test-element",
-            "args": [ "Lua", "globals" ],
-            "cwd": "${workspaceRoot}/build",
+            "args": [ "Scripting", "manager" ],
+            "cwd": "${workspaceRoot}",
             "preLaunchTask": "Waf Build",
             "linux": {
                 "MIMode": "gdb",
                 "logging": {
+                    "engineLogging": false,
+                    "exceptions": false,
                     "moduleLoad": false,
-                    "exceptions": false
+                    "programOutput": true,
+                    "trace": false,
+                    "traceResponse": false
                 },
                 "environment": [ { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" } ],
                 "setupCommands": [

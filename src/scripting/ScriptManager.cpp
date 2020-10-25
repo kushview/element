@@ -23,25 +23,34 @@ ScriptManager::~ScriptManager()
 
 }
 
-void ScriptManager::scanDirectory (File dir)
+Array<ScriptDescription> ScriptManager::scanDirectory (File dir)
 {
     sol::state lua;
     lua.open_libraries();
     Lua::openLibs (lua);
 
-    DBG("[EL] scanning: " << dir.getFullPathName());
+    Array<ScriptDescription> results;
     for (DirectoryEntry entry : RangedDirectoryIterator (dir, false, "*.lua"))
     {
+        ScriptDescription desc;
         sol::environment env (lua, sol::create, lua.globals());
         try {
-            DBG("[EL] checking: " << entry.getFile().getFileName());
-            lua.load_file (entry.getFile().getFullPathName().toStdString(), sol::load_mode::any);
-            auto desc = ScriptDescription::parse (entry.getFile());
-            DBG("[EL] script: " << desc.name);
+            auto result = lua.load_file (entry.getFile().getFullPathName().toStdString(), sol::load_mode::any);
+            if (result.status() != sol::load_status::ok)
+                continue;
+            desc = ScriptDescription::parse (entry.getFile());
         } catch (const std::exception& e) {
             DBG(e.what());
+            desc = {};
+        }
+
+        if (desc.isValid())
+        {
+            results.add (desc);
         }
     }
+    
+    return results;
 }
 
 }
