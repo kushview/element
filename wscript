@@ -70,8 +70,10 @@ def configure (conf):
     conf.load ("compiler_c compiler_cxx ar cross juce")
     conf.check_cxx_version()
     silence_warnings (conf)
+
     conf.find_program('convert', mandatory=False)
-    
+    conf.find_program('ldoc', mandatory=False)
+
     conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
@@ -162,6 +164,10 @@ def build_desktop (bld, slug='element'):
         )
 
     bld.install_files (bld.env.DATADIR, 'data/ElementIcon.png')
+
+def build_lua_docs (bld):
+    if bool(bld.env.LDOC):
+        call ([bld.env.LDOC[0], '.' ])
 
 def compile_vst_linux (bld):
     libEnv = bld.env.derive()
@@ -269,3 +275,11 @@ def dist(ctx):
     ctx.excl += ' **/.gitignore **/.gitmodules **/.git dist deploy element* pro **/Builds **/build'
     ctx.excl += ' **/.DS_Store **/.vscode **/.travis.yml *.bz2 *.zip *.gz'
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
+
+def docs (ctx):
+    build_lua_docs(ctx)
+
+from waflib.Build import BuildContext
+class BuildDocs (BuildContext):
+    cmd = 'docs'
+    fun = 'docs'
