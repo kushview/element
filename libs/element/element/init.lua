@@ -21,9 +21,9 @@ function M.world() return world end
 function M.script (path, env, ...)
     local file, e1 = package.searchpath (path, package.spath)
     if file then
-        local f, e2 = loadfile (file, 'bt', env or _ENV)
-        if type(f) == 'function' then
-            return f(...)
+        local fn, e2 = loadfile (file, 'bt', env or _ENV)
+        if type(fn) == 'function' then
+            return fn(...)
         end
         return e2
     end
