@@ -49,6 +49,16 @@
             "problemMatcher": []
         },
         {
+            "label": "Waf Docs",
+            "type": "shell",
+            "command": "python",
+            "args": [
+                "waf",
+                "docs"
+            ],
+            "problemMatcher": []
+        },
+        {
             "label": "Waf Configure (no jack, no lua)",
             "type": "shell",
             "command": "python",
