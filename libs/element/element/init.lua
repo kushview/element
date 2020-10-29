@@ -15,17 +15,19 @@ function M.world() return world end
 -- @function script
 -- @string path The script to run
 -- @tparam table env The environment to use or _ENV
--- @treturn int Return code
+-- @tparam any ... Arguments passed to script
+-- @treturn any Return value from script or no value
 -- @usage element.script ('scriptname')
 function M.script (path, env, ...)
-    local filename = '/home/mfisher/workspace/kushview/element/scripts/' .. path .. '.lua'
-    local f, err = loadfile (filename, 't', env or _ENV)
-    if type(f) == 'function' then
-        return f(...)
+    local file, e1 = package.searchpath (path, package.spath)
+    if file then
+        local f, e2 = loadfile (file, 'bt', env or _ENV)
+        if type(f) == 'function' then
+            return f(...)
+        end
+        return e2
     end
-    return err
+    return e1
 end
-
--- @usage element.script ('path/to/script')
 
 return M

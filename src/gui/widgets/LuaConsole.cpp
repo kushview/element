@@ -130,8 +130,6 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
         String msg;
         for (auto v : va)
         {
-            DBG(" - " << sol::type_name (env->getState(), v.get_type()));
-
             if (sol::type::string == v.get_type())
             {
                 msg << v.as<const char*>() << " ";

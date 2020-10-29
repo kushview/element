@@ -31,28 +31,18 @@ ScriptingEngine::Environment::Environment (sol::state& state)
 ScriptingEngine::Environment::~Environment() { }
 
 //=============================================================================
-ScriptingEngine::ScriptingEngine()
-{
-    lua.open_libraries();
-    Lua::openLibs (lua);
-}
-
-ScriptingEngine::~ScriptingEngine()
-{
-    Lua::setWorld (lua, nullptr);
-}
+ScriptingEngine::ScriptingEngine() {}
+ScriptingEngine::~ScriptingEngine() {}
 
 ScriptingEngine::Environment* ScriptingEngine::createEnvironment()
 {
     return new Environment (lua);
 }
 
-void ScriptingEngine::setWorld (Globals& nextWorld)
+void ScriptingEngine::initialize (Globals& w)
 {
-    world = &nextWorld;
+    world = &w;
     Lua::initializeState (lua, *world);
-    // Lua::setWorld (lua, world);
-    //lua.set_function ("world", std::bind (this, &ScriptingEngine::createEnvironment));
 }
 
 }

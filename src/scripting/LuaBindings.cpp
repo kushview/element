@@ -375,8 +375,14 @@ static void openWorld (Globals& world, state& lua)
         // @tparam 'element.CommandInfo' info
         // @bool async
         // @function invoke
+        // @treturn bool True if success
         "invoke",          &CommandManager::invoke,
 
+        /// Invoke a command directly
+        // @int Command ID
+        // @bool async
+        // @function invoke_directly
+        // @treturn bool True if success
         "invoke_directly", &CommandManager::invokeDirectly
     );
 
@@ -437,7 +443,7 @@ static File scriptsDir()
 {
     return File::getSpecialLocation (File::invokedExecutableFile)
                         .getParentDirectory().getParentDirectory().getParentDirectory()
-                        .getChildFile ("libs/element");
+                        .getChildFile ("scripts");
 }
 
 static File defaultLuaPath()
@@ -496,7 +502,7 @@ void openLibs (sol::state& lua)
 {
     auto e = NS (lua, "element");
     // e["wrap"] = element_wrap;
-    // sol::table (lua["package"]["searchers"]).add (requireElement);
+    // 
 
    #if 0
     openWorld (lua);
@@ -507,46 +513,22 @@ void openLibs (sol::state& lua)
    #endif
 }
 
-void setWorld (state& lua, Globals* world)
-{       
-    #if 0            
-    auto e = NS (lua, "element");
-
-    if (world != nullptr)
-    {
-        e.set_function ("world",         [world]() -> Globals&           { return *world; });
-        e.set_function ("audioengine",   [world]() -> AudioEnginePtr     { return world->getAudioEngine(); });
-        e.set_function ("commands",      [world]() -> CommandManager&    { return world->getCommandManager(); });
-        e.set_function ("devices",       [world]() -> DeviceManager&     { return world->getDeviceManager(); });
-        e.set_function ("mappings",      [world]() -> MappingEngine&     { return world->getMappingEngine(); });
-        e.set_function ("media",         [world]() -> MediaManager&      { return world->getMediaManager(); });
-        e.set_function ("midiengine",    [world]() -> MidiEngine&        { return world->getMidiEngine(); });
-        e.set_function ("plugins",       [world]() -> PluginManager&     { return world->getPluginManager(); });
-        e.set_function ("presets",       [world]() -> PresetCollection&  { return world->getPresetCollection(); });
-        e.set_function ("session",       [world]() -> SessionPtr         { return world->getSession(); });
-        e.set_function ("settings",      [world]() -> Settings&          { return world->getSettings(); });
-    }
-    else
-    {
-        for (const auto& f : StringArray{ "world", "audioengine", "commands", "devices",
-                                          "mappings", "media", "midiengine", "plugins", 
-                                          "presets", "session", "settings" })
-        {
-            e.set_function (f.toRawUTF8(), []() { return sol::lua_nil; });
-        }
-    }
-    #endif
-}
-
 #include <memory>
 
 void initializeState (sol::state& lua, Globals& world)
 {
     lua.open_libraries();
+    
+    // auto searchers = lua["package"]["searchers"].get<sol::table>();
+    // searchers.add (requireElement);
+
     lua.globals().set ("element.world", std::ref<Globals> (world));
     String path = String(defaultLuaPath().getFullPathName() + "/?.lua").toStdString();
     path << ";" << String(defaultLuaPath().getFullPathName() + "/?/init.lua").toStdString();
     lua["package"]["path"] = path.toStdString();
+    path = scriptsDir().getFullPathName(); path << "/?.lua";
+    lua["package"]["spath"] = path.toStdString();
+
     lua.script ("_G['element'] = require ('element')");
     Lua::openWorld (world, lua);
     Lua::openModel (lua);

@@ -57,7 +57,7 @@ private:
     Globals* world = nullptr;
     sol::state lua;
     HashMap<String, File> scriptFiles;
-    void setWorld (Globals&);
+    void initialize (Globals&);
 };
 
 }

@@ -67,7 +67,6 @@ public:
         sol::state lua;
         lua.open_libraries();
         Lua::openLibs (lua);
-        Lua::setWorld (lua, &getWorld());
 
         sol::table tbl;
         tbl.new_enum ("Commands");
@@ -106,7 +105,6 @@ public:
         // DBG("stack: " << lua2.stack_top());
 
         lua.collect_garbage();
-        Element::Lua::setWorld (lua, nullptr);
         shutdownWorld();
     }
 };

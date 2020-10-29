@@ -84,10 +84,10 @@ private:
         mapping .reset (new MappingEngine());
         midi    .reset (new MidiEngine());
         presets .reset (new PresetCollection());
-        lua     .reset (new ScriptingEngine());
-        lua->setWorld (owner);
-
         session = new Session();
+
+        lua.reset (new ScriptingEngine());
+        lua->initialize (owner);
     }
     
     void freeAll()

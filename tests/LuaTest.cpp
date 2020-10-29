@@ -202,13 +202,11 @@ public:
     {
         lua.open_libraries();
         Element::Lua::openLibs (lua);
-        Element::Lua::setWorld (lua, &getWorld());
     }
 
     void shutdown() override
     {
         lua.collect_garbage();
-        Element::Lua::setWorld (lua, nullptr);
         shutdownWorld();
     }
 
@@ -576,7 +574,6 @@ public:
         initializeWorld();
         lua.open_libraries();
         Lua::openLibs (lua);
-        Lua::setWorld (lua, &getWorld());
         
         lua["expect"] = [this](bool result, const char* msg) {
             this->expect (result, msg);
@@ -585,7 +582,6 @@ public:
 
     void shutdown() override
     {
-        Lua::setWorld (lua, nullptr);
         lua.collect_garbage();
         shutdownWorld();
     }
