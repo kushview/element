@@ -24,6 +24,7 @@
 #include "controllers/SessionController.h"
 #include "engine/InternalFormat.h"
 #include "engine/GraphProcessor.h"
+#include "scripting/ScriptingEngine.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "Commands.h"
@@ -152,6 +153,7 @@ private:
         setupKeyMappings();
         setupAudioEngine();
         setupMidiEngine();
+        setupScripting();
 
         sendActionMessage ("finishedLaunching");
     }
@@ -194,6 +196,11 @@ private:
         plugins.setPropertiesFile (settings.getUserSettings());
         plugins.scanInternalPlugins();
         plugins.searchUnverifiedPlugins();
+    }
+
+    void setupScripting()
+    {
+        auto& scripts = world.getScriptingEngine();
     }
 };
 

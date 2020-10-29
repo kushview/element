@@ -32,7 +32,6 @@ struct ScriptDescription
     static ScriptDescription parse (const String& buffer)
     {
         static const StringArray tags = { "@author", "@name", "@description" };
-        static const StringArray required = { "@name", "@element" };
 
         ScriptDescription desc;
         const auto lines = StringArray::fromLines (buffer);
@@ -61,7 +60,7 @@ struct ScriptDescription
                         {
                             desc.name = value;
                         }
-                        if (tag == "@element" && desc.type.isEmpty())
+                        else if (tag == "@element" && desc.type.isEmpty())
                         {
                             desc.type = value;
                         }

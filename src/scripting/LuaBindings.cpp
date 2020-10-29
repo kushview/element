@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/// Element Lua Bindings 
-// @module element
+/// @module element
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
@@ -197,10 +196,8 @@ void openUI (state& lua)
 static void openModel (sol::state& lua)
 {
     auto e = NS (lua, "element");
-    /// Sesson
-    // @type Session
+
     auto session = e.new_usertype<Session> ("Session", no_constructor,
-        /// @function __tostring
         meta_function::to_string, [](Session* self) {
             String str = "Session";
             if (self->getName().isNotEmpty())
@@ -208,22 +205,24 @@ static void openModel (sol::state& lua)
             return str.toStdString();
         },
 
-        /// @function __len
         meta_function::length, [](Session* self) { return self->getNumGraphs(); },
 
-        /// @function __index
         meta_function::index, [](Session* self, int index) {
             return isPositiveAndBelow (--index, self->getNumGraphs())
                 ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
                 : std::shared_ptr<Node>();
         },
 
-        /// @field name The session's name
         "name", property ([](Session* self, const char* name) -> void {
                 self->setName (String::fromUTF8 (name));
             },[](const Session& self) -> std::string {
                 return self.getName().toStdString();
-            })
+            }),
+        "toxmlstring", [](Session *self) -> std::string {
+            auto tree = self->getValueTree().createCopy();
+            Node::sanitizeRuntimeProperties (tree, true);
+            return tree.toXmlString().toStdString();
+        }
         
        #if 0
         "clear",                    &Session::clear,
@@ -237,10 +236,7 @@ static void openModel (sol::state& lua)
        #endif
     );
 
-    /// Node
-    // @type Node
     auto node = e.new_usertype<Node> ("Node", no_constructor,
-        /// @function __tostring
         meta_function::to_string, [](const Node& self) -> std::string {
             String str = self.isGraph() ? "Graph" : "Node";
             if (self.getName().isNotEmpty())
@@ -254,23 +250,13 @@ static void openModel (sol::state& lua)
             return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
                                    : std::shared_ptr<Node>();
         },
-
-        /// @field valid (readonly)
         "valid",                readonly_property (&Node::isValid),
-
-        /// @field name
         "name", property (
             [](Node* self) { return self->getName().toStdString(); },
             [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
         ),
-        
-        /// @field displayname (readonly)
         "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
-        
-        /// @field pluginname (readonly)
         "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
-        
-        /// @field missing (readonly)
         "missing",              readonly_property (&Node::isMissing),
         "enabled",              readonly_property (&Node::isEnabled),
         "graph",                readonly_property (&Node::isGraph),
@@ -372,23 +358,41 @@ void openKV (state& lua)
     addRectangle<double> (lua, "element", "Rect");
 }
 
-static void openWorld (state& lua)
+static void openWorld (Globals& world, state& lua)
 {
-    auto e = NS (lua, "element");
-    
-    e.new_usertype<AppController> ("AppController", no_constructor);
-    e.new_usertype<GuiController> ("GuiController", no_constructor);
+    auto e = lua["element"].get_or_create<sol::table>();
+    auto C = e; // ["C"].get_or_create<sol::table>();
 
-    e.new_usertype<AudioEngine> ("AudioEngine", no_constructor);
-    e.new_usertype<CommandManager> ("CommandManager", no_constructor);
-    e.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
-    e.new_usertype<MappingEngine> ("MappingEngine", no_constructor);
-    e.new_usertype<MidiEngine> ("MidiEngine", no_constructor);
-    e.new_usertype<PluginManager> ("PluginManager", no_constructor);
-    e.new_usertype<PresetCollection> ("PresetCollection", no_constructor);
-    e.new_usertype<Settings> ("Settings", no_constructor);
+    C.new_usertype<AppController> ("AppController", no_constructor);
+    C.new_usertype<GuiController> ("GuiController", no_constructor);
+    C.new_usertype<AudioEngine> ("AudioEngine", no_constructor);
 
-    e.new_usertype<Globals> ("World", no_constructor,
+    /// Command Manager
+    // @type CommandManager
+
+    C.new_usertype<CommandManager> ("CommandManager", no_constructor,
+        /// Invoke a command 
+        // @tparam 'element.CommandInfo' info
+        // @bool async
+        // @function invoke
+        "invoke",          &CommandManager::invoke,
+
+        "invoke_directly", &CommandManager::invokeDirectly
+    );
+
+    C.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
+    C.new_usertype<MappingEngine> ("MappingEngine", no_constructor);
+    C.new_usertype<MidiEngine> ("MidiEngine", no_constructor);
+    C.new_usertype<PluginManager> ("PluginManager", no_constructor);
+    C.new_usertype<PresetCollection> ("PresetCollection", no_constructor);
+    C.new_usertype<Settings> ("Settings", no_constructor);
+
+    /// A collection of global objects 
+    // @type World
+    C.new_usertype<Globals> ("World", no_constructor,
+        /// Get the current audio engine
+        // @function audioengine
+        // @treturn element.AudioEngine
         "audioengine",      &Globals::getAudioEngine,
         "commands",         &Globals::getCommandManager,
         "devices",          &Globals::getDeviceManager,
@@ -424,13 +428,19 @@ EL_EXPORT int luaopen_element_ui (lua_State* L)
 {
     sol::state_view lua (L);
     sol::table M = lua.create_table();
-    M.set_function ("test", []() { DBG("hello world"); });
     addRect<int> (M, "Rect");
     sol::stack::push (L, M);
     return 1;
 }
 
 static File scriptsDir()
+{
+    return File::getSpecialLocation (File::invokedExecutableFile)
+                        .getParentDirectory().getParentDirectory().getParentDirectory()
+                        .getChildFile ("libs/element");
+}
+
+static File defaultLuaPath()
 {
     return File::getSpecialLocation (File::invokedExecutableFile)
                         .getParentDirectory().getParentDirectory().getParentDirectory()
@@ -485,20 +495,23 @@ static int element_wrap (lua_State* L) {
 void openLibs (sol::state& lua)
 {
     auto e = NS (lua, "element");
-    e["wrap"] = element_wrap;
+    // e["wrap"] = element_wrap;
+    // sol::table (lua["package"]["searchers"]).add (requireElement);
 
-    sol::table(lua["package"]["searchers"]).add (requireElement);
+   #if 0
     openWorld (lua);
     openModel (lua);
     openDSP (lua);
     openKV (lua);
     openUI (lua);
+   #endif
 }
 
 void setWorld (state& lua, Globals* world)
-{
+{       
+    #if 0            
     auto e = NS (lua, "element");
-    
+
     if (world != nullptr)
     {
         e.set_function ("world",         [world]() -> Globals&           { return *world; });
@@ -522,6 +535,21 @@ void setWorld (state& lua, Globals* world)
             e.set_function (f.toRawUTF8(), []() { return sol::lua_nil; });
         }
     }
+    #endif
+}
+
+#include <memory>
+
+void initializeState (sol::state& lua, Globals& world)
+{
+    lua.open_libraries();
+    lua.globals().set ("element.world", std::ref<Globals> (world));
+    String path = String(defaultLuaPath().getFullPathName() + "/?.lua").toStdString();
+    path << ";" << String(defaultLuaPath().getFullPathName() + "/?/init.lua").toStdString();
+    lua["package"]["path"] = path.toStdString();
+    lua.script ("_G['element'] = require ('element')");
+    Lua::openWorld (world, lua);
+    Lua::openModel (lua);
 }
 
 }}

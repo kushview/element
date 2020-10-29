@@ -561,8 +561,8 @@
       <GROUP id="{0FE6240F-48A3-6F92-AFEB-D1FDAEE4E3E9}" name="scripting">
         <FILE id="TOwgaW" name="LuaBindings.cpp" compile="1" resource="0" file="../../../src/scripting/LuaBindings.cpp"/>
         <FILE id="jf2vaJ" name="LuaBindings.h" compile="0" resource="0" file="../../../src/scripting/LuaBindings.h"/>
-        <FILE id="IAjINn" name="LuaEngine.cpp" compile="1" resource="0" file="../../../src/scripting/LuaEngine.cpp"/>
-        <FILE id="sHHHK6" name="LuaEngine.h" compile="0" resource="0" file="../../../src/scripting/LuaEngine.h"/>
+        <FILE id="IAjINn" name="ScriptingEngine.cpp" compile="1" resource="0" file="../../../src/scripting/ScriptingEngine.cpp"/>
+        <FILE id="sHHHK6" name="ScriptingEngine.h" compile="0" resource="0" file="../../../src/scripting/ScriptingEngine.h"/>
         <FILE id="DUCEsK" name="LuaIterators.h" compile="0" resource="0" file="../../../src/scripting/LuaIterators.h"/>
         <FILE id="HW2ASX" name="LuaLib.cpp" compile="1" resource="0" file="../../../src/scripting/LuaLib.cpp"/>
       </GROUP>

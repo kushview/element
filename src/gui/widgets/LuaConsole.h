@@ -20,7 +20,7 @@
 #pragma once
 
 #include "gui/widgets/Console.h"
-#include "scripting/LuaEngine.h"
+#include "scripting/ScriptingEngine.h"
 
 namespace Element {
 
@@ -31,11 +31,11 @@ public:
     virtual ~LuaConsole();
     
     void textEntered (const String&) override;
-    void setEnvironment (LuaEngine::Environment*);
+    void setEnvironment (ScriptingEngine::Environment*);
 
 private:
     using LuaResult = sol::protected_function_result;
-    std::unique_ptr<LuaEngine::Environment> env;
+    std::unique_ptr<ScriptingEngine::Environment> env;
     String lastError;
     LuaResult errorHandler (lua_State* L, LuaResult pfr);
 };

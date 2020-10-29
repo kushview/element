@@ -17,38 +17,42 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "scripting/LuaEngine.h"
+#include "scripting/ScriptingEngine.h"
 #include "scripting/LuaBindings.h"
+#include "Globals.h"
 #include "sol/sol.hpp"
 
 namespace Element {
 
-LuaEngine::Environment::Environment (sol::state& state)
+ScriptingEngine::Environment::Environment (sol::state& state)
     : lua (state), env (lua, sol::create, lua.globals())
 { }
 
-LuaEngine::Environment::~Environment() { }
+ScriptingEngine::Environment::~Environment() { }
 
 //=============================================================================
-LuaEngine::LuaEngine()
+ScriptingEngine::ScriptingEngine()
 {
     lua.open_libraries();
     Lua::openLibs (lua);
 }
 
-LuaEngine::~LuaEngine()
+ScriptingEngine::~ScriptingEngine()
 {
     Lua::setWorld (lua, nullptr);
 }
 
-LuaEngine::Environment* LuaEngine::createEnvironment()
+ScriptingEngine::Environment* ScriptingEngine::createEnvironment()
 {
     return new Environment (lua);
 }
 
-void LuaEngine::setWorld (Globals& world)
+void ScriptingEngine::setWorld (Globals& nextWorld)
 {
-    Lua::setWorld (lua, &world);
+    world = &nextWorld;
+    Lua::initializeState (lua, *world);
+    // Lua::setWorld (lua, world);
+    //lua.set_function ("world", std::bind (this, &ScriptingEngine::createEnvironment));
 }
 
 }

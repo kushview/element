@@ -49,11 +49,14 @@ void LuaConsole::textEntered (const String& text)
     if (text.isEmpty() || env == nullptr)
         return;
     Console::textEntered (text);
-    auto& lua = env->getState();
     auto e = env->get();
-    
+    sol::state_view lua (e.lua_state());
+
     lua.set_exception_handler (exceptionHandler);
-   
+    
+    auto gprint = lua["print"];
+    lua["print"] = e["print"];
+
     try
     {
         bool haveReturn = true;
@@ -66,10 +69,10 @@ void LuaConsole::textEntered (const String& text)
                 buffer = text;
             }
         }
-
-        auto result = lua.safe_script (buffer.toRawUTF8(), e,
+        
+        auto result = lua.script (buffer.toRawUTF8(), e,
             [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); },
-            "console=", sol::load_mode::text);
+            "console=", sol::load_mode::any);
         
         if (result.valid() && haveReturn)
             e["print"](result);
@@ -81,12 +84,13 @@ void LuaConsole::textEntered (const String& text)
     {
         addText (e.what());
     }
-   
+    
+    lua["print"] = gprint;
     lua.set_exception_handler (sol::detail::default_exception_handler);
     lastError.clear();
 }
 
-void LuaConsole::setEnvironment (LuaEngine::Environment* newEnv)
+void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
 {
     env.reset (newEnv);
     if (env == nullptr)
@@ -120,12 +124,20 @@ void LuaConsole::setEnvironment (LuaEngine::Environment* newEnv)
         }
     };
 
-    e["print"] = [this](sol::variadic_args va) -> std::string
+    e.set_function ("print", [this](sol::variadic_args va)
     {
         auto e = env->get();
         String msg;
         for (auto v : va)
         {
+            DBG(" - " << sol::type_name (env->getState(), v.get_type()));
+
+            if (sol::type::string == v.get_type())
+            {
+                msg << v.as<const char*>() << " ";
+                continue;
+            }
+
             sol::function ts = e["tostring"];
             if (ts.valid())
             {
@@ -135,10 +147,13 @@ void LuaConsole::setEnvironment (LuaEngine::Environment* newEnv)
                         msg << sstr << "  ";
             }
         }
-
-        addText (msg.trimEnd());
-        return {};
-    };
+        
+        if (msg.isNotEmpty())
+        {
+            addText (msg.trimEnd());
+            MessageManager::getInstance()->runDispatchLoopUntil(14);
+        }
+    });
 }
 
 LuaConsole::LuaResult LuaConsole::errorHandler (lua_State* L, LuaResult pfr)

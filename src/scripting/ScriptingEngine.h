@@ -26,11 +26,11 @@ namespace Element {
 
 class Globals;
 
-class LuaEngine
+class ScriptingEngine
 {
 public:
-    LuaEngine();
-    ~LuaEngine();
+    ScriptingEngine();
+    ~ScriptingEngine();
 
     class Environment
     {
@@ -40,7 +40,7 @@ public:
         sol::state& getState() { return lua; }
 
     private:
-        friend class LuaEngine;
+        friend class ScriptingEngine;
         Environment (sol::state&);
         sol::state& lua;
         sol::environment env;
@@ -50,9 +50,13 @@ public:
     sol::state& getState()                  { return lua; }
     const sol::state& getState() const      { return lua; }
 
+    Result execute (const String& code);
+
 private:
     friend Globals;
+    Globals* world = nullptr;
     sol::state lua;
+    HashMap<String, File> scriptFiles;
     void setWorld (Globals&);
 };
 

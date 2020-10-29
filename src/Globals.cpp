@@ -18,7 +18,7 @@
 
 #include "ElementApp.h"
 #include "engine/InternalFormat.h"
-#include "scripting/LuaEngine.h"
+#include "scripting/ScriptingEngine.h"
 #include "session/DeviceManager.h"
 #include "session/MediaManager.h"
 #include "session/PluginManager.h"
@@ -58,35 +58,36 @@ public:
     ~Impl() { }
 
     Globals& owner;
-    AudioEnginePtr                engine;
-    SessionPtr                    session;
+    AudioEnginePtr                      engine;
+    SessionPtr                          session;
     
-    ScopedPointer<CommandManager> commands;
-    ScopedPointer<DeviceManager>  devices;
-    ScopedPointer<MediaManager>   media;
-    ScopedPointer<PluginManager>  plugins;
-    ScopedPointer<Settings>       settings;
-    std::unique_ptr<MappingEngine> mapping;
-    std::unique_ptr<PresetCollection> presets;
-    std::unique_ptr<MidiEngine>   midi;
-    std::unique_ptr<LuaEngine>    lua;
+    std::unique_ptr<CommandManager>     commands;
+    std::unique_ptr<DeviceManager>      devices;
+    std::unique_ptr<MediaManager>       media;
+    std::unique_ptr<PluginManager>      plugins;
+    std::unique_ptr<Settings>           settings;
+    std::unique_ptr<MappingEngine>      mapping;
+    std::unique_ptr<PresetCollection>   presets;
+    std::unique_ptr<MidiEngine>         midi;
+    std::unique_ptr<ScriptingEngine>    lua;
    
 private:
     friend class Globals;
     
     void init()
     {
-        plugins  = new PluginManager();
-        devices  = new DeviceManager();
-        media    = new MediaManager();
-        settings = new Settings();
-        commands = new CommandManager();
-        session  = new Session();
-        mapping.reset (new MappingEngine());
-        midi.reset (new MidiEngine());
-        presets.reset (new PresetCollection());
-        lua.reset (new LuaEngine());
+        plugins .reset (new PluginManager());
+        devices .reset (new DeviceManager());
+        media   .reset (new MediaManager());
+        settings.reset (new Settings());
+        commands.reset (new CommandManager());
+        mapping .reset (new MappingEngine());
+        midi    .reset (new MidiEngine());
+        presets .reset (new PresetCollection());
+        lua     .reset (new ScriptingEngine());
         lua->setWorld (owner);
+
+        session = new Session();
     }
     
     void freeAll()
@@ -148,7 +149,7 @@ MediaManager& Globals::getMediaManager()
     return *impl->media;
 }
 
-LuaEngine& Globals::getLuaEngine()
+ScriptingEngine& Globals::getScriptingEngine()
 {
     jassert (impl->lua != nullptr);
     return *impl->lua;

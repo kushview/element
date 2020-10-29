@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,5 +32,7 @@ extern void openKV (sol::state&);
 extern void openUI (sol::state&);
 extern void openLibs (sol::state&);
 extern void setWorld (sol::state&, Globals*);
+extern void initializeState (sol::state&, Globals&);
 
-}}
+}
+}

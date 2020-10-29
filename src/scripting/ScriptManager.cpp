@@ -6,17 +6,14 @@
 
 namespace Element {
 
-ScriptManager::ScriptManager()
+static File getDefaultScriptsDir()
 {
-    #if 0
-    auto exepath = File::getSpecialLocation (File::invokedExecutableFile)
-                        .getParentDirectory().getParentDirectory()
-                        .getChildFile ("scripts")
-                        .getFullPathName();
-
-    setenv ("LUA_PATH", "", true);
-    #endif
+    return File::getSpecialLocation (File::invokedExecutableFile)
+        .getParentDirectory().getParentDirectory().getParentDirectory()
+        .getChildFile ("scripts");
 }
+
+ScriptManager::ScriptManager() {}
 
 ScriptManager::~ScriptManager()
 {
