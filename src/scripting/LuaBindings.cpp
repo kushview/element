@@ -42,7 +42,6 @@
 #include "sol/sol.hpp"
 #include "lua-kv.h"
 
-//=============================================================================
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
 template <typename T>
@@ -55,134 +54,14 @@ struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
 };
 }
 
-#define CALL(x) sol::c_call<decltype(x), x>
-#define WRAP(x) sol::wrap<decltype(x), x>
-
 using namespace sol;
 
 namespace Element {
 namespace Lua {
 
+extern void openJUCE (sol::state&);
+
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
-
-template<typename T>
-static auto addRange (state_view& view, const char* name)
-{
-    using R = Range<T>;
-    return view.new_usertype<R> (name, no_constructor,
-        call_constructor, factories (
-            []() { return R(); },
-            [] (T start, T end) { return R (start, end); }
-        ),
-        "empty",            readonly_property (&R::isEmpty),
-        "start",            property (&R::getStart,  &R::setStart),
-        "length",           property (&R::getLength, &R::setLength),
-        "end",              property (&R::getEnd,    &R::setEnd),
-        "clip",             &R::clipValue,
-        "contains",         [](R* self, R* other) { return self->contains (*other); },
-        "intersects",       [](R* self, R* other) { return self->intersects (*other); },
-        "expanded",         &R::expanded
-    );
-}
-
-template<typename T>
-static auto addRectangle (state& lua, const char* ns, const char* name)
-{
-    using R = Rectangle<T>;
-    auto view = NS (lua, ns);
-    return view.new_usertype<R> (name, no_constructor,
-        call_constructor, factories (
-            []() { return R(); },
-            [] (T w, T h) { return R (w, h); },
-            [] (T x, T y, T w, T h) { return R (x, y, w, h); }
-        ),
-        meta_method::to_string, [](R* self) {
-            return self->toString().toStdString();
-        },
-        "empty",            readonly_property (&R::isEmpty),
-        "x",                property (&R::getX,  &R::setX),
-        "y",                property (&R::getY,  &R::setY),
-        "w",                property (&R::getWidth, &R::setWidth),
-        "h",                property (&R::getHeight, &R::setHeight)
-    );
-}
-
-template<typename T>
-static auto addRect (sol::table view, const char* name)
-{
-    using R = Rectangle<T>;
-    return view.new_usertype<R> (name, no_constructor,
-        call_constructor, factories (
-            []() { return R(); },
-            [] (T w, T h) { return R (w, h); },
-            [] (T x, T y, T w, T h) { return R (x, y, w, h); }
-        ),
-        meta_method::to_string, [](R* self) {
-            return self->toString().toStdString();
-        },
-        "empty",            readonly_property (&R::isEmpty),
-        "x",                property (&R::getX,  &R::setX),
-        "y",                property (&R::getY,  &R::setY),
-        "w",                property (&R::getWidth, &R::setWidth),
-        "h",                property (&R::getHeight, &R::setHeight)
-    );
-}
-
-static void openJUCE (state& lua)
-{
-    addRange<float>     (lua, "Range");
-    addRange<int>       (lua, "Span");
-    
-    // AudioBuffer
-    lua.new_usertype<AudioSampleBuffer> ("AudioBuffer", no_constructor,
-        "cleared",      readonly_property (&AudioSampleBuffer::hasBeenCleared),
-        "nchannels",    readonly_property (&AudioSampleBuffer::getNumChannels),
-        "nframes",      readonly_property (&AudioSampleBuffer::getNumSamples),
-        "resize", overload (
-            [](AudioSampleBuffer& self, int nc, int ns) { self.setSize (nc, ns); },
-            [](AudioSampleBuffer& self, int nc, int ns, bool keep) { self.setSize (nc, ns, keep); },
-            [](AudioSampleBuffer& self, int nc, int ns, bool keep, bool clear) { self.setSize (nc, ns, keep, clear); },
-            [](AudioSampleBuffer& self, int nc, int ns, bool keep, bool clear, bool avoid) { self.setSize (nc, ns, keep, clear, avoid); }),
-        "duplicate", overload (
-            [](AudioSampleBuffer& self, const AudioSampleBuffer& other) { self.makeCopyOf (other); },
-            [](AudioSampleBuffer& self, const AudioSampleBuffer& other, bool avoidReallocate) { self.makeCopyOf (other, avoidReallocate); }),
-        "clear", overload (
-            resolve<void()> (&AudioSampleBuffer::clear),
-            resolve<void(int,int)> (&AudioSampleBuffer::clear),
-            resolve<void(int,int,int)> (&AudioSampleBuffer::clear)),
-        "get_sample",       &AudioSampleBuffer::getSample,
-        "set_sample",       CALL(&AudioSampleBuffer::setSample),
-        "add_sample",       &AudioSampleBuffer::addSample,
-        "apply_gain", overload (
-            resolve<void(int,int,int,float)> (&AudioSampleBuffer::applyGain),
-            resolve<void(int,int,float)> (&AudioSampleBuffer::applyGain),
-            resolve<void(float)> (&AudioSampleBuffer::applyGain)),
-        "apply_gain_ramp", overload (
-            resolve<void(int,int,int,float,float)> (&AudioSampleBuffer::applyGainRamp),
-            resolve<void(int,int,float,float)> (&AudioSampleBuffer::applyGainRamp)),
-        "add_from", overload (
-            [](AudioSampleBuffer& self, int dc, int dss, AudioSampleBuffer& src, int sc, int sss, int ns) {
-                self.addFrom (dc, dss, src, sc, sss, ns);
-            },
-            [](AudioSampleBuffer& self, int dc, int dss, AudioSampleBuffer& src, int sc, int sss, int ns, float gain) {
-                self.addFrom (dc, dss, src, sc, sss, ns, gain);
-            }),
-        "add_from_with_ramp",   &AudioSampleBuffer::addFromWithRamp,
-        "copy_from", overload (
-            resolve<void(int,int,const AudioSampleBuffer&,int,int,int)> (&AudioSampleBuffer::copyFrom),
-            resolve<void(int,int,const float*, int)> (&AudioSampleBuffer::copyFrom),
-            resolve<void(int,int,const float*, int, float)> (&AudioSampleBuffer::copyFrom)),
-        "copy_from_with_ramp",  &AudioSampleBuffer::copyFromWithRamp,
-        "find_min_max",         &AudioSampleBuffer::findMinMax,
-        "magnitude", overload (
-            [](const AudioSampleBuffer& self, int c, int s, int n) { return self.getMagnitude (c, s, n); },
-            [](const AudioSampleBuffer& self, int s, int n) { return self.getMagnitude (s, n); }),
-        "rms",                  &AudioSampleBuffer::getRMSLevel,
-        "reverse",overload (
-            [](const AudioSampleBuffer& self, int c, int s, int n) { return self.reverse (c, s, n); },
-            [](const AudioSampleBuffer& self, int s, int n) { return self.reverse (s, n); })
-    );
-}
 
 void openUI (state& lua)
 {
@@ -354,8 +233,6 @@ void openKV (state& lua)
             self->add (type, index, channel, symbol, name, input);
         }
     );
-
-    addRectangle<double> (lua, "element", "Rect");
 }
 
 static void openWorld (Globals& world, state& lua)
@@ -395,7 +272,7 @@ static void openWorld (Globals& world, state& lua)
 
     /// A collection of global objects 
     // @type World
-    C.new_usertype<Globals> ("World", no_constructor,
+    auto W = C.new_usertype<Globals> ("World", no_constructor,
         /// Get the current audio engine
         // @function audioengine
         // @treturn element.AudioEngine
@@ -410,6 +287,7 @@ static void openWorld (Globals& world, state& lua)
         "session",          &Globals::getSession,
         "settings",         &Globals::getSettings
     );
+    W.set_function ("audioengine", [&world]() { return world.getAudioEngine(); });
 }
 
 void openDSP (sol::state& lua)
@@ -429,12 +307,58 @@ void openDSP (sol::state& lua)
  #define EL_EXPORT EL_EXTERN __attribute__((visibility("default")))
 #endif
 
+class ComponentWrapper : public Component
+{
+public:
+    ComponentWrapper() = default;
+    ComponentWrapper (sol::table obj)
+    {
+
+    }
+
+    ~ComponentWrapper()
+    {
+        widget = sol::lua_nil;
+    }
+
+    void resized() override
+    {
+        if (sol::safe_function f = widget ["resized"])
+            f (widget);
+    }
+
+    void paint (Graphics& g) override
+    {
+        if (sol::safe_function f = widget ["paint"])
+            f (widget, std::ref<Graphics> (g));
+    }
+
+    void wrap (sol::table obj)
+    {
+        widget = obj;
+        resized();
+        repaint();
+    }
+
+private:
+    sol::table widget;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComponentWrapper)
+};
+
 //=============================================================================
 EL_EXPORT int luaopen_element_ui (lua_State* L)
 {
     sol::state_view lua (L);
     sol::table M = lua.create_table();
-    addRect<int> (M, "Rect");
+
+    M.new_usertype<ComponentWrapper> ("ComponentWrapper",
+        sol::default_constructor,
+        "wrap", &ComponentWrapper::wrap,
+        "setsize", &ComponentWrapper::setSize,
+        "setvisible", &ComponentWrapper::setVisible,
+        "addtodesktop", [](ComponentWrapper* self) { self->addToDesktop (0); }
+    );
+
     sol::stack::push (L, M);
     return 1;
 }
@@ -450,21 +374,20 @@ static File defaultLuaPath()
 {
     return File::getSpecialLocation (File::invokedExecutableFile)
                         .getParentDirectory().getParentDirectory().getParentDirectory()
-                        .getChildFile ("libs/element");
+                        .getChildFile ("libs/element/src");
 }
 
 static int requireElement (lua_State* L)
 {
     const String mod = sol::stack::get<std::string> (L);
 
-    #if 0
-	if (path == "element.ui")
+   #if 1
+	if (mod == "element.ui")
 	{
-        DBG("found");
 		sol::stack::push (L, luaopen_element_ui);
 		return 1;
 	}
-    #else
+   #else
     
     auto path = mod.replaceCharacter('.', '/');
     path << ".lua";
@@ -487,11 +410,7 @@ static int element_wrap (lua_State* L) {
     
     const auto module = sol::stack::get<std::string> (L);
 
-    if (module.size() > 0)
-    {
-        M.set_function ("test", []() { DBG("hello world"); });
-        addRect<int> (M, "Rect");
-    }
+    if (module.size() > 0) {}
 
     sol::stack::push (L, M);
     return 1;
@@ -519,8 +438,8 @@ void initializeState (sol::state& lua, Globals& world)
 {
     lua.open_libraries();
     
-    // auto searchers = lua["package"]["searchers"].get<sol::table>();
-    // searchers.add (requireElement);
+    auto searchers = lua["package"]["searchers"].get<sol::table>();
+    searchers.add (requireElement);
 
     lua.globals().set ("element.world", std::ref<Globals> (world));
     String path = String(defaultLuaPath().getFullPathName() + "/?.lua").toStdString();
@@ -532,6 +451,7 @@ void initializeState (sol::state& lua, Globals& world)
     lua.script ("_G['element'] = require ('element')");
     Lua::openWorld (world, lua);
     Lua::openModel (lua);
+    Lua::openJUCE (lua);
 }
 
 }}

@@ -42,6 +42,7 @@ ScriptingEngine::Environment* ScriptingEngine::createEnvironment()
 void ScriptingEngine::initialize (Globals& w)
 {
     world = &w;
+
     Lua::initializeState (lua, *world);
 }
 

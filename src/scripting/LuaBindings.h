@@ -26,12 +26,11 @@ namespace Element {
 class Globals;
 
 namespace Lua {
-
 extern void openDSP (sol::state&);
 extern void openKV (sol::state&);
 extern void openUI (sol::state&);
 extern void openLibs (sol::state&);
 extern void initializeState (sol::state&, Globals&);
-
 }
+
 }
