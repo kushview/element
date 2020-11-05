@@ -242,7 +242,7 @@ def build (bld):
     # compile_vst (bld)
 
     # for testing purposes right now. doesn't get installed
-    if bld.env.LUA and bool(bld.env.HAVE_READLINE):
+    if bld.env.LUA and bool(bld.env.LIB_READLINE):
         bld.program(
             source = [ 'tools/lua-el/lua.cpp' ],
             name = 'lua-el',

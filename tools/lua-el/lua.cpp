@@ -14,7 +14,9 @@
 #include <string.h>
 #include <strings.h>
 
+#include "Globals.h"
 #include "scripting/LuaBindings.h"
+#include "scripting/ScriptingEngine.h"
 #include "sol/sol.hpp"
 
 #if !defined(LUA_PROMPT)
@@ -99,9 +101,16 @@
 
 #endif /* } */
 
+static bool exit_flag = false;
+static int exit_code = 0;
 static lua_State *globalL = NULL;
-
 static const char *progname = LUA_PROGNAME;
+
+static int event_hook()
+{
+    MessageManager::getInstance()->runDispatchLoopUntil (10);
+    return 0;
+}
 
 /*
 ** Hook set by signal function to stop the interpreter.
@@ -403,7 +412,7 @@ static void l_print (lua_State *L)
         /* any result to be printed? */
         luaL_checkstack (L, LUA_MINSTACK, "too many results to print");
         lua_getglobal(L, "print");
-        lua_insert(L, 1);
+        lua_insert (L, 1);
         if (lua_pcall(L, n, 0, 0) != LUA_OK)
             l_message(progname, lua_pushfstring(L, "error calling 'print' (%s)",
                                                 lua_tostring(L, -1)));
@@ -419,15 +428,17 @@ static void doREPL (lua_State *L)
     int status;
     const char *oldprogname = progname;
     progname = NULL; /* no 'progname' on errors in interactive mode */
-    while ((status = loadline(L)) != -1)
+
+    while (! exit_flag && (status = loadline (L)) != -1)
     {
         if (status == LUA_OK)
-            status = docall(L, 0, LUA_MULTRET);
+            status = docall (L, 0, LUA_MULTRET);
         if (status == LUA_OK)
-            l_print(L);
+            l_print (L);
         else
-            report(L, status);
+            report (L, status);
     }
+    
     lua_settop (L, 0); /* clear stack */
     lua_writeline();
     progname = oldprogname;
@@ -574,15 +585,15 @@ static int handle_luainit(lua_State *L)
 ** Main body of stand-alone interpreter (to be called in protected mode).
 ** Reads the options and handles them all.
 */
-static int pmain(lua_State *L)
+static int pmain (lua_State *L)
 {
     int argc = (int)lua_tointeger(L, 1);
     char **argv = (char **)lua_touserdata(L, 2);
     int script;
-    int args = collectargs(argv, &script);
-    luaL_checkversion(L); /* check that interpreter has correct version */
-    if (argv[0] && argv[0][0])
-        progname = argv[0];
+    int args = collectargs (argv, &script);
+    luaL_checkversion (L); /* check that interpreter has correct version */
+    if (argv[0] && argv [0][0])
+        progname = argv [0];
     
     if (args == has_error)
     {                              /* bad arg? */
@@ -634,24 +645,44 @@ static int pmain(lua_State *L)
     return 1;
 }
 
-int main(int argc, char **argv)
+static void do_overrides (sol::state& L) {
+    L["os"]["exit"] = sol::overload (
+        [](int code) -> void {
+            exit_code = code;
+            exit_flag = true; 
+        },
+        []() -> void { 
+            exit_code = 0;
+            exit_flag = true;
+        }
+    );
+}
+
+int main (int argc, char **argv)
 {
     int status, result;
-    sol::state L;
-    L.open_libraries();
-    Element::Lua::registerEngine (L);
+    rl_event_hook = event_hook;
 
-    // if (L.isNull()) {
-    //   l_message (argv[0], "cannot create state: not enough memory");
-    //   return EXIT_FAILURE;
-    // }
+    {
+        juce::initialiseJuce_GUI();
+        std::unique_ptr<Element::Globals> world (new Element::Globals ());
+        auto& L = world->getScriptingEngine().getState();
 
-    lua_pushcfunction(L, &pmain);   /* to call 'pmain' in protected mode */
-    lua_pushinteger(L, argc);       /* 1st argument */
-    lua_pushlightuserdata(L, argv); /* 2nd argument */
-    status = lua_pcall(L, 2, 1, 0); /* do the call */
-    result = lua_toboolean(L, -1);  /* get result */
-    report(L, status);
+        Element::Lua::initializeState (L, *world);
 
-    return (result && status == LUA_OK) ? EXIT_SUCCESS : EXIT_FAILURE;
+        do_overrides (L);
+
+        lua_pushcfunction (L, &pmain);    /* to call 'pmain' in protected mode */
+        lua_pushinteger (L, argc);        /* 1st argument */
+        lua_pushlightuserdata (L, argv);  /* 2nd argument */
+        status = lua_pcall (L, 2, 1, 0);  /* do the call */
+        result = lua_toboolean (L, -1);   /* get result */
+        report (L, status);
+        L.collect_garbage();
+        world.reset();
+
+        juce::shutdownJuce_GUI();
+    }
+
+    return (result && status == LUA_OK) ? exit_code : EXIT_FAILURE;
 }
