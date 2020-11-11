@@ -266,7 +266,7 @@ void openJUCE (sol::state& lua)
         ),
         "drawText", sol::overload (
             [](Graphics& g, std::string t, int x, int y, int w, int h) {
-                g.drawText (t, x, y, w, h, Justification::centredLeft, true);
+                g.drawText (t, x, y, w, h, Justification::centred, true);
             }
         ),
         "fillAll", sol::overload (
@@ -588,7 +588,8 @@ void openJUCE (sol::state& lua)
         "setContentNonOwned",    &DocumentWindow::setContentNonOwned,
         "addToDesktop",          sol::overload (
             [](DocumentWindow* self) { self->addToDesktop(); }
-        )
+        ),
+        sol::base_classes, sol::bases<juce::Component, juce::MouseListener>()
     );
 
     // AudioSampleBuffer

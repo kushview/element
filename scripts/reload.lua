@@ -1,7 +1,9 @@
 
 local mods = {
     ["ui"]      = "element.ui",
-    ["widget"]  = "element.widget"
+    ["widget"]  = "element.widget",
+    ["window"]  = "element.window",
+    ["object"]  = "element.object"
 }
 
 print ("Reloading modules...")

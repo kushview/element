@@ -4,13 +4,8 @@
 local Widget = {}
 local M = {}
 
-local ui = require ('element.ui')
-
-local function defaultwrap (w)
-    local wrapper = ui.ComponentWrapper.new()
-    wrapper:wrap (w)
-    return wrapper
-end
+local object    = require ('element.object')
+local ui        = require ('element.ui')
 
 function Widget:init()
 end
@@ -23,20 +18,20 @@ function Widget:setsize (w, h)
     self.impl:setSize (w, h)
 end
 
-function Widget:setvisible (v)
-    self.impl:setvisible (v)
-end
-
 function Widget:resized()
 end
 
 function Widget:paint (g)
 end
 
-function M.derive (base)
+function Widget:repaint()
+    self.impl:repaint()
+end
+
+function M.derive (base, wrap)
     local Derived = {}
     base = base or Widget
-    local wrap = defaultwrap
+    wrap = wrap or ui.ComponentWrapper.create
     for k, v in pairs (base) do
         Derived[k] = v
     end
@@ -44,9 +39,45 @@ function M.derive (base)
     Derived.SuperType = base
 
     function Derived.new()
-        local self = setmetatable ({}, { __index = Derived })
+        local self = object.instance (Derived, {},
+            {
+                name = function (self)
+                    if self.impl then return self.impl:getName()
+                    else return "" end
+                end,
+
+                visible = function (self)
+                    if self.impl then return self.impl:isVisible()
+                    else return false end
+                end,
+
+                width = function (self)
+                    if self.impl then return self.impl:getWidth()
+                    else return 0 end
+                end,
+
+                height = function (self)
+                    if self.impl then return self.impl:getHeight()
+                    else return 0 end
+                end
+            },
+            {
+                name = function (self, value)
+                    if type(value) == 'string' then
+                        self.impl:setName (value)
+                    end
+                end,
+
+                visible = function (self, value)
+                    if type(value) == 'boolean' then
+                        print ("set visible: " .. tostring (value))
+                        self.impl:setVisible (value)
+                    end
+                end
+            }
+        )
         self.impl = wrap (self)
-        
+
         local inits = {}
         local T = Derived
         while T ~= nil do
@@ -55,7 +86,7 @@ function M.derive (base)
         end
 
         for _, init in ipairs (inits) do
-            if init then init() end
+            if init then init (self) end
         end
 
         return self

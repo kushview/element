@@ -310,15 +310,19 @@ void openDSP (sol::state& lua)
 class ComponentWrapper : public Component
 {
 public:
-    ComponentWrapper() = default;
-    ComponentWrapper (sol::table obj)
-    {
-
-    }
-
     ~ComponentWrapper()
     {
         widget = sol::lua_nil;
+    }
+
+    static ComponentWrapper* create (sol::table obj)
+    {
+        DBG ("ComponentWrapper::create");
+        auto* wrapper = new ComponentWrapper();
+        wrapper->widget = obj;
+        wrapper->resized();
+        wrapper->repaint();
+        return wrapper;
     }
 
     void resized() override
@@ -333,16 +337,45 @@ public:
             f (widget, std::ref<Graphics> (g));
     }
 
-    void wrap (sol::table obj)
+private:
+    ComponentWrapper() = default;
+
+    sol::table widget;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComponentWrapper)
+};
+
+class WindowWrapper : public DocumentWindow
+{
+public:
+    ~WindowWrapper()
     {
-        widget = obj;
-        resized();
-        repaint();
+        widget = sol::lua_nil;
+    }
+
+    static WindowWrapper* create (sol::table tbl)
+    {
+        DBG(" WindowWrapper::create");
+        auto* wrapper = new WindowWrapper();
+        wrapper->widget = tbl;
+        return wrapper;
+    }
+
+    void closeButtonPressed() override
+    {
+        if (sol::safe_function f = widget ["onclosebutton"])
+            f (widget);
     }
 
 private:
+    explicit WindowWrapper (const String& name = "Window")
+        : DocumentWindow (name, Colours::darkgrey, DocumentWindow::allButtons, false)
+    {
+        setUsingNativeTitleBar (true);
+        setResizable (true, false);
+    }
+
     sol::table widget;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ComponentWrapper)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (WindowWrapper)
 };
 
 //=============================================================================
@@ -352,11 +385,34 @@ EL_EXPORT int luaopen_element_ui (lua_State* L)
     sol::table M = lua.create_table();
 
     M.new_usertype<ComponentWrapper> ("ComponentWrapper",
-        sol::default_constructor,
-        "wrap", &ComponentWrapper::wrap,
-        "setsize", &ComponentWrapper::setSize,
-        "setvisible", &ComponentWrapper::setVisible,
-        "addtodesktop", [](ComponentWrapper* self) { self->addToDesktop (0); }
+        sol::no_constructor,
+        "create",           sol::factories (ComponentWrapper::create),
+        "getName",          [](ComponentWrapper& self) { return self.getName().toStdString(); },
+        "setName",          [](ComponentWrapper& self, const char* name) { self.setName (name); },
+        "setSize",          &ComponentWrapper::setSize,
+        "setVisible",       &ComponentWrapper::setVisible,
+        "repaint",          [](ComponentWrapper& self) { self.repaint(); },
+        "isVisible",        &ComponentWrapper::isVisible,
+        "getWidth",         &ComponentWrapper::getWidth,
+        "getHeight",        &ComponentWrapper::getHeight,
+        "addToDesktop",     [](ComponentWrapper& self) { self.addToDesktop (0); },
+        sol::base_classes,  sol::bases<juce::Component, juce::MouseListener>()
+    );
+
+    M.new_usertype<WindowWrapper> ("WindowWrapper",
+        sol::no_constructor,
+        "create",           WindowWrapper::create,
+        "getName",          [](WindowWrapper& self) { return self.getName().toStdString(); },
+        "setName",          [](WindowWrapper& self, const char* name) { self.setName (name); },
+        "setSize",          &WindowWrapper::setSize,
+        "setVisible",       &WindowWrapper::setVisible,
+        "repaint",          [](WindowWrapper& self) { self.repaint(); },
+        "isVisible",        &WindowWrapper::isVisible,
+        "getWidth",         &WindowWrapper::getWidth,
+        "getHeight",        &WindowWrapper::getHeight,
+        "addToDesktop",     [](WindowWrapper& self) { self.addToDesktop(); },
+        "setContentOwned",  &WindowWrapper::setContentOwned,
+        sol::base_classes,  sol::bases<juce::DocumentWindow, juce::Component, juce::MouseListener>()
     );
 
     sol::stack::push (L, M);

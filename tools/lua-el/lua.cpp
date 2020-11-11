@@ -106,9 +106,16 @@ static int exit_code = 0;
 static lua_State *globalL = NULL;
 static const char *progname = LUA_PROGNAME;
 
+static uint32 lastLoopTime = 0;
 static int event_hook()
 {
-    MessageManager::getInstance()->runDispatchLoopUntil (10);
+    const uint32 loopTime = Time::getMillisecondCounter();
+    const uint32 runTime  = lastLoopTime != 0 && loopTime > lastLoopTime
+        ?  20 : 20; // loopTime - lastLoopTime : 20;
+
+    MessageManager::getInstance()->runDispatchLoopUntil (runTime);
+
+    lastLoopTime = loopTime;
     return 0;
 }
 
@@ -678,6 +685,8 @@ int main (int argc, char **argv)
         status = lua_pcall (L, 2, 1, 0);  /* do the call */
         result = lua_toboolean (L, -1);   /* get result */
         report (L, status);
+
+        MessageManager::getInstance()->runDispatchLoopUntil (20);
         L.collect_garbage();
         world.reset();
 
