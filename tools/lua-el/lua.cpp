@@ -676,8 +676,6 @@ int main (int argc, char **argv)
         std::unique_ptr<Element::Globals> world (new Element::Globals ());
         auto& L = world->getScriptingEngine().getState();
 
-        Element::Lua::initializeState (L, *world);
-
         do_overrides (L);
 
         lua_pushcfunction (L, &pmain);    /* to call 'pmain' in protected mode */

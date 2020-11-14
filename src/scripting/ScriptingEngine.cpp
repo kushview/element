@@ -32,7 +32,11 @@ ScriptingEngine::Environment::~Environment() { }
 
 //=============================================================================
 ScriptingEngine::ScriptingEngine() {}
-ScriptingEngine::~ScriptingEngine() {}
+ScriptingEngine::~ScriptingEngine()
+{
+    lua.collect_garbage();
+    lua.globals().set ("element.world", sol::lua_nil);
+}
 
 ScriptingEngine::Environment* ScriptingEngine::createEnvironment()
 {

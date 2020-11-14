@@ -38,7 +38,6 @@ local Widget_setters = {
 
     visible = function (self, value)
         if type(value) == 'boolean' then
-            print ("set visible: " .. tostring (value))
             self.impl:setVisible (value)
         end
     end
