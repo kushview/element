@@ -1,11 +1,7 @@
---- Test Script
--- Convert something to XML
--- @script toxml
+--- Show a custom widget in a window
+-- @script window
 -- @usage
--- local xml = element.script ('toxml')
--- print (xml)
-
-element.script ('reload/ui')
+-- local win = element.script ('window')
 
 local widget = require ('element.widget')
 local window = require ('element.window')
@@ -25,10 +21,11 @@ end
 local win = window.new (HelloWorld.new())
 
 win.onclosebutton = function (self)
-    self.visible = false
+    self.visible  = false
+    self.desktop  = false
 end
 
 win.visible = true
-win:present()
+win.desktop = true
 
 return  win

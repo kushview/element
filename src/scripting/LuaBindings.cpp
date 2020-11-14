@@ -396,6 +396,8 @@ EL_EXPORT int luaopen_element_ui (lua_State* L)
         "getWidth",         &ComponentWrapper::getWidth,
         "getHeight",        &ComponentWrapper::getHeight,
         "addToDesktop",     [](ComponentWrapper& self) { self.addToDesktop (0); },
+        "removeFromDesktop", &ComponentWrapper::removeFromDesktop,
+        "isOnDesktop",      &ComponentWrapper::isOnDesktop,
         sol::base_classes,  sol::bases<juce::Component, juce::MouseListener>()
     );
 
@@ -411,6 +413,8 @@ EL_EXPORT int luaopen_element_ui (lua_State* L)
         "getWidth",         &WindowWrapper::getWidth,
         "getHeight",        &WindowWrapper::getHeight,
         "addToDesktop",     [](WindowWrapper& self) { self.addToDesktop(); },
+        "removeFromDesktop", &WindowWrapper::removeFromDesktop,
+        "isOnDesktop",      &WindowWrapper::isOnDesktop,
         "setContentOwned",  &WindowWrapper::setContentOwned,
         sol::base_classes,  sol::bases<juce::DocumentWindow, juce::Component, juce::MouseListener>()
     );

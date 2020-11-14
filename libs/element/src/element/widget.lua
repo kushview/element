@@ -7,6 +7,43 @@ local M = {}
 local object    = require ('element.object')
 local ui        = require ('element.ui')
 
+local Widget_getters = {
+    name = function (self)
+        if self.impl then return self.impl:getName()
+        else return "" end
+    end,
+
+    visible = function (self)
+        if self.impl then return self.impl:isVisible()
+        else return false end
+    end,
+
+    width = function (self)
+        if self.impl then return self.impl:getWidth()
+        else return 0 end
+    end,
+
+    height = function (self)
+        if self.impl then return self.impl:getHeight()
+        else return 0 end
+    end
+}
+
+local Widget_setters = {
+    name = function (self, value)
+        if type(value) == 'string' then
+            self.impl:setName (value)
+        end
+    end,
+
+    visible = function (self, value)
+        if type(value) == 'boolean' then
+            print ("set visible: " .. tostring (value))
+            self.impl:setVisible (value)
+        end
+    end
+}
+
 function Widget:init()
 end
 
@@ -28,7 +65,7 @@ function Widget:repaint()
     self.impl:repaint()
 end
 
-function M.derive (base, wrap)
+function M.derive (base, wrap, get, set)
     local Derived = {}
     base = base or Widget
     wrap = wrap or ui.ComponentWrapper.create
@@ -38,44 +75,20 @@ function M.derive (base, wrap)
 
     Derived.SuperType = base
 
-    function Derived.new()
-        local self = object.instance (Derived, {},
-            {
-                name = function (self)
-                    if self.impl then return self.impl:getName()
-                    else return "" end
-                end,
+    function Derived.new ()
+        local g = {}
+        local s = {}
+        for k, f in pairs (Widget_getters)  do g[k] = f end
+        for k, f in pairs (Widget_setters)  do s[k] = f end
 
-                visible = function (self)
-                    if self.impl then return self.impl:isVisible()
-                    else return false end
-                end,
+        if type (get) == 'table' then
+            for k, f in pairs (get)         do g[k] = f end
+        end
+        if type (set) == 'table' then
+            for k, f in pairs (set)         do s[k] = f end
+        end
 
-                width = function (self)
-                    if self.impl then return self.impl:getWidth()
-                    else return 0 end
-                end,
-
-                height = function (self)
-                    if self.impl then return self.impl:getHeight()
-                    else return 0 end
-                end
-            },
-            {
-                name = function (self, value)
-                    if type(value) == 'string' then
-                        self.impl:setName (value)
-                    end
-                end,
-
-                visible = function (self, value)
-                    if type(value) == 'boolean' then
-                        print ("set visible: " .. tostring (value))
-                        self.impl:setVisible (value)
-                    end
-                end
-            }
-        )
+        local self = object.instance (Derived, {}, g, s)
         self.impl = wrap (self)
 
         local inits = {}
