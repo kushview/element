@@ -668,8 +668,9 @@ static void do_overrides (sol::state& L) {
 int main (int argc, char **argv)
 {
     int status, result;
+   #if ! __APPLE__
     rl_event_hook = event_hook;
-
+   #endif
     {
         juce::initialiseJuce_GUI();
         std::unique_ptr<Element::Globals> world (new Element::Globals ());
