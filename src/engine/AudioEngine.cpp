@@ -537,7 +537,7 @@ public:
                 }
                #endif
 
-                const double delayMs = 6.0;
+                const double delayMs = midiOutLatency.get();
                 if (! incomingMidi.isEmpty())
                 {
                     midiIOMonitor->sent();
@@ -818,11 +818,13 @@ private:
     AudioPlayHead::CurrentPositionInfo hostPos, lastHostPos;
     
     int latencySamples = 0;
-
+   
     // GraphRender::locked must match this default value
     Atomic<int> shouldBeLocked { 0 };
 
     MidiIOMonitorPtr midiIOMonitor;
+
+    Atomic<double> midiOutLatency { 0.0 };
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
@@ -895,6 +897,7 @@ void AudioEngine::applySettings (Settings& settings)
     priv->processMidiClock.set (useMidiClock ? 1 : 0);
     priv->generateMidiClock.set (settings.generateMidiClock() ? 1 : 0);
     priv->sendMidiClockToInput.set (settings.sendMidiClockToInput() ? 1 : 0);
+    priv->midiOutLatency.set (settings.getMidiOutLatency());
 }
 
 bool AudioEngine::removeGraph (RootGraph* graph)

@@ -679,6 +679,26 @@ namespace Element {
             addAndMakeVisible (midiOutput);
             midiOutput.addListener (this);
 
+            addAndMakeVisible (midiOutLatencyLabel);
+            midiOutLatencyLabel.setFont(Font(12.0, Font::bold));
+            midiOutLatencyLabel.setText("Output latency (ms)", dontSendNotification);
+            addAndMakeVisible (midiOutLatencyLabel);
+
+            addAndMakeVisible (midiOutLatency);
+            midiOutLatency.textFromValueFunction = [this](double value) -> String {
+                return String(roundToInt(value));
+            };
+            midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
+            midiOutLatency.setValue ((double) settings.getMidiOutLatency());
+            midiOutLatency.setSliderStyle (Slider::IncDecButtons);
+            midiOutLatency.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
+            midiOutLatency.onValueChange = [this]()
+            {
+                world.getSettings().setMidiOutLatency (midiOutLatency.getValue());
+                if (auto e = world.getAudioEngine())
+                    e->applySettings (world.getSettings());
+            };
+
            #if defined (EL_PRO)
             addAndMakeVisible (generateClockLabel);
             generateClockLabel.setFont (Font (12.0, Font::bold));
@@ -739,6 +759,7 @@ namespace Element {
             auto r2 = r.removeFromTop (settingHeight);
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+            layoutSetting (r, midiOutLatencyLabel, midiOutLatency, getWidth() / 4);
            #if defined (EL_PRO)
             layoutSetting (r, generateClockLabel, generateClock);
             layoutSetting (r, sendClockToInputLabel, sendClockToInput);
@@ -791,6 +812,8 @@ namespace Element {
 
         Label midiOutputLabel;
         ComboBox midiOutput;
+        Label midiOutLatencyLabel;
+        Slider midiOutLatency;
         Label generateClockLabel;
         SettingButton generateClock;
         Label sendClockToInputLabel;

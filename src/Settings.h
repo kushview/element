@@ -50,6 +50,7 @@ public:
     static const char* oscHostPortKey;
     static const char* oscHostEnabledKey;
     static const char* systrayKey;
+    static const char* midiOutLatencyKey;
 
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -115,6 +116,9 @@ public:
     bool isSystrayEnabled() const;
     void setSystrayEnabled (bool);
     
+    double getMidiOutLatency() const;
+    void setMidiOutLatency (double latencyMs);
+
 private:
     PropertiesFile* getProps() const;
 };
