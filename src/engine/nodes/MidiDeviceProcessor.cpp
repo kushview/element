@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ public:
     MidiDeviceEditor (MidiDeviceProcessor& p, const bool isInput)
         : AudioProcessorEditor (&p), proc (p), inputDevice (isInput)
     {
-        setOpaque (false);
+        setOpaque (true);
         addAndMakeVisible (deviceBox);
         deviceBox.addListener (this);
 
@@ -42,7 +42,26 @@ public:
         statusButton.setToggleState (false, dontSendNotification);
         statusButton.addListener (this);
 
-        setSize (240, 80);
+        if (! isInput)
+        {
+            addAndMakeVisible (midiOutLatencyLabel);
+            midiOutLatencyLabel.setText ("Output latency (ms)", dontSendNotification);
+            midiOutLatencyLabel.setFont (Font (12.f));
+            addAndMakeVisible (midiOutLatency);
+            midiOutLatency.setRange (-1000.0, 1000.0, 1.0);
+            midiOutLatency.setValue (proc.getLatency(), dontSendNotification);
+            midiOutLatency.textFromValueFunction = [this](double value) -> juce::String {
+                return String (roundToInt (value)) + " ms"; };
+            midiOutLatency.onValueChange = [this]() {
+                proc.setLatency (midiOutLatency.getValue()); };
+            midiOutLatency.updateText();
+
+            setSize (240, 120);
+        }
+        else
+        {
+            setSize (240, 80);
+        }
 
         startTimer (1000 * 2.5);
     }
@@ -56,6 +75,10 @@ public:
     void stabilizeComponents()
     {
         statusButton.setToggleState (proc.isDeviceOpen(), dontSendNotification);
+        if (! inputDevice)
+        {
+            midiOutLatency.setValue (proc.getLatency(), dontSendNotification);
+        }
     }
 
     void buttonClicked (Button*) override
@@ -77,10 +100,17 @@ public:
     void resized() override
     {
         const int widgetSize = 18;
-        const auto r = getLocalBounds().withSizeKeepingCentre (180, widgetSize);
+        auto r = getLocalBounds().withSizeKeepingCentre (180, widgetSize);
         deviceBox.setBounds (r.withLeft (r.getX() + 4 + widgetSize / 2));
         statusButton.setBounds (deviceBox.getX() - widgetSize - 4, deviceBox.getY(), 
                                 widgetSize ,widgetSize);
+
+        if (! inputDevice)
+        {
+            r = getLocalBounds();
+            midiOutLatency.setBounds (r.removeFromBottom (widgetSize));
+            midiOutLatencyLabel.setBounds (r.removeFromBottom (widgetSize));
+        }
     }
 
     void comboBoxChanged (ComboBox*) override
@@ -98,6 +128,8 @@ private:
     StringArray devices;
     ComboBox deviceBox;
     TextButton statusButton;
+    Slider midiOutLatency;
+    Label midiOutLatencyLabel;
 
     void updateDevices (const bool resetList = true)
     {
@@ -119,6 +151,13 @@ MidiDeviceProcessor::MidiDeviceProcessor (const bool isInput, MidiEngine& me)
 }
 
 MidiDeviceProcessor::~MidiDeviceProcessor() noexcept { }
+
+void MidiDeviceProcessor::setLatency (double latencyMs)
+{
+    if (inputDevice) 
+        return; 
+    midiOutLatency.set (jlimit (-1000.0, 1000.0, latencyMs));
+}
 
 void MidiDeviceProcessor::setCurrentDevice (const String& device)
 {
@@ -201,9 +240,9 @@ void MidiDeviceProcessor::processBlock (AudioBuffer<float>& audio, MidiBuffer& m
     }
     else
     {
-        if (output && !midi.isEmpty())
+        if (output && ! midi.isEmpty())
         {
-            const double delayMs = 6.0;
+            const auto delayMs = midiOutLatency.get();
             output->sendBlockOfMessages (
                 midi, delayMs + Time::getMillisecondCounterHiRes(), getSampleRate());
         }
@@ -242,7 +281,8 @@ void MidiDeviceProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
     ValueTree state ("state");
     state.setProperty ("inputDevice", isInputDevice(), 0)
-         .setProperty ("deviceName", deviceName, 0);
+         .setProperty ("deviceName", deviceName, 0)
+         .setProperty ("midiLatency", midiOutLatency.get(), nullptr);
     if (auto xml = state.createXml())
         copyXmlToBinary (*xml, destData);
 }
@@ -254,6 +294,7 @@ void MidiDeviceProcessor::setStateInformation (const void* data, int size)
         state = ValueTree::fromXml (*xml);
     if (! state.isValid())
         return;
+    midiOutLatency.set (state.getProperty ("midiLatency", (double) midiOutLatency.get()));
     if (inputDevice != (bool) state.getProperty ("inputDevice"))
     {
         DBG("[EL] MIDI Device node wrong direction");

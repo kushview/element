@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,6 +48,9 @@ public:
         desc.pluginFormatName   = "Internal";
         desc.version            = "1.0.0";
     }
+
+    double getLatency()         const { return inputDevice ? 0.0 : midiOutLatency.get(); }
+    void setLatency (double latencyMs);
 
     bool isInputDevice()        const { return inputDevice; }
     bool isOutputDevice()       const { return !isInputDevice(); }
@@ -133,9 +136,10 @@ private:
     MidiEngine& midi;
     bool prepared = false;
     String deviceName;
+    MidiMessageCollector inputMessages;
     std::unique_ptr<MidiInput> input;
     std::unique_ptr<MidiOutput> output;
-    MidiMessageCollector inputMessages;
+    Atomic<double> midiOutLatency { 0.0 };
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MidiDeviceProcessor);
 };
 
