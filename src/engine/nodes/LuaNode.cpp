@@ -530,26 +530,30 @@ struct LuaNode::Context
         if (! save.valid())
             return;
         
-        auto result = state.safe_script(R"(
-            local tf = io.tmpfile()
-            local oo = io.output()
-            io.output (tf);
-            node_save()
-            tf:seek ('set', 0)
-            local data = tf:read ("*a")
-            io.close()
-            io.output (oo);
-            return data
-        )");
+        try {
+            auto result = state.safe_script(R"(
+                local tf = io.tmpfile()
+                local oo = io.output()
+                io.output (tf);
+                node_save()
+                tf:seek ('set', 0)
+                local data = tf:read ("*a")
+                io.close()
+                io.output (oo);
+                return data
+            )");
 
-        if (result.valid())
-        {
-            sol::object data = result;
-            if (data.is<const char*>())
+            if (result.valid())
             {
-                MemoryOutputStream mo (block, false);
-                mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
+                sol::object data = result;
+                if (data.is<const char*>())
+                {
+                    MemoryOutputStream mo (block, false);
+                    mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
+                }
             }
+        } catch (const std::exception& e) {
+            DBG("[EL] " << e.what());
         }
     }
 
@@ -559,24 +563,28 @@ struct LuaNode::Context
         if (! restore.valid())
             return;
 
-        sol::userdata ud = state.script ("return io.tmpfile()");
-        FILE* const file = ud.as<FILE*>(); // Lua will close this
-        fwrite (data, 1, size, file);
+        try {
+            sol::userdata ud = state.script ("return io.tmpfile()");
+            FILE* const file = ud.as<FILE*>(); // Lua will close this
+            fwrite (data, 1, size, file);
 
-        state["__state_data__"] = ud;
-        state.safe_script (R"(
-            local oi = io.input()
-            __state_data__:seek ('set', 0)
-            io.input (__state_data__)
-            node_restore()
-            print (io.read ("*a"))
-            io.input(oi)
-            __state_data__:close()
-            __state_data__ = nil
-        )");
+            state["__state_data__"] = ud;
+            state.safe_script (R"(
+                local oi = io.input()
+                __state_data__:seek ('set', 0)
+                io.input (__state_data__)
+                node_restore()
+                print (io.read ("*a"))
+                io.input(oi)
+                __state_data__:close()
+                __state_data__ = nil
+            )");
 
-        state["__state_data__"] = nullptr;
-        state.collect_garbage();
+            state["__state_data__"] = nullptr;
+            state.collect_garbage();
+        } catch (const std::exception& e) { 
+            DBG("[EL] " << e.what());
+        }
     }
 
 private:

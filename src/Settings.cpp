@@ -41,9 +41,9 @@ const char* Settings::midiEngineKey             = "midiEngine";
 const char* Settings::oscHostPortKey            = "oscHostPortKey";
 const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
 const char* Settings::systrayKey                = "systrayKey";
+const char* Settings::midiOutLatencyKey         = "midiOutLatency";
 
 //=============================================================================
-
 enum OptionsMenuItemId
 {
     CheckForUpdatesOnStart = 1000000,
@@ -383,7 +383,22 @@ void Settings::setSystrayEnabled (bool enabled)
 }
 
 //=============================================================================
+double Settings::getMidiOutLatency() const
+{
+    if (auto* p = getProps())
+        return p->getDoubleValue (midiOutLatencyKey, true);
+    return 0.0;
+}
 
+void Settings::setMidiOutLatency (double latencyMs)
+{
+    if (latencyMs == getMidiOutLatency())
+        return;
+    if (auto* p = getProps())
+        p->setValue (midiOutLatencyKey, latencyMs);
+}
+
+//=============================================================================
 void Settings::addItemsToMenu (Globals& world, PopupMenu& menu)
 {
     auto& devices (world.getDeviceManager());
