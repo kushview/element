@@ -1,9 +1,9 @@
 
 local mods = {
     ["ui"]      = "element.ui",
-    ["widget"]  = "element.widget",
-    ["window"]  = "element.window",
-    ["object"]  = "element.object"
+    ["widget"]  = "el.Widget",
+    ["window"]  = "el.Window",
+    ["object"]  = "kv.object"
 }
 
 print ("Reloading modules...")
@@ -13,6 +13,6 @@ for name, module in pairs (mods) do
     _ENV[name] = nil
     package.loaded[module] = false
     package.preload[module] = nil
-    _G[name] = require (module)
-    _ENV[name] = _G[name]
+    -- require (module)
+    -- _ENV[name] = _G[name]
 end

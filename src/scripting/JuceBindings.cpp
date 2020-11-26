@@ -37,7 +37,6 @@ static auto addRectangle (sol::table& view, const char* name)
         },
 
         "leftTopRightBottom", R::leftTopRightBottom,
-
         "isEmpty",          &R::isEmpty,
         "isFinite",         &R::isFinite,
         "getX",             &R::getX,
@@ -135,14 +134,191 @@ static auto addRectangle (sol::table& view, const char* name)
 }
 
 //=============================================================================
-void openJUCE (sol::state& lua)
+void bindJUCE (sol::table& M)
 {
-    auto M = lua.create_table();
-    auto tmp = lua.create_table();
+    auto tmp = sol::state_view (M.lua_state()).create_table();
 
     addRange<int> (M, "Range");
     addRectangle<int> (M, "Rectangle");
 
+    M.new_usertype<File> ("File", sol::no_constructor,
+        "new",  sol::factories (
+            []() { return File(); },
+            [](const char* path) { return File (String::fromUTF8 (path)); }
+        ),
+        sol::meta_method::to_string, [](File& self) -> std::string {
+            return self.getFullPathName().toStdString();
+        },
+        "exists",                       &File::exists,
+        "existsAsFile",                 &File::existsAsFile,
+        "isDirectory",                  &File::isDirectory,
+        "isRoot",                       &File::isRoot,
+        "getSize",                      &File::getSize,
+        "descriptionOfSizeInBytes",     File::descriptionOfSizeInBytes,
+        "getFullPathName",              &File::getFullPathName,
+        "getFileName",                  &File::getFileName,
+        "getRelativePathFrom",          &File::getRelativePathFrom,
+        "getFileExtension",             &File::getFileExtension,
+        "hasFileExtension", [](File& self, const char* ext) {
+            return self.hasFileExtension (ext);
+        },
+        "withFileExtension",[](File& self, const char* ext) {
+            return self.withFileExtension (ext);
+        },
+        "getFileNameWithoutExtension",  &File::getFileNameWithoutExtension,
+        "hashCode",                     &File::hashCode,
+        "hashCode64",                   &File::hashCode64,
+        "getChildFile", [](File& self, const char* path) {
+            return self.getChildFile (path);
+        },
+        "getSiblingFile", [](File& self, const char* path) {
+            return self.getSiblingFile (path);
+        },
+        "getParentDirectory",           &File::getParentDirectory,
+        "isAChildOf",                   &File::isAChildOf,
+        // "getNonexistentChildFile",      &File::getNonexistentChildFile,
+        // "getNonexistentSibling",        &File::getNonexistentSibling,
+        "hasWriteAccess",               &File::hasWriteAccess,
+        "setReadOnly", sol::overload (
+            [](File& self, bool ro) { return self.setReadOnly (ro); },
+            [](File& self, bool ro, bool rec) { return self.setReadOnly (ro, rec); }
+        ),
+        "setExecutePermission",         &File::setExecutePermission,
+        "isHidden",                     &File::isHidden,
+        "getFileIdentifier",            &File::getFileIdentifier,
+        "getLastModificationTime",      &File::getLastModificationTime,
+        "getLastAccessTime",            &File::getLastAccessTime,
+        "getCreationTime",              &File::getCreationTime,
+        "setLastModificationTime",      &File::setLastModificationTime,
+        "setLastAccessTime",            &File::setLastAccessTime,
+        "setCreationTime",              &File::setCreationTime,
+        "getVersion", [](File& self) { return self.getVersion().toStdString(); },
+        "create",                       &File::create,
+        "createDirectory",              &File::createDirectory,
+        "deleteFile",                   &File::deleteFile,
+        "deleteRecursively", sol::overload (
+            [](File& self) -> bool { return self.deleteRecursively(); },
+            [](File& self, bool symlinks) -> bool { return self.deleteRecursively (symlinks); }
+        ),
+        "moveToTrash",                  &File::moveToTrash,
+        "moveFileTo",                   &File::moveFileTo,
+        "copyFileTo",                   &File::copyFileTo,
+        "replaceFileIn",                &File::replaceFileIn,
+        "copyDirectoryTo",              &File::copyDirectoryTo,
+        // "findChildFiles", [](),
+        // "getNumberOfChildFiles"
+        "containsSubDirectories",       &File::containsSubDirectories,
+        "createInputStream",            &File::createInputStream,
+        "createOutputStream", sol::overload (
+            [](File& self) { return self.createOutputStream(); },
+            [](File& self, lua_Integer bufSize) {
+                return self.createOutputStream (static_cast<size_t> (bufSize));
+            }
+        ),
+        "loadFileAsData",               &File::loadFileAsData,
+        "loadFileAsString", [](File& self) { return self.loadFileAsString().toStdString(); },
+        "readLines",                    &File::readLines,
+        "appendData",                   &File::appendData,
+        "replaceWithData",              &File::replaceWithData,
+        "appendText", sol::overload (
+            [](File& self, const char* text) { 
+                return self.appendText (String::fromUTF8 (text));
+            },
+            [](File& self, const char* text, bool unicode) { 
+                return self.appendText (String::fromUTF8 (text), unicode);
+            },
+            [](File& self, const char* text, bool unicode, bool unicodeHeader) { 
+                return self.appendText (String::fromUTF8 (text), unicode, unicodeHeader);
+            },
+            [](File& self, const char* text, bool unicode, bool unicodeHeader, const char* endings) { 
+                return self.appendText (String::fromUTF8 (text), unicode, unicodeHeader, endings);
+            }
+        ),
+        "replaceWithText", sol::overload (
+            [](File& self, const char* text) { 
+                return self.replaceWithText (String::fromUTF8 (text));
+            },
+            [](File& self, const char* text, bool unicode) { 
+                return self.replaceWithText (String::fromUTF8 (text), unicode);
+            },
+            [](File& self, const char* text, bool unicode, bool unicodeHeader) { 
+                return self.replaceWithText (String::fromUTF8 (text), unicode, unicodeHeader);
+            },
+            [](File& self, const char* text, bool unicode, bool unicodeHeader, const char* endings) {
+                return self.replaceWithText (String::fromUTF8 (text), unicode, unicodeHeader, endings);
+            }
+        ),
+        "hasIdenticalContentTo",        &File::hasIdenticalContentTo,
+        // "findFileSystemRoots",
+        "getVolumeLabel",               &File::getVolumeLabel,
+        "getVolumeSerialNumber",        &File::getVolumeSerialNumber,
+        "getBytesFreeOnVolume",         &File::getBytesFreeOnVolume,
+        "getVolumeTotalSize",           &File::getVolumeTotalSize,
+        "isOnCDRomDrive",               &File::isOnCDRomDrive,
+        "isOnHardDisk",                 &File::isOnHardDisk,
+        "isOnRemovableDrive",           &File::isOnRemovableDrive,
+        "startAsProcess", sol::overload (
+            [](File& self) { return self.startAsProcess(); },
+            [](File& self, const char* params) { 
+                return self.startAsProcess (String::fromUTF8 (params));
+            }
+        ),
+        "revealToUser",                 &File::revealToUser,
+        "getSpecialLocation", [](lua_Integer location) {
+           #if JUCE_WINDOWS
+            if (location >= File::userHomeDirectory && location <= File::globalApplicationsDirectoryX86)
+           #else
+            if (location >= File::userHomeDirectory && location <= File::globalApplicationsDirectory)
+           #endif
+                return File::getSpecialLocation (static_cast<File::SpecialLocationType> (location));
+            return File();
+        },
+        "createTempFile", [](const char* fileNameEnding) { 
+            return File::createTempFile (String::fromUTF8 (fileNameEnding));
+        },
+        "getCurrentWorkingDirectory",   File::getCurrentWorkingDirectory,
+        "setAsCurrentWorkingDirectory", &File::setAsCurrentWorkingDirectory,
+        "getSeparatorChar",             File::getSeparatorChar,
+        "getSeparatorString",           File::getSeparatorString,
+        "createLegalFileName", [](const char* filename) {
+            return File::createLegalFileName (String::fromUTF8 (filename));
+        },
+        "createLegalPathName", [](const char* path) {
+            return File::createLegalPathName (String::fromUTF8 (path));
+        },
+        "areFileNamesCaseSensitive",    File::areFileNamesCaseSensitive,
+        "isAbsolutePath", [](const char* path) { 
+            return File::isAbsolutePath (String::fromUTF8 (path));
+        },
+        "createFileWithoutCheckingPath", [](const char* absPath) { 
+            return File::createFileWithoutCheckingPath (String::fromUTF8 (absPath));
+        },
+        "addTrailingSeparator", [](const char* path) { 
+            return File::addTrailingSeparator (String::fromUTF8 (path));
+        },
+
+       #if JUCE_WINDOWS
+        "createShortcut", [](File& self, const char* desc, const File& linkFile) {
+            return self.createShortcut (String::fromUTF8 (desc), linkFile);
+        },
+        "isShortcut",                   &File::isShortcut,
+       #elif JUCE_MAC || JUCE_IOS
+        #if JUCE_MAC
+         "addToDock",                   &File::addToDock,
+        #endif
+        "getMacOSType",                 &File::getMacOSType,
+        "isBundle",                     &File::isBundle,
+       #endif
+
+        "createSymbolicLink", [](File& self, const File& link, bool overwrite) { 
+            return self.createSymbolicLink (link, overwrite);
+        },
+        "isSymbolicLink",               &File::isSymbolicLink,
+        "getLinkedTarget",              &File::getLinkedTarget,
+        //createSymbolicLink (static method)
+        "getNativeLinkedTarget",        &File::getNativeLinkedTarget
+    );
+    
     M.new_usertype<Justification> ("Justification", sol::no_constructor);
     M["Justification"]["Flags"] = tmp.new_enum ("Flags",
         "left",                     Justification::left,
@@ -264,11 +440,13 @@ void openJUCE (sol::state& lua)
             [](Graphics& g, int color) { g.setColour (Colour (color)); },
             [](Graphics& g, Colour color) { g.setColour (color); }
         ),
+        
         "drawText", sol::overload (
             [](Graphics& g, std::string t, int x, int y, int w, int h) {
                 g.drawText (t, x, y, w, h, Justification::centred, true);
             }
         ),
+
         "fillAll", sol::overload (
             [](Graphics& g)                 { g.fillAll(); },
             [](Graphics& g, int color)      { g.fillAll (Colour (color)); },
@@ -642,7 +820,12 @@ void openJUCE (sol::state& lua)
             [](const AudioSampleBuffer& self, int c, int s, int n) { return self.reverse (c, s, n); },
             [](const AudioSampleBuffer& self, int s, int n) { return self.reverse (s, n); })
     );
+}
 
+void openJUCE (sol::state& lua)
+{
+    auto M = lua.create_table();
+    bindJUCE (M);
     lua["juce"] = M;
 }
 

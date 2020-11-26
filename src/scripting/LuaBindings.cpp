@@ -19,6 +19,8 @@
 
 /// @module element
 
+#include <memory>
+
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 
@@ -60,6 +62,7 @@ namespace Element {
 namespace Lua {
 
 extern void openJUCE (sol::state&);
+extern void bindJUCE (sol::table&);
 
 static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
 
@@ -92,12 +95,15 @@ static void openModel (sol::state& lua)
                 : std::shared_ptr<Node>();
         },
 
-        "name", property ([](Session* self, const char* name) -> void {
-                self->setName (String::fromUTF8 (name));
-            },[](const Session& self) -> std::string {
+        "name", sol::property (
+            [](Session& self, const char* name) -> void {
+                self.setName (String::fromUTF8 (name));
+            }, 
+            [](Session& self) -> std::string {
                 return self.getName().toStdString();
-            }),
-        "toxmlstring", [](Session *self) -> std::string {
+            }
+        ),
+        "toXmlString", [](Session *self) -> std::string {
             auto tree = self->getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (tree, true);
             return tree.toXmlString().toStdString();
@@ -246,21 +252,20 @@ static void openWorld (Globals& world, state& lua)
 
     /// Command Manager
     // @type CommandManager
-
     C.new_usertype<CommandManager> ("CommandManager", no_constructor,
         /// Invoke a command 
         // @tparam 'element.CommandInfo' info
         // @bool async
         // @function invoke
         // @treturn bool True if success
-        "invoke",          &CommandManager::invoke,
+        "invoke",           &CommandManager::invoke,
 
         /// Invoke a command directly
         // @int Command ID
         // @bool async
-        // @function invoke_directly
+        // @function invokeDirectly
         // @treturn bool True if success
-        "invoke_directly", &CommandManager::invokeDirectly
+        "invokeDirectly",   &CommandManager::invokeDirectly
     );
 
     C.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
@@ -307,6 +312,131 @@ void openDSP (sol::state& lua)
  #define EL_EXPORT EL_EXTERN __attribute__((visibility("default")))
 #endif
 
+template<typename T>
+static auto addRectangle (sol::table& view, const char* name)
+{
+    using R = Rectangle<T>;
+    
+    return view.new_usertype<R> (name, 
+        sol::constructors<R(), R(T, T, T, T), R(T, T), R(Point<T>, Point<T>)>(),
+        
+        sol::meta_method::to_string, [](R& self) {
+            return self.toString().toStdString();
+        },
+
+        "from_coords",      R::leftTopRightBottom,
+
+        "x",                sol::property (&R::getX, &R::setX),
+        "y",                sol::property (&R::getY, &R::setY),
+        "width",            sol::property (&R::getWidth, &R::setWidth),
+        "height",           sol::property (&R::getHeight, &R::setHeight),
+
+        "left",             sol::property (&R::getX, &R::setLeft),
+        "right",            sol::property (&R::getRight, &R::setRight),
+        "top",              sol::property (&R::getY, &R::setTop),
+        "bottom",           sol::property (&R::getBottom, &R::setBottom),
+
+        "is_empty",         &R::isEmpty,
+        "is_finite",        &R::isFinite,
+        "translate",        &R::translate,
+        "translated",       &R::translated,
+
+        "expand",           &R::expand,
+        "expanded", sol::overload (
+            [](R& self, T dx, T dy) { return self.expanded (dx, dy); },
+            [](R& self, T d)        { return self.expanded (d); }
+        ),
+        
+        "reduce",               &R::reduce,
+        "reduced", sol::overload (
+            [](R& self, T dx, T dy) { return self.reduced (dx, dy); },
+            [](R& self, T d)        { return self.reduced (d); }
+        ),
+
+        "to_int",           &R::toNearestInt,
+        "to_int_edges",     &R::toNearestIntEdges
+#if 0
+        ,
+
+        "getCentreX",       &R::getCentreX,
+        "getCentreY",       &R::getCentreY,
+        "getCentre",        &R::getCentre,
+        "getAspectRatio", sol::overload (
+            [](R& self) { return self.getAspectRatio(); },
+            [](R& self, bool widthOverHeight) { return self.getAspectRatio (widthOverHeight); }
+        ),
+
+        "get_position",     &R::getPosition,
+        "set_position", sol::overload (
+            sol::resolve<void(Point<T>)> (&R::setPosition),
+            sol::resolve<void(T, T)> (&R::setPosition)
+        ),
+
+        "getTopLeft",           &R::getTopLeft,
+        "getTopRight",          &R::getTopRight,
+        "getBottomLeft",        &R::getBottomLeft,
+        "getBottomRight",       &R::getBottomRight,
+        "getHorizontalRange",   &R::getHorizontalRange,
+        "getVerticalRange",     &R::getVerticalRange,
+        "setSize",              &R::setSize,
+        "setBounds",            &R::setBounds,
+        "setX",                 &R::setX,
+        "setY",                 &R::setY,
+        "setWidth",             &R::setWidth,
+        "setHeight",            &R::setHeight,
+        "setCentre", sol::overload (
+            sol::resolve<void(T, T)> (&R::setCentre),
+            sol::resolve<void(Point<T>)> (&R::setCentre)
+        ),
+        "setHorizontalRange",   &R::setHorizontalRange,
+        "setVerticalRange",     &R::setVerticalRange,
+        "withX",                &R::withX,
+        "withY",                &R::withY,
+        "withRightX",           &R::withRightX,
+        "withBottomY",          &R::withBottomY,
+        "withPosition", sol::overload (
+            [](R& self, T x, T y)       { return self.withPosition (x, y); },
+            [](R& self, Point<T> pt)    { return self.withPosition (pt); }
+        ),
+        "withZeroOrigin",       &R::withZeroOrigin,
+        "withCentre",           &R::withCentre,
+
+        "withWidth",            &R::withWidth,
+        "withHeight",           &R::withHeight,
+        "withSize",             &R::withSize,
+        "withSizeKeepingCentre",&R::withSizeKeepingCentre,
+        "setLeft",              &R::setLeft,
+        "withLeft",             &R::withLeft,
+
+        "setTop",               &R::setTop,
+        "withTop",              &R::withTop,
+        "setRight",             &R::setRight,
+        "withRight",            &R::withRight,
+        "setBottom",            &R::setBottom,
+        "withBottom",           &R::withBottom,
+        "withTrimmedLeft",      &R::withTrimmedLeft,
+        "withTrimmedRight",     &R::withTrimmedRight,
+        "withTrimmedTop",       &R::withTrimmedTop,
+        "withTrimmedBottom",    &R::withTrimmedBottom,
+        
+        "slice_top",        &R::removeFromTop,
+        "slice_left",       &R::removeFromLeft,
+        "slice_right",      &R::removeFromRight,
+        "slice_bottom",     &R::removeFromBottom,
+
+        "getConstrainedPoint",  &R::getConstrainedPoint,
+
+        "getRelativePoint",     [](R& self, T rx, T ry) { return self.getRelativePoint (rx, ry); },
+        "proportionOfWidth",    [](R& self, T p)        { return self.proportionOfWidth (p); },
+        "proportionOfHeight",   [](R& self, T p)        { return self.proportionOfHeight (p); },
+        "getProportion",        [](R& self, R pr)       { return self.getProportion (pr); }
+#if 0
+        "",     &R::,
+#endif
+#endif
+    );
+}
+
 class ComponentWrapper : public Component
 {
 public:
@@ -317,7 +447,6 @@ public:
 
     static ComponentWrapper* create (sol::table obj)
     {
-        DBG ("ComponentWrapper::create");
         auto* wrapper = new ComponentWrapper();
         wrapper->widget = obj;
         wrapper->resized();
@@ -333,8 +462,45 @@ public:
 
     void paint (Graphics& g) override
     {
-        if (sol::safe_function f = widget ["paint"])
+        if (sol::safe_function f = widget ["paint"]) {
             f (widget, std::ref<Graphics> (g));
+        }
+    }
+
+    void mouseDrag (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget ["mouse_drag"])
+            f (widget, ev);
+    }
+
+    void mouseDown (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget ["mouse_down"])
+            f (widget, ev);
+    }
+
+    void mouseUp (const MouseEvent& ev) override
+    {
+        if (sol::safe_function f = widget ["mouse_up"])
+            f (widget, ev);
+    }
+
+    void add (sol::table child, int zorder)
+    {
+        if (Component* const impl = child.get<Component*> ("impl"))
+            addAndMakeVisible (*impl, zorder);
+    }
+    
+    sol::table getBoundsTable()
+    {
+        sol::state_view L (widget.lua_state());
+        auto r = getBounds();
+        auto t = L.create_table();
+        t["x"]      = r.getX();
+        t["y"]      = r.getY();
+        t["width"]  = r.getWidth();
+        t["height"] = r.getHeight();
+        return t;
     }
 
 private:
@@ -354,7 +520,6 @@ public:
 
     static WindowWrapper* create (sol::table tbl)
     {
-        DBG(" WindowWrapper::create");
         auto* wrapper = new WindowWrapper();
         wrapper->widget = tbl;
         return wrapper;
@@ -379,46 +544,211 @@ private:
 };
 
 //=============================================================================
+EL_EXPORT int luaopen_el_File (lua_State* L)
+{
+    sol::state_view lua (L);
+    auto t = lua.create_table();
+    t.new_usertype<File> ("File", sol::constructors<File()>(),
+        "name", sol::readonly_property ([](File& self) {
+            return self.getFileName().toStdString();
+        }
+    );
+
+    auto M = t.get<sol::table> ("File");
+    t.clear();
+    sol::stack::push (L, M);
+    return 1;
+}
+
+//=============================================================================
 EL_EXPORT int luaopen_element_ui (lua_State* L)
 {
     sol::state_view lua (L);
     sol::table M = lua.create_table();
 
+    addRectangle<lua_Number>  (M, "Rectangle");
+    addRectangle<lua_Integer> (M, "IRectangle");
+
+    /// A drawing context.
+    // @type Context
+    M.new_usertype<Graphics> ("Graphics", sol::no_constructor,
+        /// Change the color
+        // @function set_color
+        // @int color New ARGB color as integer. e.g.`0xAARRGGBB`
+        "set_color", sol::overload (
+            [](Graphics& g, int color) { g.setColour (Colour (color)); }
+        ),
+        
+        /// Draw some text
+        // @function draw_text
+        // @string text Text to draw
+        // @int x Horizontal position
+        // @int y Vertical position
+        // @int width Width of containing area
+        // @int height Height of containing area
+        "draw_text", sol::overload (
+            [](Graphics& g, std::string t, int x, int y, int w, int h) {
+                g.drawText (t, x, y, w, h, Justification::centred, true);
+            }
+        ),
+
+        /// Fill the entire drawing area.
+        // @function fill_all
+        "fill_all", sol::overload (
+            [](Graphics& g)                 { g.fillAll(); },
+            [](Graphics& g, int color)      { g.fillAll (Colour (color)); }
+        )
+    );
+
+    /// A pair of x,y coordinates.
+    // @type Point
+    using PTF = Point<lua_Number>;
+    M.new_usertype<PTF> ("Point", no_constructor,
+        sol::call_constructor, sol::factories (
+            []() { return PTF(); },
+            [](lua_Number x, lua_Number y) { return PTF (x, y); }
+        ),
+        sol::meta_method::to_string, [](PTF& self) {
+            return self.toString().toStdString();
+        },
+
+        /// True if is the origin point
+        // @function is_origin
+        "is_origin",    &PTF::isOrigin,
+
+        /// True if is finite
+        // @function is_finite
+        "is_finite",    &PTF::isFinite,
+
+        /// X coord
+        // @class field
+        // @name x
+        "x",            sol::property (&PTF::getX, &PTF::setX),
+
+        /// Y coord
+        // @class field
+        // @name x
+        "y",            sol::property (&PTF::getY, &PTF::setY),
+
+        /// True if is finite
+        // @function with_x
+        "with_x",       &PTF::withX,
+
+        /// True if is finite
+        // @function with_y
+        "with_y",       &PTF::withY,
+
+        /// True if is finite
+        // @function set_xy
+        "set_xy",       &PTF::setXY,
+
+        /// True if is finite
+        // @function add_xy
+        "add_xy",       &PTF::addXY,
+
+        /// True if is finite
+        // @function translated
+        "translated",   &PTF::translated,
+
+        /// True if is finite
+        // @function distance
+        "distance", sol::overload (
+            [](PTF& self) { return self.getDistanceFromOrigin(); },
+            [](PTF& self, PTF& o) { return self.getDistanceFrom (o); }
+        ),
+
+        /// True if is finite
+        // @function distance_squared
+        "distance_squared", sol::overload (
+            [](PTF& self) { return self.getDistanceSquaredFromOrigin(); },
+            [](PTF& self, PTF& o) { return self.getDistanceSquaredFrom (o); }
+        ),
+
+        /// True if is finite
+        // @function angle_to
+        "angle_to",     &PTF::getAngleToPoint,
+
+        /// True if is finite
+        // @function rotated
+        "rotated",      &PTF::rotatedAboutOrigin,
+        
+        /// True if is finite
+        // @function dot_product
+        "dot_product",  &PTF::getDotProduct,
+        
+        /// True if is finite
+        // @function to_int
+        "to_int",       &PTF::toInt
+    );
+
+    /// A mouse event
+    // @type MouseEvent
+    M.new_usertype<MouseEvent> ("MouseEvent", sol::no_constructor,
+        "position", sol::readonly_property ([](MouseEvent& self) {
+            return self.position.toDouble();
+        }),
+        "x",            &MouseEvent::x,
+        "y",            &MouseEvent::y,
+        "pressure",     &MouseEvent::pressure,
+        "orientation",  &MouseEvent::orientation,
+        "rotation",     &MouseEvent::rotation,
+        "tiltx",        &MouseEvent::tiltX,
+        "tilty",        &MouseEvent::tiltY
+    );
+    
+    /// Implementation type used by el.Widget
     M.new_usertype<ComponentWrapper> ("ComponentWrapper",
         sol::no_constructor,
-        "create",           sol::factories (ComponentWrapper::create),
-        "getName",          [](ComponentWrapper& self) { return self.getName().toStdString(); },
-        "setName",          [](ComponentWrapper& self, const char* name) { self.setName (name); },
-        "setSize",          &ComponentWrapper::setSize,
-        "setVisible",       &ComponentWrapper::setVisible,
-        "repaint",          [](ComponentWrapper& self) { self.repaint(); },
-        "isVisible",        &ComponentWrapper::isVisible,
-        "getWidth",         &ComponentWrapper::getWidth,
-        "getHeight",        &ComponentWrapper::getHeight,
-        "addToDesktop",     [](ComponentWrapper& self) { self.addToDesktop (0); },
-        "removeFromDesktop", &ComponentWrapper::removeFromDesktop,
-        "isOnDesktop",      &ComponentWrapper::isOnDesktop,
+        sol::call_constructor, sol::factories (ComponentWrapper::create),
+
+        "get_name",           [](ComponentWrapper& self) { return self.getName().toStdString(); },
+        "set_name",           [](ComponentWrapper& self, const char* name) { self.setName (name); },
+        "set_size",             &ComponentWrapper::setSize,
+        "set_visible",          &ComponentWrapper::setVisible,
+        "repaint",            [](ComponentWrapper& self) { self.repaint(); },
+        "is_visible",           &ComponentWrapper::isVisible,
+        "get_width",            &ComponentWrapper::getWidth,
+        "get_height",           &ComponentWrapper::getHeight,
+        "add_to_desktop",     [](ComponentWrapper& self) { self.addToDesktop (0); },
+        "remove_from_desktop",  &ComponentWrapper::removeFromDesktop,
+        "is_on_desktop",        &ComponentWrapper::isOnDesktop,
+        "add",                  &ComponentWrapper::add,
+        "resize",               &ComponentWrapper::setSize,
+        "set_bounds",         [](ComponentWrapper& self, int x, int y, int w, int h) {
+            self.setBounds (x, y, w, h);
+        },
+        "get_bounds",           &ComponentWrapper::getBoundsTable,
+
         sol::base_classes,  sol::bases<juce::Component, juce::MouseListener>()
     );
 
     M.new_usertype<WindowWrapper> ("WindowWrapper",
         sol::no_constructor,
-        "create",           WindowWrapper::create,
-        "getName",          [](WindowWrapper& self) { return self.getName().toStdString(); },
-        "setName",          [](WindowWrapper& self, const char* name) { self.setName (name); },
-        "setSize",          &WindowWrapper::setSize,
-        "setVisible",       &WindowWrapper::setVisible,
-        "repaint",          [](WindowWrapper& self) { self.repaint(); },
-        "isVisible",        &WindowWrapper::isVisible,
-        "getWidth",         &WindowWrapper::getWidth,
-        "getHeight",        &WindowWrapper::getHeight,
-        "addToDesktop",     [](WindowWrapper& self) { self.addToDesktop(); },
-        "removeFromDesktop", &WindowWrapper::removeFromDesktop,
-        "isOnDesktop",      &WindowWrapper::isOnDesktop,
-        "setContentOwned",  &WindowWrapper::setContentOwned,
+        "create",               WindowWrapper::create,
+        "get_name",             [](WindowWrapper& self) { return self.getName().toStdString(); },
+        "set_name",             [](WindowWrapper& self, const char* name) { self.setName (name); },
+        "set_size",             &WindowWrapper::setSize,
+        "set_visible",          &WindowWrapper::setVisible,
+        "repaint",              [](WindowWrapper& self) { self.repaint(); },
+        "is_visible",           &WindowWrapper::isVisible,
+        "get_width",            &WindowWrapper::getWidth,
+        "get_height",           &WindowWrapper::getHeight,
+        "add_to_desktop",       [](WindowWrapper& self) { self.addToDesktop(); },
+        "remove_from_desktop",  &WindowWrapper::removeFromDesktop,
+        "is_on_desktop",        &WindowWrapper::isOnDesktop,
+        "set_content_owned",    &WindowWrapper::setContentOwned,
         sol::base_classes,  sol::bases<juce::DocumentWindow, juce::Component, juce::MouseListener>()
     );
 
+    sol::stack::push (L, M);
+    return 1;
+}
+
+EL_EXPORT int luaopen_juce (lua_State* L)
+{
+    sol::state_view lua (L);
+    auto M = lua.create_table();
+    bindJUCE (M);
     sol::stack::push (L, M);
     return 1;
 }
@@ -430,6 +760,12 @@ static File scriptsDir()
                         .getChildFile ("scripts");
 }
 
+static File rootPath()
+{
+    return File::getSpecialLocation (File::invokedExecutableFile)
+        .getParentDirectory().getParentDirectory().getParentDirectory();
+}
+
 static File defaultLuaPath()
 {
     return File::getSpecialLocation (File::invokedExecutableFile)
@@ -437,62 +773,52 @@ static File defaultLuaPath()
                         .getChildFile ("libs/element/src");
 }
 
-static int requireElement (lua_State* L)
+static String getSearchPath()
 {
-    const String mod = sol::stack::get<std::string> (L);
-
-   #if 1
-	if (mod == "element.ui")
-	{
-		sol::stack::push (L, luaopen_element_ui);
-		return 1;
-	}
-   #else
+    Array<File> paths ({
+        rootPath().getChildFile ("libs/lua-kv/src"),
+        rootPath().getChildFile ("libs/element/src")
+    });
     
-    auto path = mod.replaceCharacter('.', '/');
-    path << ".lua";
-    auto file = scriptsDir().getChildFile(path);
-    DBG(file.getFullPathName());
-    if (file.existsAsFile()) {
-        luaL_loadfile (L, file.getFullPathName().toRawUTF8());
-        return 1;
+    StringArray path;
+    for (const auto& dir : paths)
+    {
+        path.add (dir.getFullPathName() + "/?.lua");
+        path.add (dir.getFullPathName() + "/?/init.lua");
     }
 
-    #endif
-
-	sol::stack::push (L, "Not found");
-	return 1;
+    return path.joinIntoString (";");
 }
 
-static int element_wrap (lua_State* L) {
-    sol::state_view lua (L);
-    sol::table M = lua.create_table();
+static int requireElement (lua_State* L)
+{
+    const auto mod = sol::stack::get<std::string> (L);
+    if (mod == "el.File")
+    {
+        sol::stack::push (L, luaopen_el_File);
+    }
+	else if (mod == "element.ui")
+	{
+		sol::stack::push (L, luaopen_element_ui);
+	}
+    else if (mod == "juce")
+    {
+        sol::stack::push (L, luaopen_juce);
+    }
+    else
+    {
+	    sol::stack::push (L, "Not found");
+    }
     
-    const auto module = sol::stack::get<std::string> (L);
-
-    if (module.size() > 0) {}
-
-    sol::stack::push (L, M);
-    return 1;
+	return 1;
 }
 
 //=============================================================================
 void openLibs (sol::state& lua)
 {
     auto e = NS (lua, "element");
-    // e["wrap"] = element_wrap;
-    // 
-
-   #if 0
-    openWorld (lua);
-    openModel (lua);
-    openDSP (lua);
-    openKV (lua);
-    openUI (lua);
-   #endif
 }
 
-#include <memory>
 
 void initializeState (sol::state& lua, Globals& world)
 {
@@ -502,16 +828,15 @@ void initializeState (sol::state& lua, Globals& world)
     searchers.add (requireElement);
 
     lua.globals().set ("element.world", std::ref<Globals> (world));
-    String path = String(defaultLuaPath().getFullPathName() + "/?.lua").toStdString();
-    path << ";" << String(defaultLuaPath().getFullPathName() + "/?/init.lua").toStdString();
-    lua["package"]["path"] = path.toStdString();
-    path = scriptsDir().getFullPathName(); path << "/?.lua";
+
+    lua["package"]["path"] = getSearchPath().toStdString();
+    auto path = scriptsDir().getFullPathName(); path << "/?.lua";
     lua["package"]["spath"] = path.toStdString();
 
     lua.script ("_G['element'] = require ('element')");
+    
     Lua::openWorld (world, lua);
     Lua::openModel (lua);
-    Lua::openJUCE (lua);
 }
 
 }}

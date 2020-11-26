@@ -547,7 +547,7 @@ static int collectargs(char **argv, int *first)
 ** Processes options 'e' and 'l', which involve running Lua code.
 ** Returns 0 if some code raises an error.
 */
-static int runargs(lua_State *L, char **argv, int n)
+static int runargs (lua_State *L, char **argv, int n)
 {
     int i;
     for (i = 1; i < n; i++)
@@ -611,8 +611,8 @@ static int pmain (lua_State *L)
         print_version();
     if (args & has_E)
     {                          /* option '-E'? */
-        lua_pushboolean(L, 1); /* signal for libraries to ignore env. vars. */
-        lua_setfield(L, LUA_REGISTRYINDEX, "LUA_NOENV");
+        lua_pushboolean (L, 1); /* signal for libraries to ignore env. vars. */
+        lua_setfield (L, LUA_REGISTRYINDEX, "LUA_NOENV");
     }
     luaL_openlibs (L);                      /* open standard libraries */
     createargtable (L, argv, argc, script); /* create table 'arg' */
@@ -668,14 +668,14 @@ static void do_overrides (sol::state& L) {
 int main (int argc, char **argv)
 {
     int status, result;
-   #if ! __APPLE__
+   #if ! defined(__APPLE__)
     rl_event_hook = event_hook;
    #endif
     {
         juce::initialiseJuce_GUI();
         std::unique_ptr<Element::Globals> world (new Element::Globals ());
         auto& L = world->getScriptingEngine().getState();
-
+        L.script ("_G['script'] = require ('element.script')");
         do_overrides (L);
 
         lua_pushcfunction (L, &pmain);    /* to call 'pmain' in protected mode */

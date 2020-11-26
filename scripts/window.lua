@@ -1,31 +1,91 @@
---- Show a custom widget in a window
+--- Show a custom widget in a window.
+-- The return value is the displayed window or nil
 -- @script window
 -- @usage
 -- local win = element.script ('window')
 
-local widget = require ('element.widget')
-local window = require ('element.window')
-local HelloWorld = widget.derive()
+local ui     = require ('element.ui')
+local object = require ('kv.object')
+local Widget = require ('el.Widget')
+local Window = require ('el.Window')
+
+local colors = {
+    text = 0xffffffff,
+    background = 0xff545454
+}
+
+local Label = object (Widget, {
+    text = {
+        set = function (self, value)
+            getmetatable(self).text = value
+            self:repaint()
+        end,
+        get = function (self)
+            return getmetatable(self).text or ""
+        end
+    }
+})
+function Label:init()
+    Widget.init (self)
+    self.text = ""
+    self:resize (100, 100)
+end
+
+function Label:paint (g)
+    g:set_color (colors.text)
+    g:draw_text (self.text, 0, 0, self.width, self.height)
+end
+
+local HelloWorld = object (Widget)
 
 function HelloWorld:init()
-    self.name = "Hello World"
-    self:setsize (640, 360)
+    Widget.init (self)
+    self.name = "HelloWorld"
+    self.label = self:add (object.new (Label))
+    self.label.text = "Hello world..."
+    self.original_text = self.label.text
+    self.label_height = 32
+    self.label_width  = 120
+    self:resize (640, 360)
+end
+
+function HelloWorld:resized()
+    self.label.bounds = {
+        x = (self.width / 2) - (self.label_width / 2),
+        y = (self.height / 2) - (self.label_height / 2),
+        width = self.label_width,
+        height = self.label_height
+    }
 end
 
 function HelloWorld:paint (g)
-    g:fillAll (0xff545454)
-    g:setColour (0xffffffff)
-    g:drawText (self.name, 0, 0, self.width, self.height)
+    g:fill_all (colors.background)
+    g:set_color (colors.text)
 end
 
-local win = window.new (HelloWorld.new())
+function HelloWorld:mouse_down (ev)
+    self.label.text = "HELLO WORLD..."
+    self.label_height = 44
+    self.label_width  = 130
+    self:resized()
+end
 
+function HelloWorld:mouse_up (ev)
+    self.label.text = self.original_text
+    self.label_height = 32
+    self.label_width  = 120
+    self:resized()
+end
+
+local win = object.new (Window)
+win.name = "Hello World - Element Lua"
+win:setwidget (object.new (HelloWorld))
 win.onclosebutton = function (self)
     self.visible  = false
     self.desktop  = false
 end
 
-win.visible = true
 win.desktop = true
+win.visible = true
 
-return  win
+return win
