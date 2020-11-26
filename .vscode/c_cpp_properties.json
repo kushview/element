@@ -88,7 +88,7 @@
                 "${workspaceRoot}/tests",
                 "${workspaceFolder}/libs/lua-kv/src"
             ],
-            "defines": [],
+            "defines": [ "LUA_USE_READLINE=1" ],
             "forcedInclude": [
                 "${workspaceRoot}/.vscode/vscode.h"
             ],
