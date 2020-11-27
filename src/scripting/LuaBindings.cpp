@@ -551,7 +551,7 @@ EL_EXPORT int luaopen_el_File (lua_State* L)
     t.new_usertype<File> ("File", sol::constructors<File()>(),
         "name", sol::readonly_property ([](File& self) {
             return self.getFileName().toStdString();
-        }
+        })
     );
 
     auto M = t.get<sol::table> ("File");
