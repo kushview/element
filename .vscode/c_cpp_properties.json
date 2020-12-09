@@ -86,6 +86,7 @@
                 "${workspaceRoot}/libs/lua/src",
                 "${workspaceRoot}/src",
                 "${workspaceRoot}/tests",
+                "${workspaceFolder}/libs/lua-kv",
                 "${workspaceFolder}/libs/lua-kv/src"
             ],
             "defines": [ "LUA_USE_READLINE=1" ],
@@ -106,6 +107,7 @@
                     "${workspaceRoot}/libs/lua/src",
                     "${workspaceRoot}/src",
                     "${workspaceRoot}/tests",
+                    "${workspaceFolder}/libs/lua-kv",
                     "${workspaceFolder}/libs/lua-kv/src"
                 ],
                 "limitSymbolsToIncludedHeaders": true,

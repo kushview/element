@@ -7,7 +7,7 @@
             "request": "launch",
             "args": [],
             "program": "${workspaceRoot}/build/bin/element",
-            "cwd": "${workspaceRoot}/build",
+            "cwd": "${workspaceRoot}",
             "environment": [{ "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" }],
             "externalConsole": false,
             "stopAtEntry": false,
@@ -56,7 +56,52 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/test-element",
-            "args": [ "Scripting", "manager" ],
+            "args": [ "Lua", "memoryio" ],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "Waf Build",
+            "linux": {
+                "MIMode": "gdb",
+                "logging": {
+                    "engineLogging": false,
+                    "exceptions": false,
+                    "moduleLoad": false,
+                    "programOutput": true,
+                    "trace": false,
+                    "traceResponse": false
+                },
+                "environment": [ { "name": "LD_LIBRARY_PATH", "value": "${workspaceRoot}/build/lib" } ],
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            "osx": {
+                "MIMode": "lldb",
+                "logging": {
+                    "moduleLoad": false,
+                    "exceptions": false,
+                }
+            },
+            "windows": {
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            }
+        },
+        {
+            "name": "Lua Console",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceRoot}/build/bin/lua-el",
+            "args": [ "-i", "${workspaceRoot}/console.lua" ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Waf Build",
             "linux": {
