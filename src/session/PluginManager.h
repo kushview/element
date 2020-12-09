@@ -127,7 +127,7 @@ public:
 private:
     PropertiesFile* props = nullptr;
     class Private;
-    ScopedPointer<Private> priv;
+    std::unique_ptr<Private> priv;
     
     friend class PluginScannerMaster;
     void scanFinished();
@@ -178,7 +178,7 @@ public:
 private:
     friend class PluginScannerMaster;
     friend class Timer;
-    ScopedPointer<PluginScannerMaster> master;
+    std::unique_ptr<PluginScannerMaster> master;
     ListenerList<Listener> listeners;
     StringArray failedIdentifiers;
     KnownPluginList& list;

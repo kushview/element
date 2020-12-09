@@ -421,7 +421,7 @@ PluginScanner::PluginScanner (KnownPluginList& listToManage) : list(listToManage
 PluginScanner::~PluginScanner()
 {
     listeners.clear();
-    master = nullptr;
+    master.reset();
 }
 
 void PluginScanner::cancel()
@@ -430,7 +430,7 @@ void PluginScanner::cancel()
     {
         master->cancelPendingUpdate();
         master->sendQuitMessage();
-		master = nullptr;
+		master.reset();
     }
 }
 
@@ -446,7 +446,7 @@ void PluginScanner::scanForAudioPlugins (const StringArray& formats)
     cancel();
     getSlavePluginListFile().deleteFile();
 	if (master == nullptr)
-		master = new PluginScannerMaster (*this);
+		master.reset (new PluginScannerMaster (*this));
 	if (master->isRunning())
 		return;
     master->startScanning (formats);
@@ -652,12 +652,12 @@ private:
 
 PluginManager::PluginManager()
 {
-    priv = new Private (*this);
+    priv.reset (new Private (*this));
 }
 
 PluginManager::~PluginManager()
 {
-    priv = nullptr;
+    priv.reset();
 }
 
 void PluginManager::addDefaultFormats()
