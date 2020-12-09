@@ -37,14 +37,13 @@ public:
 
 };
 
-class MidiEditorBody :  public TimelineComponent,
+class MidiEditorBody :  public kv::TimelineComponent,
                         public LassoSource<NoteClipItem*>,
                         private ValueTree::Listener
 {
 public:
-
     MidiEditorBody (MidiKeyboardState& keyboard);
-    ~MidiEditorBody();
+    virtual ~MidiEditorBody();
 
     void showAllTracks();
     void hideEmptyKeys();

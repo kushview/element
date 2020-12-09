@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_STEP_SEQUENCER_BODY_H
-#define ELEMENT_STEP_SEQUENCER_BODY_H
+#pragma once
 
 #include "ElementApp.h"
 #include "gui/MidiEditorBody.h"
@@ -33,5 +32,3 @@ public:
 };
 
 }
-
-#endif // ELEMENT_STEP_SEQUENCER_BODY_H
