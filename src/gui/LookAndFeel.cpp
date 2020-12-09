@@ -141,6 +141,24 @@ Typeface::Ptr LookAndFeel::getTypefaceForFont (const Font& font)
         f.setTypefaceName (defaultSansSerifName);
         return Typeface::createSystemTypefaceFor (f);
     }
+    else if (font.getTypefaceName() == Font::getDefaultMonospacedFontName())
+    {
+        Font f (font);
+        if (defaultMonospaceName.isEmpty())
+        {
+            const StringArray possible ("Courier 10 Pitch");
+            const auto names = Font::findAllTypefaceNames();
+            for (const auto& name : possible)
+                if (names.contains (name))
+                    { defaultSansSerifName = name; break; }
+            if (defaultMonospaceName.isEmpty())
+                defaultMonospaceName = names[0];
+        }
+
+        f.setTypefaceName (defaultSansSerifName);
+        f.setTypefaceStyle ("Regular");
+        return Typeface::createSystemTypefaceFor (f);
+    }
    #endif
     return LookAndFeel_V2::getTypefaceForFont (font);
 }

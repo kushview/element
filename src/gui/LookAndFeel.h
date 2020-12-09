@@ -122,7 +122,8 @@ public:
     void drawTreeviewPlusMinusBox (Graphics&, const Rectangle<float> &area, Colour backgroundColour, bool isOpen, bool isMouseOver) override;
 
 private:
-    String defaultSansSerifName;
+    String defaultSansSerifName,
+           defaultMonospaceName;
 };
 
 }
