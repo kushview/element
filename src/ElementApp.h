@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2014-2018  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,6 +29,20 @@ using namespace kv;
  #include "../libs/compat/BinaryData.h"
 #endif
 
+//=============================================================================
+#ifdef __cplusplus
+ #define EL_EXTERN extern "C"
+#else
+ #define EL_EXTERN
+#endif
+
+#ifdef _WIN32
+ #define EL_EXPORT EL_EXTERN __declspec(dllexport)
+#else
+ #define EL_EXPORT EL_EXTERN __attribute__((visibility("default")))
+#endif
+
+//=============================================================================
 namespace Element {
 
 using PortType = kv::PortType;
@@ -209,7 +223,8 @@ inline static bool areMajorWebsitesAvailable()
 {
     const char* urlsToTry[] = {
         "http://google.com",  "http://bing.com",  "http://amazon.com",
-        "https://google.com", "https://bing.com", "https://amazon.com", nullptr};
+        "https://google.com", "https://bing.com", "https://amazon.com",
+        nullptr };
 
     for (const char** url = urlsToTry; *url != nullptr; ++url)
         if (canConnectToWebsite (URL (*url)))

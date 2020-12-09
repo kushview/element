@@ -195,7 +195,7 @@ private:
             setClickingTogglesState (true);
         }
         
-        ~ExtButton() { }
+        ~ExtButton() override {}
         
     protected:
         
@@ -298,7 +298,7 @@ private:
             onClick = [this] { tempoTap(); }; 
         }
 
-        ~TapTempoButton() { }
+        ~TapTempoButton() override {}
 
     protected:
 

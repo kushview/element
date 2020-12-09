@@ -4,10 +4,9 @@
 -- @usage
 -- local win = element.script ('window')
 
-local ui     = require ('element.ui')
 local object = require ('kv.object')
-local Widget = require ('el.Widget')
-local Window = require ('el.Window')
+local Widget = require ('kv.Widget')
+local Window = require ('kv.Window')
 
 local colors = {
     text = 0xffffffff,
@@ -25,6 +24,7 @@ local Label = object (Widget, {
         end
     }
 })
+
 function Label:init()
     Widget.init (self)
     self.text = ""
@@ -77,9 +77,10 @@ function HelloWorld:mouse_up (ev)
     self:resized()
 end
 
+local hw  = object.new (HelloWorld)
 local win = object.new (Window)
 win.name = "Hello World - Element Lua"
-win:setwidget (object.new (HelloWorld))
+win:set_widget (hw)
 win.onclosebutton = function (self)
     self.visible  = false
     self.desktop  = false

@@ -105,8 +105,7 @@ def check_linux (self):
     self.check(lib='dl', uselib_store='DL', mandatory=True)
     
     self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=False)
-    if not bool(self.env.LIB_READLINE):
-        self.define ('LUA_USE_READLINE', False)
+    self.define ('LUA_USE_READLINE',  bool(self.env.LIB_READLINE))
     
     self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
     self.check(lib='curl', uselib_store='CURL', mandatory=True)

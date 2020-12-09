@@ -169,7 +169,7 @@ NodeEditorContentView::~NodeEditorContentView()
 void NodeEditorContentView::getState (String& state)
 {
     ValueTree tree ("state");
-    DBG("[EL] ned saving node: " << node.getUuidString());
+    // DBG("[EL] ned saving node: " << node.getUuidString());
     tree.setProperty (Tags::node, node.getUuidString(), nullptr)
         .setProperty ("sticky", sticky, nullptr);
 

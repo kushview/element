@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,12 @@
 #pragma once
 
 #include "JuceHeader.h"
+
+struct lua_State;
+namespace kv {
+namespace lua {
+    struct MidiBufferImpl;
+}}
 
 namespace Element {
 
@@ -45,6 +51,45 @@ private:
     int size = 0;
     MidiBuffer* referencedBuffers [maxReferencedBuffers];
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MidiPipe);
+};
+
+class LuaMidiPipe final
+{
+public:
+    LuaMidiPipe();
+    ~LuaMidiPipe();
+    /** Create a LuaMidiPipe and push to the Lua stack. 
+        The returned object is owned by lua and will be deleted by
+        the garbage collector.  Simply set to nullptr when not needed.
+     */
+    static LuaMidiPipe** create (lua_State* L, int numReserved);
+
+    /** Returns the number of midi buffers contained */
+    int getNumBuffers() const { return used; }
+    
+    /** Get a read only buffer */
+    const MidiBuffer* const getReadBuffer (int index) const;
+    
+    /** Get a writable buffer */
+    MidiBuffer* getWriteBuffer (int index) const;
+
+    /** Change how many buffers are managed */
+    void setSize (int newsize);
+
+    /** Swap */
+    void swapWith (MidiPipe&);
+
+    /** Lua impls */
+    static int get (lua_State* L);
+    static int resize (lua_State* L);
+    static int size (lua_State* L);
+
+private:
+    lua_State* state = nullptr;
+    Array<kv::lua::MidiBufferImpl**> buffers;
+    Array<int> refs;
+    int used { 0 };
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LuaMidiPipe);
 };
 
 }

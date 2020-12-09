@@ -20,14 +20,9 @@
 
 static bool copyData()
 {
-    const auto dataDir = File::getSpecialLocation (File::invokedExecutableFile)
-            .getParentDirectory().getParentDirectory().getParentDirectory()
-            .getChildFile("data");
-    const auto buildDir = File::getSpecialLocation (File::invokedExecutableFile)
-            .getParentDirectory().getParentDirectory().getParentDirectory()
-            .getChildFile("build");
-
-    const auto buildData = buildDir.getChildFile ("data");
+    const auto dataDir      = File::getCurrentWorkingDirectory().getChildFile ("data");
+    const auto buildDir     = File::getCurrentWorkingDirectory().getChildFile ("build");
+    const auto buildData    = buildDir.getChildFile ("data");
     if (buildData.exists())
         buildData.deleteRecursively();
     return dataDir.copyDirectoryTo (buildDir.getChildFile ("data"));
@@ -76,8 +71,6 @@ public:
 
         UnitTestRunner runner;
         runner.setAssertOnFailure (true);
-
-        DBG("command line: " << commandLine);
 
     #if JUCE_LINUX
         comp = std::make_unique<Component>();

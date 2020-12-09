@@ -74,7 +74,6 @@
 #if !defined(lua_readline) /* { */
 
 #if defined(LUA_USE_READLINE) /* { */
-
 #include <readline/readline.h>
 #include <readline/history.h>
 #define lua_readline(L, b, p) ((void)L, ((b) = readline(p)) != NULL)
@@ -675,7 +674,7 @@ int main (int argc, char **argv)
         juce::initialiseJuce_GUI();
         std::unique_ptr<Element::Globals> world (new Element::Globals ());
         auto& L = world->getScriptingEngine().getState();
-        L.script ("_G['script'] = require ('element.script')");
+        L.script ("_G['script'] = require ('el.script')");
         do_overrides (L);
 
         lua_pushcfunction (L, &pmain);    /* to call 'pmain' in protected mode */

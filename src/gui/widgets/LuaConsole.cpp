@@ -71,7 +71,7 @@ void LuaConsole::textEntered (const String& text)
         }
         
         auto result = lua.script (buffer.toRawUTF8(), e,
-            [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); },
+            // [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); },
             "console=", sol::load_mode::any);
         
         if (result.valid() && haveReturn)

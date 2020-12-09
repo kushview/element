@@ -30,7 +30,7 @@ class IconButton : public Button
 {
 public:
     IconButton (const String& buttonName = String());
-    virtual ~IconButton();
+    ~IconButton() override;
     void setIcon (Icon newIcon, float reduceSize = 4.f);
 
 protected:
@@ -45,7 +45,7 @@ class SettingButton : public Button
 {
 public:
     SettingButton (const String& name = String()) : Button (name) { }
-    ~SettingButton() { }
+    ~SettingButton() override { }
     
     enum ColourIds
     {

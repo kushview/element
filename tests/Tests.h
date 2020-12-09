@@ -92,18 +92,14 @@ protected:
 
     const File getTestsDir() const
     {
-        const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
-            .getParentDirectory().getParentDirectory().getParentDirectory()
-            .getChildFile ("tests");
+        const auto thedir = File::getCurrentWorkingDirectory().getChildFile ("tests");
         jassert (thedir.exists());
         return thedir;
     }
 
     const File getDataDir() const
     {
-        const auto thedir = File::getSpecialLocation (File::invokedExecutableFile)
-            .getParentDirectory().getParentDirectory().getParentDirectory()
-            .getChildFile("build/data");
+        const auto thedir = File::getCurrentWorkingDirectory().getChildFile ("build/data");
         jassert (thedir.exists());
         return thedir;
     }

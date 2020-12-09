@@ -1,4 +1,6 @@
 
+#if 0
+
 #include "JuceHeader.h"
 #include "sol/sol.hpp"
 
@@ -830,3 +832,4 @@ void openJUCE (sol::state& lua)
 }
 
 }}
+#endif

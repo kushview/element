@@ -1,5 +1,5 @@
 --- Script module
--- @module element.script
+-- @module el.script
 local M = {}
 
 --- Run a known script

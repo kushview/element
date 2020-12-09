@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2020  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -20,6 +20,7 @@
 #include <math.h>
 #include "sol/sol.hpp"
 #include "lua-kv.h"
+#include "kv/lua/factories.hpp"
 
 #include "ElementApp.h"
 #include "engine/nodes/LuaNode.h"
@@ -29,6 +30,16 @@
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
+
+static const String initScript = 
+R"(
+require ('kv.AudioBuffer')
+require ('kv.MidiBuffer')
+require ('kv.MidiMessage')
+require ('kv.midi')
+require ('kv.audio')
+require ('el.MidiPipe')
+)";
 
 static const String stereoAmpScript = 
 R"(--- Stereo Amplifier in Lua
@@ -46,7 +57,8 @@ R"(--- Stereo Amplifier in Lua
 
 local audio = require ('kv.audio')
 
--- Our gain parameters. Used for fading between changes in volume
+--- Gain parameters.
+-- Used for fading between changes in volume
 local start_gain = 1.0
 local end_gain = 1.0
 
@@ -83,36 +95,11 @@ end
 
 --- Render audio and midi
 -- Use the provided audio and midi objects to process your plugin
--- @param a     The source kv.audio.Buffer
--- @param m     The source kv.midi.Pipe
+-- @param a     The source kv.AudioBuffer
+-- @param m     The source el.MidiPipe
 function node_render (a, m)
-   end_gain = audio.togain (Param.values[1])
-
-   --[[
-   -- process a fade frame by frame
-   local increment = (end_gain - start_gain) / a:length()
-   for c = 1, a:channels() do
-      local vec = a:vector (c)
-      local gain = start_gain
-      for f = 1, a:length() do
-         vec[f] = gain * vec[f]
-         gain = gain + increment
-      end
-   end
-   --]]
-
-   ---[[
-   -- same as frame by frame but faster
+   end_gain = audio.togain (Param.values [1])
    a:fade (start_gain, end_gain)
-   --]]
-   
-   --[[
-   -- same as above specifying channel and range
-   for c = 1, a:channels() do
-      a:fade (c, 1, a:length(), start_gain, end_gain)
-   end
-   --]]
-
    start_gain = end_gain
 end
 
@@ -183,7 +170,7 @@ private:
 struct LuaNode::Context
 {
     explicit Context ()
-    { 
+    {
         L = state.lua_state();
     }
 
@@ -216,12 +203,10 @@ struct LuaNode::Context
         String errorMsg;
         try
         {
-            state.open_libraries (sol::lib::base, sol::lib::string,
-                                  sol::lib::io, sol::lib::package,
-                                  sol::lib::math);
-            Lua::openDSP (state);
-            auto res = state.script (script.toRawUTF8());
-            
+            Lua::initializeState (state);
+            auto res = state.script (initScript.toRawUTF8());
+            if (res.valid())
+                res = state.script (script.toRawUTF8());
             if (res.valid())
             {
                 bool ok = false;
@@ -233,18 +218,18 @@ struct LuaNode::Context
 
                 if (ok)
                 {
-                    audioBuffer = kv_audio_buffer_new (state, 0, 0);
+                    audioBuffer = kv::lua::new_userdata<AudioBuffer<float>> (state, LKV_MT_AUDIO_BUFFER_32);
                     audioBufRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = audioBufRef != LUA_REFNIL && audioBufRef != LUA_NOREF;
                 }
 
                 if (ok)
                 {
-                    midiPipe = kv_midi_pipe_new (state, 0);
+                    midiPipe = LuaMidiPipe::create (L, 4);
                     midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = midiPipeRef != LUA_REFNIL && midiPipeRef != LUA_NOREF;
                 }
-                
+
                 loaded = ok;
             }
         }
@@ -309,14 +294,14 @@ struct LuaNode::Context
             ctx->state["__ln_validate_nframes"] = block;
             ctx->state.script (R"(
                 function __ln_validate_render()
-                    local audio = require ('kv.audio')
-                    local midi  = require ('kv.midi')
+                    local AudioBuffer = require ('kv.AudioBuffer')
+                    local MidiPipe    = require ('el.MidiPipe')
 
-                    local a = audio.Buffer (__ln_validate_nchans, __ln_validate_nframes)
-                    local m = midi.Pipe (__ln_validate_nmidi)
+                    local a = AudioBuffer (__ln_validate_nchans, __ln_validate_nframes)
+                    local m = MidiPipe (__ln_validate_nmidi)
                     
                     for _ = 1,4 do
-                        for i = 1,#m do
+                        for i = 0,m:size() - 1 do
                             local b = m:get(i)
                             b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
                             b:insert (10, midi.noteoff (1, 60, 0))
@@ -328,9 +313,12 @@ struct LuaNode::Context
                     
                     a = nil
                     m = nil
+                    collectgarbage()
                 end
 
                 __ln_validate_render()
+                __ln_validate_render = nil
+                collectgarbage()
             )");
 
             ctx->release();
@@ -350,8 +338,8 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (auto fn = state ["node_prepare"])
-            fn (rate, block);
+        if (sol::function f = state ["node_prepare"])
+            f (rate, block);
         
         using PT = kv::PortType;
         auto nchans = jmax (ports.size (PT::Audio, true),
@@ -359,16 +347,14 @@ struct LuaNode::Context
         auto nmidi  = jmax (ports.size (PT::Midi, true),
                             ports.size (PT::Midi, false));
 
+
         if (audioBuffer != nullptr)
         {
-            kv_audio_buffer_resize (audioBuffer, nchans, block,
-                                     false, true, false);
+            (*audioBuffer)->setSize (nchans, block, false, true, false);
         }
-
         if (midiPipe != nullptr)
         {
-            kv_midi_pipe_resize (L, midiPipe, nmidi);
-            kv_midi_pipe_clear (midiPipe, -1);
+            (*midiPipe)->setSize (nmidi);
         }
 
         state.collect_garbage();
@@ -379,18 +365,17 @@ struct LuaNode::Context
         if (! ready())
             return;
 
-        if (auto fn = state ["node_release"])
-            fn();
+        if (sol::function f = state ["node_release"])
+            f();
         
         if (audioBuffer != nullptr)
         {
-            kv_audio_buffer_resize (audioBuffer, 1, 1,
-                                     false, true, false);
+            (*audioBuffer)->setSize (1, 1, false, true, false);
         }
 
         if (midiPipe != nullptr)
         {
-            kv_midi_pipe_resize (L, midiPipe, 0);
+            (*midiPipe)->setSize (0);
         }
 
         state.collect_garbage();
@@ -405,62 +390,21 @@ struct LuaNode::Context
         const auto nframes = audio.getNumSamples();
         const auto nmidi   = midi.getNumBuffers();
 
+#if 1
         if (lua_rawgeti (L, LUA_REGISTRYINDEX, renderRef) == LUA_TFUNCTION)
         {
             if (lua_rawgeti (L, LUA_REGISTRYINDEX, audioBufRef) == LUA_TUSERDATA)
             {
                 if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiPipeRef) == LUA_TUSERDATA)
                 {
-                   #if ! LRT_FORCE_FLOAT32
-                    kv_audio_buffer_duplicate_32 (audioBuffer,
-                        audio.getArrayOfReadPointers(), nchans, nframes);
-                   #else
-                    kv_audio_buffer_refer_to (audioBuffer,
-                        audio.getArrayOfWritePointers(), nchans, nframes);
-                   #endif
-                
-                    kv_midi_pipe_resize (L, midiPipe, midi.getNumBuffers());
-                    kv_midi_pipe_clear (midiPipe, -1);
-                    
-                    int bytes = 0, frame = 0;
-                    const uint8* data = nullptr;
-                    for (int i = 0; i < nmidi; ++i)
-                    {
-                        auto* src = midi.getWriteBuffer (i);
-                        auto* dst = kv_midi_pipe_get (midiPipe, i);
-                        if (src->isEmpty())
-                            continue;
-                        MidiBuffer::Iterator iter (*src);
-                        while (iter.getNextEvent (data, bytes, frame))
-                            kv_midi_buffer_insert (dst, data, bytes, frame);
-                        src->clear();
-                    }
+                    // (*audioBuffer)->setSize (audio.getNumChannels(), audio.getNumSamples(), true, false, true);
+                    (*audioBuffer)->setDataToReferTo (audio.getArrayOfWritePointers(),
+                            audio.getNumChannels(), audio.getNumSamples());
+                    (*midiPipe)->swapWith (midi);
 
                     lua_call (L, 2, 0);
                     
-                    for (int i = 0; i < nmidi; ++i) 
-                    {
-                        auto* src = kv_midi_pipe_get (midiPipe, i);
-                        auto* dst = midi.getWriteBuffer (i);
-                        kv_midi_buffer_foreach (src, iter)
-                        {
-                            dst->addEvent (
-                                kv_midi_buffer_iter_data (iter),
-                                kv_midi_buffer_iter_size (iter),
-                                kv_midi_buffer_iter_frame (iter)
-                            );
-                        }
-                    }
-
-                   #if ! LRT_FORCE_FLOAT32
-                    const kv_sample_t* const* src = kv_audio_buffer_array (audioBuffer);
-                    auto** dst = audio.getArrayOfWritePointers();
-                    for (int c = 0; c < nchans; ++c)
-                    {
-                        for (int f = 0; f < nframes; ++f)
-                            dst[c][f] = static_cast<float> (src[c][f]);
-                    }
-                   #endif
+                    (*midiPipe)->swapWith (midi);
                 }
             }
         }
@@ -468,6 +412,7 @@ struct LuaNode::Context
         {
             DBG("didn't get render fucntion in callback");
         }
+#endif
     }
     
     const OwnedArray<PortDescription>& getPortArray() const noexcept
@@ -531,7 +476,7 @@ struct LuaNode::Context
             return;
         
         try {
-            auto result = state.safe_script(R"(
+            auto result = state.safe_script (R"(
                 local tf = io.tmpfile()
                 local oo = io.output()
                 io.output (tf);
@@ -564,18 +509,17 @@ struct LuaNode::Context
             return;
 
         try {
-            sol::userdata ud = state.script ("return io.tmpfile()");
-            FILE* const file = ud.as<FILE*>(); // Lua will close this
-            fwrite (data, 1, size, file);
+            sol::userdata ud = state["io"]["tmpfile"]();
+            luaL_Stream* const stream = (luaL_Stream*) ud.pointer();
+            fwrite (data, 1, size, stream->f);
+            rewind (stream->f);
 
             state["__state_data__"] = ud;
             state.safe_script (R"(
                 local oi = io.input()
-                __state_data__:seek ('set', 0)
                 io.input (__state_data__)
                 node_restore()
-                print (io.read ("*a"))
-                io.input(oi)
+                io.input (oi)
                 __state_data__:close()
                 __state_data__ = nil
             )");
@@ -595,11 +539,11 @@ private:
     String name;
     bool loaded = false;
 
-    int renderRef  = LUA_NOREF;
+    int renderRef   = LUA_NOREF;
     int audioBufRef = LUA_NOREF;
     int midiPipeRef = LUA_NOREF;
-    kv_midi_pipe_t* midiPipe { nullptr };
-    kv_audio_buffer_t* audioBuffer { nullptr };
+    LuaMidiPipe** midiPipe { nullptr };
+    AudioBuffer<float>** audioBuffer { nullptr };
 
     PortList ports;
     ParameterArray inParams, outParams;
@@ -628,7 +572,7 @@ private:
 
     void addParameters()
     {
-        if (auto f = state ["node_params"])
+        if (sol::function f = state ["node_params"])
         {
             int index = ports.size();
             int inChan = 0, outChan = 0;
@@ -686,7 +630,7 @@ private:
     {
         auto& lua = state;
 
-        if (auto f = lua ["node_io_ports"])
+        if (sol::function f = lua ["node_io_ports"])
         {
             sol::table t = f();
             int audioIns = 0, audioOuts = 0,

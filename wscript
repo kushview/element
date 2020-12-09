@@ -112,22 +112,31 @@ def configure (conf):
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
 def common_includes():
-    return [ 'libs/JUCE/modules', \
-             'libs/kv/modules', \
-             'libs/jlv2/modules', \
-             'libs/compat', \
-             'libs/lua', \
-             'libs/lua/src', \
-             'libs/lua-kv/src', \
-             'build/include', \
-             VST3_PATH, \
-             'src' ]
+    return [ 
+        'libs/JUCE/modules', \
+        'libs/kv/modules', \
+        'libs/jlv2/modules', \
+        'libs/compat', \
+        'libs/lua', \
+        'libs/lua/src', \
+        'libs/lua-kv', \
+        'libs/lua-kv/src', \
+        'build/include', \
+        VST3_PATH, \
+        'src'
+    ]
+
+def lua_kv_sources (ctx):
+    return ctx.path.ant_glob ('libs/lua-kv/src/kv/**/*.c') + \
+           ctx.path.ant_glob ('libs/lua-kv/src/kv/**/*.cpp')
+
+def juce_sources (ctx):
+    return element.get_juce_library_code ("libs/compat") + \
+           ctx.path.ant_glob ('libs/compat/BinaryData*.cpp')
 
 def common_sources (ctx):
-    return element.get_juce_library_code ("libs/compat") + \
-        ctx.path.ant_glob ('libs/compat/BinaryData*.cpp') + \
-        ctx.path.ant_glob ('src/**/*.cpp') + \
-        ctx.path.ant_glob ('libs/lua-kv/src/*.c')
+    return juce_sources (ctx) + lua_kv_sources (ctx) + \
+            ctx.path.ant_glob ('src/**/*.cpp')
 
 def build_desktop (bld, slug='element'):
     if not juce.is_linux():
@@ -277,7 +286,7 @@ def dist(ctx):
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
 
 def docs (ctx):
-    build_lua_docs(ctx)
+    build_lua_docs (ctx)
 
 from waflib.Build import BuildContext
 class BuildDocs (BuildContext):
