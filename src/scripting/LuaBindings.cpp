@@ -35,12 +35,8 @@
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
-
 #include "Globals.h"
 #include "Settings.h"
-
-#include "scripting/LuaIterators.h"
-
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
 
@@ -63,7 +59,6 @@ extern int luaopen_kv_MidiMessage (lua_State*);
 extern int luaopen_kv_MouseEvent (lua_State*);
 extern int luaopen_kv_Point (lua_State*);
 extern int luaopen_kv_Rectangle (lua_State*);
-
 extern int luaopen_el_MidiPipe (lua_State*);
 
 namespace sol {
@@ -300,11 +295,12 @@ static int el_Globals_instance (lua_State* L) {
 
 LUAMOD_API int luaopen_el_Globals (lua_State* L)
 {
+    using Element::Globals;
     sol::state_view lua (L);
     auto M = lua.create_table();
     /// A collection of global objects 
     // @type Globals
-    M.new_usertype<Globals> ("Globals", no_constructor,
+    M.new_usertype<Globals> ("Globals", sol::no_constructor,
         "instance",      el_Globals_instance,
         /// Get the current audio engine
         // @function audioengine
