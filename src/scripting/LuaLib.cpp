@@ -20,8 +20,9 @@
 #include "sol/sol.hpp"
 
 #if defined(JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED)
- #error Cannot include JUCE before LuaLib.cpp
-#else
+ #pragma error "Cannot include JUCE before LuaLib.cpp"
+ #pragma GCC error "Cannot include JUCE before LuaLib.cpp"
+#endif
 
 #ifdef _MSC_VER
  #pragma warning(disable: 4244) // convert possible data loss
@@ -39,7 +40,6 @@
 #include "../../libs/lua/src/lvm.c"
 #include "../../libs/lua/src/lfunc.c"
 #include "../../libs/lua/src/lstrlib.c"
-// #include "../../libs/lua/src/lua.c"
 #include "../../libs/lua/src/linit.c"
 #include "../../libs/lua/src/lstring.c"
 #include "../../libs/lua/src/lundump.c"
@@ -55,7 +55,6 @@
 #include "../../libs/lua/src/lcorolib.c"
 #include "../../libs/lua/src/lcode.c"
 #include "../../libs/lua/src/ltablib.c"
-// #include "../../libs/lua/src/lbitlib.c"
 #include "../../libs/lua/src/lapi.c"
 #include "../../libs/lua/src/lbaselib.c"
 #include "../../libs/lua/src/ldebug.c"
@@ -63,9 +62,6 @@
 #include "../../libs/lua/src/llex.c"
 #include "../../libs/lua/src/ltm.c"
 #include "../../libs/lua/src/ldo.c"
-
-// #include "../../libs/lua-rt/src/audio.c"
-// #include "../../libs/lua-rt/src/midi.c"
 
 #endif
 #endif
