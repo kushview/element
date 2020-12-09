@@ -45,7 +45,7 @@ struct LuaTokeniserFunctions
             { "repeat", "return", "elseif", nullptr};
 
         static const char* const keywordsOther[] =
-            { "function", "@interface", "@end", "@synthesize", "@dynamic", "@public",
+            { "function", "require", "@interface", "@end", "@synthesize", "@dynamic", "@public",
               "@private", "@property", "@protected", "@class", nullptr };
 
         const char* const* k;
