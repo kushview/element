@@ -16,6 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#if 1
 #include "sol/sol.hpp"
 
 #if defined(JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED)
@@ -54,7 +55,7 @@
 #include "../../libs/lua/src/lcorolib.c"
 #include "../../libs/lua/src/lcode.c"
 #include "../../libs/lua/src/ltablib.c"
-#include "../../libs/lua/src/lbitlib.c"
+// #include "../../libs/lua/src/lbitlib.c"
 #include "../../libs/lua/src/lapi.c"
 #include "../../libs/lua/src/lbaselib.c"
 #include "../../libs/lua/src/ldebug.c"
@@ -66,4 +67,5 @@
 // #include "../../libs/lua-rt/src/audio.c"
 // #include "../../libs/lua-rt/src/midi.c"
 
+#endif
 #endif
