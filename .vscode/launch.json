@@ -56,7 +56,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/test-element",
-            "args": [ "Lua", "memoryio" ],
+            "args": [],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Waf Build",
             "linux": {
