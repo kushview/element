@@ -10,6 +10,8 @@ bld.program (
                 '../libs/lua/src',
                 '../libs/lua',
                 '../build/include',
+                '../libs/lua-kv/src',
+                '../libs/lua-kv',
                 '../src' ],
     target = '../bin/test-element',
     use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
