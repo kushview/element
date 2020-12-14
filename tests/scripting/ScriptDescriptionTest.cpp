@@ -16,55 +16,88 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "Tests.h"
+#include "LuaUnitTest.h"
 #include "scripting/ScriptDescription.h"
 
 using namespace Element;
 
 //=============================================================================
-const static String sSingleLineComments = 
-R"(--- Example Action Script
--- @name Example Action Script
--- @author Michael R. Fisher
--- hi there, this is some dummy text 
--- that should be skipped
-
-function somefunc()
-    print("not parsed")
-end
+const static String sDummyScript = 
+R"(---  A Dummy script.
+-- @script %NAME%
+-- @author %AUTHOR%
+-- @description A super cool script
+-- @kind %KIND%
+}
 )";
 
-const static String sBlockComments = 
-R"(--[[
-Example Action Script
-@name BLOCK Example Action Script
-@author Michael R. Fisher
-hi there, this is some dummy text 
-that should be skipped
---]]
-
-function somefunc()
-    print("not parsed")
-end
+const static String sErrorScript = 
+R"(
+require ("fake module")
+some error in the script
 )";
+
+const static String sMissingInfo = 
+R"(
+---
+-- Missing Info
+-- 
+)";
+
+static String toString (const ScriptDescription& desc) {
+    String result;
+    result << juce::newLine << "ScriptDescription:" << juce::newLine <<
+        " name\t\t = " << desc.name << juce::newLine <<
+        " type\t\t = " << desc.type << juce::newLine <<
+        " author\t\t = " << desc.author << juce::newLine <<
+        " description\t = " << desc.description << juce::newLine <<
+        " source\t\t = " << desc.source << juce::newLine;
+    return result;
+}
+
+static void print (const ScriptDescription& desc) {
+    DBG (toString (desc));
+}
 
 //=============================================================================
 class ScriptDescriptionTest : public UnitTestBase
 {
 public:
     ScriptDescriptionTest ()
-        : UnitTestBase ("Script Description", "Scripting", "description") { }
+        : UnitTestBase ("Script Description", "ScriptDescription", "parse") { }
 
     void runTest() override
     {
-        beginTest ("ScriptDescription::parse");
-        auto info = ScriptDescription::parse (sSingleLineComments);
-        expect (info.isValid());
+        beginTest ("parse buffer");
+        auto info = ScriptDescription::parse (sDummyScript
+            .replace ("%NAME%", "Dummy")
+            .replace ("%KIND%", "el.DSP")
+            .replace ("%AUTHOR%", "Michael R. Fisher"));
+
+        expect (info.isValid(), "Script description not valid");
+        expect (info.name   == "Dummy");
+        expect (info.type   == "DSP");
         expect (info.author == "Michael R. Fisher");
-        
-        info = ScriptDescription::parse (sBlockComments);
+        expect (info.source.isEmpty());
+        expect (info.description.isNotEmpty());
+
+        beginTest ("parse file");
+        const auto sfile = File::getCurrentWorkingDirectory().getChildFile ("scripts/amp.lua");
+        info = ScriptDescription::parse (sfile);
         expect (info.isValid());
-        expect (info.author == "Michael R. Fisher");
+        expect (info.name   == "amp", toString (info));
+        expect (info.type   == "DSP", toString (info));
+        expect (info.author == "Michael Fisher", toString (info));
+        expect (URL(info.source).getLocalFile() == sfile, toString(info));
+        expect (info.description.isEmpty(), toString (info));
+
+        beginTest ("script error");
+        info = ScriptDescription::parse (sErrorScript);
+        expect (! info.isValid(), "Script should be invalid");
+
+        beginTest ("missing details");
+        info = ScriptDescription::parse (sMissingInfo);
+        expect (! info.isValid(), "Script should be invalid");
     }
 };
 

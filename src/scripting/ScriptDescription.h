@@ -1,15 +1,36 @@
+/*
+    This file is part of Element
+    Copyright (C) 2020  Kushview, LLC.  All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+*/
+
 #pragma once
 
 #include "JuceHeader.h"
+#include "sol/forward.hpp"
 
 namespace Element {
 
-struct ScriptDescription
+struct ScriptDescription final
 {
     String name;
     String type;
     String author;
     String description;
+    String source;
 
     ScriptDescription() = default;
     ScriptDescription (const ScriptDescription& o) { operator= (o); }
@@ -21,85 +42,18 @@ struct ScriptDescription
         this->type          = o.type;
         this->author        = o.author;
         this->description   = o.description;
+        this->source        = o.source;
         return *this;
     }
 
-    bool isValid() const
-    {
-        return name.isNotEmpty() && type.isNotEmpty();
-    }
+    static ScriptDescription read (lua_State*, const String& buffer);
+    static ScriptDescription read (const String& buffer);
+    static ScriptDescription read (File file);
 
-    static ScriptDescription parse (const String& buffer)
-    {
-        static const StringArray tags = { "@author", "@name", "@description" };
+    static ScriptDescription parse (const String& buffer);
+    static ScriptDescription parse (File file);
 
-        ScriptDescription desc;
-        const auto lines = StringArray::fromLines (buffer);
-        int index = 0;
-        bool inBlock = false;
-        bool finished = false;
-        for (int index = 0; index < lines.size(); ++index)
-        {
-            const auto line = lines[index].trim();
-            
-            if (! inBlock)
-                inBlock = line.startsWith ("--[[");
-            
-            if (inBlock || line.startsWith ("--"))
-            {
-                for (const auto& tag : tags)
-                {
-                    if (line.contains (tag))
-                    {
-                        const auto value = line.fromFirstOccurrenceOf (tag, false, false).trimStart()
-                                               .upToFirstOccurrenceOf ("--]]", false, false).trimEnd();
-                        
-                        // DBG (tag.replace("@","") << " = " << value);
-                        
-                        if (tag == "@name" && desc.name.isEmpty())
-                        {
-                            desc.name = value;
-                        }
-                        else if (tag == "@element" && desc.type.isEmpty())
-                        {
-                            desc.type = value;
-                        }
-                        else if (tag == "@author" && desc.author.isEmpty())
-                        {
-                            desc.author = value;
-                        }
-                        else if (tag == "@description" && desc.description.isEmpty())
-                        {
-                            desc.description = value;
-                        }
-                    }
-                }
-
-                if (inBlock)
-                {
-                    inBlock  = ! line.contains ("--]]");
-                    finished = ! inBlock;
-                }
-            }
-            else if (! inBlock && ! line.startsWith ("--"))
-            {
-                finished = true;
-            }
-
-            if (finished) {
-                // DBG("finihed at line index: " << index);
-                // DBG("LINE: " << lines[index]);
-                break;
-            }
-        }
-
-        return desc;
-    }
-     
-    static ScriptDescription parse (File file)
-    {
-        return parse (file.loadFileAsString());
-    }
+    bool isValid() const { return name.isNotEmpty() && type.isNotEmpty(); }
 };
 
 }
