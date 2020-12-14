@@ -519,7 +519,7 @@ static int searcher (lua_State* L)
 void openLibs (sol::state& lua) {}
 
 void initializeState (sol::state& lua) {
-    lua.open_libraries ();
+    lua.open_libraries();
     
     auto searchers = lua["package"]["searchers"].get<sol::table>();
     searchers.add (searcher);
@@ -527,7 +527,6 @@ void initializeState (sol::state& lua) {
     lua["package"]["path"] = getSearchPath().toStdString();
     auto path = scriptsDir().getFullPathName(); path << "/?.lua";
     lua["package"]["spath"] = path.toStdString();
-    DBG(getRootPath().getFullPathName());
 }
 
 void initializeState (sol::state& lua, Globals& world)
