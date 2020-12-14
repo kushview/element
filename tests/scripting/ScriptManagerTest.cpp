@@ -23,89 +23,19 @@
 
 using namespace Element;
 
-static const String sScript1 =
-R"(
-function func1()
-    print("hello there 1")
-end
-
-function func2()
-end
-)";
-
-static const String sScript2 =
-R"(
-function func1()
-    print("hello there 2")
-end
-
-function func2()
-end
-)";
-
-static File scriptsDir()
-{
-    return File::getSpecialLocation (File::invokedExecutableFile)
-                        .getParentDirectory().getParentDirectory().getParentDirectory()
-                        .getChildFile ("scripts");
-}
-
 //=============================================================================
 class ScriptManagerTest : public UnitTestBase
 {
 public:
     ScriptManagerTest ()
-        : UnitTestBase ("Script Manager", "Scripting", "manager") { }
+        : UnitTestBase ("Script Manager", "ScriptManager", "manager") { }
 
     void runTest() override
     {
-        beginTest ("scanning");
+        beginTest ("scanDefaultLocation");
         ScriptManager scripts;
-        scripts.scanDirectory (scriptsDir());
-
-        beginTest ("loading");
-        sol::state lua;
-        lua.open_libraries();
-        Lua::openLibs (lua);
-
-        sol::table tbl;
-        tbl.new_enum ("Commands");
-
-        auto file   = scriptsDir().getChildFile ("closepluginwindows.lua");
-        auto result = lua.load_file (file.getFullPathName().toStdString());
-        
-        switch (result.status()) {
-            case sol::load_status::file:
-                DBG("sol::load_status::file");
-                break;
-            case sol::load_status::gc:
-                DBG("sol::load_status::gc");
-                break;
-            case sol::load_status::memory:
-                DBG("sol::load_status::memory");
-                break;
-            case sol::load_status::ok:
-                DBG("sol::load_status::ok");
-                break;
-            case sol::load_status::syntax:
-                DBG("sol::load_status::syntax");
-                break;
-        }
-
-        try {
-            lua.script (file.loadFileAsString().toRawUTF8());
-        } catch (const std::exception&) { }
-
-        // sol::state_view lua2 (lua.lua_state());
-        // DBG("stack: " << lua2.stack_top());
-        // {
-        //     sol::table M = lua2.require();
-        //     DBG("stack: " << lua2.stack_top());
-        // }
-        // DBG("stack: " << lua2.stack_top());
-
-        lua.collect_garbage();
-        shutdownWorld();
+        scripts.scanDefaultLocation();
+        expect (scripts.getNumScripts() == 3, "Wrong number of default scripts");
     }
 };
 
