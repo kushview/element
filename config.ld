@@ -6,7 +6,6 @@ file = {
     'libs/element/src',
     'scripts',
     'src/scripting/LuaBindings.cpp',
-    'src/scripting/JuceBindings.cpp',
     exclude = {
         'libs/lua-kv/src/lua-kv.h'
     },
@@ -28,17 +27,17 @@ custom_tags = {
         format = function (data)
             return data .. ""
         end
+    } , {
+        "kind",
+        title = "Script Type",
+        hidden = false,
     }
 }
 
 custom_display_name_handler = function (item, default_handler)
-    if item.tags.property then
-        -- for k,v in pairs(item) do
-        --     print(k, v)
-        -- end
-        item.args = nil
+    if item.tags.kind then
         return item.name
     end
-    return default_handler(item)
+    return default_handler (item)
 end
 --]]
