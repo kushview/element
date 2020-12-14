@@ -29,13 +29,15 @@ public:
     ScriptManager();
     ~ScriptManager();
 
-    Array<ScriptDescription> scanDirectory (File dir);
+    void scanDefaultLocation();
+    
+    int getNumScripts() const;
+    ScriptDescription getScript (int) const;
 
 private:
-    // class Registry;
-    // std::unique_ptr<Registry> scripts;
-    FileSearchPath locations;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ScriptManager);
+    class Registry;
+    std::unique_ptr<Registry> registry;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ScriptManager);
 };
 
 }

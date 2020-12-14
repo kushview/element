@@ -6,38 +6,15 @@
 
 namespace Element {
 
-static File getDefaultScriptsDir()
+static void scanForScripts (File dir, Array<ScriptDescription>& results)
 {
-    return File::getSpecialLocation (File::invokedExecutableFile)
-        .getParentDirectory().getParentDirectory().getParentDirectory()
-        .getChildFile ("scripts");
-}
-
-ScriptManager::ScriptManager() {}
-
-ScriptManager::~ScriptManager()
-{
-
-}
-
-Array<ScriptDescription> ScriptManager::scanDirectory (File dir)
-{
-    sol::state lua;
-    lua.open_libraries();
-    Lua::openLibs (lua);
-
-    Array<ScriptDescription> results;
     for (DirectoryEntry entry : RangedDirectoryIterator (dir, false, "*.lua"))
     {
         ScriptDescription desc;
-        sol::environment env (lua, sol::create, lua.globals());
         try {
-            auto result = lua.load_file (entry.getFile().getFullPathName().toStdString(), sol::load_mode::any);
-            if (result.status() != sol::load_status::ok)
-                continue;
             desc = ScriptDescription::parse (entry.getFile());
         } catch (const std::exception& e) {
-            DBG(e.what());
+            DBG (e.what());
             desc = {};
         }
 
@@ -46,8 +23,58 @@ Array<ScriptDescription> ScriptManager::scanDirectory (File dir)
             results.add (desc);
         }
     }
-    
-    return results;
+}
+
+static File getDefaultScriptsDir()
+{
+   #if JUCE_DEBUG
+    return File::getCurrentWorkingDirectory().getChildFile ("scripts");
+   #else
+    return {};
+   #endif
+}
+
+//==============================================================================
+class ScriptManager::Registry
+{
+public:
+    Registry (ScriptManager& sm)
+        : owner (sm) {}
+
+    void scanDefaults()
+    {
+        Array<ScriptDescription> results;
+        scanForScripts (getDefaultScriptsDir(), results);
+        scripts.swapWith (results);
+    }
+
+private:
+    friend class ScriptManager;
+    ScriptManager& owner;
+    Array<ScriptDescription> scripts;
+};
+
+//==============================================================================
+ScriptManager::ScriptManager()
+{
+    registry.reset (new Registry (*this));
+}
+
+ScriptManager::~ScriptManager() {}
+
+void ScriptManager::scanDefaultLocation()
+{
+    registry->scanDefaults();
+}
+
+int ScriptManager::getNumScripts() const
+{
+    return registry->scripts.size();
+}
+
+ScriptDescription ScriptManager::getScript (int index) const
+{
+    return registry->scripts [index];
 }
 
 }
