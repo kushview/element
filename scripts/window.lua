@@ -60,7 +60,6 @@ end
 
 function HelloWorld:paint (g)
     g:fill_all (colors.background)
-    g:set_color (colors.text)
 end
 
 function HelloWorld:mouse_down (ev)
@@ -81,12 +80,16 @@ local hw  = object.new (HelloWorld)
 local win = object.new (Window)
 win.name = "Hello World - Element Lua"
 win:set_widget (hw)
-win.onclosebutton = function (self)
+
+function win:onclosebutton()
     self.visible  = false
     self.desktop  = false
+    self:set_widget (nil)
+    win.impl = nil
+    win = nil
+    hw.impl = nil
+    hw = nil
 end
 
 win.desktop = true
 win.visible = true
-
-return win
