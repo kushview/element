@@ -13,12 +13,26 @@ public:
 
     void initialise() override
     {
-        Element::Lua::initializeState (lua, getWorld());
+        Element::Lua::initializeState (lua);
+        lua ["begintest"] = sol::overload (
+            [this](const char* name) {
+                beginTest (String::fromUTF8 (name));
+            }
+        );
+        lua ["expect"] = sol::overload (
+            [this](bool result) -> void {
+                this->expect (result);
+            } , 
+            [this](bool result, const char* msg) -> void {
+                this->expect (result, String::fromUTF8 (msg));
+            }
+        );
     }
 
     void shutdown() override
     {
         lua.collect_garbage();
+
         shutdownWorld();
     }
 
