@@ -17,7 +17,7 @@
 */
 
 #include "LuaUnitTest.h"
-#include "scripting/ScriptObject.h"
+#include "scripting/Script.h"
 #include "kv/lua/factories.hpp"
 
 using namespace Element;
@@ -33,87 +33,79 @@ static const String sExceptionError = R"(
 
 
 //=============================================================================
-class ScriptObjectTest : public LuaUnitTest
+class ScriptTest : public LuaUnitTest
 {
 public:
-    ScriptObjectTest()
-        : LuaUnitTest ("ScriptObject", "ScriptObject", "basics") {}
-
+    ScriptTest()
+        : LuaUnitTest ("Script", "Script", "basics") {}
+    
     void runTest() override
     {
+        const auto ampFile = File::getCurrentWorkingDirectory()
+            .getChildFile ("scripts/amp.lua");
         {
-            ScriptObject script;
-            script.load (lua, File::getCurrentWorkingDirectory()
-                .getChildFile ("scripts/amp.lua").loadFileAsString());
+            beginTest ("load");
+            auto script = std::unique_ptr<Script> (new Script (lua));
+            expect (! script->isLoaded(), String ("Should not be loaded"));
+            expect (! script->hasError());
+            script->load (ampFile);
+            expect (script->isLoaded(), "Should be loaded");
             beginTest ("script name");
-            expect (script.getName().toLowerCase() == "amp", script.getName());
+            expect (script->getName().toLowerCase() == "amp", script->getName());
             beginTest ("script type");
-            expect (script.getType() == "DSP", script.getType());
+            expect (script->getType() == "DSP", script->getType());
             beginTest ("script author");
-            expect (script.getAuthor() == "Michael Fisher", script.getAuthor());
-            auto Amp = script.call();
-            expect (Amp.get_type() == sol::type::table);
+            expect (script->getAuthor() == "Michael Fisher", script->getAuthor());
+            beginTest ("call type");
+            auto amp = script->call();
+            expect (amp.valid() && amp.get_type() == sol::type::table);
         }
 
         {
-            ScriptObject script;
+            auto script = std::unique_ptr<Script> (new Script (lua, ampFile));
+            expect (script->isLoaded() && !script->hasError(), script->getErrorMessage());
+        }
+
+        {
+            auto script = std::unique_ptr<Script> (new Script (lua, sSyntaxError));
             beginTest (String ("load with error"));
-            expect (script.load (lua, sSyntaxError), script.getErrorMessage());
+            expect (script->hasError(), script->getErrorMessage());
+            DBG(script->getErrorMessage());
 
             beginTest ("error");
-            ScriptResult result = script.call();
-            expect (! result.valid());
-            expect (script.getErrorMessage().containsIgnoreCase ("error"));
+            auto result = script->call();
+            expect (! result.valid(), sol::type_name (lua, result.get_type()));
+            expect (script->getErrorMessage().containsIgnoreCase ("error"));
+            DBG (script->getErrorMessage());
         }
-
+        
         {
-            ScriptObject script;
-            script.load (lua, sExceptionError);
-            script.call();
-            beginTest (String("exception: ") + script.getErrorMessage());
-            expect (script.getErrorMessage().isNotEmpty());
+            auto script = std::unique_ptr<Script> (new Script (lua));
+            script->load (sExceptionError);
+            script->call();
+            beginTest (String("exception: ") + script->getErrorMessage());
+            expect (script->getErrorMessage().isNotEmpty());
         }
 
         {
             beginTest ("base64 encode");
-            String urlStr = "base64://"; urlStr << Base64::toBase64 (sExceptionError);
+            String urlStr = "base64://"; urlStr << Util::toBase64 (sExceptionError);
             URL url (urlStr);
-            MemoryOutputStream mo;
-            Base64::convertFromBase64 (mo, url.toString(false).replace ("base64://", ""));
-            expect (sExceptionError.trim() == mo.toString().trim());
+            const auto decoded = Util::fromBase64 (url.toString(false).replace ("base64://", ""));
+            expect (decoded.trim() == sExceptionError.trim(), decoded);
         }
 
         {
-            beginTest ("gzip encode");
-            String urlStr = "gzip://";
-
-            MemoryOutputStream out;
-            {
-                MemoryOutputStream mo;
-                {
-                    GZIPCompressorOutputStream gz (mo);
-                    gz.writeString (sExceptionError);
-                }
-                Base64::convertToBase64 (out, mo.getData(), mo.getDataSize());
-            }
-
-            expect (out.getDataSize() > 0);
-            urlStr << out.toString();
-            beginTest ("gzip decode");
-
+            beginTest ("gzip encode/decode");
+            String urlStr = "gzip://"; urlStr << gzip::encode (sExceptionError);
             URL url (urlStr);
-            MemoryOutputStream mo;
-            Base64::convertFromBase64 (mo, url.toString(false).replace ("gzip://", ""));
-            auto block = mo.getMemoryBlock();
-            MemoryInputStream mi (block, false);
-            GZIPDecompressorInputStream dc (&mi, false, GZIPDecompressorInputStream::zlibFormat, mo.getDataSize());
-            const auto decompressed = dc.readEntireStreamAsString();
+            const auto decompressed = gzip::decode (url.toString(false).replace ("gzip://", ""));
             expect (sExceptionError.trim() == decompressed.trim());
         }
     }
 };
 
-static ScriptObjectTest sScriptObjectTest;
+static ScriptTest sScriptTest;
 
 //=============================================================================
 const static String sAmp = R"(
@@ -157,11 +149,12 @@ function Amp.params()
 end
 
 function Amp.prepare (r, b)
-   begintest ("correct rate and block")
-   expect (r == 44100)
-   expect (b == 4096)
-   Amp.rate = r
-   Amp.block = b
+    print ("Amp.prepare", r, b)
+    begintest ("correct rate and block")
+    expect (r == 44100)
+    expect (b == 4096)
+    Amp.rate = r
+    Amp.block = b
 end
 
 function Amp.process (a, m)
@@ -185,13 +178,7 @@ return Amp
 
 )";
 
-class ScriptInstance {
-public:
-    ScriptInstance() = default;
-    virtual ~ScriptInstance() = default;
-};
-
-class DSPScript // : public ScriptInstance
+class DSPScript
 {
 public:
     DSPScript (sol::table tbl)
@@ -401,24 +388,25 @@ class DSPScriptTest : public LuaUnitTest
 {
 public:
     DSPScriptTest()
-        : LuaUnitTest ("DSP ScriptObject", "ScriptObject", "DSP") { }
+        : LuaUnitTest ("DSP Script", "Script", "DSP") { }
 
     void runTest() override
     {
         {
             beginTest ("load");
-            ScriptObject script;
-            if (! script.load (lua, sAmp))
+            auto script = std::unique_ptr<Script> (new Script (lua));
+            script->load (sAmp);
+            if (script->hasError())
             {
-                expect (false, String ("Could not load script: ") + script.getErrorMessage());
+                expect (false, String ("Could not load script: ") + script->getErrorMessage());
                 return;
             }
 
-            expect (! script.hasError(), script.getErrorMessage());
-            if (script.hasError())
+            expect (! script->hasError(), script->getErrorMessage());
+            if (script->hasError())
                 return;
             
-            auto result = script.call();
+            auto result = script->call();
             expect(result.get_type() == sol::type::table, sol::type_name (result.lua_state(), result.get_type()));
             sol::table Amp = result;
             DSPScript dsp (Amp);
@@ -427,12 +415,12 @@ public:
             dsp.init();
             expect (Amp.get_or ("initialized", false), "didn't call init");
 
-            beginTest ("prepare");
             dsp.prepare (44100, 4096);
+            beginTest ("prepared");
             expect (Amp.get_or ("rate", 0.0) == 44100.0, String (Amp.get_or ("rate", 0)));
             expect (Amp.get_or ("block", 0.0) == 4096.0, String (Amp.get_or ("block", 0)));
 
-            beginTest ("process");
+            beginTest ("processed");
             AudioSampleBuffer audio (2, 4096);
             for (int c = 0; c < 2; ++c)
                 for (int f = 0; f < 4096; ++f)
@@ -444,7 +432,7 @@ public:
                 for (int f = 0; f < 4096; ++f)
                     if (audio.getSample (c, f) < -0.00001 || audio.getSample (c, f) > 0.00001)
                         { expect (false, "bad rendering"); return; }
-            
+
             MemoryBlock block;
             beginTest ("save");
             dsp.save (block);
@@ -457,7 +445,7 @@ public:
             dsp.release();
             expect (Amp.get_or ("released", false) == true);
         }
-       
+
         lua.collect_garbage();
     }
 };

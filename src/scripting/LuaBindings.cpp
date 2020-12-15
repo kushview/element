@@ -518,7 +518,7 @@ static int searcher (lua_State* L)
 //=============================================================================
 void openLibs (sol::state& lua) {}
 
-void initializeState (sol::state& lua) {
+void initializeState (sol::state_view& lua) {
     lua.open_libraries();
     
     auto searchers = lua["package"]["searchers"].get<sol::table>();
@@ -529,7 +529,7 @@ void initializeState (sol::state& lua) {
     lua["package"]["spath"] = path.toStdString();
 }
 
-void initializeState (sol::state& lua, Globals& world)
+void initializeState (sol::state_view& lua, Globals& world)
 {
     initializeState (lua);
     lua.globals().set ("el.globals", std::ref<Globals> (world));

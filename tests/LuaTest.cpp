@@ -178,7 +178,6 @@ public:
     {
         initializeWorld();
         lua.open_libraries();
-        Lua::openLibs (lua);
         
         lua["expect"] = [this](bool result, const char* msg) {
             this->expect (result, msg);
@@ -248,7 +247,6 @@ public:
     void initialise() override
     {
         lua.open_libraries();
-        Lua::openLibs (lua);
         lua.collect_garbage();
     }
 
