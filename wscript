@@ -178,6 +178,53 @@ def build_lua_docs (bld):
     if bool(bld.env.LDOC):
         call ([bld.env.LDOC[0], '.' ])
 
+def build_lua_lib (bld):
+    lua = bld (
+        features = 'c cstlib',
+        includes = [
+            'libs/lua/src'
+        ],
+        source = '''
+            libs/lua/src/lauxlib.c
+            libs/lua/src/liolib.c
+            libs/lua/src/lopcodes.c
+            libs/lua/src/lstate.c
+            libs/lua/src/lobject.c
+            libs/lua/src/lmathlib.c
+            libs/lua/src/loadlib.c
+            libs/lua/src/lvm.c
+            libs/lua/src/lfunc.c
+            libs/lua/src/lstrlib.c
+            libs/lua/src/linit.c
+            libs/lua/src/lstring.c
+            libs/lua/src/lundump.c
+            libs/lua/src/lctype.c
+            libs/lua/src/ltable.c
+            libs/lua/src/ldump.c
+            libs/lua/src/loslib.c
+            libs/lua/src/lgc.c
+            libs/lua/src/lzio.c
+            libs/lua/src/ldblib.c
+            libs/lua/src/lutf8lib.c
+            libs/lua/src/lmem.c
+            libs/lua/src/lcorolib.c
+            libs/lua/src/lcode.c
+            libs/lua/src/ltablib.c
+            libs/lua/src/lapi.c
+            libs/lua/src/lbaselib.c
+            libs/lua/src/ldebug.c
+            libs/lua/src/lparser.c
+            libs/lua/src/llex.c
+            libs/lua/src/ltm.c
+            libs/lua/src/ldo.c
+        '''.split(),
+        name = 'LUA',
+        target = 'lib/lua',
+        install_path = None
+    )
+    bld.add_group()
+    return lua
+
 def compile_vst_linux (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
@@ -247,17 +294,17 @@ def compile (bld):
 
 def build (bld):
     bld.add_pre_fun (configure_git_version)
+    # build_lua_lib (bld)
     compile (bld)
     # compile_vst (bld)
 
-    # for testing purposes right now. doesn't get installed
     if bld.env.LUA and bool(bld.env.LIB_READLINE):
         bld.program(
             source = [ 'tools/lua-el/lua.cpp' ],
             name = 'lua-el',
             target = 'bin/lua-el',
             includes = common_includes(),
-            use = [ 'ELEMENT', 'READLINE' ],
+            use = [ 'ELEMENT', 'LUA', 'READLINE' ],
             install_path = None
         )
 
