@@ -35,10 +35,32 @@ public:
     bool load (const String& buffer);
     bool load (File file);
 
-    template<typename ...Args>
-    sol::reference call (Args&& ...args)
+    sol::function caller() const
     {
-        return callInternal (std::forward<Args> (args)...);
+        sol::function f = loaded;
+        return f;
+    }
+
+    template<typename ...Args>
+    sol::object call (Args&& ...args)
+    {
+        return execute (sol::environment(), std::forward<Args> (args)...);
+    }
+
+    template<typename ...Args>
+    sol::object operator() (Args&& ...args) { 
+        return call (std::forward<Args> (args)...);
+    }
+
+    template<typename ...Args>
+    sol::object call (const sol::environment& env, Args&& ...args)
+    {
+        return execute (env, std::forward<Args> (args)...);
+    }
+
+    template<typename ...Args>
+    sol::object operator() (const sol::environment& env, Args&& ...args) { 
+        return call (env, std::forward<Args> (args)...);
     }
 
     const auto& getInfo()       const { return info; }
@@ -58,17 +80,21 @@ private:
     bool hasloaded  = false;
     sol::load_result loaded;
     String error;
-    
+
     template<typename ...Args>
-    sol::reference callInternal (Args&& ...args)
+    sol::reference execute (const sol::environment& e, Args&& ...args)
     {
         jassert (L != nullptr);
         sol::state_view view (L);
-        sol::reference ref = view.script ("return nil");
+        sol::reference ref = view.safe_script ("return nil");
         if (! isLoaded() || hasError())
             return ref;
         try {
-            auto result = loaded.call (std::forward<Args> (args)...);
+            // env["testvalue"] = true;
+            sol::function f = caller();
+            if (e.valid())
+                sol::set_environment (e, f);
+            auto result = f (std::forward<Args> (args)...);
             switch (result.status()) {
                 case sol::call_status::file:
                     error = "File error";
@@ -89,7 +115,7 @@ private:
                 case sol::call_status::runtime:    
                     error = "Runtime error";
                     break;
-                case sol::call_status::syntax:    
+                case sol::call_status::syntax:
                     error = "Syntax error";
                     break;
                 case sol::call_status::yielded:

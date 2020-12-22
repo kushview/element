@@ -28,9 +28,10 @@ Script::Script (lua_State* state)
 {
     ownedstate = state == nullptr;
     L = ownedstate ? luaL_newstate() : state;
+    sol::state_view view (L);
+
     if (ownedstate)
-    {
-        sol::state_view view (L);
+    {  
         Lua::initializeState (view);
     }
 }
@@ -44,9 +45,6 @@ Script::Script (sol::state_view& view, const String& buffer)
 Script::Script (sol::state_view& view, File file)
     : Script (view.lua_state())
 {
-    sol::environment env;
-    env.valid();
-    env = sol::environment (view, sol::create, view.globals());
     this->load (file);
 }
 

@@ -50,7 +50,8 @@ extern int luaopen_kv_round (lua_State*);
 extern int luaopen_kv_AudioBuffer32 (lua_State*);
 extern int luaopen_kv_AudioBuffer64 (lua_State*);
 extern int luaopen_kv_Bounds (lua_State*);
-extern int luaopen_kv_Component (lua_State*);
+extern int luaopen_kv_TextButton (lua_State*);
+extern int luaopen_kv_Widget (lua_State*);
 extern int luaopen_kv_DocumentWindow (lua_State*);
 extern int luaopen_kv_File (lua_State*);
 extern int luaopen_kv_Graphics (lua_State*);
@@ -489,9 +490,13 @@ static int searcher (lua_State* L)
     {
         sol::stack::push (L, luaopen_kv_Bounds);
     }
-    else if (mod == "kv.Component")
+    else if (mod == "kv.TextButton")
     {
-        sol::stack::push (L, luaopen_kv_Component);
+        sol::stack::push (L, luaopen_kv_TextButton);
+    }
+    else if (mod == "kv.Widget")
+    {
+        sol::stack::push (L, luaopen_kv_Widget);
     }
     else if (mod == "kv.DocumentWindow")
     {
