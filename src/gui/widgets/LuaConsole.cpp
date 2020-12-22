@@ -28,21 +28,13 @@
 namespace Element {
 
 //=============================================================================
-
-static int exceptionHandler (lua_State* L, sol::optional<const std::exception&> e, sol::string_view v)
-{
-    return sol::detail::default_exception_handler (L, e, v);
-}
-
-//=============================================================================
-
 LuaConsole::LuaConsole()
     : Console ("Lua Console")
 {
     setSize (100, 100);
 }
 
-LuaConsole::~LuaConsole() {}
+LuaConsole::~LuaConsole() { }
 
 void LuaConsole::textEntered (const String& text)
 {
@@ -51,8 +43,6 @@ void LuaConsole::textEntered (const String& text)
     Console::textEntered (text);
     auto e = env->get();
     sol::state_view lua (e.lua_state());
-
-    lua.set_exception_handler (exceptionHandler);
     
     auto gprint = lua["print"];
     lua["print"] = e["print"];
@@ -72,11 +62,20 @@ void LuaConsole::textEntered (const String& text)
         
         auto result = lua.script (buffer.toRawUTF8(), e,
             // [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); },
-            "console=", sol::load_mode::any);
+            "console=", sol::load_mode::text);
         
-        if (result.valid() && haveReturn)
-            e["print"](result);
-
+        if (result.valid())
+        {
+            if (haveReturn)
+                e["print"](result);
+        }
+        else
+        {
+            sol::error error = result;
+            for (const auto& line : StringArray::fromLines (error.what()))
+                addText (line);
+        }
+        
         if (lastError.isNotEmpty())
             addText (lastError);
     }
@@ -86,7 +85,6 @@ void LuaConsole::textEntered (const String& text)
     }
     
     lua["print"] = gprint;
-    lua.set_exception_handler (sol::detail::default_exception_handler);
     lastError.clear();
 }
 
@@ -149,7 +147,7 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
         if (msg.isNotEmpty())
         {
             addText (msg.trimEnd());
-            MessageManager::getInstance()->runDispatchLoopUntil(14);
+            MessageManager::getInstance()->runDispatchLoopUntil (4);
         }
     });
 }
