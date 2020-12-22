@@ -17,8 +17,8 @@
 */
 
 #include "LuaUnitTest.h"
+#include "scripting/DSPScript.h"
 #include "scripting/Script.h"
-#include "kv/lua/factories.hpp"
 
 using namespace Element;
 
@@ -31,6 +31,11 @@ static const String sExceptionError = R"(
     obj:nil_function()
 )";
 
+static const String sAnonymous = R"(
+    local msg = "anon"
+    testvalue = msg
+    return msg
+)";
 
 //=============================================================================
 class ScriptTest : public LuaUnitTest
@@ -88,6 +93,45 @@ public:
         }
 
         {
+            beginTest ("environment");
+            auto script = std::unique_ptr<Script> (new Script (lua));
+            script->load (sAnonymous);
+            auto env = sol::environment (lua, sol::create, lua.globals());
+            env["testvalue"] = true;
+            sol::object a = env["testvalue"], b = lua["testvalue"];
+            expect (a != b);
+            expect (a.get_type() == sol::type::boolean);
+            expect (b.get_type() == sol::type::nil);
+
+            beginTest ("environment: in lua");
+            env["testvalue"] = 95.0;
+            lua["testvalue"] = "hello world";
+            a = env["testvalue"], b = lua["testvalue"];
+            expect (a.get_type() == sol::type::number);
+            expect (b.get_type() == sol::type::string);
+            lua.script ("expect (testvalue == 'hello world')");
+            lua.script ("expect (testvalue == 95)", env);
+
+            sol::function call = script->caller();
+            auto renv = sol::get_environment (call);
+            env.set_on (call);
+            renv = sol::get_environment (call);
+            expect (renv.valid());
+            call();
+            lua.script ("expect (testvalue == 'anon')", renv);
+            lua.script ("expect (testvalue == 'hello world')");
+        }
+
+        {
+            beginTest ("return value");
+            auto script = std::unique_ptr<Script> (new Script (lua));
+            script->load (sAnonymous);
+            sol::object obj = script->call();
+            expect (obj.is<std::string>(), "not a string");
+            expect (obj.as<std::string>() == "anon");
+        }
+
+        {
             beginTest ("base64 encode");
             String urlStr = "base64://"; urlStr << Util::toBase64 (sExceptionError);
             URL url (urlStr);
@@ -128,6 +172,7 @@ function Amp.init()
 end
 
 function Amp.layout()
+    print ("Amp.layout")
     return {
         audio = { 2, 2 },
         midi  = { 0, 0 }
@@ -158,7 +203,7 @@ function Amp.prepare (r, b)
 end
 
 function Amp.process (a, m)
-   a:fade (gain1, gain2)
+    a:fade (gain1, gain2)
 end
 
 function Amp.release()
@@ -177,211 +222,6 @@ end
 return Amp
 
 )";
-
-class DSPScript
-{
-public:
-    DSPScript (sol::table tbl)
-        : DSP (tbl)
-    {
-        bool ok = DSP.valid();
-        
-        if (ok)
-        {
-            L = DSP.lua_state();
-            ok = L != nullptr;
-        }
-
-        if (ok)
-        {
-            sol::state_view lua (L);
-            ok = lua.safe_script (R"(
-                require ('kv.audio')
-                require ('kv.midi')
-                require ('kv.AudioBuffer')
-                require ('kv.MidiBuffer')
-                require ('kv.MidiMessage')
-                require ('el.MidiPipe')
-            )").status() == sol::call_status::ok;    
-        }
-
-        if (ok)
-        {
-            processFunc = DSP ["process"];
-            processRef = processFunc.registry_index();
-            ok = processRef != LUA_REFNIL && processRef != LUA_NOREF;
-        }
-
-        if (ok)
-        {
-            audio = kv::lua::new_userdata<AudioBuffer<float>> (
-                L, LKV_MT_AUDIO_BUFFER_32);
-            audioRef = luaL_ref (L, LUA_REGISTRYINDEX);
-            ok = audioRef != LUA_REFNIL && audioRef != LUA_NOREF;
-        }
-
-        if (ok)
-        {
-            midi = LuaMidiPipe::create (L, 4);
-            midiRef = luaL_ref (L, LUA_REGISTRYINDEX);
-            ok = midiRef != LUA_REFNIL && midiRef != LUA_NOREF;
-        }
-
-        loaded = ok;
-        if (! loaded)
-        {
-            derefAudioMidi();
-        }
-    }
-
-    ~DSPScript()
-    {
-        derefAudioMidi();
-    }
-
-    void init()
-    {
-        if (sol::function f = DSP ["init"])
-            f();
-    }
-
-    void prepare (double rate, int block)
-    {
-        if (sol::function f = DSP ["prepare"])
-            f (rate, block);
-    }
-
-    void release()
-    {
-        if (sol::function f = DSP ["release"])
-            f();
-    }
-
-    void process (AudioSampleBuffer& a, MidiPipe& m)
-    {
-        if (! loaded)
-            return;
-
-        const auto nchans  = a.getNumChannels();
-        const auto nframes = a.getNumSamples();
-        const auto nmidi   = m.getNumBuffers();
-
-        if (lua_rawgeti (L, LUA_REGISTRYINDEX, processRef) == LUA_TFUNCTION)
-        {
-            if (lua_rawgeti (L, LUA_REGISTRYINDEX, audioRef) == LUA_TUSERDATA)
-            {
-                if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiRef) == LUA_TUSERDATA)
-                {
-                    (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
-                            a.getNumChannels(), a.getNumSamples());
-                    (*midi)->swapWith (m);
-
-                    lua_call (L, 2, 0);
-                    
-                    (*midi)->swapWith (m);
-                }
-            }
-        }
-        else
-        {
-            DBG("didn't get render fucntion in callback");
-        }
-    }
-
-    void save (MemoryBlock& block)
-    {
-        sol::function save = DSP ["save"];
-        if (! save.valid())
-            return;
-        
-        try {
-            sol::state_view lua (L);
-            sol::environment env (lua, sol::create, lua.globals());
-            env["dsp_script_save"] = save;
-            auto result = lua.safe_script (R"(
-                local tf = io.tmpfile()
-                local oo = io.output()
-                io.output (tf);
-                dsp_script_save()
-                tf:seek ('set', 0)
-                local data = tf:read ("*a")
-                io.close()
-                io.output (oo);
-                dsp_script_save = nil
-                return data
-            )", env);
-
-            if (result.valid())
-            {
-                sol::object data = result;
-                if (data.is<const char*>())
-                {
-                    MemoryOutputStream mo (block, false);
-                    mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
-                }
-            }
-
-            lua.collect_garbage();
-        } catch (const std::exception& e) {
-            DBG("[EL] " << e.what());
-        }
-    }
-
-    void restore (const void* data, size_t size)
-    {
-        sol::function restore = DSP["restore"];
-        if (! restore.valid())
-            return;
-
-        try {
-            sol::state_view lua (L);
-            sol::environment env (lua, sol::create, lua.globals());
-            sol::userdata ud = lua["io"]["tmpfile"]();
-            luaL_Stream* const stream = (luaL_Stream*) ud.pointer();
-
-            fwrite (data, 1, size, stream->f);
-            rewind (stream->f);
-
-            env["__state_data__"] = ud;
-            env["dsp_script_restore"] = restore;
-            lua.safe_script (R"(
-                local oi = io.input()
-                io.input (__state_data__)
-                dsp_script_restore()
-                io.input (oi)
-                __state_data__:close()
-                __state_data__ = nil
-                dsp_script_restore = nil
-            )", env);
-
-            lua.collect_garbage();
-        } catch (const std::exception& e) { 
-            DBG("[EL] " << e.what());
-        }
-    }
-
-private:
-    sol::table DSP;
-    sol::function processFunc;
-    AudioBuffer<float>** audio  = nullptr;
-    LuaMidiPipe** midi          = nullptr;
-    int processRef              = LUA_REFNIL;
-    int audioRef                = LUA_REFNIL;
-    int midiRef                 = LUA_REFNIL;
-    lua_State* L                = nullptr;
-    bool loaded                 = false;
-
-    void derefAudioMidi()
-    {
-        loaded = false;
-        audio = nullptr;
-        luaL_unref (DSP.lua_state(), LUA_REGISTRYINDEX, audioRef);
-        audioRef = LUA_REFNIL;
-        midi = nullptr;
-        luaL_unref (DSP.lua_state(), LUA_REGISTRYINDEX, midiRef);
-        midiRef = LUA_REFNIL;
-    }
-};
 
 //=============================================================================
 class DSPScriptTest : public LuaUnitTest
@@ -405,11 +245,20 @@ public:
             expect (! script->hasError(), script->getErrorMessage());
             if (script->hasError())
                 return;
-            
+
             auto result = script->call();
             expect(result.get_type() == sol::type::table, sol::type_name (result.lua_state(), result.get_type()));
             sol::table Amp = result;
             DSPScript dsp (Amp);
+
+            beginTest ("ports");
+            const auto& ports = dsp.getPorts();
+            expect (ports.size (kv::PortType::Audio,   true)  == 2);
+            expect (ports.size (kv::PortType::Audio,   false) == 2);
+            expect (ports.size (kv::PortType::Midi,    true)  == 0);
+            expect (ports.size (kv::PortType::Midi,    false) == 0);
+            expect (ports.size (kv::PortType::Control, true)  == 1);
+            expect (ports.size (kv::PortType::Control, false) == 0);
 
             beginTest ("init");
             dsp.init();

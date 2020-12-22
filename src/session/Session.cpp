@@ -42,23 +42,23 @@ namespace Element {
         return Node();
     }
 
-    class Session::Private
+    class Session::Impl
     {
     public:
-        Private (Session& s)
-            : session (s)
+        Impl (Session& s)
+            : owner (s)
         { }
 
-        ~Private() { }
+        ~Impl() { }
     private:
         friend class Session;
-        Session&                     session;
+        Session&  owner;
     };
 
     Session::Session()
         : ObjectModel (Tags::session)
     {
-        priv = new Private (*this);
+        impl.reset (new Impl (*this));
         setMissingProperties (true);
         objectData.addListener (this);
     }
@@ -67,9 +67,7 @@ namespace Element {
     {
         objectData.removeListener (this);
         clear();
-
-        priv = nullptr;
-        
+        impl.reset();
         jassert (getReferenceCount() == 0);
     }
     

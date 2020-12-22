@@ -63,6 +63,7 @@ local function amp_process (a, m)
 end
 
 return script.dsp {
+    layout  = amp_layout,
     init    = amp_init,
     process = amp_process
 }

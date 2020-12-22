@@ -142,8 +142,8 @@ namespace Element {
         virtual void valueTreeRedirected (ValueTree& treeWhichHasBeenChanged);
 
     private:
-        class Private;
-        ScopedPointer<Private> priv;
+        class Impl;
+        std::unique_ptr<Impl> impl;
         void setMissingProperties (bool resetExisting = false);
         
         inline ValueTree getGraphsValueTree()                   const { return objectData.getChildWithName (Tags::graphs); }

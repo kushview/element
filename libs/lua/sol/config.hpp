@@ -27,6 +27,7 @@
 #ifndef SOL_SINGLE_CONFIG_HPP
 #define SOL_SINGLE_CONFIG_HPP
 
+// #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 // beginning of sol/config.hpp
 
 /* Base, empty configuration file!
@@ -47,6 +48,9 @@ https://sol2.readthedocs.io/en/latest/safety.html ! You can also pass them throu
 the build system, or the command line options of your compiler.
 
 */
+
+#define SOL_USING_CXX_LUA 0
+#define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 
 // end of sol/config.hpp
 
