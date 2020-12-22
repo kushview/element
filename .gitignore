@@ -39,3 +39,5 @@ node_modules
 /*.AppImage
 
 /tools/contrib/contrib
+
+/*.lua
