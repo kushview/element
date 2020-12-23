@@ -1,12 +1,13 @@
 --- Show a custom widget in a window.
 -- The return value is the displayed window or nil
--- @script window
+-- @script helloworld
 -- @usage
 -- local win = element.script ('window')
 
-local object        = require ('kv.object')
-local TextButton    = require ('kv.TextButton')
-local Widget        = require ('kv.Widget')
+local object            = require ('kv.object')
+local DocumentWindow    = require ('kv.DocumentWindow')
+local TextButton        = require ('kv.TextButton')
+local Widget            = require ('kv.Widget')
 local new = object.new
 
 local colors = {
@@ -51,9 +52,13 @@ function HelloWorld:init()
     self.label = self:add (label)
 
     self.button = new (TextButton)
-    self.button.text = "Close"
+    self.button.text = "Quit"
     self.button.name = "TextButton"
+    self.button.onclick = function() 
+        os.exit()
+    end
     self.button:resize (90, 24)
+
     self:add (self.button, 9999)
     self:resize (640, 360)
 end
@@ -83,15 +88,18 @@ function HelloWorld:mouseup (ev)
     self:resized()
 end
 
-local hw = new (HelloWorld)
-
-local function close (self)
-    hw.visible = false
-    hw:remove_from_desktop()
-    hw = nil
+local win = new (DocumentWindow)
+function win.onclosebutton()
+    if win then
+        win.visible = false
+        win:remove_from_desktop()
+        win = nil
+    end
 end
 
-hw.button.onclick = close
+win:set_content (new (HelloWorld))
+win.visible = true
+win:add_to_desktop()
 
 local function promise (f)
     setmetatable ({
@@ -105,8 +113,4 @@ local function promise (f)
     })
 end
 
-promise (function() 
-    if hw then close (hw) end
-end)
-
-return hw
+return win
