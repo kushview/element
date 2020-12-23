@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
+
 #include <math.h>
 #include "sol/sol.hpp"
 #include "lua-kv.h"
@@ -146,7 +148,7 @@ public:
         addListener (this);
     }
 
-    ~ScriptNodeParameter()
+    ~ScriptNodeParameter() override
     {
         unlink();
     }
@@ -161,7 +163,7 @@ public:
 
     void controlValueChanged (int parameterIndex, float newValue) override;
     void controlTouched (int parameterIndex, bool gestureIsStarting) override;
-    
+
 private:
     ScriptNode::Context* ctx { nullptr };
 };
@@ -858,3 +860,5 @@ void ScriptNode::setParameter (int index, float value)
 }
 
 }
+
+#endif
