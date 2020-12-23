@@ -2,7 +2,7 @@
 -- The return value is the displayed window or nil
 -- @script helloworld
 -- @usage
--- local win = element.script ('window')
+-- local win = script.exec ('helloworld')
 
 local object            = require ('kv.object')
 local DocumentWindow    = require ('kv.DocumentWindow')
@@ -54,9 +54,6 @@ function HelloWorld:init()
     self.button = new (TextButton)
     self.button.text = "Quit"
     self.button.name = "TextButton"
-    self.button.onclick = function() 
-        os.exit()
-    end
     self.button:resize (90, 24)
 
     self:add (self.button, 9999)
@@ -89,28 +86,14 @@ function HelloWorld:mouseup (ev)
 end
 
 local win = new (DocumentWindow)
-function win.onclosebutton()
-    if win then
-        win.visible = false
-        win:remove_from_desktop()
-        win = nil
-    end
+function win:onclosebutton()
+    if not win then return end
+    win.visible = false
+    win = nil
 end
 
-win:set_content (new (HelloWorld))
+win.content = new (HelloWorld)
+win.content.button.onclick = win.onclosebutton
 win.visible = true
-win:add_to_desktop()
-
-local function promise (f)
-    setmetatable ({
-        exec = f
-    } , {
-        __gc = function (self)
-            if (type (self.exec) == 'function') then
-                self.exec()
-            end
-        end 
-    })
-end
 
 return win
