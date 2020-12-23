@@ -93,9 +93,9 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
     env.reset (newEnv);
     if (env == nullptr)
         return;
-
     auto e = env->get();
     jassert (e.valid());
+    sol::state_view lua (e.lua_state());
 
     e["os"]["exit"] = sol::overload (
         [this]() { ViewHelpers::invokeDirectly (this, Commands::quit, true); },
@@ -150,6 +150,8 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
             MessageManager::getInstance()->runDispatchLoopUntil (4);
         }
     });
+
+    lua.script ("require('el.script').exec('console')", e);
 }
 
 LuaConsole::LuaResult LuaConsole::errorHandler (lua_State* L, LuaResult pfr)
