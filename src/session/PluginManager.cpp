@@ -28,6 +28,7 @@
 #include "engine/nodes/MidiRouterNode.h"
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
+#include "engine/nodes/ScriptNode.h"
 #include "DataPath.h"
 #include "Settings.h"
 
@@ -772,6 +773,10 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_LUA)
     {
         return new LuaNode();
+    }
+    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_SCRIPT)
+    {
+        return new ScriptNode();
     }
    #endif
 

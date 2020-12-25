@@ -21,8 +21,11 @@
 
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphNode.h"
+#include "sol/sol.hpp"
 
 namespace Element {
+
+class DSPScript;
 
 class ScriptNode : public GraphNode,
                    public ChangeBroadcaster
@@ -44,10 +47,10 @@ public:
     
     Result loadScript (const String&);
 
-    const String& getScript() const { return script; }
-    const String& getDraftScript() const { return draftScript; }
-    void setDraftScript (const String& draft) { draftScript = draft; }
-    bool hasChanges() const { return script.hashCode64() != draftScript.hashCode64(); }
+    const String& getScript() const { return code; }
+    const String& getDraftScript() const { return draftCode; }
+    void setDraftScript (const String& draft) { draftCode = draft; }
+    bool hasChanges() const { return code.hashCode64() != draftCode.hashCode64(); }
 
     /** Set a parameter value by index
      
@@ -62,12 +65,13 @@ protected:
     Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:
-    String script, draftScript;
+    String code, draftCode;
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
     CriticalSection lock;
-    std::unique_ptr<Context> context;
+    sol::state lua;
+    std::unique_ptr<DSPScript> script;
     ParameterArray inParams, outParams;
 };
 

@@ -39,6 +39,8 @@ public:
             f();
     }
 
+    static Result validate (const String& script);
+
     void prepare (double rate, int block)
     {
         if (sol::function f = DSP ["prepare"])
@@ -52,7 +54,13 @@ public:
     }
 
     const kv::PortList& getPorts() const { return ports; }
+    void getPorts (kv::PortList& out);
+
     int getNumParameters() const { return numParams; }
+    void setParameter (int, float) {}
+    void copyParameterValues (const DSPScript&) const {}
+    void getParameterData (MemoryBlock&) {}
+    void setParameterData (MemoryBlock&) {}
 
     void process (AudioSampleBuffer& a, MidiPipe& m);
     void save (MemoryBlock& block);

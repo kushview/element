@@ -69,6 +69,93 @@ DSPScript::~DSPScript()
     derefAudioMidi();
 }
 
+Result DSPScript::validate (const String& script)
+{
+    if (script.isEmpty())
+        return Result::fail ("script contains no code");
+    return Result::ok();
+#if 0
+    Script loader;
+    loader.load (script);
+
+    auto result = ctx->load (script);
+    if (result.failed())
+        return result;
+    
+    auto ctx = std::make_unique<DSPScript>();
+    if (! ctx->ready())
+        return Result::fail ("could not parse script");
+
+    try
+    {
+        const int block = 1024;
+        const double rate = 44100.0;
+
+        using PT = kv::PortType;
+        
+        // call node_io_ports() and node_params()
+        PortList validatePorts;
+        ctx->getPorts (validatePorts);
+
+        // create a dummy audio buffer and midipipe
+        auto nchans = jmax (validatePorts.size (PT::Audio, true),
+                            validatePorts.size (PT::Audio, false));
+        auto nmidi  = jmax (validatePorts.size (PT::Midi, true),
+                            validatePorts.size (PT::Midi, false));
+        
+        ctx->prepare (rate, block);
+
+        ctx->state["__ln_validate_rate"]    = rate;
+        ctx->state["__ln_validate_nmidi"]   = nmidi;
+        ctx->state["__ln_validate_nchans"]  = nchans;
+        ctx->state["__ln_validate_nframes"] = block;
+        ctx->state.script (R"(
+            function __ln_validate_render()
+                local AudioBuffer = require ('kv.AudioBuffer')
+                local MidiPipe    = require ('el.MidiPipe')
+
+                local a = AudioBuffer (__ln_validate_nchans, __ln_validate_nframes)
+                local m = MidiPipe (__ln_validate_nmidi)
+                
+                for _ = 1,4 do
+                    for i = 0,m:size() - 1 do
+                        local b = m:get(i)
+                        b:insert (0, midi.noteon (1, 60, math.random (1, 127)))
+                        b:insert (10, midi.noteoff (1, 60, 0))
+                    end
+                    node_render (a, m)
+                    a:clear()
+                    m:clear()
+                end
+                
+                a = nil
+                m = nil
+                collectgarbage()
+            end
+
+            __ln_validate_render()
+            __ln_validate_render = nil
+            collectgarbage()
+        )");
+
+        ctx->release();
+        ctx.reset();
+        result = Result::ok();
+    }
+    catch (const std::exception& e)
+    {
+        result = Result::fail (e.what());
+    }
+    return result;
+#endif
+}
+
+void DSPScript::getPorts (PortList& out)
+{
+    for (const auto* port : ports.getPorts())
+        out.add (new PortDescription (*port));
+}
+
 void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
 {
     if (! loaded)

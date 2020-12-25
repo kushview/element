@@ -17,7 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if 0
 
 #include <math.h>
 #include "sol/sol.hpp"
@@ -29,6 +28,8 @@
 #include "engine/MidiPipe.h"
 #include "engine/Parameter.h"
 #include "scripting/LuaBindings.h"
+#include "scripting/DSPScript.h"
+#include "scripting/Script.h"
 
 #define EL_LUA_DBG(x)
 // #define EL_LUA_DBG(x) DBG(x)
@@ -169,6 +170,7 @@ private:
 };
 
 //=============================================================================
+#if 0
 struct ScriptNode::Context
 {
     explicit Context()
@@ -694,78 +696,95 @@ private:
         }
     }
 };
+#endif
 
+struct ScriptNode::Context
+{
+
+};
+
+//=============================================================================
 void ScriptNodeParameter::controlValueChanged (int index, float value)
 {
-    if (ctx != nullptr) // index may not be set so use port channel.
-        ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
+    // if (ctx != nullptr) // index may not be set so use port channel.
+    //     ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
 }
 
 void ScriptNodeParameter::controlTouched (int, bool) {}
 
+//=============================================================================
 ScriptNode::ScriptNode() noexcept
     : GraphNode (0)
 {
-    context = std::make_unique<Context>();
+    Lua::initializeState (lua);
+    script.reset (new DSPScript (lua.create_table()));
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
-    loadScript (stereoAmpScript);
+    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_SCRIPT, nullptr);
 }
 
 ScriptNode::~ScriptNode()
 {
-    context.reset();
+    script.reset();
 }
 
 void ScriptNode::createPorts()
 {
-    if (context == nullptr)
+    if (script == nullptr)
         return;
     ports.clearQuick();
-    context->getPorts (ports);
+    script->getPorts (ports);
 }
 
 Parameter::Ptr ScriptNode::getParameter (const PortDescription& port)
 {
-    return context->getParameter (port);
+    return nullptr;
 }
 
-Result ScriptNode::loadScript (const String& newScript)
+Result ScriptNode::loadScript (const String& newCode)
 {
-    auto result = Context::validate (newScript);
+    auto result = DSPScript::validate (newCode);
     if (result.failed())
         return result;
-    
-    auto newContext = std::make_unique<Context>();
-    result = newContext->load (newScript);
 
-    if (result.wasOk())
+    Script loader (lua);
+    loader.load (newCode);
+    if (loader.hasError())
+        return Result::fail (loader.getErrorMessage());
+
+    auto dsp = loader();
+    if (! dsp.valid() || dsp.get_type() != sol::type::table)
+        return Result::fail ("Could not instantiate script");
+
+    auto newScript = std::unique_ptr<DSPScript> (new DSPScript (dsp));
+    
+    if (true)
     {
-        script = draftScript = newScript;
+        code = draftCode = newCode;
         if (prepared)
-            newContext->prepare (sampleRate, blockSize);
+            newScript->prepare (sampleRate, blockSize);
         triggerPortReset();
         ScopedLock sl (lock);
-        if (context != nullptr)
-            newContext->copyParameterValues (*context);
-        context.swap (newContext);
+        if (script != nullptr)
+            newScript->copyParameterValues (*script);
+        
+        script.swap (newScript);
     }
 
-    if (newContext != nullptr)
+    if (newScript != nullptr)
     {
-        newContext->release();
-        newContext.reset();
+        newScript->release();
+        newScript.reset();
     }
 
-    return result;
+    return Result::ok();
 }
 
 void ScriptNode::fillInPluginDescription (PluginDescription& desc)
 {
-    desc.name               = "Lua";
-    desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
-    desc.uid                = EL_INTERNAL_UID_LUA;
+    desc.name               = "Script";
+    desc.fileOrIdentifier   = EL_INTERNAL_ID_SCRIPT;
+    desc.uid                = EL_INTERNAL_UID_SCRIPT;
     desc.descriptiveName    = "A user scriptable Element node";
     desc.numInputChannels   = 0;
     desc.numOutputChannels  = 0;
@@ -782,7 +801,7 @@ void ScriptNode::prepareToRender (double rate, int block)
         return;
     sampleRate = rate;
     blockSize = block;
-    context->prepare (sampleRate, blockSize);
+    script->prepare (sampleRate, blockSize);
     prepared = true;
 }
 
@@ -791,13 +810,13 @@ void ScriptNode::releaseResources()
     if (! prepared)
         return;
     prepared = false;
-    context->release();
+    script->release();
 }
 
 void ScriptNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     ScopedLock sl (lock);
-    context->render (audio, midi);
+    script->process (audio, midi);
 }
 
 void ScriptNode::setState (const void* data, int size)
@@ -815,7 +834,7 @@ void ScriptNode::setState (const void* data, int size)
                 const var& params = state.getProperty ("params");
                 if (params.isBinaryData())
                     if (auto* block = params.getBinaryData())
-                        context->setParameterData (*block);
+                        script->setParameterData (*block);
             }
 
             if (state.hasProperty ("data"))
@@ -823,7 +842,7 @@ void ScriptNode::setState (const void* data, int size)
                 const var& data = state.getProperty ("data");
                 if (data.isBinaryData())
                     if (auto* block = data.getBinaryData())
-                        context->setState (block->getData(), block->getSize());
+                        script->restore (block->getData(), block->getSize());
             }
         }
         sendChangeMessage();
@@ -833,16 +852,16 @@ void ScriptNode::setState (const void* data, int size)
 void ScriptNode::getState (MemoryBlock& block)
 {
     ValueTree state ("ScriptNodeState");
-    state.setProperty ("script", script, nullptr)
-         .setProperty ("draft",  draftScript, nullptr);
+    state.setProperty ("script", code, nullptr)
+         .setProperty ("draft",  draftCode, nullptr);
 
     MemoryBlock scriptBlock;
-    context->getParameterData (scriptBlock);
+    script->getParameterData (scriptBlock);
     if (scriptBlock.getSize() > 0)
         state.setProperty ("params", scriptBlock, nullptr);
 
     scriptBlock.reset();
-    context->getState (scriptBlock);
+    script->save (scriptBlock);
     if (scriptBlock.getSize() > 0)
         state.setProperty ("data", scriptBlock, nullptr);
 
@@ -856,9 +875,7 @@ void ScriptNode::getState (MemoryBlock& block)
 void ScriptNode::setParameter (int index, float value)
 {
     ScopedLock sl (lock);
-    context->setParameter (index, value);
+    script->setParameter (index, value);
 }
 
 }
-
-#endif

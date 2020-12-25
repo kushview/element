@@ -38,6 +38,7 @@
 #include "engine/nodes/OSCReceiverNode.h"
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ReverbProcessor.h"
+#include "engine/nodes/ScriptNode.h"
 #include "engine/nodes/SubGraphProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
@@ -364,6 +365,13 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         LuaNode().fillInPluginDescription (*desc);
        #endif
     }
+    else if (fileOrId == EL_INTERNAL_ID_SCRIPT)
+    {
+       #if EL_USE_LUA
+        auto* const desc = ds.add (new PluginDescription());
+        ScriptNode().fillInPluginDescription (*desc);
+       #endif
+    }
    #endif
 }
 
@@ -401,6 +409,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_OSC_SENDER);
    #if EL_USE_LUA
     results.add (EL_INTERNAL_ID_LUA);
+    results.add (EL_INTERNAL_ID_SCRIPT);
    #endif
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
    #endif // product enablements

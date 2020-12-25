@@ -30,6 +30,7 @@
 #include "gui/PluginWindow.h"
 #include "gui/nodes/AudioRouterEditor.h"
 #include "gui/nodes/LuaNodeEditor.h"
+#include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/nodes/MidiMonitorNodeEditor.h"
 #include "gui/nodes/MidiProgramMapEditor.h"
 #include "gui/nodes/MidiRouterEditor.h"
@@ -215,6 +216,10 @@ public:
         else if (node.getIdentifier().toString() == EL_INTERNAL_ID_LUA)
         {
             return createPluginWindowFor (node, new LuaNodeEditor (node));
+        }
+        else if (node.getIdentifier().toString() == EL_INTERNAL_ID_SCRIPT)
+        {
+            return createPluginWindowFor (node, new ScriptNodeEditor (node));
         }
         
         GraphNodePtr object = node.getGraphNode();
