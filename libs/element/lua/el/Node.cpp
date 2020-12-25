@@ -1,5 +1,6 @@
-/// Node object
+/// Node object.
 // @classmod el.Node
+// @pragma nostrip
 
 #include "lua-kv.hpp"
 #include "session/Node.h"
@@ -24,24 +25,44 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
             return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
                                    : std::shared_ptr<Node>();
         },
+
+        /// True if a valid node (readonly).
+        // @field Node.valid
+        // @within Attributes
         "valid",                readonly_property (&Node::isValid),
+
+        /// Node name.
+        // @field Node.name
+        // @within Attributes
         "name", property (
             [](Node* self) { return self->getName().toStdString(); },
             [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
         ),
-        "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
-        "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
+        
+        /// Is the node missing?.
+        // @field Node.missing
+        // @within Attributes
         "missing",              readonly_property (&Node::isMissing),
+
+        /// True if enabled.
+        // @field Node.enabled
+        // @within Attributes
         "enabled",              readonly_property (&Node::isEnabled),
+
+        "uuid",                 readonly_property (&Node::getUuid),
+        "uuidstring",           readonly_property (&Node::getUuidString),
+        
         "graph",                readonly_property (&Node::isGraph),
         "root",                 readonly_property (&Node::isRootGraph),
         "nodeid",               readonly_property (&Node::getNodeId),
-        "uuid",                 readonly_property (&Node::getUuid),
-        "uuidstring",           readonly_property (&Node::getUuidString),
+        
         "type",                 readonly_property (&Node::getNodeType),
         "muted",                property (&Node::isMuted, &Node::setMuted),
         "bypassed",             readonly_property (&Node::isBypassed),
-        "editor",               readonly_property (&Node::hasEditor),
+        "has_editor",           readonly_property (&Node::hasEditor),
+
+        "display_name",         [](Node* self) { return self->getDisplayName().toStdString(); },
+        "plugin_name",          [](Node* self) { return self->getPluginName().toStdString(); },
 
         "toxmlstring", [](Node* self) -> std::string
         {
@@ -49,10 +70,11 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
             Node::sanitizeRuntimeProperties (copy, true);
             return copy.toXmlString().toStdString();
         },
-        "resetports",           &Node::resetPorts,
-        "savestate",            &Node::savePluginState,
-        "restoretate",          &Node::restorePluginState,
-        "writefile", [](const Node& node, const char* filepath) -> bool {
+
+        "reset_ports",          &Node::resetPorts,
+        "save_state",           &Node::savePluginState,
+        "restore_state",        &Node::restorePluginState,
+        "write_file", [](const Node& node, const char* filepath) -> bool {
             if (! File::isAbsolutePath (filepath))
                 return false;
             return node.writeToFile (File (String::fromUTF8 (filepath)));

@@ -26,6 +26,9 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
                 : std::shared_ptr<Node>();
         },
 
+        /// Session name.
+        // @field Session.name
+        // @within Attributes
         "name", sol::property (
             [](Session& self, const char* name) -> void {
                 self.setName (String::fromUTF8 (name));
@@ -35,15 +38,25 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
             }
         ),
 
-        /// Convert to an XML string
+        /// Convert to an XML string.
         // @function Session:toxmlstring
         // @return XML formatted string of the session
         "toxmlstring", [](Session& self) -> std::string {
             auto tree = self.getValueTree().createCopy();
             Node::sanitizeRuntimeProperties (tree, true);
             return tree.toXmlString().toStdString();
-        }
+        },
         
+        /// Save the state.
+        // Will save state for all loaded plugins as well
+        // @function Session:save_state
+        "save_state",               &Session::saveGraphState,
+
+        /// Restore state.
+        // Restores all plugin states
+        // @function Session:restore_state
+        "restore_state",            &Session::restoreGraphState
+
        #if 0
         "clear",                    &Session::clear,
         "get_num_graphs",           &Session::getNumGraphs,
@@ -51,8 +64,6 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
         "get_active_graph",         &Session::getActiveGraph,
         "get_active_graph_index",   &Session::getActiveGraphIndex,
         "add_graph",                &Session::addGraph,
-        "save_state",               &Session::saveGraphState,
-        "restore_state",            &Session::restoreGraphState
        #endif
     );
 
