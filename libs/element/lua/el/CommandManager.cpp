@@ -4,6 +4,7 @@
 
 #include "lua-kv.hpp"
 #include "session/CommandManager.h"
+#include "Commands.h"
 
 LUAMOD_API int luaopen_el_CommandManager (lua_State* L)
 {

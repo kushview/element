@@ -17,8 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef EL_COMMAND_MANAGER_H
-#define EL_COMMAND_MANAGER_H
+#pragma once
 
 #include "ElementApp.h"
 
@@ -35,5 +34,3 @@ private:
 };
 
 }
-
-#endif  /* EL_COMMAND_MANAGER_H */
