@@ -31,11 +31,11 @@ public:
     virtual ~LuaConsole();
     
     void textEntered (const String&) override;
-    void setEnvironment (ScriptingEngine::Environment*);
+    void setEnvironment (const sol::environment& e);
 
 private:
     using LuaResult = sol::protected_function_result;
-    std::unique_ptr<ScriptingEngine::Environment> env;
+    sol::environment env;
     String lastError;
     LuaResult errorHandler (lua_State* L, LuaResult pfr);
 };

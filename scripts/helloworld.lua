@@ -1,5 +1,5 @@
 --- Show a custom widget in a window.
--- The return value is the displayed window or nil
+-- The return value is the displayed kv.DocumentWindow or nil
 -- @script helloworld
 -- @usage
 -- local win = script.exec ('helloworld')

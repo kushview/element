@@ -8,8 +8,10 @@ namespace Element {
 
 void LuaConsoleView::initializeView (AppController& app)
 {
-    auto& e = app.getWorld().getScriptingEngine();
-    console.setEnvironment (e.createEnvironment());
+    auto& se = app.getWorld().getScriptingEngine();
+    console.setEnvironment (
+        sol::environment (se.getState(), sol::create, se.getState().globals())
+    );
 }
 
 }

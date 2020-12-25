@@ -38,10 +38,10 @@ LuaConsole::~LuaConsole() { }
 
 void LuaConsole::textEntered (const String& text)
 {
-    if (text.isEmpty() || env == nullptr)
+    if (text.isEmpty() || !env.valid())
         return;
     Console::textEntered (text);
-    auto e = env->get();
+    auto& e = env;
     sol::state_view lua (e.lua_state());
     
     auto gprint = lua["print"];
@@ -61,7 +61,6 @@ void LuaConsole::textEntered (const String& text)
         }
         
         auto result = lua.script (buffer.toRawUTF8(), e,
-            // [this](lua_State* L, LuaResult pfr) { return errorHandler (L, pfr); },
             "console=", sol::load_mode::text);
         
         if (result.valid())
@@ -88,12 +87,10 @@ void LuaConsole::textEntered (const String& text)
     lastError.clear();
 }
 
-void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
+void LuaConsole::setEnvironment (const sol::environment& _env)
 {
-    env.reset (newEnv);
-    if (env == nullptr)
-        return;
-    auto e = env->get();
+    env = _env;
+    auto& e = env;
     jassert (e.valid());
     sol::state_view lua (e.lua_state());
 
@@ -124,7 +121,7 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
 
     e.set_function ("print", [this](sol::variadic_args va)
     {
-        auto e = env->get();
+        auto& e = env;
         String msg;
         for (auto v : va)
         {
@@ -151,14 +148,7 @@ void LuaConsole::setEnvironment (ScriptingEngine::Environment* newEnv)
         }
     });
 
-    lua.script ("require('el.script').exec('console')", e);
-}
-
-LuaConsole::LuaResult LuaConsole::errorHandler (lua_State* L, LuaResult pfr)
-{
-    sol::error err = pfr;
-    lastError = err.what();
-    return pfr;
+    lua.script ("require('el.script').exec('console', _ENV)", e);
 }
 
 }

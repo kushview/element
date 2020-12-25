@@ -3,15 +3,18 @@ title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = { 
     'libs/lua-kv/src',
-    'libs/element/src',
+    'libs/lua-kv/src/juce_rectangle.hpp',
+    'libs/element/lua',
     'scripts',
-    'src/scripting/LuaBindings.cpp',
     exclude = {
-        'libs/lua-kv/src/lua-kv.h'
+        'libs/element/lua/element.lua',
+        'libs/lua-kv/src/lua-kv.h',
+        'libs/lua-kv/src/kv/vector.c'
     },
 }
 examples = {
-    'scripts'
+    'scripts/helloworld.lua',
+    'scripts/amp.lua'
 }
 dir         = 'build/doc/lua'
 output      = 'index'

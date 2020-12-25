@@ -117,6 +117,7 @@ def common_includes():
         'libs/kv/modules', \
         'libs/jlv2/modules', \
         'libs/compat', \
+        'libs/element/lua', \
         'libs/lua', \
         'libs/lua/src', \
         'libs/lua-kv', \

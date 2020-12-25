@@ -1,0 +1,61 @@
+/// Session object
+// @classmod el.Session
+// @pragma nostrip
+
+#include "lua-kv.hpp"
+#include "session/Node.h"
+#include "session/Session.h"
+
+LUAMOD_API int luaopen_el_Session (lua_State* L) {
+    using namespace Element;
+    
+    sol::state_view lua (L);
+    auto M = lua.create_table();
+    M.new_usertype<Session> ("Session", sol::no_constructor,
+        sol::meta_function::to_string, [](Session* self) {
+            String str = "Session";
+            if (self->getName().isNotEmpty())
+                str << ": " << self->getName();
+            return str.toStdString();
+        },
+
+        sol::meta_function::length, [](Session* self) { return self->getNumGraphs(); },
+        sol::meta_function::index, [](Session* self, int index) {
+            return isPositiveAndBelow (--index, self->getNumGraphs())
+                ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
+                : std::shared_ptr<Node>();
+        },
+
+        "name", sol::property (
+            [](Session& self, const char* name) -> void {
+                self.setName (String::fromUTF8 (name));
+            }, 
+            [](Session& self) -> std::string {
+                return self.getName().toStdString();
+            }
+        ),
+
+        /// Convert to an XML string
+        // @function Session:toxmlstring
+        // @return XML formatted string of the session
+        "toxmlstring", [](Session& self) -> std::string {
+            auto tree = self.getValueTree().createCopy();
+            Node::sanitizeRuntimeProperties (tree, true);
+            return tree.toXmlString().toStdString();
+        }
+        
+       #if 0
+        "clear",                    &Session::clear,
+        "get_num_graphs",           &Session::getNumGraphs,
+        "get_graph",                &Session::getGraph,
+        "get_active_graph",         &Session::getActiveGraph,
+        "get_active_graph_index",   &Session::getActiveGraphIndex,
+        "add_graph",                &Session::addGraph,
+        "save_state",               &Session::saveGraphState,
+        "restore_state",            &Session::restoreGraphState
+       #endif
+    );
+
+    sol::stack::push (L, kv::lua::remove_and_clear (M, "Session"));
+    return 1;
+}

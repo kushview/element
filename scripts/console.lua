@@ -1,15 +1,21 @@
 --- Console init.
--- Runs when the console is loaded in the GUI. This annonymous script sets global
+-- Runs when the console is loaded in the GUI. This anonymous script sets global
 -- variables, so be careful if you use it directly.
 -- @script console
+-- @pragma nostrip
+-- @kind anonymous
 
 io      = require ('io')
 object  = require ('kv.object')
+command = require ('el.command')
 script  = require ('el.script')
 
---- Built-in console helper table
 console = {
-    --- Print to stdout instead of the GUI display
+    --- Log to stdout.
+    -- Calls `tostring` on each argument then prints the combined result to 
+    -- stdout
+    -- @function console.log
+    -- @param ... Things to log
     log = function (...)
         local out = ""
         for i = 1, select ('#', ...) do

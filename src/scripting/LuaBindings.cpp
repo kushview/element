@@ -17,8 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/// @module element
-
 #include <memory>
 
 #include "controllers/AppController.h"
@@ -35,10 +33,27 @@
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
-#include "Globals.h"
+
 #include "Settings.h"
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
+
+namespace sol {
+/** Support juce::ReferenceCountedObjectPtr */
+template <typename T>
+struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
+    typedef T type;
+    typedef ReferenceCountedObjectPtr<T> actual_type;
+    static const bool value = true;
+    static bool is_null (const actual_type& ptr)    { return ptr == nullptr; }
+    static type* get (const actual_type& ptr)       { return ptr.get(); }
+};
+}
+
+#include "../../element/lua/el/CommandManager.cpp"
+#include "../../element/lua/el/Globals.cpp"
+#include "../../element/lua/el/Node.cpp"
+#include "../../element/lua/el/Session.cpp"
 
 extern "C" {
 extern int luaopen_kv_audio (lua_State* L);
@@ -62,17 +77,6 @@ extern int luaopen_kv_Point (lua_State*);
 extern int luaopen_kv_Rectangle (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
 
-namespace sol {
-/** Support juce::ReferenceCountedObjectPtr */
-template <typename T>
-struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
-    typedef T type;
-    typedef ReferenceCountedObjectPtr<T> actual_type;
-    static const bool value = true;
-    static bool is_null (const actual_type& ptr)    { return ptr == nullptr; }
-    static type* get (const actual_type& ptr)       { return ptr.get(); }
-};
-}
 
 using namespace sol;
 
@@ -87,122 +91,6 @@ void openUI (state& lua)
         "enabled", sol::property (
             []() -> bool { return SystemTray::getInstance() != nullptr; },
             SystemTray::setEnabled));
-}
-
-LUAMOD_API int luaopen_el_Session (lua_State* L) {
-    sol::state_view lua (L);
-    auto M = lua.create_table();
-    M.new_usertype<Session> ("Session", no_constructor,
-        meta_function::to_string, [](Session* self) {
-            String str = "Session";
-            if (self->getName().isNotEmpty())
-                str << ": " << self->getName();
-            return str.toStdString();
-        },
-
-        meta_function::length, [](Session* self) { return self->getNumGraphs(); },
-
-        meta_function::index, [](Session* self, int index) {
-            return isPositiveAndBelow (--index, self->getNumGraphs())
-                ? std::make_shared<Node> (self->getGraph(index).getValueTree(), false)
-                : std::shared_ptr<Node>();
-        },
-
-        "name", sol::property (
-            [](Session& self, const char* name) -> void {
-                self.setName (String::fromUTF8 (name));
-            }, 
-            [](Session& self) -> std::string {
-                return self.getName().toStdString();
-            }
-        ),
-        "toXmlString", [](Session *self) -> std::string {
-            auto tree = self->getValueTree().createCopy();
-            Node::sanitizeRuntimeProperties (tree, true);
-            return tree.toXmlString().toStdString();
-        }
-        
-       #if 0
-        "clear",                    &Session::clear,
-        "get_num_graphs",           &Session::getNumGraphs,
-        "get_graph",                &Session::getGraph,
-        "get_active_graph",         &Session::getActiveGraph,
-        "get_active_graph_index",   &Session::getActiveGraphIndex,
-        "add_graph",                &Session::addGraph,
-        "save_state",               &Session::saveGraphState,
-        "restore_state",            &Session::restoreGraphState
-       #endif
-    );
-
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Session"));
-    return 1;
-}
-
-LUAMOD_API int luaopen_el_Node (lua_State* L) {
-    sol::state_view lua (L);
-    auto M = lua.create_table();
-    M.new_usertype<Node> ("Node", no_constructor,
-        meta_function::to_string, [](const Node& self) -> std::string {
-            String str = self.isGraph() ? "Graph" : "Node";
-            if (self.getName().isNotEmpty())
-                str << ": " << self.getName();
-            return std::move (str.toStdString());
-        },
-        meta_function::length,  &Node::getNumNodes,
-        meta_function::index,   [](Node* self, int index)
-        {
-            const auto child = self->getNode (index - 1);
-            return child.isValid() ? std::make_shared<Node> (child.getValueTree(), false)
-                                   : std::shared_ptr<Node>();
-        },
-        "valid",                readonly_property (&Node::isValid),
-        "name", property (
-            [](Node* self) { return self->getName().toStdString(); },
-            [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
-        ),
-        "displayname",          readonly_property ([](Node* self) { return self->getDisplayName().toStdString(); }),
-        "pluginname",           readonly_property ([](Node* self) { return self->getPluginName().toStdString(); }),
-        "missing",              readonly_property (&Node::isMissing),
-        "enabled",              readonly_property (&Node::isEnabled),
-        "graph",                readonly_property (&Node::isGraph),
-        "root",                 readonly_property (&Node::isRootGraph),
-        "nodeid",               readonly_property (&Node::getNodeId),
-        "uuid",                 readonly_property (&Node::getUuid),
-        "uuidstring",           readonly_property (&Node::getUuidString),
-        "type",                 readonly_property (&Node::getNodeType),
-        "muted",                property (&Node::isMuted, &Node::setMuted),
-        "bypassed",             readonly_property (&Node::isBypassed),
-        "editor",               readonly_property (&Node::hasEditor),
-
-        "toxmlstring", [](Node* self) -> std::string
-        {
-            auto copy = self->getValueTree().createCopy();
-            Node::sanitizeRuntimeProperties (copy, true);
-            return copy.toXmlString().toStdString();
-        },
-        "resetports",           &Node::resetPorts,
-        "savestate",            &Node::savePluginState,
-        "restoretate",          &Node::restorePluginState,
-        "writefile", [](const Node& node, const char* filepath) -> bool {
-            if (! File::isAbsolutePath (filepath))
-                return false;
-            return node.writeToFile (File (String::fromUTF8 (filepath)));
-        }
-        
-       #if 0
-        "has_modified_name",    &Node::hasModifiedName,
-        "has_node_type",        &Node::hasNodeType,
-        "get_parent_graph",     &Node::getParentGraph,
-        "is_child_of_root_graph", &Node::isChildOfRootGraph,
-        "is_muting_inputs",     &Node::isMutingInputs,
-        "set_mute_input",       &Node::setMuteInput,
-        "get_num_nodes",        &Node::getNumNodes,
-        "get_node",             &Node::getNode,
-       #endif
-    );
-
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Node"));
-    return 1;
 }
 
 static void openModel (sol::state& lua)
@@ -232,7 +120,6 @@ void openKV (state& lua)
 {
     auto kv   = NS (lua, "element");
     
-    // PortType
     kv.new_usertype<kv::PortType> ("PortType", no_constructor,
         call_constructor, factories (
             [](int t) {
@@ -255,7 +142,6 @@ void openKV (state& lua)
 
     kv.new_usertype<kv::PortDescription> ("PortDescription", no_constructor);
     
-    // PortList
     kv.new_usertype<kv::PortList> ("PortList",
         sol::constructors<kv::PortList()>(),
         meta_method::to_string, [](MidiPipe*) { return "element.PortList"; },
@@ -268,80 +154,6 @@ void openKV (state& lua)
     );
 }
 
-LUAMOD_API int luaopen_el_CommandManager (lua_State* L)
-{
-    sol::state_view lua (L);
-    auto M = lua.create_table();
-    /// Command Manager
-    // @type CommandManager
-    M.new_usertype<CommandManager> ("CommandManager", no_constructor,
-        /// Invoke a command directly
-        // @int command Command ID to invoke
-        // @bool async Invoke now or aysnc
-        // @function CommandManager:invoke_directly
-        // @treturn bool True if success
-        "invoke_directly",   &CommandManager::invokeDirectly
-    );
-
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "CommandManager"));
-    return 1;
-}
-
-static int el_Globals_instance (lua_State* L) {
-    sol::state_view lua (L);
-    auto& _G = lua.globals();
-    sol::stack::push (L, _G.get_or<sol::userdata> ("el.globals", sol::lua_nil));
-    return 1;
-}
-
-LUAMOD_API int luaopen_el_Globals (lua_State* L)
-{
-    using Element::Globals;
-    sol::state_view lua (L);
-    auto M = lua.create_table();
-    /// A collection of global objects 
-    // @type Globals
-    M.new_usertype<Globals> ("Globals", sol::no_constructor,
-        "instance",      el_Globals_instance,
-        /// Get the current audio engine
-        // @function audioengine
-        // @treturn el.AudioEngine
-        "audio",          &Globals::getAudioEngine,
-        "commands",       &Globals::getCommandManager,
-        "devices",        &Globals::getDeviceManager,
-        "mappings",              &Globals::getMappingEngine,
-        // "media_manager",        &Globals::getMediaManager,
-        "midi",          &Globals::getMidiEngine,
-        "plugins",       &Globals::getPluginManager,
-        "presets",              &Globals::getPresetCollection,
-        "session",              &Globals::getSession,
-        "settings",             &Globals::getSettings
-    );
-
-    sol::stack::push (L, kv::lua::remove_and_clear (M, "Globals"));
-    return 1;
-}
-
-static void openWorld (Globals& world, state& lua)
-{
-    auto e = lua["element"].get_or_create<sol::table>();
-    auto C = e; // ["C"].get_or_create<sol::table>();
-
-    C.new_usertype<AppController> ("AppController", no_constructor);
-    C.new_usertype<GuiController> ("GuiController", no_constructor);
-    C.new_usertype<AudioEngine> ("AudioEngine", no_constructor);
-    C.new_usertype<DeviceManager> ("DeviceManager", no_constructor);
-    C.new_usertype<MappingEngine> ("MappingEngine", no_constructor);
-    C.new_usertype<MidiEngine> ("MidiEngine", no_constructor);
-    C.new_usertype<PluginManager> ("PluginManager", no_constructor);
-    C.new_usertype<PresetCollection> ("PresetCollection", no_constructor);
-    C.new_usertype<Settings> ("Settings", no_constructor);
-}
-
-void openDSP (sol::state& lua)
-{
-    // kv_openlibs (lua.lua_state(), 0);
-}
 
 //=============================================================================
 EL_EXPORT int luaopen_element_ui (lua_State* L)
@@ -352,16 +164,6 @@ EL_EXPORT int luaopen_element_ui (lua_State* L)
     return 1;
 }
 
-EL_EXPORT int luaopen_juce (lua_State* L)
-{
-    sol::state_view lua (L);
-    auto M = lua.create_table();
-    sol::stack::push (L, M);
-    return 1;
-}
-
-
-
 static File getRootPath()
 {
     return File::getCurrentWorkingDirectory();
@@ -370,6 +172,23 @@ static File getRootPath()
 static File scriptsDir()
 {
     return getRootPath().getChildFile ("scripts");
+}
+
+static String getScriptSearchPath()
+{
+    Array<File> paths ({
+        scriptsDir(),
+        File::getSpecialLocation (File::userHomeDirectory).getChildFile(".local/lib/element/scripts"),
+    });
+    
+    StringArray path;
+
+    for (const auto& dir : paths)
+    {
+        path.add (dir.getFullPathName() + "/?.lua");
+    }
+
+    return path.joinIntoString (";");
 }
 
 static String getCSearchPath()
@@ -529,9 +348,8 @@ void initializeState (sol::state_view& lua) {
     auto searchers = lua["package"]["searchers"].get<sol::table>();
     searchers.add (searcher);
 
-    lua["package"]["path"] = getSearchPath().toStdString();
-    auto path = scriptsDir().getFullPathName(); path << "/?.lua";
-    lua["package"]["spath"] = path.toStdString();
+    lua["package"]["path"]  = getSearchPath().toStdString();
+    lua["package"]["spath"] = getScriptSearchPath().toStdString();
 }
 
 void initializeState (sol::state_view& lua, Globals& world)

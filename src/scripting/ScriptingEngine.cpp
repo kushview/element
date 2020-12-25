@@ -24,12 +24,6 @@
 
 namespace Element {
 
-ScriptingEngine::Environment::Environment (sol::state& state)
-    : lua (state), env (lua, sol::create, lua.globals())
-{ }
-
-ScriptingEngine::Environment::~Environment() { }
-
 //=============================================================================
 ScriptingEngine::ScriptingEngine() {}
 ScriptingEngine::~ScriptingEngine()
@@ -38,15 +32,9 @@ ScriptingEngine::~ScriptingEngine()
     lua.globals().set ("element.world", sol::lua_nil);
 }
 
-ScriptingEngine::Environment* ScriptingEngine::createEnvironment()
-{
-    return new Environment (lua);
-}
-
 void ScriptingEngine::initialize (Globals& w)
 {
     world = &w;
-
     Lua::initializeState (lua, *world);
 }
 

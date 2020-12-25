@@ -32,31 +32,14 @@ public:
     ScriptingEngine();
     ~ScriptingEngine();
 
-    class Environment
-    {
-    public:
-        ~Environment();
-        sol::environment get() const { return env; }
-        sol::state& getState() { return lua; }
-
-    private:
-        friend class ScriptingEngine;
-        Environment (sol::state&);
-        sol::state& lua;
-        sol::environment env;
-    };
-
-    Environment* createEnvironment();
     sol::state& getState()                  { return lua; }
     const sol::state& getState() const      { return lua; }
-
     Result execute (const String& code);
 
 private:
     friend Globals;
     Globals* world = nullptr;
     sol::state lua;
-    HashMap<String, File> scriptFiles;
     void initialize (Globals&);
 };
 
