@@ -39,7 +39,6 @@ public:
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:
-    CodeDocument document;
     kv::LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
     TextButton compileButton;
@@ -50,6 +49,9 @@ private:
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
 
+    CodeDocument& getActiveDoc();
+    void updateAll();
+    void updateCodeEditor();
     void updateProperties();
     void onPortsChanged();
 };

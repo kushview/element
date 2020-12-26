@@ -44,95 +44,6 @@ require ('kv.audio')
 require ('el.MidiPipe')
 )";
 
-static const String stereoAmpScript = 
-R"(--- Stereo Amplifier in Lua
---
--- This script came with Element and is in the public domain.
---
--- The code contained implements a simple stereo amplifier plugin.
--- It does not try to smooth the volume parameter and could cause
--- zipper noise.
---
--- The Lua filter node is highly experimental and the API is subject 
--- to change without warning.  Please bear with us as we move toward 
--- a stable version. If you are a developer and want to help out, 
--- see https://github.com/kushview/element
-
-local audio = require ('kv.audio')
-
---- Gain parameters.
--- Used for fading between changes in volume
-local start_gain = 1.0
-local end_gain = 1.0
-
--- Return a table of audio/midi inputs and outputs
-function node_io_ports()
-   return {
-      audio_ins   = 2,
-      audio_outs  = 2,
-      midi_ins    = 0,
-      midi_outs   = 0
-   }
-end
-
--- Return parameters
-function node_params()
-   return {
-      {
-         name    = "Volume",
-         label   = "dB",
-         type    = "float",
-         flow    = "input",
-         min     = -90.0,
-         max     = 24.0,
-         default = 0.0
-      }
-   }
-end
-
---- Prepare for rendering
---  Allocate any special data needed here
-function node_prepare (rate, block)
-   -- nothing to do in this example
-end
-
---- Render audio and midi
--- Use the provided audio and midi objects to process your plugin
--- @param a     The source kv.AudioBuffer
--- @param m     The source el.MidiPipe
-function node_render (a, m)
-   end_gain = audio.togain (Param.values [1])
-   a:fade (start_gain, end_gain)
-   start_gain = end_gain
-end
-
---- Release node resources
--- Free any allocated resources in this callback
-function node_release()
-end
-
---- Save node state
---
--- This is an optional function you can implement to save state.  
--- The host will prepare the IO stream so all you have to do is 
--- `io.write(...)` your data
---
--- Note: Parameter values will automatically be saved and restored,
--- you do not need to handle them here.
-function node_save()
-   io.write("some custom state data")
-end
-
---- Restore node state
--- This is an optional function you can implement to restore state.  
--- The host will prepare the IO stream so all you have to do is 
--- `io.read(...)` your data previsouly written in `node_save()`
-function node_restore()
-   print ("restored data:")
-   print (io.read ("*a"));
-end
-)";
-
 namespace Element {
 
 //=============================================================================
@@ -756,11 +667,10 @@ Result ScriptNode::loadScript (const String& newCode)
     if (! dsp.valid() || dsp.get_type() != sol::type::table)
         return Result::fail ("Could not instantiate script");
 
-    auto newScript = std::unique_ptr<DSPScript> (new DSPScript (dsp));
+    auto newScript = std::make_unique<DSPScript> (dsp);
     
     if (true)
     {
-        code = draftCode = newCode;
         if (prepared)
             newScript->prepare (sampleRate, blockSize);
         triggerPortReset();
@@ -825,10 +735,12 @@ void ScriptNode::setState (const void* data, int size)
     if (state.isValid())
     {
         // May want to do this procedure async with a Message::post()
-        auto result = loadScript (state["script"].toString());
+        auto result = loadScript (state["dspCode"].toString());
 
         if (result.wasOk())
         {
+            dspCode.replaceAllContent (state["dspCode"].toString());
+            edCode.replaceAllContent (state["editorCode"].toString());
             if (state.hasProperty ("params"))
             {
                 const var& params = state.getProperty ("params");
@@ -845,6 +757,7 @@ void ScriptNode::setState (const void* data, int size)
                         script->restore (block->getData(), block->getSize());
             }
         }
+
         sendChangeMessage();
     }
 }
@@ -852,8 +765,8 @@ void ScriptNode::setState (const void* data, int size)
 void ScriptNode::getState (MemoryBlock& block)
 {
     ValueTree state ("ScriptNodeState");
-    state.setProperty ("script", code, nullptr)
-         .setProperty ("draft",  draftCode, nullptr);
+    state.setProperty ("dspCode", dspCode.getAllContent(), nullptr)
+         .setProperty ("editorCode", edCode.getAllContent(), nullptr);
 
     MemoryBlock scriptBlock;
     script->getParameterData (scriptBlock);

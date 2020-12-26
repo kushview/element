@@ -151,27 +151,18 @@ ScriptNodeEditor::ScriptNodeEditor (const Node& node)
     jassert (lua);
 
     setOpaque (true);
-    editor.reset (new CodeEditorComponent (document, &tokens));
-    addAndMakeVisible (editor.get());
-    editor->setTabSize (4, true);
-    editor->setFont (editor->getFont().withHeight (18));
-    editor->loadContent (lua->getDraftScript());
-    editor->setColourScheme (luaColors());
 
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
     compileButton.onClick = [this]()
     {
-        if (auto* const lua = getNodeObjectOfType<ScriptNode>())
-        {
-            const auto script = document.getAllContent();
-            auto result = lua->loadScript (script);
-            if (! result.wasOk())
-            {
-                AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                    "Script Error", result.getErrorMessage());
-            }
-        }
+        // const auto script = document.getAllContent();
+        // auto result = lua->loadScript (script);
+        // if (! result.wasOk())
+        // {
+        //     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+        //         "Script Error", result.getErrorMessage());
+        // }
     };
 
     addAndMakeVisible (editorButton);
@@ -188,41 +179,45 @@ ScriptNodeEditor::ScriptNodeEditor (const Node& node)
     modeButton.setButtonText ("Script");
     modeButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
     modeButton.onClick = [this]()
-    {
+    { 
         modeButton.setToggleState (! modeButton.getToggleState(), dontSendNotification);
-        modeButton.setButtonText (
-            modeButton.getToggleState() ? "Editor" : "Script"
-        );
-
-        if (modeButton.getToggleState())
-        {
-            lua->setDraftScript (document.getAllContent());
-            editor->loadContent ("EDitor");
-        }
-        else
-        {
-            editor->loadContent (lua->getDraftScript());
-        }
+        modeButton.setButtonText (modeButton.getToggleState() ? "Editor" : "Script");
+        updateCodeEditor();
     };
 
     addAndMakeVisible (props);
     props.setVisible (editorButton.getToggleState());
 
-    updateProperties();
+    updateAll();
+
     lua->addChangeListener (this);
     portsChangedConnection = lua->portsChanged.connect (
         std::bind (&ScriptNodeEditor::onPortsChanged, this));
+
     setSize (660, 480);
 }
 
 ScriptNodeEditor::~ScriptNodeEditor()
 {
     portsChangedConnection.disconnect();
-    if (auto* const lua = getNodeObjectOfType<ScriptNode>())
-    {
-        lua->removeChangeListener (this);
-        lua->setDraftScript (document.getAllContent());
-    }
+    lua->removeChangeListener (this);
+    editor.reset();
+}
+
+void ScriptNodeEditor::updateAll()
+{
+    updateCodeEditor();
+    updateProperties();
+}
+
+void ScriptNodeEditor::updateCodeEditor()
+{
+    editor.reset (new CodeEditorComponent (getActiveDoc(), &tokens));
+    addAndMakeVisible (editor.get());
+    editor->setTabSize (4, true);
+    editor->setFont (editor->getFont().withHeight (18));
+    editor->setColourScheme (luaColors());
+    resized();
 }
 
 void ScriptNodeEditor::updateProperties()
@@ -243,10 +238,14 @@ void ScriptNodeEditor::onPortsChanged()
     updateProperties();
 }
 
+CodeDocument& ScriptNodeEditor::getActiveDoc()
+{
+    return lua->getCodeDocument (modeButton.getToggleState());
+}
+
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
-    editor->loadContent (lua->getDraftScript());
-    updateProperties();
+    updateAll();
     resized();
 }
 

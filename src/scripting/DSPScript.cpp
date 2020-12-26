@@ -373,7 +373,7 @@ void DSPScript::addParameterPorts()
             }
 
             ports.addControl (index++, channel, sym, name,
-                                min, max, dfault, isInput);
+                              min, max, dfault, isInput);
         }
 
         numParams = ports.size (PortType::Control, true);

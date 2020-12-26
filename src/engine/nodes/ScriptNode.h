@@ -35,7 +35,7 @@ public:
 
     explicit ScriptNode() noexcept;
     virtual ~ScriptNode();
-    
+
     struct Context;
 
     void fillInPluginDescription (PluginDescription& desc);
@@ -44,13 +44,10 @@ public:
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
-    
+
     Result loadScript (const String&);
 
-    const String& getScript() const { return code; }
-    const String& getDraftScript() const { return draftCode; }
-    void setDraftScript (const String& draft) { draftCode = draft; }
-    bool hasChanges() const { return code.hashCode64() != draftCode.hashCode64(); }
+    CodeDocument& getCodeDocument (bool forEditor = false) { return forEditor ? edCode : dspCode; }
 
     /** Set a parameter value by index
      
@@ -65,14 +62,15 @@ protected:
     Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:
-    String code, draftCode;
+    CriticalSection lock;
+    sol::state lua;
+    CodeDocument dspCode, edCode;
+    std::unique_ptr<DSPScript> script;
+    ParameterArray inParams, outParams;
+
     int blockSize = 512;
     double sampleRate = 44100.0;
     bool prepared = false;
-    CriticalSection lock;
-    sol::state lua;
-    std::unique_ptr<DSPScript> script;
-    ParameterArray inParams, outParams;
 };
 
 }
