@@ -53,7 +53,7 @@ struct ScriptDescription final
     static ScriptDescription parse (const String& buffer);
     static ScriptDescription parse (File file);
 
-    bool isValid() const { return name.isNotEmpty() && type.isNotEmpty(); }
+    bool isValid() const { return name.isNotEmpty(); }
 };
 
 }
