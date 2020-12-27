@@ -6,9 +6,9 @@
 
 namespace Element {
 
-static void scanForScripts (File dir, Array<ScriptDescription>& results)
+static void scanForScripts (File dir, Array<ScriptDescription>& results, bool recursive = true)
 {
-    for (DirectoryEntry entry : RangedDirectoryIterator (dir, false, "*.lua"))
+    for (DirectoryEntry entry : RangedDirectoryIterator (dir, recursive, "*.lua"))
     {
         ScriptDescription desc;
         try {

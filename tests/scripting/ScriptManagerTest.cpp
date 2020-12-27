@@ -35,7 +35,8 @@ public:
         beginTest ("scanDefaultLocation");
         ScriptManager scripts;
         scripts.scanDefaultLocation();
-        expect (scripts.getNumScripts() == 3, "Wrong number of default scripts");
+        expect (scripts.getNumScripts() == 5, 
+                String("Wrong number of default scripts: ") + String (scripts.getNumScripts()));
     }
 };
 
