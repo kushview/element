@@ -152,78 +152,6 @@ public:
 static ScriptTest sScriptTest;
 
 //=============================================================================
-const static String sAmp = R"(
-local Amp = {}
-local audio  = require ('kv.audio')
-
-local gain1 = 1.0
-local gain2 = 1.0
-local statedata = "some save data from save/restore"
-
-Amp.rate = 0
-Amp.block = 0
-Amp.released = false
-Amp.initialized = false
-
-function Amp.init()
-    gain1 = 0.0
-    gain2 = 0.0
-    Amp.initialized = true
-end
-
-function Amp.layout()
-    print ("Amp.layout")
-    return {
-        audio = { 2, 2 },
-        midi  = { 0, 0 }
-    }
-end
-
-function Amp.params()
-    return {
-        {
-            name    = "Volume",
-            label   = "dB",
-            type    = "float",
-            flow    = "input",
-            min     = -90.0,
-            max     = 24.0,
-            default = 0.0
-        }
-    }
-end
-
-function Amp.prepare (r, b)
-    print ("Amp.prepare", r, b)
-    begintest ("correct rate and block")
-    expect (r == 44100)
-    expect (b == 4096)
-    Amp.rate = r
-    Amp.block = b
-end
-
-function Amp.process (a, m)
-    a:fade (gain1, gain2)
-end
-
-function Amp.release()
-    Amp.released = true
-end
-
-function Amp.save()
-   io.write (statedata)
-end
-
-function Amp.restore()
-   begintest ("read saved data")
-   expect (io.read ("a") == statedata);
-end
-
-return Amp
-
-)";
-
-//=============================================================================
 class DSPScriptTest : public LuaUnitTest
 {
 public:
@@ -235,7 +163,7 @@ public:
         {
             beginTest ("load");
             auto script = std::unique_ptr<Script> (new Script (lua));
-            script->load (sAmp);
+            script->load (readSnippet ("test_dsp_script_01.lua"));
             if (script->hasError())
             {
                 expect (false, String ("Could not load script: ") + script->getErrorMessage());
@@ -269,18 +197,18 @@ public:
             expect (Amp.get_or ("rate", 0.0) == 44100.0, String (Amp.get_or ("rate", 0)));
             expect (Amp.get_or ("block", 0.0) == 4096.0, String (Amp.get_or ("block", 0)));
 
-            beginTest ("processed");
+            
             AudioSampleBuffer audio (2, 4096);
             for (int c = 0; c < 2; ++c)
                 for (int f = 0; f < 4096; ++f)
                     audio.setSample (c, f, 1.0);
             MidiPipe midi;
+
+            dsp.setParameter (0, -95.0);
             dsp.process (audio, midi);
 
-            for (int c = 0; c < 2; ++c)
-                for (int f = 0; f < 4096; ++f)
-                    if (audio.getSample (c, f) < -0.00001 || audio.getSample (c, f) > 0.00001)
-                        { expect (false, "bad rendering"); return; }
+            beginTest ("processed");
+            expect (audio.getSample (0, 4095) < 1.0, String (audio.getSample(0, 4095)));
 
             MemoryBlock block;
             beginTest ("save");

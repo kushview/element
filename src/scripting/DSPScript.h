@@ -46,25 +46,25 @@ public:
         if (sol::function f = DSP ["prepare"])
             f (rate, block);
     }
-
     void release()
     {
         if (sol::function f = DSP ["release"])
             f();
     }
 
+    void process (AudioSampleBuffer& a, MidiPipe& m);
+    
+    void save (MemoryBlock& block);
+    void restore (const void* data, size_t size);
+
     const kv::PortList& getPorts() const { return ports; }
     void getPorts (kv::PortList& out);
 
     int getNumParameters() const { return numParams; }
-    void setParameter (int, float) {}
-    void copyParameterValues (const DSPScript&) const {}
-    void getParameterData (MemoryBlock&) {}
-    void setParameterData (MemoryBlock&) {}
-
-    void process (AudioSampleBuffer& a, MidiPipe& m);
-    void save (MemoryBlock& block);
-    void restore (const void* data, size_t size);
+    void setParameter (int, float);
+    void copyParameterValues (const DSPScript&);
+    void getParameterData (MemoryBlock&);
+    void setParameterData (MemoryBlock&);
 
 private:
     sol::table DSP;
@@ -77,10 +77,12 @@ private:
     lua_State* L                = nullptr;
     bool loaded                 = false;
     int numParams               = 0;
-    float paramData [128];
+    enum { maxParams = 128 };
+    float paramData [maxParams];
+    sol::userdata params;
     kv::PortList ports;
 
-    void derefAudioMidi();
+    void deref();
     void addAudioMidiPorts();
     void addParameterPorts();
 };

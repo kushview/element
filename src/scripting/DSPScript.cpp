@@ -57,16 +57,25 @@ DSPScript::DSPScript (sol::table tbl)
         addParameterPorts();
     }
 
+    if (ok)
+    {
+        sol::state_view view (L);
+        auto tmp = view.create_table();
+        tmp["params"] = &paramData;
+        params = tmp["params"];
+        ok = params.valid();
+    }
+
     loaded = ok;
     if (! loaded)
     {
-        derefAudioMidi();
+        deref();
     }
 }
 
 DSPScript::~DSPScript()
 {
-    derefAudioMidi();
+    deref();
 }
 
 Result DSPScript::validate (const String& script)
@@ -161,23 +170,22 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
     if (! loaded)
         return;
 
-    const auto nchans  = a.getNumChannels();
-    const auto nframes = a.getNumSamples();
-    const auto nmidi   = m.getNumBuffers();
-
     if (lua_rawgeti (L, LUA_REGISTRYINDEX, processRef) == LUA_TFUNCTION)
     {
         if (lua_rawgeti (L, LUA_REGISTRYINDEX, audioRef) == LUA_TUSERDATA)
         {
             if (lua_rawgeti (L, LUA_REGISTRYINDEX, midiRef) == LUA_TUSERDATA)
             {
-                (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
-                        a.getNumChannels(), a.getNumSamples());
-                (*midi)->swapWith (m);
+                if (lua_rawgeti (L, LUA_REGISTRYINDEX, params.registry_index()) == LUA_TUSERDATA)
+                {
+                    (*audio)->setDataToReferTo (a.getArrayOfWritePointers(),
+                            a.getNumChannels(), a.getNumSamples());
+                    (*midi)->swapWith (m);
 
-                lua_call (L, 2, 0);
-                
-                (*midi)->swapWith (m);
+                    lua_call (L, 3, 0);
+                    
+                    (*midi)->swapWith (m);
+                }
             }
         }
     }
@@ -259,14 +267,38 @@ void DSPScript::restore (const void* data, size_t size)
     }
 }
 
-void DSPScript::derefAudioMidi()
+void DSPScript::setParameter (int index, float value)
+{
+    jassert (index < maxParams);
+    paramData [index] = value;
+}
+
+void DSPScript::copyParameterValues (const DSPScript& o)
+{
+    for (int i = jmin (numParams, o.numParams); --i >= 0;)
+        paramData[i] = o.paramData[i];
+}
+
+void DSPScript::getParameterData (MemoryBlock& block)
+{
+    block.append (paramData, sizeof(float) * static_cast<size_t> (numParams));
+}
+
+void DSPScript::setParameterData (MemoryBlock& block)
+{
+    jassert (block.getSize() % sizeof(float) == 0);
+    jassert (block.getSize() < sizeof(float) * maxParams);
+    memcpy (paramData, block.getData(), block.getSize());
+}
+
+void DSPScript::deref()
 {
     loaded = false;
     audio = nullptr;
-    luaL_unref (DSP.lua_state(), LUA_REGISTRYINDEX, audioRef);
+    luaL_unref (L, LUA_REGISTRYINDEX, audioRef);
     audioRef = LUA_REFNIL;
     midi = nullptr;
-    luaL_unref (DSP.lua_state(), LUA_REGISTRYINDEX, midiRef);
+    luaL_unref (L, LUA_REGISTRYINDEX, midiRef);
     midiRef = LUA_REFNIL;
 }
 
