@@ -56,6 +56,8 @@ public:
     */
     void setParameter (int index, float value);
 
+    lua_State* getLuaState() const { return lua.lua_state(); }
+
 protected:
     inline bool wantsMidiPipe() const override { return true; }
     void createPorts() override;

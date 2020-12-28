@@ -734,13 +734,14 @@ void ScriptNode::setState (const void* data, int size)
     const auto state = ValueTree::readFromGZIPData (data, size);
     if (state.isValid())
     {
+        dspCode.replaceAllContent (state["dspCode"].toString());
+        edCode.replaceAllContent  (state["editorCode"].toString());
+
         // May want to do this procedure async with a Message::post()
-        auto result = loadScript (state["dspCode"].toString());
+        auto result = loadScript (dspCode.getAllContent());
 
         if (result.wasOk())
         {
-            dspCode.replaceAllContent (state["dspCode"].toString());
-            edCode.replaceAllContent (state["editorCode"].toString());
             if (state.hasProperty ("params"))
             {
                 const var& params = state.getProperty ("params");
