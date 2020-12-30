@@ -20,6 +20,7 @@
 #pragma once
 
 #include "sol/sol.hpp"
+#include "engine/Parameter.h"
 #include "scripting/ScriptInstance.h"
 #include "JuceHeader.h"
 
@@ -61,7 +62,9 @@ public:
     void getPorts (kv::PortList& out);
 
     int getNumParameters() const { return numParams; }
-    void setParameter (int, float);
+
+    Element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
+
     void copyParameterValues (const DSPScript&);
     void getParameterData (MemoryBlock&);
     void setParameterData (MemoryBlock&);
@@ -82,9 +85,14 @@ private:
     sol::userdata params;
     kv::PortList ports;
 
+    class Parameter; friend class Parameter;
+    ReferenceCountedArray<Parameter> inParams, outParams;
+
     void deref();
     void addAudioMidiPorts();
     void addParameterPorts();
+    void unlinkParams();
+    void setParameter (int, float);
 };
 
 }

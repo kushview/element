@@ -6,6 +6,46 @@
 using namespace kv;
 namespace Element {
 
+//==============================================================================
+class DSPScript::Parameter : public ControlPortParameter,
+                             public Element::Parameter::Listener
+{
+public:
+    Parameter (DSPScript* c, const PortDescription& port)
+        : ControlPortParameter (port),
+          ctx (c)
+    {
+        const auto sp = getPort();
+        set (sp.defaultValue);
+        addListener (this);
+    }
+
+    ~Parameter() override
+    {
+        unlink();
+    }
+
+    String getLabel() const override { return {}; }
+
+    void unlink()
+    {
+        removeListener (this);
+        ctx = nullptr;
+    }
+
+    void controlValueChanged (int index, float value) override
+    {
+        if (ctx != nullptr) // index may not be set so use port channel.
+            ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
+    }
+
+    void controlTouched (int parameterIndex, bool gestureIsStarting) override {}
+
+private:
+    DSPScript* ctx { nullptr };
+};
+
+//==============================================================================
 DSPScript::DSPScript (sol::table tbl)
     : DSP (tbl)
 {
@@ -75,6 +115,7 @@ DSPScript::DSPScript (sol::table tbl)
 
 DSPScript::~DSPScript()
 {
+    unlinkParams();
     deref();
 }
 
@@ -269,7 +310,6 @@ void DSPScript::restore (const void* data, size_t size)
 
 void DSPScript::setParameter (int index, float value)
 {
-    jassert (index < maxParams);
     paramData [index] = value;
 }
 
@@ -364,6 +404,12 @@ void DSPScript::addAudioMidiPorts()
     }
 }
 
+Element::Parameter::Ptr
+DSPScript::getParameterObject (int index, bool input) const
+{
+    return input ? inParams[index] : outParams[index];
+}
+
 void DSPScript::addParameterPorts()
 {
     sol::function f = DSP ["params"];
@@ -409,7 +455,28 @@ void DSPScript::addParameterPorts()
         }
 
         numParams = ports.size (PortType::Control, true);
+
+        unlinkParams();
+        for (const auto* port : ports.getPorts())
+        {
+            if (port->type == PortType::Control && port->input)
+                inParams.add (new Parameter (this, *port));
+            else if (port->type == PortType::Control && !port->input)
+                outParams.add (new Parameter (this, *port));
+        }
     }
     catch (const std::exception&) {}
 }
+
+void DSPScript::unlinkParams()
+{
+    for (auto* p : inParams)
+        p->unlink();
+    for (auto* p : outParams)
+        p->unlink();
+    
+    inParams.clearQuick();
+    outParams.clearQuick();
+}
+
 }
