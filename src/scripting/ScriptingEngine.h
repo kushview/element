@@ -32,6 +32,7 @@ public:
     ScriptingEngine();
     ~ScriptingEngine();
 
+    lua_State* getLuaState() const          { return lua.lua_state(); }
     sol::state& getState()                  { return lua; }
     const sol::state& getState() const      { return lua; }
     Result execute (const String& code);

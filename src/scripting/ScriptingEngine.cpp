@@ -24,6 +24,14 @@
 
 namespace Element {
 
+namespace LuaHelpers {
+
+static int exceptionHandler (lua_State* L, sol::optional<const std::exception &> e, sol::string_view description) {
+    return sol::stack::push (L, description);
+}
+
+}
+
 //=============================================================================
 ScriptingEngine::ScriptingEngine() {}
 ScriptingEngine::~ScriptingEngine()
@@ -36,6 +44,7 @@ void ScriptingEngine::initialize (Globals& w)
 {
     world = &w;
     Lua::initializeState (lua, *world);
+    lua.set_exception_handler (LuaHelpers::exceptionHandler);
 }
 
 }
