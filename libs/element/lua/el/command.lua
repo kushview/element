@@ -35,16 +35,27 @@ end
 -- Returns a function which invokes the command async or not. By default the
 -- command is not invoked async
 -- @int cmd Command ID
+-- @bool async Whether to invoke async or not
+-- @return function Function which invokes the command
 -- @usage
--- local show_about = command.closure (command.SHOW_ABOUT)
--- local async = true
--- show_about (async)
-function M.closure (cmd)
+-- local show_about = command.closure (command.SHOW_ABOUT, true)
+-- show_about()
+function M.closure (cmd, async)
     assert (type (cmd) == 'number', "command must be a number")
+
     local c = math.tointeger (cmd)
-    return function (async)
-        return M.invoke (c, async or false)
+    local a = true
+    if type(async) == 'boolean' then
+        a = async
+    elseif type(async) == 'number' then
+        a = async ~= 0.0
+    elseif type(async) == 'string' then
+        a = string.len (async) > 0
+    elseif type(async) == 'nil' then
+        a = true
     end
+
+    return function() return M.invoke (c, a) end
 end
 
 -- Define standard commands as constants. e.g. Commands::showAbout in C++ 
