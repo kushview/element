@@ -138,7 +138,6 @@ void AudioProcessorNode::releaseResources()
 
 void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 {
-    DBG("[EL] AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()");
     node.setEnabled (! node.isEnabled());
 }
 
