@@ -204,7 +204,7 @@ public:
                     audio.setSample (c, f, 1.0);
             MidiPipe midi;
 
-            dsp.setParameter (0, -95.0);
+            dsp.getParameterObject(0)->setValueNotifyingHost(0.0);
             dsp.process (audio, midi);
 
             beginTest ("processed");

@@ -45,7 +45,7 @@ end
 
 function Amp.process (a, m, params)
     begintest ("params")
-    expect (params[1] == -95.0)
+    expect (params[1] == -90.0)
     gain2 = audio.togain (params[1])
     a:fade (gain1, gain2)
     gain1 = gain2
