@@ -11,6 +11,9 @@ public:
     
     void cleanup()
     {
+        if (! object.valid())
+            return;
+
         switch (object.get_type()) {
             case sol::type::table:
             {
