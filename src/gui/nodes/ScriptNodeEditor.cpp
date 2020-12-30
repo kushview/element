@@ -18,19 +18,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "kv/lua/object.hpp"
 #include "gui/nodes/ScriptNodeEditor.h"
 #include "gui/LookAndFeel.h"
+#include "scripting/LuaBindings.h"
+#include "scripting/ScriptingEngine.h"
+#include "scripting/Script.h"
 
 namespace Element {
-
-//==============================================================================
-// class ScriptNodeEditorTabs : public TabbedComponent
-// {
-// public:
-//     ScriptNodeEditorTabs() {
-//         addTab ("DSP", Colours::black, new Component(), true);
-//     }
-// };
 
 //==============================================================================
 static CodeEditorComponent::ColourScheme luaColors()
@@ -58,6 +53,77 @@ static CodeEditorComponent::ColourScheme luaColors()
     return cs;
 }
 
+//==============================================================================
+class ControlPort : private ParameterListener
+{
+public:
+    ControlPort (Parameter* parameter)
+        : ParameterListener (parameter)
+    {
+        param = parameter;
+        control = dynamic_cast<ControlPortParameter*> (param.get());
+    }
+
+    virtual ~ControlPort()
+    {
+        param = nullptr;
+        control = nullptr;
+    }
+
+    float getValue() const { return param->getValue(); }
+    void setValue (float val) { param->setValue (val); }
+    
+    bool isControl() const  { return control != nullptr; }
+
+    float getControl() const
+    {
+        if (control)
+            return control->get();
+        return param->getValue();
+    }
+
+    void setControl (float val)
+    {
+        if (control)
+            control->set (val);
+        else
+            param->setValueNotifyingHost (val);
+    }
+
+    std::function<void()> onValueChange;
+
+private:
+    Parameter::Ptr param;
+    ControlPortParameter::Ptr control;
+    void handleNewParameterValue() override
+    {
+        if (onValueChange)
+            onValueChange();
+    }
+};
+
+class ScriptNodeControlPort : public ControlPort
+{
+public:
+    ScriptNodeControlPort (Parameter* param)
+        : ControlPort (param)
+    {
+        onValueChange = [this]() {
+            if (changed.valid())
+                changed();
+        };
+    }
+
+    ~ScriptNodeControlPort() override {}
+
+    sol::function getChangedFunction () const { return changed; }
+    void setChangedFunction (const sol::function& f) { changed = f; }
+
+private:
+    sol::function changed;
+};
+
+//==============================================================================
 class LuaNodeParameterPropertyFloat : public PropertyComponent,
                                       private ParameterListener
 {
@@ -108,7 +174,7 @@ public:
 
         slider.valueFromTextFunction = [this](const String& text) -> double
         {
-             if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
+            if (auto* cp = dynamic_cast<ControlPortParameter*> (param.get()))
                 return (double) cp->convertTo0to1 (text.getFloatValue());
             return text.getDoubleValue();
         };
@@ -144,9 +210,38 @@ private:
     }
 };
 
-ScriptNodeEditor::ScriptNodeEditor (const Node& node)
-    : NodeEditorComponent (node)
+sol::table ScriptNodeEditor::createContext()
 {
+    using CPP = ControlPortParameter;
+    sol::state_view view (state.lua_state());
+    sol::table ctx  = view.create_table();
+
+    ctx["params"] = view.create_table();
+    for (auto* param : lua->getParameters())
+    {
+        ctx["params"][1 + param->getParameterIndex()] = 
+            std::make_shared<ScriptNodeControlPort> (param);
+    }
+
+    return ctx;
+}
+
+ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
+    : NodeEditorComponent (node),
+      state (scripts.getLuaState())
+{
+    auto M = state.create_table();
+    M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
+        "iscontrol", &ScriptNodeControlPort::isControl,
+        "value",   sol::property (&ScriptNodeControlPort::getValue, 
+                                  &ScriptNodeControlPort::setValue),
+        "control", sol::property (&ScriptNodeControlPort::getControl,
+                                  &ScriptNodeControlPort::setControl),
+        "changed", sol::property (&ScriptNodeControlPort::getChangedFunction,
+                                  &ScriptNodeControlPort::setChangedFunction)
+    );
+    state["ScriptNodeEditor.ControlPort"] = M;
+    
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
 
@@ -156,37 +251,73 @@ ScriptNodeEditor::ScriptNodeEditor (const Node& node)
     compileButton.setButtonText ("Compile");
     compileButton.onClick = [this]()
     {
-        // const auto script = document.getAllContent();
-        // auto result = lua->loadScript (script);
-        // if (! result.wasOk())
-        // {
-        //     AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-        //         "Script Error", result.getErrorMessage());
-        // }
+        const auto script = lua->getCodeDocument(false).getAllContent();
+        auto result = lua->loadScript (script);
+        if (! result.wasOk())
+        {
+            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
+                "Script Error", result.getErrorMessage());
+        }
     };
 
-    addAndMakeVisible (editorButton);
-    editorButton.setButtonText ("Params");
-    editorButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    editorButton.onClick = [this]()
+    addAndMakeVisible (paramsButton);
+    paramsButton.setButtonText ("Params");
+    paramsButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    paramsButton.onClick = [this]()
     {
-        editorButton.setToggleState (! editorButton.getToggleState(), dontSendNotification);
-        props.setVisible (editorButton.getToggleState());
+        paramsButton.setToggleState (! paramsButton.getToggleState(), dontSendNotification);
+        props.setVisible (paramsButton.getToggleState());
         resized();
     };
 
-    addAndMakeVisible (modeButton);
-    modeButton.setButtonText ("Script");
-    modeButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    modeButton.onClick = [this]()
-    { 
-        modeButton.setToggleState (! modeButton.getToggleState(), dontSendNotification);
-        modeButton.setButtonText (modeButton.getToggleState() ? "Editor" : "Script");
-        updateCodeEditor();
+    addAndMakeVisible (dspButton);
+    dspButton.setButtonText ("DSP");
+    dspButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    dspButton.setToggleState (true, dontSendNotification);
+    dspButton.onClick = [this]()
+    {
+        if (! dspButton.getToggleState())
+        {
+            dspButton.setToggleState (true, dontSendNotification);
+            uiButton.setToggleState (false, dontSendNotification);
+            previewButton.setToggleState (false, dontSendNotification);
+            updatePreview();
+            updateCodeEditor();
+        }
+    };
+
+    addAndMakeVisible (uiButton);
+    uiButton.setButtonText ("UI");
+    uiButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    uiButton.onClick = [this]()
+    {
+        if (! uiButton.getToggleState())
+        {
+            dspButton.setToggleState (false, dontSendNotification);
+            uiButton.setToggleState (true, dontSendNotification);
+            previewButton.setToggleState (false, dontSendNotification);
+            updatePreview();
+            updateCodeEditor();
+        }
+    };
+
+    addAndMakeVisible (previewButton);
+    previewButton.setButtonText ("Preview");
+    previewButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
+    previewButton.onClick = [this]()
+    {
+        if (! previewButton.getToggleState())
+        {
+            dspButton.setToggleState (false, dontSendNotification);
+            uiButton.setToggleState (false, dontSendNotification);
+            previewButton.setToggleState (true, dontSendNotification);
+            updateCodeEditor();
+            updatePreview();
+        }
     };
 
     addAndMakeVisible (props);
-    props.setVisible (editorButton.getToggleState());
+    props.setVisible (paramsButton.getToggleState());
 
     updateAll();
 
@@ -233,6 +364,55 @@ void ScriptNodeEditor::updateProperties()
     props.addProperties (pcs);
 }
 
+void ScriptNodeEditor::updatePreview()
+{
+    if (previewButton.getToggleState())
+    {
+        Script loader (state);
+        if (loader.load (lua->getCodeDocument(true).getAllContent()))
+        {
+            sol::environment env (state, sol::create, state.globals());
+            auto f = loader.caller(); env.set_on (f);
+            auto instance = f (createContext());
+            if (instance.valid() && instance.get_type() == sol::type::table)
+            {
+                if (auto* const c = kv::lua::object_userdata<Component> (instance))
+                {
+                    comp = c;
+                    widget = instance;
+                    addAndMakeVisible (*comp);
+                    comp->setAlwaysOnTop (true);
+                }
+                else
+                {
+                    DBG("didn't get component from editor script");
+                }
+            }
+            else if (!instance.valid())
+            {
+                sol::error e = instance;
+                DBG(e.what());
+            }
+        }
+        else
+        {
+            DBG(loader.getErrorMessage());
+        }
+    }
+    else
+    {
+        if (comp != nullptr)
+        {
+            removeChildComponent (comp);
+            comp = nullptr;
+            widget = sol::lua_nil;
+        }
+    }
+
+    editor->setVisible (! previewButton.getToggleState());
+    resized();
+}
+
 void ScriptNodeEditor::onPortsChanged()
 {
     updateProperties();
@@ -240,7 +420,7 @@ void ScriptNodeEditor::onPortsChanged()
 
 CodeDocument& ScriptNodeEditor::getActiveDoc()
 {
-    return lua->getCodeDocument (modeButton.getToggleState());
+    return lua->getCodeDocument (uiButton.getToggleState());
 }
 
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
@@ -256,17 +436,26 @@ void ScriptNodeEditor::paint (Graphics& g)
 
 void ScriptNodeEditor::resized()
 {
+    const int toolbarSize = 22;
     auto r1 = getLocalBounds().reduced (4);
-    auto r2 = r1.removeFromTop (22);
+    auto r2 = r1.removeFromTop (toolbarSize);
     
+    dspButton.changeWidthToFitText (r2.getHeight());
+    dspButton.setBounds (r2.removeFromLeft (dspButton.getWidth()));
+    r2.removeFromLeft (2);
+    uiButton.changeWidthToFitText (r2.getHeight());
+    uiButton.setBounds (r2.removeFromLeft (uiButton.getWidth()));
+    r2.removeFromLeft (2);
+    previewButton.changeWidthToFitText (r2.getHeight());
+    previewButton.setBounds (r2.removeFromLeft (previewButton.getWidth()));
+    r2.removeFromLeft (2);
     compileButton.changeWidthToFitText (r2.getHeight());
     compileButton.setBounds (r2.removeFromLeft (compileButton.getWidth()));
-    editorButton.changeWidthToFitText (r2.getHeight());
-    editorButton.setBounds (r2.removeFromRight (editorButton.getWidth()));
+    
+    paramsButton.changeWidthToFitText (r2.getHeight());
+    paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
     r2.removeFromRight (2);
-    modeButton.changeWidthToFitText (r2.getHeight());
-    modeButton.setBounds (r2.removeFromRight (modeButton.getWidth()));
-
+    
     r1.removeFromTop (2);
     if (props.isVisible())
     {
@@ -275,6 +464,12 @@ void ScriptNodeEditor::resized()
     }
 
     editor->setBounds (r1);
+
+    if (previewButton.getToggleState() && comp != nullptr)
+    {
+        auto b = comp->getLocalBounds();
+        comp->setBounds (b.withCentre (r1.getCentre()));
+    }
 }
 
 }

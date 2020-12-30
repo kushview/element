@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "Globals.h"
 #include "controllers/GuiController.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
@@ -55,6 +56,62 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
     window->addKeyListener (gui.getKeyListener());
     window->addKeyListener (gui.commander().getKeyMappings());
     return window;
+}
+
+PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
+{
+    if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
+    {
+        auto* const pgced = new MidiProgramMapEditor (node);
+        if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getGraphNode()))
+            pgced->setSize (object->getWidth(), object->getHeight());
+
+        return createPluginWindowFor (node, pgced);
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
+    {
+        auto* ared = new AudioRouterEditor (node);
+        ared->setAutoResize (true);
+        ared->adjustBoundsToMatrixSize (32);
+        return createPluginWindowFor (node, ared);
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_ROUTER)
+    {
+        return createPluginWindowFor (node, new MidiRouterEditor (node));
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_MONITOR)
+    {
+        return createPluginWindowFor (node, new MidiMonitorNodeEditor (node));
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_RECEIVER)
+    {
+        return createPluginWindowFor (node, new OSCReceiverNodeEditor (node));
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_SENDER)
+    {
+        return createPluginWindowFor (node, new OSCSenderNodeEditor (node));
+    }
+    else if (node.getIdentifier().toString().contains ("element.volume"))
+    {
+        return createPluginWindowFor (node, new VolumeNodeEditor (node, gui));
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_LUA)
+    {
+        return createPluginWindowFor (node, new LuaNodeEditor (node));
+    }
+    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_SCRIPT)
+    {
+        return createPluginWindowFor (node, new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node));
+    }
+    
+    GraphNodePtr object = node.getGraphNode();
+    AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
+    if (! proc)
+        return nullptr;
+    if (! proc->hasEditor())
+        return createPluginWindowFor (node, new GenericAudioProcessorEditor (proc));
+    auto* editor = proc->createEditorIfNeeded();
+    return (editor != nullptr) ? createPluginWindowFor (node, editor) : nullptr;
 }
 
 }

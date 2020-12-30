@@ -25,12 +25,12 @@
 #include "gui/LuaTokeniser.h"
 
 namespace Element {
-
+class ScriptingEngine;
 class ScriptNodeEditor : public NodeEditorComponent,
                          public ChangeListener
 {
 public:
-    explicit ScriptNodeEditor (const Node&);
+    explicit ScriptNodeEditor (ScriptingEngine& scripts, const Node& node);
     ~ScriptNodeEditor() override;
 
     void resized() override;
@@ -42,18 +42,26 @@ private:
     kv::LuaTokeniser tokens;
     std::unique_ptr<CodeEditorComponent> editor;
     TextButton compileButton;
-    TextButton editorButton;
-    TextButton modeButton;
-    
+    TextButton paramsButton;
+    TextButton dspButton;
+    TextButton uiButton;
+    TextButton previewButton;
+
     PropertyPanel props;
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
 
+    sol::state_view state;
+    sol::table widget;
+    Component* comp = nullptr;
+
     CodeDocument& getActiveDoc();
     void updateAll();
+    void updatePreview();
     void updateCodeEditor();
     void updateProperties();
     void onPortsChanged();
+    sol::table createContext();
 };
 
 }

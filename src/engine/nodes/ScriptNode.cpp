@@ -47,40 +47,6 @@ require ('el.MidiPipe')
 namespace Element {
 
 //=============================================================================
-class ScriptNodeParameter : public ControlPortParameter,
-                            public Parameter::Listener
-{
-public:
-    ScriptNodeParameter (ScriptNode::Context* c, const PortDescription& port)
-        : ControlPortParameter (port),
-          ctx (c)
-    {
-        const auto sp = getPort();
-        set (sp.defaultValue);
-        addListener (this);
-    }
-
-    ~ScriptNodeParameter() override
-    {
-        unlink();
-    }
-
-    String getLabel() const override { return {}; }
-
-    void unlink()
-    {
-        removeListener (this);
-        ctx = nullptr;
-    }
-
-    void controlValueChanged (int parameterIndex, float newValue) override;
-    void controlTouched (int parameterIndex, bool gestureIsStarting) override;
-
-private:
-    ScriptNode::Context* ctx { nullptr };
-};
-
-//=============================================================================
 #if 0
 struct ScriptNode::Context
 {
@@ -609,20 +575,6 @@ private:
 };
 #endif
 
-struct ScriptNode::Context
-{
-
-};
-
-//=============================================================================
-void ScriptNodeParameter::controlValueChanged (int index, float value)
-{
-    // if (ctx != nullptr) // index may not be set so use port channel.
-    //     ctx->setParameter (getPortChannel(), convertFrom0to1 (value));
-}
-
-void ScriptNodeParameter::controlTouched (int, bool) {}
-
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
     : GraphNode (0)
@@ -649,7 +601,8 @@ void ScriptNode::createPorts()
 
 Parameter::Ptr ScriptNode::getParameter (const PortDescription& port)
 {
-    return nullptr;
+    jassert (port.type == PortType::Control);
+    return script ? script->getParameterObject (port.channel, port.input) : nullptr;
 }
 
 Result ScriptNode::loadScript (const String& newCode)
@@ -684,6 +637,7 @@ Result ScriptNode::loadScript (const String& newCode)
     if (newScript != nullptr)
     {
         newScript->release();
+        newScript->cleanup();
         newScript.reset();
     }
 
@@ -789,7 +743,6 @@ void ScriptNode::getState (MemoryBlock& block)
 void ScriptNode::setParameter (int index, float value)
 {
     ScopedLock sl (lock);
-    script->setParameter (index, value);
 }
 
 }
