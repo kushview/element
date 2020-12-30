@@ -67,6 +67,7 @@ extern int luaopen_kv_AudioBuffer64 (lua_State*);
 extern int luaopen_kv_Bounds (lua_State*);
 extern int luaopen_kv_TextButton (lua_State*);
 extern int luaopen_kv_Widget (lua_State*);
+extern int luaopen_kv_Desktop (lua_State*);
 extern int luaopen_kv_DocumentWindow (lua_State*);
 extern int luaopen_kv_File (lua_State*);
 extern int luaopen_kv_Graphics (lua_State*);
@@ -75,6 +76,7 @@ extern int luaopen_kv_MidiMessage (lua_State*);
 extern int luaopen_kv_MouseEvent (lua_State*);
 extern int luaopen_kv_Point (lua_State*);
 extern int luaopen_kv_Rectangle (lua_State*);
+extern int luaopen_kv_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
 
 
@@ -241,6 +243,10 @@ static int searcher (lua_State* L)
     {
         sol::stack::push (L, luaopen_el_CommandManager);
     }
+    else if (mod == "el.Globals")
+    {
+        sol::stack::push (L, luaopen_el_Globals);
+    }
     else if (mod == "el.MidiPipe")
     {
         sol::stack::push (L, luaopen_el_MidiPipe);
@@ -253,10 +259,7 @@ static int searcher (lua_State* L)
     {
         sol::stack::push (L, luaopen_el_Session);
     }
-    else if (mod == "el.Globals")
-    {
-        sol::stack::push (L, luaopen_el_Globals);
-    }
+    
     
 #define EL_LUA_INTERNAL_MOD_KV      1
 #if defined (EL_LUA_INTERNAL_MOD_KV)
@@ -317,6 +320,10 @@ static int searcher (lua_State* L)
     {
         sol::stack::push (L, luaopen_kv_Widget);
     }
+    else if (mod == "kv.Desktop")
+    {
+        sol::stack::push (L, luaopen_kv_Desktop);
+    }
     else if (mod == "kv.DocumentWindow")
     {
         sol::stack::push (L, luaopen_kv_DocumentWindow);
@@ -328,6 +335,10 @@ static int searcher (lua_State* L)
     else if (mod == "kv.File")
     {
         sol::stack::push (L, luaopen_kv_File);
+    }
+    else if (mod == "kv.Slider")
+    {
+        sol::stack::push (L, luaopen_kv_Slider);
     }
 #endif
 
