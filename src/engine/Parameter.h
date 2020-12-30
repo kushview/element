@@ -309,6 +309,8 @@ using ParameterArray = ReferenceCountedArray<Parameter>;
 class ControlPortParameter : public Parameter
 {
 public:
+    using Ptr = ReferenceCountedObjectPtr<ControlPortParameter>;
+
     ControlPortParameter (const kv::PortDescription&);
     ~ControlPortParameter();
 
@@ -345,6 +347,7 @@ private:
     float value { 0.0 };
 };
 
+//==============================================================================
 class ParameterListener : private Parameter::Listener,
                           private Timer
 {
