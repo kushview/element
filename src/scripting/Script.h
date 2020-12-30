@@ -25,7 +25,8 @@ namespace Element {
 class Script final : public ReferenceCountedObject
 {
 public:
-    explicit Script (lua_State* L = nullptr);
+    Script() = delete;
+    explicit Script (lua_State* L);
     Script (sol::state_view& view, const String& buffer);
     Script (sol::state_view& view, File file);
     ~Script();
@@ -41,6 +42,26 @@ public:
         return f;
     }
 
+    sol::object call (const sol::environment& env)
+    {
+        return execute (env);
+    }
+
+    sol::object operator() (const sol::environment& env) { 
+        return call (env);
+    }
+
+    template<typename Env, typename ...Args>
+    sol::object call (const Env& env, Args&& ...args)
+    {
+        return execute (env, std::forward<Args> (args)...);
+    }
+
+    template<typename Env, typename ...Args>
+    sol::object operator() (const Env& env, Args&& ...args) { 
+        return call (env, std::forward<Args> (args)...);
+    }
+
     template<typename ...Args>
     sol::object call (Args&& ...args)
     {
@@ -50,17 +71,6 @@ public:
     template<typename ...Args>
     sol::object operator() (Args&& ...args) { 
         return call (std::forward<Args> (args)...);
-    }
-
-    template<typename ...Args>
-    sol::object call (const sol::environment& env, Args&& ...args)
-    {
-        return execute (env, std::forward<Args> (args)...);
-    }
-
-    template<typename ...Args>
-    sol::object operator() (const sol::environment& env, Args&& ...args) { 
-        return call (env, std::forward<Args> (args)...);
     }
 
     const auto& getInfo()       const { return info; }

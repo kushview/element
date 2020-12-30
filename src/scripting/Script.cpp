@@ -78,10 +78,11 @@ bool Script::load (const String& buffer)
     
     sol::state_view view (L);
     info = ScriptDescription::parse (buffer);
+    std::string chunk = info.name.isNotEmpty() ? info.name.toStdString() : "script=";
     error = "";
 
     try {
-        loaded = view.load_buffer (buffer.toRawUTF8(), (size_t) buffer.length());
+        loaded = view.load_buffer (buffer.toRawUTF8(), (size_t) buffer.length(), chunk);
         switch (loaded.status())
         {
             case sol::load_status::file:
