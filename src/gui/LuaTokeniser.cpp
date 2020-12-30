@@ -33,7 +33,7 @@ struct LuaTokeniserFunctions
             { "if", "in", "do", nullptr };
 
         static const char* const keywords3Char[] =
-            { "end", "for", nullptr };
+            { "end", "for", "not", "and", nullptr };
 
         static const char* const keywords4Char[] =
             { "then", "else", nullptr };
@@ -81,7 +81,7 @@ struct LuaTokeniserFunctions
             { "nil", nullptr };
 
         static const char* const keywords4Char[] =
-            { "then", "true", "else", nullptr };
+            { "then", "true", "else", "self", nullptr };
 
         static const char* const keywords5Char[] =
             {  "false", "local", "until", "while", "break", nullptr };
