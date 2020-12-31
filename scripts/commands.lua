@@ -1,10 +1,10 @@
 --- List commands registered in the command manager.
--- @script util.listcommands
+-- @script commands
 -- @kind anonymous
 -- @license GPLv3
 -- @author Michael Fisher
 -- @usage
--- > script.exec ('util.listcommands')
+-- > script.exec ('commands')
 -- SHOW_ABOUT = 256
 -- SHOW_ALL_PLUGIN_WINDOWS = 265
 -- SHOW_SESSION_CONFIG = 260
@@ -16,7 +16,6 @@
 
 local CMD   = require ('el.CommandManager')
 local slug  = require ('kv.slug')
-
 local format = select (1, ...) or 'constants'
 
 if not slug.valid (format) then
