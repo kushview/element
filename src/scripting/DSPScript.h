@@ -66,8 +66,6 @@ public:
     Element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
 
     void copyParameterValues (const DSPScript&);
-    void getParameterData (MemoryBlock&);
-    void setParameterData (MemoryBlock&);
 
 private:
     sol::table DSP;
@@ -89,6 +87,8 @@ private:
     ReferenceCountedArray<Parameter> inParams, outParams;
 
     void deref();
+    void getParameterData (MemoryBlock&);
+    void setParameterData (MemoryBlock&);
     void addAudioMidiPorts();
     void addParameterPorts();
     void unlinkParams();

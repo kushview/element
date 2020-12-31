@@ -691,19 +691,10 @@ void ScriptNode::setState (const void* data, int size)
         dspCode.replaceAllContent (state["dspCode"].toString());
         edCode.replaceAllContent  (state["editorCode"].toString());
 
-        // May want to do this procedure async with a Message::post()
         auto result = loadScript (dspCode.getAllContent());
 
         if (result.wasOk())
         {
-            if (state.hasProperty ("params"))
-            {
-                const var& params = state.getProperty ("params");
-                if (params.isBinaryData())
-                    if (auto* block = params.getBinaryData())
-                        script->setParameterData (*block);
-            }
-
             if (state.hasProperty ("data"))
             {
                 const var& data = state.getProperty ("data");
@@ -717,23 +708,19 @@ void ScriptNode::setState (const void* data, int size)
     }
 }
 
-void ScriptNode::getState (MemoryBlock& block)
+void ScriptNode::getState (MemoryBlock& out)
 {
-    ValueTree state ("ScriptNodeState");
+    ValueTree state ("ScriptNode");
     state.setProperty ("dspCode", dspCode.getAllContent(), nullptr)
          .setProperty ("editorCode", edCode.getAllContent(), nullptr);
 
-    MemoryBlock scriptBlock;
-    script->getParameterData (scriptBlock);
-    if (scriptBlock.getSize() > 0)
-        state.setProperty ("params", scriptBlock, nullptr);
+    MemoryBlock block;
+    script->save (block);
+    if (block.getSize() > 0)
+        state.setProperty ("data", block, nullptr);
+    block.reset();
 
-    scriptBlock.reset();
-    script->save (scriptBlock);
-    if (scriptBlock.getSize() > 0)
-        state.setProperty ("data", scriptBlock, nullptr);
-
-    MemoryOutputStream mo (block, false);
+    MemoryOutputStream mo (out, false);
     {
         GZIPCompressorOutputStream gz (mo);
         state.writeToStream (gz);

@@ -41,6 +41,13 @@ public:
 
     void controlTouched (int parameterIndex, bool gestureIsStarting) override {}
 
+    void update (float value)
+    {
+        removeListener (this);
+        set (value);
+        addListener (this);
+    }
+
 private:
     DSPScript* ctx { nullptr };
 };
@@ -200,7 +207,7 @@ Result DSPScript::validate (const String& script)
 #endif
 }
 
-void DSPScript::getPorts (PortList& out)
+void DSPScript::getPorts (kv::PortList& out)
 {
     for (const auto* port : ports.getPorts())
         out.add (new PortDescription (*port));
@@ -236,49 +243,82 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
     }
 }
 
-void DSPScript::save (MemoryBlock& block)
+void DSPScript::save (MemoryBlock& out)
 {
+    ValueTree state ("DSP");
+    MemoryBlock block;
+
+    block.reset();
+    getParameterData (block);
+    if (block.getSize() > 0)
+        state.setProperty ("params", block, nullptr);
+
     sol::function save = DSP ["save"];
-    if (! save.valid())
-        return;
     
-    try {
+    if (save.valid())
+    {
         sol::state_view lua (L);
         sol::environment env (lua, sol::create, lua.globals());
-        env["dsp_script_save"] = save;
-        auto result = lua.safe_script (R"(
-            local tf = io.tmpfile()
-            local oo = io.output()
-            io.output (tf);
-            dsp_script_save()
-            tf:seek ('set', 0)
-            local data = tf:read ("*a")
-            io.close()
-            io.output (oo);
-            dsp_script_save = nil
-            return data
-        )", env);
+        try {
+            
+            env["dsp_script_save"] = save;
+            auto result = lua.safe_script (R"(
+                local tf = io.tmpfile()
+                local oo = io.output()
+                io.output (tf);
+                dsp_script_save()
+                tf:seek ('set', 0)
+                local data = tf:read ("*a")
+                io.close()
+                io.output (oo);
+                dsp_script_save = nil
+                return data
+            )", env);
 
-        if (result.valid())
-        {
-            sol::object data = result;
-            if (data.is<const char*>())
+            if (result.valid())
             {
-                MemoryOutputStream mo (block, false);
-                mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
+                sol::object data = result;
+                if (data.is<const char*>())
+                {
+                    block.reset();
+                    MemoryOutputStream mo (block, false);
+                    mo.write (data.as<const char*>(), strlen (data.as<const char*>()));
+                }
             }
+        } catch (const std::exception& e) {
+            DBG("[EL] " << e.what());
         }
-
         lua.collect_garbage();
-    } catch (const std::exception& e) {
-        DBG("[EL] " << e.what());
+    }
+
+    MemoryOutputStream mo (out, false);
+    {
+        GZIPCompressorOutputStream gz (mo);
+        state.writeToStream (gz);
     }
 }
 
-void DSPScript::restore (const void* data, size_t size)
+void DSPScript::restore (const void* d, size_t s)
 {
+    const auto state = ValueTree::readFromGZIPData (d, s);
+    if (! state.isValid())
+        return;
+
+    const var& params = state.getProperty ("params");
+    if (params.isBinaryData())
+    {
+        setParameterData (*params.getBinaryData());
+        for (auto* const param : inParams)
+        {
+            const auto port = param->getPort();
+            param->update (paramData [port.channel]);
+            DBG("restore param: " << param->get());
+        }
+    }
+
+    const var& data = state.getProperty ("data");
     sol::function restore = DSP ["restore"];
-    if (! restore.valid())
+    if (!restore.valid() || !data.isBinaryData())
         return;
 
     try {
@@ -287,7 +327,9 @@ void DSPScript::restore (const void* data, size_t size)
         sol::userdata ud = lua["io"]["tmpfile"]();
         luaL_Stream* const stream = (luaL_Stream*) ud.pointer();
 
-        fwrite (data, 1, size, stream->f);
+        fwrite (data.getBinaryData()->getData(), 1,
+                data.getBinaryData()->getSize(), 
+                stream->f);
         rewind (stream->f);
 
         env["__state_data__"] = ud;
@@ -303,7 +345,7 @@ void DSPScript::restore (const void* data, size_t size)
         )", env);
 
         lua.collect_garbage();
-    } catch (const std::exception& e) { 
+    } catch (const std::exception& e) {
         DBG("[EL] " << e.what());
     }
 }
