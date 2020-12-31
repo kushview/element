@@ -350,24 +350,28 @@ static int searcher (lua_State* L)
 	return 1;
 }
 
-//=============================================================================
-void openLibs (sol::state& lua) {}
-
-void initializeState (sol::state_view& lua) {
+//==============================================================================
+void initializeState (sol::state_view& lua)
+{
     lua.open_libraries();
     
-    auto searchers = lua["package"]["searchers"].get<sol::table>();
+    auto package = lua["package"];
+    
+    auto searchers = lua.create_table();
     searchers.add (searcher);
-
-    lua["package"]["path"]  = getSearchPath().toStdString();
-    lua["package"]["spath"] = getScriptSearchPath().toStdString();
+    for (const auto& s : package["searchers"].get<sol::table>())
+        searchers.add (s.second);
+    
+    package["searchers"]    = searchers;
+    package["path"]         = getSearchPath().toStdString();
+    package["cpath"]        = getCSearchPath().toStdString();
+    package["spath"]        = getScriptSearchPath().toStdString();
 }
 
 void initializeState (sol::state_view& lua, Globals& world)
 {
     initializeState (lua);
     lua.globals().set ("el.globals", std::ref<Globals> (world));
-    lua.script ("_G['element'] = require ('element')");
 }
 
 }}
