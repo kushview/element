@@ -373,25 +373,41 @@ void ScriptNodeEditor::updatePreview()
         {
             sol::environment env (state, sol::create, state.globals());
             auto f = loader.caller(); env.set_on (f);
-            auto instance = f (createContext());
-            if (instance.valid() && instance.get_type() == sol::type::table)
+            auto ctx = createContext();
+
+            auto instance = f (ctx);
+            if (! instance.valid())
             {
-                if (auto* const c = kv::lua::object_userdata<Component> (instance))
+                sol::error e = instance;
+                DBG(e.what());
+                return;
+            }
+            
+            if (instance.get_type() == sol::type::table)
+            {
+                sol::table DSPUI = instance;
+                sol::table editor;
+                
+                switch (DSPUI["editor"].get_type())
+                {
+                    case sol::type::function:
+                        editor = DSPUI["editor"](ctx);
+                        break;
+                    default:
+                        break;
+                }
+
+                if (auto* const c = kv::lua::object_userdata<Component> (editor))
                 {
                     comp = c;
-                    widget = instance;
+                    widget = editor;
                     addAndMakeVisible (*comp);
                     comp->setAlwaysOnTop (true);
                 }
                 else
                 {
-                    DBG("didn't get component from editor script");
+                    DBG("[EL] ScriptNodeEditor: didn't get widget from DSPUI script");
                 }
-            }
-            else if (!instance.valid())
-            {
-                sol::error e = instance;
-                DBG(e.what());
             }
         }
         else
