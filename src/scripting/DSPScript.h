@@ -42,6 +42,7 @@ public:
 
     static Result validate (const String& script);
 
+    //==========================================================================
     void prepare (double rate, int block)
     {
         if (sol::function f = DSP ["prepare"])
@@ -53,19 +54,24 @@ public:
             f();
     }
 
+    //==========================================================================
     void process (AudioSampleBuffer& a, MidiPipe& m);
-    
+
+    //==========================================================================
     void save (MemoryBlock& block);
     void restore (const void* data, size_t size);
 
+    //==========================================================================
     const kv::PortList& getPorts() const { return ports; }
     void getPorts (kv::PortList& out);
 
+    //==========================================================================
     int getNumParameters() const { return numParams; }
-
     Element::Parameter::Ptr getParameterObject (int index, bool input = true) const;
-
     void copyParameterValues (const DSPScript&);
+
+    //==========================================================================
+    String getUI() const;
 
 private:
     sol::table DSP;

@@ -312,7 +312,6 @@ void DSPScript::restore (const void* d, size_t s)
         {
             const auto port = param->getPort();
             param->update (paramData [port.channel]);
-            DBG("restore param: " << param->get());
         }
     }
 
@@ -371,6 +370,15 @@ void DSPScript::setParameterData (MemoryBlock& block)
     jassert (block.getSize() % sizeof(float) == 0);
     jassert (block.getSize() < sizeof(float) * maxParams);
     memcpy (paramData, block.getData(), block.getSize());
+}
+
+String DSPScript::getUI() const
+{
+    if (! DSP.valid())
+        return {};
+    if (DSP["ui"].get_type() == sol::type::string)
+        return DSP["ui"].get<std::string>();
+    return {};
 }
 
 void DSPScript::deref()
