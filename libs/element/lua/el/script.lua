@@ -3,9 +3,7 @@
 local M = {}
 
 local function define (desc, kind)
-    if type(desc) ~= 'table' then
-        assert(type(desc) == 'table', "Expected table descriptor")
-    end
+    assert (type(desc) == 'table', "Expected table descriptor")
     desc.type = tostring (kind) or ''
     return desc
 end
@@ -14,13 +12,15 @@ end
 -- @usage script.dsp {
 --     process = process
 -- }
-function M.dsp (desc) return define (desc, 'dsp') end
+function M.dsp (desc) return define (desc, 'DSP') end
 
---- Load a known script
+--- Define a DSPUI script.
+function M.dspui (desc) return define (desc, 'DSPUI') end
+
+--- Load a known script.
 -- @function load
 -- @string path The script to run
 -- @tparam table env The environment to use or _ENV
--- @tparam any ... Arguments passed to script
 -- @treturn table The script's descriptor table
 -- @usage script.load ('scriptname')
 function M.load (path, env)
