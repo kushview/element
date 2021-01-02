@@ -295,7 +295,27 @@ def build_app (bld):
         pass
 
 def install_lua_files (bld):
-    return
+    path = bld.path
+    join = os.path.join
+    bld.install_files (join (bld.env.DATADIR, 'scripts'),
+                       path.ant_glob ("scripts/**/*.lua"),
+                       relative_trick=True,
+                       cwd=path.find_dir ('scripts'))
+
+    bld.install_files (join (bld.env.DATADIR, 'doc/lua'),
+                       bld.path.ant_glob ("build/doc/lua/**/*.*"),
+                       relative_trick=True,
+                       cwd=bld.path.find_dir ('build/doc/lua'))
+
+    bld.install_files (join (bld.env.DATADIR, 'lua'),
+                       bld.path.ant_glob ("libs/lua-kv/src/**/*.lua"),
+                       relative_trick=True,
+                       cwd=bld.path.find_dir ('libs/lua-kv/src'))
+
+    bld.install_files (join (bld.env.DATADIR, 'lua'),
+                       bld.path.ant_glob ("libs/element/lua/**/*.lua"),
+                       relative_trick=True,
+                       cwd=bld.path.find_dir ('libs/element/lua'))
 
 def build (bld):
     bld.add_pre_fun (configure_git_version)
