@@ -23,6 +23,8 @@
 
 namespace Element {
 
+using ScriptArray = Array<ScriptDescription>;
+
 class ScriptManager final
 {
 public:
@@ -33,6 +35,8 @@ public:
     
     int getNumScripts() const;
     ScriptDescription getScript (int) const;
+
+    const ScriptArray& getScriptsDSP() const;
 
 private:
     class Registry;

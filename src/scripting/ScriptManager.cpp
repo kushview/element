@@ -45,13 +45,32 @@ public:
     {
         Array<ScriptDescription> results;
         scanForScripts (getDefaultScriptsDir(), results);
+        Array<ScriptDescription> newDSP;
+        Array<ScriptDescription> newDSPUI;
+        
+        for (int i = 0; i < results.size(); ++i)
+        {
+            const auto d = results [i];
+            if (d.type.toLowerCase() == "dsp")
+            {
+                newDSP.add (d);
+            }
+            else if (d.type.toLowerCase() == "dspui")
+            {
+                newDSPUI.add (d);
+            }
+        }
+        
         scripts.swapWith (results);
+        dsp.swapWith (newDSP);
+        dspui.swapWith (newDSPUI);
     }
 
 private:
     friend class ScriptManager;
     ScriptManager& owner;
     Array<ScriptDescription> scripts;
+    Array<ScriptDescription> dsp, dspui;
 };
 
 //==============================================================================
@@ -75,6 +94,11 @@ int ScriptManager::getNumScripts() const
 ScriptDescription ScriptManager::getScript (int index) const
 {
     return registry->scripts [index];
+}
+
+const ScriptArray& ScriptManager::getScriptsDSP() const
+{
+    return registry->dsp;
 }
 
 }

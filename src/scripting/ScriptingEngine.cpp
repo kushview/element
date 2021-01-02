@@ -18,6 +18,7 @@
 */
 
 #include "scripting/ScriptingEngine.h"
+#include "scripting/ScriptManager.h"
 #include "scripting/LuaBindings.h"
 #include "Globals.h"
 #include "sol/sol.hpp"
@@ -33,7 +34,38 @@ static int exceptionHandler (lua_State* L, sol::optional<const std::exception &>
 }
 
 //=============================================================================
-ScriptingEngine::ScriptingEngine() {}
+
+//=============================================================================
+class ScriptingEngine::Impl
+{
+public:
+    Impl (ScriptingEngine& e)
+        : owner (e)
+    {
+       
+    }
+    
+    ~Impl() {}
+
+    void scanDefaultLoctaion()
+    {
+        manager.scanDefaultLocation();
+       
+    }
+
+    ScriptManager& getManager() { return manager; }
+
+private:
+    friend class ScriptingEngine;
+    ScriptingEngine& owner;
+    ScriptManager manager;
+};
+
+//=============================================================================
+ScriptingEngine::ScriptingEngine() {
+    impl.reset (new Impl (*this));
+}
+
 ScriptingEngine::~ScriptingEngine()
 {
     lua.collect_garbage();
@@ -45,6 +77,11 @@ void ScriptingEngine::initialize (Globals& w)
     world = &w;
     Lua::initializeState (lua, *world);
     lua.set_exception_handler (LuaHelpers::exceptionHandler);
+}
+
+ScriptManager& ScriptingEngine::getScriptManager()
+{
+    return impl->manager;
 }
 
 }
