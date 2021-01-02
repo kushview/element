@@ -39,8 +39,16 @@ public:
     void changeListenerCallback (ChangeBroadcaster*) override;
 
 private:
+    ScriptingEngine& engine;
+    sol::state_view state;
+    sol::environment env;
+    sol::table widget;
+    Component* comp = nullptr;
+
     kv::LuaTokeniser tokens;
-    std::unique_ptr<CodeEditorComponent> editor;
+    class CodeEditor;
+    std::unique_ptr<CodeEditor> editor;
+
     TextButton compileButton;
     TextButton paramsButton;
     TextButton dspButton;
@@ -51,15 +59,12 @@ private:
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
 
-    sol::state_view state;
-    sol::table widget;
-    Component* comp = nullptr;
-
     CodeDocument& getActiveDoc();
     void updateAll();
     void updatePreview();
     void updateCodeEditor();
     void updateProperties();
+    void updateScriptsCombo();
     void onPortsChanged();
     sol::table createContext();
 };

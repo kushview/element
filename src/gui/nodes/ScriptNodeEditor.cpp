@@ -23,6 +23,7 @@
 #include "gui/LookAndFeel.h"
 #include "scripting/LuaBindings.h"
 #include "scripting/ScriptingEngine.h"
+#include "scripting/ScriptManager.h"
 #include "scripting/Script.h"
 
 namespace Element {
@@ -210,6 +211,7 @@ private:
     }
 };
 
+//==============================================================================
 sol::table ScriptNodeEditor::createContext()
 {
     using CPP = ControlPortParameter;
@@ -226,26 +228,77 @@ sol::table ScriptNodeEditor::createContext()
     return ctx;
 }
 
+class ScriptNodeEditor::CodeEditor : public CodeEditorComponent
+{
+public:
+    CodeEditor (ScriptNodeEditor& o, CodeDocument& doc, CodeTokeniser* tokens)
+        : CodeEditorComponent (doc, tokens),
+          owner (o)
+    {
+    }
+
+    ~CodeEditor() override {}
+
+    void addPopupMenuItems (PopupMenu &menu, const MouseEvent *event) override
+    {
+        menu.addItem ("Open File", [this]()
+        {
+            FileChooser fc ("Open Script", {}, "*.lua");
+            if (fc.browseForFileToOpen())
+            {
+                getDocument().replaceAllContent (
+                    fc.getResult().loadFileAsString());
+            }
+        });
+
+        menu.addItem ("Save File", [this]()
+        {
+            FileChooser fc ("Save Script", {}, "*.lua");
+            if (fc.browseForFileToSave (true))
+            {
+                TemporaryFile tmpFile (fc.getResult());
+                auto stream = tmpFile.getFile().createOutputStream();
+                if (getDocument().writeToStream (*stream))                
+                    tmpFile.overwriteTargetFileWithTemporary();
+            }
+        });
+
+        menu.addSeparator();
+        CodeEditorComponent::addPopupMenuItems (menu, event);
+    }
+
+    void performPopupMenuAction (int menuItemID) override
+    {
+        CodeEditorComponent::performPopupMenuAction (menuItemID);
+    }
+
+private:
+    ScriptNodeEditor& owner;
+};
+
+//==============================================================================
 ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     : NodeEditorComponent (node),
-      state (scripts.getLuaState())
+      engine (scripts),
+      state (engine.getLuaState()),
+      env (state, sol::create, state.globals())
 {
+    setOpaque (true);
+
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
         "iscontrol", &ScriptNodeControlPort::isControl,
-        "value",   sol::property (&ScriptNodeControlPort::getValue, 
+        "value",   sol::property (&ScriptNodeControlPort::getValue,
                                   &ScriptNodeControlPort::setValue),
         "control", sol::property (&ScriptNodeControlPort::getControl,
                                   &ScriptNodeControlPort::setControl),
         "changed", sol::property (&ScriptNodeControlPort::getChangedFunction,
                                   &ScriptNodeControlPort::setChangedFunction)
     );
-    state["ScriptNodeEditor.ControlPort"] = M;
+    env["ScriptNodeEditor.ControlPort"] = M;
     
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
-
-    setOpaque (true);
 
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
@@ -343,7 +396,7 @@ void ScriptNodeEditor::updateAll()
 
 void ScriptNodeEditor::updateCodeEditor()
 {
-    editor.reset (new CodeEditorComponent (getActiveDoc(), &tokens));
+    editor.reset (new CodeEditor (*this, getActiveDoc(), &tokens));
     addAndMakeVisible (editor.get());
     editor->setTabSize (4, true);
     editor->setFont (editor->getFont().withHeight (18));
@@ -371,11 +424,10 @@ void ScriptNodeEditor::updatePreview()
         Script loader (state);
         if (loader.load (lua->getCodeDocument(true).getAllContent()))
         {
-            sol::environment env (state, sol::create, state.globals());
             auto f = loader.caller(); env.set_on (f);
             auto ctx = createContext();
-
             auto instance = f (ctx);
+
             if (! instance.valid())
             {
                 sol::error e = instance;
@@ -429,6 +481,11 @@ void ScriptNodeEditor::updatePreview()
     resized();
 }
 
+void ScriptNodeEditor::updateScriptsCombo()
+{
+    // scriptsCombo.clear (dontSendNotification);
+}
+
 void ScriptNodeEditor::onPortsChanged()
 {
     updateProperties();
@@ -470,8 +527,7 @@ void ScriptNodeEditor::resized()
     
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
-    r2.removeFromRight (2);
-    
+
     r1.removeFromTop (2);
     if (props.isVisible())
     {
