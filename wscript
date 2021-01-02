@@ -226,7 +226,7 @@ def build_lua_lib (bld):
     bld.add_group()
     return lua
 
-def compile_vst_linux (bld):
+def build_vst_linux (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
@@ -246,13 +246,14 @@ def compile_vst_linux (bld):
         build_desktop (bld)
         vst.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
 
-def compile_vst (bld):
-    if juce.is_linux(): compile_vst_linux (bld)
+def build_vst (bld):
+    if juce.is_linux(): build_vst_linux (bld)
 
-def compile (bld):
+def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
+    
     library = bld (
         features    = 'cxx cxxshlib',
         source      = common_sources (bld),
@@ -293,14 +294,17 @@ def compile (bld):
     else:
         pass
 
+def install_lua_files (bld):
+    return
+
 def build (bld):
     bld.add_pre_fun (configure_git_version)
     # build_lua_lib (bld)
-    compile (bld)
-    # compile_vst (bld)
+    build_app (bld)
+    # build_vst (bld)
 
     if bld.env.LUA and bool(bld.env.LIB_READLINE):
-        bld.program(
+        bld.program (
             source = [ 'tools/lua-el/lua.cpp' ],
             name = 'lua-el',
             target = 'bin/lua-el',
@@ -310,14 +314,16 @@ def build (bld):
         )
 
     if bld.env.TEST: bld.recurse ('tests')
+    
+    install_lua_files (bld)
 
 def check (ctx):
     if not os.path.exists('build/bin/test-element'):
-        ctx.fatal("Tests not compiled")
+        ctx.fatal ("Tests not compiled")
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
     if 0 != call (["build/bin/test-element"]):
-        ctx.fatal("Tests failed")
+        ctx.fatal ("Tests failed")
 
 def dist(ctx):
     z = ctx.options.ziptype
