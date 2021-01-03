@@ -59,10 +59,51 @@ def configure_git_version (ctx):
     if os.path.exists('.git'):
         call(["python", "tools/gitversion.py"], stdout=PIPE)
 
+def make_lua_path (paths):
+    out = ''
+    if len(paths) > 0:
+        for path in paths:
+            if len(out) > 0: out += ';'
+            out += '%s/?.lua' % path
+            out += ';%s/?/init.lua' % path
+    return out
+
+def make_lua_spath (paths):
+    out = ''
+    if len(paths) > 0:
+        for path in paths:
+            if len(out) > 0: out += ';'
+            out += '%s/?.lua' % path
+    return out
+
+def make_lua_cpath (paths):
+    out = ''
+    if len(paths) > 0:
+        for path in paths:
+            if len(out) > 0: out += ';'
+            out += '%s/?.so' % path
+            out += ';%s/loadall.so' % path
+    return out
+
 def configure (conf):
     configure_git_version (conf)
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
-    
+    conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
+
+    conf.env.LUA_PATH_DEFAULT = make_lua_path ([
+        os.path.join (conf.env.DATADIR, 'lua'),
+    ])
+
+    conf.env.LUA_CPATH_DEFAULT = make_lua_cpath ([
+        # os.path.join (os.path.expanduser('~'), '.local/lib/element/lua'),
+        os.path.join (conf.env.LIBDIR, 'element/lua')
+    ])
+
+    conf.env.EL_SPATH_DEFAULT = make_lua_spath ([
+        # os.path.join (os.path.expanduser('~'), '.local/share/element/scripts'),
+        os.path.join (conf.env.DATADIR, 'scripts')
+    ])
+
     conf.check_ccache()
     cross.setup_compiler (conf)
     if len(conf.options.cross) <= 0:
@@ -253,7 +294,7 @@ def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
-    
+
     library = bld (
         features    = 'cxx cxxshlib',
         source      = common_sources (bld),
@@ -261,7 +302,12 @@ def build_app (bld):
         target      = 'lib/element-0',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS' ]
+        use         = [ 'BOOST_SIGNALS' ],
+        cxxflags    = [
+            '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
+            '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
+            '-DEL_SPATH_DEFAULT="%s"'  % libEnv.EL_SPATH_DEFAULT
+        ]
     )
 
     bld.add_group()

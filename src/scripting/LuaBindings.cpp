@@ -157,89 +157,99 @@ void openKV (state& lua)
 }
 
 
-//=============================================================================
-EL_EXPORT int luaopen_element_ui (lua_State* L)
-{
-    sol::state_view lua (L);
-    sol::table M = lua.create_table();
-    sol::stack::push (L, M);
-    return 1;
-}
-
+//==============================================================================
 static File getRootPath()
 {
     return File::getCurrentWorkingDirectory();
 }
 
-static File scriptsDir()
+static File getScriptsDir()
 {
     return getRootPath().getChildFile ("scripts");
 }
 
+static String getHomeLuaDir()
+{
+    return File::getSpecialLocation (File::userHomeDirectory)
+        .getChildFile (".local/share/element/lua")
+        .getFullPathName();
+}
+
+static String getHomeScriptsPath()
+{
+    return File::getSpecialLocation (File::userHomeDirectory)
+        .getChildFile (".local/share/element/scripts")
+        .getFullPathName() + "/?.lua";
+}
+
 static String getScriptSearchPath()
 {
-    Array<File> paths ({
-        scriptsDir(),
-        File::getSpecialLocation (File::userHomeDirectory).getChildFile(".local/lib/element/scripts"),
-    });
+    if (auto* scriptPath = std::getenv ("EL_SPATH"))
+        return String::fromUTF8 (scriptPath).trim();
     
-    StringArray path;
+    StringArray result;
+    result.add (getHomeScriptsPath());
 
-    for (const auto& dir : paths)
-    {
-        path.add (dir.getFullPathName() + "/?.lua");
-    }
+    #if defined (EL_SPATH_DEFAULT)
+        String defaultPath (EL_SPATH_DEFAULT);
+        if (defaultPath.isNotEmpty())
+            result.addArray (StringArray::fromTokens (defaultPath, ";"));
+    #else    
+        #if JUCE_WINDOWS
+            #pragma error "Windows script path needed"
+        #else
+            result.add ("/usr/local/share/element/scripts/?.lua");
+        #endif
+    #endif
 
-    return path.joinIntoString (";");
+    return result.joinIntoString (";");
 }
 
-static String getCSearchPath()
+static String getLuaPath()
 {
-    Array<File> paths ({
-        getRootPath().getChildFile ("build/lib/lua")
-    });
+    if (auto* luaPath = std::getenv ("LUA_PATH"))
+        return String::fromUTF8 (luaPath).trim();
+
+    const StringArray dirs (
+        getHomeLuaDir(),
+        "/usr/local/share/element/lua"
+    );
     
     StringArray path;
-    for (const auto& dir : paths)
+    for (const auto& dir : dirs)
     {
-       #if JUCE_WINDOWS
-        path.add (dir.getFullPathName() + "/?.dll");
-        path.add (dir.getFullPathName() + "/loadall.dll");
-       #else
-        path.add (dir.getFullPathName() + "/?.so");
-        path.add (dir.getFullPathName() + "/loadall.so");
-       #endif
+        path.add (dir + "/?.lua");
+        path.add (dir + "/?/init.lua");
     }
 
     return path.joinIntoString (";");
 }
 
-static String getSearchPath()
+static String getLuaCPath()
 {
-    Array<File> paths ({
-        getRootPath().getChildFile ("libs/lua-kv/src"),
-        getRootPath().getChildFile ("libs/element/lua")
-    });
+    if (auto* luaPath = std::getenv ("LUA_CPATH"))
+        return String::fromUTF8 (luaPath).trim();
+
+    const StringArray dirs (
+        getHomeLuaDir(),
+        "/usr/local/lib/element/lua"
+    );
     
     StringArray path;
-    for (const auto& dir : paths)
+    for (const auto& dir : dirs)
     {
-        path.add (dir.getFullPathName() + "/?.lua");
-        path.add (dir.getFullPathName() + "/?/init.lua");
+        path.add (dir + "/?.so");
+        path.add (dir + "/loadall.so");
     }
 
     return path.joinIntoString (";");
 }
 
-static int searcher (lua_State* L)
+static int searchInternalModules (lua_State* L)
 {
     const auto mod = sol::stack::get<std::string> (L);
 
-    if (mod == "element.ui")
-	{
-		sol::stack::push (L, luaopen_element_ui);
-	}
-    else if (mod == "el.CommandManager")
+    if (mod == "el.CommandManager")
     {
         sol::stack::push (L, luaopen_el_CommandManager);
     }
@@ -344,7 +354,8 @@ static int searcher (lua_State* L)
 
     else
     {
-	    sol::stack::push (L, "Not found");
+        String msg = "no internal '"; msg << mod << "'";
+	    sol::stack::push (L, msg.toStdString());
     }
     
 	return 1;
@@ -361,21 +372,22 @@ void clearGlobals (sol::state_view& view)
     view.globals().set ("el.globals", sol::lua_nil);
 }
 
+//==============================================================================
 void initializeState (sol::state_view& view)
 {
-    view.open_libraries();
-    
+    view.open_libraries ();
+
     auto package = view["package"];
-    
     auto searchers = view.create_table();
-    searchers.add (searcher);
-    for (const auto& s : package["searchers"].get<sol::table>())
-        searchers.add (s.second);
-    
-    package["searchers"]    = searchers;
-    // package["path"]         = getSearchPath().toStdString();
-    // package["cpath"]        = getCSearchPath().toStdString();
-    // package["spath"]        = getScriptSearchPath().toStdString();
+    searchers.add (package ["searchers"][1]);
+    searchers.add (searchInternalModules);
+    for (int i = 2; i <= ((sol::table)package["searchers"]).size(); ++i)
+        searchers.add (package["searchers"][i]);
+    package["searchers"] = searchers;
+
+    package["path"]     = getLuaPath().toStdString();
+    package["cpath"]    = getLuaCPath().toStdString();
+    package["spath"]    = getScriptSearchPath().toStdString();
 }
 
 void initializeState (sol::state_view& view, Globals& g)

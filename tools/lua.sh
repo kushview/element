@@ -1,4 +1,7 @@
 #!/bin/bash
 export LD_LIBRARY_PATH="`pwd`/build/lib"
+export LUA_PATH="libs/lua-kv/src/?.lua;libs/element/lua/?.lua"
+export LUA_CPATH="build/lib/lua/?.lua"
+export EL_SPATH="scripts/?.lua"
 build/bin/lua-el $@
 exit $?
