@@ -351,27 +351,37 @@ static int searcher (lua_State* L)
 }
 
 //==============================================================================
-void initializeState (sol::state_view& lua)
+void setGlobals (sol::state_view& view, Globals& g)
 {
-    lua.open_libraries();
+    view.globals().set ("el.globals", std::ref<Globals> (g));
+}
+
+void clearGlobals (sol::state_view& view)
+{
+    view.globals().set ("el.globals", sol::lua_nil);
+}
+
+void initializeState (sol::state_view& view)
+{
+    view.open_libraries();
     
-    auto package = lua["package"];
+    auto package = view["package"];
     
-    auto searchers = lua.create_table();
+    auto searchers = view.create_table();
     searchers.add (searcher);
     for (const auto& s : package["searchers"].get<sol::table>())
         searchers.add (s.second);
     
     package["searchers"]    = searchers;
-    package["path"]         = getSearchPath().toStdString();
-    package["cpath"]        = getCSearchPath().toStdString();
-    package["spath"]        = getScriptSearchPath().toStdString();
+    // package["path"]         = getSearchPath().toStdString();
+    // package["cpath"]        = getCSearchPath().toStdString();
+    // package["spath"]        = getScriptSearchPath().toStdString();
 }
 
-void initializeState (sol::state_view& lua, Globals& world)
+void initializeState (sol::state_view& view, Globals& g)
 {
-    initializeState (lua);
-    lua.globals().set ("el.globals", std::ref<Globals> (world));
+    initializeState (view);
+    setGlobals (view, g);
 }
 
 }}

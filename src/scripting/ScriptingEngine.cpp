@@ -17,11 +17,15 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sol/sol.hpp"
 #include "scripting/ScriptingEngine.h"
 #include "scripting/ScriptManager.h"
 #include "scripting/LuaBindings.h"
 #include "Globals.h"
-#include "sol/sol.hpp"
+
+#ifndef EL_LUA_SPATH
+ #define EL_LUA_SPATH ""
+#endif
 
 namespace Element {
 
@@ -29,6 +33,7 @@ namespace LuaHelpers {
 
 static int exceptionHandler (lua_State* L, sol::optional<const std::exception &> e, sol::string_view description) {
     return sol::stack::push (L, description);
+    
 }
 
 }
@@ -62,20 +67,22 @@ private:
 };
 
 //=============================================================================
-ScriptingEngine::ScriptingEngine() {
+ScriptingEngine::ScriptingEngine()
+{
     impl.reset (new Impl (*this));
+    Lua::initializeState (lua);
 }
 
 ScriptingEngine::~ScriptingEngine()
 {
+    Lua::clearGlobals (lua);
     lua.collect_garbage();
-    lua.globals().set ("element.world", sol::lua_nil);
 }
 
-void ScriptingEngine::initialize (Globals& w)
+void ScriptingEngine::initialize (Globals& g)
 {
-    world = &w;
-    Lua::initializeState (lua, *world);
+    world = &g;
+    Lua::setGlobals (lua, g);
     lua.set_exception_handler (LuaHelpers::exceptionHandler);
 }
 
