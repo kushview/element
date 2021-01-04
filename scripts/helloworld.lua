@@ -52,7 +52,7 @@ function HelloWorld:init()
     self.label = self:add (label)
 
     self.button = new (TextButton)
-    self.button.text = "Quit"
+    self.button.text = "Close"
     self.button.name = "TextButton"
     self.button:resize (90, 24)
 
