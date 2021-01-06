@@ -34,6 +34,7 @@
 #include "session/Presets.h"
 #include "session/Session.h"
 
+#include "DataPath.h"
 #include "Settings.h"
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
@@ -175,53 +176,121 @@ static String getHomeLuaDir()
         .getFullPathName();
 }
 
-static String getHomeScriptsPath()
+//==============================================================================
+static String getHomeScriptsDir()
 {
     return File::getSpecialLocation (File::userHomeDirectory)
         .getChildFile (".local/share/element/scripts")
-        .getFullPathName() + "/?.lua";
+        .getFullPathName();
 }
 
+static String getUserScriptsDir()
+{
+    return DataPath::applicationDataDir()
+        .getChildFile ("Scripts")
+        .getFullPathName();
+}
+
+//==============================================================================
 static String getScriptSearchPath()
 {
-    if (auto* scriptPath = std::getenv ("EL_SPATH"))
+    if (auto* scriptPath = std::getenv ("ELEMENT_SCRIPTS_PATH"))
         return String::fromUTF8 (scriptPath).trim();
     
-    StringArray result;
-    result.add (getHomeScriptsPath());
+    StringArray dirs;
+    dirs.add (getUserScriptsDir());
 
-    #if defined (EL_SPATH_DEFAULT)
-        String defaultPath (EL_SPATH_DEFAULT);
-        if (defaultPath.isNotEmpty())
-            result.addArray (StringArray::fromTokens (defaultPath, ";"));
-    #else    
-        #if JUCE_WINDOWS
-            #pragma error "Windows script path needed"
-        #else
-            result.add ("/usr/local/share/element/scripts/?.lua");
+    #if JUCE_WINDOWS
+        const auto installDir = WindowsRegistry::getValue (
+            "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
+        if (File::isAbsolutePath (installDir))
+        {
+            dirs.add (File(installDir).getChildFile("scripts").getFullPathName());
+        }
+        else
+        {
+            #if ! EL_RUNNING_AS_PLUGIN
+                dirs.add (File::getSpecialLocation (File::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile ("scripts")
+                    .getFullPathName());
+            #endif
+        }
+
+    #elif JUCE_MAC
+        dirs.add (File::getSpecialLocation (File::currentApplicationFile)
+            .getChildFile ("Contents/Resources/scripts")
+            .getFullPathName());
+
+    #else
+        #if defined (EL_SCRIPTSDIR)
+            if (File::isAbsolutePath (EL_SCRIPTSDIR))
+                dirs.add (String (EL_SCRIPTSDIR));
         #endif
     #endif
 
-    return result.joinIntoString (";");
+    jassert(dirs.size() > 1);
+    return dirs.joinIntoString (";");
 }
 
 static String getLuaPath()
 {
     if (auto* luaPath = std::getenv ("LUA_PATH"))
         return String::fromUTF8 (luaPath).trim();
+    
+    StringArray dirs;
 
-    const StringArray dirs (
-        getHomeLuaDir(),
-        "/usr/local/share/element/lua"
-    );
+    #if JUCE_WINDOWS
+        const auto installDir = WindowsRegistry::getValue (
+            "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
+        if (File::isAbsolutePath (installDir))
+        {
+            dirs.add (File (installDir).getChildFile ("lua").getFullPathName());
+        }
+        else
+        {
+            #if ! EL_RUNNING_AS_PLUGIN
+                dirs.add (File::getSpecialLocation (File::currentExecutableFile)
+                    .getParentDirectory()
+                    .getChildFile ("lua")
+                    .getFullPathName());
+            #endif
+        }
+
+    #elif JUCE_MAC
+        dirs.add (File::getSpecialLocation (File::currentApplicationFile)
+            .getChildFile ("Contents/Resources/lua")
+            .getFullPathName());
+    
+    #else
+        #if defined (EL_LUADIR)
+            if (File::isAbsolutePath (EL_LUADIR))
+                dirs.add (EL_LUADIR);
+        #endif
+    #endif
+
+    dirs.removeEmptyStrings();
+    dirs.removeDuplicates (true);
+
     
     StringArray path;
-    for (const auto& dir : dirs)
+
+    if (dirs.size() <= 0)
     {
-        path.add (dir + "/?.lua");
-        path.add (dir + "/?/init.lua");
+       #if defined (LUA_PATH_DEFAULT)
+        path.addArray (StringArray::fromTokens (LUA_PATH_DEFAULT, ";"));
+       #endif
+    }
+    else
+    {
+        for (const auto& dir : dirs)
+        {
+            path.add (dir + "/?.lua");
+            path.add (dir + "/?/init.lua");
+        }
     }
 
+    jassert (path.size() > 0);
     return path.joinIntoString (";");
 }
 
@@ -230,11 +299,11 @@ static String getLuaCPath()
     if (auto* luaPath = std::getenv ("LUA_CPATH"))
         return String::fromUTF8 (luaPath).trim();
 
-    const StringArray dirs (
-        getHomeLuaDir(),
-        "/usr/local/lib/element/lua"
-    );
+    StringArray dirs;
     
+    dirs.removeDuplicates (true);
+    dirs.removeEmptyStrings();
+
     StringArray path;
     for (const auto& dir : dirs)
     {
@@ -245,6 +314,7 @@ static String getLuaCPath()
     return path.joinIntoString (";");
 }
 
+//==============================================================================
 static int searchInternalModules (lua_State* L)
 {
     const auto mod = sol::stack::get<std::string> (L);

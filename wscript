@@ -89,18 +89,18 @@ def configure (conf):
     configure_git_version (conf)
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
+    conf.env.LUADIR  = os.path.join (conf.env.DATADIR, 'lua')
+    conf.env.SCRIPTSDIR  = os.path.join (conf.env.DATADIR, 'scripts')
 
     conf.env.LUA_PATH_DEFAULT = make_lua_path ([
-        os.path.join (conf.env.DATADIR, 'lua'),
+        conf.env.LUADIR
     ])
 
     conf.env.LUA_CPATH_DEFAULT = make_lua_cpath ([
-        # os.path.join (os.path.expanduser('~'), '.local/lib/element/lua'),
         os.path.join (conf.env.LIBDIR, 'element/lua')
     ])
 
     conf.env.EL_SPATH_DEFAULT = make_lua_spath ([
-        # os.path.join (os.path.expanduser('~'), '.local/share/element/scripts'),
         os.path.join (conf.env.DATADIR, 'scripts')
     ])
 
@@ -112,8 +112,8 @@ def configure (conf):
     conf.check_cxx_version()
     silence_warnings (conf)
 
-    conf.find_program('convert', mandatory=False)
-    conf.find_program('ldoc', mandatory=False)
+    conf.find_program ('convert', mandatory=False)
+    conf.find_program ('ldoc',    mandatory=False)
 
     conf.check_common()
     if cross.is_mingw(conf): conf.check_mingw()
@@ -128,8 +128,6 @@ def configure (conf):
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1)
-    
-    conf.env.append_unique ("MODULE_PATH", [conf.env.MODULEDIR])
 
     print
     juce.display_header ("Element")
@@ -306,7 +304,7 @@ def build_app (bld):
         cxxflags    = [
             '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
-            '-DEL_SPATH_DEFAULT="%s"'  % libEnv.EL_SPATH_DEFAULT
+            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
         ]
     )
 
