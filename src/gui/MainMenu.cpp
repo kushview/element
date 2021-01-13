@@ -124,6 +124,16 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         URL ("https://help.kushview.net/collection/10-element").launchInDefaultBrowser();
     }
+    else if (index == 6500 && menu == Help)
+    {
+       #ifdef EL_API_DOCS_URL
+        URL url (EL_API_DOCS_URL);
+       #else
+        URL url ("https://api.kushview.net/element/lua");
+       #endif
+
+        url.launchInDefaultBrowser();
+    }
     else if (index == 7000 && menu == Help)
     {
         URL ("https://github.com/kushview/element/issues").launchInDefaultBrowser();
@@ -354,6 +364,7 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
     menu.addItem (6000, "Online documentation...");
+    menu.addItem (6500, "API documentation...");
     menu.addItem (7000, "Submit Feedback...");
     #if ! JUCE_MAC
     menu.addSeparator();
