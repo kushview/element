@@ -32,6 +32,7 @@ LuaConsole::LuaConsole()
     : Console ("Lua Console")
 {
     setSize (100, 100);
+    startTimer (200);
 }
 
 LuaConsole::~LuaConsole() { }
@@ -143,12 +144,32 @@ void LuaConsole::setEnvironment (const sol::environment& _env)
         
         if (msg.isNotEmpty())
         {
-            addText (msg.trimEnd());
-            MessageManager::getInstance()->runDispatchLoopUntil (4);
+            printMessages.add (msg.trimEnd());
         }
     });
 
     lua.script ("require('el.script').exec('console', _ENV)", e);
+}
+
+void LuaConsole::timerCallback()
+{
+    if (! printMessages.isEmpty())
+    {
+        const int block = jmax (1, printMessages.size() / 4);
+        const int count = jmin (block, printMessages.size());
+        
+        if (count > 0)
+        {       
+            addText (printMessages.joinIntoString ("\n",0, count));
+            printMessages.removeRange (0, count);
+        }
+
+        startTimerHz (50);
+    }
+    else
+    {
+        startTimer (jmin (250, getTimerInterval() + 10));
+    }
 }
 
 }

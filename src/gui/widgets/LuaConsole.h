@@ -24,7 +24,8 @@
 
 namespace Element {
 
-class LuaConsole : public Console
+class LuaConsole : public Console,
+                   private Timer
 {
 public:
     LuaConsole();
@@ -37,7 +38,11 @@ private:
     using LuaResult = sol::protected_function_result;
     sol::environment env;
     String lastError;
+    StringArray printMessages;
     LuaResult errorHandler (lua_State* L, LuaResult pfr);
+
+    friend class Timer;
+    void timerCallback() override;
 };
 
 }
