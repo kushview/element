@@ -552,7 +552,7 @@ void ScriptNodeEditor::resized()
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
 
-    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * 0.6)));
+    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
 
     r1.removeFromTop (2);
     if (props.isVisible())
