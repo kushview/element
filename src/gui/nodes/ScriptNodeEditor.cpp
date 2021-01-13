@@ -287,13 +287,13 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
-        "iscontrol", &ScriptNodeControlPort::isControl,
-        "value",   sol::property (&ScriptNodeControlPort::getValue,
-                                  &ScriptNodeControlPort::setValue),
-        "control", sol::property (&ScriptNodeControlPort::getControl,
-                                  &ScriptNodeControlPort::setControl),
-        "changed", sol::property (&ScriptNodeControlPort::getChangedFunction,
-                                  &ScriptNodeControlPort::setChangedFunction)
+        "iscontrol",    &ScriptNodeControlPort::isControl,
+        "value",        sol::property (&ScriptNodeControlPort::getValue,
+                                       &ScriptNodeControlPort::setValue),
+        "control",      sol::property (&ScriptNodeControlPort::getControl,
+                                       &ScriptNodeControlPort::setControl),
+        "valuechanged", sol::property (&ScriptNodeControlPort::getChangedFunction,
+                                       &ScriptNodeControlPort::setChangedFunction)
     );
     env["ScriptNodeEditor.ControlPort"] = M;
     
@@ -372,6 +372,9 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     addAndMakeVisible (props);
     props.setVisible (paramsButton.getToggleState());
 
+    addAndMakeVisible (console);
+    console.setEnvironment (env);
+
     updateAll();
 
     lua->addChangeListener (this);
@@ -421,50 +424,71 @@ void ScriptNodeEditor::updatePreview()
 {
     if (previewButton.getToggleState())
     {
-        Script loader (state);
-        if (loader.load (lua->getCodeDocument(true).getAllContent()))
-        {
-            auto f = loader.caller(); env.set_on (f);
-            auto ctx = createContext();
-            auto instance = f (ctx);
-
-            if (! instance.valid())
+        try {
+            Script loader (state);
+            if (loader.load (lua->getCodeDocument(true).getAllContent()))
             {
-                sol::error e = instance;
-                DBG(e.what());
-                return;
-            }
+                auto f = loader.caller(); env.set_on (f);
+                auto ctx = createContext();
+                sol::protected_function_result instance = f (ctx);
             
-            if (instance.get_type() == sol::type::table)
-            {
-                sol::table DSPUI = instance;
-                sol::table editor;
+                if (! instance.valid())
+                {
+                    sol::error e = instance;
+                    for (const auto& line : StringArray::fromLines (e.what()))
+                        console.addText (line);
+                    return;
+                }
                 
-                switch (DSPUI["editor"].get_type())
+                if (instance.get_type() == sol::type::table)
                 {
-                    case sol::type::function:
-                        editor = DSPUI["editor"](ctx);
-                        break;
-                    default:
-                        break;
-                }
+                    sol::table DSPUI = instance;
+                    sol::table editor;
+                    
+                    switch (DSPUI["editor"].get_type())
+                    {
+                        case sol::type::function:
+                        {
+                            sol::function instantiate = DSPUI["editor"];
+                            auto editorResult = instantiate (ctx);
+                            if (! editorResult.valid())
+                            {
+                                sol::error e = editorResult;
+                                for (const auto& line : StringArray::fromLines (e.what()))
+                                    console.addText (line);
+                            }
+                            else if (editorResult.get_type() == sol::type::table)
+                            {
+                                editor = editorResult;
+                            }
+                            break;
+                        }
+                        default:
+                            break;
+                    }
 
-                if (auto* const c = kv::lua::object_userdata<Component> (editor))
-                {
-                    comp = c;
-                    widget = editor;
-                    addAndMakeVisible (*comp);
-                    comp->setAlwaysOnTop (true);
+                    if (auto* const c = kv::lua::object_userdata<Component> (editor))
+                    {
+                        comp = c;
+                        widget = editor;
+                        addAndMakeVisible (*comp);
+                        comp->setAlwaysOnTop (true);
+                    }
+                    else
+                    {
+                        console.addText ("ScriptNodeEditor: didn't get widget from DSPUI script");
+                    }
                 }
-                else
-                {
-                    DBG("[EL] ScriptNodeEditor: didn't get widget from DSPUI script");
-                }
+            }
+            else
+            {
+                console.addText (loader.getErrorMessage());
             }
         }
-        else
+        catch (const std::exception& e)
         {
-            DBG(loader.getErrorMessage());
+            for (const auto& line : StringArray::fromLines (e.what()))
+                console.addText (line);
         }
     }
     else
@@ -527,6 +551,8 @@ void ScriptNodeEditor::resized()
     
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
+
+    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * 0.6)));
 
     r1.removeFromTop (2);
     if (props.isVisible())

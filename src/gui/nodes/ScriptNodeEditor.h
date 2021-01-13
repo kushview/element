@@ -22,9 +22,11 @@
 
 #include "engine/nodes/ScriptNode.h"
 #include "gui/nodes/NodeEditorComponent.h"
+#include "gui/widgets/LuaConsole.h"
 #include "gui/LuaTokeniser.h"
 
 namespace Element {
+
 class ScriptingEngine;
 class ScriptNodeEditor : public NodeEditorComponent,
                          public ChangeListener
@@ -59,6 +61,8 @@ private:
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
 
+    LuaConsole console;
+    
     CodeDocument& getActiveDoc();
     void updateAll();
     void updatePreview();
