@@ -12,12 +12,15 @@ LUAMOD_API int luaopen_el_CommandManager (lua_State* L)
     sol::state_view lua (L);
     auto M = lua.create_table();
     M.new_usertype<CommandManager> ("CommandManager", sol::no_constructor,
+        /// Methods.
+        // @section methods
+        
         /// Invoke a command directly
         // @int cmd Command ID to invoke
         // @bool async Invoke now or aysnc
-        // @function CommandManager:invoke_directly
+        // @function CommandManager:invokedirectly
         // @treturn bool True if success
-        "invoke_directly",   &CommandManager::invokeDirectly,
+        "invokedirectly",   &CommandManager::invokeDirectly,
 
         // Clears the current list of all commands.
         // Note that this will also clear the contents of the KeyPressMappingSet.
@@ -34,7 +37,10 @@ LUAMOD_API int luaopen_el_CommandManager (lua_State* L)
 
         /// Tell the manager a command has changed.
         // Call this if you modify the details of a command.
-        "command_changed", &CommandManager::commandStatusChanged,
+        "commandchanged", &CommandManager::commandStatusChanged,
+
+        /// Class Methods.
+        // @section classmethods
 
         /// Retursn list of standard command IDs
         // @function CommandManager.standard

@@ -18,6 +18,7 @@ local mods = {
     ["object"]          = "kv.object",
 
     ['MidiPipe']        = 'el.MidiPipe',
+    ['command']         = 'el.command',
     ["script"]          = "el.script"
 }
 

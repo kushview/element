@@ -1,15 +1,17 @@
 project     = 'Element'
 title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
-file = { 
-    'libs/lua-kv/src',
+file = {
+    'libs/lua-kv/src/kv',
     'libs/lua-kv/src/juce_rectangle.hpp',
+    'libs/lua-kv/kv/lua/widget.hpp',
     'libs/element/lua',
     'scripts',
     exclude = {
         'libs/element/lua/element.lua',
         'libs/lua-kv/src/lua-kv.h',
-        'libs/lua-kv/src/kv/vector.c'
+        'libs/lua-kv/src/kv/vector.c',
+        'libs/lua-kv/src/kv/File.cpp'
     },
 }
 examples = {
@@ -20,6 +22,8 @@ dir         = 'build/doc/lua'
 output      = 'index'
 merge       = true
 all         = false
+
+add_language_extension ('.hpp', 'c')
 
 ---[[
 custom_tags = {

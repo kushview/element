@@ -40,8 +40,9 @@ end
 
 --- Render audio and midi.
 -- Use the provided audio and midi objects to process your plugin
--- @param a     The source kv.AudioBuffer
--- @param m     The source el.MidiPipe
+-- @param a The source kv.AudioBuffer
+-- @param m The source el.MidiPipe
+-- @param params DSP parameters
 local function amp_process (a, m, params)
     gain2 = audio.togain (params [1])
     a:fade (gain1, gain2)

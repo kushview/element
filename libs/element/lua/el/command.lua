@@ -9,7 +9,7 @@ local M = {}
 --- Returns the global el.CommandManager
 function M.manager()
     local g = Globals.instance()
-    return g and g:command_manager() or nil
+    return g and g:commandmanager() or nil
 end
 
 --- Invoke a command.
@@ -25,7 +25,7 @@ function M.invoke (cmd, async)
     if cmd > 0 then
         local m = M.manager()
         assert (m ~= nil, "nil el.CommandManager")
-        return m:invoke_directly (cmd, async or false)
+        return m:invokedirectly (cmd, async or false)
     end
 
     return false

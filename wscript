@@ -91,6 +91,7 @@ def configure (conf):
     conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
     conf.env.LUADIR  = os.path.join (conf.env.DATADIR, 'lua')
     conf.env.SCRIPTSDIR  = os.path.join (conf.env.DATADIR, 'scripts')
+    conf.env.DOCDIR  = os.path.join (conf.env.PREFIX, 'share/doc/element')
 
     conf.env.LUA_PATH_DEFAULT = make_lua_path ([
         conf.env.LUADIR
@@ -216,7 +217,7 @@ def build_desktop (bld, slug='element'):
 
 def build_lua_docs (bld):
     if bool(bld.env.LDOC):
-        call ([bld.env.LDOC[0], '.' ])
+        call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
 def build_lua_lib (bld):
     lua = bld (
@@ -304,7 +305,8 @@ def build_app (bld):
         cxxflags    = [
             '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
-            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
+            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
+            '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
         ]
     )
 
@@ -346,7 +348,7 @@ def install_lua_files (bld):
                        relative_trick=True,
                        cwd=path.find_dir ('scripts'))
 
-    bld.install_files (join (bld.env.DATADIR, 'doc/lua'),
+    bld.install_files (join (bld.env.DOCDIR, 'lua'),
                        bld.path.ant_glob ("build/doc/lua/**/*.*"),
                        relative_trick=True,
                        cwd=bld.path.find_dir ('build/doc/lua'))

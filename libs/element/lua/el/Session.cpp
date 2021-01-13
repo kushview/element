@@ -26,9 +26,11 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
                 : std::shared_ptr<Node>();
         },
 
+        /// Attributes.
+        // @section attributes
+        
         /// Session name.
         // @field Session.name
-        // @within Attributes
         "name", sol::property (
             [](Session& self, const char* name) -> void {
                 self.setName (String::fromUTF8 (name));
@@ -37,6 +39,9 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
                 return self.getName().toStdString();
             }
         ),
+
+        /// Methods.
+        // @section methods
 
         /// Convert to an XML string.
         // @function Session:toxmlstring
@@ -49,13 +54,13 @@ LUAMOD_API int luaopen_el_Session (lua_State* L) {
         
         /// Save the state.
         // Will save state for all loaded plugins as well
-        // @function Session:save_state
-        "save_state",               &Session::saveGraphState,
+        // @function Session:savestate
+        "savestate",               &Session::saveGraphState,
 
         /// Restore state.
         // Restores all plugin states
-        // @function Session:restore_state
-        "restore_state",            &Session::restoreGraphState
+        // @function Session:restorestate
+        "restorestate",            &Session::restoreGraphState
 
        #if 0
         "clear",                    &Session::clear,

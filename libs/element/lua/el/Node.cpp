@@ -26,6 +26,9 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
                                    : std::shared_ptr<Node>();
         },
 
+        /// Attributes.
+        // @section Attributes
+
         /// True if a valid node (readonly).
         // @field Node.valid
         // @within Attributes
@@ -57,13 +60,36 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
         "nodeid",               readonly_property (&Node::getNodeId),
         
         "type",                 readonly_property (&Node::getNodeType),
+
+        /// Is muted.
+        // @field Node.muted
         "muted",                property (&Node::isMuted, &Node::setMuted),
+
+        /// Is bypassed.
+        // @field Node.bypassed
         "bypassed",             readonly_property (&Node::isBypassed),
-        "has_editor",           readonly_property (&Node::hasEditor),
 
-        "display_name",         [](Node* self) { return self->getDisplayName().toStdString(); },
-        "plugin_name",          [](Node* self) { return self->getPluginName().toStdString(); },
+        /// Display name.
+        // Will be a user-defined name or name provided by the plugin.
+        // @field Node.displayname
+        "displayname",          [](Node* self) { return self->getDisplayName().toStdString(); },
 
+        /// Plugin name.
+        // Name provided by the plugin.
+        // @field Node.pluginname
+        "pluginname",           [](Node* self) { return self->getPluginName().toStdString(); },
+
+        /// Methods.
+        // @section methods
+
+        /// Has custom editor.
+        // @function Node:haseditor
+        // @return True if the plugin provides it's own editor
+        "haseditor",           readonly_property (&Node::hasEditor),
+
+        /// Convert to an XML string.
+        // @function Node:toxmlstring
+        // @treturn string Node formatted as XML
         "toxmlstring", [](Node* self) -> std::string
         {
             auto copy = self->getValueTree().createCopy();
@@ -71,10 +97,23 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
             return copy.toXmlString().toStdString();
         },
 
-        "reset_ports",          &Node::resetPorts,
-        "save_state",           &Node::savePluginState,
-        "restore_state",        &Node::restorePluginState,
-        "write_file", [](const Node& node, const char* filepath) -> bool {
+        /// Rebuild port metadata.
+        // @function Node:resetports
+        "resetports",          &Node::resetPorts,
+
+        /// Save state.
+        // @function Node:savestate
+        "savestate",           &Node::savePluginState,
+
+        /// Restore state.
+        // @function Node:restorestate
+        "restorestate",        &Node::restorePluginState,
+
+        /// Write node to file.
+        // @function Node:writefile
+        // @string f Absolute file path to save to
+        // @return True if successful
+        "writefile", [](const Node& node, const char* filepath) -> bool {
             if (! File::isAbsolutePath (filepath))
                 return false;
             return node.writeToFile (File (String::fromUTF8 (filepath)));

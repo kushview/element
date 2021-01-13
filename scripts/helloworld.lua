@@ -62,8 +62,8 @@ end
 
 function HelloWorld:resized()
     local r = self.localbounds:reduced (8)
-    self.button.bounds = r:slice_bottom (30)
-                          :slice_right (90)
+    self.button.bounds = r:slicebottom (30)
+                          :sliceright (90)
     self.label.bounds  = r:reduced (20)
 end
 
@@ -86,14 +86,19 @@ function HelloWorld:mouseup (ev)
 end
 
 local win = new (DocumentWindow)
-function win:onclosebutton()
+
+local function closewindow()
     if not win then return end
     win.visible = false
     win = nil
 end
 
+function win:closepressed()
+    closewindow()
+end
+
 win.content = new (HelloWorld)
-win.content.button.onclick = win.onclosebutton
+win.content.button.clicked = closewindow
 win.visible = true
 
 return win

@@ -28,48 +28,54 @@ LUAMOD_API int luaopen_el_Globals (lua_State* L)
     sol::state_view lua (L);
     auto M = lua.create_table();
     M.new_usertype<Globals> ("Globals", sol::no_constructor,
+        /// Class Methods.
+        // @section classmethods
+
         /// Returns el.Globals single instance
         // @function Globals.instance
         // @treturn el.Globals
         "instance",                 el_Globals_userdata,
 
+        /// Methods.
+        // @section methods
+
         /// Get the current audio engine
-        // @function Globals:audio_engine
+        // @function Globals:audioengine
         // @treturn el.AudioEngine
-        "audio_engine",&Globals::getAudioEngine,
+        "audioengine",&Globals::getAudioEngine,
 
         /// Returns the command manager
-        // @function Globals:command_manager
+        // @function Globals:commandmanager
         // @treturn el.CommandManager
-        "command_manager", &Globals::getCommandManager,
+        "commandmanager", &Globals::getCommandManager,
 
         /// Returns the device manager
-        // @function Globals:device_manager
+        // @function Globals:devicemanager
         // @treturn el.DeviceManager
-        "device_manager", &Globals::getDeviceManager,
+        "devicemanager", &Globals::getDeviceManager,
 
         /// Returns the mapping engine
-        // @function Globals:mapping_engine
+        // @function Globals:mappingengine
         // @treturn el.MappingEngine
-        "mapping_engine", &Globals::getMappingEngine,
+        "mappingengine", &Globals::getMappingEngine,
 
         /// Returns the midi engine
-        // @function Globals:midi_engine
+        // @function Globals:midiengine
         // @treturn el.MidiEngine
-        "midi_engine", &Globals::getMidiEngine,
+        "midiengine", &Globals::getMidiEngine,
 
         /// Returns the plugin manager
-        // @function Globals:plugin_manager
+        // @function Globals:pluginmanager
         // @treturn el.PluginManager
-        "plugin_manager", &Globals::getPluginManager,
+        "pluginmanager", &Globals::getPluginManager,
 
         /// Returns the preset manager
-        // @function Globals:preset_manager
+        // @function Globals:presetmanager
         // @treturn el.PresetManager
-        "preset_manager", &Globals::getPresetCollection,
+        "presetmanager", &Globals::getPresetCollection,
 
         /// Returns the preset manager
-        // @function Globals.session
+        // @function Globals:session
         // @treturn el.Session
         "session", &Globals::getSession,
 
