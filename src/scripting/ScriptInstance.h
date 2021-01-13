@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "sol/sol.hpp"
+
 namespace Element {
 
 class ScriptInstance
