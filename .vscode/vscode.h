@@ -4,6 +4,7 @@
 #include "Globals.h"
 #include "lua.hpp"
 #include "sol/sol.hpp"
+
 using namespace juce;
 using namespace Element;
 

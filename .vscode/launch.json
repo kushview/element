@@ -101,7 +101,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceRoot}/build/bin/lua-el",
-            "args": [ "-i", "${workspaceRoot}/console.lua" ],
+            "args": [],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Waf Build",
             "linux": {

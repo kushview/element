@@ -89,7 +89,11 @@
                 "${workspaceFolder}/libs/lua-kv",
                 "${workspaceFolder}/libs/lua-kv/src"
             ],
-            "defines": [ "LUA_USE_READLINE=1" ],
+            "defines": [ 
+                "LUA_USE_READLINE=1",
+                "EL_LUADIR=\"/usr/share/element/lua\"",
+                "EL_SCRIPTSDIR=\"/usr/share/element/scripts\""
+            ],
             "forcedInclude": [
                 "${workspaceRoot}/.vscode/vscode.h"
             ],
