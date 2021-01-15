@@ -48,7 +48,7 @@ private:
     Component* comp = nullptr;
 
     kv::LuaTokeniser tokens;
-    class CodeEditor;
+    class CodeEditor; friend class CodeEditor;
     std::unique_ptr<CodeEditor> editor;
 
     TextButton compileButton;
@@ -62,6 +62,9 @@ private:
     ScriptNode::Ptr lua;
 
     LuaConsole console;
+    
+    FileBrowserComponent fileBrowser;
+    std::unique_ptr<FileChooser> chooser;
     
     CodeDocument& getActiveDoc();
     void updateAll();

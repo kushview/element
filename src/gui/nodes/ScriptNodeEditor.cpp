@@ -211,23 +211,6 @@ private:
     }
 };
 
-//==============================================================================
-sol::table ScriptNodeEditor::createContext()
-{
-    using CPP = ControlPortParameter;
-    sol::state_view view (state.lua_state());
-    sol::table ctx  = view.create_table();
-
-    ctx["params"] = view.create_table();
-    for (auto* param : lua->getParameters())
-    {
-        ctx["params"][1 + param->getParameterIndex()] = 
-            std::make_shared<ScriptNodeControlPort> (param);
-    }
-
-    return ctx;
-}
-
 class ScriptNodeEditor::CodeEditor : public CodeEditorComponent
 {
 public:
@@ -241,35 +224,48 @@ public:
 
     void addPopupMenuItems (PopupMenu &menu, const MouseEvent *event) override
     {
-        menu.addItem ("Open File", [this]()
-        {
-            FileChooser fc ("Open Script", {}, "*.lua");
-            if (fc.browseForFileToOpen())
-            {
-                getDocument().replaceAllContent (
-                    fc.getResult().loadFileAsString());
-            }
-        });
-
-        menu.addItem ("Save File", [this]()
-        {
-            FileChooser fc ("Save Script", {}, "*.lua");
-            if (fc.browseForFileToSave (true))
-            {
-                TemporaryFile tmpFile (fc.getResult());
-                auto stream = tmpFile.getFile().createOutputStream();
-                if (getDocument().writeToStream (*stream))                
-                    tmpFile.overwriteTargetFileWithTemporary();
-            }
-        });
-
+        menu.addItem (50001, "Open File");
+        menu.addItem (50002, "Save File");
         menu.addSeparator();
         CodeEditorComponent::addPopupMenuItems (menu, event);
     }
 
     void performPopupMenuAction (int menuItemID) override
     {
-        CodeEditorComponent::performPopupMenuAction (menuItemID);
+        switch (menuItemID)
+        {
+            case 50001:
+            {
+                // owner.fileBrowser.setVisible (true);
+                // owner.fileBrowser.toFront (true);
+                
+                FileChooser& fc (*owner.chooser);
+                if (fc.browseForFileToOpen())
+                {
+                    auto& doc = getDocument();
+                    doc.replaceAllContent (
+                        fc.getResult().loadFileAsString());
+                }
+                break;
+            }
+            
+            case 50002:
+            {
+                FileChooser fc ("Save Script", {}, "*.lua");
+                if (fc.browseForFileToSave (true))
+                {
+                    TemporaryFile tmpFile (fc.getResult());
+                    auto stream = tmpFile.getFile().createOutputStream();
+                    if (getDocument().writeToStream (*stream))                
+                        tmpFile.overwriteTargetFileWithTemporary();
+                }
+                break;
+            }
+
+            default:
+                CodeEditorComponent::performPopupMenuAction (menuItemID);
+                break;
+        }
     }
 
 private:
@@ -281,7 +277,9 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     : NodeEditorComponent (node),
       engine (scripts),
       state (engine.getLuaState()),
-      env (state, sol::create, state.globals())
+      env (state, sol::create, state.globals()),
+      fileBrowser (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles, 
+                   ScriptManager::getSystemScriptsDir(), nullptr, nullptr)
 {
     setOpaque (true);
 
@@ -315,6 +313,9 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
+
+    chooser.reset (new FileChooser ("Script", ScriptManager::getSystemScriptsDir(),
+                                    "*.lua", false, false, this));
 
     addAndMakeVisible (compileButton);
     compileButton.setButtonText ("Compile");
@@ -407,6 +408,24 @@ ScriptNodeEditor::~ScriptNodeEditor()
     editor.reset();
 }
 
+//==============================================================================
+sol::table ScriptNodeEditor::createContext()
+{
+    using CPP = ControlPortParameter;
+    sol::state_view view (state.lua_state());
+    sol::table ctx  = view.create_table();
+
+    ctx["params"] = view.create_table();
+    for (auto* param : lua->getParameters())
+    {
+        ctx["params"][1 + param->getParameterIndex()] = 
+            std::make_shared<ScriptNodeControlPort> (param);
+    }
+
+    return ctx;
+}
+
+//==============================================================================
 void ScriptNodeEditor::updateAll()
 {
     updateCodeEditor();
@@ -553,6 +572,8 @@ void ScriptNodeEditor::resized()
     auto r1 = getLocalBounds().reduced (4);
     auto r2 = r1.removeFromTop (toolbarSize);
     
+    fileBrowser.setBounds (r1.reduced (8));
+
     dspButton.changeWidthToFitText (r2.getHeight());
     dspButton.setBounds (r2.removeFromLeft (dspButton.getWidth()));
     r2.removeFromLeft (2);
@@ -584,6 +605,8 @@ void ScriptNodeEditor::resized()
         auto b = comp->getLocalBounds();
         comp->setBounds (b.withCentre (r1.getCentre()));
     }
+
+
 }
 
 }
