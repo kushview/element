@@ -480,7 +480,7 @@ DSPScript::getParameterObject (int index, bool input) const
 
 void DSPScript::addParameterPorts()
 {
-    sol::function f = DSP ["params"];
+    sol::function f = DSP ["parameters"];
     if (! f.valid()) return;
 
     try {
