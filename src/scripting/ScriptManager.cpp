@@ -21,6 +21,7 @@
 #include "scripting/LuaBindings.h"
 #include "scripting/ScriptDescription.h"
 #include "scripting/ScriptManager.h"
+#include "DataPath.h"
 #include "sol/sol.hpp"
 
 namespace Element {
@@ -118,6 +119,38 @@ ScriptDescription ScriptManager::getScript (int index) const
 const ScriptArray& ScriptManager::getScriptsDSP() const
 {
     return registry->dsp;
+}
+
+//==============================================================================
+File ScriptManager::getSystemScriptsDir()
+{
+    File dir;
+
+   #if defined (EL_SCRIPTSDIR)
+    dir = File (EL_SCRIPTSDIR);
+
+   #elif JUCE_LINUX
+    dir = File ("/usr/local/share/element/scripts");
+
+   #else
+    jassert (false)
+   #endif
+   
+    return dir;
+}
+
+File ScriptManager::getHomeScriptsDir()
+{
+    return File::getSpecialLocation (File::userHomeDirectory)
+        .getChildFile (".local/share/element/scripts")
+        .getFullPathName();
+}
+
+File ScriptManager::getUserScriptsDir()
+{
+    return DataPath::applicationDataDir()
+        .getChildFile ("Scripts")
+        .getFullPathName();
 }
 
 }

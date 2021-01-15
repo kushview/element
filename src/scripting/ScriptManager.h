@@ -38,6 +38,10 @@ public:
 
     const ScriptArray& getScriptsDSP() const;
 
+    static File getSystemScriptsDir();
+    static File getHomeScriptsDir();
+    static File getUserScriptsDir();
+
 private:
     class Registry;
     std::unique_ptr<Registry> registry;
