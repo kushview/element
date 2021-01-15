@@ -287,11 +287,27 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
-        "iscontrol",    &ScriptNodeControlPort::isControl,
-        "value",        sol::property (&ScriptNodeControlPort::getValue,
-                                       &ScriptNodeControlPort::setValue),
-        "control",      sol::property (&ScriptNodeControlPort::getControl,
-                                       &ScriptNodeControlPort::setControl),
+        "value",        sol::overload (
+            [](ScriptNodeControlPort& self) -> double {
+                return self.getValue();
+            },
+            [](ScriptNodeControlPort& self, bool normal) -> double {
+                return normal ? self.getValue() : self.getControl();
+            },
+            [](ScriptNodeControlPort& self, double value) -> double {
+                self.setValue (static_cast<float> (value));
+                return self.getValue();
+            },
+            [](ScriptNodeControlPort& self, double value, bool normal) -> double {
+                if (normal) self.setValue (static_cast<float> (value));
+                else        self.setControl (static_cast<float> (value));
+                return normal ? self.getValue() : self.getControl();
+            }
+        ),
+        "normalized",   sol::property (&ScriptNodeControlPort::getValue,
+                                       [](ScriptNodeControlPort& self, double  value) { self.setValue (value); }),
+        "regular",      sol::property (&ScriptNodeControlPort::getControl,
+                                       [](ScriptNodeControlPort& self, double  value) { self.setControl (value); }),
         "valuechanged", sol::property (&ScriptNodeControlPort::getChangedFunction,
                                        &ScriptNodeControlPort::setChangedFunction)
     );
@@ -528,7 +544,7 @@ void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 
 void ScriptNodeEditor::paint (Graphics& g)
 {
-    g.fillAll (Element::LookAndFeel::backgroundColor);
+    g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker());
 }
 
 void ScriptNodeEditor::resized()
@@ -552,15 +568,15 @@ void ScriptNodeEditor::resized()
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
 
-    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
-
     r1.removeFromTop (2);
+
     if (props.isVisible())
     {
         props.setBounds (r1.removeFromRight (220));
         r1.removeFromRight (2);
     }
 
+    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
     editor->setBounds (r1);
 
     if (previewButton.getToggleState() && comp != nullptr)

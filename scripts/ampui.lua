@@ -19,17 +19,17 @@ function Editor:init (ctx)
 
     self.knob = self:add (object.new (Slider))
     self.knob:range (-90, 24, 0.01)
-    self.knob:value (volume.control)
+    self.knob:value (volume:value (false))
     self.knob.dragging  = false
     self.knob.dragstart = function() self.knob.dragging = true end
     self.knob.dragend   = function() self.knob.dragging = false end
     self.knob.valuechanged   = function()
         if not self.knob.dragging then return end
-        volume.control = self.knob:value()
+        volume:value (self.knob:value(), false)
     end
 
     volume.valuechanged = function()
-        self.knob:value (volume.control, 0)
+        self.knob:value (volume:value (false), 0)
     end
 
     self:resize (240, 90)
