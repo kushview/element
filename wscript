@@ -18,8 +18,6 @@ def options (opt):
         help="Disable LADSPA plugin hosting")
     opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
         help="Disable LV2 plugin hosting")
-    opt.add_option ('--disable-gtkui', default=False, action='store_true', dest='no_gtkui', \
-        help="Disable GtkUI plugin hosting")
     
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
@@ -147,16 +145,15 @@ def configure (conf):
     juce.display_msg (conf, "VST3",   True)
     juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
     juce.display_msg (conf, "LV2",    bool(conf.env.LV2))
-    juce.display_msg (conf, "GtkUI",  bool(conf.env.GTKUI))
     juce.display_msg (conf, "Lua",    bool(conf.env.LUA))
     juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
     juce.display_msg (conf, "Debug", conf.options.debug)
 
     print
-    juce.display_msg (conf, "PREFIX", conf.env.PREFIX)
-    juce.display_msg (conf, "DATADIR", conf.env.DATADIR)
-    juce.display_msg (conf, "CFLAGS", conf.env.CFLAGS)
-    juce.display_msg (conf, "CXXFLAGS", conf.env.CXXFLAGS)
+    juce.display_msg (conf, "PREFIX",    conf.env.PREFIX)
+    juce.display_msg (conf, "DATADIR",   conf.env.DATADIR)
+    juce.display_msg (conf, "CFLAGS",    conf.env.CFLAGS)
+    juce.display_msg (conf, "CXXFLAGS",  conf.env.CXXFLAGS)
     juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
 
 def common_includes():
