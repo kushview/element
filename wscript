@@ -57,7 +57,13 @@ def configure_product (conf):
 
 def configure_git_version (ctx):
     if os.path.exists('.git'):
-        call(["python", "tools/gitversion.py"], stdout=PIPE)
+        process = Popen(["git", "rev-parse", "--short", "HEAD"], stdout=PIPE)
+        (githash, err) = process.communicate()
+        githash = githash.strip()
+        process.wait()
+        ctx.env.GIT_HASH = str(githash)
+    else:
+        ctx.env.GIT_HASH = ''
 
 def make_lua_path (paths):
     out = ''
@@ -129,6 +135,8 @@ def configure (conf):
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
     conf.define ('KV_DOCKING_WINDOWS', 1)
+    if len(conf.env.GIT_HASH) > 0:
+        conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
     print
     juce.display_header ("Element")

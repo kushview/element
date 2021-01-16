@@ -19,7 +19,6 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "GitVersion.h"
 
 #ifndef EL_GIT_VERSION
  #define EL_GIT_VERSION ""
