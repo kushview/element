@@ -106,8 +106,7 @@ private:
 };
 
 Globals::Globals (const String& _cli)
-    : WorldBase (this),
-      cli (_cli)
+    : cli (_cli)
 {
     appName = "Element";
     impl = new Impl (*this);

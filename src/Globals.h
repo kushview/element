@@ -24,7 +24,6 @@
 #include "engine/MidiEngine.h"
 #include "session/Session.h"
 #include "URIs.h"
-#include "WorldBase.h"
 
 namespace Element {
 
@@ -46,7 +45,7 @@ struct CommandLine
     const String commandLine;
 };
 
-class Globals : public WorldBase
+class Globals final
 {
 public:
     explicit Globals (const String& commandLine = String());

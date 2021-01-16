@@ -259,7 +259,6 @@ public:
         engine = nullptr;
         controller = nullptr;
         world->setEngine (nullptr);
-        world->unloadModules();
         world = nullptr;
     }
 
