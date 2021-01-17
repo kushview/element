@@ -101,7 +101,7 @@ public:
             sol::object a = env["testvalue"], b = lua["testvalue"];
             expect (a != b);
             expect (a.get_type() == sol::type::boolean);
-            expect (b.get_type() == sol::type::nil);
+            expect (b.get_type() == sol::type::lua_nil);
 
             beginTest ("environment: in lua");
             env["testvalue"] = 95.0;
