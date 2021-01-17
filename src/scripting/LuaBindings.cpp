@@ -21,19 +21,15 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
-
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
-
 #include "gui/SystemTray.h"
-
 #include "session/CommandManager.h"
 #include "session/MediaManager.h"
 #include "session/Node.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
 #include "session/Session.h"
-
 #include "DataPath.h"
 #include "Settings.h"
 #include "sol/sol.hpp"

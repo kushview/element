@@ -17,10 +17,10 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "sol/sol.hpp"
 #include "scripting/LuaBindings.h"
 #include "scripting/ScriptDescription.h"
 #include "scripting/Script.h"
-#include "sol/sol.hpp"
 
 namespace Element {
 
