@@ -35,6 +35,8 @@ public:
     MainWindow (Globals&);
     virtual ~MainWindow();
     void closeButtonPressed() override;
+    void minimiseButtonPressed() override;
+    
     void refreshMenu();
     Globals& getWorld() { return world; }
     AppController& getAppController();

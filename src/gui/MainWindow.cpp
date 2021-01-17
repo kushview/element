@@ -23,7 +23,9 @@
 #include "gui/MainMenu.h"
 #include "gui/MainWindow.h"
 #include "session/CommandManager.h"
+#include "Commands.h"
 #include "Globals.h"
+#include "Settings.h"
 #include "Utils.h"
 
 namespace Element {
@@ -139,6 +141,14 @@ void MainWindow::closeButtonPressed()
 {
     JUCEApplication* app (JUCEApplication::getInstance());
     app->systemRequestedQuit();
+}
+
+void MainWindow::minimiseButtonPressed()
+{
+    if (world.getSettings().isSystrayEnabled())
+        world.getCommandManager().invokeDirectly (Commands::toggleUserInterface, true);
+    else
+        DocumentWindow::minimiseButtonPressed();
 }
 
 void MainWindow::activeWindowStatusChanged()
