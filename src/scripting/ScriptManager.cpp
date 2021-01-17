@@ -133,7 +133,7 @@ File ScriptManager::getSystemScriptsDir()
     dir = File ("/usr/local/share/element/scripts");
 
    #else
-    jassert (false)
+    jassert (false);
    #endif
    
     return dir;
