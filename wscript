@@ -33,7 +33,7 @@ def options (opt):
         help="Build the test suite")
     opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
         help="Specify the VST2 SDK path")
-    opt.add_option('--ziptype', default='gz', dest='ziptype', type='string', 
+    opt.add_option ('--ziptype', default='gz', dest='ziptype', type='string', 
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
 def silence_warnings (conf):
