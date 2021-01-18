@@ -89,10 +89,8 @@ inline static bool isGmailExtended (const String& email)
                 .length() >= 1; 
 }
 
-StringArray getFullVesrionPluginIdentifiers();
 
 //=============================================================================
-
 inline static bool isValidOscPort (int port)
 {
     return port > 0 && port < 65536;

@@ -31,19 +31,6 @@
 
 namespace Element {
 
-static bool isFullVersionPlugin (const PluginDescription& desc)
-{
-    return Util::getFullVesrionPluginIdentifiers().contains (desc.fileOrIdentifier);
-}
-
-static String denyPluginMessage (const PluginDescription& desc)
-{
-    String message;
-    if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
-        message << "Nested Graphs are available in the paid version only.";
-    return message;
-}
-
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
 {
     String header = "Plugin Instantiation Failed";
