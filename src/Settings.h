@@ -51,6 +51,7 @@ public:
     static const char* oscHostEnabledKey;
     static const char* systrayKey;
     static const char* midiOutLatencyKey;
+    static const char* desktopScaleKey;
 
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -118,6 +119,9 @@ public:
     
     double getMidiOutLatency() const;
     void setMidiOutLatency (double latencyMs);
+
+    double getDesktopScale() const;
+    void setDesktopScale (double);
 
 private:
     PropertiesFile* getProps() const;

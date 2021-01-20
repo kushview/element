@@ -42,6 +42,7 @@ const char* Settings::oscHostPortKey            = "oscHostPortKey";
 const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
 const char* Settings::systrayKey                = "systrayKey";
 const char* Settings::midiOutLatencyKey         = "midiOutLatency";
+const char* Settings::desktopScaleKey           = "desktopScale";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -112,7 +113,6 @@ Settings::Settings()
 Settings::~Settings() { }
 
 //=============================================================================
-
 bool Settings::checkForUpdates() const
 {
     if (auto* props = getProps())
@@ -129,7 +129,6 @@ void Settings::setCheckForUpdates (const bool shouldCheck)
 }
 
 //=============================================================================
-
 PropertiesFile* Settings::getProps() const
 {
     return (const_cast<Settings*> (this))->getUserSettings();
@@ -153,7 +152,6 @@ void Settings::setLastGraph (const ValueTree& data)
 }
     
 //=============================================================================
-
 bool Settings::scanForPluginsOnStartup() const
 {
     if (auto* p = getProps())
@@ -170,7 +168,6 @@ void Settings::setScanForPluginsOnStartup (const bool shouldScan)
 }
 
 //=============================================================================
-
 bool Settings::showPluginWindowsWhenAdded() const
 {
     if (auto* p = getProps())
@@ -187,7 +184,6 @@ void Settings::setShowPluginWindowsWhenAdded (const bool shouldShow)
 }
 
 //=============================================================================
-
 bool Settings::openLastUsedSession() const
 {
     if (auto* p = getProps())
@@ -204,7 +200,6 @@ void Settings::setOpenLastUsedSession (const bool shouldOpen)
 }
 
 //=============================================================================
-
 void Settings::setGenerateMidiClock (const bool generate)
 {
     if (auto* p = getProps())
@@ -349,7 +344,6 @@ void Settings::setOscHostEnabled (bool enabled)
 }
 
 //=============================================================================
-
 int Settings::getOscHostPort() const
 {
     if (auto* p = getProps())
@@ -366,7 +360,6 @@ void Settings::setOscHostPort (int port)
 }
 
 //=============================================================================
-
 bool Settings::isSystrayEnabled() const
 {
     if (auto* p = getProps())
@@ -396,6 +389,23 @@ void Settings::setMidiOutLatency (double latencyMs)
         return;
     if (auto* p = getProps())
         p->setValue (midiOutLatencyKey, latencyMs);
+}
+
+//=============================================================================
+double Settings::getDesktopScale() const
+{
+    if (auto* p = getProps())
+        return p->getDoubleValue (desktopScaleKey, 1.0);
+    return 1.0;
+}
+
+void Settings::setDesktopScale (double scale)
+{
+    if (scale == getDesktopScale())
+        return;
+    scale = jlimit (0.1, 8.0, scale);
+    if (auto* p = getProps())
+        p->setValue (desktopScaleKey, scale);
 }
 
 //=============================================================================

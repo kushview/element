@@ -445,6 +445,28 @@ namespace Element {
             systray.setToggleState (settings.isSystrayEnabled(), dontSendNotification);
             systray.getToggleStateValue().addListener (this);
 
+            addAndMakeVisible (desktopScaleLabel);
+            desktopScaleLabel.setText ("Desktop scale", dontSendNotification);
+            desktopScaleLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (desktopScale);
+            desktopScale.textFromValueFunction = [this](double value) -> String {
+                return String (value, 2);
+            };
+            desktopScale.setRange (0.1, 8.0, 0.01);
+            desktopScale.setValue ((double) settings.getDesktopScale());
+            desktopScale.setSliderStyle (Slider::IncDecButtons);
+            desktopScale.setTextBoxStyle (Slider::TextBoxLeft, false, 82, 22);
+            desktopScale.onValueChange = [this]()
+            {
+                settings.setDesktopScale (desktopScale.getValue());
+                desktopScale.setValue (settings.getDesktopScale(), dontSendNotification);
+                if (settings.getDesktopScale() != Desktop::getInstance().getGlobalScaleFactor()) {
+                    Desktop::getInstance().setGlobalScaleFactor (settings.getDesktopScale());
+                    if (auto* parent = findParentComponentOfClass<PreferencesComponent>())
+                        parent->updateSize();
+                }
+            };
+
            #ifdef EL_PRO
             addAndMakeVisible (defaultSessionFileLabel);
             defaultSessionFileLabel.setText ("Default new Session", dontSendNotification);
@@ -523,7 +545,7 @@ namespace Element {
             layoutSetting (r, openLastSessionLabel, openLastSession);
             layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
             layoutSetting (r, systrayLabel, systray);
-
+            layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
            #ifdef EL_PRO
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
             defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
@@ -624,6 +646,9 @@ namespace Element {
 
         Label systrayLabel;
         SettingButton systray;
+
+        Label desktopScaleLabel;
+        Slider desktopScale;
 
         Settings& settings;
         AudioEnginePtr engine;
@@ -992,8 +1017,7 @@ PreferencesComponent::PreferencesComponent (Globals& g, GuiController& _gui)
     groupComponent->setVisible (false);
     //[/UserPreSize]
 
-    setSize (600, 500);
-
+    updateSize();
 
     //[Constructor] You can add your own custom stuff here..
     addPage (EL_GENERAL_SETTINGS_NAME);
@@ -1091,6 +1115,13 @@ void PreferencesComponent::setPage (const String& name)
         pageComponent = new Component (name);
     }
     resized();
+}
+
+void PreferencesComponent::updateSize()
+{
+    setSize (600, 500);
+    // setSize (roundDoubleToInt (600.0 * Desktop::getInstance().getGlobalScaleFactor()),
+    //          roundDoubleToInt (500.0 * Desktop::getInstance().getGlobalScaleFactor()));
 }
 
 } /* namespace Element */

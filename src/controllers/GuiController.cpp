@@ -151,6 +151,8 @@ void GuiController::saveProperties (PropertiesFile* props)
 void GuiController::activate()
 {
     getWorld().getDeviceManager().addChangeListener (this);
+    // Desktop::getInstance().setGlobalScaleFactor(
+    //     getWorld().getSettings().getDesktopScale());
     Controller::activate();
 }
 
@@ -358,7 +360,9 @@ void GuiController::run()
     }
 
     mainWindow->addToDesktop();
-
+    Desktop::getInstance().setGlobalScaleFactor(
+        getWorld().getSettings().getDesktopScale());
+    
     if (pf->getBoolValue ("mainWindowVisible", true))
     {
         mainWindow->setVisible (true);

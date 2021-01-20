@@ -45,6 +45,7 @@ public:
     void setPage (const String& name);
     void addPage (const String& name);
     Component* createPageForName (const String& name);
+    void updateSize();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
