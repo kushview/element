@@ -138,6 +138,10 @@ def configure (conf):
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
 
+    # Hidden Visibiility by default
+    for k in 'CFLAGS CXXFLAGS'.split():
+        conf.env.append_unique (k, ['-fvisibility=hidden'])
+
     print
     juce.display_header ("Element")
     juce.display_msg (conf, "ALSA",   conf.env.ALSA)
@@ -302,7 +306,7 @@ def build_app (bld):
         libEnv.append_unique (k, [ '-fPIC' ])
 
     library = bld (
-        features    = 'cxx cxxshlib',
+        features    = 'cxx cxxstlib',
         source      = common_sources (bld),
         includes    = common_includes(),
         target      = 'lib/element-0',
@@ -314,7 +318,8 @@ def build_app (bld):
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
             '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
             '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
-        ]
+        ],
+        install_path = None
     )
 
     bld.add_group()
