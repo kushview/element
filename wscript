@@ -18,6 +18,10 @@ def options (opt):
         help="Disable LADSPA plugin hosting")
     opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
         help="Disable LV2 plugin hosting")
+    opt.add_option ('--disable-vst', default=False, action='store_true', dest='no_vst', \
+        help="Disable VST2 plugin hosting")
+    opt.add_option ('--disable-vst3', default=False, action='store_true', dest='no_vst3', \
+        help="Disable VST3 plugin hosting")
     
     opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
         help="Build with docking window support")
@@ -31,8 +35,6 @@ def options (opt):
     
     opt.add_option ('--test', default=False, action='store_true', dest='test', \
         help="Build the test suite")
-    opt.add_option ('--with-vst-sdk', default='', type='string', dest='vst_sdk', \
-        help="Specify the VST2 SDK path")
     opt.add_option ('--ziptype', default='gz', dest='ziptype', type='string', 
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
@@ -141,8 +143,8 @@ def configure (conf):
     juce.display_msg (conf, "ALSA",   conf.env.ALSA)
     juce.display_msg (conf, "JACK",   conf.env.JACK)
     juce.display_msg (conf, "AU",     juce.is_mac())
-    juce.display_msg (conf, "VST2",   bool(conf.env.HAVE_VST))
-    juce.display_msg (conf, "VST3",   True)
+    juce.display_msg (conf, "VST2",   conf.env.VST)
+    juce.display_msg (conf, "VST3",   conf.env.VST3)
     juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
     juce.display_msg (conf, "LV2",    bool(conf.env.LV2))
     juce.display_msg (conf, "Lua",    bool(conf.env.LUA))

@@ -36,19 +36,16 @@ def check_common (self):
     self.define('KV_JACK_AUDIO', self.env.JACK)
     self.define('EL_USE_JACK', self.env.JACK)
 
-    # VST support
-    if len(self.options.vst_sdk) > 0:
-        self.env.append_unique ('CXXFLAGS', ['-I%s' % self.options.vst_sdk])
-    line_just = self.line_just
-    self.check(header_name='pluginterfaces/vst2.x/aeffect.h', 
-               mandatory=False, uselib_store="VST")
-    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
-    self.line_just = line_just
+    # VST2/3 host support
+    self.env.VST  = not bool (self.options.no_vst)
+    self.define ('JUCE_PLUGINHOST_VST', self.env.VST)
+    self.env.VST3 = not bool (self.options.no_vst3)
+    self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
 
     # LV2 Support
     self.env.LV2 = not bool(self.options.no_lv2)
     if self.env.LV2:
-        self.check_cfg(package='lv2', uselib_store="LV2", args='--cflags', mandatory=False)
+        self.check_cfg(package='lv2',    uselib_store="LV2", args='--cflags', mandatory=False)
         self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
         self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
         if bool(self.env.HAVE_SUIL):
@@ -90,8 +87,6 @@ def check_mingw (self):
 
 @conf
 def check_mac (self):
-    # VST/VST3 OSX Support
-    self.define('JUCE_PLUGINHOST_VST3', 1)
     self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=True)
 
     if self.env.JACK:
