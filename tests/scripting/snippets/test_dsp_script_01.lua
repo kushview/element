@@ -21,7 +21,7 @@ function Amp.layout()
     }
 end
 
-function Amp.params()
+function Amp.parameters()
     return {
         {
             name    = "Volume",
