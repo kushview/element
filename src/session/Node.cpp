@@ -24,6 +24,7 @@
 
 namespace Element {
 
+//==============================================================================
 struct NameSorter
 {
     NameSorter() { }
@@ -56,6 +57,7 @@ static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescripti
     }
 }
 
+//==============================================================================
 int Port::getChannel() const
 {
     const Node node (objectData.getParent().getParent());
@@ -64,7 +66,12 @@ int Port::getChannel() const
     return -1;
 }
 
-//=============================================================================
+Node Port::getNode() const
+{
+    return Node (getNodeValueTree(), false);
+}
+
+//==============================================================================
 Node::Node() : ObjectModel() {}
     
 Node::Node (const ValueTree& data, const bool setMissing)

@@ -85,6 +85,7 @@ namespace Tags
     const Identifier destChannel        = "destChannel";
     
     const Identifier identifier         = "identifier";
+    const Identifier symbol             = "symbol";
     const Identifier format             = "format";
     const Identifier flow               = "flow";
     const Identifier input              = "input";

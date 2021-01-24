@@ -35,8 +35,9 @@ namespace Element {
 
         for (int i = start.getNumNodes(); --i >= 0;)
         {
-            const auto node = findNodeRecursive (start.getNode(i), uuid);
-            if (node.isValid()) return node;
+            const auto node = findNodeRecursive (start.getNode (i), uuid);
+            if (node.isValid())
+                return node;
         }
 
         return Node();

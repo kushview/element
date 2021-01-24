@@ -27,6 +27,7 @@ namespace Element {
 class GraphManager;
 class NodeArray;
 class PortArray;
+class Node;
 
 class Port : public ObjectModel
 {
@@ -37,11 +38,12 @@ public:
     
     /** Returns the ValueTree of the Node containing this port
         will not always be valid 
-        */
-    inline ValueTree getNode() const { return objectData.getParent().getParent(); }
+     */
+    inline ValueTree getNodeValueTree() const { return objectData.getParent().getParent(); }
+    Node getNode() const;
 
     /** Returns true if this port probably lives on a Node */
-    inline bool hasParentNode() const { return getNode().hasType (Tags::node); }
+    inline bool hasParentNode() const { return getNodeValueTree().hasType (Tags::node); }
 
     /** Returns the coresponding channel for this port's index */
     int getChannel() const;
@@ -59,14 +61,16 @@ public:
     }
     
     const String getName() const { return getProperty (Tags::name, "Port"); }
-    const PortType getType() const { return PortType (getProperty (Slugs::type, "unknown").toString()); }
+    const PortType getType() const { return PortType (getProperty (Tags::type, "unknown").toString()); }
     bool isA (const PortType type, const bool isInputFlow) const { return getType() == type && isInputFlow == isInput(); }
     
     uint32 getIndex() const
     {
-        const int index = getProperty (Slugs::index, -1);
+        const int index = getProperty (Tags::index, -1);
         return index >= 0 ? static_cast<uint32> (index) : KV_INVALID_PORT;
     }
+
+    const String getSymbol() const { return getProperty(Tags::symbol, String()); }
 
     operator uint32() const { return getIndex(); }
 };
