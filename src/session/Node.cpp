@@ -57,6 +57,25 @@ static void readPluginDescriptionForLoading (const ValueTree& p, PluginDescripti
     }
 }
 
+static ValueTree getBlockValueTree (const Node& node)
+{
+    return node.getUIValueTree().getOrCreateChildWithName ("block", nullptr);
+}
+
+static StringArray getHiddenPortsProperty (const Node& node)
+{
+    const auto bv = getBlockValueTree (node);
+    auto result = StringArray::fromTokens (bv.getProperty("hiddenPorts").toString(), ",", "\"\'");
+    result.trim();
+    return result;
+}
+
+static void setHiddenPortsProperty (const Node& node, const StringArray& symbols)
+{
+    auto bv = getBlockValueTree (node);
+    bv.setProperty ("hiddenPorts", symbols.joinIntoString (","), nullptr);
+}
+
 //==============================================================================
 int Port::getChannel() const
 {
@@ -69,6 +88,37 @@ int Port::getChannel() const
 Node Port::getNode() const
 {
     return Node (getNodeValueTree(), false);
+}
+
+void Port::setHiddenOnBlock (bool hidden)
+{
+    // if (hidden == isHiddenOnBlock())
+    //     return;
+    
+    const auto node (getNode());
+    auto symbols = getHiddenPortsProperty (node);
+
+    if (hidden)
+    {
+        symbols.addIfNotAlreadyThere (getSymbol());        
+    }
+    else
+    {
+        symbols.removeString (getSymbol().toRawUTF8());
+    }
+
+    setHiddenPortsProperty (node, symbols);
+}
+
+bool Port::isHiddenOnBlock() const
+{
+    const auto parent (getNode());
+    if (! parent.isValid()) {
+        return true;
+    }
+
+    const auto symbols = getHiddenPortsProperty (parent);
+    return symbols.contains (getSymbol().toRawUTF8());
 }
 
 //==============================================================================

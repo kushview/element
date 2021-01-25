@@ -33,13 +33,16 @@ class Port : public ObjectModel
 {
 public:
     Port() : ObjectModel (Tags::port) { }
-    Port (const ValueTree& p) : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
+    Port (const ValueTree& p) 
+        : ObjectModel (p) { jassert (p.hasType (Tags::port)); }
     ~Port() { }
     
     /** Returns the ValueTree of the Node containing this port
         will not always be valid 
      */
     inline ValueTree getNodeValueTree() const { return objectData.getParent().getParent(); }
+
+    /** Returns the Node containing this port */
     Node getNode() const;
 
     /** Returns true if this port probably lives on a Node */
@@ -70,7 +73,10 @@ public:
         return index >= 0 ? static_cast<uint32> (index) : KV_INVALID_PORT;
     }
 
-    const String getSymbol() const { return getProperty(Tags::symbol, String()); }
+    const String getSymbol() const { return getProperty (Tags::symbol, String()); }
+
+    void setHiddenOnBlock (bool);
+    bool isHiddenOnBlock() const;
 
     operator uint32() const { return getIndex(); }
 };
