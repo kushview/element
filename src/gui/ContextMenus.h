@@ -123,8 +123,7 @@ private:
     bool hasAddedPlugins = false;
 };
 
-// MARK: Node Popup Menu
-
+//==============================================================================
 class NodePopupMenu : public PopupMenu
 {
 public:
