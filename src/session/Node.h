@@ -331,6 +331,15 @@ public:
 
     inline bool isIONode() const { return isAudioIONode() || isMidiIONode(); }
 
+    /** Returns true if this is a single MIDI input device (not global) */
+    bool isMidiInputDevice() const;
+    
+    /** Returns true if this is a single MIDI output device (not global) */
+    bool isMidiOutputDevice() const;
+
+    /** Returns true if a MIDI in or out device */
+    bool isMidiDevice() { return isMidiInputDevice() || isMidiOutputDevice(); }
+
     /** Returns the format of this node */
     inline const var& getFormat() const        { return objectData.getProperty (Tags::format); }
 

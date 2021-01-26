@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "engine/nodes/BaseProcessor.h" // for internal id macros
 #include "session/Node.h"
 #include "session/Session.h"
 #include "controllers/GraphManager.h"
@@ -509,6 +510,20 @@ void Node::getAudioOutputs (PortArray& ports) const {
     getPorts (ports, PortType::Audio, false);
 }
 
+//==============================================================================
+bool Node::isMidiInputDevice() const
+{
+    return objectData.getProperty(Tags::format) == "Element" &&
+            objectData.getProperty(Tags::identifier) == EL_INTERNAL_ID_MIDI_INPUT_DEVICE;
+}
+
+bool Node::isMidiOutputDevice() const
+{
+    return objectData.getProperty(Tags::format) == "Element" &&
+            objectData.getProperty(Tags::identifier) == EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
+}
+
+//==============================================================================
 void Node::resetPorts()
 {
     if (GraphNodePtr ptr = getGraphNode())
