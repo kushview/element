@@ -19,6 +19,7 @@
 
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
+#include "gui/views/NodePortsTableView.h"
 #include "gui/BlockComponent.h"
 #include "gui/Buttons.h"
 #include "gui/ContentComponent.h"
@@ -33,7 +34,6 @@
 namespace Element {
 
 //=============================================================================
-
 PortComponent::PortComponent (const Node& g, const Node& n,
                               const uint32 nid, const uint32 i,
                               const bool dir, const PortType t,
@@ -138,7 +138,7 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
 
     shadow.setShadowProperties (DropShadow (Colours::black.withAlpha (0.5f), 3, Point<int> (0, 1)));
     setComponentEffect (&shadow);
-    
+
     addAndMakeVisible (configButton);
     configButton.setPath (getIcons().fasCog);
     configButton.addListener (this);
@@ -158,6 +158,11 @@ BlockComponent::BlockComponent (const Node& graph_, const Node& node_, const boo
     muteButton.setClickingTogglesState (true);
     muteButton.addListener (this);
 
+    hiddenPorts = node.getUIValueTree()
+        .getOrCreateChildWithName("block", nullptr)
+        .getPropertyAsValue("hiddenPorts", nullptr);
+    hiddenPorts.addListener (this);
+
     setSize (170, 60);
 }
 
@@ -165,6 +170,7 @@ BlockComponent::~BlockComponent() noexcept
 {
     nodeEnabled.removeListener (this);
     nodeName.removeListener (this);
+    hiddenPorts.removeListener (this);
     deleteAllPins();
 }
 
@@ -185,6 +191,9 @@ void BlockComponent::valueChanged (Value& value)
     } else if (nodeName.refersToSameSourceAs (value)) {
         setName (node.getName());
         repaint();
+    } else if (hiddenPorts.refersToSameSourceAs (value)) {
+        if (auto* ge = getGraphPanel())
+            ge->updateComponents (false);
     }
 }
 
@@ -317,6 +326,13 @@ void BlockComponent::mouseDown (const MouseEvent& e)
             auto& plugins (world->getPluginManager());
             NodePopupMenu menu (node);
             menu.addReplaceSubmenu (plugins);
+
+            if (! node.isIONode() && ! node.isMidiDevice())
+            {
+                menu.addSeparator();
+                menu.addItem (10, "Ports...", true, false);
+            }
+
             menu.addSeparator();
             menu.addOptionsSubmenu();
             
@@ -346,6 +362,21 @@ void BlockComponent::mouseDown (const MouseEvent& e)
                 const auto index = plugins.getKnownPlugins().getIndexChosenByMenu (result);
                 if (const auto* desc = plugins.getKnownPlugins().getType (index))
                     ViewHelpers::postMessageFor (this, new ReplaceNodeMessage (node, *desc));
+            }
+            else
+            {
+                switch (result) 
+                {
+                    case 10: {
+                        auto* component = new NodePortsTable();
+                        component->setNode (node);
+                        CallOutBox::launchAsynchronously (
+                            std::unique_ptr<Component> (component),
+                            getScreenBounds(),
+                            nullptr);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -615,8 +646,10 @@ void BlockComponent::resized()
     }
 }
 
-void BlockComponent::getPortPos (const int index, const bool isInput, float& x, float& y)
+bool BlockComponent::getPortPos (const int index, const bool isInput, float& x, float& y)
 {
+    bool res = false;
+    
     for (int i = 0; i < getNumChildComponents(); ++i)
     {
         if (auto* const pc = dynamic_cast <PortComponent*> (getChildComponent (i)))
@@ -625,13 +658,16 @@ void BlockComponent::getPortPos (const int index, const bool isInput, float& x, 
             {
                 x = getX() + pc->getX() + pc->getWidth() * 0.5f;
                 y = getY() + pc->getY() + pc->getHeight() * 0.5f;
+                res = true;
                 break;
             }
         }
     }
+
+    return res;
 }
 
-void BlockComponent::update (const bool doPosition)
+void BlockComponent::update (const bool doPosition, const bool forcePins)
 {
     vertical = getGraphPanel()->isLayoutVertical();
 
@@ -647,7 +683,7 @@ void BlockComponent::update (const bool doPosition)
     for (int i = 0; i < numPorts; ++i)
     {
         const Port port (node.getPort (i));
-        if (PortType::Control == port.getType())
+        if (PortType::Control == port.getType() || port.isHiddenOnBlock())
             continue;
         
         if (port.isInput())
@@ -674,7 +710,8 @@ void BlockComponent::update (const bool doPosition)
     
     int textWidth = font.getStringWidth (node.getDisplayName());
     textWidth += (vertical) ? 20 : 36;
-    setSize (jmax (w, textWidth), h);
+    w = jmax (w, textWidth);
+    setSize (w, h);
     setName (node.getDisplayName());
 
     if (doPosition)
@@ -688,7 +725,7 @@ void BlockComponent::update (const bool doPosition)
         setNodePosition (b.getX(), b.getY());
     }
 
-    if (numIns != numInputs || numOuts != numOutputs)
+    if (forcePins || numIns != numInputs || numOuts != numOutputs)
     {
         numInputs  = numIns;
         numOutputs = numOuts;
@@ -699,7 +736,7 @@ void BlockComponent::update (const bool doPosition)
         {
             const Port port (node.getPort (i));
             const PortType t (port.getType());
-            if (t == PortType::Control)
+            if (t == PortType::Control || port.isHiddenOnBlock())
                 continue;
 
             const bool isInput (port.isInput());

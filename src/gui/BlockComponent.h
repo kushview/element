@@ -90,7 +90,6 @@ public:
     SettingButton& getPowerButton()         { return powerButton; }
 
     //=========================================================================
-
     /** Change the config button's visibility */
     void setConfigButtonVisible (bool);
 
@@ -98,7 +97,6 @@ public:
     SettingButton& getConfigButton()        { return configButton; }
 
     //=========================================================================
-
     /** Change the mute button's visibility */ 
     void setMuteButtonVisible (bool);
 
@@ -106,9 +104,10 @@ public:
     SettingButton& getMuteButton()          { return muteButton; }
 
     //=========================================================================
-
-    /** Gets the coordinate of the port index */
-    void getPortPos (const int index, const bool isInput, float& x, float& y);
+    /** Gets the coordinate of the port index 
+        Returns true if the coords were acquired.
+     */
+    bool getPortPos (const int index, const bool isInput, float& x, float& y);
 
     /** @internal */
     void buttonClicked (Button* b) override;
@@ -136,6 +135,7 @@ private:
 
     Value nodeEnabled;
     Value nodeName;
+    Value hiddenPorts;
 
     int numInputs = 0, numOutputs = 0;
     int numIns = 0, numOuts = 0;
@@ -171,14 +171,13 @@ private:
     void setNodePosition (const int x, const int y);
     void updatePosition();
     void makeEditorActive();
-    void update (const bool doPosition = true);
+    void update (const bool doPosition = true, const bool forcePins = false);
     void handleAsyncUpdate() override;
     void valueChanged (Value& value) override;
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(BlockComponent);
 };
 
 //=============================================================================
-
 class BlockFactory
 {
 public:

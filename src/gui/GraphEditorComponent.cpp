@@ -175,8 +175,10 @@ public:
         repaint();
     }
 
-    void getPoints (float& x1, float& y1, float& x2, float& y2) const
+    bool getPoints (float& x1, float& y1, float& x2, float& y2) const
     {
+        bool sres = false, dres = false;
+
         x1 = lastInputX;
         y1 = lastInputY;
         x2 = lastOutputX;
@@ -185,11 +187,13 @@ public:
         if (GraphEditorComponent* const hostPanel = getGraphPanel())
         {
             if (auto* srcBlock = hostPanel->getComponentForFilter (sourceFilterID))
-                srcBlock->getPortPos (sourceFilterChannel, false, x1, y1);
+                sres = srcBlock->getPortPos (sourceFilterChannel, false, x1, y1);
 
             if (auto* dstBlock = hostPanel->getComponentForFilter (destFilterID))
-                dstBlock->getPortPos (destFilterChannel, true, x2, y2);
+                dres = dstBlock->getPortPos (destFilterChannel, true, x2, y2);
         }
+
+        return sres && dres;
     }
 
     void paint (Graphics& g) override
@@ -678,7 +682,11 @@ void GraphEditorComponent::updateConnectorComponents()
             }
             else
             {
-                cc->update();
+                float x1,y1,x2,y2;
+                if (cc->getPoints (x1, y1, x2, y2))
+                    cc->update();
+                else
+                    delete cc;
             }
         }
     }
@@ -698,7 +706,7 @@ void GraphEditorComponent::stabilizeNodes()
             { fc->update (false); fc->repaint(); }
 }
 
-void GraphEditorComponent::updateComponents()
+void GraphEditorComponent::updateComponents (const bool doNodePositions)
 {
     for (int i = graph.getNumConnections(); --i >= 0;)
     {
@@ -729,7 +737,7 @@ void GraphEditorComponent::updateComponents()
         }
     }
 
-    updateBlockComponents (true);
+    updateBlockComponents (doNodePositions);
     updateConnectorComponents();
 }
 

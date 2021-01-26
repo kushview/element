@@ -65,7 +65,7 @@ public:
     /** Stabilize all nodes without changing position */
     void stabilizeNodes();
 
-    void updateComponents();
+    void updateComponents (const bool doNodePositions = true);
 
     bool areResizePositionsFrozen() const { return resizePositionsFrozen; }
     inline void setResizePositionsFrozen (const bool shouldBeFrozen)
