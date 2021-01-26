@@ -59,6 +59,14 @@ GraphEditorView::GraphEditorView()
             block.setTopLeftPosition (revertTopLeftPos);
     };
 
+    graph.onZoomChanged = [this]() {
+        auto s = getSettings();
+        if (s.isValid())
+        {
+            s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
+        }
+    };
+
     addAndMakeVisible (view);
     view.setViewedComponent (&graph, false);
     view.setScrollBarsShown (true, true, false, false);
@@ -70,6 +78,8 @@ GraphEditorView::GraphEditorView()
 
 GraphEditorView::~GraphEditorView()
 {
+    graph.onZoomChanged = nullptr;
+    graph.onBlockMoved = nullptr;
     nodeSelectedConnection.disconnect();
     nodeRemovedConnection.disconnect();
     view.setViewedComponent (nullptr, false);
@@ -221,6 +231,7 @@ void GraphEditorView::restoreSettings()
 
     graph.setSize (s.getProperty (Tags::width,  getWidth()),
                    s.getProperty (Tags::height, getHeight()));
+    graph.setZoomScale (s.getProperty ("zoomScale", 1.0f));
     view.getHorizontalScrollBar().setCurrentRangeStart (s.getProperty ("horizontalRangeStart", 0.0));
     view.getVerticalScrollBar().setCurrentRangeStart (s.getProperty ("verticalRangeStart", 0.0));
 }
@@ -235,6 +246,7 @@ void GraphEditorView::saveSettings()
     s.setProperty (Tags::height, graph.getHeight(), nullptr);
     s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
     s.setProperty ("verticalRangeStart",   view.getVerticalScrollBar().getCurrentRangeStart(),   nullptr);
+    s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
 }
 
 } /* namespace Element */

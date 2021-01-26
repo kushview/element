@@ -48,25 +48,34 @@ public:
     /** Returns the displayed graph */
     Node getGraph() const { return graph; }
     
+    //=========================================================================
     /** Selects the given node */
     void selectNode (const Node& n);
 
     /** Removes the selected nodes */    
     void deleteSelectedNodes();
     
+    //=========================================================================
+    void setZoomScale (float scale);
+    float getZoomScale() const noexcept { return zoomScale; }
+
+    //=========================================================================
     /** Returns true if the layout is vertical */
     bool isLayoutVertical() const { return verticalLayout; }
 
     /** Changes the layout to vertical or not */
     void setVerticalLayout (const bool isVertical);
 
+    //=========================================================================
     Rectangle<int> getRequiredSpace() const;
 
+    //=========================================================================
     /** Stabilize all nodes without changing position */
     void stabilizeNodes();
 
     void updateComponents (const bool doNodePositions = true);
 
+    //=========================================================================
     bool areResizePositionsFrozen() const { return resizePositionsFrozen; }
     inline void setResizePositionsFrozen (const bool shouldBeFrozen)
     {
@@ -77,6 +86,7 @@ public:
             graph.setProperty (Tags::staticPos, resizePositionsFrozen);
     }
 
+    //=========================================================================
     void changeListenerCallback (ChangeBroadcaster*) override;
 
     void paint (Graphics& g) override;
@@ -89,6 +99,7 @@ public:
 
     //=========================================================================
     std::function<void(BlockComponent&)> onBlockMoved;
+    std::function<void()> onZoomChanged;
 
 protected:
     virtual Component* wrapAudioProcessorEditor (AudioProcessorEditor* ed, GraphNodePtr editorNode);
@@ -113,6 +124,8 @@ private:
     
     SelectedItemSet<uint32> selectedNodes;
     bool ignoreNodeSelected = false;
+
+    float zoomScale = 1.0;
 
     void selectNode (const Node& node, ModifierKeys mods);
 

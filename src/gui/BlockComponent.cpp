@@ -669,7 +669,14 @@ bool BlockComponent::getPortPos (const int index, const bool isInput, float& x, 
 
 void BlockComponent::update (const bool doPosition, const bool forcePins)
 {
-    vertical = getGraphPanel()->isLayoutVertical();
+    auto* const ged = getGraphPanel();
+    if (nullptr == ged)
+    {
+        jassertfalse;
+        return;
+    }
+
+    vertical = ged->isLayoutVertical();
 
     if (! node.getValueTree().getParent().hasType (Tags::nodes))
     {
@@ -692,8 +699,8 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
             ++numOuts;
     }
 
-    int w = 120;
-    int h = 46;
+    int w = roundToInt (120.0 * ged->getZoomScale());
+    int h = roundToInt (46.0 * ged->getZoomScale());
 
     const int maxPorts = jmax (numIns, numOuts) + 1;
     
@@ -708,6 +715,7 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
         h = jmax (h, int(maxPorts * pinSize) + int(maxPorts * jmax(int(pinSize * scale), 2)) + endcap);
     }
     
+    font.setHeight (11.f * ged->getZoomScale());
     int textWidth = font.getStringWidth (node.getDisplayName());
     textWidth += (vertical) ? 20 : 36;
     w = jmax (w, textWidth);

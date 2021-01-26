@@ -463,6 +463,17 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         }
         
         menu.addSeparator();
+        PopupMenu zoomMenu;
+        zoomMenu.addItem (50, "25%",  true, getZoomScale() == 0.25);
+        zoomMenu.addItem (51, "50%",  true, getZoomScale() == 0.50);
+        zoomMenu.addItem (52, "75%",  true, getZoomScale() == 0.75);
+        zoomMenu.addItem (53, "100%", true, getZoomScale() == 1.00);
+        zoomMenu.addItem (54, "125%", true, getZoomScale() == 1.25);
+        zoomMenu.addItem (55, "150%", true, getZoomScale() == 1.50);
+        zoomMenu.addItem (56, "175%", true, getZoomScale() == 1.75);
+        zoomMenu.addItem (57, "200%", true, getZoomScale() == 2.00);
+        menu.addSubMenu ("Zoom", zoomMenu);
+
         menu.addItem (5, "Change orientation...");
         menu.addItem (7, "Gather nodes...");
        #if JUCE_DEBUG
@@ -577,6 +588,16 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
                     return;
                 } break;
                 
+                // Zoom options (commented don't look right yet)
+                // case 50: setZoomScale (0.25); return; break;
+                // case 51: setZoomScale (0.50); return; break;
+                case 52: setZoomScale (0.75); return; break;
+                case 53: setZoomScale (1.00); return; break;
+                case 54: setZoomScale (1.25); return; break;
+                case 55: setZoomScale (1.50); return; break;
+                case 56: setZoomScale (1.75); return; break;
+                case 57: setZoomScale (2.00); return; break;
+
                 case 100:
                 {
                     updateBlockComponents (true);
@@ -617,9 +638,9 @@ BlockComponent* GraphEditorComponent::getComponentForFilter (const uint32 filter
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (BlockComponent* const fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
-            if (fc->filterID == filterID)
-                return fc;
+        if (BlockComponent* const block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+            if (block->filterID == filterID)
+                return block;
     }
 
     return nullptr;
@@ -644,10 +665,10 @@ PortComponent* GraphEditorComponent::findPinAt (const int x, const int y) const
 {
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (BlockComponent* fc = dynamic_cast <BlockComponent*> (getChildComponent (i)))
+        if (BlockComponent* block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
         {
-            if (PortComponent* pin = dynamic_cast <PortComponent*> (fc->getComponentAt (x - fc->getX(),
-                                                                                      y - fc->getY())))
+            if (PortComponent* pin = dynamic_cast <PortComponent*> (block->getComponentAt (x - block->getX(),
+                                                                                      y - block->getY())))
                 return pin;
         }
     }
@@ -682,6 +703,7 @@ void GraphEditorComponent::updateConnectorComponents()
             }
             else
             {
+                // update cable or remove if can't get coordinates
                 float x1,y1,x2,y2;
                 if (cc->getPoints (x1, y1, x2, y2))
                     cc->update();
@@ -695,15 +717,15 @@ void GraphEditorComponent::updateConnectorComponents()
 void GraphEditorComponent::updateBlockComponents (const bool doPosition)
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-            { fc->update (doPosition); }
+        if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+            { block->update (doPosition); }
 }
 
 void GraphEditorComponent::stabilizeNodes()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
-            { fc->update (false); fc->repaint(); }
+        if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+            { block->update (false); block->repaint(); }
 }
 
 void GraphEditorComponent::updateComponents (const bool doNodePositions)
@@ -748,12 +770,12 @@ Rectangle<int> GraphEditorComponent::getRequiredSpace() const
     r.setY (0);
     for (int i = getNumChildComponents(); --i >= 0;)
     {
-        if (auto* const fc = dynamic_cast<BlockComponent*> (getChildComponent (i)))
+        if (auto* const block = dynamic_cast<BlockComponent*> (getChildComponent (i)))
         { 
-            if (fc->getRight() > r.getWidth())
-                r.setWidth (fc->getRight());
-            if (fc->getBottom() > r.getHeight())
-                r.setHeight (fc->getBottom());
+            if (block->getRight() > r.getWidth())
+                r.setWidth (block->getRight());
+            if (block->getBottom() > r.getHeight())
+                r.setHeight (block->getBottom());
         }
     }
     return r;
@@ -1060,6 +1082,17 @@ void GraphEditorComponent::deleteSelectedNodes()
 
     ViewHelpers::postMessageFor (this, new RemoveNodeMessage (toRemove));
     selectedNodes.deselectAll();
+}
+
+void GraphEditorComponent::setZoomScale (float scale)
+{
+    if (scale == zoomScale)
+        return;
+    
+    zoomScale = scale;
+    updateComponents();
+    if (onZoomChanged)
+        onZoomChanged();
 }
 
 void GraphEditorComponent::updateSelection()
