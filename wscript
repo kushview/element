@@ -7,7 +7,7 @@ sys.path.append (os.getcwd() + "/tools/waf")
 import cross, element, juce
 
 APPNAME='element'
-VERSION='0.45.1'
+VERSION='0.46.0'
 
 VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
