@@ -79,10 +79,6 @@
  //#define JLV2_SUIL_INIT 1
 #endif
 
-#ifndef    JLV2_GTKUI
- //#define JLV2_GTKUI 0
-#endif
-
 //==============================================================================
 // juce_audio_devices flags:
 
