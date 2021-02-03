@@ -719,7 +719,7 @@
                documentExtensions="elc,elg,els" hardenedRuntime="1" iosInAppPurchases="0"
                iosPushNotifications="0" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                extraCompilerFlags="-Wno-deprecated-declarations" prebuildCommand="export MACOSX_DEPLOYMENT_TARGET=10.9&#10;# cd ../../../../.. &amp;&amp; python tools/gitversion.py&#10;"
-               microphonePermissionNeeded="1">
+               microphonePermissionNeeded="1" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${topdir}/build/${CONFIGURATION}/${PRODUCT_NAME}.app/Contents/&quot;&#10;&#10;rm -rf &quot;${contents}/Frameworks/lua&quot;&#10;mkdir -p &quot;${contents}/Frameworks/lua&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${contents}/Frameworks/lua/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${contents}/Frameworks/lua/&quot;&#10;&#10;ls &quot;${topdir}/libs/lua-kv/src/kv/&quot;&#10;&#10;rm -rf &quot;${contents}/Frameworks/scripts&quot;&#10;mkdir -p &quot;${contents}/Frameworks/scripts&quot;&#10;rsync -var --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${contents}/Frameworks/scripts/&quot;&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" osxArchitecture="64BitIntel" isDebug="1" optimisation="1"
                        targetName="Element" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"

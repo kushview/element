@@ -24,6 +24,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
 #include "gui/SystemTray.h"
+#include "scripting/ScriptManager.h"
 #include "session/CommandManager.h"
 #include "session/MediaManager.h"
 #include "session/Node.h"
@@ -214,9 +215,7 @@ static String getScriptSearchPath()
         }
 
     #elif JUCE_MAC
-        dirs.add (File::getSpecialLocation (File::currentApplicationFile)
-            .getChildFile ("Contents/Resources/scripts")
-            .getFullPathName());
+        dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
 
     #else
         #if defined (EL_SCRIPTSDIR)
@@ -224,9 +223,15 @@ static String getScriptSearchPath()
                 dirs.add (String (EL_SCRIPTSDIR));
         #endif
     #endif
-
-    jassert(dirs.size() > 1);
-    return dirs.joinIntoString (";");
+    
+    StringArray path;
+    for (const auto& dir : dirs)
+    {
+        path.add (dir + "/?.lua");
+    }
+    
+    jassert(path.size() > 1);
+    return path.joinIntoString (";");
 }
 
 static String getLuaPath()
@@ -255,7 +260,7 @@ static String getLuaPath()
 
     #elif JUCE_MAC
         dirs.add (File::getSpecialLocation (File::currentApplicationFile)
-            .getChildFile ("Contents/Resources/lua")
+            .getChildFile ("Contents/Frameworks/lua")
             .getFullPathName());
     
     #else

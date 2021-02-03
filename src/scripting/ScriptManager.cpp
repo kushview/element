@@ -132,6 +132,10 @@ File ScriptManager::getSystemScriptsDir()
    #elif JUCE_LINUX
     dir = File ("/usr/local/share/element/scripts");
 
+   #elif JUCE_MAC
+    dir = File::getSpecialLocation (File::currentApplicationFile)
+        .getChildFile ("Contents/Frameworks/scripts")
+        .getFullPathName();
    #else
     jassert (false);
    #endif
