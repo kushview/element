@@ -727,7 +727,7 @@
                        linkTimeOptimisation="1" targetName="KV_ElementFX" aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        cppLibType="libc++" osxArchitecture="64BitIntel" osxCompatibility="10.9 SDK"
-                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,&#10;ONLY_ACTIVE_ARCH=YES,&#10;MACOSX_DEPLOYMENT_TARGET=10.9,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
                        binaryPath="../../../build/Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
