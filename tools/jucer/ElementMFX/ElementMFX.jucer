@@ -16,33 +16,84 @@
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumi'"
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
               pluginAAXDisableMultiMono="0" jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element MFX">
     <GROUP id="{9C95AAF2-091D-90F2-8252-0716A4C35CDF}" name="libs">
-      <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
-        <GROUP id="{62C1DB42-24AC-1BEF-C5A1-87EE68F8EAE4}" name="src">
-          <FILE id="xkzgQn" name="audio.c" compile="1" resource="0" file="../../../libs/lua-kv/src/audio.c"/>
-          <FILE id="epC8ac" name="kvlib.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvlib.c"/>
-          <FILE id="w9Nx9n" name="kvmod.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kvmod.c"/>
-          <FILE id="yVeUsE" name="lua-kv.h" compile="0" resource="0" file="../../../libs/lua-kv/src/lua-kv.h"/>
-          <FILE id="O5nmdj" name="luainc.h" compile="0" resource="0" file="../../../libs/lua-kv/src/luainc.h"/>
-          <FILE id="CtMqjs" name="midi.c" compile="1" resource="0" file="../../../libs/lua-kv/src/midi.c"/>
-          <FILE id="p61bd4" name="util.h" compile="0" resource="0" file="../../../libs/lua-kv/src/util.h"/>
-          <FILE id="ZCiOX1" name="vector.c" compile="1" resource="0" file="../../../libs/lua-kv/src/vector.c"/>
-          <FILE id="CvQVB2" name="vector.h" compile="0" resource="0" file="../../../libs/lua-kv/src/vector.h"/>
+      <GROUP id="{40F739D5-AB76-3C1C-09FB-C1258EB39883}" name="lua-kv">
+        <GROUP id="{D995EB84-6A94-18E9-97F2-D2DF31BFC385}" name="kv">
+          <GROUP id="{E5F61C4F-132F-A433-F708-FCEE4C845D22}" name="lua">
+            <FILE id="So6LVj" name="audio_buffer.hpp" compile="0" resource="0"
+                  file="../../../libs/lua-kv/kv/lua/audio_buffer.hpp"/>
+            <FILE id="bVlHwM" name="factories.hpp" compile="0" resource="0" file="../../../libs/lua-kv/kv/lua/factories.hpp"/>
+            <FILE id="GnUf0v" name="midi_buffer.hpp" compile="0" resource="0" file="../../../libs/lua-kv/kv/lua/midi_buffer.hpp"/>
+            <FILE id="SNCWRQ" name="object.hpp" compile="0" resource="0" file="../../../libs/lua-kv/kv/lua/object.hpp"/>
+            <FILE id="b1DdC7" name="widget.hpp" compile="0" resource="0" file="../../../libs/lua-kv/kv/lua/widget.hpp"/>
+          </GROUP>
         </GROUP>
-        <GROUP id="{2471B734-2C45-6D3D-A0B5-6363A21F763E}" name="tests">
-          <FILE id="EGvk54" name="test.c" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.c"/>
-          <FILE id="D1BZrb" name="test.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test.lua"/>
-          <FILE id="dZiAlf" name="testmods" compile="0" resource="0" file="../../../libs/lua-kv/tests/testmods"/>
+        <GROUP id="{420ED8F1-73FE-1542-E2EB-7ECCF9E4E743}" name="src">
+          <GROUP id="{A5C108DF-2638-150B-040D-9CD52CC6DBAF}" name="kv">
+            <FILE id="qN2uh9" name="audio.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/audio.c"/>
+            <FILE id="X4bmVZ" name="AudioBuffer.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/AudioBuffer.lua"/>
+            <FILE id="iH0UU4" name="AudioBuffer32.cpp" compile="1" resource="0"
+                  file="../../../libs/lua-kv/src/kv/AudioBuffer32.cpp"/>
+            <FILE id="EcD7Ci" name="AudioBuffer64.cpp" compile="1" resource="0"
+                  file="../../../libs/lua-kv/src/kv/AudioBuffer64.cpp"/>
+            <FILE id="RR3l8D" name="AudioBufferImpl.cpp" compile="0" resource="0"
+                  file="../../../libs/lua-kv/src/kv/AudioBufferImpl.cpp"/>
+            <FILE id="rXL0rx" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Bounds.cpp"/>
+            <FILE id="Ve18Mg" name="byte.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/byte.c"/>
+            <FILE id="CVPSA7" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Desktop.cpp"/>
+            <FILE id="M0I7bd" name="DocumentWindow.cpp" compile="1" resource="0"
+                  file="../../../libs/lua-kv/src/kv/DocumentWindow.cpp"/>
+            <FILE id="r1hjck" name="File.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/File.cpp"/>
+            <FILE id="sTgIYi" name="Graphics.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Graphics.cpp"/>
+            <FILE id="bngRn4" name="midi.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/midi.c"/>
+            <FILE id="NcEkN1" name="MidiBuffer.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MidiBuffer.cpp"/>
+            <FILE id="fqwz0Z" name="MidiMessage.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MidiMessage.cpp"/>
+            <FILE id="kDUUNi" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MouseEvent.cpp"/>
+            <FILE id="ho546p" name="object.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/object.lua"/>
+            <FILE id="IcCFFq" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Point.cpp"/>
+            <FILE id="SbYo06" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Rectangle.cpp"/>
+            <FILE id="erJygp" name="round.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/round.c"/>
+            <FILE id="YBis52" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Slider.cpp"/>
+            <FILE id="fh8KDi" name="slug.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/slug.lua"/>
+            <FILE id="Vdb9la" name="TextButton.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/TextButton.cpp"/>
+            <FILE id="kNj8vg" name="vector.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/vector.c"/>
+            <FILE id="A5zRnu" name="Widget.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Widget.cpp"/>
+          </GROUP>
+          <FILE id="ulzOzW" name="juce_rectangle.hpp" compile="0" resource="0"
+                file="../../../libs/lua-kv/src/juce_rectangle.hpp"/>
+          <FILE id="tOnAhb" name="kvlib.c" compile="0" resource="0" file="../../../libs/lua-kv/src/kvlib.c"/>
+          <FILE id="rDSpfJ" name="lua-kv.h" compile="0" resource="0" file="../../../libs/lua-kv/src/lua-kv.h"/>
+          <FILE id="v25pZb" name="lua-kv.hpp" compile="0" resource="0" file="../../../libs/lua-kv/src/lua-kv.hpp"/>
+          <FILE id="FHZrdf" name="luainc.h" compile="0" resource="0" file="../../../libs/lua-kv/src/luainc.h"/>
+          <FILE id="x9jCPu" name="midi_impl.c" compile="0" resource="0" file="../../../libs/lua-kv/src/midi_impl.c"/>
+          <FILE id="JRijpA" name="packed.h" compile="0" resource="0" file="../../../libs/lua-kv/src/packed.h"/>
+          <FILE id="B7VS6R" name="util.h" compile="0" resource="0" file="../../../libs/lua-kv/src/util.h"/>
         </GROUP>
-        <FILE id="MqQCw6" name="AUTHORS" compile="0" resource="0" file="../../../libs/lua-kv/AUTHORS"/>
-        <FILE id="gkFPEe" name="LICENSE" compile="0" resource="0" file="../../../libs/lua-kv/LICENSE"/>
-        <FILE id="btkRZ1" name="README.md" compile="0" resource="0" file="../../../libs/lua-kv/README.md"/>
-        <FILE id="Bxpxfe" name="waf" compile="0" resource="0" file="../../../libs/lua-kv/waf"/>
-        <FILE id="kDF1KU" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
+        <GROUP id="{AEA98907-FC06-0D81-00D6-B3725C765CC7}" name="tests">
+          <FILE id="Diq77K" name="luaunit.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/luaunit.lua"/>
+          <FILE id="b9afEC" name="test_byte.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test_byte.lua"/>
+          <FILE id="a6UOYU" name="test_midi.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test_midi.lua"/>
+          <FILE id="X20lO5" name="test_object.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/test_object.lua"/>
+          <FILE id="h59zNc" name="TestAudioBuffer.lua" compile="0" resource="0"
+                file="../../../libs/lua-kv/tests/TestAudioBuffer.lua"/>
+          <FILE id="YWc4pR" name="TestBounds.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/TestBounds.lua"/>
+          <FILE id="MfgGQg" name="TestMidiBuffer.lua" compile="0" resource="0"
+                file="../../../libs/lua-kv/tests/TestMidiBuffer.lua"/>
+          <FILE id="XEykPh" name="TestMidiMessage.lua" compile="0" resource="0"
+                file="../../../libs/lua-kv/tests/TestMidiMessage.lua"/>
+          <FILE id="ry29gU" name="TestPoint.lua" compile="0" resource="0" file="../../../libs/lua-kv/tests/TestPoint.lua"/>
+        </GROUP>
+        <FILE id="IS4cet" name="AUTHORS" compile="0" resource="0" file="../../../libs/lua-kv/AUTHORS"/>
+        <FILE id="LO1QkC" name="config.ld" compile="0" resource="0" file="../../../libs/lua-kv/config.ld"/>
+        <FILE id="Y9yajU" name="LICENSE" compile="0" resource="0" file="../../../libs/lua-kv/LICENSE"/>
+        <FILE id="trv8oQ" name="README.md" compile="0" resource="0" file="../../../libs/lua-kv/README.md"/>
+        <FILE id="mzMqbp" name="test" compile="0" resource="0" file="../../../libs/lua-kv/test"/>
+        <FILE id="rxj58F" name="waf" compile="0" resource="0" file="../../../libs/lua-kv/waf"/>
+        <FILE id="oC5bCa" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
       </GROUP>
     </GROUP>
     <GROUP id="{79158675-9931-4F98-C7A8-52C82F095CAA}" name="Source">
@@ -662,20 +713,21 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
-               extraDefs="" userNotes="" postbuildCommand="" hardenedRuntime="1"
-               hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
-               prebuildCommand="export MACOSX_DEPLOYMENT_TARGET=10.8&#10;cd ../../../../.. &amp;&amp; python tools/gitversion.py&#10;">
+               extraDefs="" userNotes="" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Frameworks/lua&quot;&#10;scriptsdir=&quot;${contents}/Frameworks/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;fi"
+               hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
                        linkTimeOptimisation="0" targetName="KV_ElementMFX" headerPath="/opt/kushview/include&#10;/usr/local/include"
-                       osxCompatibility="10.8 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
+                       osxCompatibility="10.9 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
-                       customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"/>
+                       customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"
+                       binaryPath="../../../build/Debug"/>
         <CONFIGURATION name="Release" enablePluginBinaryCopyStep="1" isDebug="0" optimisation="3"
                        linkTimeOptimisation="1" targetName="KV_ElementMFX" aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
-                       cppLibType="libc++" osxArchitecture="64BitIntel" osxCompatibility="10.8 SDK"
-                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"/>
+                       cppLibType="libc++" osxArchitecture="64BitIntel" osxCompatibility="10.9 SDK"
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,MACOSX_DEPLOYMENT_TARGET=10.8,OTHER_CODE_SIGN_FLAGS=--timestamp,CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
+                       binaryPath="../../../build/Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
