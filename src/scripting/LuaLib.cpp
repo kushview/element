@@ -23,8 +23,11 @@
 
 #ifdef _MSC_VER
  #pragma warning(disable: 4244) // convert possible data loss
+ #pragma warning(disable: 4297) // function assumed not to throw an exception but does
  #pragma warning(disable: 4310) // cast truncates constant value
  #pragma warning(disable: 4334) // result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
+ #pragma warning(disable: 4701) // potentially uninitialized local variable
+ #pragma warning(disable: 4702) // unreachable code
 #endif
 
 extern "C" {

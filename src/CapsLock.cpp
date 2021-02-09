@@ -30,15 +30,16 @@ namespace Element {
 
 bool isCapsLockOn()
 {
+    bool result = false;
    #if defined(__MINGW32__) || defined(_MSC_VER)
-    return (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
+    result = (GetKeyState (VK_CAPITAL) & 0x0001) != 0;
    #elif defined(__APPLE__)
     CGEventFlags flags = CGEventSourceFlagsState (kCGEventSourceStateHIDSystemState);
-    return (kCGEventFlagMaskAlphaShift & flags) != 0;
+    result = (kCGEventFlagMaskAlphaShift & flags) != 0;
    #else
     // linux
    #endif
-    return false;
+    return result;
 }
 
 }
