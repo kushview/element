@@ -449,12 +449,13 @@ void initializeState (sol::state_view& view)
     view.open_libraries ();
 
     auto package = view["package"];
-    auto searchers = view.create_table();
-    searchers.add (package ["searchers"][1]);
-    searchers.add (searchInternalModules);
-    for (int i = 2; i <= ((sol::table)package["searchers"]).size(); ++i)
-        searchers.add (package["searchers"][i]);
-    package["searchers"] = searchers;
+    auto newSearchers = view.create_table();
+    newSearchers.add (package ["searchers"][1]);
+    newSearchers.add (searchInternalModules);
+    sol::table packageSearchers = package["searchers"];
+    for (int i = 2; i <= packageSearchers.size(); ++i)
+        newSearchers.add (package["searchers"][i]);
+    package["searchers"] = newSearchers;
 
     package["path"]     = getLuaPath().toStdString();
     package["cpath"]    = getLuaCPath().toStdString();

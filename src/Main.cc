@@ -194,6 +194,7 @@ private:
     void setupScripting()
     {
         auto& scripts = world.getScriptingEngine();
+        ignoreUnused (scripts);
     }
 };
 

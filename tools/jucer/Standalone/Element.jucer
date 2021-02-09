@@ -4,10 +4,10 @@
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2020 Kushview, LLC"
+              splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2021 Kushview, LLC"
               defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_VERSION_STRING=&quot;0.46.0&quot;&#10;EL_USE_LUA=1&#10;"
               userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;"
-              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
@@ -768,7 +768,7 @@
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
             smallIcon="zjwu85" bigIcon="zjwu85" toolset="v141_xp" cppLanguageStandard="stdcpp14"
-            windowsTargetPlatformVersion="10.0.16299.0" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
+            vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
             extraCompilerFlags="/bigobj">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="Win32"
@@ -816,6 +816,40 @@
         <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
       </MODULEPATHS>
     </VS2017>
+    <VS2019 targetFolder="Builds/VisualStudio2019" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
+            extraCompilerFlags="/bigobj" smallIcon="zjwu85" bigIcon="zjwu85"
+            toolset="v142">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" binaryPath="../../../build/Win32/Debug"
+                       targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" characterSet="MultiByte"/>
+        <CONFIGURATION isDebug="0" name="Release" binaryPath="../../../build/Win32/Release"
+                       targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" useRuntimeLibDLL="0"
+                       characterSet="MultiByte"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="kv_models"/>
+        <MODULEPATH id="kv_gui"/>
+        <MODULEPATH id="kv_engines"/>
+        <MODULEPATH id="kv_core"/>
+        <MODULEPATH id="juce_osc"/>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_dsp"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_cryptography"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+        <MODULEPATH id="jlv2_host"/>
+      </MODULEPATHS>
+    </VS2019>
   </EXPORTFORMATS>
   <MODULES>
     <MODULE id="jlv2_host" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
