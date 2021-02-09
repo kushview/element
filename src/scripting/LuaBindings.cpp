@@ -197,7 +197,17 @@ static String getScriptSearchPath()
     StringArray dirs;
     dirs.add (getUserScriptsDir());
 
+
     #if JUCE_WINDOWS
+    #if JUCE_DEBUG
+        auto topdir = File::getSpecialLocation(File::currentExecutableFile)
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory();
+        dirs.add (topdir.getChildFile("scripts").getFullPathName());
+    #else
         const auto installDir = WindowsRegistry::getValue (
             "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
         if (File::isAbsolutePath (installDir))
@@ -213,7 +223,7 @@ static String getScriptSearchPath()
                     .getFullPathName());
             #endif
         }
-
+    #endif
     #elif JUCE_MAC
         dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
 
@@ -242,6 +252,16 @@ static String getLuaPath()
     StringArray dirs;
 
     #if JUCE_WINDOWS
+    #if JUCE_DEBUG
+        auto topdir = File::getSpecialLocation(File::currentExecutableFile)
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory()
+            .getParentDirectory();
+        dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
+        dirs.add (topdir.getChildFile ("libs/element/lua").getFullPathName());
+    #else
         const auto installDir = WindowsRegistry::getValue (
             "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
         if (File::isAbsolutePath (installDir))
@@ -257,7 +277,7 @@ static String getLuaPath()
                     .getFullPathName());
             #endif
         }
-
+    #endif
     #elif JUCE_MAC
         dirs.add (File::getSpecialLocation (File::currentApplicationFile)
             .getChildFile ("Contents/Frameworks/lua")
