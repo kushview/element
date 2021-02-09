@@ -33,7 +33,7 @@ static ScriptDescription parseScriptComments (const String& buffer)
     int index = 0;
     bool inBlock = false;
     bool finished = false;
-    for (int index = 0; index < lines.size(); ++index)
+    for (index = 0; index < lines.size(); ++index)
     {
         const auto line = lines[index].trim();
         
@@ -109,7 +109,7 @@ ScriptDescription ScriptDescription::read (lua_State* L, const String& buffer)
             desc.description    = script["description"].get_or<std::string> ("");
         }
     }
-    catch (const std::exception& e) {
+    catch (const std::exception&) {
         desc = {};
     }
 

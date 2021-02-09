@@ -49,6 +49,7 @@
  #pragma warning(disable: 4457) // declaration of 'xxx' hides function parameter
  #pragma warning(disable: 4458) // declaration of 'xxx' hides class member
  #pragma warning(disable: 4389) // signed/unsigned mismatch
+ #pragma warning(disable: 26812) 
 #endif
 
 #if defined(EL_FREE) && defined(EL_SOLO)
