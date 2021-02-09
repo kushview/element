@@ -822,11 +822,19 @@
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" binaryPath="../../../build/Win32/Debug"
                        targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" characterSet="MultiByte"
+                       winArchitecture="Win32"/>
+        <CONFIGURATION isDebug="1" name="Debug" binaryPath="../../../build/x64/Debug"
+                       targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" characterSet="MultiByte"/>
         <CONFIGURATION isDebug="0" name="Release" binaryPath="../../../build/Win32/Release"
                        targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
-                       defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0" useRuntimeLibDLL="0"
-                       characterSet="MultiByte"/>
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" winArchitecture="Win32"/>
+        <CONFIGURATION isDebug="0" name="Release" binaryPath="../../../build/x64/Release"
+                       targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
+                       useRuntimeLibDLL="0" characterSet="MultiByte"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="kv_models"/>

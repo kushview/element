@@ -3,7 +3,7 @@
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" projectType="audioplug" version="1.46.0"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
-              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
+              cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2021 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element"
               pluginDesc="Element Modular Instrument" pluginManufacturer="Kushview"
@@ -17,7 +17,7 @@
               userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
               pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
-              headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element">
     <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
@@ -754,15 +754,15 @@
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" windowsTargetPlatformVersion="10.0.16299.0"
             extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
-            toolset="v141_xp" aaxFolder="C:\SDKs\AAX" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
-            vstLegacyFolder="C:/SDKs/vstsdk2.4" extraCompilerFlags="/bigobj">
+            toolset="v141_xp" vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
+            extraCompilerFlags="/bigobj">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="2" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="1"
                        linkTimeOptimisation="0" isDebug="1" optimisation="1" targetName="KV_Element"
                        binaryPath="../../../build/x64/Debug" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" useRuntimeLibDLL="1"
-                       vst3BinaryLocation="c:\Users\mfisher\Desktop\VST3" vstBinaryLocation="c:\Users\mfisher\Desktop\VST"/>
+                       vstBinaryLocation="c:\Users\mfisher\Desktop\VST" vst3BinaryLocation="c:\Users\mfisher\Desktop\VST3"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1" isDebug="0" optimisation="3" targetName="KV_Element"
@@ -806,6 +806,46 @@
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
       </MODULEPATHS>
     </VS2017>
+    <VS2019 targetFolder="Builds/VisualStudio2019" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
+            extraCompilerFlags="/bigobj" toolset="v142">
+      <CONFIGURATIONS>
+        <CONFIGURATION isDebug="1" name="Debug" binaryPath="../../../build/Win32/Debug"
+                       targetName="KV_Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1" winArchitecture="Win32"/>
+        <CONFIGURATION isDebug="1" name="Debug" binaryPath="../../../build/x64/Debug"
+                       targetName="KV_Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0&#10;EL_DISABLE_UNLOCKING=1"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="KV_Element" binaryPath="../../../build/Win32/Release"
+                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0" winArchitecture="Win32" useRuntimeLibDLL="0"/>
+        <CONFIGURATION isDebug="0" name="Release" targetName="KV_Element" binaryPath="../../../build/x64/Release"
+                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
+                       defines="EL_USE_LOCAL_AUTH=0" useRuntimeLibDLL="0"/>
+      </CONFIGURATIONS>
+      <MODULEPATHS>
+        <MODULEPATH id="kv_models"/>
+        <MODULEPATH id="kv_gui"/>
+        <MODULEPATH id="kv_engines"/>
+        <MODULEPATH id="kv_core"/>
+        <MODULEPATH id="juce_osc"/>
+        <MODULEPATH id="juce_opengl"/>
+        <MODULEPATH id="juce_gui_extra"/>
+        <MODULEPATH id="juce_gui_basics"/>
+        <MODULEPATH id="juce_graphics"/>
+        <MODULEPATH id="juce_events"/>
+        <MODULEPATH id="juce_dsp"/>
+        <MODULEPATH id="juce_data_structures"/>
+        <MODULEPATH id="juce_cryptography"/>
+        <MODULEPATH id="juce_core"/>
+        <MODULEPATH id="juce_audio_utils"/>
+        <MODULEPATH id="juce_audio_processors"/>
+        <MODULEPATH id="juce_audio_plugin_client"/>
+        <MODULEPATH id="juce_audio_formats"/>
+        <MODULEPATH id="juce_audio_devices"/>
+        <MODULEPATH id="juce_audio_basics"/>
+        <MODULEPATH id="jlv2_host"/>
+      </MODULEPATHS>
+    </VS2019>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_PLUGINHOST_LADSPA=1&#10;JLV2_PLUGINHOST_LV2=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
                 linuxExtraPkgConfig="lilv-0 suil-0 gtk+-2.0" extraCompilerFlags="-Wno-deprecated-declarations">
       <CONFIGURATIONS>
