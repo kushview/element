@@ -9,7 +9,7 @@ rm -rf build
 ./waf install --destdir="${appdir}"
 
 export LD_LIBRARY_PATH="build/lib"
-"${HOME}/workspace/apps/linuxdeploy-x86_64.AppImage" \
+linuxdeploy \
     --appdir ${appdir} --output appimage \
     --desktop-file="build/share/applications/net.kushview.element.desktop" \
     --icon-file="build/share/icons/hicolor/16x16/apps/net.kushview.element.png" \
