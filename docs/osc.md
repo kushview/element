@@ -1,6 +1,11 @@
 # Element OSC Commands
 Element can be controlled by OSC.
 
+#### Engine Control
+| Command | Description |
+|---------|-------------|
+| `/element/engine/samplerate/:rate` | Change the sample rate |
+
 #### Application Commands
 
 | Command  | Description   |

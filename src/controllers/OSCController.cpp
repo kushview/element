@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,11 +19,13 @@
 
 #include "controllers/OSCController.h"
 #include "session/CommandManager.h"
+#include "session/DeviceManager.h"
 #include "Commands.h"
 #include "Globals.h"
 #include "Settings.h"
 
 #define EL_OSC_ADDRESS_COMMAND "/element/command"
+#define EL_OSC_ADDRESS_ENGINE  "/element/engine"
 
 namespace Element {
 
@@ -52,7 +54,55 @@ private:
 };
 
 //=============================================================================
+struct EngineOSCListener final : OSCReceiver::ListenerWithOSCAddress<>
+{       
+    EngineOSCListener (Globals& g)
+        : globals (g)
+    { }
 
+    void oscMessageReceived (const OSCMessage& message) override
+    {
+        const auto slug = message[0];
+        if (! slug.isString())
+            return;
+
+        if (message.size() >= 2 && slug.getString().toLowerCase().trim() == "samplerate")
+            handleSampleRate (message[1]);
+    }
+
+private:
+    Globals& globals;
+
+    void handleSampleRate (const OSCArgument& arg)
+    {
+        double sampleRate = 0.0;
+        switch (arg.getType())
+        {
+            // see juce_OSCTypes.cpp for other types
+            case 'i':
+                sampleRate = (double) arg.getInt32();
+                break;
+            case 'f':
+                sampleRate = (double) roundToInt (arg.getFloat32());
+                break;
+            default:
+                break;
+        }
+
+        if (sampleRate <= 0.0)
+            return;
+        
+        auto& devs = globals.getDeviceManager();
+        auto setup = devs.getAudioDeviceSetup();
+        if (sampleRate != setup.sampleRate)
+        {
+            setup.sampleRate = sampleRate;
+            devs.setAudioDeviceSetup (setup, true);
+        }
+    }
+};
+
+//=============================================================================
 class OSCController::Impl
 {
 public:
@@ -99,6 +149,9 @@ public:
         application.reset (new CommandOSCListener (owner.getWorld()));
         receiver.addListener (application.get(), EL_OSC_ADDRESS_COMMAND);
 
+        engine.reset (new EngineOSCListener (owner.getWorld()));
+        receiver.addListener (engine.get(), EL_OSC_ADDRESS_ENGINE);
+
         listenersReady = true;
     }
 
@@ -109,7 +162,10 @@ public:
         listenersReady = false;
 
         receiver.removeListener (application.get());
+        receiver.removeListener (engine.get());
+
         application.reset();
+        engine.reset();
     }
 
     int getHostPort() const { return serverPort; }
@@ -124,6 +180,7 @@ private:
     int serverPort { 9000 };
 
     std::unique_ptr<CommandOSCListener> application;
+    std::unique_ptr<EngineOSCListener> engine;
 };
 
 //=============================================================================
