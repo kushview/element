@@ -687,6 +687,8 @@
       <FILE id="mKjzvm" name="CommonConfig.h" compile="0" resource="0" file="../../../src/CommonConfig.h"/>
       <FILE id="jR5x7A" name="DataPath.cpp" compile="1" resource="0" file="../../../src/DataPath.cpp"/>
       <FILE id="MVHx4v" name="DataPath.h" compile="0" resource="0" file="../../../src/DataPath.h"/>
+      <FILE id="qUgpST" name="ScopedCallback.h" compile="0" resource="0"
+            file="../../../src/ScopedCallback.h"/>
       <FILE id="I7TUit" name="ElementApp.h" compile="0" resource="0" file="../../../src/ElementApp.h"/>
       <FILE id="zqPFJd" name="Globals.cpp" compile="1" resource="0" file="../../../src/Globals.cpp"/>
       <FILE id="jCV85f" name="Globals.h" compile="0" resource="0" file="../../../src/Globals.h"/>
