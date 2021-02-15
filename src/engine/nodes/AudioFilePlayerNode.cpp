@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -234,7 +234,8 @@ private:
     IconButton watchButton;
     ToggleButton startStopContinueToggle;
     Atomic<int> startStopContinue { 0 };
-
+    SignalConnection stateRestoredConnection;
+    
     bool draggingPos = false;
 
     void sortRecents()
@@ -247,7 +248,7 @@ private:
     void bindHandlers()
     {
         processor.getPlayer().addChangeListener (this);
-        processor.restoredState.connect (std::bind(
+        stateRestoredConnection = processor.restoredState.connect (std::bind(
             &AudioFilePlayerEditor::onStateRestored, this
         ));
 
@@ -309,6 +310,7 @@ private:
 
     void unbindHandlers()
     {
+        stateRestoredConnection.disconnect();
         playButton.onClick = nullptr;
         loopButton.onClick = nullptr;
         position.onDragStart = nullptr;
