@@ -21,6 +21,7 @@
 #include "gui/BlockComponent.h"
 #include "gui/views/GraphEditorView.h"
 #include "Common.h"
+#include "ScopedCallback.h"
 
 namespace Element {
 
@@ -43,6 +44,18 @@ GraphEditorView::GraphEditorView()
         // save top left
         const auto revertTopLeftPos = pos;
         const bool revertTopLeft = pos.getX() != block.getX() || pos.getY() != block.getY();
+        ScopedCallback defer ([this, &block, &revertTopLeftPos, &revertTopLeft]() {
+            if (revertTopLeft)
+                block.setTopLeftPosition (revertTopLeftPos);
+        });
+        
+        // no action if mouse within viewable area
+        const auto mp = view.getLocalPoint (nullptr, Desktop::getInstance().getMousePosition());
+        if (mp.getX() > 0 && mp.getX() < view.getViewWidth() &&
+            mp.getY() > 0 && mp.getY() < view.getViewHeight())
+        {
+            return;
+        }
         
         // expand and scroll bottom/right
         pos = block.getBounds().getBottomRight();
@@ -53,10 +66,7 @@ GraphEditorView::GraphEditorView()
         if (sizeShouldChange)       { graph.setBounds (gb); }
 
         pos = view.getLocalPoint (&graph, pos.toFloat()).toInt();
-        view.autoScroll (pos.x, pos.y, edgeSpeed, maxSpeed);
-
-        if (revertTopLeft)
-            block.setTopLeftPosition (revertTopLeftPos);
+        view.autoScroll (pos.x, pos.y, edgeSpeed, maxSpeed);        
     };
 
     graph.onZoomChanged = [this]() {
