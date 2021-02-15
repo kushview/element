@@ -297,7 +297,7 @@ inline static StringArray getOSCAddresses()
         if (addy.isNotEmpty())
             res.add (addy);
     }
-    return std::move (res);
+    return res;
 }
 
 }}
