@@ -327,7 +327,7 @@ void BlockComponent::mouseDown (const MouseEvent& e)
             NodePopupMenu menu (node);
             menu.addReplaceSubmenu (plugins);
 
-            if (! node.isIONode() && ! node.isMidiDevice())
+            if (! node.isMidiIONode() && ! node.isMidiDevice())
             {
                 menu.addSeparator();
                 menu.addItem (10, "Ports...", true, false);
