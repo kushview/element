@@ -353,11 +353,12 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
                 tryStereo = &stereoOut;
             }
 
-            if (tryStereo != nullptr)
+            if (tryStereo != nullptr && proc->checkBusesLayoutSupported (*tryStereo))
             {
                 proc->suspendProcessing (true);
                 proc->releaseResources();
                 proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->setBusesLayout (*tryStereo);
                 proc->suspendProcessing (false);
             }
         }
