@@ -252,8 +252,6 @@ public:
     
     Element::ContentComponent* getContentComponent();
     
-    void showUnlockForm (const bool showIt);
-
     void handleAsyncUpdate() override;
     ElementPluginAudioProcessor& getProcessor() { return processor; }
 

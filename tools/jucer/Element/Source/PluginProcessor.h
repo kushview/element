@@ -74,8 +74,8 @@ public:
             parameterIdx    = GraphNode::NoParameter;
         }
         
-        oldNode.reset();
         oldParam.reset();
+        oldNode.reset();
         model = Node();
 
         if (onCleared)
@@ -382,7 +382,6 @@ public:
     const Rectangle<int>& getEditorBounds() const { return editorBounds; }
 
     void updateLatencySamples();
-    void updateUnlockStatus();
 
     bool getEditorWantsKeyboard() const { return editorWantsKeyboard; }
     void setEditorWantsKeyboard (bool wantsIt) { editorWantsKeyboard = wantsIt; }

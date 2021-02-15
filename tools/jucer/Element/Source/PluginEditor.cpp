@@ -178,8 +178,6 @@ ElementPluginAudioProcessorEditor::ElementPluginAudioProcessorEditor (ElementPlu
 
     perfParamChangedConnection = processor.onPerfParamsChanged.connect (std::bind (
         &ElementPluginAudioProcessorEditor::updatePerformanceParamEnablements, this));
-    
-    showUnlockForm (false);
 }
 
 ElementPluginAudioProcessorEditor::~ElementPluginAudioProcessorEditor()
@@ -199,21 +197,9 @@ ElementPluginAudioProcessorEditor::~ElementPluginAudioProcessorEditor()
     }
 }
 
-void ElementPluginAudioProcessorEditor::showUnlockForm (const bool showIt)
-{
-    auto* const app = processor.getAppController();
-    auto* const gui = app->findChild<GuiController>();
-    form = nullptr;
-    resized();
-}
-
 void ElementPluginAudioProcessorEditor::handleAsyncUpdate()
 {
-    if (auto* const app = processor.getAppController())
-    {
-        processor.updateUnlockStatus();
-        showUnlockForm (false);
-    }
+    // noop
 }
 
 Element::ContentComponent* ElementPluginAudioProcessorEditor::getContentComponent()

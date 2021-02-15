@@ -186,6 +186,10 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
 
 ElementPluginAudioProcessor::~ElementPluginAudioProcessor()
 {
+    for (auto* param : perfparams)
+        param->clearNode();
+    perfparams.clear();
+
     if (controllerActive)
         controller->deactivate();
 
@@ -197,12 +201,6 @@ ElementPluginAudioProcessor::~ElementPluginAudioProcessor()
     world->setEngine (nullptr);
     controller = nullptr;
     world = nullptr;
-}
-
-void ElementPluginAudioProcessor::updateUnlockStatus()
-{
-    shouldProcess.set (true);
-    triggerAsyncUpdate();
 }
 
 const String ElementPluginAudioProcessor::getName() const
