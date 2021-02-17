@@ -183,8 +183,6 @@ ElementPluginAudioProcessorEditor::ElementPluginAudioProcessorEditor (ElementPlu
 ElementPluginAudioProcessorEditor::~ElementPluginAudioProcessorEditor()
 {
     perfParamChangedConnection.disconnect();
-    licenseRefreshedConnection.disconnect();
-    form = nullptr;
     removeChildComponent (content.getComponent());
     content = nullptr;
     if (auto* const app = processor.getAppController())

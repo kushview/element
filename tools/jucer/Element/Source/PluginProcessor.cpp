@@ -406,11 +406,6 @@ bool ElementPluginAudioProcessor::hasEditor() const { return true; }
 
 AudioProcessorEditor* ElementPluginAudioProcessor::createEditor()
 {
-    if (!(bool) hasCheckedLicense)
-    {
-        var yes (1); hasCheckedLicense.swapWith (yes);
-    }
-        
     if (auto* gui = controller->findChild<GuiController>())
         gui->stabilizeContent();
     return new ElementPluginAudioProcessorEditor (*this);

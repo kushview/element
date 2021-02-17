@@ -206,7 +206,6 @@ public:
 
     void resized() override
     {
-        const int tableSize = 0; //paramTableVisible ? paramTableSize : 0;
         int space = 12;
         Rectangle<int> sb;
         sb = getLocalBounds();
@@ -288,8 +287,6 @@ public:
 private:
     ElementPluginAudioProcessor& processor;
     SafePointer<Component> content;
-    ScopedPointer<Component> form;
-    SignalConnection licenseRefreshedConnection;
     SignalConnection perfParamChangedConnection;
 
     const int paramTableSize = 100;

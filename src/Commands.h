@@ -118,7 +118,7 @@ enum AppCommands
 
 inline static Array<CommandID> getAllCommands()
 {
-    return std::move (Array<CommandID> ({
+    return {
         quit,
         undo,
         redo,
@@ -195,7 +195,7 @@ inline static Array<CommandID> getAllCommands()
        #endif
 
         recentsClear,
-    }));
+    };
 }
 
 inline static String toString (CommandID command)
