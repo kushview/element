@@ -823,27 +823,27 @@
                        defines="EL_USE_LOCAL_AUTH=0" useRuntimeLibDLL="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
-        <MODULEPATH id="kv_models"/>
-        <MODULEPATH id="kv_gui"/>
-        <MODULEPATH id="kv_engines"/>
-        <MODULEPATH id="kv_core"/>
-        <MODULEPATH id="juce_osc"/>
-        <MODULEPATH id="juce_opengl"/>
-        <MODULEPATH id="juce_gui_extra"/>
-        <MODULEPATH id="juce_gui_basics"/>
-        <MODULEPATH id="juce_graphics"/>
-        <MODULEPATH id="juce_events"/>
-        <MODULEPATH id="juce_dsp"/>
-        <MODULEPATH id="juce_data_structures"/>
-        <MODULEPATH id="juce_cryptography"/>
-        <MODULEPATH id="juce_core"/>
-        <MODULEPATH id="juce_audio_utils"/>
-        <MODULEPATH id="juce_audio_processors"/>
-        <MODULEPATH id="juce_audio_plugin_client"/>
-        <MODULEPATH id="juce_audio_formats"/>
-        <MODULEPATH id="juce_audio_devices"/>
-        <MODULEPATH id="juce_audio_basics"/>
-        <MODULEPATH id="jlv2_host"/>
+        <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_gui" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_engines" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="kv_core" path="../../../libs/kv/modules"/>
+        <MODULEPATH id="juce_osc" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_opengl" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_extra" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_gui_basics" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_graphics" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_events" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_dsp" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_data_structures" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_cryptography" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_utils" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_processors" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_plugin_client" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_formats" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_devices" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="juce_audio_basics" path="../../../libs/JUCE/modules"/>
+        <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
       </MODULEPATHS>
     </VS2019>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_PLUGINHOST_LADSPA=1&#10;JLV2_PLUGINHOST_LV2=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"

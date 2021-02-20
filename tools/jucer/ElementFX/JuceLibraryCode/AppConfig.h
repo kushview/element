@@ -48,6 +48,7 @@
 #define JUCE_PROJUCER_VERSION 0x60004
 
 //==============================================================================
+#define JUCE_MODULE_AVAILABLE_jlv2_host                     1
 #define JUCE_MODULE_AVAILABLE_juce_audio_basics             1
 #define JUCE_MODULE_AVAILABLE_juce_audio_devices            1
 #define JUCE_MODULE_AVAILABLE_juce_audio_formats            1
@@ -69,6 +70,17 @@
 #define JUCE_MODULE_AVAILABLE_kv_models                     1
 
 #define JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED 1
+
+//==============================================================================
+// jlv2_host flags:
+
+#ifndef    JLV2_PLUGINHOST_LV2
+ //#define JLV2_PLUGINHOST_LV2 1
+#endif
+
+#ifndef    JLV2_SUIL_INIT
+ //#define JLV2_SUIL_INIT 1
+#endif
 
 //==============================================================================
 // juce_audio_devices flags:
