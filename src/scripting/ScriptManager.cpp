@@ -137,7 +137,19 @@ File ScriptManager::getSystemScriptsDir()
         .getChildFile ("Contents/Frameworks/scripts")
         .getFullPathName();
    #else
-    jassert (false);
+    const auto installDir = DataPath::installDir();
+    if (installDir.isDirectory())
+    {
+        dir = installDir.getChildFile ("scripts");
+    }
+    else
+    {
+       #if ! EL_RUNNING_AS_PLUGIN
+        dir = File::getSpecialLocation (File::currentExecutableFile)
+            .getParentDirectory()
+            .getChildFile ("scripts");
+       #endif
+    }
    #endif
    
     return dir;

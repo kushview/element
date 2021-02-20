@@ -37,7 +37,7 @@
 #include "lua-kv.hpp"
 
 // uncomment to test using system paths when JUCE_DEBUG is enabled
-// #define EL_FORCE_SYSTEM_LUA_PATHS
+#define EL_FORCE_SYSTEM_LUA_PATHS
 
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
@@ -202,7 +202,7 @@ static String getScriptSearchPath()
 
 
     #if JUCE_WINDOWS
-    #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
+      #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
         auto topdir = File::getSpecialLocation(File::currentExecutableFile)
             .getParentDirectory()
             .getParentDirectory()
@@ -210,23 +210,10 @@ static String getScriptSearchPath()
             .getParentDirectory()
             .getParentDirectory();
         dirs.add (topdir.getChildFile("scripts").getFullPathName());
-    #else
-        const auto installDir = WindowsRegistry::getValue (
-            "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
-        if (File::isAbsolutePath (installDir))
-        {
-            dirs.add (File(installDir).getChildFile("scripts").getFullPathName());
-        }
-        else
-        {
-            #if ! EL_RUNNING_AS_PLUGIN
-                dirs.add (File::getSpecialLocation (File::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile ("scripts")
-                    .getFullPathName());
-            #endif
-        }
-    #endif
+      #else
+        dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
+      #endif
+
     #elif JUCE_MAC
         dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
 
@@ -265,11 +252,10 @@ static String getLuaPath()
         dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
         dirs.add (topdir.getChildFile ("libs/element/lua").getFullPathName());
     #else
-        const auto installDir = WindowsRegistry::getValue (
-            "HKEY_CURRENT_USER\\Software\\Kushview\\Element\\InstallDir", "");
-        if (File::isAbsolutePath (installDir))
+        const auto installDir = DataPath::installDir();
+        if (installDir.isDirectory())
         {
-            dirs.add (File (installDir).getChildFile ("lua").getFullPathName());
+            dirs.add (installDir.getChildFile ("lua").getFullPathName());
         }
         else
         {
