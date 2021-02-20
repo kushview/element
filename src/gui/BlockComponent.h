@@ -128,6 +128,7 @@ public:
 
 private:
     friend class GraphEditorComponent;
+    friend class GraphEditorView;
 
     const uint32 filterID;
     Node graph;
@@ -169,6 +170,14 @@ private:
     GraphEditorComponent* getGraphPanel() const noexcept;
     void setButtonVisible (Button&, bool);
     void setNodePosition (const int x, const int y);
+
+    template<typename T>
+    void setNodePosition (const Point<T>& pt)
+    {
+        const auto pti = pt.toInt();
+        setNodePosition (pti.x, pti.y);
+    }
+
     void updatePosition();
     void makeEditorActive();
     void update (const bool doPosition = true, const bool forcePins = false);

@@ -46,7 +46,10 @@ GraphEditorView::GraphEditorView()
         const bool revertTopLeft = pos.getX() != block.getX() || pos.getY() != block.getY();
         ScopedCallback defer ([this, &block, &revertTopLeftPos, &revertTopLeft]() {
             if (revertTopLeft)
-                block.setTopLeftPosition (revertTopLeftPos);
+            {
+                block.setNodePosition (revertTopLeftPos);
+                block.setPositionFromNode();
+            }
         });
         
         // no action if mouse within viewable area
