@@ -3,6 +3,8 @@
 data/*.ai
 
 dst
+waf-*
+waf3-*
 .waf-*
 .waf3-*
 .lock*
