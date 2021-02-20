@@ -127,4 +127,19 @@ namespace Element
             dir.createDirectory();
         return dir;
     }
+
+    const File DataPath::installDir()
+    {
+        File dir;
+
+       #if JUCE_WINDOWS
+        const auto installDir = WindowsRegistry::getValue (
+            "HKEY_LOCAL_MACHINE\\Software\\Kushview\\Element\\InstallDir", "")
+            .unquoted();
+        if (File::isAbsolutePath (installDir))
+            dir = File (installDir);
+       #endif
+        DBG(installDir);
+        return dir;
+    }
 }

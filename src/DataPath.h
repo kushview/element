@@ -44,6 +44,11 @@ public:
     static const File defaultControllersDir();
     static const File workspacesDir();
 
+    /** Returns the installation directory. May return an invalid file,
+        especially when in debug mode. Use this sparingly
+      */
+    static const File installDir();
+
     const File& getRootDir() const { return root; }
     File createNewPresetFile (const Node& node, const String& name = String()) const;
     void findPresetsFor (const String& format, const String& identifier, NodeArray& nodes) const;
