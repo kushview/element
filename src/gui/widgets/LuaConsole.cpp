@@ -148,7 +148,19 @@ void LuaConsole::setEnvironment (const sol::environment& _env)
         }
     });
 
-    lua.script ("require('el.script').exec('console', _ENV)", e);
+    try {
+        auto result = lua.safe_script("require('el.script').exec('console', _ENV)", e);
+        if (!result.valid())
+        {
+            sol::error error = result;
+            for (const auto& line : StringArray::fromLines(error.what()))
+                addText(line);
+        }
+    }
+    catch (const sol::error& e)
+    {
+        addText (e.what());
+    }
 }
 
 void LuaConsole::timerCallback()

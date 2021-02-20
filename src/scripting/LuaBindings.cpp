@@ -36,6 +36,9 @@
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
 
+// uncomment to test using system paths when JUCE_DEBUG is enabled
+// #define EL_FORCE_SYSTEM_LUA_PATHS
+
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
 template <typename T>
@@ -199,7 +202,7 @@ static String getScriptSearchPath()
 
 
     #if JUCE_WINDOWS
-    #if JUCE_DEBUG
+    #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
         auto topdir = File::getSpecialLocation(File::currentExecutableFile)
             .getParentDirectory()
             .getParentDirectory()
@@ -252,7 +255,7 @@ static String getLuaPath()
     StringArray dirs;
 
     #if JUCE_WINDOWS
-    #if JUCE_DEBUG
+    #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
         auto topdir = File::getSpecialLocation(File::currentExecutableFile)
             .getParentDirectory()
             .getParentDirectory()
