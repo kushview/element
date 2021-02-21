@@ -72,7 +72,7 @@
 // jlv2_host flags:
 
 #ifndef    JLV2_PLUGINHOST_LV2
- //#define JLV2_PLUGINHOST_LV2 1
+ #define   JLV2_PLUGINHOST_LV2 0
 #endif
 
 #ifndef    JLV2_SUIL_INIT

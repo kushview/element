@@ -894,7 +894,8 @@
     <MODULE id="kv_models" showAllCode="1" useLocalCopy="0" useGlobalPath="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled" KV_LV2_PLUGIN_HOST="0" JUCE_PLUGINHOST_VST="1"
-               JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_AU="1" KV_DOCKING_WINDOWS="1"/>
+               JUCE_PLUGINHOST_VST3="1" JUCE_PLUGINHOST_AU="1" KV_DOCKING_WINDOWS="1"
+               JLV2_PLUGINHOST_LV2="0"/>
   <LIVE_SETTINGS>
     <OSX/>
     <WINDOWS/>
