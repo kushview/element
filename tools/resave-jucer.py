@@ -2,10 +2,10 @@ from subprocess import call
 import sys
 
 PROJUCER_PROJECTS = '''
-    tools\jucer\Standalone\Element.jucer
-    tools\jucer\Standalone\Element.jucer
-    tools\jucer\Standalone\Element.jucer
-    tools\jucer\Standalone\Element.jucer'''.split()
+    tools/jucer/Standalone/Element.jucer
+    tools/jucer/Standalone/Element.jucer
+    tools/jucer/Standalone/Element.jucer
+    tools/jucer/Standalone/Element.jucer'''.split()
 
 def projucer_exe():
     if 'win' in sys.platform:
