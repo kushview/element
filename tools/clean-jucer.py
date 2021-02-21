@@ -14,7 +14,7 @@ XCODE_PROJECTS = [
     'tools/jucer/Standalone/Builds/MacOSX/Element.xcodeproj'
 ]
 
-if 'win' in sys.platform:
+if 'win32' in sys.platform or 'win64' in sys.platform:
     for project in MSVC_PROJECTS:
         call (['msbuild', '/t:Clean', '/p:Configuration=Release', '/p:Platform=x64', project])
 elif 'darwin' in sys.platform:
