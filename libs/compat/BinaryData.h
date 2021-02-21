@@ -18,10 +18,10 @@ namespace BinaryData
     const int            Editing_elwSize = 1820;
 
     extern const char*   acknowledgements_txt;
-    const int            acknowledgements_txtSize = 3461;
+    const int            acknowledgements_txtSize = 3541;
 
     extern const char*   developers_txt;
-    const int            developers_txtSize = 82;
+    const int            developers_txtSize = 164;
 
     extern const char*   ElementIcon_png;
     const int            ElementIcon_pngSize = 11697;
