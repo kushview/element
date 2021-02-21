@@ -134,7 +134,7 @@ File ScriptManager::getSystemScriptsDir()
 
    #elif JUCE_MAC
     dir = File::getSpecialLocation (File::currentApplicationFile)
-        .getChildFile ("Contents/Frameworks/scripts")
+        .getChildFile ("Contents/Resources/scripts")
         .getFullPathName();
    #else
     const auto installDir = DataPath::installDir();

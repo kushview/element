@@ -269,7 +269,7 @@ static String getLuaPath()
     #endif
     #elif JUCE_MAC
         dirs.add (File::getSpecialLocation (File::currentApplicationFile)
-            .getChildFile ("Contents/Frameworks/lua")
+            .getChildFile ("Contents/Resources/lua")
             .getFullPathName());
     
     #else
