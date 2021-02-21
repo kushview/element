@@ -8,7 +8,9 @@ rm -rf build
 ./waf build
 ./waf install --destdir="${appdir}"
 
+export VERSION="0.46.0b1"
 export LD_LIBRARY_PATH="build/lib"
+
 linuxdeploy \
     --appdir ${appdir} --output appimage \
     --desktop-file="build/share/applications/net.kushview.element.desktop" \
