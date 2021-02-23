@@ -37,7 +37,7 @@
 #include "lua-kv.hpp"
 
 // uncomment to test using system paths when JUCE_DEBUG is enabled
-#define EL_FORCE_SYSTEM_LUA_PATHS
+// #define EL_FORCE_SYSTEM_LUA_PATHS
 
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
