@@ -691,11 +691,11 @@ private:
             PopupMenu menu;
             menu.addItem (1, "Refresh...");
             menu.addSeparator();
-            #if JUCE_MAC
+           #if JUCE_MAC
             String name = "Show in Finder";
-            #else
-			String name = "Show in Exlorer";
-            #endif
+           #else
+			String name = "Show in Explorer";
+           #endif
             menu.addItem (2, name);
             const int res = menu.show();
             if (res == 1)
