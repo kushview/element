@@ -28,7 +28,8 @@ namespace SymbolHelpers
 {
     static String formatSymbol (const String& input)
     {
-
+        // todo
+        return input;
     }
 
     static bool isValidSymbol (const String& input)
