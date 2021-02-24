@@ -24,6 +24,20 @@
 using namespace kv;
 namespace Element {
 
+namespace SymbolHelpers
+{
+    static String formatSymbol (const String& input)
+    {
+
+    }
+
+    static bool isValidSymbol (const String& input)
+    {
+        return input.isNotEmpty() &&
+               input.containsOnly ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_");
+    }
+}
+
 //==============================================================================
 class DSPScript::Parameter : public ControlPortParameter,
                              public Element::Parameter::Listener
@@ -491,8 +505,15 @@ void DSPScript::addParameterPorts()
         {
             auto param = params [i + 1];
 
-            String name  = param["name"].get_or (std::string ("Param"));
-            String sym   = name.trim().toLowerCase().replace(" ", "_");
+            String name  = param["name"].get_or (std::string ("Param ") + String(i + 1).toStdString());
+            String sym   = param["symbol"].get_or (std::string());
+            if (sym.isEmpty())
+            {
+                sym = name.trim().toLowerCase()
+                    .replaceCharacter ('-', '_')
+                    .replaceCharacter (' ', '_');
+            }
+            
             String type  = param["type"].get_or (std::string ("float"));
             String flow  = param["flow"].get_or (std::string ("input"));
             jassert (flow == "input" || flow == "output");
