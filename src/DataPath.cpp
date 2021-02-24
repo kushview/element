@@ -138,8 +138,10 @@ namespace Element
             .unquoted();
         if (File::isAbsolutePath (installDir))
             dir = File (installDir);
+       #elif JUCE_MAC
+        dir = File ("/Applications");
        #endif
-        DBG(installDir);
+
         return dir;
     }
 }
