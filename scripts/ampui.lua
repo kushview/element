@@ -1,6 +1,6 @@
 --- Editor for `amp` DSP script.
 -- @script ampui
--- @kind DSPUI
+-- @kind DSPUI amp
 
 local Widget        = require ('kv.Widget')
 local Slider        = require ('kv.Slider')
@@ -18,6 +18,8 @@ function Editor:init (ctx)
     local volume = ctx.params [1]
 
     self.knob = self:add (object.new (Slider))
+    self.knob.style = Slider.ROTARY
+    self.knob:textboxstyle (Slider.TEXT_BOX_BELOW, true, 52, 26)
     self.knob:range (-90, 24, 0.01)
     self.knob:value (volume:value (false))
     self.knob.dragging  = false
@@ -32,7 +34,7 @@ function Editor:init (ctx)
         self.knob:value (volume:value (false), 0)
     end
 
-    self:resize (240, 90)
+    self:resize (180, 170)
 end
 
 function Editor:paint (g)
