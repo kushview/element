@@ -295,7 +295,7 @@ def build_vst_linux (bld):
 
     if juce.is_linux():
         build_desktop (bld)
-        vst.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
+        vst.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
 
 def build_vst (bld):
     if juce.is_linux(): build_vst_linux (bld)
@@ -340,7 +340,7 @@ def build_app (bld):
 
     if juce.is_linux():
         build_desktop (bld)
-        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL', 'GTK' ]
+        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
 
     elif juce.is_mac():
         library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
