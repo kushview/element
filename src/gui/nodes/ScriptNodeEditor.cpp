@@ -219,6 +219,8 @@ public:
         : CodeEditorComponent (doc, tokens),
           owner (o)
     {
+        setTabSize (4, true);
+        setColourScheme (luaColors());
         setFont (getFont().withHeight (getDefaultFontHeight()));
     }
 
@@ -441,9 +443,6 @@ void ScriptNodeEditor::updateCodeEditor()
 {
     editor.reset (new CodeEditor (*this, getActiveDoc(), &tokens));
     addAndMakeVisible (editor.get());
-    editor->setTabSize (4, true);
-    editor->setFont (editor->getFont().withHeight (18));
-    editor->setColourScheme (luaColors());
     resized();
 }
 
@@ -610,8 +609,6 @@ void ScriptNodeEditor::resized()
         auto b = comp->getLocalBounds();
         comp->setBounds (b.withCentre (r1.getCentre()));
     }
-
-
 }
 
 }
