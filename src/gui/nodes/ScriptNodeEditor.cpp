@@ -226,6 +226,11 @@ public:
 
     ~CodeEditor() override {}
 
+    //==========================================================================
+    /** Returns the default font height used by this editor */
+    float getDefaultFontHeight() const { return defaultFontHeight; }
+
+    //==========================================================================
     void addPopupMenuItems (PopupMenu &menu, const MouseEvent *event) override
     {
         menu.addItem (50001, "Open File");
@@ -272,13 +277,10 @@ public:
         }
     }
 
-    /** Returns the default font height used by this editor */
-    float getDefaultFontHeight() const { return defaultFontHeight; }
-
 private:
     ScriptNodeEditor& owner;
-   #if JUCE_MAC || JUCE_WINDOWS
-    static constexpr float defaultFontHeight = 14.f;
+   #if JUCE_MAC
+    static constexpr float defaultFontHeight = 14.5f;
    #elif JUCE_WINDOWS
     static constexpr float defaultFontHeight = 13.f;
    #elif JUCE_LINUX
