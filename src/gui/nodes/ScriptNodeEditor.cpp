@@ -272,11 +272,20 @@ public:
         }
     }
 
+    /** Returns the default font height used by this editor */
     float getDefaultFontHeight() const { return defaultFontHeight; }
 
 private:
     ScriptNodeEditor& owner;
+   #if JUCE_MAC || JUCE_WINDOWS
     static constexpr float defaultFontHeight = 14.f;
+   #elif JUCE_WINDOWS
+    static constexpr float defaultFontHeight = 13.f;
+   #elif JUCE_LINUX
+    static constexpr float defaultFontHeight = 16.f;
+   #else
+    static constexpr float defaultFontHeight = 15.f;
+   #endif
 };
 
 //==============================================================================
