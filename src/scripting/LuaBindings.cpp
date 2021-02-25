@@ -191,6 +191,18 @@ static String getUserScriptsDir()
         .getFullPathName();
 }
 
+static File getAppImageLuaPath()
+{
+   #if defined (EL_APPIMAGE)
+    return File::getSpecialLocation (File::currentExecutableFile)
+        .getParentDirectory() // bin
+        .getParentDirectory() // usr
+        .getChildFile ("share/element/lua");
+   #endif
+    jassertfalse;
+    return File();
+}
+
 //==============================================================================
 static String getScriptSearchPath()
 {
@@ -218,7 +230,9 @@ static String getScriptSearchPath()
         dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
 
     #else
-        #if defined (EL_SCRIPTSDIR)
+        #if defined (EL_APPIMAGE)
+            dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());           
+        #elif defined (EL_SCRIPTSDIR)
             if (File::isAbsolutePath (EL_SCRIPTSDIR))
                 dirs.add (String (EL_SCRIPTSDIR));
         #endif
@@ -273,7 +287,9 @@ static String getLuaPath()
             .getFullPathName());
     
     #else
-        #if defined (EL_LUADIR)
+        #if defined (EL_APPIMAGE)
+            dirs.add (getAppImageLuaPath().getFullPathName());   
+        #elif defined (EL_LUADIR)
             if (File::isAbsolutePath (EL_LUADIR))
                 dirs.add (EL_LUADIR);
         #endif

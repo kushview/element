@@ -126,7 +126,13 @@ File ScriptManager::getSystemScriptsDir()
 {
     File dir;
 
-   #if defined (EL_SCRIPTSDIR)
+   #if defined (EL_APPIMAGE)
+    dir = File::getSpecialLocation (File::currentExecutableFile)
+        .getParentDirectory() // bin
+        .getParentDirectory() // usr
+        .getChildFile ("share/element/scripts");
+
+   #elif defined (EL_SCRIPTSDIR)
     dir = File (EL_SCRIPTSDIR);
 
    #elif JUCE_LINUX

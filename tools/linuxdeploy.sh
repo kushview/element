@@ -4,13 +4,16 @@ set -ex
 appdir="build/AppDir"
 
 rm -rf build
+
+export CFLAGS="-DEL_APPIMAGE=1"
+export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf configure --prefix=/usr $@
-./waf build
+
+./waf build --progress
 ./waf install --destdir="${appdir}"
 
 export VERSION="0.46.0b1"
 export LD_LIBRARY_PATH="build/lib"
-
 linuxdeploy \
     --appdir ${appdir} --output appimage \
     --desktop-file="build/share/applications/net.kushview.element.desktop" \
