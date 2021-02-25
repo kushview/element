@@ -211,6 +211,7 @@ private:
     }
 };
 
+//==============================================================================
 class ScriptNodeEditor::CodeEditor : public CodeEditorComponent
 {
 public:
@@ -218,6 +219,7 @@ public:
         : CodeEditorComponent (doc, tokens),
           owner (o)
     {
+        setFont (getFont().withHeight (getDefaultFontHeight()));
     }
 
     ~CodeEditor() override {}
@@ -268,8 +270,11 @@ public:
         }
     }
 
+    float getDefaultFontHeight() const { return defaultFontHeight; }
+
 private:
     ScriptNodeEditor& owner;
+    static constexpr float defaultFontHeight = 14.f;
 };
 
 //==============================================================================
