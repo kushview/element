@@ -360,8 +360,6 @@ public:
     /** Triggered when the node changes its name */
     Signal<void()> nameChanged;
 
-
-
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
