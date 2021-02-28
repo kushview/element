@@ -847,10 +847,12 @@
       </MODULEPATHS>
     </VS2019>
     <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="KSP1_INTERNAL=1&#10;HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_PLUGINHOST_LADSPA=1&#10;JLV2_PLUGINHOST_LV2=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
-                linuxExtraPkgConfig="lilv-0 suil-0 gtk+-2.0" extraCompilerFlags="-Wno-deprecated-declarations">
+                linuxExtraPkgConfig="lilv-0 suil-0" extraCompilerFlags="-Wno-deprecated-declarations">
       <CONFIGURATIONS>
-        <CONFIGURATION isDebug="1" name="Debug"/>
-        <CONFIGURATION isDebug="0" name="Release"/>
+        <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="0" targetName="KV_Element"
+                       binaryPath="../../../build/Debug"/>
+        <CONFIGURATION isDebug="0" name="Release" enablePluginBinaryCopyStep="0" targetName="KV_Element"
+                       binaryPath="../../../build/Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="kv_models" path="../../../libs/kv/modules"/>
