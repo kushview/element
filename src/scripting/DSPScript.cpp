@@ -98,15 +98,21 @@ DSPScript::DSPScript (sol::table tbl)
 
     if (ok)
     {
-        sol::state_view lua (L);
-        ok = lua.safe_script (R"(
-            require ('kv.audio')
-            require ('kv.midi')
-            require ('kv.AudioBuffer')
-            require ('kv.MidiBuffer')
-            require ('kv.MidiMessage')
-            require ('el.MidiPipe')
-        )").status() == sol::call_status::ok;
+        try {
+            sol::state_view lua (L);
+            auto result = lua.safe_script (R"(
+                require ('kv.audio')
+                require ('kv.midi')
+                require ('kv.AudioBuffer')
+                require ('kv.MidiBuffer')
+                require ('kv.MidiMessage')
+                require ('el.MidiPipe')
+            )");
+            ok = result.status() == sol::call_status::ok;
+        } catch (const sol::error& e) {
+            DBG(e.what());
+            ok = false;
+        }
     }
 
     if (ok)
