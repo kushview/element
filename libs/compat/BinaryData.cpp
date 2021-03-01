@@ -202,7 +202,7 @@ static const unsigned char temp_binary_data_4[] =
 "Steve Schow (steveschow)\n"
 "iamvs2002\n"
 "jatinchowdhury18\n"
-"mmoole. (mmoole)\n";
+"mmoole. (mmoole)";
 
 const char* developers_txt = (const char*) temp_binary_data_4;
 
@@ -445,7 +445,7 @@ const char* getNamedResource (const char* resourceNameUTF8, int& numBytes)
         case 0x5b24ff63:  numBytes = 1631; return Classic_elw;
         case 0xe469c969:  numBytes = 1820; return Editing_elw;
         case 0x046a62ea:  numBytes = 3461; return acknowledgements_txt;
-        case 0x117be71a:  numBytes = 164; return developers_txt;
+        case 0x117be71a:  numBytes = 163; return developers_txt;
         case 0x9eb8b85f:  numBytes = 11697; return ElementIcon_png;
         case 0xcd7846f9:  numBytes = 7122; return ElementIconTemplate_png;
         default: break;

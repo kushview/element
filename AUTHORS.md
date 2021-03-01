@@ -4,5 +4,11 @@
     Michael Fisher (mfisher31)
 
 ## Contributors
+    Chris Ryan (digitalelements)
+    David Runge (dvzrv)
     Eliot Akira (eliot-akira)
+    Max Hunter (nippoo)
+    Steve Schow (steveschow)
     iamvs2002
+    jatinchowdhury18
+    mmoole. (mmoole)

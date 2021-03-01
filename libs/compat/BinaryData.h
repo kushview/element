@@ -21,7 +21,7 @@ namespace BinaryData
     const int            acknowledgements_txtSize = 3461;
 
     extern const char*   developers_txt;
-    const int            developers_txtSize = 164;
+    const int            developers_txtSize = 163;
 
     extern const char*   ElementIcon_png;
     const int            ElementIcon_pngSize = 11697;

@@ -229,7 +229,8 @@ AboutComponent::AboutComponent()
     donors->getPanel().addSection ("Sponsors", {
         "Davide Anselmi",
         "Greg Gibbs",
-        "Kent Kingery"        
+        "Kent Kingery",
+        "Michael Kıral"
     });
 
     tabs.addTab ("Donors",  tabc, donors, true);
