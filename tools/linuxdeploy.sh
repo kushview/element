@@ -26,3 +26,27 @@ linuxdeploy \
     --executable="build/bin/element"
 
 mv *.AppImage build/
+
+here="`pwd`"
+
+cd "${here}/tools/jucer/Element/Builds/LinuxMakefile"
+make clean && rm -rf build && make -j4 CONFIG=Release
+
+cd "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile"
+make clean && rm -rf build && make -j4 CONFIG=Release
+
+cd "${here}"
+pkgname="element-linux64-${VERSION}"
+pkgdir="build/${pkgname}"
+
+rm -f build/*.tar.gz
+rm -rf "${pkgdir}"
+mkdir -p "build/${pkgname}/vst"
+mkdir -p "build/${pkgname}/vst3"
+
+cp -vf build/*.AppImage "${pkgdir}/"
+cp -vrf build/Release/KV_Element*.so "${pkgdir}/vst"
+cp -vrf build/Release/KV_Element*.vst3 "${pkgdir}/vst3"
+cd "${pkgdir}/.." && tar -czvf "${pkgname}.tar.gz" "${pkgname}"
+
+cd "${here}"
