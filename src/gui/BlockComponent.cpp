@@ -190,7 +190,7 @@ void BlockComponent::valueChanged (Value& value)
         repaint();
     } else if (nodeName.refersToSameSourceAs (value)) {
         setName (node.getName());
-        repaint();
+        update();
     } else if (hiddenPorts.refersToSameSourceAs (value)) {
         if (auto* ge = getGraphPanel())
             ge->updateComponents (false);
