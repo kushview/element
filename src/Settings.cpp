@@ -35,6 +35,7 @@ const char* Settings::generateMidiClockKey      = "generateMidiClockKey";
 const char* Settings::sendMidiClockToInputKey   = "sendMidiClockToInputKey";
 const char* Settings::hidePluginWindowsWhenFocusLostKey = "hidePluginWindowsWhenFocusLost";
 const char* Settings::lastGraphKey              = "lastGraph";
+const char* Settings::lastSessionKey            = "lastSession";
 const char* Settings::legacyInterfaceKey        = "legacyInterface";
 const char* Settings::workspaceKey              = "workspace";
 const char* Settings::midiEngineKey             = "midiEngine";

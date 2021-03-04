@@ -44,6 +44,7 @@ public:
     static const char* sendMidiClockToInputKey;
     static const char* hidePluginWindowsWhenFocusLostKey;
     static const char* lastGraphKey;
+    static const char* lastSessionKey;
     static const char* legacyInterfaceKey;
     static const char* workspaceKey;
     static const char* midiEngineKey;
