@@ -196,10 +196,15 @@ void GraphEditorView::onNodeSelected()
 {
     if (auto* const cc = ViewHelpers::findContentComponent (this))
     {
+        auto session = cc->getSession();
         auto& gui = *cc->getAppController().findChild<GuiController>();
         const auto selected = gui.getSelectedNode();
-        if (selected.descendsFrom (getGraph()))
+        if (selected.descendsFrom (getGraph())) {
+            // prevent minor gui changes from marking session as dirty.
+            // This is a hack and need a better solution;
+            Session::ScopedFrozenLock freeze (*session);
             graph.selectNode (selected);
+        }
     }
 }
 

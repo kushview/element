@@ -377,13 +377,21 @@ private:
             auto gain = Decibels::decibelsToGain (value, -60.0);
             if (isAudioOutNode || isMonitoringInputs())
             {
-                node.setProperty ("inputGain", gain);
-                object->setInputGain (static_cast<float> (gain));
+                if (gain != (double) node.getProperty ("inputGain", gain) ||
+                    gain != (double) object->getInputGain())
+                {
+                    node.setProperty ("inputGain", gain);
+                    object->setInputGain (static_cast<float> (gain));
+                }
             }
             else
             {
-                node.setProperty ("gain", gain);
-                object->setGain (static_cast<float> (gain));
+                if (gain != (double) node.getProperty ("gain", gain) ||
+                    gain != (double) object->getGain())
+                {
+                    node.setProperty ("gain", gain);
+                    object->setGain (static_cast<float> (gain));
+                }
             }
         }
     }
