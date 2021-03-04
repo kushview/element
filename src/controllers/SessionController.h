@@ -28,8 +28,8 @@ namespace Element {
 class SessionController : public AppController::Child
 {
 public:
-    SessionController() { }
-    ~SessionController() { }
+    SessionController();
+    ~SessionController();
     
     void activate() override;
     void deactivate() override;
@@ -50,9 +50,12 @@ public:
     void importGraph (const File& file);
     
     Signal<void()> sessionLoaded;
+
 private:
     SessionPtr currentSession;
-    ScopedPointer<SessionDocument> document;
+    std::unique_ptr<SessionDocument> document;
+    class ChangeResetter;
+    std::unique_ptr<ChangeResetter> changeResetter;
     void loadNewSessionData();
     void refreshOtherControllers();
 };

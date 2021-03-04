@@ -33,11 +33,31 @@
 
 namespace Element {
 
+class SessionController::ChangeResetter : public AsyncUpdater
+{
+public:
+    explicit ChangeResetter (SessionController& sc) : owner(sc) {}
+    ~ChangeResetter() = default;
+    
+    void handleAsyncUpdate() override
+    {
+        owner.resetChanges (false);
+        jassert (!owner.hasSessionChanged());
+    }
+
+private:
+    SessionController& owner;
+};
+
+SessionController::SessionController() { }
+SessionController::~SessionController() { }
+
 void SessionController::activate()
 {
     auto* app = dynamic_cast<AppController*> (getRoot());
     currentSession = app->getWorld().getSession();
-    document = new SessionDocument (currentSession);
+    document.reset (new SessionDocument (currentSession));
+    changeResetter.reset (new ChangeResetter (*this));
 }
 
 void SessionController::deactivate()
@@ -49,10 +69,13 @@ void SessionController::deactivate()
     if (document)
     {
         if (document->getFile().existsAsFile())
-            props->setValue ("lastSession", document->getFile().getFullPathName());
+            props->setValue (Settings::lastSessionKey, document->getFile().getFullPathName());
         document = nullptr;
     }
-    
+
+    changeResetter->cancelPendingUpdate();
+    changeResetter.reset (nullptr);
+
     currentSession->clear();
     currentSession = nullptr;
 }
@@ -119,8 +142,11 @@ void SessionController::openFile (const File& file)
     }
     
     if (didSomething)
+    {
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
+        changeResetter->triggerAsyncUpdate();
+    }
 }
 
 void SessionController::exportGraph (const Node& node, const File& targetFile)
