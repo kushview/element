@@ -276,12 +276,18 @@ public:
         
         if (world->getSettings().askToSaveSession())
         {
-            if (AlertWindow::showOkCancelBox (AlertWindow::NoIcon, "Save Session",
-                    "This session may have changes.\nWould you like to save before exiting?",
-                    "Yes", "No"))
-            {
+            DBG("hasSessionChanged? : " << (int) sc->hasSessionChanged());
+            // - 0 if the third button was pressed ('cancel')
+            // - 1 if the first button was pressed ('yes')
+            // - 2 if the middle button was pressed ('no')
+            const int res = ! sc->hasSessionChanged() ? 2
+                : AlertWindow::showYesNoCancelBox (AlertWindow::NoIcon, "Save Session",
+                    "This session may have changes. Would you like to save before exiting?");
+            
+            if (res == 1)
                 sc->saveSession();
-            }
+            if (res != 0)
+                Application::quit();
         }
         else
         {
@@ -298,9 +304,10 @@ public:
                     sc->saveSession();
                 }
             }
+
+            Application::quit();
         }
 
-        Application::quit();
        #else // lite and solo
         auto* gc = controller->findChild<GraphController>();
         if (world->getSettings().askToSaveSession())
