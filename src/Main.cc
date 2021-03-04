@@ -276,7 +276,6 @@ public:
         
         if (world->getSettings().askToSaveSession())
         {
-            DBG("hasSessionChanged? : " << (int) sc->hasSessionChanged());
             // - 0 if the third button was pressed ('cancel')
             // - 1 if the first button was pressed ('yes')
             // - 2 if the middle button was pressed ('no')
