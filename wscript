@@ -300,6 +300,11 @@ def build_vst_linux (bld):
 def build_vst (bld):
     if juce.is_linux(): build_vst_linux (bld)
 
+def copy_app_bundle_lua_files(ctx):
+    if not juce.is_mac():
+        return
+    call (['bash', 'tools/osx-lua.copy.sh'])
+
 def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
@@ -313,12 +318,7 @@ def build_app (bld):
         name        = 'ELEMENT',
         env         = libEnv,
         use         = [ 'BOOST_SIGNALS' ],
-        cxxflags    = [
-            '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
-            '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
-            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
-            '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
-        ],
+        cxxflags    = [],
         install_path = None
     )
 
@@ -341,6 +341,12 @@ def build_app (bld):
     if juce.is_linux():
         build_desktop (bld)
         library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+        library.cxxflags += [
+            '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
+            '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
+            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
+            '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
+        ]
 
     elif juce.is_mac():
         library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
@@ -349,10 +355,14 @@ def build_app (bld):
         app.mac_app     = True
         app.mac_plist   = 'data/Info.plist'
         app.mac_files   = [ 'data/Icon.icns' ]
+
+        bld.add_post_fun(copy_app_bundle_lua_files)
     else:
         pass
 
 def install_lua_files (bld):
+    if not juce.is_linux():
+        return
     path = bld.path
     join = os.path.join
     bld.install_files (join (bld.env.DATADIR, 'scripts'),
@@ -376,6 +386,9 @@ def install_lua_files (bld):
                        cwd=bld.path.find_dir ('libs/element/lua'))
 
 def build (bld):
+    if bld.is_install and juce.is_mac():
+        bld.fatal ("waf install not supported on OSX")
+
     bld.add_pre_fun (configure_git_version)
     # build_lua_lib (bld)
     build_app (bld)
