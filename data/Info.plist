@@ -3,31 +3,33 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist>
   <dict>
+    <key>CFBundleDisplayName</key>
+    <string>Element</string>
+    <key>CFBundleIdentifier</key>
+    <string>new.kushview.Element</string>
+    <key>CFBundleName</key>
+    <string>Element</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
       <true/>
     </dict>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>This app requires audio input. If you do not have an audio interface connected it will use the built-in microphone.</string>
     <key>CFBundleExecutable</key>
     <string>Element</string>
     <key>CFBundleIconFile</key>
     <string>Icon.icns</string>
-    <key>CFBundleIdentifier</key>
-    <string>net.kushview.Element</string>
-    <key>CFBundleName</key>
-    <string>Element</string>
-    <key>CFBundleDisplayName</key>
-    <string>Element</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.15.7</string>
+    <string>0.46.0b2</string>
     <key>CFBundleVersion</key>
-    <string>0.15.7</string>
+    <string>0.46.0b2</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright (c) 2017-2018 Kushview, LLC</string>
+    <string>Copyright (c) 2014-2021 Kushview, LLC</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleDocumentTypes</key>
