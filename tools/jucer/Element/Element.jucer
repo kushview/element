@@ -713,20 +713,20 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
                extraDefs="" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;fi"
                hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
-               extraCompilerFlags="-Wno-deprecated-declarations">
+               extraCompilerFlags="-Wno-deprecated-declarations" xcodeValidArchs="arm64,x86_64">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
                        linkTimeOptimisation="0" targetName="KV_Element" headerPath="/opt/kushview/include&#10;/usr/local/include&#10;"
-                       osxCompatibility="10.9 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
+                       osxCompatibility="10.11 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"
-                       binaryPath="../../../build/Debug"/>
+                       binaryPath="../../../build/Debug" osxSDK="10.15 SDK"/>
         <CONFIGURATION name="Release" enablePluginBinaryCopyStep="1" isDebug="0" optimisation="3"
                        linkTimeOptimisation="1" targetName="KV_Element" cppLibType="libc++"
-                       osxArchitecture="64BitIntel" osxCompatibility="10.9 SDK" headerPath="/opt/kushview/include&#10;/usr/local/include"
+                       osxArchitecture="64BitIntel" osxCompatibility="10.11 SDK" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,ONLY_ACTIVE_ARCH=YES,&#10;MACOSX_DEPLOYMENT_TARGET=10.9,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
-                       binaryPath="../../../build/Release"/>
+                       binaryPath="../../../build/Release" osxSDK="10.15 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>

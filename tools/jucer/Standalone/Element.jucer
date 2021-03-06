@@ -721,30 +721,32 @@
                documentExtensions="elc,elg,els" hardenedRuntime="1" iosInAppPurchases="0"
                iosPushNotifications="0" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                extraCompilerFlags="-Wno-deprecated-declarations" microphonePermissionNeeded="1"
-               postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -ar --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -ar --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;else&#10;echo &quot;Skipped copying lua files to ${FULL_PRODUCT_NAME}&quot;&#10;fi&#10;">
+               postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -ar --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -ar --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;else&#10;echo &quot;Skipped copying lua files to ${FULL_PRODUCT_NAME}&quot;&#10;fi&#10;"
+               xcodeValidArchs="arm64,x86_64">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" osxArchitecture="64BitIntel" isDebug="1" optimisation="1"
-                       targetName="Element" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Element"
+                       cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0&#10;"
-                       enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES&#10;MACOSX_DEPLOYMENT_TARGET=10.9&#10;"
-                       headerPath="/opt/kushview/include&#10;/usr/local/include" osxCompatibility="10.9 SDK"/>
+                       enablePluginBinaryCopyStep="1" headerPath="/opt/kushview/include&#10;/usr/local/include"
+                       osxSDK="10.15 SDK" osxArchitecture="64BitIntel" osxCompatibility="10.11 SDK"/>
         <CONFIGURATION name="Release" osxArchitecture="64BitIntel" isDebug="0" optimisation="2"
                        targetName="Element" binaryPath="../../../build/Release" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,&#10;MACOSX_DEPLOYMENT_TARGET=10.9,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO&#10;"
-                       osxCompatibility="10.9 SDK"/>
+                       osxCompatibility="10.11 SDK" osxSDK="10.15 SDK"/>
         <CONFIGURATION name="Debug_SE" osxArchitecture="64BitIntel" isDebug="1" optimisation="1"
                        targetName="Element SE" cppLibType="libc++" libraryPath="" binaryPath="../../../build/Debug"
                        defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0&#10;EL_SOLO=1"
                        enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES, MACOSX_DEPLOYMENT_TARGET=10.9&#10;"
-                       headerPath="/opt/kushview/include&#10;/usr/local/include" osxCompatibility="10.9 SDK"/>
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" osxCompatibility="10.11 SDK"
+                       osxSDK="10.15 SDK"/>
         <CONFIGURATION name="Release_SE" osxArchitecture="64BitIntel" isDebug="0" optimisation="2"
                        targetName="Element SE" binaryPath="../../../build/Release" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        libraryPath="" cppLibType="libc++" cppLanguageStandard="c++11"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0&#10;EL_SOLO=1&#10;"
                        fastMath="0" enablePluginBinaryCopyStep="1" customXcodeFlags="ONLY_ACTIVE_ARCH=YES,&#10;MACOSX_DEPLOYMENT_TARGET=10.9,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
-                       osxCompatibility="10.9 SDK"/>
+                       osxCompatibility="10.11 SDK" osxSDK="10.15 SDK"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_gui_extra" path="../../../libs/JUCE/modules"/>
