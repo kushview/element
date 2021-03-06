@@ -303,7 +303,7 @@
 #endif
 
 #ifndef    JUCE_WIN_PER_MONITOR_DPI_AWARE
- #define   JUCE_WIN_PER_MONITOR_DPI_AWARE 0
+ #define   JUCE_WIN_PER_MONITOR_DPI_AWARE 1
 #endif
 
 //==============================================================================
