@@ -12,7 +12,7 @@ export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf build --progress
 ./waf install --destdir="${appdir}"
 
-export VERSION="0.46.0b2"
+export VERSION="0.46.0b3"
 export LD_LIBRARY_PATH="build/lib"
 linuxdeploy \
     --appdir ${appdir} --output appimage \
