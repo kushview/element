@@ -44,8 +44,8 @@ def check_common (self):
             self.env.append_unique ('CXXFLAGS', [ '-I%s' % self.options.vstsdk24 ])
 
         line_just = self.line_just
-        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False, env=self.env)
-        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False, env=self.env)        
+        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False)
+        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False)
         self.env.VST = bool(self.env.HAVE_AEFFECT_H) and bool(self.env.HAVE_AEFFECTX_H)
         if not self.env.VST:
             # check for distrho... somehow?
