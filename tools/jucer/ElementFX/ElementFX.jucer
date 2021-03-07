@@ -5,7 +5,7 @@
               bundleIdentifier="net.kushview.plugins.ElementFX" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="Element FX"
+              buildAAX="1" buildStandalone="0" enableIAA="0" pluginName="Element FX"
               pluginDesc="Element Modular Effects Rack" pluginManufacturer="Kushview"
               pluginManufacturerCode="KshV" pluginCode="ElFX" pluginChannelConfigs=""
               pluginIsSynth="0" pluginWantsMidiIn="1" pluginProducesMidiOut="1"
@@ -15,8 +15,7 @@
               defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
               userNotes="This configuration is for the FX version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
-              pluginFormats="buildVST,buildVST3,buildAU,buildAAX,buildStandalone"
-              pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
+              pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
               pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
               pluginAAXDisableMultiMono="0" jucerFormatVersion="1" pluginVST3Category="Fx">
@@ -714,22 +713,22 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
-               extraDefs="" userNotes="" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;fi"
+               userNotes="" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;fi"
                hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
-               xcodeValidArchs="arm64,x86_64">
+               xcodeValidArchs="arm64,x86_64" extraCompilerFlags="-Wno-deprecated-declarations&#10;-Wno-comma&#10;-Wno-unused-function&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
                        linkTimeOptimisation="0" targetName="KV_ElementFX" headerPath="/opt/kushview/include&#10;/usr/local/include"
                        osxCompatibility="10.11 SDK" osxArchitecture="64BitIntel" cppLibType="libc++"
                        aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers"
-                       binaryPath="../../../build/Debug" osxSDK="10.15 SDK"/>
+                       binaryPath="../../../build/Debug"/>
         <CONFIGURATION name="Release" enablePluginBinaryCopyStep="1" isDebug="0" optimisation="3"
                        linkTimeOptimisation="1" targetName="KV_ElementFX" aaxBinaryLocation="$(HOME)/Library/Audio/Plug-Ins/AAX_unsigned"
                        codeSigningIdentity="9511F5241B78B0D38961CD756873066A5F0ED225"
                        cppLibType="libc++" osxArchitecture="64BitIntel" osxCompatibility="10.11 SDK"
-                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,&#10;ONLY_ACTIVE_ARCH=YES,&#10;MACOSX_DEPLOYMENT_TARGET=10.9,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
-                       binaryPath="../../../build/Release" osxSDK="10.15 SDK"/>
+                       headerPath="/opt/kushview/include&#10;/usr/local/include" customXcodeFlags="REZ_SEARCH_PATHS=$(DEVELOPER_DIR)/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/System/Library/Frameworks/AudioUnit.framework/Headers,&#10;OTHER_CODE_SIGN_FLAGS=--timestamp --deep,&#10;CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO"
+                       binaryPath="../../../build/Release"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../../libs/JUCE/modules"/>
