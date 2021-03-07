@@ -386,11 +386,6 @@ struct LuaNode::Context
         if (! loaded)
             return;
 
-        const auto nchans  = audio.getNumChannels();
-        const auto nframes = audio.getNumSamples();
-        const auto nmidi   = midi.getNumBuffers();
-
-#if 1
         if (lua_rawgeti (L, LUA_REGISTRYINDEX, renderRef) == LUA_TFUNCTION)
         {
             if (lua_rawgeti (L, LUA_REGISTRYINDEX, audioBufRef) == LUA_TUSERDATA)
@@ -412,7 +407,6 @@ struct LuaNode::Context
         {
             DBG("didn't get render fucntion in callback");
         }
-#endif
     }
     
     const OwnedArray<PortDescription>& getPortArray() const noexcept

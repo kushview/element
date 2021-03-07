@@ -16,7 +16,7 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
             String str = self.isGraph() ? "Graph" : "Node";
             if (self.getName().isNotEmpty())
                 str << ": " << self.getName();
-            return std::move (str.toStdString());
+            return str.toStdString();
         },
         meta_function::length,  &Node::getNumNodes,
         meta_function::index,   [](Node* self, int index)

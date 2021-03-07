@@ -211,7 +211,6 @@ public:
         if (slider.isVisible())
             slider.setBounds (matrixArea.getX() - size + 2, matrixArea.getBottom() + 4, size - 2, size - 2);
 
-        auto r1 = getLocalBounds();
         int btnH = 24;
         int btnW = 36;
         sizeButton->changeWidthToFitText (btnH);

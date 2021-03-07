@@ -45,8 +45,8 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
         : control (ctl),
           model (_node), 
           node (_node.getGraphNode()),
-          parameterIndex (_parameter),
           parameter (nullptr),
+          parameterIndex (_parameter),
           noteNumber (message.getNoteNumber())
     {
         jassert (message.isNoteOn());

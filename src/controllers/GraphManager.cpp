@@ -574,9 +574,8 @@ void GraphManager::setNodeModel (const Node& node)
         for (const auto& n : failed)
             arcs.removeChild (n, nullptr);
 
+    
     loaded = true;
-    const int numArcs = arcs.getNumChildren();
-    const int numConns = processor.getNumConnections();
     jassert (arcs.getNumChildren() == processor.getNumConnections());
     failed.clearQuick();
 

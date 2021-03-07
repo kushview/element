@@ -737,12 +737,12 @@ void EngineController::setRootNode (const Node& newRootNode)
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
-    typedef GraphProcessor::AudioGraphIOProcessor IOP;
+    using IOP = GraphProcessor::AudioGraphIOProcessor;
+
+   #if ! EL_RUNNING_AS_PLUGIN
     auto session = getWorld().getSession();
     auto* const root = graphs->findActiveRootGraphManager();
     auto& devices (getWorld().getDeviceManager());
-    
-   #if ! EL_RUNNING_AS_PLUGIN
     if (cb == &devices && root != nullptr)
     {
         auto& processor (root->getRootGraph());

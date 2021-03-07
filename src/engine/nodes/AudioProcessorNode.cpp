@@ -69,8 +69,8 @@ public:
     bool isAutomatable() const override                         { return param.isAutomatable(); }
     bool isMetaParameter() const override                       { return param.isMetaParameter(); }
     Category getCategory() const override                       { return static_cast<Parameter::Category> (param.getCategory()); }
-    String getCurrentValueAsText() const override               { return std::move (param.getCurrentValueAsText()); }
-    StringArray getValueStrings() const override                { return std::move (param.getAllValueStrings()); }
+    String getCurrentValueAsText() const override               { return param.getCurrentValueAsText(); }
+    StringArray getValueStrings() const override                { return param.getAllValueStrings(); }
 
 private:
     friend class AudioProcessorNode;

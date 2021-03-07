@@ -150,7 +150,8 @@ void LuaMidiPipe::swapWith (MidiPipe& pipe)
 int LuaMidiPipe::get (lua_State* L)
 {
     auto* pipe = *(LuaMidiPipe**) lua_touserdata (L, 1);
-    lua_rawgeti (L, LUA_REGISTRYINDEX, pipe->refs.getUnchecked (lua_tointeger (L, 2)));
+    lua_rawgeti (L, LUA_REGISTRYINDEX, pipe->refs.getUnchecked (
+        static_cast<int> (lua_tointeger (L, 2))));
     return 1;
 }
 
@@ -174,7 +175,7 @@ static int midipipe_new (lua_State* L)
 {
     lua_Integer nbufs = (lua_gettop (L) > 1 && lua_isinteger (L, 2))
         ? jmax (lua_Integer(), lua_tointeger (L, 2)) : 0;
-    Element::LuaMidiPipe::create (L, nbufs);
+    Element::LuaMidiPipe::create (L, static_cast<int> (nbufs));
     return 1;
 }
 

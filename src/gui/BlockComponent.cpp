@@ -39,7 +39,7 @@ PortComponent::PortComponent (const Node& g, const Node& n,
                               const bool dir, const PortType t,
                               const bool v)
     : graph (g), node (n), nodeID (nid), port (i), 
-      input (dir), type (t), vertical (v)
+      type (t), input (dir), vertical (v)
 {
     if (const GraphNodePtr obj = node.getGraphNode())
     {

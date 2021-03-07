@@ -246,7 +246,7 @@ PortDescription GraphNode::getPort (int index) const
 {
     auto port = ports.getPort (index);
     jassert (index == port.index);
-    return std::move (port);
+    return port;
 }
 
 bool GraphNode::isPortInput (const uint32 port)  const 
