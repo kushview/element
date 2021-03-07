@@ -40,7 +40,7 @@ def check_common (self):
     self.env.VST = False
     if not bool (self.options.no_vst):
         line_just = self.line_just
-        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',   uselib_store='AEFFECT_H',  mandatory=False)
+        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False)
         self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False)        
         self.env.VST = bool(self.env.HAVE_AEFFECT_H) and bool(self.env.HAVE_AEFFECTX_H)
         if not self.env.VST:
