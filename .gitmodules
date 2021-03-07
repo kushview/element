@@ -4,7 +4,7 @@
 	branch = develop
 [submodule "libs/JUCE"]
 	path = libs/JUCE
-	url = https://github.com/DISTRHO/JUCE
+	url = https://github.com/kushview/JUCE
 	branch = master
 [submodule "libs/jlv2"]
 	path = libs/jlv2
