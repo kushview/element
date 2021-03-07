@@ -39,9 +39,13 @@ def check_common (self):
     # VST2 host support
     self.env.VST = False
     if not bool (self.options.no_vst):
+        if isinstance(self.options.vstsdk24, str) and len(self.options.vstsdk24) > 0:
+            self.env.append_unique ('CFLAGS', [ '-I%s' % self.options.vstsdk24 ])
+            self.env.append_unique ('CXXFLAGS', [ '-I%s' % self.options.vstsdk24 ])
+
         line_just = self.line_just
-        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False)
-        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False)        
+        self.check(header_name='pluginterfaces/vst2.x/aeffect.h',  uselib_store='AEFFECT_H',  mandatory=False, env=self.env)
+        self.check(header_name='pluginterfaces/vst2.x/aeffectx.h', uselib_store='AEFFECTX_H', mandatory=False, env=self.env)        
         self.env.VST = bool(self.env.HAVE_AEFFECT_H) and bool(self.env.HAVE_AEFFECTX_H)
         if not self.env.VST:
             # check for distrho... somehow?

@@ -18,6 +18,8 @@ def options (opt):
         help="Disable LADSPA plugin hosting")
     opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
         help="Disable LV2 plugin hosting")
+    opt.add_option ('--with-vstsdk24', default='', dest='vstsdk24', type='string', 
+        help='Path to vstsdk2.4 sources')
     opt.add_option ('--disable-vst', default=False, action='store_true', dest='no_vst', \
         help="Disable VST2 plugin hosting")
     opt.add_option ('--disable-vst3', default=False, action='store_true', dest='no_vst3', \
