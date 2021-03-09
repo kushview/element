@@ -27,6 +27,18 @@ def display_msg (conf, msg, status = None, color = None):
     Logs.pprint(color, status)
 
 @conf
+def message (self, msg, status=None, color=None):
+    display_msg (self, msg, status, color)
+
+@conf
+def display_archs (self):
+    if is_mac() and isinstance (self.env.ARCH, list):
+        if len(self.env.ARCH) > 0:
+            display_msg (self, 'ARCHS', ' '.join (self.env.ARCH))
+        else:
+            display_msg (self, 'ARCHS', 'default')
+
+@conf
 def prefer_clang(self):
     '''Use clang by default on non-windows'''
     if is_windows(): return
@@ -138,7 +150,14 @@ def configure (conf):
     # do platform stuff
     if is_linux() and not 'mingw' in conf.env.CXX[0]:
         conf.define ('LINUX', 1)
+
     elif is_mac():
+        osARCHS = os.getenv ('ARCHS', '')
+        if isinstance(osARCHS, str) and len(osARCHS) > 0:
+            conf.env.ARCH = osARCHS.split()
+        else:
+            conf.env.ARCH = []
+        
         conf.env.FRAMEWORK_ACCELERATE     = 'Accelerate'
         conf.env.FRAMEWORK_AUDIO_TOOLBOX  = 'AudioToolbox'
         conf.env.FRAMEWORK_AUDIO_UNIT     = 'AudioUnit'
@@ -155,7 +174,9 @@ def configure (conf):
         conf.env.FRAMEWORK_QUARTZ_CORE    = 'QuartzCore'
         conf.env.FRAMEWORK_WEB_KIT        = 'WebKit'
         conf.env.FRAMEWORK_PYTHON         = 'Python'
-    elif is_win32(): pass
+    
+    elif is_win32(): 
+        pass
 
 def extension():
     if platform.system() != "Darwin":

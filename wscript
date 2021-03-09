@@ -117,10 +117,12 @@ def configure (conf):
     cross.setup_compiler (conf)
     if len(conf.options.cross) <= 0:
         conf.prefer_clang()
+    
     conf.load ("compiler_c compiler_cxx ar cross juce")
+
     conf.check_cxx_version()
     silence_warnings (conf)
-
+    
     conf.find_program ('convert', mandatory=False)
     conf.find_program ('ldoc',    mandatory=False)
 
@@ -146,24 +148,25 @@ def configure (conf):
 
     print
     juce.display_header ("Element")
-    juce.display_msg (conf, "ALSA",   conf.env.ALSA)
-    juce.display_msg (conf, "JACK",   conf.env.JACK)
-    juce.display_msg (conf, "AU",     juce.is_mac())
-    juce.display_msg (conf, "VST2",   conf.env.VST)
-    juce.display_msg (conf, "VST3",   conf.env.VST3)
-    juce.display_msg (conf, "LADSPA", bool(conf.env.LADSPA))
-    juce.display_msg (conf, "LV2",    bool(conf.env.LV2))
-    juce.display_msg (conf, "Lua",    bool(conf.env.LUA))
-    juce.display_msg (conf, "Workspaces", conf.options.enable_docking)
-    juce.display_msg (conf, "Debug", conf.options.debug)
+    conf.message ("ALSA",   conf.env.ALSA)
+    conf.message ("JACK",   conf.env.JACK)
+    conf.message ("AU",     juce.is_mac())
+    conf.message ("VST2",   conf.env.VST)
+    conf.message ("VST3",   conf.env.VST3)
+    conf.message ("LADSPA", bool(conf.env.LADSPA))
+    conf.message ("LV2",    bool(conf.env.LV2))
+    conf.message ("Lua",    bool(conf.env.LUA))
+    conf.message ("Workspaces", conf.options.enable_docking)
+    conf.message ("Debug", conf.options.debug)
 
     print
-    juce.display_msg (conf, "PREFIX",    conf.env.PREFIX)
-    juce.display_msg (conf, "DATADIR",   conf.env.DATADIR)
-    juce.display_msg (conf, "CFLAGS",    conf.env.CFLAGS)
-    juce.display_msg (conf, "CXXFLAGS",  conf.env.CXXFLAGS)
-    juce.display_msg (conf, "LINKFLAGS", conf.env.LINKFLAGS)
-
+    conf.display_archs()
+    conf.message ("PREFIX",    conf.env.PREFIX)
+    conf.message ("DATADIR",   conf.env.DATADIR)
+    conf.message ("CFLAGS",    conf.env.CFLAGS)
+    conf.message ("CXXFLAGS",  conf.env.CXXFLAGS)
+    conf.message ("LINKFLAGS", conf.env.LINKFLAGS)
+    
 def common_includes():
     return [ 
         'libs/JUCE/modules', \
