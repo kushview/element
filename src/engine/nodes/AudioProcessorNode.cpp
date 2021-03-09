@@ -145,10 +145,11 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     : GraphNode (nodeId),
       enablement (*this)
 {
-    proc = processor;
+    proc.reset (processor);
     jassert (proc != nullptr);
     setLatencySamples (proc->getLatencySamples());
     setName (proc->getName());
+    proc->refreshParameterList();
     
     for (auto* param : proc->getParameters())
         params.add (new AudioProcessorNodeParameter (*param));
@@ -224,17 +225,30 @@ void AudioProcessorNode::createPorts()
     }
     jassert (channel == proc->getTotalNumOutputChannels());
 
-    const auto& params = proc->getParameters();
-    for (int i = 0; i < params.size(); ++i)
+    const auto& procParams = proc->getParameters();
+    for (int i = 0; i < procParams.size(); ++i)
     {
-        auto* const param = params.getUnchecked (i);
+        auto* const param = procParams.getUnchecked (i);
         String symbol = "control_"; symbol << i;
         newPorts.add (PortType::Control, index, i, 
                       symbol, param->getName (32),
                       true);
         ++index;
     }
-
+    
+    if (procParams.size() != params.size())
+    {
+        // TODO: better controlled handling of parameter management.
+        // This should have been setup in the ctor, but some plugins return an
+        // empty array there.  Need to redo the plugin initialization steps preferably
+        // with Unit tests.
+        jassertfalse;
+        clearParameters();
+        params.clear();
+        for (auto* procParam : procParams)
+            params.add (new AudioProcessorNodeParameter (*procParam));
+    }
+    
     if (proc->acceptsMidi())
     {
         newPorts.add (PortType::Midi, index, 0, "midi_in_0", "MIDI", true);

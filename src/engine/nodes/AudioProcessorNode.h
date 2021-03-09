@@ -33,7 +33,7 @@ public:
     virtual ~AudioProcessorNode();
 
     /** Returns the processor as an AudioProcessor */
-    AudioProcessor* getAudioProcessor() const noexcept override { return proc; }
+    AudioProcessor* getAudioProcessor() const noexcept override { return proc.get(); }
     
     void getState (MemoryBlock&) override;
     void setState (const void*, int) override;
@@ -44,12 +44,11 @@ public:
 protected:
     void createPorts() override;
     Parameter::Ptr getParameter (const PortDescription& port) override;
-
+    
 private:
-    ScopedPointer<AudioProcessor> proc;
+    std::unique_ptr<AudioProcessor> proc;
     Atomic<int> enabled { 1 };
     MemoryBlock pluginState;
-
     ParameterArray params;
 
     struct EnablementUpdater : public AsyncUpdater
