@@ -182,7 +182,7 @@ namespace Element {
     void Session::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
     {
         if (property == Tags::object ||
-            (tree.hasType(Tags::node) && property == Tags::state))
+            (tree.hasType(Tags::node) && (property == Tags::state || property == Tags::updater)))
         {
             return;
         }
