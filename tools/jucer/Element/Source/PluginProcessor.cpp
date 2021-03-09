@@ -299,7 +299,7 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
                                                  getTotalNumInputChannels(),
                                                  getTotalNumOutputChannels());
 
-                setLatencySamples (engine->getExternalLatencySamples());
+                updateLatencySamples();
             }
             
             triggerAsyncUpdate();
@@ -307,7 +307,7 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
         }
     }
 
-    setLatencySamples (engine->getExternalLatencySamples());
+    updateLatencySamples();
     engine->sampleLatencyChanged.connect (
         std::bind (&ElementPluginAudioProcessor::updateLatencySamples, this));
 }
@@ -336,7 +336,7 @@ void ElementPluginAudioProcessor::reloadEngine()
     engine->prepareExternalPlayback (sampleRate, bufferSize,
                                      getTotalNumInputChannels(),
                                      getTotalNumOutputChannels());
-    setLatencySamples (engine->getExternalLatencySamples());
+    updateLatencySamples();
 
     session->restoreGraphState();
     enginectl->sessionReloaded();
@@ -345,11 +345,6 @@ void ElementPluginAudioProcessor::reloadEngine()
     devsctl->refresh();
     
     suspendProcessing (wasSuspended);
-}
-
-void ElementPluginAudioProcessor::updateLatencySamples()
-{
-    setLatencySamples (engine != nullptr ? engine->getExternalLatencySamples() : 0);
 }
 
 void ElementPluginAudioProcessor::reset()
@@ -416,8 +411,10 @@ void ElementPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
     if (auto session = world->getSession())
     {
         session->saveGraphState();
-        session->getValueTree().setProperty ("pluginEditorBounds", editorBounds.toString(), nullptr)
-                               .setProperty ("editorKeyboardFocus", editorWantsKeyboard, nullptr);
+        session->getValueTree()
+            .setProperty ("pluginEditorBounds", editorBounds.toString(), nullptr)
+            .setProperty ("editorKeyboardFocus", editorWantsKeyboard, nullptr)
+            .setProperty ("forceZeroLatency", isForcingZeroLatency(), nullptr);
         auto ppData = session->getValueTree().getOrCreateChildWithName ("perfParams", nullptr);
         ppData.removeAllChildren (nullptr);
         for (auto* const pp : perfparams)
@@ -465,7 +462,7 @@ void ElementPluginAudioProcessor::setStateInformation (const void* data, int siz
             editorBounds = RI::fromString (session->getProperty (
                 "pluginEditorBounds", RI().toString()).toString());
             editorWantsKeyboard = (bool) session->getProperty ("editorKeyboardFocus", false);
-
+            setForceZeroLatency ((bool)session->getProperty ("forceZeroLatency", isForcingZeroLatency()));
             session->forEach (setPluginMissingNodeProperties);
             for (auto* const param : perfparams)
                 param->clearNode();
@@ -625,6 +622,27 @@ void ElementPluginAudioProcessor::handlePerformanceParameterResult (int result, 
     
     onPerfParamsChanged();
     menuMap.clearQuick (true);
+}
+
+void ElementPluginAudioProcessor::setForceZeroLatency (bool force)
+{
+    if (force == forceZeroLatency)
+        return;
+    forceZeroLatency = force;
+    updateLatencySamples();
+}
+
+int ElementPluginAudioProcessor::calculateLatencySamples() const
+{
+    if (forceZeroLatency)
+        return 0;
+    return engine != nullptr ? engine->getExternalLatencySamples()
+                             : 0;
+}
+
+void ElementPluginAudioProcessor::updateLatencySamples()
+{
+    setLatencySamples (calculateLatencySamples());
 }
 
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

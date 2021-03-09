@@ -284,6 +284,15 @@ public:
         return getWantsKeyboardFocus();
     }
 
+    int getLatencySamples() const { return processor.getLatencySamples(); }
+
+    void setReportZeroLatency (bool force)
+    {
+        processor.setForceZeroLatency (force);
+    }
+
+    bool isReportingZeroLatency() const { return processor.isForcingZeroLatency(); }
+
 private:
     ElementPluginAudioProcessor& processor;
     SafePointer<Component> content;

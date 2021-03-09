@@ -268,18 +268,33 @@ public:
 
            #if EL_RUNNING_AS_PLUGIN
             if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+            {
                 menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
+                menu.addItem (99997,  "Report zero latency", true, pe->isReportingZeroLatency());
+            }
            #endif
 
             auto result = menu.show();
 
             if (99999 == result)
+            {
                 ViewHelpers::closePluginWindows (this, false);
+            }
             else if (99998 == result)
             {
                #if EL_RUNNING_AS_PLUGIN
                 if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
                     pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
+               #endif
+            }
+            else if (99997 == result)
+            {
+               #if EL_RUNNING_AS_PLUGIN
+                if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+                {
+                    pe->setReportZeroLatency (!pe->isReportingZeroLatency());
+                    owner.refreshStatusBar();
+                }
                #endif
             }
         }
@@ -405,8 +420,17 @@ public:
         auto engine = world.getAudioEngine();
        #if EL_RUNNING_AS_PLUGIN
         String text = "Latency: ";
-        const int latencySamples = (engine != nullptr) ? engine->getExternalLatencySamples() : 0;
-        text << latencySamples << " samples";
+
+        if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+        {
+            const int latencySamples = pe->getLatencySamples();
+            text << latencySamples << " samples";
+        }
+        else
+        {
+            text << "unknown";
+        }
+
         sampleRateLabel.setText (text, dontSendNotification);
         streamingStatusLabel.setText ("", dontSendNotification);
         statusLabel.setText ("Plugin", dontSendNotification);

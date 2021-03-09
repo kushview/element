@@ -386,6 +386,9 @@ public:
     bool getEditorWantsKeyboard() const { return editorWantsKeyboard; }
     void setEditorWantsKeyboard (bool wantsIt) { editorWantsKeyboard = wantsIt; }
     
+    void setForceZeroLatency (bool);
+    bool isForcingZeroLatency() const { return forceZeroLatency; }
+
     Signal<void()> onPerfParamsChanged;
 
 private:
@@ -418,11 +421,15 @@ private:
     bool controllerActive = false;
     bool loadSessionOnPrepare = false;
     
+    bool forceZeroLatency = false;
+
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;
     void reloadEngine();
     void initialize();
     
-    var hasCheckedLicense { 0 };
+    var hasCheckedLicense { 0 };    
+    int calculateLatencySamples() const;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ElementPluginAudioProcessor)
 };
