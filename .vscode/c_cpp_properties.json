@@ -67,6 +67,37 @@
             "cppStandard": "c++17"
         },
         {
+            "name": "OSX Generic",
+            "intelliSenseMode": "${default}",
+            "cStandard": "c11",
+            "cppStandard": "c++17",
+            "defines": [
+                "JUCE_PLUGINHOST_VST=1",
+                "JLV2_PLUGINHOST_LV2=1",
+                "VSCODE=1",
+                "EL_DOCKING=1",
+                "KV_DOCKING_WINDOWS=1",
+                "KV_JACK_AUDIO=1",
+                "HAVE_PYTHON=1",
+                "EL_USE_LOCAL_AUTH=1",
+                "EL_PRO=1"
+            ],
+            "forcedInclude": [
+                "${workspaceRoot}/.vscode/vscode.h"
+            ],
+            "includePath": [
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
+                "${workspaceRoot}/libs/JUCE/modules/*",
+                "${workspaceRoot}/libs/kv/modules/*",
+                "${workspaceRoot}/libs/jlv2/modules/*",
+                "${workspaceRoot}/libs/compat/*",
+                "${workspaceRoot}/libs/lua/*",
+                "${workspaceRoot}/libs/lua/src/*",
+                "${workspaceRoot}/src/*",
+                "${workspaceRoot}/tests/*"
+            ]
+        },
+        {
             "name": "Linux",
             "includePath": [
                 "/usr/include",
@@ -89,7 +120,7 @@
                 "${workspaceFolder}/libs/lua-kv",
                 "${workspaceFolder}/libs/lua-kv/src"
             ],
-            "defines": [ 
+            "defines": [
                 "LUA_USE_READLINE=1",
                 "EL_LUADIR=\"/usr/share/element/lua\"",
                 "EL_SCRIPTSDIR=\"/usr/share/element/scripts\""
