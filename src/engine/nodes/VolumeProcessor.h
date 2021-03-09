@@ -35,10 +35,11 @@ private:
 public:
     explicit VolumeProcessor (const double minDb, const double maxDb,
                               const bool _stereo = false)
-        : BaseProcessor(),
-            stereo (_stereo)
+        : BaseProcessor (BusesProperties()
+            .withInput  ("Main",  _stereo ? AudioChannelSet::stereo() : AudioChannelSet::mono(), true)
+            .withOutput ("Main",  _stereo ? AudioChannelSet::stereo() : AudioChannelSet::mono(), true)),
+          stereo (_stereo)
     {
-        setPlayConfigDetails (stereo ? 2 : 1, stereo ? 2 : 1, 44100.0, 1024);
         addParameter (volume = new AudioParameterFloat (Tags::volume.toString(),
                                                         "Volume", minDb, maxDb, 0.f));
         lastVolume = *volume;
@@ -124,6 +125,17 @@ public:
             }
         }
     }
+protected:
+    bool isBusesLayoutSupported (const BusesLayout& layout) const override
+    {
+        if (layout.inputBuses.size() != 1 || layout.outputBuses.size() != 1)
+            return false;
+        const int nchans = stereo ? 2 : 1;
+        return layout.getMainInputChannels() == nchans
+            && layout.getMainOutputChannels() == nchans;
+    }
+
+    bool canApplyBusCountChange (bool, bool, BusProperties&)    override { return false; }
 };
 
 }
