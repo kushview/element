@@ -339,6 +339,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
             AudioProcessor::BusesLayout stereoOut;
             stereoOut.outputBuses.add (AudioChannelSet::stereo());
             AudioProcessor::BusesLayout* tryStereo = nullptr;
+            const auto oldLayout = proc->getBusesLayout();
 
             if (proc->getTotalNumInputChannels() == 1 &&
                 proc->getTotalNumOutputChannels() == 1 &&
@@ -357,8 +358,11 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
             {
                 proc->suspendProcessing (true);
                 proc->releaseResources();
+
+                if (! proc->setBusesLayout (*tryStereo))
+                    proc->setBusesLayout (oldLayout);
+
                 proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
-                proc->setBusesLayout (*tryStereo);
                 proc->suspendProcessing (false);
             }
         }
