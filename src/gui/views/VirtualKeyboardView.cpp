@@ -284,10 +284,75 @@ void VirtualKeyboardView::didBecomeActive()
     }
 }
 
-bool VirtualKeyboardView::keyPressed (const KeyPress& k, Component* c)
+bool VirtualKeyboardView::keyPressed (const KeyPress& key, Component* c)
 {
-    return keyboard != nullptr ? keyboard->keyPressed (k) 
-        : ContentView::keyPressed (k, c);
+    if (! keyboard)
+        return ContentView::keyPressed (key, c);
+
+    const auto isShiftDown  = key.getModifiers().isShiftDown();
+    const auto isCtrlDown   = key.getModifiers().isCommandDown();
+    const auto isAltDown    = key.getModifiers().isAltDown();
+
+    if (!isShiftDown && isCtrlDown && !isAltDown &&
+        (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    {
+        // ctrl + minus
+        midiChannel.setValue (midiChannel.getValue() - 1);
+        return true;
+    }
+    else if (!isShiftDown && isCtrlDown && !isAltDown &&
+             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    {
+        // ctrl + plus
+        midiChannel.setValue (midiChannel.getValue() + 1);
+        return true;
+    }
+
+    else if (!isShiftDown && isCtrlDown && isAltDown &&
+             (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    {
+        // ctrl + alt + minus
+        midiProgram.setValue (midiProgram.getValue() - 1);
+        return true;
+    }
+    else if (!isShiftDown && isCtrlDown && isAltDown && 
+             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    {
+        // ctrl + alt + plus
+        midiProgram.setValue (midiProgram.getValue() + 1);
+        return true;
+    }
+    
+    else if (isShiftDown && isCtrlDown && isAltDown && 
+             (key.isKeyCode ('_') || key.isKeyCode ('-')))
+    {
+        // shift + ctrl + alt + minus
+        if (widthDown.onClick)
+            widthDown.onClick();
+        return true;
+    }
+    else if (isShiftDown && isCtrlDown && isAltDown &&
+             (key.isKeyCode ('=') || key.isKeyCode ('+')))
+    {
+        // shift + ctrl + alt + plus
+        if (widthUp.onClick)
+            widthUp.onClick();
+        return true;
+    }
+
+    else if (!isShiftDown && isCtrlDown && !isAltDown && key.isKeyCode (KeyPress::spaceKey))
+    {
+        // ctrl + spacebar
+        sustain.setToggleState (! sustain.getToggleState(), sendNotification);
+    }
+
+    else if (!isShiftDown && isCtrlDown && isAltDown && key.isKeyCode (KeyPress::spaceKey))
+    {
+        // ctrl + alt + spacebar
+        hold.setToggleState (! hold.getToggleState(), sendNotification);
+    }
+
+    return keyboard->keyPressed (key);
 }
 
 bool VirtualKeyboardView::keyStateChanged (bool isDown)
