@@ -137,15 +137,22 @@ def check_linux (self):
     if self.env.LUA:
         self.define ('LUA_USE_LINUX', True)
 
-    self.check_cfg(package='freetype2', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='x11', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='xext', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='xrandr', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='xcomposite', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='xinerama', args='--cflags --libs', mandatory=True)
-    self.check_cfg(package='xcursor', args='--cflags --libs', mandatory=True)
-    self.check_cfg (package='gtk+-3.0', uselib_store='GTK',args='--cflags --libs', mandatory=False)
+    self.check_cfg (package='freetype2', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='x11', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='xext', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='xrandr', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='xcomposite', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='xinerama', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='xcursor', args='--cflags --libs', mandatory=True)
+    self.check_cfg (package='gtk+-3.0', uselib_store='GTK',
+        args='--cflags --libs', mandatory=False)
     
+    self.define ('JUCE_USE_XRANDR', True)
+    self.define ('JUCE_USE_XINERAMA', True)
+    self.define ('JUCE_USE_XSHM', True)
+    self.define ('JUCE_USE_XRENDER', True)
+    self.define ('JUCE_USE_XCURSOR', True)
+
     self.define ('JLV2_GTKUI', False)
 
 def get_mingw_libs():
