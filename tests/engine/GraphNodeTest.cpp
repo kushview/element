@@ -59,26 +59,34 @@ public:
         }
 
         {
+            const double sampleRate = 44100.0;
+            const int procLatencySamples = 100;
+            const double delayComp = 10.0;
+
             GraphProcessor graph;
-            graph.setPlayConfigDetails (0, 2, 44100.0, 512);
+            graph.setPlayConfigDetails (0, 2, sampleRate, 512);
             graph.prepareToPlay (44100.0, 512);
             
-            beginTest ("audio processor");
+            
             auto* const plugin1 = createPluginProcessor();
-            plugin1->setLatencySamples (100);
+            plugin1->setLatencySamples (procLatencySamples);
             auto* const plugin2 = new Element::GraphProcessor::AudioGraphIOProcessor (
                 GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
             
             GraphNodePtr node1 = graph.addNode (plugin1);
+            node1->setDelayCompensation (delayComp);
+            beginTest ("node latencies");
+            expect (node1->getDelayCompensation() == delayComp);
+            expect (node1->getDelayCompensationSamples() == roundToInt (sampleRate * delayComp * 0.001));
             GraphNodePtr node2 = graph.addNode (plugin2);
             node1->connectAudioTo (node2);
-            for (int i = 0; i < 3; ++i)
-                runDispatchLoop (15);
+            graph.handleUpdateNowIfNeeded();
 
             auto nc = graph.getNumConnections();
             auto ls = graph.getLatencySamples();
+            beginTest ("graph details");
             expect (graph.getNumConnections() == 2);
-            expect (graph.getLatencySamples() == 100);
+            expect (graph.getLatencySamples() == node1->getLatencySamples());
             
             node1 = nullptr; node2 = nullptr;
             graph.releaseResources();

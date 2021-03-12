@@ -295,17 +295,21 @@ int GraphNode::getNthPort (const PortType type, const int index, bool isInput, b
 uint32 GraphNode::getMidiInputPort()  const { return getPortForChannel (PortType::Midi, 0, true); }
 uint32 GraphNode::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
 
-void GraphNode::prepare (const double sampleRate, const int blockSize,
+void GraphNode::prepare (const double newSampleRate, const int blockSize,
                          GraphProcessor* const parentGraph,
                          bool willBeEnabled)
 {
+    sampleRate = newSampleRate;
     parent = parentGraph;
+
     if ((willBeEnabled || enabled.get() == 1) && !isPrepared)
     {
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
 
-        initOversampling (jmax (getNumPorts (PortType::Audio, true), getNumPorts (PortType::Audio, false)), blockSize);
+        initOversampling (jmax (getNumPorts (PortType::Audio, true), 
+                                getNumPorts (PortType::Audio, false)), 
+                                blockSize);
 
         const int osFactor = getOversamplingFactor();
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
@@ -343,10 +347,10 @@ void GraphNode::unprepare()
     if (isPrepared)
     {
         isPrepared = false;
+        releaseResources();
+        resetOversampling();
         inRMS.clear (true);
         outRMS.clear (true);
-        resetOversampling();
-        releaseResources();
     }
 }
 
@@ -711,8 +715,9 @@ void GraphNode::initOversampling (int numChannels, int blockSize)
 {
     osProcessors.clear();
     numChannels = jmax (1, numChannels); // avoid assertion on nodes that don't have audio
-    for (int pow = 1; pow <= maxOsPow; ++pow)
-        osProcessors.add (new dsp::Oversampling<float> (numChannels, pow, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
+    for (int p = 1; p <= maxOsPow; ++p)
+        osProcessors.add (new dsp::Oversampling<float> (numChannels, 
+            p, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
 
     prepareOversampling (blockSize);
 }
@@ -751,10 +756,24 @@ int GraphNode::getOversamplingFactor()
 }
 
 //=========================================================================
+void GraphNode::setDelayCompensation (double delayMs)
+{
+    if (delayCompMillis == delayMs)
+        return;
+    delayCompMillis = delayMs;
+    jassert (sampleRate > 0.0);
+    delayCompSamples = roundToInt (delayCompMillis * 0.001 * sampleRate);
+}
 
-struct ChannelConnectionMap {
-    ChannelConnectionMap() {}
-    ~ChannelConnectionMap() {}
+double GraphNode::getDelayCompensation()        const { return delayCompMillis; }
+int GraphNode::getDelayCompensationSamples()    const { return delayCompSamples; }
+
+//=========================================================================
+struct ChannelConnectionMap
+{
+    ChannelConnectionMap() { }
+    ~ChannelConnectionMap() { }
+
     int channel;
     PortType type { PortType::Unknown };
     uint32 otherNodeId;
@@ -814,7 +833,19 @@ void GraphNode::triggerPortReset()
 }
 
 //=========================================================================
+int GraphNode::getLatencySamples() const
+{
+    return latencySamples + delayCompSamples + roundFloatToInt (osLatency);
+}
 
+void GraphNode::setLatencySamples (int latency)
+{
+    if (latency == latencySamples)
+        return;
+    latencySamples = latency;
+}
+
+//=========================================================================
 Parameter::Ptr GraphNode::getOrCreateParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control && port.input == true);

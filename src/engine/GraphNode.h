@@ -69,6 +69,9 @@ public:
     String getName() const { return name; }
     
     //=========================================================================
+    double getSamleRate() const { return sampleRate; }
+
+    //=========================================================================
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
 
@@ -163,10 +166,7 @@ public:
     void suspendProcessing (const bool);
 
     /** Get latency audio samples */
-    int getLatencySamples() const { return latencySamples + roundFloatToInt (osLatency); }
-
-    /** Set latency samples */
-    void setLatencySamples (int latency) { if (latencySamples != latency) latencySamples = latency; }
+    int getLatencySamples() const;
 
     /** Set the Input Gain of this Node */
     void setInputGain (const float f);
@@ -339,6 +339,11 @@ public:
     int getOversamplingFactor();
 
     //=========================================================================
+    void setDelayCompensation (double delayMs);
+    double getDelayCompensation() const;
+    int getDelayCompensationSamples() const;
+
+    //=========================================================================
     /** Triggered when the enabled state changes */
     Signal<void(GraphNode*)> enablementChanged;
 
@@ -363,7 +368,8 @@ public:
 protected:
     GraphNode (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
-    
+    virtual void initialize() {}
+
     /** Clear the top level referenced parameters. Some node types
         can use this in their destructor if deletion order is important
         for processors/parameters */
@@ -378,10 +384,14 @@ protected:
         }
     }
 
-    //=========================================================================
+    //==========================================================================
+    /** Set latency samples */
+    void setLatencySamples (int latency);
+
+    //==========================================================================
     virtual Parameter::Ptr getParameter (const PortDescription& port) { return nullptr; }
 
-    //=========================================================================
+    //==========================================================================
     void triggerPortReset();
 
     kv::PortList ports;
@@ -396,11 +406,13 @@ private:
     
     GraphProcessor* parent = nullptr;
     bool isPrepared = false;
+    
     Atomic<int> enabled { 1 };
     Atomic<int> bypassed { 0 };
     Atomic<int> mute { 0 };
     Atomic<int> muteInput { 0 };
 
+    double sampleRate = 0.0;
     int latencySamples = 0;
     String name;
 
@@ -469,6 +481,9 @@ private:
     float osLatency = 0.0f;
     OwnedArray<dsp::Oversampling<float>> osProcessors;
     const int maxOsPow = 3;
+
+    double delayCompMillis = 0.0;
+    int delayCompSamples = 0;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
 };
