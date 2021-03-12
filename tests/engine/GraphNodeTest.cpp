@@ -103,8 +103,7 @@ public:
             GraphNodePtr midiOut = graph.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
                 GraphProcessor::AudioGraphIOProcessor::midiOutputNode));
             GraphNodePtr filter = graph.addNode (new MidiChannelSplitterNode());
-            for (int i = 0; i < 2; ++i)
-                MessageManager::getInstance()->runDispatchLoopUntil (10);
+            graph.handleUpdateNowIfNeeded();
 
             beginTest ("port/channel mappings");
             expect (filter->getNumPorts() == 17);
@@ -127,6 +126,7 @@ public:
             for (int ch = 0; ch < 16; ++ch)
                 expect (graph.connectChannels (PortType::Midi, filter->nodeId, ch, midiOut->nodeId, 0));
             
+            graph.handleUpdateNowIfNeeded();
             graph.releaseResources();
             graph.clear();
         }
