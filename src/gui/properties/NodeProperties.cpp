@@ -215,6 +215,9 @@ public:
     }
 };
 
+NodeProperties::NodeProperties (const Node& n, int groups)
+    : NodeProperties (n, groups & General, groups & Midi) {}
+
 NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
 {
     Node node = n;
@@ -230,10 +233,8 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
         // MIDI Channel
         add (new NodeMidiChannelsPropertyComponent (node));
         
-       #if defined (EL_PRO) || defined (EL_SOLO)
         // MIDI Program
         add (new NodeMidiProgramPropertyComponent (node, "MIDI Program"));
-       #endif
 
         // Key Start
         add (new MidiNotePropertyComponent (node.getPropertyAsValue (Tags::keyStart, false), "Key Start"));

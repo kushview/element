@@ -25,7 +25,6 @@
 #include "gui/ViewHelpers.h"
 
 #define EL_PROGRAM_NAME_PLACEHOLDER "Name..."
-#define EL_NODE_MIDI_CONTENT_VIEW_PROPS 1
 
 namespace Element {
 
@@ -92,11 +91,9 @@ void NodeMidiContentView::stabilizeContent()
 
 void NodeMidiContentView::updateProperties()
 {
-   #if EL_NODE_MIDI_CONTENT_VIEW_PROPS
     props.clear();
     props.addProperties (NodeProperties (node, false, true));
     resized();
-   #endif
 }
 
 void NodeMidiContentView::updateMidiProgram()

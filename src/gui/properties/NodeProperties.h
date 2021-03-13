@@ -25,6 +25,14 @@ class Node;
 
 struct NodeProperties : public Array<PropertyComponent*>
 {
+    enum Groups
+    {
+        General = 1 << 0,
+        Midi    = 1 << 1,
+        ALL     = General | Midi
+    };
+
+    NodeProperties (const Node& n, int groups);
     NodeProperties (const Node& n, bool nodeProps = true, bool midiProps = false);
 };
 

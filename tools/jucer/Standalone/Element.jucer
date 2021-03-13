@@ -359,6 +359,10 @@
                 file="../../../src/gui/properties/NodeProperties.cpp"/>
           <FILE id="ifEk58" name="NodeProperties.h" compile="0" resource="0"
                 file="../../../src/gui/properties/NodeProperties.h"/>
+          <FILE id="nA48dr" name="NodePropertyPanel.cpp" compile="1" resource="0"
+                file="../../../src/gui/properties/NodePropertyPanel.cpp"/>
+          <FILE id="B25zlw" name="NodePropertyPanel.h" compile="0" resource="0"
+                file="../../../src/gui/properties/NodePropertyPanel.h"/>
         </GROUP>
         <GROUP id="{F9E24913-E0C1-0169-D5D6-448ED71D2439}" name="scripting"/>
         <GROUP id="{A1821B1E-A115-809D-7493-A2A90CC7AEA7}" name="views">
