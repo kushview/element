@@ -290,6 +290,15 @@ private:
    #endif
 };
 
+static ValueTree getUIChild (const Node& node, const String& name) {
+    auto UI = node.getUIValueTree();
+    return UI.getOrCreateChildWithName (name, nullptr);
+}
+
+static ValueTree getScriptNodeEditorState (const Node& node) {
+    return getUIChild (node, "ScriptNodeEditor");
+}
+
 //==============================================================================
 ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     : NodeEditorComponent (node),
@@ -361,7 +370,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     addAndMakeVisible (dspButton);
     dspButton.setButtonText ("DSP");
     dspButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    dspButton.setToggleState (true, dontSendNotification);
     dspButton.onClick = [this]()
     {
         if (! dspButton.getToggleState())
@@ -410,19 +418,45 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     addAndMakeVisible (console);
     console.setEnvironment (env);
 
-    updateAll();
-
     lua->addChangeListener (this);
     portsChangedConnection = lua->portsChanged.connect (
         std::bind (&ScriptNodeEditor::onPortsChanged, this));
 
     setSize (660, 480);
+
+    const auto SNE = getScriptNodeEditorState (getNode());
+    if ((bool) SNE.getProperty ("showParams", false))
+    {
+        paramsButton.setToggleState (true, dontSendNotification);
+        props.setVisible (true);
+    }
+
+    if ((bool) SNE.getProperty ("showDSP", true))
+        dspButton.setToggleState (true, dontSendNotification);
+    else if ((bool) SNE.getProperty ("showUI", false))
+        uiButton.setToggleState (true, dontSendNotification);
+    else if ((bool) SNE.getProperty ("preview", false))
+        previewButton.setToggleState (true, dontSendNotification);
+    else
+        dspButton.setToggleState (true, dontSendNotification);
+
+    updateAll();
+    updatePreview();
+    resized();
 }
 
 ScriptNodeEditor::~ScriptNodeEditor()
 {
     portsChangedConnection.disconnect();
     lua->removeChangeListener (this);
+
+    auto SNE = getScriptNodeEditorState (getNode());
+    SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr)
+       .setProperty ("console",    console.isVisible(), nullptr)
+       .setProperty ("showDSP",    dspButton.getToggleState(), nullptr)
+       .setProperty ("showUI",     uiButton.getToggleState(), nullptr)
+       .setProperty ("preview",    previewButton.getToggleState(), nullptr);
+
     editor.reset();
 }
 
@@ -613,7 +647,8 @@ void ScriptNodeEditor::resized()
     }
 
     console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
-    editor->setBounds (r1);
+    if (editor)
+        editor->setBounds (r1);
 
     if (previewButton.getToggleState() && comp != nullptr)
     {
