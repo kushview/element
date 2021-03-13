@@ -190,7 +190,7 @@ void BlockComponent::valueChanged (Value& value)
         repaint();
     } else if (nodeName.refersToSameSourceAs (value)) {
         setName (node.getName());
-        update();
+        update (false, false);
     } else if (hiddenPorts.refersToSameSourceAs (value)) {
         if (auto* ge = getGraphPanel())
             ge->updateComponents (false);
@@ -753,6 +753,8 @@ void BlockComponent::update (const bool doPosition, const bool forcePins)
 
         resized();
     }
+
+    repaint();
 }
 
 void BlockComponent::setButtonVisible (Button& b, bool v)
