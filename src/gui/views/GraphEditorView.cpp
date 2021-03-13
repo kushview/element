@@ -86,6 +86,22 @@ GraphEditorView::GraphEditorView()
     view.setScrollOnDragEnabled (false);
     view.setBounds (graph.getLocalBounds());
 
+    addAndMakeVisible (nodeProps);
+    setSize (640, 360);
+
+    addAndMakeVisible (nodePropsToggle);
+    nodePropsToggle.setText ("<<", dontSendNotification);
+    nodePropsToggle.setJustificationType (Justification::centred);
+    nodePropsToggle.onClick = [this]()
+    {
+        nodeProps.setVisible (! nodeProps.isVisible());
+        auto s = getSettings();
+        if (s.isValid())
+            s.setProperty ("nodePropsVisible", nodeProps.isVisible(), nullptr);
+        resized();
+        stabilizeContent();
+    };
+
     setWantsKeyboardFocus (true);
 }
 
@@ -144,6 +160,9 @@ void GraphEditorView::stabilizeContent()
     
     const auto g = getGraph();
     graph.setNode (g);
+    onNodeSelected();
+
+    nodePropsToggle.setText (nodeProps.isVisible() ? ">>" : "<<", dontSendNotification);
 }
 
 void GraphEditorView::didBecomeActive()
@@ -168,7 +187,25 @@ void GraphEditorView::paint (Graphics& g)
 
 void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
 {
-    view.setBounds (area);
+    auto r = area;
+    if (nodeProps.isVisible())
+    {
+        const auto hidePropsWidth = nodePropsWidth * 1.5;
+        if (getWidth() >= hidePropsWidth && nodePropsWidth > 0)
+        {
+            nodeProps.setBounds (r.removeFromRight (nodePropsWidth));
+            r.removeFromRight (2);
+        }
+        else
+        {
+            // place offscreen
+            nodeProps.setBounds (getWidth() + 2, 0, nodePropsWidth, getHeight());
+        }
+    }
+
+    nodePropsToggle.setBounds (r.getRight() - 38, r.getY() + 4, 30, 18);
+
+    view.setBounds (r);
     if (graph.getWidth() < view.getWidth() || graph.getHeight() < view.getHeight())
         graph.setBounds (view.getBounds());
 
@@ -204,6 +241,9 @@ void GraphEditorView::onNodeSelected()
             // This is a hack and need a better solution;
             Session::ScopedFrozenLock freeze (*session);
             graph.selectNode (selected);
+            nodeProps.addProperties (selected);
+            if (nodeProps.isVisible())
+                resized();
         }
     }
 }
@@ -252,6 +292,9 @@ void GraphEditorView::restoreSettings()
     graph.setZoomScale (s.getProperty ("zoomScale", 1.0f));
     view.getHorizontalScrollBar().setCurrentRangeStart (s.getProperty ("horizontalRangeStart", 0.0));
     view.getVerticalScrollBar().setCurrentRangeStart (s.getProperty ("verticalRangeStart", 0.0));
+    nodeProps.setVisible (s.getProperty ("nodePropsVisible", false));
+
+    resized();
 }
 
 void GraphEditorView::saveSettings()
@@ -265,6 +308,7 @@ void GraphEditorView::saveSettings()
     s.setProperty ("horizontalRangeStart", view.getHorizontalScrollBar().getCurrentRangeStart(), nullptr);
     s.setProperty ("verticalRangeStart",   view.getVerticalScrollBar().getCurrentRangeStart(),   nullptr);
     s.setProperty ("zoomScale", graph.getZoomScale(), nullptr);
+    s.setProperty ("nodePropsVisible", nodeProps.isVisible(), nullptr);
 }
 
 } /* namespace Element */
