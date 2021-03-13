@@ -190,7 +190,7 @@ void GraphEditorView::graphDisplayResized (const Rectangle<int> &area)
     auto r = area;
     if (nodeProps.isVisible())
     {
-        const auto hidePropsWidth = nodePropsWidth * 1.5;
+        const auto hidePropsWidth = nodePropsWidth * 1.75;
         if (getWidth() >= hidePropsWidth && nodePropsWidth > 0)
         {
             nodeProps.setBounds (r.removeFromRight (nodePropsWidth));

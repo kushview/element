@@ -503,6 +503,7 @@ class NodeObjectSync final : private ValueTree::Listener
 {
 public:
     NodeObjectSync();
+    NodeObjectSync (const Node& node);
     ~NodeObjectSync();
 
     void setNode (const Node&);
@@ -521,6 +522,8 @@ private:
     void valueTreeChildOrderChanged (ValueTree& parent, int oldIndex, int newIndex) override;
     void valueTreeParentChanged (ValueTree& tree) override;
     void valueTreeRedirected (ValueTree& tree) override;
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NodeObjectSync)
 };
 
 class PortArray : public Array<Port>

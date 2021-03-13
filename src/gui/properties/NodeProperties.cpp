@@ -215,6 +215,26 @@ public:
     }
 };
 
+class MillisecondSliderPropertyComponent : public SliderPropertyComponent
+{ 
+public:
+    MillisecondSliderPropertyComponent (const Value& value, const String& name)
+        : SliderPropertyComponent (value, name, -1000.0, 1000.0, 0.1, 1.0, false)
+    {
+        slider.textFromValueFunction = [](double value) {
+            String str (value, 1);
+            str << " ms";
+            return str;
+        };
+
+        slider.valueFromTextFunction = [this](const String& text) -> double {
+            return text.replace ("ms","", false).trim().getFloatValue();
+        };
+
+        slider.updateText();
+    }
+};
+
 NodeProperties::NodeProperties (const Node& n, int groups)
     : NodeProperties (n, groups & General, groups & Midi) {}
 
@@ -226,6 +246,9 @@ NodeProperties::NodeProperties (const Node& n, bool nodeProps, bool midiProps)
     {
         add (new TextPropertyComponent (node.getPropertyAsValue (Tags::name), 
             "Name", 100, false, true));
+        if (! node.isIONode())
+            add (new MillisecondSliderPropertyComponent (
+                node.getPropertyAsValue (Tags::delayCompensation), "Delay comp."));
     }
 
     if (midiProps)

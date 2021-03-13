@@ -24,6 +24,7 @@
 namespace Element {
 
 class Node;
+class NodeObjectSync;
 
 /** A PropertyPanel which display node properties */
 class NodePropertyPanel : public PropertyPanel
@@ -54,6 +55,7 @@ public:
     void addProperties (const Node& node, int extraSpace = 0);
 
 private:
+    std::unique_ptr<NodeObjectSync> sync;
     void initialize();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodePropertyPanel)
 };

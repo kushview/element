@@ -458,6 +458,7 @@ void Node::setMissingProperties()
     stabilizeProperty (Tags::keyStart, 0);
     stabilizeProperty (Tags::keyEnd, 127);
     stabilizeProperty (Tags::transpose, 0);
+    stabilizeProperty (Tags::delayCompensation, 0);
 
    #if ! defined (EL_PRO)
     stabilizeProperty (Tags::tempo, (double) 120.0);
@@ -854,6 +855,7 @@ void Node::restorePluginState()
             obj->setTransposeOffset (getProperty (Tags::transpose));
         
         obj->setOversamplingFactor (jmax (1, (int) getProperty (Tags::oversamplingFactor, 1)));
+        obj->setDelayCompensation (getProperty (Tags::delayCompensation, 0.0));
     }
 
     // this was originally here to help reduce memory usage
@@ -916,6 +918,7 @@ void Node::savePluginState()
         String mps; obj->getMidiProgramsState (mps);
         setProperty (Tags::midiProgramsState, mps);
         setProperty (Tags::oversamplingFactor, obj->getOversamplingFactor());
+        setProperty (Tags::delayCompensation, obj->getDelayCompensation());
     }
 
     for (int i = 0; i < getNumNodes(); ++i)
@@ -1087,6 +1090,11 @@ void Node::setMidiProgramName (int program, const String& name)
     // setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
 }
 
+NodeObjectSync::NodeObjectSync (const Node& node)
+    : NodeObjectSync()
+{
+    setNode (node);
+}
 
 NodeObjectSync::NodeObjectSync()
 {
@@ -1145,6 +1153,15 @@ void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier
     else if (property == Tags::transpose)
     {
         obj->setTransposeOffset (roundToInt ((double) tree.getProperty (property)));
+    }
+    else if (property == Tags::delayCompensation)
+    {
+        obj->setDelayCompensation (tree.getProperty (property, obj->getDelayCompensation()));
+        if (auto* const g = obj->getParentGraph())
+        {
+            g->cancelPendingUpdate();
+            g->triggerAsyncUpdate();
+        }
     }
 }
 
