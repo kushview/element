@@ -12,8 +12,8 @@ VERSION='0.46.0b3'
 VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
-    opt.load ("compiler_c compiler_cxx cross juce")
-    
+    opt.load ("compiler_c compiler_cxx ccache cross juce")
+
     opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
         help="Disable LADSPA plugin hosting")
     opt.add_option ('--disable-lv2', default=False, action='store_true', dest='no_lv2', \
@@ -113,16 +113,15 @@ def configure (conf):
         os.path.join (conf.env.DATADIR, 'scripts')
     ])
 
-    conf.check_ccache()
     cross.setup_compiler (conf)
     if len(conf.options.cross) <= 0:
         conf.prefer_clang()
     
-    conf.load ("compiler_c compiler_cxx ar cross juce")
+    conf.load ("compiler_c compiler_cxx ccache ar cross juce")
 
     conf.check_cxx_version()
     silence_warnings (conf)
-    
+
     conf.find_program ('convert', mandatory=False)
     conf.find_program ('ldoc',    mandatory=False)
 
@@ -161,6 +160,8 @@ def configure (conf):
 
     print
     conf.display_archs()
+    conf.message ("CC",        ' '.join (conf.env.CC))
+    conf.message ("CXX",       ' '.join (conf.env.CXX))
     conf.message ("PREFIX",    conf.env.PREFIX)
     conf.message ("DATADIR",   conf.env.DATADIR)
     conf.message ("CFLAGS",    conf.env.CFLAGS)

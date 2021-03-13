@@ -47,10 +47,6 @@ def prefer_clang(self):
             self.env.CC  = 'clang'
             self.env.CXX = 'clang++'
 
-@conf 
-def check_ccache(self):
-    return self.find_program ('ccache', mandatory=False)
-
 @conf
 def check_juce (self):
     '''this just checks that a version of juce exists'''
