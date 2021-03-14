@@ -25,9 +25,9 @@
     <key>CFBundleSignature</key>
     <string>????</string>
     <key>CFBundleShortVersionString</key>
-    <string>0.46.0b2</string>
+    <string>@PACKAGE_VERSION@</string>
     <key>CFBundleVersion</key>
-    <string>0.46.0b2</string>
+    <string>@PACKAGE_VERSION@</string>
     <key>NSHumanReadableCopyright</key>
     <string>Copyright (c) 2014-2021 Kushview, LLC</string>
     <key>NSHighResolutionCapable</key>

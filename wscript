@@ -4,12 +4,13 @@ from subprocess import call, Popen, PIPE
 import os, sys
 import string
 sys.path.append (os.getcwd() + "/tools/waf")
-import cross, element, juce
+import cross, element, juce, templates
 
-APPNAME='element'
-VERSION='0.46.0b3'
+APPNAME         = element.APPNAME
+VERSION         = element.VERSION
+PLUGIN_VERSION  = element.PLUGIN_VERSION
 
-VST3_PATH='libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
+VST3_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
     opt.load ("compiler_c compiler_cxx ccache cross juce")
@@ -122,6 +123,7 @@ def configure (conf):
     conf.check_cxx_version()
     silence_warnings (conf)
 
+    conf.find_projucer (mandatory=False)
     conf.find_program ('convert', mandatory=False)
     conf.find_program ('ldoc',    mandatory=False)
 
@@ -144,6 +146,8 @@ def configure (conf):
     # Hidden Visibiility by default
     for k in 'CFLAGS CXXFLAGS'.split():
         conf.env.append_unique (k, ['-fvisibility=hidden'])
+
+    templates.generate()
 
     print
     juce.display_header ("Element")
@@ -394,7 +398,7 @@ def install_lua_files (bld):
 def build (bld):
     if bld.is_install and juce.is_mac():
         bld.fatal ("waf install not supported on OSX")
-
+        
     bld.add_pre_fun (configure_git_version)
     # build_lua_lib (bld)
     build_app (bld)
@@ -422,7 +426,7 @@ def check (ctx):
     if 0 != call (["build/bin/test-element"]):
         ctx.fatal ("Tests failed")
 
-def dist(ctx):
+def dist (ctx):
     z = ctx.options.ziptype
     if 'zip' in z:
         ziptype = z
@@ -439,7 +443,27 @@ def dist(ctx):
 def docs (ctx):
     build_lua_docs (ctx)
 
+def versionbump (ctx):
+    apps = [
+        'tools/jucer/Standalone/Element.jucer',
+    ]
+    plugins = [
+        'tools/jucer/Element/Element.jucer',
+        'tools/jucer/ElementFX/ElementFX.jucer',
+        'tools/jucer/ElementMFX/ElementMFX.jucer'
+    ]
+
+    prog = ctx.env.PROJUCER
+    if isinstance (prog, list) and len(prog) > 0:
+        cmd = prog + [ '--set-version', VERSION ]
+        for app in apps: call (cmd + [app])
+        cmd = prog + [ '--set-version', PLUGIN_VERSION ]
+        for plugin in plugins: call (cmd + [plugin])
+
 from waflib.Build import BuildContext
 class BuildDocs (BuildContext):
     cmd = 'docs'
     fun = 'docs'
+class BuildVersionBump (BuildContext):
+    cmd = 'versionbump'
+    fun = 'versionbump'

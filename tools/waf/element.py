@@ -5,6 +5,14 @@ import os, platform
 from waflib.Configure import conf
 import juce
 
+# Package name
+APPNAME="element"
+# Version number
+VERSION="0.46.0b3"
+# plugin version is +1 that of standalone. VSTSDK isn't smart enough to 
+# deal with < 1.0 versions
+PLUGIN_VERSION="1.46.0b3"
+
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography

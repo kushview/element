@@ -42,5 +42,7 @@ node_modules
 
 /tools/contrib/contrib
 /tools/contrib/*.exe
+/tools/linuxdeploy.sh
+/data/Info.plist
 
 /*.lua

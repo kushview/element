@@ -27,6 +27,10 @@ def display_msg (conf, msg, status = None, color = None):
     Logs.pprint(color, status)
 
 @conf
+def find_projucer (self, **k):
+    return self.find_program ("Projucer", **k)
+
+@conf
 def message (self, msg, status=None, color=None):
     display_msg (self, msg, status, color)
 
@@ -39,7 +43,7 @@ def display_archs (self):
             display_msg (self, 'ARCHS', 'default')
 
 @conf
-def prefer_clang(self):
+def prefer_clang (self):
     '''Use clang by default on non-windows'''
     if is_windows(): return
     if not 'CC' in os.environ or not 'CXX' in os.environ:
