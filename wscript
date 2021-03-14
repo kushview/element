@@ -459,6 +459,7 @@ def versionbump (ctx):
         for app in apps: call (cmd + [app])
         cmd = prog + [ '--set-version', PLUGIN_VERSION ]
         for plugin in plugins: call (cmd + [plugin])
+        call (['bash', 'tools/copybin.sh'])
 
 from waflib.Build import BuildContext
 class BuildDocs (BuildContext):
