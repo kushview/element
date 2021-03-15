@@ -42,6 +42,9 @@ public:
 
     static Result validate (const String& script);
 
+    /** Returns true if the script loaded ok */
+    bool isValid() const { return loaded; }
+
     //==========================================================================
     void prepare (double rate, int block)
     {

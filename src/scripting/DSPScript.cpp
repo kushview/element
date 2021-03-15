@@ -109,6 +109,33 @@ DSPScript::DSPScript (sol::table tbl)
                 require ('el.MidiPipe')
             )");
             ok = result.status() == sol::call_status::ok;
+        
+            switch (result.status())
+            {
+                case sol::call_status::file:
+                    DBG("DSPScript: file error");
+                    break;
+                case sol::call_status::gc:
+                   DBG("DSPScript: gc error");
+                    break;
+                case sol::call_status::handler:
+                    DBG("DSPScript: handler error");
+                    break;
+                case sol::call_status::memory:
+                    DBG("DSPScript: memory error");
+                    break;
+                case sol::call_status::runtime:
+                    DBG("DSPScript: runtime error");
+                    break;
+                case sol::call_status::syntax:
+                    DBG("DSPScript: syntax error");
+                    break;
+                case sol::call_status::yielded:
+                    DBG("DSPScript: yielded error");
+                    break;
+                case sol::call_status::ok:
+                    break;
+            }
         } catch (const sol::error& e) {
             DBG(e.what());
             ok = false;
@@ -278,7 +305,7 @@ void DSPScript::process (AudioSampleBuffer& a, MidiPipe& m)
     }
     else
     {
-        DBG("didn't get render fucntion in callback");
+        DBG("didn't get render function in callback");
     }
 }
 
@@ -454,6 +481,7 @@ void DSPScript::addAudioMidiPorts()
 
         int index = ports.size();
         int channel = 0;
+
         for (int i = 0; i < numAudioIn; ++i)
         {
             String slug = "in_"; slug << (i + 1);

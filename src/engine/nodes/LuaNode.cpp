@@ -206,7 +206,15 @@ struct LuaNode::Context
             Lua::initializeState (state);
             auto res = state.script (initScript.toRawUTF8());
             if (res.valid())
+            {
                 res = state.script (script.toRawUTF8());
+            }
+            else
+            {
+                sol::error e = res;
+                errorMsg = e.what();
+            }
+
             if (res.valid())
             {
                 bool ok = false;
@@ -215,6 +223,9 @@ struct LuaNode::Context
                     renderRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = renderRef != LUA_REFNIL && renderRef != LUA_NOREF;
                 }
+                
+                if (! ok)
+                    errorMsg = "render function not found";
 
                 if (ok)
                 {
@@ -223,12 +234,18 @@ struct LuaNode::Context
                     ok = audioBufRef != LUA_REFNIL && audioBufRef != LUA_NOREF;
                 }
 
+                if (! ok)
+                    errorMsg = "could not allocate audio buffer";
+
                 if (ok)
                 {
                     midiPipe = LuaMidiPipe::create (L, 4);
                     midiPipeRef = luaL_ref (state, LUA_REGISTRYINDEX);
                     ok = midiPipeRef != LUA_REFNIL && midiPipeRef != LUA_NOREF;
                 }
+
+                if (! ok)
+                    errorMsg = "could not create MIDI pipe";
 
                 loaded = ok;
             }

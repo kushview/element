@@ -169,13 +169,17 @@ public:
 
     void runTest() override
     {
+        char* oldPath = getenv("LUA_PATH");
+        setenv("LUA_PATH", getPath().toRawUTF8(), 1);
         auto graph = std::make_unique<GraphProcessor>();
         graph->prepareToPlay (44100.0, 1024);
         auto* node = new LuaNode();
         
         beginTest ("validate");
         auto result = node->loadScript (nodeScript);
-        expect (result.wasOk());
+        expect (result.wasOk(), result.getErrorMessage());
+
+        setenv("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
         if (! result.wasOk())
             return;
 
@@ -204,19 +208,23 @@ private:
 static LuaNodeLifecycleTest sLuaNodeLifecycleTest;
 
 //=============================================================================
-class LuaNodeValidateTest : public UnitTestBase
+class LuaNodeValidateTest : public LuaUnitTest
 {
 public:
-    LuaNodeValidateTest() : UnitTestBase ("Lua Node Validation", "LuaNode", "validate") { }
+    LuaNodeValidateTest() : LuaUnitTest ("Lua Node Validation", "LuaNode", "validate") { }
     virtual ~LuaNodeValidateTest() {}
 
     void runTest() override
     {
+        char* oldPath = getenv("LUA_PATH");
+        setenv ("LUA_PATH", getPath().toRawUTF8(), 1);
+
         auto node = std::make_unique<LuaNode>();
 
         beginTest ("validation ok");
         auto result = node->loadScript (nodeScript);
         expect (result.wasOk());
+        setenv("LUA_PATH", oldPath != nullptr ? oldPath : "", 1);
         return;
 
         beginTest ("global syntax error");

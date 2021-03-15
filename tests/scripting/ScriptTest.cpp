@@ -162,7 +162,7 @@ public:
     {
         {
             beginTest ("load");
-            auto script = std::unique_ptr<Script> (new Script (lua));
+            auto script = std::make_unique<Script> (lua);
             script->load (readSnippet ("test_dsp_script_01.lua"));
             if (script->hasError())
             {
@@ -178,7 +178,11 @@ public:
             expect(result.get_type() == sol::type::table, sol::type_name (result.lua_state(), result.get_type()));
             sol::table Amp = result;
             DSPScript dsp (Amp);
-
+            beginTest ("dsp loaded");
+            expect (dsp.isValid(), "Could not instantiate DSP Script");
+            if (! dsp.isValid())
+                return;
+            
             beginTest ("ports");
             const auto& ports = dsp.getPorts();
             expect (ports.size (kv::PortType::Audio,   true)  == 2);

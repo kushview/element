@@ -30,6 +30,28 @@ public:
                 this->expect (result, obj.as<std::string>());
             }
         );
+
+        resetPaths();
+    }
+
+    String getPath() const
+    {
+        String path (lua["package"]["path"].get_or<std::string>(""));
+        DBG(path);
+        return path;
+    }
+
+    /** Reset lua paths to defaults (in-tree locations for unit tests) */
+    void resetPaths()
+    {
+        // by default
+        auto package = lua["package"];
+        const auto root = File::getCurrentWorkingDirectory().getFullPathName();
+        String path; path << root << "/libs/element/lua/?.lua;" 
+                          << root << "/libs/lua-kv/src/?.lua";
+        package["path"] = path.toStdString();
+        path.clear(); path << root << "/scripts/?.lua";
+        package["spath"] = path.toStdString();
     }
 
     File getSnippetFile (const String& filename) const
