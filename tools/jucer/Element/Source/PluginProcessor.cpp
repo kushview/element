@@ -182,10 +182,14 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
         devsctl->refresh();
         shouldProcess.set (true);
     }
+
+    asyncPrepare.reset (new AsyncPrepare (*this));
 }
 
 ElementPluginAudioProcessor::~ElementPluginAudioProcessor()
 {
+    asyncPrepare.reset();
+
     for (auto* param : perfparams)
         param->clearNode();
     perfparams.clear();
@@ -263,8 +267,15 @@ void ElementPluginAudioProcessor::changeProgramName (int index, const String& ne
 {
 }
 
-void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
+void ElementPluginAudioProcessor::prepareToPlay(double sr, int bs)
 {
+    if (!MessageManager::getInstance()->isThisTheMessageThread())
+    {
+        asyncPrepare->prepare (sr, bs);
+        shouldProcess.set (false);
+        return;
+    }
+
     DBG("[EL] prepare to play: prepared=" << (int) prepared <<
         " sampleRate: " << sampleRate <<
         " buff: " << bufferSize <<
@@ -298,7 +309,6 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
                 engine->prepareExternalPlayback (sampleRate, bufferSize,
                                                  getTotalNumInputChannels(),
                                                  getTotalNumOutputChannels());
-
                 updateLatencySamples();
             }
             
@@ -310,6 +320,8 @@ void ElementPluginAudioProcessor::prepareToPlay (double sr, int bs)
     updateLatencySamples();
     engine->sampleLatencyChanged.connect (
         std::bind (&ElementPluginAudioProcessor::updateLatencySamples, this));
+
+    shouldProcess.set (true);
 }
 
 void ElementPluginAudioProcessor::releaseResources()

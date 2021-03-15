@@ -423,6 +423,29 @@ private:
     
     bool forceZeroLatency = false;
 
+    class AsyncPrepare : public AsyncUpdater
+    {
+        AudioProcessor& processor;
+        int bufferSize = 0;
+        double sampleRate = 0.0;
+    public:
+        AsyncPrepare(AudioProcessor& p)
+            : processor(p) { }
+        ~AsyncPrepare() { cancelPendingUpdate();  }
+        void prepare(double s, int b)
+        {
+            cancelPendingUpdate();
+            bufferSize = b;
+            sampleRate = s;
+            triggerAsyncUpdate();
+        }
+
+        void handleAsyncUpdate() override {
+            processor.prepareToPlay (sampleRate, bufferSize);
+        }
+    };
+    std::unique_ptr<AsyncPrepare> asyncPrepare;
+
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;
     void reloadEngine();
