@@ -1,15 +1,8 @@
 #!/bin/bash
+
 set -ex
 
 appdir="build/AppDir"
-
-rm -rf build
-
-export CFLAGS="-DEL_APPIMAGE=1"
-export CXXFLAGS="-DEL_APPIMAGE=1"
-./waf configure --prefix=/usr $@
-
-./waf build --progress
 ./waf install --destdir="${appdir}"
 
 export VERSION="@PACKAGE_VERSION@"
@@ -29,13 +22,6 @@ mv *.AppImage build/
 
 here="`pwd`"
 
-cd "${here}/tools/jucer/Element/Builds/LinuxMakefile"
-make clean && rm -rf build && make -j4 CONFIG=Release
-
-cd "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile"
-make clean && rm -rf build && make -j4 CONFIG=Release
-
-cd "${here}"
 pkgname="element-linux64-${VERSION}"
 pkgdir="build/${pkgname}"
 
