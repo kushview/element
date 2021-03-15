@@ -109,7 +109,7 @@ Globals::Globals (const String& _cli)
     : cli (_cli)
 {
     appName = "Element";
-    impl = new Impl (*this);
+    impl.reset (new Impl (*this));
     impl->init();
 }
 

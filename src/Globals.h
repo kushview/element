@@ -72,7 +72,7 @@ private:
     friend class Application;
     class Impl;
     String appName;
-    ScopedPointer<Impl> impl;
+    std::unique_ptr<Impl> impl;
 };
 
 }
