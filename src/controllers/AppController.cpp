@@ -92,9 +92,7 @@ void AppController::activate()
 }
 
 void AppController::deactivate()
-{
-    licenseRefreshedConnection.disconnect();
-    
+{    
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (! recentList.existsAsFile())
         recentList.create();
@@ -609,28 +607,6 @@ void AppController::checkForegroundStatus()
     };
 
     (new CheckForeground(*this))->post();
-   #endif
-}
-
-void AppController::licenseRefreshed()
-{
-   #if 0
-    findChild<Element::DevicesController>()->refresh();
-    findChild<Element::MappingController>()->learn (false);
-    if (auto engine = getWorld().getAudioEngine())
-        engine->updateUnlockStatus();
-
-   #if EL_RUNNING_AS_PLUGIN
-    // FIXME: this came from UnlockForm.cpp
-    // typedef ElementPluginAudioProcessorEditor EdType;
-    // if (EdType* editor = form.findParentComponentOfClass<EdType>())
-    //     editor->triggerAsyncUpdate();
-   #else
-    getWorld().getDeviceManager().restartLastAudioDevice();
-   #endif
-
-    findChild<GuiController>()->stabilizeContent();
-    findChild<GuiController>()->stabilizeViews();
    #endif
 }
 
