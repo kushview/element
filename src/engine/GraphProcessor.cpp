@@ -223,6 +223,9 @@ public:
             midiBufferToUse = chans[PortType::Midi].getFirst();
 
         lastMute = node->isMuted();
+
+        osChanSize = totalChans;
+        osChans.reset (new float* [osChanSize]);
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
@@ -351,12 +354,19 @@ public:
                 dsp::AudioBlock<float> block (buffer);
                 dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
 
-                std::unique_ptr<float*> ptrArray;
-                ptrArray.reset (new float* [buffer.getNumChannels()]);
-                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-                    ptrArray.get()[ch] = osBlock.getChannelPointer (ch);
+                if (buffer.getNumChannels() > osChanSize)
+                {
+                    osChanSize = buffer.getNumChannels();
+                    osChans.reset (new float* [osChanSize]);
+                }
 
-                AudioBuffer<float> osBuffer (ptrArray.get(), buffer.getNumChannels(), static_cast<int> (osBlock.getNumSamples()));
+                float** osData = osChans.get();
+                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                    osData[ch] = osBlock.getChannelPointer (ch);
+                
+                AudioSampleBuffer osBuffer (osData, 
+                    buffer.getNumChannels(),
+                    static_cast<int> (osBlock.getNumSamples()));
                 pluginProcessBlock (osBuffer, processor->isSuspended());
 
                 osProcessor->processSamplesDown (block);
@@ -414,6 +424,8 @@ private:
     bool lastMute = false;
     MidiTranspose transpose;
     MidiBuffer tempMidi;
+    std::unique_ptr<float*> osChans;
+    int osChanSize = 0;
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)
 };
 
