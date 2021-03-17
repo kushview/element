@@ -441,7 +441,7 @@ def dist (ctx):
     ctx.excl += ' tools/jucer/**/JuceLibraryCode'
 
 def docs (ctx):
-    build_lua_docs (ctx)
+    ctx.add_pre_fun (build_lua_docs)
 
 def versionbump (ctx):
     import projects
