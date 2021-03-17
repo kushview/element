@@ -445,11 +445,11 @@ def docs (ctx):
 
 def versionbump (ctx):
     import projects
-    projects.set_versions (ctx, VERSION, PLUGIN_VERSION)
+    ctx.add_pre_fun (projects.update_version)
 
 def resave (ctx):
     import projects
-    projects.resave (ctx)
+    ctx.add_pre_fun (projects.resave)
 
 from waflib.Build import BuildContext
 

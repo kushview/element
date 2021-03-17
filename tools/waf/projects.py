@@ -1,4 +1,4 @@
-import os, subprocess, sys
+import element, os, subprocess, sys
 
 PROJUCER_PROJECTS = '''
     tools/jucer/ElementFX/ElementFX.jucer
@@ -36,7 +36,7 @@ def resave (ctx):
     devnull.close()
     print ("Done!")
 
-def set_versions (ctx, appvers, pluginvers):
+def update_version (ctx):
     prog = projucer (ctx)
     if not isinstance (prog, list) and len(prog) > 0:
         return
@@ -48,8 +48,10 @@ def set_versions (ctx, appvers, pluginvers):
     for project in PROJUCER_PROJECTS:
         cmd = prog + [ '--set-version' ]
         version = ''
-        if 'Standalone' in project: version = appvers
-        else: version = pluginvers
+        if 'Standalone' in project: version = element.VERSION
+        else:                       version = element.PLUGIN_VERSION
+        if len(version) <= 0: ctx.fail ("Could not determine version numbers")
+
         print (os.path.basename (project))        
         cmd += [ version, project ]
         call (cmd)
