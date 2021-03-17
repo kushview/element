@@ -46,7 +46,7 @@ namespace Element
         DataPathHelpers::initializeUserLibrary (root);
     }
     
-    DataPath::~DataPath() { }
+    DataPath::~DataPath() {}
     
     const File DataPath::applicationDataDir()
     {
@@ -54,7 +54,7 @@ namespace Element
         return File::getSpecialLocation (File::userApplicationDataDirectory)
             .getChildFile ("Application Support/Element");
        #else
-        return File::getSpecialLocation(File::userApplicationDataDirectory)
+        return File::getSpecialLocation (File::userApplicationDataDirectory)
             .getChildFile ("Element");
        #endif
     }

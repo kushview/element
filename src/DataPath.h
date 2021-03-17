@@ -34,18 +34,30 @@ public:
     ~DataPath();
     
     /** Returns the app data dir.
-        For example, on OSX this is ~/Library/Application Support/Element */
+        For example, on OSX this is ~/Library/Application Support/Element
+     */
     static const File applicationDataDir();
 
+    /** Returns the default settings file */
     static const File defaultSettingsFile();
+
+    /** Returns the default user data path */
     static const File defaultLocation();
+
+    /** Returns the default session directory */
     static const File defaultSessionDir();
+
+    /** Returns the default Graph directory */
     static const File defaultGraphDir();
+
+    /** Returns the default Controllers directory */
     static const File defaultControllersDir();
+
+    /** Returns the default Workspaces directory */
     static const File workspacesDir();
 
     /** Returns the installation directory. May return an invalid file,
-        especially when in debug mode. Use this sparingly
+        especially when in debug mode. Use this sparingly.
       */
     static const File installDir();
 
