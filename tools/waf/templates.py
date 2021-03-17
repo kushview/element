@@ -35,6 +35,6 @@ def process_linuxdeploy_sh():
     os.chmod (script, st.st_mode | stat.S_IEXEC)
 
 def generate():
-    # generate all templates
+    # Process all templates
     process_linuxdeploy_sh()
     process_info_plist()

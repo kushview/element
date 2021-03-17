@@ -461,10 +461,20 @@ def versionbump (ctx):
         for plugin in plugins: call (cmd + [plugin])
         call (['bash', 'tools/copybin.sh'])
 
+def resave (ctx):
+    import projects
+    projects.resave (ctx)
+
 from waflib.Build import BuildContext
-class BuildDocs (BuildContext):
+
+class ResaveBuildContext (BuildContext):
+    cmd  = 'resave'
+    fun  = 'resave'
+
+class DocsBuildContext (BuildContext):
     cmd = 'docs'
     fun = 'docs'
-class BuildVersionBump (BuildContext):
+
+class VersionBumpContext (BuildContext):
     cmd = 'versionbump'
     fun = 'versionbump'

@@ -2,7 +2,6 @@
 # Copies Lua scripts and modules into a mac bundle
 
 echo "Bundling lua scripts"
-
 set -e
 
 bundle="build/Applications/Element.app"
