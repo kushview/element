@@ -93,17 +93,6 @@
       <FILE id="qBmCnP" name="waf" compile="0" resource="0" file="../../../libs/lua-kv/waf"/>
       <FILE id="madLvC" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
     </GROUP>
-    <GROUP id="{79158675-9931-4F98-C7A8-52C82F095CAA}" name="Source">
-      <FILE id="oYFN9D" name="ElementFXConfig.h" compile="0" resource="0"
-            file="Source/ElementFXConfig.h"/>
-      <FILE id="ydCQPD" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="Source/PluginProcessor.cpp"/>
-      <FILE id="J4Hpqm" name="PluginProcessor.h" compile="0" resource="0"
-            file="Source/PluginProcessor.h"/>
-      <FILE id="Owyiau" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="XRnJdB" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
-    </GROUP>
     <GROUP id="{EBBBD07C-993F-C2E5-D8CB-EF16E7E0D8B4}" name="src">
       <GROUP id="{12C49717-71FF-AF9E-0B6A-47CEFDBFBB3C}" name="controllers">
         <FILE id="JJ7KCM" name="AppController.cpp" compile="1" resource="0"
@@ -612,6 +601,15 @@
         <FILE id="cjejNi" name="ControllerDeviceMessages.h" compile="0" resource="0"
               file="../../../src/messages/ControllerDeviceMessages.h"/>
         <FILE id="M3PjKh" name="GuiMessages.h" compile="0" resource="0" file="../../../src/messages/GuiMessages.h"/>
+      </GROUP>
+      <GROUP id="{43F48304-5AE0-D4D4-9D75-80653DF3C81B}" name="plugins">
+        <FILE id="ueLt8i" name="PluginEditor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginEditor.cpp"/>
+        <FILE id="IGyNrH" name="PluginEditor.h" compile="0" resource="0" file="../../../src/plugins/PluginEditor.h"/>
+        <FILE id="SMqM2u" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginProcessor.cpp"/>
+        <FILE id="WF8r0b" name="PluginProcessor.h" compile="0" resource="0"
+              file="../../../src/plugins/PluginProcessor.h"/>
       </GROUP>
       <GROUP id="{482FF60D-AC62-5E8E-443D-59DAFD7BD345}" name="scripting">
         <FILE id="ESHqFM" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>

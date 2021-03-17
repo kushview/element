@@ -921,7 +921,6 @@ void GuiController::changeListenerCallback (ChangeBroadcaster* broadcaster)
             win->refreshMenu();
 }
 
-#if EL_RUNNING_AS_PLUGIN
 void GuiController::clearContentComponent()
 {
     if (about)
@@ -931,9 +930,15 @@ void GuiController::clearContentComponent()
         about = nullptr;
     }
 
-    jassert(content != nullptr);
+    if (mainWindow)
+    {
+        jassertfalse; // This should only ever be called from 
+                      // an Element plugin instance
+        mainWindow->clearContentComponent();
+    }
+
+    jassert (content != nullptr);
     content = nullptr;
 }
-#endif
 
 }

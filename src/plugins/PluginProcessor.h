@@ -19,14 +19,13 @@
 
 #pragma once
 
-#include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "engine/AudioEngine.h"
 #include "engine/Parameter.h"
+#include "ElementApp.h"
 #include "Globals.h"
 
-using namespace Element;
-using Element::Parameter;
+namespace Element {
 
 //=============================================================================
 class PerformanceParameter : public AudioProcessorParameter,
@@ -332,12 +331,12 @@ private:
     SignalConnection removedConnection;
 };
 
-class ElementPluginAudioProcessor  : public AudioProcessor,
+class PluginProcessor  : public AudioProcessor,
                                      private AsyncUpdater
 {
 public:    
-    ElementPluginAudioProcessor();
-    ~ElementPluginAudioProcessor();
+    PluginProcessor();
+    ~PluginProcessor();
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
@@ -454,5 +453,7 @@ private:
     var hasCheckedLicense { 0 };    
     int calculateLatencySamples() const;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ElementPluginAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
+
+}

@@ -96,17 +96,6 @@
         <FILE id="cIkit7" name="wscript" compile="0" resource="0" file="../../../libs/lua-kv/wscript"/>
       </GROUP>
     </GROUP>
-    <GROUP id="{79158675-9931-4F98-C7A8-52C82F095CAA}" name="Source">
-      <FILE id="vePspm" name="ElementFXConfig.h" compile="0" resource="0"
-            file="../Element/Source/ElementFXConfig.h"/>
-      <FILE id="onjCLg" name="PluginEditor.cpp" compile="1" resource="0"
-            file="../Element/Source/PluginEditor.cpp"/>
-      <FILE id="fu1Fsl" name="PluginEditor.h" compile="0" resource="0" file="../Element/Source/PluginEditor.h"/>
-      <FILE id="KRRvkm" name="PluginProcessor.cpp" compile="1" resource="0"
-            file="../Element/Source/PluginProcessor.cpp"/>
-      <FILE id="nTIEZa" name="PluginProcessor.h" compile="0" resource="0"
-            file="../Element/Source/PluginProcessor.h"/>
-    </GROUP>
     <GROUP id="{EBBBD07C-993F-C2E5-D8CB-EF16E7E0D8B4}" name="src">
       <GROUP id="{12C49717-71FF-AF9E-0B6A-47CEFDBFBB3C}" name="controllers">
         <FILE id="uNPad7" name="AppController.cpp" compile="1" resource="0"
@@ -616,6 +605,15 @@
               file="../../../src/messages/ControllerDeviceMessages.h"/>
         <FILE id="EFGtSm" name="GuiMessages.h" compile="0" resource="0" file="../../../src/messages/GuiMessages.h"/>
       </GROUP>
+      <GROUP id="{43F48304-5AE0-D4D4-9D75-80653DF3C81B}" name="plugins">
+        <FILE id="veLJ37" name="PluginEditor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginEditor.cpp"/>
+        <FILE id="IuoiEl" name="PluginEditor.h" compile="0" resource="0" file="../../../src/plugins/PluginEditor.h"/>
+        <FILE id="Pjc77p" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginProcessor.cpp"/>
+        <FILE id="bxYOOq" name="PluginProcessor.h" compile="0" resource="0"
+              file="../../../src/plugins/PluginProcessor.h"/>
+      </GROUP>
       <GROUP id="{482FF60D-AC62-5E8E-443D-59DAFD7BD345}" name="scripting">
         <FILE id="WgvVZa" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>
         <FILE id="IGjqEg" name="DSPScript.h" compile="0" resource="0" file="../../../src/scripting/DSPScript.h"/>
@@ -845,7 +843,7 @@
         <MODULEPATH id="jlv2_host" path="../../../libs/jlv2/modules"/>
       </MODULEPATHS>
     </VS2019>
-    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_PLUGINHOST_LADSPA=1&#10;JLV2_PLUGINHOST_LV2=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
+    <LINUX_MAKE targetFolder="Builds/LinuxMakefile" extraDefs="JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_PLUGINHOST_LADSPA=1&#10;JLV2_PLUGINHOST_LV2=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
                 linuxExtraPkgConfig="suil-0 lilv-0" extraCompilerFlags="-Wno-deprecated-declarations">
       <CONFIGURATIONS>
         <CONFIGURATION isDebug="1" name="Debug" enablePluginBinaryCopyStep="0" targetName="KV_ElementFX"

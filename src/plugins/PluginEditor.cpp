@@ -20,20 +20,18 @@
 #include "gui/GuiCommon.h"
 #include "gui/ContentComponent.h"
 #include "gui/PluginWindow.h"
+#include "plugins/PluginEditor.h"
+#include "plugins/PluginProcessor.h"
 
-#include "PluginProcessor.h"
-#include "PluginEditor.h"
-
-#define EL_PLUGIN_MIN_WIDTH     546
-#define EL_PLUGIN_MIN_HEIGHT    266
-
+#define EL_PLUGIN_MIN_WIDTH         546
+#define EL_PLUGIN_MIN_HEIGHT        266
 #define EL_PLUGIN_DEFAULT_WIDTH     760
 #define EL_PLUGIN_DEFAULT_HEIGHT    480
 
 namespace Element {
 using Element::LookAndFeel;
 
-class ElementPluginAudioProcessorEditor::ParamTable : public TableListBox,
+class PluginEditor::ParamTable : public TableListBox,
                                                       public TableListBoxModel
 {
 public:
@@ -79,14 +77,14 @@ public:
 
 void PerformanceParameterSlider::mouseDown (const MouseEvent& ev)
 {
-    auto* const editor = findParentComponentOfClass<ElementPluginAudioProcessorEditor>();
+    auto* const editor = findParentComponentOfClass<PluginEditor>();
     if (editor != nullptr && ev.mods.isPopupMenu())
     {
         auto& processor = editor->getProcessor();
         PopupMenu menu = processor.getPerformanceParameterMenu (param.getParameterIndex());
         const int paramIndex = param.getParameterIndex();
         menu.showMenuAsync (PopupMenu::Options().withTargetComponent(this),
-                            std::bind (&ElementPluginAudioProcessor::handlePerformanceParameterResult, &processor,
+                            std::bind (&PluginProcessor::handlePerformanceParameterResult, &processor,
                             std::placeholders::_1, paramIndex));
         return;
     }
@@ -94,7 +92,7 @@ void PerformanceParameterSlider::mouseDown (const MouseEvent& ev)
     return Slider::mouseDown (ev);
 }
 
-class ElementPluginAudioProcessorEditor::ParamTableToggle : public Button
+class PluginEditor::ParamTableToggle : public Button
 {
 public:
     ParamTableToggle() : Button ("ParamToggle") {}
@@ -111,8 +109,8 @@ protected:
     }
 };
 
-ElementPluginAudioProcessorEditor::ElementPluginAudioProcessorEditor (ElementPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), processor (p)
+PluginEditor::PluginEditor (PluginProcessor& plugin)
+    : AudioProcessorEditor (&plugin), processor (plugin)
 {
     paramTable.reset (new ParamTable());
     addAndMakeVisible (paramTable.get());
@@ -177,10 +175,10 @@ ElementPluginAudioProcessorEditor::ElementPluginAudioProcessorEditor (ElementPlu
     }
 
     perfParamChangedConnection = processor.onPerfParamsChanged.connect (std::bind (
-        &ElementPluginAudioProcessorEditor::updatePerformanceParamEnablements, this));
+        &PluginEditor::updatePerformanceParamEnablements, this));
 }
 
-ElementPluginAudioProcessorEditor::~ElementPluginAudioProcessorEditor()
+PluginEditor::~PluginEditor()
 {
     perfParamChangedConnection.disconnect();
     removeChildComponent (content.getComponent());
@@ -195,12 +193,12 @@ ElementPluginAudioProcessorEditor::~ElementPluginAudioProcessorEditor()
     }
 }
 
-void ElementPluginAudioProcessorEditor::handleAsyncUpdate()
+void PluginEditor::handleAsyncUpdate()
 {
     // noop
 }
 
-Element::ContentComponent* ElementPluginAudioProcessorEditor::getContentComponent()
+Element::ContentComponent* PluginEditor::getContentComponent()
 {
     if (nullptr == content)
         if (auto* app = processor.getAppController())
@@ -210,7 +208,7 @@ Element::ContentComponent* ElementPluginAudioProcessorEditor::getContentComponen
                               : 0;
 }
 
-bool ElementPluginAudioProcessorEditor::keyPressed (const KeyPress &key, Component *originatingComponent)
+bool PluginEditor::keyPressed (const KeyPress &key, Component *originatingComponent)
 {
     ignoreUnused (originatingComponent);
     auto* app = processor.getAppController();
@@ -227,7 +225,7 @@ bool ElementPluginAudioProcessorEditor::keyPressed (const KeyPress &key, Compone
     return false;
 }
 
-void ElementPluginAudioProcessorEditor::paint (Graphics& g)
+void PluginEditor::paint (Graphics& g)
 {
     g.fillAll (Element::LookAndFeel::widgetBackgroundColor.darker (0.29));
     if (! content)
@@ -238,7 +236,7 @@ void ElementPluginAudioProcessorEditor::paint (Graphics& g)
     }
 }
 
-void ElementPluginAudioProcessorEditor::resized()
+void PluginEditor::resized()
 {
     auto bounds (getLocalBounds());
     processor.setEditorBounds (bounds);

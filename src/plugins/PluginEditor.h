@@ -27,9 +27,6 @@
 
 namespace Element {
 
-// class ContentComponent;
-class ActivationComponent;
-
 class PerformanceParameterSlider : public Slider,
                                    private AudioProcessorParameter::Listener,
                                    private Timer
@@ -176,7 +173,7 @@ private:
 class PerfSliders : public Component
 {
 public:
-    PerfSliders (ElementPluginAudioProcessor& processor)
+    PerfSliders (PluginProcessor& processor)
     {
         for (auto* param : processor.getParameters())
         {
@@ -235,13 +232,13 @@ private:
     OwnedArray<PerformanceParameterSlider> sliders;
 };
 
-class ElementPluginAudioProcessorEditor  : public AudioProcessorEditor,
+class PluginEditor  : public AudioProcessorEditor,
                                            public KeyListener,
                                            public AsyncUpdater
 {
 public:
-    ElementPluginAudioProcessorEditor (ElementPluginAudioProcessor&);
-    ~ElementPluginAudioProcessorEditor();
+    PluginEditor (PluginProcessor&);
+    ~PluginEditor();
 
     void paint (Graphics&) override;
     void resized() override;
@@ -252,7 +249,7 @@ public:
     Element::ContentComponent* getContentComponent();
     
     void handleAsyncUpdate() override;
-    ElementPluginAudioProcessor& getProcessor() { return processor; }
+    PluginProcessor& getProcessor() { return processor; }
 
     void updatePerformanceParamEnablements()
     {
@@ -294,7 +291,7 @@ public:
     bool isReportingZeroLatency() const { return processor.isForcingZeroLatency(); }
 
 private:
-    ElementPluginAudioProcessor& processor;
+    PluginProcessor& processor;
     SafePointer<Component> content;
     SignalConnection perfParamChangedConnection;
 
@@ -303,6 +300,7 @@ private:
     class ParamTable; std::unique_ptr<ParamTable> paramTable;
     class ParamTableToggle; std::unique_ptr<ParamTableToggle> paramToggle;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (ElementPluginAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginEditor)
 };
+
 }

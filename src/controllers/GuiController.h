@@ -122,9 +122,8 @@ public:
     /** Get the look and feel used by this instance */
     Element::LookAndFeel& getLookAndFeel();
 
-    #if EL_RUNNING_AS_PLUGIN
+    /** Clears the current content component */
     void clearContentComponent();
-    #endif
 
     // TODO: content manager on selected nodes
     Node getSelectedNode() const    { return selectedNode; }

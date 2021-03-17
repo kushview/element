@@ -25,13 +25,15 @@
 #include "engine/InternalFormat.h"
 #include "session/PluginManager.h"
 #include "session/Session.h"
-
+#include "ElementApp.h"
 #include "Settings.h"
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-#include "../../../libs/compat/BinaryData.cpp"
+// #include "../../../libs/compat/BinaryData.cpp"
+
+namespace Element {
 
 //=============================================================================
 static void setPluginMissingNodeProperties (const ValueTree& tree)
@@ -56,7 +58,7 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 #define devsctl controller->findChild<DevicesController>()
 
 //=============================================================================
-ElementPluginAudioProcessor::ElementPluginAudioProcessor()
+PluginProcessor::PluginProcessor()
     : AudioProcessor (BusesProperties()
        #if JucePlugin_IsSynth
         .withInput  ("Main",  AudioChannelSet::stereo(), false)
@@ -186,7 +188,7 @@ ElementPluginAudioProcessor::ElementPluginAudioProcessor()
     asyncPrepare.reset (new AsyncPrepare (*this));
 }
 
-ElementPluginAudioProcessor::~ElementPluginAudioProcessor()
+PluginProcessor::~PluginProcessor()
 {
     asyncPrepare.reset();
 
@@ -207,12 +209,12 @@ ElementPluginAudioProcessor::~ElementPluginAudioProcessor()
     world = nullptr;
 }
 
-const String ElementPluginAudioProcessor::getName() const
+const String PluginProcessor::getName() const
 {
     return "Element";
 }
 
-bool ElementPluginAudioProcessor::acceptsMidi() const
+bool PluginProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -221,7 +223,7 @@ bool ElementPluginAudioProcessor::acceptsMidi() const
    #endif
 }
 
-bool ElementPluginAudioProcessor::producesMidi() const
+bool PluginProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -230,7 +232,7 @@ bool ElementPluginAudioProcessor::producesMidi() const
    #endif
 }
 
-bool ElementPluginAudioProcessor::isMidiEffect() const
+bool PluginProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -239,35 +241,35 @@ bool ElementPluginAudioProcessor::isMidiEffect() const
    #endif
 }
 
-double ElementPluginAudioProcessor::getTailLengthSeconds() const
+double PluginProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
 
-int ElementPluginAudioProcessor::getNumPrograms()
+int PluginProcessor::getNumPrograms()
 {
     return 1;
 }
 
-int ElementPluginAudioProcessor::getCurrentProgram()
+int PluginProcessor::getCurrentProgram()
 {
     return 0;
 }
 
-void ElementPluginAudioProcessor::setCurrentProgram (int index)
+void PluginProcessor::setCurrentProgram (int index)
 {
 }
 
-const String ElementPluginAudioProcessor::getProgramName (int index)
+const String PluginProcessor::getProgramName (int index)
 {
     return  { "Default" };
 }
 
-void ElementPluginAudioProcessor::changeProgramName (int index, const String& newName)
+void PluginProcessor::changeProgramName (int index, const String& newName)
 {
 }
 
-void ElementPluginAudioProcessor::prepareToPlay(double sr, int bs)
+void PluginProcessor::prepareToPlay(double sr, int bs)
 {
     if (!MessageManager::getInstance()->isThisTheMessageThread())
     {
@@ -319,12 +321,12 @@ void ElementPluginAudioProcessor::prepareToPlay(double sr, int bs)
 
     updateLatencySamples();
     engine->sampleLatencyChanged.connect (
-        std::bind (&ElementPluginAudioProcessor::updateLatencySamples, this));
+        std::bind (&PluginProcessor::updateLatencySamples, this));
 
     shouldProcess.set (true);
 }
 
-void ElementPluginAudioProcessor::releaseResources()
+void PluginProcessor::releaseResources()
 {
     DBG("[EL] release resources: " << (int) prepared);
     if (engine)
@@ -335,7 +337,7 @@ void ElementPluginAudioProcessor::releaseResources()
     }
 }
 
-void ElementPluginAudioProcessor::reloadEngine()
+void PluginProcessor::reloadEngine()
 {
     jassert(MessageManager::getInstance()->isThisTheMessageThread());
 
@@ -359,13 +361,13 @@ void ElementPluginAudioProcessor::reloadEngine()
     suspendProcessing (wasSuspended);
 }
 
-void ElementPluginAudioProcessor::reset()
+void PluginProcessor::reset()
 {
     DBG("[EL] plugin reset");
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool ElementPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -387,7 +389,7 @@ bool ElementPluginAudioProcessor::isBusesLayoutSupported (const BusesLayout& lay
 }
 #endif
 
-void ElementPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi)
+void PluginProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi)
 {
     ScopedNoDenormals noDenormals;
 
@@ -409,16 +411,16 @@ void ElementPluginAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiB
     engine->processExternalBuffers (buffer, midi);
 }
 
-bool ElementPluginAudioProcessor::hasEditor() const { return true; }
+bool PluginProcessor::hasEditor() const { return true; }
 
-AudioProcessorEditor* ElementPluginAudioProcessor::createEditor()
+AudioProcessorEditor* PluginProcessor::createEditor()
 {
     if (auto* gui = controller->findChild<GuiController>())
         gui->stabilizeContent();
-    return new ElementPluginAudioProcessorEditor (*this);
+    return new PluginEditor (*this);
 }
 
-void ElementPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
+void PluginProcessor::getStateInformation (MemoryBlock& destData)
 {
     if (auto session = world->getSession())
     {
@@ -445,7 +447,7 @@ void ElementPluginAudioProcessor::getStateInformation (MemoryBlock& destData)
     }
 }
 
-void ElementPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
     DBG("[EL] restore state: prepared: " << (int) prepared);
     
@@ -493,25 +495,25 @@ void ElementPluginAudioProcessor::setStateInformation (const void* data, int siz
     }
 }
 
-void ElementPluginAudioProcessor::numChannelsChanged()
+void PluginProcessor::numChannelsChanged()
 {
     DBG("[EL] num channels changed: " <<
         getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 }
 
-void ElementPluginAudioProcessor::numBusesChanged()
+void PluginProcessor::numBusesChanged()
 {
     DBG("[EL] num buses changed: " <<
         getBusCount (true) << "/" << getBusCount (false));
 }
 
-void ElementPluginAudioProcessor::processorLayoutsChanged()
+void PluginProcessor::processorLayoutsChanged()
 {
     DBG("[EL] layout changed: prepared: " << (int) prepared);
     triggerAsyncUpdate();
 }
 
-void ElementPluginAudioProcessor::handleAsyncUpdate()
+void PluginProcessor::handleAsyncUpdate()
 {
     DBG("[EL] handle async update");
     reloadEngine();
@@ -538,7 +540,7 @@ void ElementPluginAudioProcessor::handleAsyncUpdate()
     onPerfParamsChanged();
 }
 
-bool ElementPluginAudioProcessor::isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const
+bool PluginProcessor::isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const
 {
     if (! boundNode.isValid() || boundParam == GraphNode::NoParameter)
         return false;
@@ -548,7 +550,7 @@ bool ElementPluginAudioProcessor::isNodeBoundToAnyPerformanceParameter (const No
     return false;
 }
 
-PopupMenu ElementPluginAudioProcessor::getPerformanceParameterMenu (int perfParam)
+PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
 { 
     auto* const paramObj = perfparams [perfParam];
     if (nullptr == paramObj)
@@ -607,7 +609,7 @@ PopupMenu ElementPluginAudioProcessor::getPerformanceParameterMenu (int perfPara
     return menu;
 }
 
-void ElementPluginAudioProcessor::handlePerformanceParameterResult (int result, int perfParam)
+void PluginProcessor::handlePerformanceParameterResult (int result, int perfParam)
 {
     auto* const param = perfparams [perfParam];
     if (! param)
@@ -636,7 +638,7 @@ void ElementPluginAudioProcessor::handlePerformanceParameterResult (int result, 
     menuMap.clearQuick (true);
 }
 
-void ElementPluginAudioProcessor::setForceZeroLatency (bool force)
+void PluginProcessor::setForceZeroLatency (bool force)
 {
     if (force == forceZeroLatency)
         return;
@@ -644,7 +646,7 @@ void ElementPluginAudioProcessor::setForceZeroLatency (bool force)
     updateLatencySamples();
 }
 
-int ElementPluginAudioProcessor::calculateLatencySamples() const
+int PluginProcessor::calculateLatencySamples() const
 {
     if (forceZeroLatency)
         return 0;
@@ -652,12 +654,14 @@ int ElementPluginAudioProcessor::calculateLatencySamples() const
                              : 0;
 }
 
-void ElementPluginAudioProcessor::updateLatencySamples()
+void PluginProcessor::updateLatencySamples()
 {
     setLatencySamples (calculateLatencySamples());
 }
 
+}
+
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new ElementPluginAudioProcessor();
+    return new Element::PluginProcessor();
 }
