@@ -10,9 +10,8 @@ def set_intree_lua_paths():
 
 def options():
     parser = OptionParser()
-    parser.add_option ("--system-lua",
-                       action="store_true", dest="syslua", default=False,
-                       help="Load system lua modules and scripts instead of in tree")
+    parser.add_option ("--system-lua", action="store_true", dest="syslua", default=False,
+        help="Load system lua modules and scripts instead of in tree")
 
     (opts, args) = parser.parse_args()
     return opts

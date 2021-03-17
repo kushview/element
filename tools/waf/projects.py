@@ -19,7 +19,7 @@ def projucer (ctx):
         return ctx.env.PROJUCER
     return projucer_fallback()
 
-def resave (ctx = None):
+def resave (ctx):
     # Resave all projects
     exe = projucer (ctx)
     exe.append ('--resave')
@@ -35,6 +35,27 @@ def resave (ctx = None):
         stdout=devnull, stderr=subprocess.STDOUT)
     devnull.close()
     print ("Done!")
+
+def set_versions (ctx, appvers, pluginvers):
+    prog = projucer (ctx)
+    if not isinstance (prog, list) and len(prog) > 0:
+        return
+
+    call    = subprocess.call
+    devnull = open (os.devnull, 'w')
+
+    print ("Updating project versions")
+    for project in PROJUCER_PROJECTS:
+        cmd = prog + [ '--set-version' ]
+        version = ''
+        if 'Standalone' in project: version = appvers
+        else: version = pluginvers
+        print (os.path.basename (project))        
+        cmd += [ version, project ]
+        call (cmd)
+
+    call (['bash', 'tools/copybin.sh'],
+        stdout=devnull, stderr=subprocess.STDOUT)
 
 # from waflib import Task, TaskGen
 # from waflib.TaskGen import feature, after_method

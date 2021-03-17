@@ -444,22 +444,8 @@ def docs (ctx):
     build_lua_docs (ctx)
 
 def versionbump (ctx):
-    apps = [
-        'tools/jucer/Standalone/Element.jucer',
-    ]
-    plugins = [
-        'tools/jucer/Element/Element.jucer',
-        'tools/jucer/ElementFX/ElementFX.jucer',
-        'tools/jucer/ElementMFX/ElementMFX.jucer'
-    ]
-
-    prog = ctx.env.PROJUCER
-    if isinstance (prog, list) and len(prog) > 0:
-        cmd = prog + [ '--set-version', VERSION ]
-        for app in apps: call (cmd + [app])
-        cmd = prog + [ '--set-version', PLUGIN_VERSION ]
-        for plugin in plugins: call (cmd + [plugin])
-        call (['bash', 'tools/copybin.sh'])
+    import projects
+    projects.set_versions (ctx, VERSION, PLUGIN_VERSION)
 
 def resave (ctx):
     import projects
