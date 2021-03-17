@@ -9,6 +9,7 @@
     Eliot Akira (eliot-akira)
     Max Hunter (nippoo)
     Steve Schow (steveschow)
+    Trevor Parscal (trevorparscal)
     iamvs2002
     jatinchowdhury18
     mmoole. (mmoole)
