@@ -398,7 +398,7 @@ def install_lua_files (bld):
 def build (bld):
     if bld.is_install and juce.is_mac():
         bld.fatal ("waf install not supported on OSX")
-        
+
     bld.add_pre_fun (configure_git_version)
     # build_lua_lib (bld)
     build_app (bld)

@@ -20,7 +20,9 @@ def projucer (ctx):
     return projucer_fallback()
 
 def resave (ctx):
-    # Resave all projects
+    """
+    Resave all projects
+    """
     exe = projucer (ctx)
     exe.append ('--resave')
     call = subprocess.call
@@ -35,6 +37,20 @@ def resave (ctx):
         stdout=devnull, stderr=subprocess.STDOUT)
     devnull.close()
     print ("Done!")
+
+def resave_resources (ctx):
+    exe = projucer (ctx)
+    if exe:
+        exe.append ('--resave-resources')
+        call = subprocess.call
+        devnull = open (os.devnull, 'w')
+
+        call (exe + ['tools/jucer/Standalone/Element.jucer'])#,
+            # stdout=devnull, stderr=subprocess.STDOUT)
+        call (['bash', 'tools/copybin.sh'],
+            stdout=devnull, stderr=subprocess.STDOUT)
+
+        devnull.close()
 
 def update_version (ctx):
     prog = projucer (ctx)
