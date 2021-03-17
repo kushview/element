@@ -97,7 +97,7 @@ private:
     GuiController& owner;
 };
 
-static ScopedPointer<GlobalLookAndFeel> sGlobalLookAndFeel;
+static std::unique_ptr<GlobalLookAndFeel> sGlobalLookAndFeel;
 static Array<GuiController*> sGuiControllerInstances;
 
 GuiController::GuiController (Globals& w, AppController& a)
@@ -106,11 +106,11 @@ GuiController::GuiController (Globals& w, AppController& a)
       windowManager (nullptr),
       mainWindow (nullptr)
 {
-    keys = new KeyPressManager (*this);
+    keys.reset (new KeyPressManager (*this));
     if (sGuiControllerInstances.size() <= 0)
-        sGlobalLookAndFeel = new GlobalLookAndFeel();
+        sGlobalLookAndFeel.reset (new GlobalLookAndFeel());
     sGuiControllerInstances.add (this);
-    windowManager = new WindowManager (*this);
+    windowManager.reset (new WindowManager (*this));
 }
 
 GuiController::~GuiController()
@@ -169,14 +169,16 @@ void GuiController::deactivate()
 
     if (mainWindow)
     {
-        mainWindow->removeKeyListener (keys);
-        keys = nullptr;
-
+        if (keys)
+            mainWindow->removeKeyListener (keys.get());
+        
         closeAllWindows();
         mainWindow->setVisible (false);
         mainWindow->removeFromDesktop();
         mainWindow = nullptr;
     }
+
+    keys = nullptr;
 
     if (windowManager)
     {
@@ -257,7 +259,7 @@ ContentComponent* GuiController::getContentComponent()
 {
     if (! content)
     {
-        content = ContentComponent::create (controller);
+        content.reset (ContentComponent::create (controller));
         content->setSize (760, 480);
     }
     
@@ -343,11 +345,11 @@ void GuiController::run()
     auto& settings = getWorld().getSettings();
     PropertiesFile* const pf = settings.getUserSettings();
 
-    mainWindow = new MainWindow (world);
+    mainWindow.reset (new MainWindow (world));
     mainWindow->setContentNonOwned (getContentComponent(), true);
     mainWindow->centreWithSize (content->getWidth(), content->getHeight());
     mainWindow->restoreWindowStateFromString (pf->getValue ("mainWindowState"));
-    mainWindow->addKeyListener (keys);
+    mainWindow->addKeyListener (keys.get());
     mainWindow->addKeyListener (commander().getKeyMappings());
     getContentComponent()->restoreState (pf);
 
@@ -885,7 +887,7 @@ void GuiController::toggleAboutScreen()
 {
     if (! about)
     {
-        about = new AboutDialog (*this);
+        about.reset (new AboutDialog (*this));
     }
 
     jassert (about);

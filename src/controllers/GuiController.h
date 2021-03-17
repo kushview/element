@@ -139,16 +139,16 @@ private:
     AppController& controller;
     Globals& world;
     SessionRef sessionRef;
-    OwnedArray<PluginWindow>         pluginWindows;
-    ScopedPointer<WindowManager>     windowManager;
-    ScopedPointer<MainWindow>        mainWindow;
-    ScopedPointer<ContentComponent>  content;
-    ScopedPointer<DialogWindow>      about;
-    std::unique_ptr<Component>       activation;
+    OwnedArray<PluginWindow>            pluginWindows;
+    std::unique_ptr<WindowManager>      windowManager;
+    std::unique_ptr<MainWindow>         mainWindow;
+    std::unique_ptr<ContentComponent>   content;
+    std::unique_ptr<DialogWindow>       about;
+
     Node selectedNode; // TODO: content manager
 
     struct KeyPressManager;
-    ScopedPointer<KeyPressManager> keys;
+    std::unique_ptr<KeyPressManager> keys;
 
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;
