@@ -15,7 +15,8 @@ def projucer_fallback():
         return ['Projucer']
 
 def projucer (ctx):
-    if ctx and isinstance (ctx.env.PROJUCER, list):
+    if ctx and isinstance (ctx.env.PROJUCER, list) \
+           and len (ctx.env.PROJUCER) > 0:
         return ctx.env.PROJUCER
     return projucer_fallback()
 
