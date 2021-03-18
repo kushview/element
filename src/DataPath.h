@@ -44,6 +44,12 @@ public:
     /** Returns the default user data path */
     static const File defaultLocation();
 
+    /** Returns the default User data path */
+    static const File defaultUserDataPath();
+
+    /** Returns the default scripts dir (user) */
+    static const File defaultScriptsDir();
+
     /** Returns the default session directory */
     static const File defaultSessionDir();
 

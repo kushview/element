@@ -25,7 +25,7 @@ namespace Element
     {
         StringArray getSubDirs()
         {
-            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates", "Sessions" });
+            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates", "Scripts", "Sessions" });
         }
         
         void initializeUserLibrary (const File& path)
@@ -42,7 +42,7 @@ namespace Element
     
     DataPath::DataPath()
     {
-        root = defaultLocation();
+        root = defaultUserDataPath();
         DataPathHelpers::initializeUserLibrary (root);
     }
     
@@ -59,6 +59,12 @@ namespace Element
        #endif
     }
     
+    const File DataPath::defaultUserDataPath()
+    {
+        return File::getSpecialLocation(File::userMusicDirectory)
+            .getChildFile("Element");
+    }
+
     const File DataPath::defaultSettingsFile()
     {
        #if JUCE_DEBUG
@@ -70,13 +76,13 @@ namespace Element
     
     const File DataPath::defaultLocation()
     {
-        return File::getSpecialLocation (File::userMusicDirectory)
-            .getChildFile ("Element");
+        return defaultUserDataPath();
     }
     
-    const File DataPath::defaultSessionDir()        { return defaultLocation().getChildFile ("Sessions"); }
-    const File DataPath::defaultGraphDir()          { return defaultLocation().getChildFile ("Graphs"); }
-    const File DataPath::defaultControllersDir()    { return defaultLocation().getChildFile ("Controllers"); }
+    const File DataPath::defaultScriptsDir()        { return defaultUserDataPath().getChildFile ("Scripts"); }
+    const File DataPath::defaultSessionDir()        { return defaultUserDataPath().getChildFile ("Sessions"); }
+    const File DataPath::defaultGraphDir()          { return defaultUserDataPath().getChildFile ("Graphs"); }
+    const File DataPath::defaultControllersDir()    { return defaultUserDataPath().getChildFile ("Controllers"); }
 
     File DataPath::createNewPresetFile (const Node& node, const String& name) const
     {

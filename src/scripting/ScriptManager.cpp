@@ -170,9 +170,7 @@ File ScriptManager::getHomeScriptsDir()
 
 File ScriptManager::getUserScriptsDir()
 {
-    return DataPath::applicationDataDir()
-        .getChildFile ("Scripts")
-        .getFullPathName();
+    return DataPath::defaultScriptsDir().getFullPathName();
 }
 
 }

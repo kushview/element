@@ -186,9 +186,7 @@ static String getHomeScriptsDir()
 
 static String getUserScriptsDir()
 {
-    return DataPath::applicationDataDir()
-        .getChildFile ("Scripts")
-        .getFullPathName();
+    return ScriptManager::getUserScriptsDir().getFullPathName();
 }
 
 static File getAppImageLuaPath()
@@ -208,10 +206,8 @@ static String getScriptSearchPath()
 {
     if (auto* scriptPath = std::getenv ("ELEMENT_SCRIPTS_PATH"))
         return String::fromUTF8 (scriptPath).trim();
-    
     StringArray dirs;
     dirs.add (getUserScriptsDir());
-
 
     #if JUCE_WINDOWS
       #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
