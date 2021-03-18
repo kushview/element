@@ -38,7 +38,7 @@
 #include "Messages.h"
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../../tools/jucer/Element/Source/PluginEditor.h"
+ #include "plugins/PluginEditor.h"
 #endif
 
 namespace Element {
@@ -105,7 +105,7 @@ ContentComponent* findContentComponent (Component* c)
         return pw->getElementContentComponent();
 
    #if EL_RUNNING_AS_PLUGIN
-    if (auto* ed = c->findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+    if (auto* ed = c->findParentComponentOfClass<PluginEditor>())
         return ed->getContentComponent();
    #endif
     

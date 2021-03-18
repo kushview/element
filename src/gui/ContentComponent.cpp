@@ -43,7 +43,7 @@
 #include "gui/ContentComponent.h"
 
 #if EL_RUNNING_AS_PLUGIN
- #include "../../tools/jucer/Element/Source/PluginEditor.h"
+ #include "plugins/PluginEditor.h"
 #endif
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
@@ -58,7 +58,7 @@ ContentView::ContentView()
 {
     addKeyListener (this);
 }
-    
+
 ContentView::~ContentView()
 {
     removeKeyListener (this);
@@ -267,7 +267,7 @@ public:
                 MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
 
            #if EL_RUNNING_AS_PLUGIN
-            if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+            if (auto* pe = findParentComponentOfClass<PluginEditor>())
             {
                 menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
                 menu.addItem (99997,  "Report zero latency", true, pe->isReportingZeroLatency());
@@ -283,14 +283,14 @@ public:
             else if (99998 == result)
             {
                #if EL_RUNNING_AS_PLUGIN
-                if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+                if (auto* pe = findParentComponentOfClass<PluginEditor>())
                     pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
                #endif
             }
             else if (99997 == result)
             {
                #if EL_RUNNING_AS_PLUGIN
-                if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+                if (auto* pe = findParentComponentOfClass<PluginEditor>())
                 {
                     pe->setReportZeroLatency (!pe->isReportingZeroLatency());
                     owner.refreshStatusBar();
@@ -421,7 +421,7 @@ public:
        #if EL_RUNNING_AS_PLUGIN
         String text = "Latency: ";
 
-        if (auto* pe = findParentComponentOfClass<ElementPluginAudioProcessorEditor>())
+        if (auto* pe = findParentComponentOfClass<PluginEditor>())
         {
             const int latencySamples = pe->getLatencySamples();
             text << latencySamples << " samples";
