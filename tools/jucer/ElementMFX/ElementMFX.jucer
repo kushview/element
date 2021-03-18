@@ -712,6 +712,7 @@
       <FILE id="TTa23Y" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
       <FILE id="ajChn7" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
     </GROUP>
+    <FILE id="lsuqJS" name="ElementMFX.cpp" compile="1" resource="0" file="Source/ElementMFX.cpp"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"

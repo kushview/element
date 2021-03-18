@@ -712,6 +712,7 @@
       <FILE id="DZbsWy" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
       <FILE id="sIyJPv" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
     </GROUP>
+    <FILE id="Vv5wbr" name="ElementFX.cpp" compile="1" resource="0" file="Source/ElementFX.cpp"/>
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
