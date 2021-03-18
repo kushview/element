@@ -719,7 +719,7 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=0"
+    <XCODE_MAC targetFolder="Builds/MacOSX" externalLibraries="" extraDefs="JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;JUCE_DISABLE_AUDIOPROCESSOR_BEGIN_END_GESTURE_CHECKING=0"
                extraLinkerFlags="" bigIcon="zjwu85" smallIcon="zjwu85" iosDevelopmentTeamID=""
                extraFrameworks="" customPList="&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&#10;&#10;&lt;!DOCTYPE plist PUBLIC &quot;-//Apple//DTD PLIST 1.0//EN&quot; &quot;http://www.apple.com/DTDs/PropertyList-1.0.dtd&quot;&gt;&#10;&lt;plist&gt;&#10;    &lt;dict&gt;&#10;        &lt;key&gt;CFBundleDisplayName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_DISPLAY_NAME)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleIdentifier&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_IDENTIFIER)&lt;/string&gt;&#10;        &lt;key&gt;CFBundleName&lt;/key&gt;&#10;        &lt;string&gt;$(BUNDLE_NAME)&lt;/string&gt;&#10;        &lt;key&gt;NSAppTransportSecurity&lt;/key&gt;&#10;        &lt;dict&gt;&#10;            &lt;key&gt;NSAllowsArbitraryLoads&lt;/key&gt;&#10;            &lt;true/&gt;&#10;        &lt;/dict&gt;&#10;    &lt;/dict&gt;&#10;&lt;/plist&gt;&#10;"
                documentExtensions="elc,elg,els" hardenedRuntime="1" iosInAppPurchases="0"
