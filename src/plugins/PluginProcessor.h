@@ -334,11 +334,22 @@ private:
 class PluginProcessor  : public AudioProcessor,
                                      private AsyncUpdater
 {
-public:    
-    PluginProcessor();
-    ~PluginProcessor();
+public:
+    enum Variant
+    {
+        Instrument,
+        Effect,
+        MidiEffect
+    };
+
+    explicit PluginProcessor (Variant instanceType = Instrument, int numBuses = 0);
+    ~PluginProcessor() override;
+
+    const String getName() const override;
+    Variant getVariant() const { return variant; }
 
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
+    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
     void releaseResources() override;
     void reset() override;
 
@@ -346,31 +357,30 @@ public:
     PopupMenu getPerformanceParameterMenu (int perfParam);
     void handlePerformanceParameterResult (int result, int perfParam);
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
-    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
-
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
+    //==========================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
-    const String getName() const override;
-
+    //==========================================================================
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect () const override;
+
+    //==========================================================================
     double getTailLengthSeconds() const override;
 
+    //==========================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
 
+    //==========================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    //==========================================================================
     void numChannelsChanged() override;
     void numBusesChanged() override;
     void processorLayoutsChanged() override;
@@ -390,6 +400,9 @@ public:
 
     Signal<void()> onPerfParamsChanged;
 
+protected:
+    bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
+
 private:
     Array<PerformanceParameter*> perfparams;
     struct PerfParamMenuItem
@@ -399,9 +412,11 @@ private:
         bool unlink = false;
     };
 
+    const Variant variant;
+
     OwnedArray<PerfParamMenuItem> menuMap;
-    ScopedPointer<Globals> world;
-    ScopedPointer<AppController> controller;
+    std::unique_ptr<Globals> world;
+    std::unique_ptr<AppController> controller;
     AudioEnginePtr engine;
     
     bool initialized = false;
@@ -428,10 +443,11 @@ private:
         int bufferSize = 0;
         double sampleRate = 0.0;
     public:
-        AsyncPrepare(AudioProcessor& p)
+        AsyncPrepare (AudioProcessor& p)
             : processor(p) { }
         ~AsyncPrepare() { cancelPendingUpdate();  }
-        void prepare(double s, int b)
+        
+        void prepare (double s, int b)
         {
             cancelPendingUpdate();
             bufferSize = b;
@@ -443,16 +459,16 @@ private:
             processor.prepareToPlay (sampleRate, bufferSize);
         }
     };
+
     std::unique_ptr<AsyncPrepare> asyncPrepare;
 
     friend class AsyncUpdater;
     void handleAsyncUpdate() override;
     void reloadEngine();
-    void initialize();
     
     var hasCheckedLicense { 0 };    
     int calculateLatencySamples() const;
-
+    static BusesProperties createDefaultBuses (Variant variant, int numAux);
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginProcessor)
 };
 

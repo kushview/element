@@ -31,7 +31,8 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-// #include "../../../libs/compat/BinaryData.cpp"
+// #define PLUGIN_DBG(msg) DBG(msg)
+#define PLUGIN_DBG(msg)
 
 namespace Element {
 
@@ -46,7 +47,7 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
     else if (tree.hasType (Tags::controller) ||
              tree.hasType (Tags::control))
     {
-        DBG("[EL] set missing for: " << tree.getProperty(Tags::name).toString());
+        PLUGIN_DBG("[EL] set missing for: " << tree.getProperty(Tags::name).toString());
     }
 }
 
@@ -57,83 +58,17 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 #define mapsctl controller->findChild<MappingController>()
 #define devsctl controller->findChild<DevicesController>()
 
+
+
 //=============================================================================
-PluginProcessor::PluginProcessor()
-    : AudioProcessor (BusesProperties()
-       #if JucePlugin_IsSynth
-        .withInput  ("Main",  AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 1", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 2", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 3", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 4", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 5", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 6", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 7", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 8", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 9", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 10", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 11", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 12", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 13", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 14", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 15", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 16", AudioChannelSet::stereo(), false)
-        
-        .withOutput ("Main",  AudioChannelSet::stereo(), true)
-        .withOutput  ("Aux 1", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 2", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 3", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 4", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 5", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 6", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 7", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 8", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 9", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 10", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 11", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 12", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 13", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 14", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 15", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 16", AudioChannelSet::stereo(), false))
-       #else
-        .withInput  ("Main",  AudioChannelSet::stereo(), true)
-        .withInput  ("Aux 1", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 2", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 3", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 4", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 5", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 6", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 7", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 8", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 9", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 10", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 11", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 12", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 13", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 14", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 15", AudioChannelSet::stereo(), false)
-        .withInput  ("Aux 16", AudioChannelSet::stereo(), false)
-        
-        .withOutput ("Main",  AudioChannelSet::stereo(), true)
-        .withOutput  ("Aux 1", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 2", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 3", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 4", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 5", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 6", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 7", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 8", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 9", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 10", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 11", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 12", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 13", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 14", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 15", AudioChannelSet::stereo(), false)
-        .withOutput  ("Aux 16", AudioChannelSet::stereo(), false))
-       #endif
+PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
+    : AudioProcessor (createDefaultBuses (instanceType, jmax (0, numBuses))),
+      variant (instanceType)
 {
+    setRateAndBufferSizeDetails (sampleRate, bufferSize);
+    numIns  = getTotalNumInputChannels();
+    numOuts = getTotalNumOutputChannels();
+
     for (int i = 0; i < 8; ++i)
     {
         auto* param = new PerformanceParameter (i);
@@ -142,48 +77,45 @@ PluginProcessor::PluginProcessor()
     }
 
     prepared = controllerActive = false;
-    world = new Globals();
-    
-    controller = new AppController (*world);
-    engine = new AudioEngine (*world);
-    world->setEngine (engine);
+    world.reset (new Globals());
+    world->setEngine (new AudioEngine (*world));
+    engine = world->getAudioEngine();
     SessionPtr session = world->getSession();
+    Settings& settings (world->getSettings());
+    PluginManager& plugins (world->getPluginManager());
+    engine->applySettings (settings);
 
-    if (true)
+    plugins.addDefaultFormats();
+    plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
+    plugins.addFormat (new ElementAudioPluginFormat (*world));
+    plugins.restoreUserPlugins (settings);
+
+    // The hosts WILL release and prepare the plugin frequently at any given
+    // time. plugins are handled different by each one, so it's best to keep
+    // our engine running at all times to reduce massive plugin unloads and
+    // re-loads back to back.
+    engine->prepareExternalPlayback (sampleRate, bufferSize,
+                                     getTotalNumInputChannels(),
+                                     getTotalNumOutputChannels());
+    session->clear();
+    if (MessageManager::getInstance()->isThisTheMessageThread())
     {
-        Settings& settings (world->getSettings());
-        PluginManager& plugins (world->getPluginManager());
-        engine->applySettings (settings);
-
-        plugins.addDefaultFormats();
-        plugins.addFormat (new InternalFormat (*engine, world->getMidiEngine()));
-        plugins.addFormat (new ElementAudioPluginFormat (*world));
-        plugins.restoreUserPlugins (settings);
-
-        // The hosts WILL release and prepare the plugin frequently at any given time.
-        // plugins are handled different by each one, so it's best to keep our engine
-        // running at all times to reduce massive plugin unloads and re-loads back to back.
-        engine->prepareExternalPlayback (sampleRate, bufferSize,
-                                         getTotalNumInputChannels(),
-                                         getTotalNumOutputChannels());
-        session->clear();
-        if (MessageManager::getInstance()->isThisTheMessageThread())
-        {
-            session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
-            DBG("[EL] default graph created");
-        }
-        else
-        {
-            DBG("[EL] couldn't create default graph");
-        }
-        controller->activate();
-        controllerActive = true;
-
-        enginectl->sessionReloaded();
-        mapsctl->learn (false);
-        devsctl->refresh();
-        shouldProcess.set (true);
+        session->addGraph (Node::createDefaultGraph ("Graph 1"), true);
+        PLUGIN_DBG("[EL] default graph created");
     }
+    else
+    {
+        PLUGIN_DBG("[EL] couldn't create default graph");
+    }
+
+    controller.reset (new AppController (*world));   
+    controller->activate();
+    controllerActive = true;
+
+    enginectl->sessionReloaded();
+    mapsctl->learn (false);
+    devsctl->refresh();
+    shouldProcess.set (true);
 
     asyncPrepare.reset (new AsyncPrepare (*this));
 }
@@ -205,87 +137,54 @@ PluginProcessor::~PluginProcessor()
         session->clear();
 
     world->setEngine (nullptr);
+    engine = nullptr;
     controller = nullptr;
     world = nullptr;
 }
 
 const String PluginProcessor::getName() const
 {
+    switch (variant)
+    {
+        case Instrument:    return "Element"; break;
+        case Effect:        return "Element FX"; break;
+        case MidiEffect:    return "Element MFX"; break;
+        default: break;
+    }
+
+    jassertfalse;
     return "Element";
 }
 
-bool PluginProcessor::acceptsMidi() const
-{
-   #if JucePlugin_WantsMidiInput
-    return true;
-   #else
-    return false;
-   #endif
-}
+bool PluginProcessor::acceptsMidi() const   { return true; }
+bool PluginProcessor::producesMidi() const  { return true; }
+bool PluginProcessor::isMidiEffect() const  { return variant == MidiEffect; }
 
-bool PluginProcessor::producesMidi() const
-{
-   #if JucePlugin_ProducesMidiOutput
-    return true;
-   #else
-    return false;
-   #endif
-}
+double PluginProcessor::getTailLengthSeconds() const { return 0.0; }
 
-bool PluginProcessor::isMidiEffect() const
-{
-   #if JucePlugin_IsMidiEffect
-    return true;
-   #else
-    return false;
-   #endif
-}
-
-double PluginProcessor::getTailLengthSeconds() const
-{
-    return 0.0;
-}
-
-int PluginProcessor::getNumPrograms()
-{
-    return 1;
-}
-
-int PluginProcessor::getCurrentProgram()
-{
-    return 0;
-}
-
-void PluginProcessor::setCurrentProgram (int index)
-{
-}
-
-const String PluginProcessor::getProgramName (int index)
-{
-    return  { "Default" };
-}
-
-void PluginProcessor::changeProgramName (int index, const String& newName)
-{
-}
+int PluginProcessor::getNumPrograms()       { return 1; }
+int PluginProcessor::getCurrentProgram()    { return 0; }
+void PluginProcessor::setCurrentProgram (int index) { ignoreUnused (index); }
+const String PluginProcessor::getProgramName (int index) { ignoreUnused (index); return { "Default" }; }
+void PluginProcessor::changeProgramName (int index, const String& newName) { ignoreUnused (index, newName); }
 
 void PluginProcessor::prepareToPlay(double sr, int bs)
 {
-    if (!MessageManager::getInstance()->isThisTheMessageThread())
+    if (! MessageManager::getInstance()->isThisTheMessageThread())
     {
         asyncPrepare->prepare (sr, bs);
         shouldProcess.set (false);
         return;
     }
 
-    DBG("[EL] prepare to play: prepared=" << (int) prepared <<
+    PLUGIN_DBG("[EL] prepare to play: prepared=" << (int) prepared <<
         " sampleRate: " << sampleRate <<
         " buff: " << bufferSize <<
 		" numIns: " << numIns <<
         " numOuts: " << numOuts);
     
     const bool channelCountsChanged = numIns != getTotalNumInputChannels()
-                                   || numOuts != getTotalNumOutputChannels();
+                                  || numOuts != getTotalNumOutputChannels();
     const bool detailsChanged = sampleRate != sr || bufferSize != bs || channelCountsChanged;
     
 	numIns		= getTotalNumInputChannels();
@@ -302,7 +201,7 @@ void PluginProcessor::prepareToPlay(double sr, int bs)
         
         if (detailsChanged)
         {
-            DBG("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " <<
+            PLUGIN_DBG("[EL] details changed: " << sampleRate << " : " << bufferSize << " : " <<
                  getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
             
             if (channelCountsChanged) // && preparedCount <= 0)
@@ -328,7 +227,7 @@ void PluginProcessor::prepareToPlay(double sr, int bs)
 
 void PluginProcessor::releaseResources()
 {
-    DBG("[EL] release resources: " << (int) prepared);
+    PLUGIN_DBG("[EL] release resources: " << (int) prepared);
     if (engine)
         engine->sampleLatencyChanged.disconnect_all_slots();
     if (prepared)
@@ -363,31 +262,37 @@ void PluginProcessor::reloadEngine()
 
 void PluginProcessor::reset()
 {
-    DBG("[EL] plugin reset");
+    PLUGIN_DBG("[EL] plugin reset");
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
 bool PluginProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
-    return true;
+    bool supported = false;
+    switch (variant)
+    {
+        case Instrument:
+            // require at least a main output bus
+            supported = layouts.outputBuses.size() > 0 &&
+                        layouts.getNumChannels (false, 0) > 0;
+            break;
 
-  #else
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-          && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
-        return false;
+        case Effect:
+            // require at least a main input and output bus
+            supported = layouts.inputBuses.size() > 0 &&
+                        layouts.getNumChannels (true, 0) > 0 &&
+                        layouts.outputBuses.size() > 0 &&
+                        layouts.getNumChannels (false, 0) > 0;
+            break;
 
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
-        return false;
-   #endif
+        case MidiEffect:
+            // buses not supported in midi effect mode
+        default:
+            supported = false;
+            break;
+    }
 
-    return true;
-  #endif
+    return supported;
 }
-#endif
 
 void PluginProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midi)
 {
@@ -449,7 +354,7 @@ void PluginProcessor::getStateInformation (MemoryBlock& destData)
 
 void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    DBG("[EL] restore state: prepared: " << (int) prepared);
+    PLUGIN_DBG("[EL] restore state: prepared: " << (int) prepared);
     
     auto session = world->getSession();
     if (! session || ! shouldProcess.get())
@@ -468,7 +373,7 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
         
         if (error.isNotEmpty())
         {
-            DBG("[EL] plugin failed restoring state: " << error);
+            PLUGIN_DBG("[EL] plugin failed restoring state: " << error);
         }
         else
         {
@@ -486,36 +391,36 @@ void PluginProcessor::setStateInformation (const void* data, int sizeInBytes)
         
         if (prepared)
         {
-            DBG("[EL] plugin restored state while already prepared");
+            PLUGIN_DBG("[EL] plugin restored state while already prepared");
         }
         else
         {
-            DBG("[EL] plugin tried to restore state when not prepared");
+            PLUGIN_DBG("[EL] plugin tried to restore state when not prepared");
         }
     }
 }
 
 void PluginProcessor::numChannelsChanged()
 {
-    DBG("[EL] num channels changed: " <<
+    PLUGIN_DBG("[EL] num channels changed: " <<
         getTotalNumInputChannels() << "/" << getTotalNumOutputChannels());
 }
 
 void PluginProcessor::numBusesChanged()
 {
-    DBG("[EL] num buses changed: " <<
+    PLUGIN_DBG("[EL] num buses changed: " <<
         getBusCount (true) << "/" << getBusCount (false));
 }
 
 void PluginProcessor::processorLayoutsChanged()
 {
-    DBG("[EL] layout changed: prepared: " << (int) prepared);
+    PLUGIN_DBG("[EL] layout changed: prepared: " << (int) prepared);
     triggerAsyncUpdate();
 }
 
 void PluginProcessor::handleAsyncUpdate()
 {
-    DBG("[EL] handle async update");
+    PLUGIN_DBG("[EL] handle async update");
     reloadEngine();
     
     auto session = world->getSession();
@@ -659,9 +564,25 @@ void PluginProcessor::updateLatencySamples()
     setLatencySamples (calculateLatencySamples());
 }
 
+//=============================================================================
+AudioProcessor::BusesProperties PluginProcessor::createDefaultBuses (PluginProcessor::Variant variant, int numAux)
+{
+    if (variant == PluginProcessor::MidiEffect)
+        return {};
+    
+    const auto stereo = AudioChannelSet::stereo();
+
+    AudioProcessor::BusesProperties buses;
+    buses.addBus (true,  "Main", stereo, variant == PluginProcessor::Effect);
+    buses.addBus (false, "Main", stereo, true);
+    for (int i = 0; i < numAux; ++i)
+    {
+        String name = "Aux "; name << String (i + 1);
+        buses.addBus (true,  name, stereo, false);
+        buses.addBus (false, name, stereo, false);
+    }
+    
+    return buses;
 }
 
-AudioProcessor* JUCE_CALLTYPE createPluginFilter()
-{
-    return new Element::PluginProcessor();
 }
