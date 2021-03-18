@@ -976,7 +976,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
     if (auto* ctl = graphs->findGraphManagerFor (graph))
     {
         double x = 0.0, y = 0.0;
-        node.getRelativePosition (x, y);
+        node.getPosition (x, y);
         const auto oldNodeId = node.getNodeId();
         const auto wasWindowOpen = (bool) node.getProperty ("windowVisible");
         const auto nodeId = ctl->addNode (&desc, x, y);
@@ -1018,7 +1018,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
             }
 
             auto newNode (ctl->getNodeModelForId (nodeId));
-            newNode.setRelativePosition (x, y); // TODO: GraphManager should handle these
+            newNode.setPosition (x, y); // TODO: GraphManager should handle these
             newNode.setProperty ("windowX", (int) node.getProperty ("windowX"))
                    .setProperty ("windowY", (int) node.getProperty ("windowY"));
 
