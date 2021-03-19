@@ -136,9 +136,8 @@ def configure (conf):
     conf.env.DEBUG = conf.options.debug
     conf.env.EL_VERSION_STRING = VERSION
     
-    conf.define ('EL_USE_JACK', 0)
     conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
-    conf.define ('EL_DOCKING', 1 if conf.options.enable_docking else 0)
+    conf.define ('EL_DOCKING', True if conf.options.enable_docking else False)
     conf.define ('KV_DOCKING_WINDOWS', 1)
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
@@ -151,26 +150,28 @@ def configure (conf):
 
     print
     juce.display_header ("Element")
-    conf.message ("ALSA",   conf.env.ALSA)
-    conf.message ("JACK",   conf.env.JACK)
-    conf.message ("AU",     juce.is_mac())
-    conf.message ("VST2",   conf.env.VST)
-    conf.message ("VST3",   conf.env.VST3)
-    conf.message ("LADSPA", bool(conf.env.LADSPA))
-    conf.message ("LV2",    bool(conf.env.LV2))
-    conf.message ("Lua",    bool(conf.env.LUA))
+    conf.message ("ALSA",       conf.env.ALSA)
+    conf.message ("JACK",       conf.env.JACK)
+    conf.message ("AU",         juce.is_mac())
+    conf.message ("VST2",       conf.env.VST)
+    conf.message ("VST3",       conf.env.VST3)
+    conf.message ("LADSPA",     bool(conf.env.LADSPA))
+    conf.message ("LV2",        bool(conf.env.LV2))
+    conf.message ("Lua",        bool(conf.env.LUA))
     conf.message ("Workspaces", conf.options.enable_docking)
-    conf.message ("Debug", conf.options.debug)
+    conf.message ("Debug",      conf.options.debug)
 
     print
     conf.display_archs()
-    conf.message ("CC",        ' '.join (conf.env.CC))
-    conf.message ("CXX",       ' '.join (conf.env.CXX))
-    conf.message ("PREFIX",    conf.env.PREFIX)
-    conf.message ("DATADIR",   conf.env.DATADIR)
-    conf.message ("CFLAGS",    conf.env.CFLAGS)
-    conf.message ("CXXFLAGS",  conf.env.CXXFLAGS)
-    conf.message ("LINKFLAGS", conf.env.LINKFLAGS)
+    conf.message ("CC",             ' '.join (conf.env.CC))
+    conf.message ("CXX",            ' '.join (conf.env.CXX))
+    conf.message ("PREFIX",         conf.env.PREFIX)
+    conf.message ("DATADIR",        conf.env.DATADIR)
+    conf.message ("LUADIR",         conf.env.LUADIR)
+    conf.message ("SCRIPTSDIR",     conf.env.SCRIPTSDIR)
+    conf.message ("CFLAGS",         conf.env.CFLAGS)
+    conf.message ("CXXFLAGS",       conf.env.CXXFLAGS)
+    conf.message ("LINKFLAGS",      conf.env.LINKFLAGS)
     
 def common_includes():
     return [ 
@@ -354,6 +355,7 @@ def build_app (bld):
         library.cxxflags += [
             '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
+            '-DEL_LUADIR="%s"'         % libEnv.LUADIR,
             '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
             '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
         ]
