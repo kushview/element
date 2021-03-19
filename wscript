@@ -377,7 +377,8 @@ def build_app (bld):
 
     elif juce.is_mac():
         library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
-                         'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE' ]
+                         'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
+                         'TEMPLATES' ]
         app.target      = 'Applications/Element'
         app.mac_app     = True
         app.mac_plist   = 'data/Info.plist'
@@ -421,6 +422,7 @@ def build (bld):
         source = bld.path.ant_glob ("tools/**/*.in") + \
                  bld.path.ant_glob ("data/**/*.in"),
         install_path = None,
+        name = 'TEMPLATES',
         PACKAGE_VERSION = VERSION
     )
     bld.add_group()
