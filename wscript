@@ -58,16 +58,6 @@ def configure_product (conf):
     conf.env.EL_FREE = False
     conf.env.EL_PRO  = True
 
-def configure_git_version (ctx):
-    if os.path.exists('.git'):
-        process = Popen(["git", "rev-parse", "--short", "HEAD"], stdout=PIPE)
-        (githash, err) = process.communicate()
-        githash = githash.strip()
-        process.wait()
-        ctx.env.GIT_HASH = str(githash)
-    else:
-        ctx.env.GIT_HASH = ''
-
 def make_lua_path (paths):
     out = ''
     if len(paths) > 0:
@@ -95,7 +85,6 @@ def make_lua_cpath (paths):
     return out
 
 def configure (conf):
-    configure_git_version (conf)
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR, 'vst')
@@ -126,11 +115,12 @@ def configure (conf):
     silence_warnings (conf)
 
     conf.find_projucer (mandatory=False)
+    conf.find_program ('git', var='GIT', mandatory=False)
     conf.find_program ('convert', mandatory=False)
     conf.find_program ('ldoc',    mandatory=False)
 
     conf.check_common()
-    if cross.is_mingw(conf): conf.check_mingw()
+    if cross.is_mingw (conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
@@ -426,14 +416,14 @@ def install_lua_files (bld):
 def build (bld):
     if bld.is_install and juce.is_mac():
         bld.fatal ("waf install not supported on OSX")
-    
-    bld.add_pre_fun (configure_git_version)
 
     bld.template (
         source = bld.path.ant_glob ("tools/**/*.in") + \
-                 bld.path.ant_glob ("data/**/*.in")
+                 bld.path.ant_glob ("data/**/*.in"),
+        install_path = None,
+        PACKAGE_VERSION = VERSION
     )
-    bld.add_group ()
+    bld.add_group()
 
     build_lua_lib (bld)
     install_lua_files (bld)
