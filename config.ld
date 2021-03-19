@@ -3,7 +3,7 @@ title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = {
     'libs/lua-kv/src/kv',
-    'libs/lua-kv/src/juce_rectangle.hpp',
+    'libs/lua-kv/kv/lua/rectangle.hpp',
     'libs/lua-kv/kv/lua/widget.hpp',
     'libs/element/lua',
     'scripts',
