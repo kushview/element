@@ -245,9 +245,10 @@ public:
         {
             case 50001:
             {
-                // owner.fileBrowser.setVisible (true);
-                // owner.fileBrowser.toFront (true);
-                
+                owner.chooser.reset (new FileChooser (
+                    "Open script", ScriptManager::getUserScriptsDir(), 
+                    "*.lua", false, false, &owner));
+
                 FileChooser& fc (*owner.chooser);
                 if (fc.browseForFileToOpen())
                 {
@@ -260,7 +261,10 @@ public:
             
             case 50002:
             {
-                FileChooser fc ("Save Script", {}, "*.lua");
+                 owner.chooser.reset (new FileChooser (
+                    "Save script", ScriptManager::getUserScriptsDir(), 
+                    "*.lua", false, false, &owner));
+                FileChooser& fc (*owner.chooser);
                 if (fc.browseForFileToSave (true))
                 {
                     TemporaryFile tmpFile (fc.getResult());
@@ -306,7 +310,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
       state (engine.getLuaState()),
       env (state, sol::create, state.globals()),
       fileBrowser (FileBrowserComponent::openMode | FileBrowserComponent::canSelectFiles, 
-                   ScriptManager::getSystemScriptsDir(), nullptr, nullptr)
+                   ScriptManager::getUserScriptsDir(), nullptr, nullptr)
 {
     setOpaque (true);
 
@@ -341,7 +345,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     lua = getNodeObjectOfType<ScriptNode>();
     jassert (lua);
 
-    chooser.reset (new FileChooser ("Script", ScriptManager::getSystemScriptsDir(),
+    chooser.reset (new FileChooser ("Script", ScriptManager::getUserScriptsDir(),
                                     "*.lua", false, false, this));
 
     addAndMakeVisible (compileButton);
