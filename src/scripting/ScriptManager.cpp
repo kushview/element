@@ -121,7 +121,13 @@ const ScriptArray& ScriptManager::getScriptsDSP() const
     return registry->dsp;
 }
 
+
 //==============================================================================
+File ScriptManager::getApplicationScriptsDir()
+{
+    return DataPath::applicationDataDir().getChildFile ("Scripts");
+}
+
 File ScriptManager::getSystemScriptsDir()
 {
     File dir;
@@ -133,7 +139,8 @@ File ScriptManager::getSystemScriptsDir()
         .getChildFile ("share/element/scripts");
 
    #elif defined (EL_SCRIPTSDIR)
-    dir = File (EL_SCRIPTSDIR);
+    if (File::isAbsolutePath (EL_SCRIPTSDIR))
+        dir = File (EL_SCRIPTSDIR);
 
    #elif JUCE_LINUX
     dir = File ("/usr/local/share/element/scripts");
@@ -142,20 +149,11 @@ File ScriptManager::getSystemScriptsDir()
     dir = File::getSpecialLocation (File::currentApplicationFile)
         .getChildFile ("Contents/Resources/scripts")
         .getFullPathName();
-   #else
+
+   #elif JUCE_WINDOWS
     const auto installDir = DataPath::installDir();
     if (installDir.isDirectory())
-    {
         dir = installDir.getChildFile ("scripts");
-    }
-    else
-    {
-       #if ! EL_RUNNING_AS_PLUGIN
-        dir = File::getSpecialLocation (File::currentExecutableFile)
-            .getParentDirectory()
-            .getChildFile ("scripts");
-       #endif
-    }
    #endif
    
     return dir;
@@ -163,9 +161,11 @@ File ScriptManager::getSystemScriptsDir()
 
 File ScriptManager::getHomeScriptsDir()
 {
+   #if JUCE_LINUX || JUCE_MAC
     return File::getSpecialLocation (File::userHomeDirectory)
         .getChildFile (".local/share/element/scripts")
         .getFullPathName();
+   #endif
 }
 
 File ScriptManager::getUserScriptsDir()

@@ -38,8 +38,20 @@ public:
 
     const ScriptArray& getScriptsDSP() const;
 
+    /** Returns the application's script directory.
+        Scripts in the app data dir
+    */
+    static File getApplicationScriptsDir();
+
+    /** Returns the system scripts directory.
+        The location where scripts were installed or packaged
+    */
     static File getSystemScriptsDir();
+
+    /** Scripts in the users home dir. e.g. ~/.local/share */
     static File getHomeScriptsDir();
+
+    /** User scripts location. e.g. $HOME/Music/Element/Scripts */
     static File getUserScriptsDir();
 
 private:
