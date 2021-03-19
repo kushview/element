@@ -37,7 +37,6 @@
       <dict>
         <key>CFBundleTypeExtensions</key>
         <array>
-          <string>elc</string>
           <string>elg</string>
           <string>els</string>
         </array>
