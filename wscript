@@ -41,6 +41,7 @@ def options (opt):
     opt.add_option ('--ziptype', default='gz', dest='ziptype', type='string', 
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
+    opt.add_option ('--minimal', dest='minimal', default=False, action='store_true')
 def silence_warnings (conf):
     '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
@@ -105,17 +106,14 @@ def configure (conf):
         os.path.join (conf.env.DATADIR, 'scripts')
     ])
 
-    cross.setup_compiler (conf)
-    if len(conf.options.cross) <= 0:
-        conf.prefer_clang()
-    
-    conf.load ("compiler_c compiler_cxx ccache ar cross juce")
+    conf.load ("git")    
+    conf.load ("compiler_c compiler_cxx  ar")
+    conf.load ("juce")
 
     conf.check_cxx_version()
     silence_warnings (conf)
 
     conf.find_projucer (mandatory=False)
-    conf.find_program ('git', var='GIT', mandatory=False)
     conf.find_program ('convert', mandatory=False)
     conf.find_program ('ldoc',    mandatory=False)
 
@@ -415,17 +413,26 @@ def install_lua_files (bld):
                        cwd=bld.path.find_dir ('libs/element/lua'))
 
 def build (bld):
-    if bld.is_install and juce.is_mac():
-        bld.fatal ("waf install not supported on OSX")
+    if bld.is_install:
+        if juce.is_mac(): bld.fatal ("waf install not supported on OSX")
+        if bld.options.minimal: return
+
+    if bld.cmd == 'build':
+        bld.add_pre_fun (bld.git_update_env)
 
     bld.template (
-        source = bld.path.ant_glob ("tools/**/*.in") + \
-                 bld.path.ant_glob ("data/**/*.in"),
+        name = 'TEMPLATES',
+        source = bld.path.ant_glob ('src/**/*.h.in') \
+               + bld.path.ant_glob ('data/**/*.in') \
+               + bld.path.ant_glob ("tools/**/*.in"),
         install_path = None,
         name = 'TEMPLATES',
         PACKAGE_VERSION = VERSION
     )
+
     bld.add_group()
+    if bld.options.minimal:
+        return
 
     build_lua_lib (bld)
     install_lua_files (bld)

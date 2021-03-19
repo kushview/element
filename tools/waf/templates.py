@@ -31,5 +31,8 @@ def template (self, *k, **kw):
     kw['target'] = []
     T = self(*k, **kw)
     for f in T.source:
+        if not f: continue
+        if isinstance (f, str): f = self.path.find_resource (f)
+        if not f: continue
         T.target.append (f.relpath().replace ('.in', ''))
     return T
