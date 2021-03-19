@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#if ! HAVE_LUA
+
 #if defined(JUCE_GLOBAL_MODULE_SETTINGS_INCLUDED)
  #pragma error "Cannot include JUCE before LuaLib.cpp"
  #pragma GCC error "Cannot include JUCE before LuaLib.cpp"
@@ -66,3 +68,5 @@ extern "C" {
 #include "../../libs/lua/src/linit.c"
 #include "../../libs/lua/src/lundump.c"
 }
+
+#endif

@@ -36,8 +36,31 @@ def check_common (self):
 
     # LUA
     self.env.LUA = not bool(self.options.no_lua)
+    if self.env.LUA:
+        self.check_cxx (
+            msg = "Checking for Lua",
+            includes = [
+                self.path.find_node ('libs/lua').abspath(),
+                self.path.find_node ('libs/lua/src').abspath(),
+                self.path.find_node ('libs/lua-kv').abspath(),
+                self.path.find_node ('libs/lua-kv/src').abspath()
+            ],
+            fragment = '''
+                #include <sol/forward.hpp>
+                #include <lua-kv.hpp>
+                #include <kv/lua/object.hpp>
+                int main (int, char**) {
+                    using mystate = sol::state;
+                    return 0;
+                }
+            ''',
+            mandatory       = True,
+            execute         = True,
+            define_name     = 'HAVE_LUA'            
+        )
+        self.env.LUA = bool(self.env.HAVE_LUA)
     self.define ('EL_USE_LUA', self.env.LUA)
-
+    
     # JACK
     self.check_cfg(package='jack', uselib_store="JACK", args='--cflags --libs', mandatory=False)
     self.env.JACK = bool(self.env.HAVE_JACK) and not bool(self.options.no_jack)
@@ -74,7 +97,7 @@ def check_common (self):
         if bool(self.env.HAVE_SUIL):
             self.check_cxx(
                 msg = "Checking for suil_init(...)",
-                fragmant = '''
+                fragment = '''
                     #include <suil/suil.h>
                     int main(int, char**) {
                         suil_init (nullptr, nullptr, SUIL_ARG_NONE);
@@ -82,7 +105,7 @@ def check_common (self):
                     }
                 ''',
                 execute = False,
-                use = ['SUIL'],
+                use = [ 'SUIL' ],
                 uselib_store = 'SUIL_INIT',
                 define_name = 'HAVE_SUIL_INIT',
                 mandatory = False

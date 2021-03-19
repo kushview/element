@@ -98,6 +98,8 @@ def configure (conf):
     configure_git_version (conf)
     conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
     conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
+    conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR, 'vst')
+    conf.env.VST3DIR = os.path.join (conf.env.LIBDIR, 'vst3')
     conf.env.LUADIR  = os.path.join (conf.env.DATADIR, 'lua')
     conf.env.SCRIPTSDIR  = os.path.join (conf.env.DATADIR, 'scripts')
     conf.env.DOCDIR  = os.path.join (conf.env.PREFIX, 'share/doc/element')
@@ -150,42 +152,50 @@ def configure (conf):
 
     print
     juce.display_header ("Element")
-    conf.message ("ALSA",       conf.env.ALSA)
-    conf.message ("JACK",       conf.env.JACK)
-    conf.message ("AU",         juce.is_mac())
+    conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
+    conf.message ("Workspaces", conf.options.enable_docking)
+    conf.message ("Scripting",  bool(conf.env.LUA))
+    conf.message ("Workspaces", conf.options.enable_docking)
+    print
+    juce.display_header ("Audio Devices")
+    conf.message ("Alsa",       conf.env.ALSA)
+    conf.message ("JACK Audio", conf.env.JACK)
+    print
+    juce.display_header ("Plugin Host")
+    conf.message ("AudioUnit",  juce.is_mac())
     conf.message ("VST2",       conf.env.VST)
     conf.message ("VST3",       conf.env.VST3)
     conf.message ("LADSPA",     bool(conf.env.LADSPA))
     conf.message ("LV2",        bool(conf.env.LV2))
-    conf.message ("Lua",        bool(conf.env.LUA))
-    conf.message ("Workspaces", conf.options.enable_docking)
-    conf.message ("Debug",      conf.options.debug)
-
     print
+    juce.display_header ("Plugin Clients")
+    conf.message ("VST2",       conf.env.VST)
+    print
+    juce.display_header ("Paths")
+    conf.message ("Prefix",      conf.env.PREFIX)
+    conf.message ("Data",        conf.env.DATADIR)
+    conf.message ("Modules",     conf.env.LUADIR)
+    conf.message ("Scripts",     conf.env.SCRIPTSDIR)
+    if conf.env.VST:
+        conf.message ("VST",     conf.env.VSTDIR)
+    print
+    juce.display_header ("Compiler")
     conf.display_archs()
     conf.message ("CC",             ' '.join (conf.env.CC))
     conf.message ("CXX",            ' '.join (conf.env.CXX))
-    conf.message ("PREFIX",         conf.env.PREFIX)
-    conf.message ("DATADIR",        conf.env.DATADIR)
-    conf.message ("LUADIR",         conf.env.LUADIR)
-    conf.message ("SCRIPTSDIR",     conf.env.SCRIPTSDIR)
     conf.message ("CFLAGS",         conf.env.CFLAGS)
     conf.message ("CXXFLAGS",       conf.env.CXXFLAGS)
     conf.message ("LINKFLAGS",      conf.env.LINKFLAGS)
-    
+
 def common_includes():
-    return [ 
+    return [
+        VST3_PATH, \
         'libs/JUCE/modules', \
         'libs/kv/modules', \
         'libs/jlv2/modules', \
         'libs/compat', \
         'libs/element/lua', \
-        'libs/lua', \
-        'libs/lua/src', \
-        'libs/lua-kv', \
-        'libs/lua-kv/src', \
         'build/include', \
-        VST3_PATH, \
         'src'
     ]
 
@@ -243,9 +253,12 @@ def build_lua_docs (bld):
 
 def build_lua_lib (bld):
     lua = bld (
-        features = 'c cstlib',
+        features = 'cxx cxxstlib',
         includes = [
-            'libs/lua/src'
+            'libs/lua',
+            'libs/lua/src',
+            'libs/lua-kv',
+            'libs/lua-kv/src',
         ],
         source = '''
             libs/lua/src/lauxlib.c
@@ -281,34 +294,37 @@ def build_lua_lib (bld):
             libs/lua/src/ltm.c
             libs/lua/src/ldo.c
         '''.split(),
-        name = 'LUA',
-        target = 'lib/lua',
+        target  = 'lib/lua',
+        name    = 'LUA',
         install_path = None
     )
+    lua.export_includes = lua.includes
     bld.add_group()
     return lua
 
 def build_vst_linux (bld):
-    libEnv = bld.env.derive()
+    vstEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
-        libEnv.append_unique (k, [ '-fPIC' ])
+        vstEnv.append_unique (k, [ '-fPIC' ])
+    vstEnv.cxxshlib_PATTERN = bld.env.plugin_PATTERN
     vst = bld (
-        features    = 'cxx cxxshlib',
-        source      = common_sources (bld),
-        includes    = common_includes(),
-        target      = 'lib/vst/Element',
-        name        = 'ELEMENT_VST',
-        env         = libEnv,
-        use         = [ 'BOOST_SIGNALS' ]
+        features        = 'cxx cxxshlib',
+        source          = [
+            'tools/jucer/Element/Source/Element.cpp',
+            'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
+        ],
+        includes        = common_includes(),
+        target          = 'lib/vst/Element',
+        name            = 'ELEMENT_VST',
+        env             = vstEnv,
+        use             = [ 'ELEMENT', 'LUA' ],
+        install_path    = bld.env.VSTDIR,
     )
-    if bld.env.LV2:     vst.use += [ 'SUIL', 'LILV', 'LV2' ]
-    if bld.env.JACK:    vst.use += [ 'JACK' ]
-
-    if juce.is_linux():
-        build_desktop (bld)
-        vst.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+    bld.add_group()
 
 def build_vst (bld):
+    if not bld.env.VST:
+        return
     if juce.is_linux(): build_vst_linux (bld)
 
 def copy_app_bundle_lua_files(ctx):
@@ -320,17 +336,25 @@ def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
-
+    
     library = bld (
         features    = 'cxx cxxstlib',
         source      = common_sources (bld),
         includes    = common_includes(),
-        target      = 'lib/element-0',
+        target      = 'lib/element',
         name        = 'ELEMENT',
         env         = libEnv,
         use         = [ 'BOOST_SIGNALS' ],
         cxxflags    = [],
         install_path = None
+    )
+
+    bld (
+        features = 'subst',
+        source = 'tools/linuxdeploy.sh.in',
+        target = 'tools/linuxdeploy.sh',
+        PACKAGE_VERSION = VERSION,
+        name = 'LINUXDEPLOY_SH'
     )
 
     bld.add_group()
@@ -342,16 +366,19 @@ def build_app (bld):
         target      = 'bin/element',
         name        = 'ElementApp',
         env         = appEnv,
-        use         = [ 'ELEMENT' ],
+        use         = [ 'LUA', 'ELEMENT' ],
         linkflags   = []
     )
-    
+
+    bld.add_group()
+
+    if bld.env.LUA:     library.use += [ 'LUA' ]
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
     if bld.env.JACK:    library.use += [ 'JACK' ]
-
+    
     if juce.is_linux():
         build_desktop (bld)
-        library.use += [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL' ]
+        library.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
         library.cxxflags += [
             '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
@@ -368,7 +395,8 @@ def build_app (bld):
         app.mac_plist   = 'data/Info.plist'
         app.mac_files   = [ 'data/Icon.icns' ]
 
-        bld.add_post_fun(copy_app_bundle_lua_files)
+        bld.add_post_fun (copy_app_bundle_lua_files)
+
     else:
         pass
 
@@ -402,7 +430,9 @@ def build (bld):
         bld.fatal ("waf install not supported on OSX")
 
     bld.add_pre_fun (configure_git_version)
-    # build_lua_lib (bld)
+    
+    build_lua_lib (bld)
+    install_lua_files (bld)
     build_app (bld)
     # build_vst (bld)
 
@@ -417,8 +447,6 @@ def build (bld):
         )
 
     if bld.env.TEST: bld.recurse ('tests')
-    
-    install_lua_files (bld)
 
 def check (ctx):
     if not os.path.exists('build/bin/test-element'):
