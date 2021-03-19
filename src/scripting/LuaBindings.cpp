@@ -36,8 +36,9 @@
 #include "sol/sol.hpp"
 #include "lua-kv.hpp"
 
-// uncomment to test using system paths when JUCE_DEBUG is enabled
-// #define EL_FORCE_SYSTEM_LUA_PATHS
+#ifndef EL_LOCAL_LUA_PATHS
+ #define EL_LOCAL_LUA_PATHS 0
+#endif
 
 namespace sol {
 /** Support juce::ReferenceCountedObjectPtr */
@@ -80,115 +81,12 @@ extern int luaopen_kv_Rectangle (lua_State*);
 extern int luaopen_kv_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
 
-
 using namespace sol;
 
 namespace Element {
 namespace Lua {
 
-static auto NS (state& lua, const char* name) { return lua[name].get_or_create<table>(); }
-
-void openUI (state& lua)
-{
-    auto systray = lua.new_usertype<SystemTray> ("systray", no_constructor,
-        "enabled", sol::property (
-            []() -> bool { return SystemTray::getInstance() != nullptr; },
-            SystemTray::setEnabled));
-}
-
-static void openModel (sol::state& lua)
-{
-    auto e = NS (lua, "element");
-    e.set_function ("newgraph", [](sol::variadic_args args) {
-        String name;
-        bool defaultGraph = false;
-        int argIdx = 0;
-        
-        for (const auto arg : args)
-        {
-            if (arg.get_type() == sol::type::string && name.isNotEmpty())
-                name = String::fromUTF8 (arg.as<const char*>());
-            else if (arg.get_type() == sol::type::boolean)
-                defaultGraph = arg.as<bool>();
-            if (++argIdx == 2)
-                break;
-        }
-
-        return defaultGraph ? Node::createDefaultGraph (name)
-                            : Node::createGraph (name);
-    });
-}
-
-void openKV (state& lua)
-{
-    auto kv   = NS (lua, "element");
-    
-    kv.new_usertype<kv::PortType> ("PortType", no_constructor,
-        call_constructor, factories (
-            [](int t) {
-                if (t < 0 || t > kv::PortType::Unknown)
-                    t = kv::PortType::Unknown;
-                return kv::PortType (t);
-            },
-            [](const char* slug) {
-                return kv::PortType (String::fromUTF8 (slug));
-            }
-        ),
-        meta_method::to_string, [](PortType* self) {
-            return self->getName().toStdString();
-        },
-
-        "name", readonly_property ([](kv::PortType* self) { return self->getName().toStdString(); }),
-        "slug", readonly_property ([](kv::PortType* self) { return self->getSlug().toStdString(); }),
-        "uri",  readonly_property ([](kv::PortType* self) { return self->getURI().toStdString(); })
-    );
-
-    kv.new_usertype<kv::PortDescription> ("PortDescription", no_constructor);
-    
-    kv.new_usertype<kv::PortList> ("PortList",
-        sol::constructors<kv::PortList()>(),
-        meta_method::to_string, [](MidiPipe*) { return "element.PortList"; },
-        "add", [](kv::PortList* self, int type, int index, int channel,
-                                      const char* symbol, const char* name,
-                                      const bool input)
-        {
-            self->add (type, index, channel, symbol, name, input);
-        }
-    );
-}
-
-
 //==============================================================================
-static File getRootPath()
-{
-    return File::getCurrentWorkingDirectory();
-}
-
-static File getScriptsDir()
-{
-    return getRootPath().getChildFile ("scripts");
-}
-
-static String getHomeLuaDir()
-{
-    return File::getSpecialLocation (File::userHomeDirectory)
-        .getChildFile (".local/share/element/lua")
-        .getFullPathName();
-}
-
-//==============================================================================
-static String getHomeScriptsDir()
-{
-    return File::getSpecialLocation (File::userHomeDirectory)
-        .getChildFile (".local/share/element/scripts")
-        .getFullPathName();
-}
-
-static String getUserScriptsDir()
-{
-    return ScriptManager::getUserScriptsDir().getFullPathName();
-}
-
 static File getAppImageLuaPath()
 {
    #if defined (EL_APPIMAGE)
@@ -201,39 +99,119 @@ static File getAppImageLuaPath()
     return File();
 }
 
+static File getTopDirectory()
+{
+    File topdir = File::getSpecialLocation (File::currentExecutableFile).getParentDirectory();
+    while (topdir.exists() && topdir.isDirectory())
+    {
+        if (topdir.getChildFile ("tools/waf/element.py").existsAsFile())
+            return topdir;
+        topdir = topdir.getParentDirectory();
+    }
+    return File();
+}
+
+//==============================================================================
+static String getLocalScriptsDir()
+{
+    File dir;
+
+   #if JUCE_DEBUG && EL_LOCAL_LUA_PATHS
+    File topdir = getTopDirectory();
+    if (topdir.exists() && topdir.isDirectory())
+        dir = topdir.getChildFile ("scripts");
+   #endif
+
+    return dir.exists() ? dir.getFullPathName() : String();
+}
+
+static String getHomeScriptsDir()
+{
+    return File::getSpecialLocation (File::userHomeDirectory)
+        .getChildFile (".local/share/element/scripts")
+        .getFullPathName();
+}
+
+static String getApplicationScriptsDir()
+{
+    return ScriptManager::getApplicationScriptsDir().getFullPathName();
+}
+
+static String getUserScriptsDir()
+{
+    return ScriptManager::getUserScriptsDir().getFullPathName();
+}
+
+static String getSystemScriptsDir()
+{
+    return ScriptManager::getSystemScriptsDir().getFullPathName();
+}
+
+//==============================================================================
+static String getHomeLuaDir()
+{
+    return File::getSpecialLocation (File::userHomeDirectory)
+        .getChildFile (".local/share/element/lua")
+        .getFullPathName();
+}
+
+static StringArray getLocalLuaDirs()
+{
+    StringArray dirs;
+   #if JUCE_DEBUG && EL_LOCAL_LUA_PATHS
+    auto topdir = getTopDirectory();
+    if (topdir.exists() && topdir.isDirectory())
+    {
+        dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
+        dirs.add (topdir.getChildFile ("libs/element/lua").getFullPathName());
+    }
+   #endif
+    return dirs;
+}
+
+static String getApplicationLuaDir()
+{
+    return DataPath::applicationDataDir().getChildFile ("Modules").getFullPathName();
+}
+
+static File getSystemLuaDir()
+{
+    File dir;
+   #if defined (EL_APPIMAGE)
+    dir = getAppImageLuaPath().getFullPathName();
+    
+   #elif defined (EL_LUADIR)
+    if (File::isAbsolutePath (EL_LUADIR))
+        dir = File (EL_LUADIR);
+
+   #elif JUCE_MAC
+    dir = File::getSpecialLocation (File::currentApplicationFile)
+        .getChildFile ("Contents/Resources/lua")
+        .getFullPathName();
+    
+   #elif JUCE_WINDOWS
+    const auto installDir = DataPath::installDir();
+    if (installDir.isDirectory())
+        dir = installDir.getChildFile("lua").getFullPathName();
+   #endif
+
+    return dir;
+}
+
 //==============================================================================
 static String getScriptSearchPath()
 {
     if (auto* scriptPath = std::getenv ("ELEMENT_SCRIPTS_PATH"))
         return String::fromUTF8 (scriptPath).trim();
+
     StringArray dirs;
+    dirs.add (getLocalScriptsDir());
     dirs.add (getUserScriptsDir());
+    dirs.add (getApplicationScriptsDir());
+    dirs.add (getSystemScriptsDir());
+    dirs.removeEmptyStrings();
+    dirs.removeDuplicates (false);
 
-    #if JUCE_WINDOWS
-      #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
-        auto topdir = File::getSpecialLocation(File::currentExecutableFile)
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory();
-        dirs.add (topdir.getChildFile("scripts").getFullPathName());
-      #else
-        dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
-      #endif
-
-    #elif JUCE_MAC
-        dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());
-
-    #else
-        #if defined (EL_APPIMAGE)
-            dirs.add (ScriptManager::getSystemScriptsDir().getFullPathName());           
-        #elif defined (EL_SCRIPTSDIR)
-            if (File::isAbsolutePath (EL_SCRIPTSDIR))
-                dirs.add (String (EL_SCRIPTSDIR));
-        #endif
-    #endif
-    
     StringArray path;
     for (const auto& dir : dirs)
     {
@@ -248,53 +226,13 @@ static String getLuaPath()
 {
     if (auto* luaPath = std::getenv ("LUA_PATH"))
         return String::fromUTF8 (luaPath).trim();
-    
-    StringArray dirs;
 
-    #if JUCE_WINDOWS
-    #if JUCE_DEBUG && !defined (EL_FORCE_SYSTEM_LUA_PATHS)
-        auto topdir = File::getSpecialLocation(File::currentExecutableFile)
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory()
-            .getParentDirectory();
-        dirs.add (topdir.getChildFile ("libs/lua-kv/src").getFullPathName());
-        dirs.add (topdir.getChildFile ("libs/element/lua").getFullPathName());
-    #else
-        const auto installDir = DataPath::installDir();
-        if (installDir.isDirectory())
-        {
-            dirs.add (installDir.getChildFile ("lua").getFullPathName());
-        }
-        else
-        {
-            #if ! EL_RUNNING_AS_PLUGIN
-                dirs.add (File::getSpecialLocation (File::currentExecutableFile)
-                    .getParentDirectory()
-                    .getChildFile ("lua")
-                    .getFullPathName());
-            #endif
-        }
-    #endif
-    #elif JUCE_MAC
-        dirs.add (File::getSpecialLocation (File::currentApplicationFile)
-            .getChildFile ("Contents/Resources/lua")
-            .getFullPathName());
-    
-    #else
-        #if defined (EL_APPIMAGE)
-            dirs.add (getAppImageLuaPath().getFullPathName());   
-        #elif defined (EL_LUADIR)
-            if (File::isAbsolutePath (EL_LUADIR))
-                dirs.add (EL_LUADIR);
-        #endif
-    #endif
-
+    StringArray dirs = getLocalLuaDirs();
+    dirs.add (getApplicationLuaDir());
+    dirs.add (getSystemLuaDir().getFullPathName());
     dirs.removeEmptyStrings();
-    dirs.removeDuplicates (true);
+    dirs.removeDuplicates (false);
 
-    
     StringArray path;
 
     if (dirs.size() <= 0)
