@@ -148,8 +148,6 @@ def configure (conf):
     for k in 'CFLAGS CXXFLAGS'.split():
         conf.env.append_unique (k, ['-fvisibility=hidden'])
 
-    templates.generate()
-
     print
     juce.display_header ("Element")
     conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
@@ -428,9 +426,15 @@ def install_lua_files (bld):
 def build (bld):
     if bld.is_install and juce.is_mac():
         bld.fatal ("waf install not supported on OSX")
-
-    bld.add_pre_fun (configure_git_version)
     
+    bld.add_pre_fun (configure_git_version)
+
+    bld.template (
+        source = bld.path.ant_glob ("tools/**/*.in") + \
+                 bld.path.ant_glob ("data/**/*.in")
+    )
+    bld.add_group ()
+
     build_lua_lib (bld)
     install_lua_files (bld)
     build_app (bld)
