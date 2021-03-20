@@ -12,9 +12,8 @@
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementFX"
               aaxIdentifier="net.kushview.ElementFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1"
-              pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
-              userNotes="This configuration is for the FX version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
+              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1" pluginVSTCategory="kPlugCategEffect"
+              pluginAUMainType="'aumf'" userNotes="This configuration is for the FX version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
               pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
@@ -716,7 +715,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
-               userNotes="" postbuildCommand="topdir=&quot;../../../../..&quot;&#10;contents=&quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}/Contents/&quot;&#10;luadir=&quot;${contents}/Resources/lua&quot;&#10;scriptsdir=&quot;${contents}/Resources/scripts&quot;&#10;&#10;if [ -d &quot;${contents}&quot; ]; then&#10;rm -rf &quot;${luadir}&quot;&#10;mkdir -p &quot;${luadir}&quot;&#10;&#10;# copy lua modules&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/element/lua/&quot; &quot;${luadir}/&quot;&#10;rsync -var --update --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${topdir}/libs/lua-kv/src/&quot; &quot;${luadir}/&quot;&#10;&#10;rm -rf &quot;${scriptsdir}&quot;&#10;mkdir -p &quot;${scriptsdir}&quot;&#10;rsync -ar --update &quot;${topdir}/scripts/&quot; --include=&quot;*.lua&quot; --exclude=&quot;*.*&quot; \&#10;    &quot;${scriptsdir}/&quot;&#10;fi"
+               userNotes="" postbuildCommand="cd ../../../../..&#10;sh tools/osx-lua-copy.sh &quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}&quot;"
                hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                xcodeValidArchs="arm64,x86_64" extraCompilerFlags="-Wno-deprecated-declarations&#10;-Wno-comma&#10;-Wno-unused-function&#10;-Wno-unused-variable&#10;">
       <CONFIGURATIONS>
