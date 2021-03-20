@@ -1,24 +1,32 @@
 #!/bin/bash
 # Copies Lua scripts and modules into a mac bundle
 
-echo "Bundling lua scripts"
 set -e
 
-bundle="build/Applications/Element.app"
+bundle="${1}"
+
+if [ -z "${bundle}" ]; then
+    bundle="build/Applications/Element.app"
+fi
+
 resources="${bundle}/Contents/Resources"
+scripts="${resources}/Scripts"
+modules="${resources}/Modules"
+scriptsrc="scripts"
+elsrc="libs/element/lua"
+kvsrc="libs/lua-kv/src"
 
 if [ -d "${bundle}" ]; then
-    rm -rf "${resources}/scripts"
-    mkdir -p "${resources}/scripts"
-    rsync -ar --delete --include="*.lua" --exclude="*.*" \
-        scripts/ "${resources}/scripts/"
+    echo "Copying Lua Scripts"
+    rm -rf "${scripts}"
+    mkdir -p "${scripts}"
+    rsync -ar --delete --include="*.lua" --exclude="*.*" "${scriptsrc}/" "${scripts}/"
 
-    rm -rf "${resources}/lua"
-    mkdir -p "${resources}/lua"
-    rsync -ar --update --include="*.lua" --exclude="*.*" \
-        libs/element/lua/  "${resources}/lua/"
-    rsync -ar --update --include="*.lua" --exclude="*.*" \
-        libs/lua-kv/src/  "${resources}/lua/"
+    echo "Copying Lua Modules"
+    rm -rf "${modules}"
+    mkdir -p "${modules}"
+    rsync -ar --delete --include="*.lua" --exclude="*.*" "${kvsrc}/"  "${modules}/"
+    rsync -ar --update --include="*.lua" --exclude="*.*" "${elsrc}/"  "${modules}/"
 else
     echo "Skipping `basename ${bundle}`: not an app or plugin bundle"
 fi

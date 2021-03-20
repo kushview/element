@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from subprocess import call, Popen, PIPE
+from waflib import Utils
 import os, sys
 import string
 sys.path.append (os.path.join (os.getcwd(), 'tools/waf'))
@@ -60,6 +61,7 @@ def configure (conf):
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
     
     conf.load ('templates')
+    conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
 
@@ -339,7 +341,7 @@ def install_lua_files (bld):
         return
     path = bld.path
     join = os.path.join
-    bld.install_files (join (bld.env.DATADIR, 'scripts'),
+    bld.install_files (bld.env.SCRIPTSDIR,
                        path.ant_glob ("scripts/**/*.lua"),
                        relative_trick=True,
                        cwd=path.find_dir ('scripts'))
@@ -349,12 +351,12 @@ def install_lua_files (bld):
                        relative_trick=True,
                        cwd=bld.path.find_dir ('build/doc/lua'))
 
-    bld.install_files (join (bld.env.DATADIR, 'lua'),
+    bld.install_files (bld.env.LUADIR,
                        bld.path.ant_glob ("libs/lua-kv/src/**/*.lua"),
                        relative_trick=True,
                        cwd=bld.path.find_dir ('libs/lua-kv/src'))
 
-    bld.install_files (join (bld.env.DATADIR, 'lua'),
+    bld.install_files (bld.env.LUADIR,
                        bld.path.ant_glob ("libs/element/lua/**/*.lua"),
                        relative_trick=True,
                        cwd=bld.path.find_dir ('libs/element/lua'))

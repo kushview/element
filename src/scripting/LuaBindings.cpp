@@ -93,7 +93,7 @@ static File getAppImageLuaPath()
     return File::getSpecialLocation (File::currentExecutableFile)
         .getParentDirectory() // bin
         .getParentDirectory() // usr
-        .getChildFile ("share/element/lua");
+        .getChildFile ("share/element/modules");
    #endif
     jassertfalse;
     return File();
@@ -151,7 +151,7 @@ static String getSystemScriptsDir()
 static String getHomeLuaDir()
 {
     return File::getSpecialLocation (File::userHomeDirectory)
-        .getChildFile (".local/share/element/lua")
+        .getChildFile (".local/share/element/modules")
         .getFullPathName();
 }
 
@@ -186,13 +186,13 @@ static File getSystemLuaDir()
 
    #elif JUCE_MAC
     dir = File::getSpecialLocation (File::currentApplicationFile)
-        .getChildFile ("Contents/Resources/lua")
+        .getChildFile ("Contents/Resources/Modules")
         .getFullPathName();
     
    #elif JUCE_WINDOWS
     const auto installDir = DataPath::installDir();
     if (installDir.isDirectory())
-        dir = installDir.getChildFile("lua").getFullPathName();
+        dir = installDir.getChildFile("Modules").getFullPathName();
    #endif
 
     return dir;
