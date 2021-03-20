@@ -12,7 +12,7 @@
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementFX"
               aaxIdentifier="net.kushview.ElementFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_VERSION_STRING=&quot;0.44.0&quot;&#10;EL_USE_LUA=1"
+              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategEffect" pluginAUMainType="'aumf'"
               userNotes="This configuration is for the FX version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut"
