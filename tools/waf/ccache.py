@@ -2,10 +2,10 @@ from waflib.Configure import conf
 
 @conf 
 def check_ccache (self):
-    return self.find_program ('ccache', uselib_store='CCACHE', mandatory=False)
+    return self.find_program ('ccache', var='CCACHE', mandatory=False)
 
 def options (self):
-    self.add_option ('--enable-ccache', default=False, action='store_true', dest='use_ccache', \
+    self.add_option ('--ccache', default=False, action='store_true', dest='use_ccache', \
         help="Use ccache if possible [ Default: disabled ]")
 
 def configure (self):
