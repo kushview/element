@@ -28,7 +28,10 @@ def display_msg (conf, msg, status = None, color = None):
 
 @conf
 def find_projucer (self, **k):
-    return self.find_program ("Projucer", **k)
+    prog = 'Projucer'
+    if is_mac():
+        prog = '/Applications/Projucer.app/Contents/MacOS/Projucer'
+    return self.find_program (prog, **k)
 
 @conf
 def message (self, msg, status=None, color=None):
