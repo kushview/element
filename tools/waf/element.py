@@ -47,15 +47,13 @@ def check_common (self):
             ],
             fragment = '''
                 #include <sol/forward.hpp>
-                #include <lua-kv.hpp>
-                #include <kv/lua/object.hpp>
                 int main (int, char**) {
                     using mystate = sol::state;
                     return 0;
                 }
             ''',
             mandatory       = True,
-            execute         = True,
+            execute         = False,
             define_name     = 'HAVE_LUA'            
         )
         self.env.LUA = bool(self.env.HAVE_LUA)

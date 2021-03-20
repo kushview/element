@@ -334,14 +334,8 @@ def build_app (bld):
         cxxflags    = [],
         install_path = None
     )
-
-    bld (
-        features = 'subst',
-        source = 'tools/linuxdeploy.sh.in',
-        target = 'tools/linuxdeploy.sh',
-        PACKAGE_VERSION = VERSION,
-        name = 'LINUXDEPLOY_SH'
-    )
+    library.export_includes = library.includes
+    
 
     bld.add_group()
 
@@ -426,7 +420,6 @@ def build (bld):
                + bld.path.ant_glob ('data/**/*.in') \
                + bld.path.ant_glob ("tools/**/*.in"),
         install_path = None,
-        name = 'TEMPLATES',
         PACKAGE_VERSION = VERSION
     )
 
@@ -439,17 +432,10 @@ def build (bld):
     build_app (bld)
     # build_vst (bld)
 
-    if bld.env.LUA and bool(bld.env.LIB_READLINE):
-        bld.program (
-            source = [ 'tools/lua-el/lua.cpp' ],
-            name = 'lua-el',
-            target = 'bin/lua-el',
-            includes = common_includes(),
-            use = [ 'ELEMENT', 'LUA', 'READLINE' ],
-            install_path = None
-        )
-
-    if bld.env.TEST: bld.recurse ('tests')
+    if bld.env.LUA and bool (bld.env.LIB_READLINE):
+        bld.recurse ('tools/lua-el')
+    if bld.env.TEST:
+        bld.recurse ('tests')
 
 def check (ctx):
     if not os.path.exists('build/bin/test-element'):

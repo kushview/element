@@ -1,20 +1,10 @@
 #!/usr/bin/env python
+# Build the unit tests
 
 bld.program (
     source = bld.path.ant_glob ("**/*.cpp"),
-    includes = ['.',
-                '../libs/compat',
-                '../libs/jlv2/modules',
-                '../libs/JUCE/modules',
-                '../libs/kv/modules',
-                '../libs/lua/src',
-                '../libs/lua',
-                '../build/include',
-                '../libs/lua-kv/src',
-                '../libs/lua-kv',
-                '../src' ],
+    includes = [ '.' ],
     target = '../bin/test-element',
-    use = [ 'FREETYPE2', 'X11', 'DL', 'PTHREAD', 
-            'ALSA', 'XEXT', 'ELEMENT' ],
+    use = [ 'ELEMENT', 'LUA' ],
     install_path = None
 )

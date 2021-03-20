@@ -1,0 +1,11 @@
+#!/usr/bin/env python
+# Builds the lua-el interpretor
+
+bld.program (
+    source = [ 'lua.cpp' ],
+    name = 'lua-el',
+    target = '../../bin/lua-el',
+    includes = [ '.', ],
+    use = [ 'ELEMENT', 'LUA', 'READLINE' ],
+    install_path = None
+)
