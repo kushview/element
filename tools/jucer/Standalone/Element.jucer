@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.0b3"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.0rc1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
