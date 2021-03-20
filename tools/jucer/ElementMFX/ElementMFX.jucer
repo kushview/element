@@ -715,7 +715,7 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
-               userNotes="" postbuildCommand="cd ../../../../..&#10;sh tools/osx-lua-copy.sh &quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}&quot;"
+               userNotes="" postbuildCommand="cd ../../../../..&#10;sh tools/osx-lua-copy.sh &quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}&quot;&#10;"
                hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                xcodeValidArchs="arm64,x86_64" extraCompilerFlags="-Wno-deprecated-declarations&#10;-Wno-comma&#10;-Wno-unused-function&#10;-Wno-unused-variable&#10;">
       <CONFIGURATIONS>

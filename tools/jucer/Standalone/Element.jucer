@@ -5,8 +5,7 @@
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2021 Kushview, LLC"
-              defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_USE_LUA=1&#10;" userNotes="The main project. If you change this jucer file, don't forget to update the Element and ElementFX plugin projects too.&#10;"
-              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              defines="EL_RUNNING_AS_PLUGIN=0&#10;EL_USE_LUA=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">

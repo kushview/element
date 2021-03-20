@@ -12,9 +12,8 @@
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementAU"
               pluginRTASCategory="2048" aaxIdentifier="net.kushview.Element"
               pluginAAXCategory="2048" companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1&#10;"
+              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
-              userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
               headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
@@ -713,10 +712,9 @@
   </MAINGROUP>
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX" smallIcon="RalCSg" bigIcon="RalCSg"
-               postbuildCommand="cd ../../../../..&#10;sh tools/osx-lua-copy.sh &quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}&quot;"
                hardenedRuntime="1" hardenedRuntimeOptions="com.apple.security.cs.allow-jit,com.apple.security.cs.disable-library-validation,com.apple.security.device.audio-input"
                extraCompilerFlags="-Wno-deprecated-declarations&#10;-Wno-comma&#10;-Wno-unused-function&#10;-Wno-unused-variable&#10;"
-               xcodeValidArchs="arm64,x86_64">
+               xcodeValidArchs="arm64,x86_64" postbuildCommand="cd ../../../../..&#10;sh tools/osx-lua-copy.sh &quot;${BUILT_PRODUCTS_DIR}/${FULL_PRODUCT_NAME}&quot;&#10;">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" enablePluginBinaryCopyStep="1" isDebug="1" optimisation="1"
                        linkTimeOptimisation="0" targetName="KV_Element" headerPath="/opt/kushview/include&#10;/usr/local/include&#10;"
