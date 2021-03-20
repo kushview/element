@@ -3,8 +3,8 @@
 from subprocess import call, Popen, PIPE
 import os, sys
 import string
-sys.path.append (os.getcwd() + "/tools/waf")
-import cross, element, juce, templates
+sys.path.append (os.path.join (os.getcwd(), 'tools/waf'))
+import cross, element, juce
 
 APPNAME         = element.APPNAME
 VERSION         = element.VERSION
@@ -58,7 +58,8 @@ def configure (conf):
     conf.env.LIBDIR  = os.path.join (conf.env.PREFIX,  'lib')
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
-      
+    
+    conf.load ('templates')
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
 
