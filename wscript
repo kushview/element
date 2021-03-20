@@ -13,7 +13,7 @@ PLUGIN_VERSION  = element.PLUGIN_VERSION
 VST3_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
-    opt.load ("compiler_c compiler_cxx ccache cross juce")
+    opt.load ("scripting compiler_c compiler_cxx ccache cross juce")
 
     opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
         help="Disable LADSPA plugin hosting")
@@ -33,8 +33,6 @@ def options (opt):
         help="Build without ALSA support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
-    opt.add_option ('--without-lua', default=False, action='store_true', dest='no_lua', \
-        help="Build without LUA scripting")
     
     opt.add_option ('--test', default=False, action='store_true', dest='test', \
         help="Build the test suite")
@@ -42,6 +40,7 @@ def options (opt):
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
     opt.add_option ('--minimal', dest='minimal', default=False, action='store_true')
+
 def silence_warnings (conf):
     '''TODO: resolve these'''
     conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
@@ -53,70 +52,25 @@ def silence_warnings (conf):
         conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
         conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
 
-def configure_product (conf):
-    conf.define ('EL_PRO', 1)
-    conf.env.EL_SOLO = False
-    conf.env.EL_FREE = False
-    conf.env.EL_PRO  = True
-
-def make_lua_path (paths):
-    out = ''
-    if len(paths) > 0:
-        for path in paths:
-            if len(out) > 0: out += ';'
-            out += '%s/?.lua' % path
-            out += ';%s/?/init.lua' % path
-    return out
-
-def make_lua_spath (paths):
-    out = ''
-    if len(paths) > 0:
-        for path in paths:
-            if len(out) > 0: out += ';'
-            out += '%s/?.lua' % path
-    return out
-
-def make_lua_cpath (paths):
-    out = ''
-    if len(paths) > 0:
-        for path in paths:
-            if len(out) > 0: out += ';'
-            out += '%s/?.so' % path
-            out += ';%s/loadall.so' % path
-    return out
-
 def configure (conf):
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX, 'share/element')
-    conf.env.LIBDIR  = os.path.join (conf.env.PREFIX, 'lib')
-    conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR, 'vst')
-    conf.env.VST3DIR = os.path.join (conf.env.LIBDIR, 'vst3')
-    conf.env.LUADIR  = os.path.join (conf.env.DATADIR, 'lua')
-    conf.env.SCRIPTSDIR  = os.path.join (conf.env.DATADIR, 'scripts')
-    conf.env.DOCDIR  = os.path.join (conf.env.PREFIX, 'share/doc/element')
-
-    conf.env.LUA_PATH_DEFAULT = make_lua_path ([
-        conf.env.LUADIR
-    ])
-
-    conf.env.LUA_CPATH_DEFAULT = make_lua_cpath ([
-        os.path.join (conf.env.LIBDIR, 'element/lua')
-    ])
-
-    conf.env.EL_SPATH_DEFAULT = make_lua_spath ([
-        os.path.join (conf.env.DATADIR, 'scripts')
-    ])
-
-    conf.load ("git")    
-    conf.load ("compiler_c compiler_cxx  ar")
-    conf.load ("juce")
-
+    conf.env.DATADIR = os.path.join (conf.env.PREFIX,  'share/element')
+    conf.env.DOCDIR  = os.path.join (conf.env.PREFIX,  'share/doc/element')
+    conf.env.LIBDIR  = os.path.join (conf.env.PREFIX,  'lib')
+    conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
+    conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
+      
+    conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
+
+    conf.load ("git")
+    conf.load ("juce")
+    conf.load ('scripting')
+
     silence_warnings (conf)
 
     conf.find_projucer (mandatory=False)
     conf.find_program ('convert', mandatory=False)
-    conf.find_program ('ldoc',    mandatory=False)
-
+    
     conf.check_common()
     if cross.is_mingw (conf): conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
@@ -124,9 +78,7 @@ def configure (conf):
 
     conf.env.TEST = bool(conf.options.test)
     conf.env.DEBUG = conf.options.debug
-    conf.env.EL_VERSION_STRING = VERSION
     
-    conf.define ('EL_VERSION_STRING', conf.env.EL_VERSION_STRING)
     conf.define ('EL_DOCKING', True if conf.options.enable_docking else False)
     conf.define ('KV_DOCKING_WINDOWS', 1)
     if len(conf.env.GIT_HASH) > 0:

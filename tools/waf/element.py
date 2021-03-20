@@ -27,38 +27,13 @@ mingw_libs = '''
 
 @conf 
 def check_common (self):
-    self.check(lib='curl', mandatory=False)
-    self.check(header_name='stdbool.h', mandatory=True)
-    self.check(header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
+    self.check (lib='curl', mandatory=False)
+    self.check (header_name='stdbool.h', mandatory=True)
+    self.check (header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
 
     # Web Browser
     self.define ('JUCE_WEB_BROWSER', 0)
 
-    # LUA
-    self.env.LUA = not bool(self.options.no_lua)
-    if self.env.LUA:
-        self.check_cxx (
-            msg = "Checking for Lua",
-            includes = [
-                self.path.find_node ('libs/lua').abspath(),
-                self.path.find_node ('libs/lua/src').abspath(),
-                self.path.find_node ('libs/lua-kv').abspath(),
-                self.path.find_node ('libs/lua-kv/src').abspath()
-            ],
-            fragment = '''
-                #include <sol/forward.hpp>
-                int main (int, char**) {
-                    using mystate = sol::state;
-                    return 0;
-                }
-            ''',
-            mandatory       = True,
-            execute         = False,
-            define_name     = 'HAVE_LUA'            
-        )
-        self.env.LUA = bool(self.env.HAVE_LUA)
-    self.define ('EL_USE_LUA', self.env.LUA)
-    
     # JACK
     self.check_cfg(package='jack', uselib_store="JACK", args='--cflags --libs', mandatory=False)
     self.env.JACK = bool(self.env.HAVE_JACK) and not bool(self.options.no_jack)
