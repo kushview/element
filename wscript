@@ -64,7 +64,7 @@ def configure (conf):
     conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
-
+    conf.load ('ccache')
     conf.load ("git")
     conf.load ("juce")
     conf.load ('scripting')
