@@ -60,6 +60,7 @@ def configure (conf):
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
     
+    conf.load ('bundle')
     conf.load ('templates')
     conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
