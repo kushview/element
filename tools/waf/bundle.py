@@ -22,7 +22,7 @@ def bundle_name (self):
 
 @feature ('bundle')
 @before_method ('apply_link')
-def list_includes (self):
+def create_task_bundle (self):
     bundle = self.bundle_node()
     if not bundle: return
     self.bundle_task = self.create_task ('bundle', [], bundle)
