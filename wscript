@@ -404,7 +404,6 @@ def build_app (bld):
             'TEMPLATES'
         ]
         app.target       = 'Applications/Element'
-        app.install_path = None
         app.mac_app      = True
         app.mac_plist    = 'data/Info.plist'
         app.mac_files    = [ 'data/Icon.icns' ]
