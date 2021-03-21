@@ -54,13 +54,15 @@ def check_common (self):
             # check for distrho... somehow?
             pass
         self.line_just = line_just
-
     self.define ('JUCE_PLUGINHOST_VST', self.env.VST)
 
     # VST3 hosting
     self.env.VST3 = not bool (self.options.no_vst3)
     self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
-
+    if self.env.VST3:
+        self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', uselib_store='VSTFXSTORE_H', mandatory=False)
+        self.define ('JUCE_VST3_CAN_REPLACE_VST2', bool (self.env.HAVE_VSTFXSTORE_H))
+    
     # LV2 Support
     self.env.LV2 = not bool(self.options.no_lv2)
     if self.env.LV2:
@@ -68,7 +70,7 @@ def check_common (self):
         self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
         self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
         if bool(self.env.HAVE_SUIL):
-            self.check_cxx(
+            self.check_cxx (
                 msg = "Checking for suil_init(...)",
                 fragment = '''
                     #include <suil/suil.h>
