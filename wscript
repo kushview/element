@@ -285,7 +285,7 @@ def build_vst_linux (bld, plugin):
             'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
         ],
         includes        = common_includes(),
-        target          = 'lib/vst/Kushview/%s' % plugin,
+        target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
         use             = [ 'ELEMENT', 'LUA' ],
@@ -313,23 +313,32 @@ def build_vst3_linux (bld, plugin):
         vstEnv.append_unique (k, [ '-fPIC' ])
     
     vstEnv.cxxshlib_PATTERN = bld.env.plugin_PATTERN
-    vst3 = bld (
+    vst3 = bld.bundle (
+        name            = '%s_BUNDLE_VST3' % plugin,
+        target          = 'plugins/VST3/%s.vst3' % plugin,
+        install_path    = '%s/Kushview' % (bld.env.VST3DIR)
+    )
+    
+    L = bld (
+        name            = '%s_VST3' % plugin,
+        target          = vst3.bundle_target ('Contents/%s/%s' % (vst3_bundle_arch(), plugin)).relpath(),
         features        = 'cxx cxxshlib',
         source          = [
             'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
             'libs/compat/include_juce_audio_plugin_client_VST3.cpp'
         ],
         includes        = common_includes(),
-        target          = 'lib/vst3/Kushview/%s.vst3/Contents/%s/%s' % (plugin, vst3_bundle_arch(), plugin),
-        name            = 'ELEMENT_VST3',
         env             = vstEnv,
-        use             = [ 'ELEMENT', 'LUA' ],
-        install_path    = '%s/Kushview/%s.vst3/Contents/%s' % (bld.env.VST3DIR, plugin, vst3_bundle_arch())
+        use             = [ 'ELEMENT', 'LUA', vst3.name ]
     )
 
+    if vst3.install_path:
+        L.install_path = '%s/%s/Contents/%s' \
+            % (vst3.install_path, vst3.bundle_name(), vst3_bundle_arch())
+
     add_scripts_to (bld,
-        'lib/vst3/Kushview/%s.vst3/Contents/Resources' % plugin,
-        '%s/Kushview/%s.vst3/Contents/Resources' % (bld.env.VST3DIR, plugin)
+        '%s/Contents/Resources' % vst3.bundle_node(),
+        '%s/Kushview/%s/Contents/Resources' % (bld.env.VST3DIR, vst3.bundle_name())
     )
 
 def build_vst3 (bld):
@@ -360,8 +369,6 @@ def build_app (bld):
     )
     library.export_includes = library.includes
     
-    bld.add_group()
-
     appEnv = bld.env.derive()
     app = bld.program (
         source      = [ 'src/Main.cc' ],
@@ -372,8 +379,6 @@ def build_app (bld):
         use         = [ 'LUA', 'ELEMENT' ],
         linkflags   = []
     )
-
-    bld.add_group()
 
     if bld.env.LUA:     library.use += [ 'LUA' ]
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
