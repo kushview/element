@@ -256,21 +256,21 @@ def add_scripts_to (bld, builddir, instdir,
             features    ='subst', 
             source      = node,
             target      = '%s/%s/el/%s' % (builddir, modsdir, node.name),
-            install_path= '%s/%s/el' % (instdir, modsdir)
+            install_path= '%s/%s/el' % (instdir, modsdir) if instdir else None
         )
     for node in bld.path.ant_glob ('libs/lua-kv/src/kv/*.lua'):
         bld (
             features    ='subst',
             source      = node,
             target      = '%s/%s/kv/%s' % (builddir, modsdir, node.name),
-            install_path= '%s/%s/kv' % (instdir, modsdir)
+            install_path= '%s/%s/kv' % (instdir, modsdir) if instdir else None
         )
     for node in bld.path.ant_glob ('scripts/**/*.lua'):
         bld (
             features    ='subst',
             source      = node,
             target      = '%s/%s/%s' % (builddir, scriptsdir, node.name),
-            install_path= '%s/%s' % (instdir, scriptsdir)
+            install_path= '%s/%s' % (instdir, scriptsdir) if instdir else None
         )
 
 def build_vst_linux (bld, plugin):
@@ -398,15 +398,17 @@ def build_app (bld):
         ]
 
     elif juce.is_mac():
-        library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
-                         'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
-                         'TEMPLATES' ]
-        app.target      = 'Applications/Element'
-        app.mac_app     = True
-        app.mac_plist   = 'data/Info.plist'
-        app.mac_files   = [ 'data/Icon.icns' ]
-
-        bld.add_post_fun (copy_app_bundle_lua_files)
+        library.use += [
+            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
+            'TEMPLATES'
+        ]
+        app.target       = 'Applications/Element'
+        app.install_path = None
+        app.mac_app      = True
+        app.mac_plist    = 'data/Info.plist'
+        app.mac_files    = [ 'data/Icon.icns' ]
+        add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     else:
         pass
