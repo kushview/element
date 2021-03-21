@@ -308,6 +308,8 @@ def vst3_bundle_arch():
     return ''
 
 def build_vst3_linux (bld, plugin):
+    if not bld.env.VST:
+        return
     vstEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         vstEnv.append_unique (k, [ '-fPIC' ])
