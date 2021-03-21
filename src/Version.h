@@ -49,8 +49,8 @@ struct Version
 };
 
 class CurrentVersion : private Timer,
-                       public DeletedAtShutdown,
-                       public Thread
+                       private Thread,
+                       public DeletedAtShutdown
 {
 public:
     CurrentVersion();
@@ -61,11 +61,13 @@ public:
     
     /** Returns true if a newer version is available for download */
     bool isNewerVersionAvailable();
-    
-    void run() override;
-    
+
+    void cancel() { cancelled.set(true); signalThreadShouldExit(); }
+    bool isCancelled() const { return cancelled.get(); }
+
 private:
     String permalink, version;
+    Atomic<bool> cancelled = false;
     bool hasChecked;
     bool shouldShowUpToDateMessage;
     bool result = false;
@@ -73,5 +75,6 @@ private:
     
     friend class Timer;
     void timerCallback() override;
+    void run() override;
 };
 }
