@@ -194,7 +194,14 @@ def build_lua_docs (bld):
         call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
 def build_lua_lib (bld):
+    luaEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        luaEnv.append_unique (k, [ '-fPIC' ])
     lua = bld (
+        name     = 'LUA',
+        target   = 'lib/lua',
+        env      = luaEnv,
+        install_path = None,
         features = 'cxx cxxstlib',
         includes = [
             'libs/lua',
@@ -235,16 +242,38 @@ def build_lua_lib (bld):
             libs/lua/src/llex.c
             libs/lua/src/ltm.c
             libs/lua/src/ldo.c
-        '''.split(),
-        target  = 'lib/lua',
-        name    = 'LUA',
-        install_path = None
+        '''.split()
     )
     lua.export_includes = lua.includes
     bld.add_group()
     return lua
 
-def build_vst_linux (bld):
+def add_scripts_to (bld, builddir, instdir, 
+                    modsdir='Modules', 
+                    scriptsdir='Scripts'):
+    for node in bld.path.ant_glob ('libs/element/lua/el/*.lua'):
+        s = bld (
+            features    ='subst', 
+            source      = node,
+            target      = '%s/%s/el/%s' % (builddir, modsdir, node.name),
+            install_path= '%s/%s/el' % (instdir, modsdir)
+        )
+    for node in bld.path.ant_glob ('libs/lua-kv/src/kv/*.lua'):
+        bld (
+            features    ='subst',
+            source      = node,
+            target      = '%s/%s/kv/%s' % (builddir, modsdir, node.name),
+            install_path= '%s/%s/kv' % (instdir, modsdir)
+        )
+    for node in bld.path.ant_glob ('scripts/**/*.lua'):
+        bld (
+            features    ='subst',
+            source      = node,
+            target      = '%s/%s/%s' % (builddir, scriptsdir, node.name),
+            install_path= '%s/%s' % (instdir, scriptsdir)
+        )
+
+def build_vst_linux (bld, plugin):
     vstEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         vstEnv.append_unique (k, [ '-fPIC' ])
@@ -252,22 +281,61 @@ def build_vst_linux (bld):
     vst = bld (
         features        = 'cxx cxxshlib',
         source          = [
-            'tools/jucer/Element/Source/Element.cpp',
+            'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
             'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
         ],
         includes        = common_includes(),
-        target          = 'lib/vst/Element',
+        target          = 'lib/vst/Kushview/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
         use             = [ 'ELEMENT', 'LUA' ],
-        install_path    = bld.env.VSTDIR,
+        install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
     bld.add_group()
 
 def build_vst (bld):
     if not bld.env.VST:
         return
-    if juce.is_linux(): build_vst_linux (bld)
+    if juce.is_linux():
+        for plugin in 'Element ElementFX'.split():
+            build_vst_linux (bld, plugin)
+
+def vst3_bundle_arch():
+    if juce.is_mac():
+        return 'MacOS'
+    if juce.is_linux():
+        return 'x86_64-linux'
+    return ''
+
+def build_vst3_linux (bld, plugin):
+    vstEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        vstEnv.append_unique (k, [ '-fPIC' ])
+    
+    vstEnv.cxxshlib_PATTERN = bld.env.plugin_PATTERN
+    vst3 = bld (
+        features        = 'cxx cxxshlib',
+        source          = [
+            'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
+            'libs/compat/include_juce_audio_plugin_client_VST3.cpp'
+        ],
+        includes        = common_includes(),
+        target          = 'lib/vst3/Kushview/%s.vst3/Contents/%s/%s' % (plugin, vst3_bundle_arch(), plugin),
+        name            = 'ELEMENT_VST3',
+        env             = vstEnv,
+        use             = [ 'ELEMENT', 'LUA' ],
+        install_path    = '%s/Kushview/%s.vst3/Contents/%s' % (bld.env.VST3DIR, plugin, vst3_bundle_arch())
+    )
+
+    add_scripts_to (bld,
+        'lib/vst3/Kushview/%s.vst3/Contents/Resources' % plugin,
+        '%s/Kushview/%s.vst3/Contents/Resources' % (bld.env.VST3DIR, plugin)
+    )
+
+def build_vst3 (bld):
+    if juce.is_linux():
+        for plugin in 'Element ElementFX'.split():
+            build_vst3_linux (bld, plugin)
 
 def copy_app_bundle_lua_files(ctx):
     if not juce.is_mac():
@@ -292,7 +360,6 @@ def build_app (bld):
     )
     library.export_includes = library.includes
     
-
     bld.add_group()
 
     appEnv = bld.env.derive()
@@ -386,7 +453,8 @@ def build (bld):
     build_lua_lib (bld)
     install_lua_files (bld)
     build_app (bld)
-    # build_vst (bld)
+    build_vst (bld)
+    build_vst3 (bld)
 
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
