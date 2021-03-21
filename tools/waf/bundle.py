@@ -11,8 +11,8 @@ def create_task_bundle (self):
     dir = self.path.find_or_declare (B)
     self.create_task ('bundle',[], dir)
 
-@feature ('cxxshlib', 'cxxstlib', 'bundle')
-@after_method('apply_link')
+@feature ('cshlib', 'cstlib', 'bundle')
+@after_method ('apply_link')
 def list_includes (self):
     have_bundle = isinstance (getattr (self, 'bundle', False), str)
     if have_bundle and self.link_task:
