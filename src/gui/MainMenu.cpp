@@ -127,12 +127,24 @@ void MainMenu::menuItemSelected (int index, int menu)
     else if (index == 6500 && menu == Help)
     {
        #ifdef EL_API_DOCS_URL
-        URL url (EL_API_DOCS_URL);
-       #else
-        URL url ("https://api.kushview.net/element/lua");
+        String urlStr (EL_API_DOCS_URL);
+        if (URL::isProbablyAWebsiteURL (urlStr) ||
+            urlStr.startsWithIgnoreCase ("file:/"))
+        {
+            auto url = URL (urlStr);
+            if (url.isLocalFile() ? url.getLocalFile().existsAsFile()
+                                  : true)
+            {
+                url.launchInDefaultBrowser();
+            }
+        }
+        else if (File::isAbsolutePath (urlStr))
+        {
+            juce::File file (urlStr);
+            if (file.existsAsFile())
+                URL(file).launchInDefaultBrowser();
+        }
        #endif
-
-        url.launchInDefaultBrowser();
     }
     else if (index == 7000 && menu == Help)
     {
@@ -364,12 +376,14 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
     menu.addItem (6000, "Online documentation...");
+   #ifdef EL_API_DOCS_URL
     menu.addItem (6500, "API documentation...");
+   #endif
     menu.addItem (7000, "Submit Feedback...");
-    #if ! JUCE_MAC
+   #if ! JUCE_MAC
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");
-    #endif
+   #endif
 }
 
 void MainMenu::buildSessionMenu (CommandManager& cmd, PopupMenu& menu)
