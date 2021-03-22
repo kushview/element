@@ -149,8 +149,6 @@ public:
     {
         const auto f1 = chooser->getCurrentFile();
         const auto f2 = processor.getAudioFile();
-        DBG(f1.getFullPathName());
-
         if (! f1.isDirectory() && f1 != f2)
             processor.openFile (chooser->getCurrentFile());
     }
