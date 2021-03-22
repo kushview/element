@@ -245,7 +245,6 @@ def build_lua_lib (bld):
         '''.split()
     )
     lua.export_includes = lua.includes
-    bld.add_group()
     return lua
 
 def add_scripts_to (bld, builddir, instdir, 
@@ -291,7 +290,6 @@ def build_vst_linux (bld, plugin):
         use             = [ 'ELEMENT', 'LUA' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
-    bld.add_group()
 
 def build_vst (bld):
     if not bld.env.VST:
@@ -310,6 +308,7 @@ def vst3_bundle_arch():
 def build_vst3_linux (bld, plugin):
     if not bld.env.VST:
         return
+
     vstEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         vstEnv.append_unique (k, [ '-fPIC' ])
@@ -320,11 +319,10 @@ def build_vst3_linux (bld, plugin):
         target          = 'plugins/VST3/%s.vst3' % plugin,
         install_path    = '%s/Kushview' % (bld.env.VST3DIR)
     )
-    
-    L = bld (
-        name            = '%s_VST3' % plugin,
-        target          = vst3.bundle_target ('Contents/%s/%s' % (vst3_bundle_arch(), plugin)).relpath(),
+
+    binary = vst3.bundle_create_child ('Contents/%s/%s' % (vst3_bundle_arch(), plugin),
         features        = 'cxx cxxshlib',
+        name            = '%s_VST3' % plugin,        
         source          = [
             'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
             'libs/compat/include_juce_audio_plugin_client_VST3.cpp'
@@ -334,13 +332,9 @@ def build_vst3_linux (bld, plugin):
         use             = [ 'ELEMENT', 'LUA', vst3.name ]
     )
 
-    if vst3.install_path:
-        L.install_path = '%s/%s/Contents/%s' \
-            % (vst3.install_path, vst3.bundle_name(), vst3_bundle_arch())
-
     add_scripts_to (bld,
         '%s/Contents/Resources' % vst3.bundle_node(),
-        '%s/Kushview/%s/Contents/Resources' % (bld.env.VST3DIR, vst3.bundle_name())
+        '%s/Contents/Resources' % vst3.bundle_install_path()
     )
 
 def build_vst3 (bld):

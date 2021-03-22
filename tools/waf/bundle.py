@@ -20,6 +20,20 @@ def bundle_target (self, leaf):
 def bundle_name (self):
     return self.bundle_node().name
 
+@taskgen_method
+def bundle_install_path (self):
+    if not self.install_path: return None
+    return '%s/%s' % (self.install_path, self.bundle_name())
+
+@taskgen_method
+def bundle_create_child (self, relpath, *k, **kw):
+    C = self.bld (*k, **kw)
+    C.target = self.bundle_target(relpath).relpath()
+    instdir = os.path.abspath (os.path.join (self.bundle_install_path(), relpath, os.pardir))
+    if self.install_path and instdir:
+        C.install_path = instdir
+    return C
+
 @feature ('bundle')
 @before_method ('apply_link')
 def create_task_bundle (self):
