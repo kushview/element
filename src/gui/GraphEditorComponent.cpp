@@ -1098,13 +1098,8 @@ void GraphEditorComponent::setZoomScale (float scale)
 void GraphEditorComponent::updateSelection()
 {
     for (int i = getNumChildComponents(); --i >= 0;)
-    {
         if (auto* const block = dynamic_cast <BlockComponent*> (getChildComponent (i)))
-        { 
             block->repaint();
-            MessageManager::getInstance()->runDispatchLoopUntil (20);
-        }
-    }
 }
 
 BlockComponent* GraphEditorComponent::createBlock (const Node& node)

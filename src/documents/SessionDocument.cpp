@@ -104,9 +104,13 @@ namespace Element {
     void SessionDocument::onSessionChanged()
     {
         if (! session->notificationsFrozen())
+        {
             changed();
+        }
         else
+        {
             setChangedFlag (false);
+        }
     }
     
     void SessionDocument::changeListenerCallback (ChangeBroadcaster* cb)

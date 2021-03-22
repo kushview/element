@@ -8,6 +8,10 @@
 using namespace juce;
 using namespace Element;
 
+#ifndef EL_API_DOCS_URL
+ #define EL_API_DOCS_URL "http://vscode.API_DOCS_URL.local"
+#endif
+
 namespace kv {
 using namespace juce;
 using PortDescription = kv::PortDescription;
