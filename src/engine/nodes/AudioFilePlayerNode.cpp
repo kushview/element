@@ -33,7 +33,7 @@
 namespace Element {
 
 class AudioFilePlayerEditor : public AudioProcessorEditor,
-                              public FilenameComponentListener,
+                              public FileComboBoxListener,
                               public ChangeListener,
                               public DragAndDropTarget,
                               public FileDragAndDropTarget,
@@ -45,11 +45,12 @@ public:
           processor (o)
     {
         setOpaque (true);
-        chooser.reset (new FilenameComponent ("Audio File", File(), 
+        chooser.reset (new FileComboBox ("Audio File", File(), 
                                               false, false, false,
                                               o.getWildcard(), String(),
                                               TRANS("Select Audio File")));
         addAndMakeVisible (chooser.get());
+        chooser->setShowFullPathName (false);
 
         addAndMakeVisible (watchButton); 
         watchButton.setIcon (Icon (getIcons().fasFolderOpen, Colours::black));
@@ -144,10 +145,12 @@ public:
                                                 dontSendNotification);
     }
 
-    void filenameComponentChanged (FilenameComponent*) override
+    void fileComboBoxChanged (FileComboBox*) override
     {
         const auto f1 = chooser->getCurrentFile();
         const auto f2 = processor.getAudioFile();
+        DBG(f1.getFullPathName());
+
         if (! f1.isDirectory() && f1 != f2)
             processor.openFile (chooser->getCurrentFile());
     }
@@ -226,7 +229,7 @@ public:
 
 private:
     AudioFilePlayerNode& processor;
-    std::unique_ptr<FilenameComponent> chooser;
+    std::unique_ptr<FileComboBox> chooser;
     Slider position;
     Slider volume;
     TextButton playButton;
