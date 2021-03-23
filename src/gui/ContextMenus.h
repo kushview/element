@@ -83,7 +83,7 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
-        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByManufacturer);
+        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByCategory);
     
         PopupMenu unvMenu;
        #if JUCE_MAC
