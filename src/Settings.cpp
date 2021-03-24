@@ -585,7 +585,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
                 AudioDeviceManager::AudioDeviceSetup setup;
                 devices.getAudioDeviceSetup (setup);
                 setup.sampleRate = rate;
-                devices.setAudioDeviceSetup (setup, false);
+                devices.setAudioDeviceSetup (setup, true);
             }
         }
     }
@@ -600,7 +600,7 @@ bool Settings::performMenuResult (Globals& world, const int result)
                 AudioDeviceManager::AudioDeviceSetup setup;
                 devices.getAudioDeviceSetup (setup);
                 setup.bufferSize = bufSize;
-                devices.setAudioDeviceSetup (setup, false);
+                devices.setAudioDeviceSetup (setup, true);
             }
         }
     }
