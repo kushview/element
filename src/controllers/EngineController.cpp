@@ -739,7 +739,9 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     using IOP = GraphProcessor::AudioGraphIOProcessor;
 
-   #if ! EL_RUNNING_AS_PLUGIN
+    if (getRunMode() == RunMode::PLUGIN)
+        return;
+
     auto session = getWorld().getSession();
     auto* const root = graphs->findActiveRootGraphManager();
     auto& devices (getWorld().getDeviceManager());
@@ -764,7 +766,6 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
             processor.suspendProcessing (false);
         }
     }
-   #endif
 }
 
 void EngineController::syncModels()

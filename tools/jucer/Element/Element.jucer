@@ -12,7 +12,7 @@
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementAU"
               pluginRTASCategory="2048" aaxIdentifier="net.kushview.Element"
               pluginAAXCategory="2048" companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1"
+              companyEmail="support@kushview.net" defines="EL_USE_LUA=1&#10;"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
               headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"

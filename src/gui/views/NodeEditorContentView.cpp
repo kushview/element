@@ -374,41 +374,45 @@ void NodeEditorContentView::clearEditor()
 Component* NodeEditorContentView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
+    jassert(world);
+    auto& app   = ViewHelpers::findContentComponent (this)->getAppController();
     
     if (node.isAudioInputNode())
     {
-       #if ! EL_RUNNING_AS_PLUGIN
-        if (node.isChildOfRootGraph())
+        if (app.getRunMode() == RunMode::STANDALONE)
         {
-            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                1, DeviceManager::maxAudioChannels, 0, 0, 
-                false, false, false, false);
+            if (node.isChildOfRootGraph())
+            {
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                    1, DeviceManager::maxAudioChannels, 0, 0, 
+                    false, false, false, false);
+            }
+            else
+            {
+                return nullptr;
+            }
         }
-        else
-        {
-            return nullptr;
-        }
-       #else
+
         return new AudioIONodeEditor (node, world->getDeviceManager(), true, false);
-       #endif
     }
 
     if (node.isAudioOutputNode())
     {
-       #if ! EL_RUNNING_AS_PLUGIN
-        if (node.isChildOfRootGraph())
+        if (app.getRunMode() == RunMode::STANDALONE)
         {
-            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                0, 0, 1, DeviceManager::maxAudioChannels, 
-                false, false, false, false);
+            if (node.isChildOfRootGraph())
+            {
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                    0, 0, 1, DeviceManager::maxAudioChannels, 
+                    false, false, false, false);
+            }
+            else
+            {
+                return nullptr;
+            }
         }
-        else
-        {
-            return nullptr;
-        }
-       #else
+
         return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
-       #endif
     }
 
     if (node.isMidiInputNode())

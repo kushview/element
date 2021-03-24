@@ -34,24 +34,16 @@ RootGraph::RootGraph() { }
 
 void RootGraph::setPlayConfigFor (DeviceManager& devices)
 {
-   #if EL_RUNNING_AS_PLUGIN
-    ignoreUnused (devices);
-    graphName = "Device";
-   #else
     if (auto* device = devices.getCurrentAudioDevice())
         setPlayConfigFor (device);
     DeviceManager::AudioSettings setup;
     devices.getAudioDeviceSetup (setup);
     audioInName     = setup.inputDeviceName;
     audioOutName    = setup.outputDeviceName;
-   #endif
 }
 
 void RootGraph::setPlayConfigFor (AudioIODevice *device)
 {
-#if EL_RUNNING_AS_PLUGIN
-    ignoreUnused (device);
-#else
     jassert (device);
     
     const int numIns        = device->getActiveInputChannels().countNumberOfSetBits();
@@ -59,11 +51,10 @@ void RootGraph::setPlayConfigFor (AudioIODevice *device)
     const int bufferSize    = device->getCurrentBufferSizeSamples();
     const double sampleRate = device->getCurrentSampleRate();
     setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
-
     updateChannelNames (device);
     graphName = device->getName();
-    if (graphName.isEmpty()) graphName = "Device";
-#endif
+    if (graphName.isEmpty())
+        graphName = "Device";
 }
 
 void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
@@ -600,11 +591,9 @@ public:
     
     bool isTimeMaster() const
     {
-       #if EL_RUNNING_AS_PLUGIN
-        return sessionWantsExternalClock.get() == 0;
-       #else
+        if (engine.getRunMode() == RunMode::PLUGIN)
+            return sessionWantsExternalClock.get() == 0;
         return processMidiClock.get() == 0 && sessionWantsExternalClock.get() == 0;
-       #endif
     }
     
     void audioDeviceAboutToStart (AudioIODevice* const device) override
@@ -773,11 +762,9 @@ public:
     
     bool isUsingExternalClock() const
     {
-       #if EL_RUNNING_AS_PLUGIN
-        return sessionWantsExternalClock.get() > 0;
-       #else
+        if (engine.getRunMode() == RunMode::PLUGIN)
+            return sessionWantsExternalClock.get() > 0;
         return sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0;
-       #endif
     }
     
 private:
@@ -851,8 +838,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Private)
 };
 
-AudioEngine::AudioEngine (Globals& g)
-    : world (g)
+AudioEngine::AudioEngine (Globals& g, RunMode m)
+    : world (g), runMode (m)
 {
     priv = new Private (*this);
 }
@@ -865,18 +852,20 @@ AudioEngine::~AudioEngine() noexcept
 
 void AudioEngine::activate()
 {
-   #if ! EL_RUNNING_AS_PLUGIN
-    auto& midi (world.getMidiEngine());
-    midi.addMidiInputCallback (String(), &getMidiInputCallback());
-   #endif
+    if (getRunMode() == RunMode::STANDALONE)
+    {
+        auto& midi (world.getMidiEngine());
+        midi.addMidiInputCallback (String(), &getMidiInputCallback());
+    }
 }
 
 void AudioEngine::deactivate()
 {
-   #if ! EL_RUNNING_AS_PLUGIN
-    auto& midi (world.getMidiEngine());
-    midi.removeMidiInputCallback (String(), &getMidiInputCallback());
-   #endif
+    if (getRunMode() == RunMode::STANDALONE)
+    {
+        auto& midi (world.getMidiEngine());
+        midi.removeMidiInputCallback (String(), &getMidiInputCallback());
+    }
 }
 
 AudioIODeviceCallback&  AudioEngine::getAudioIODeviceCallback() { jassert (priv != nullptr); return *priv; }
@@ -998,9 +987,8 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
 {
     if (priv)
     {
-       #if EL_RUNNING_AS_PLUGIN
-        world.getMidiEngine().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
-       #endif
+        if (getRunMode() == RunMode::PLUGIN)
+            world.getMidiEngine().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
         priv->processCurrentGraph (buffer, midi);
     }
 }

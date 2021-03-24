@@ -58,8 +58,6 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 #define mapsctl controller->findChild<MappingController>()
 #define devsctl controller->findChild<DevicesController>()
 
-
-
 //=============================================================================
 PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     : AudioProcessor (createDefaultBuses (instanceType, jmax (0, numBuses))),
@@ -78,7 +76,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
 
     prepared = controllerActive = false;
     world.reset (new Globals());
-    world->setEngine (new AudioEngine (*world));
+    world->setEngine (new AudioEngine (*world, RunMode::PLUGIN));
     engine = world->getAudioEngine();
     SessionPtr session = world->getSession();
     Settings& settings (world->getSettings());
@@ -108,7 +106,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
         PLUGIN_DBG("[EL] couldn't create default graph");
     }
 
-    controller.reset (new AppController (*world));   
+    controller.reset (new AppController (*world, RunMode::PLUGIN));
     controller->activate();
     controllerActive = true;
 

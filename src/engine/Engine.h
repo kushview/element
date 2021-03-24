@@ -26,7 +26,7 @@ namespace Element {
 class Engine : public ReferenceCountedObject
 {
 public:
-    virtual ~Engine() { }
+    virtual ~Engine() {}
     virtual AudioIODeviceCallback& getAudioIODeviceCallback() = 0;
     virtual MidiInputCallback& getMidiInputCallback() = 0;
 };

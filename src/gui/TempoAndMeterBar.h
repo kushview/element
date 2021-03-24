@@ -172,12 +172,11 @@ private:
         if (extButton.isVisible() && extButton.getToggleState())
         {
             tempoLabel.setEnabled (false);
-            
-           #if EL_RUNNING_AS_PLUGIN
             // MIDI clock doesn't change the meter, only disable user
             // interaction in the plugin.
-            meter->setEnabled (false);
-           #endif
+            if (auto* cc = ViewHelpers::findContentComponent (this))
+                if (cc->getAppController().getRunMode() == RunMode::PLUGIN)
+                    meter->setEnabled (false);
         }
         else
         {

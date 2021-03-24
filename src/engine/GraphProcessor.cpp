@@ -1504,7 +1504,6 @@ GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
 
 const String GraphProcessor::AudioGraphIOProcessor::getName() const
 {
-   #if ! EL_RUNNING_AS_PLUGIN
     if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
     {
         switch (type)
@@ -1516,7 +1515,6 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
             default:                break;
         }
     }
-   #endif
 
     switch (type)
     {

@@ -26,6 +26,7 @@
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
+#include "RunMode.h"
 
 namespace Element {
 
@@ -128,10 +129,13 @@ class AudioEngine : public Engine
 {
 public:
     Signal<void()> sampleLatencyChanged;
-
-    AudioEngine (Globals&);
+    AudioEngine (Globals&, RunMode mode = RunMode::STANDALONE);
     virtual ~AudioEngine() noexcept;
 
+    //==========================================================================
+    RunMode getRunMode() const { return runMode; }
+
+    //==========================================================================
     void activate();
     void deactivate();
     
@@ -191,6 +195,7 @@ private:
     class Private;
     ScopedPointer<Private> priv;
     Globals& world;
+    RunMode runMode;
 };
 
 typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;

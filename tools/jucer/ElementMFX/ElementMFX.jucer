@@ -12,7 +12,7 @@
               pluginIsMidiEffectPlugin="1" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementMFX"
               aaxIdentifier="net.kushview.ElementMFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
-              defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1" pluginVSTCategory="kPlugCategEffect"
+              defines="EL_USE_LUA=1&#10;" pluginVSTCategory="kPlugCategEffect"
               pluginAUMainType="'aumi'" userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
               pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
               pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"

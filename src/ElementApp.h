@@ -25,10 +25,6 @@
 namespace kv { }
 using namespace kv;
 
-#if EL_RUNNING_AS_PLUGIN
- #include "../libs/compat/BinaryData.h"
-#endif
-
 //=============================================================================
 #ifdef __cplusplus
  #define EL_EXTERN extern "C"
