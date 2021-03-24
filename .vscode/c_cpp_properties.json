@@ -120,7 +120,8 @@
             "defines": [
                 "LUA_USE_READLINE=1",
                 "EL_LUADIR=\"/usr/share/element/lua\"",
-                "EL_SCRIPTSDIR=\"/usr/share/element/scripts\""
+                "EL_SCRIPTSDIR=\"/usr/share/element/scripts\"",
+                "JUCE_PLUGINHOST_AU=0"
             ],
             "forcedInclude": [
                 "${workspaceRoot}/.vscode/vscode.h"
