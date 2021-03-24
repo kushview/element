@@ -31,6 +31,7 @@
 #include "engine/nodes/ScriptNode.h"
 #include "DataPath.h"
 #include "Settings.h"
+#include "Utils.h"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME          "DeadAudioPlugins.txt"
 #define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH       "Temp/SlavePluginList.xml"
@@ -481,8 +482,7 @@ public:
 
         if (props)
         {
-            const StringArray formats = { "AU", "VST", "VST3", "LV2" };
-            for (const auto& f : formats)
+            for (const auto& f : Util::getSupportedAudioPluginFormats())
             {
                 const auto key = String(Settings::lastPluginScanPathPrefix) + f;
                 paths.set (f, FileSearchPath (props->getValue (key)));
@@ -663,10 +663,36 @@ PluginManager::~PluginManager()
 
 void PluginManager::addDefaultFormats()
 {
-    getAudioPluginFormats().addDefaultFormats();
-   #if JLV2_PLUGINHOST_LV2
-    addFormat (new jlv2::LV2PluginFormat());
-   #endif
+    auto& audioPlugs = getAudioPluginFormats();
+    for (const auto& fmt : Util::getSupportedAudioPluginFormats())
+    {
+        if (fmt == "") continue;
+       
+       #if JUCE_MAC && JUCE_PLUGINHOST_AU
+        else if (fmt == "AudioUnit")
+            audioPlugs.addFormat (new AudioUnitPluginFormat());
+       #endif
+
+       #if JUCE_PLUGINHOST_VST
+        else if (fmt == "VST")
+            audioPlugs.addFormat (new VSTPluginFormat());
+       #endif
+       
+       #if JUCE_PLUGINHOST_VST3
+        else if (fmt == "VST3")
+            audioPlugs.addFormat (new VST3PluginFormat());
+       #endif
+       
+       #if JUCE_PLUGINHOST_LADSPA
+        else if (fmt == "LADSPA")
+            audioPlugs.addFormat (new LADSPAPluginFormat());
+       #endif
+       
+       #if JLV2_PLUGINHOST_LV2
+        else if (fmt == "LV2")
+            audioPlugs.addFormat (new jlv2::LV2PluginFormat());
+       #endif
+    }
 }
 
 void PluginManager::addFormat (AudioPluginFormat* fmt)

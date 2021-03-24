@@ -453,6 +453,8 @@ inline static String fromBase64 (const String& input)
     return mo.toString();
 }
 
+StringArray getSupportedAudioPluginFormats();
+
 }
 
 class DataURI

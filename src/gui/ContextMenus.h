@@ -22,6 +22,7 @@
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -84,18 +85,10 @@ public:
             return;
         hasAddedPlugins = true;
         plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByCategory);
-    
+
         PopupMenu unvMenu;
-       #if JUCE_MAC
-        StringArray unvFormats = { "AudioUnit", "VST", "VST3", "LV2" };
-       #elif JUCE_WINDOWS
-        StringArray unvFormats = { "VST", "VST3" };
-       #else
-        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" };
-       #endif
-        
         unverified.clearQuick (true);
-        for (const auto& name : unvFormats)
+        for (const auto& name : Util::getSupportedAudioPluginFormats())
         {
             PopupMenu menu;
             const int lastSize = unverified.size();

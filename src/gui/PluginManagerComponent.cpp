@@ -758,7 +758,7 @@ private:
 
 static StringArray scanAllFormats (PluginManager& p)
 {
-    const StringArray supported ({ "AudioUnit", "VST", "VST3", "LV2", "LADSPA" });
+    const StringArray supported (Util::getSupportedAudioPluginFormats());
     StringArray filtered;
     for (int i = 0; i < p.getAudioPluginFormats().getNumFormats (); ++i)
     {
