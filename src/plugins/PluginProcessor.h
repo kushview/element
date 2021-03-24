@@ -55,7 +55,7 @@ public:
 
     void clearNode()
     {
-        GraphNodePtr oldNode;
+        NodeObjectPtr oldNode;
         Element::Parameter::Ptr oldParam;
         
         if (parameter)
@@ -70,7 +70,7 @@ public:
             node            = nullptr;
             oldParam        = parameter;
             parameter       = nullptr;
-            parameterIdx    = GraphNode::NoParameter;
+            parameterIdx    = NodeObject::NoParameter;
         }
         
         oldParam.reset();
@@ -87,7 +87,7 @@ public:
             return;
         
         model = newNode;
-        GraphNodePtr newNodeObj = model.getGraphNode();
+        NodeObjectPtr newNodeObj = model.getGraphNode();
         
         {
             SpinLock::ScopedLockType sl (lock);
@@ -117,13 +117,13 @@ public:
         {
             switch (parameterIdx)
             {
-                case GraphNode::EnabledParameter:
+                case NodeObject::EnabledParameter:
                     setValueNotifyingHost (node->isEnabled() ? 1.f : 0.f);
                     break;
-                case GraphNode::BypassParameter:
+                case NodeObject::BypassParameter:
                     setValueNotifyingHost (node->isSuspended() ? 1.f : 0.f);
                     break;
-                case GraphNode::MuteParameter:
+                case NodeObject::MuteParameter:
                     setValueNotifyingHost (node->isMuted() ? 1.f : 0.f);
                     break;
             }
@@ -159,9 +159,9 @@ public:
         
         switch (parameterIdx)
         {
-            case GraphNode::MuteParameter:      return 0.f; break;
-            case GraphNode::EnabledParameter:   return 1.f; break;
-            case GraphNode::BypassParameter:    return 0.f; break;
+            case NodeObject::MuteParameter:      return 0.f; break;
+            case NodeObject::EnabledParameter:   return 1.f; break;
+            case NodeObject::BypassParameter:    return 0.f; break;
         }
         
         return 0.f;
@@ -192,9 +192,9 @@ public:
         
         switch (parameterIdx)
         {
-            case GraphNode::MuteParameter:
-            case GraphNode::EnabledParameter:
-            case GraphNode::BypassParameter:
+            case NodeObject::MuteParameter:
+            case NodeObject::EnabledParameter:
+            case NodeObject::BypassParameter:
                 return 1;
                 break;
         }
@@ -215,9 +215,9 @@ public:
         
         switch (parameterIdx)
         {
-            case GraphNode::MuteParameter:
-            case GraphNode::EnabledParameter:
-            case GraphNode::BypassParameter:
+            case NodeObject::MuteParameter:
+            case NodeObject::EnabledParameter:
+            case NodeObject::BypassParameter:
                 return true;
                 break;
         }
@@ -322,7 +322,7 @@ private:
     const int index;
     Atomic<float> value { 0.f };
     Node model;
-    GraphNodePtr node;
+    NodeObjectPtr node;
     AudioProcessor* processor = nullptr;
     Element::Parameter::Ptr parameter = nullptr;
     int parameterIdx = -1;

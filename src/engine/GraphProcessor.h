@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "engine/VelocityCurve.h"
 #include "Signals.h"
 
@@ -81,13 +81,13 @@ public:
         This will return nullptr if the index is out of range.
         @see getNodeForId
     */
-    GraphNode* getNode (const int index) const                           { return nodes [index]; }
+    NodeObject* getNode (const int index) const                           { return nodes [index]; }
 
     /** Searches the graph for a node with the given ID number and returns it.
         If no such node was found, this returns nullptr.
         @see getNode
     */
-    GraphNode* getNodeForId (const uint32 nodeId) const;
+    NodeObject* getNodeForId (const uint32 nodeId) const;
 
     /** Adds a node to the graph.
 
@@ -100,9 +100,9 @@ public:
 
         If this succeeds, it returns a pointer to the newly-created node.
     */
-    GraphNode* addNode (AudioProcessor* newProcessor, uint32 nodeId = 0);
+    NodeObject* addNode (AudioProcessor* newProcessor, uint32 nodeId = 0);
 
-    GraphNode* addNode (GraphNode* newNode, uint32 nodeId = 0);
+    NodeObject* addNode (NodeObject* newNode, uint32 nodeId = 0);
 
     /** Deletes a node within the graph which has the specified ID.
 
@@ -111,7 +111,7 @@ public:
     bool removeNode (uint32 nodeId);
 
     /** Builds an array of ordered nodes */
-    void getOrderedNodes (ReferenceCountedArray<GraphNode>& res);
+    void getOrderedNodes (ReferenceCountedArray<NodeObject>& res);
     
     /** Returns the number of connections in the graph. */
     int getNumConnections() const                                       { return connections.size(); }
@@ -330,13 +330,13 @@ public:
     virtual void fillInPluginDescription (PluginDescription& d) const override;
 
 protected:
-    virtual GraphNode* createNode (uint32, AudioProcessor*);
+    virtual NodeObject* createNode (uint32, AudioProcessor*);
     virtual void preRenderNodes() { }
     virtual void postRenderNodes() { }
 
 private:
     typedef ArcTable<Connection> LookupTable;
-    ReferenceCountedArray<GraphNode> nodes;
+    ReferenceCountedArray<NodeObject> nodes;
     OwnedArray<Connection> connections;
     uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
     

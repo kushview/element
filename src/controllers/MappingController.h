@@ -18,7 +18,7 @@
 */
 
 #include "controllers/AppController.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "session/ControllerDevice.h"
 #include "Signals.h"
 

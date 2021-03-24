@@ -110,7 +110,7 @@ private:
     friend class AudioEngine;
     friend struct RootGraphRender;
 
-    GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+    NodeObjectPtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
     String audioInName, audioOutName;
     StringArray audioInputNames;

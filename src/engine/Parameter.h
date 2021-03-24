@@ -289,7 +289,7 @@ public:
     void sendGestureChangedMessageToListeners (bool touched);
 
 private:
-    friend class GraphNode;
+    friend class NodeObject;
 
     //==============================================================================
     int parameterIndex = -1;

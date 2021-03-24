@@ -183,7 +183,7 @@ namespace Element {
         {
             auto session = ViewHelpers::getSession (this);
             node.setProperty (Tags::midiChannel, getMidiChannel());
-            if (GraphNodePtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getGraphNode())
                 if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                     root->setMidiChannel (getMidiChannel());
         }
@@ -233,7 +233,7 @@ namespace Element {
             if (! locked)
             {
                 node.setProperty (Tags::midiProgram, roundToInt (v));
-                if (GraphNodePtr ptr = node.getGraphNode())
+                if (NodeObjectPtr ptr = node.getGraphNode())
                     if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                         root->setMidiProgram ((int) node.getProperty (Tags::midiProgram));
             }

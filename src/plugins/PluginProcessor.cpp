@@ -445,7 +445,7 @@ void PluginProcessor::handleAsyncUpdate()
 
 bool PluginProcessor::isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const
 {
-    if (! boundNode.isValid() || boundParam == GraphNode::NoParameter)
+    if (! boundNode.isValid() || boundParam == NodeObject::NoParameter)
         return false;
     for (auto* const pp : perfparams)
         if (boundNode == pp->getNode() && boundParam == pp->getBoundParameter())
@@ -471,7 +471,7 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
         {
             PopupMenu submenu;
             auto node = graph.getNode (j);
-            GraphNodePtr ptr = node.getGraphNode();
+            NodeObjectPtr ptr = node.getGraphNode();
             if (ptr == nullptr)
                 continue;
             auto* proc = ptr->getAudioProcessor();

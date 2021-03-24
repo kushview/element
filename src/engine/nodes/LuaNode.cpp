@@ -713,7 +713,7 @@ void LuaParameter::controlValueChanged (int index, float value)
 void LuaParameter::controlTouched (int, bool) {}
 
 LuaNode::LuaNode() noexcept
-    : GraphNode (0)
+    : NodeObject (0)
 {
     context = std::make_unique<Context>();
     jassert (metadata.hasType (Tags::node));

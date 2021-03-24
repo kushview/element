@@ -104,7 +104,7 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
         return createPluginWindowFor (node, new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node));
     }
     
-    GraphNodePtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getGraphNode();
     AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (! proc)
         return nullptr;

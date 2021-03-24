@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "engine/MappingEngine.h"
 #include "engine/MidiEngine.h"
 #include "session/ControllerDevice.h"
@@ -116,9 +116,9 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == GraphNode::EnabledParameter ||
-                 parameterIndex == GraphNode::BypassParameter ||
-                 parameterIndex == GraphNode::MuteParameter)
+        else if (parameterIndex == NodeObject::EnabledParameter ||
+                 parameterIndex == NodeObject::BypassParameter ||
+                 parameterIndex == NodeObject::MuteParameter)
         {
             triggerAsyncUpdate();
         }
@@ -135,17 +135,17 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 
         if (momentary.get() == 0)
         {
-            if (parameterIndex == GraphNode::EnabledParameter)
+            if (parameterIndex == NodeObject::EnabledParameter)
             {
                 node->setEnabled (! node->isEnabled());
                 model.setProperty (Tags::enabled, node->isEnabled());
             }
-            else if (parameterIndex == GraphNode::BypassParameter)
+            else if (parameterIndex == NodeObject::BypassParameter)
             {
                 node->suspendProcessing (! node->isSuspended());
                 model.setProperty (Tags::bypass, node->isSuspended());
             }
-            else if (parameterIndex == GraphNode::MuteParameter)
+            else if (parameterIndex == NodeObject::MuteParameter)
             {
                 model.setMuted (! model.isMuted());
             }
@@ -156,17 +156,17 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
             // DBG("async note off: " << (int) event.isNoteOff());
             const bool isInverse = inverse.get() == 1;
 
-            if (parameterIndex == GraphNode::EnabledParameter)
+            if (parameterIndex == NodeObject::EnabledParameter)
             {
                 node->setEnabled (isInverse ? event.isNoteOff() : event.isNoteOn());
                 model.setProperty (Tags::enabled, node->isEnabled());
             }
-            else if (parameterIndex == GraphNode::BypassParameter)
+            else if (parameterIndex == NodeObject::BypassParameter)
             {
                 node->suspendProcessing (isInverse ? event.isNoteOn() : event.isNoteOff());
                 model.setProperty (Tags::bypass, node->isSuspended());
             }
-            else if (parameterIndex == GraphNode::MuteParameter)
+            else if (parameterIndex == NodeObject::MuteParameter)
             {
                 model.setMuted (isInverse ? event.isNoteOff() : event.isNoteOn());
             }
@@ -176,7 +176,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
 private:
     ControllerDevice::Control control;
     Node model;
-    GraphNodePtr node { nullptr };
+    NodeObjectPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
     int parameterIndex = -1;
 
@@ -248,7 +248,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter = node->getParameters()[parameterIndex];
             jassert (nullptr != parameter);
         }
-        else if (parameterIndex == GraphNode::EnabledParameter)
+        else if (parameterIndex == NodeObject::EnabledParameter)
         {
             lastControllerValue = model.isEnabled() ? 127 : 0;
         }
@@ -279,9 +279,9 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             parameter->setValueNotifyingHost (static_cast<float> (ccValue) / 127.f);
             parameter->endChangeGesture();
         }
-        else if (parameterIndex == GraphNode::EnabledParameter ||
-                 parameterIndex == GraphNode::BypassParameter ||
-                 parameterIndex == GraphNode::MuteParameter)
+        else if (parameterIndex == NodeObject::EnabledParameter ||
+                 parameterIndex == NodeObject::BypassParameter ||
+                 parameterIndex == NodeObject::MuteParameter)
         {
             const auto currentToggleState = desiredToggleState.get();
             const auto mode = toggleMode.get();
@@ -349,20 +349,20 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
             ? (inverseToggle.get() == 1 ? 0 : 1) // inverse on, then compare false
             : 1;                                 // equals mode always compare true
 
-        if (parameterIndex == GraphNode::EnabledParameter)
+        if (parameterIndex == NodeObject::EnabledParameter)
         {
             node->setEnabled (desiredToggleState.get() == stateToCompare);
             if (model.isEnabled() != node->isEnabled())
                 model.setProperty (Tags::enabled, node->isEnabled());
         }
-        else if (parameterIndex == GraphNode::BypassParameter)
+        else if (parameterIndex == NodeObject::BypassParameter)
         {
             // inverted because UI displays bypass as inactive (or active for not bypassed)
             node->suspendProcessing (! (desiredToggleState.get() == stateToCompare));
             if (model.isBypassed() != node->isSuspended())
                 model.setProperty (Tags::bypass, node->isSuspended());
         }
-        else if (parameterIndex == GraphNode::MuteParameter)
+        else if (parameterIndex == NodeObject::MuteParameter)
         {
             model.setMuted (desiredToggleState.get() == stateToCompare);
         }
@@ -371,7 +371,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
 private:
     ControllerDevice::Control control;
     Node model;
-    GraphNodePtr node { nullptr };
+    NodeObjectPtr node { nullptr };
     Parameter::Ptr parameter { nullptr };
     
     const int controllerNumber { -1 };

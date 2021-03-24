@@ -145,9 +145,9 @@ bool invokeDirectly (Component* c, const int commandID, bool async) {
     return false;
 }
 
-GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
+NodeObjectPtr findGraphNodeFor (Component* c, const Node& node)
 {
-    GraphNodePtr obj = node.getGraphNode();
+    NodeObjectPtr obj = node.getGraphNode();
     
     if (nullptr == obj)
     {

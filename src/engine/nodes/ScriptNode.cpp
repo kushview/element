@@ -48,7 +48,7 @@ namespace Element {
 
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
-    : GraphNode (0)
+    : NodeObject (0)
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));

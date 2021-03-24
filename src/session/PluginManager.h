@@ -25,7 +25,7 @@
 
 namespace Element {
 
-class GraphNode;
+class NodeObject;
 class Node;
 class PluginScannerMaster;
 class PluginScanner;
@@ -104,7 +104,7 @@ public:
 
     AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
     Processor *createPlugin (const PluginDescription& desc, String& errorMsg);
-    GraphNode* createGraphNode (const PluginDescription& desc, String& errorMsg);
+    NodeObject* createGraphNode (const PluginDescription& desc, String& errorMsg);
 
     /** Set the play config used when instantiating plugins */
     void setPlayConfig (double sampleRate, int blockSize);

@@ -759,7 +759,7 @@ Processor* PluginManager::createPlugin (const PluginDescription &desc, String &e
     return nullptr;
 }
 
-GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
+NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
 {
     if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
     {

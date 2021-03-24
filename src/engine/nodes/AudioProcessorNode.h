@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 
 namespace Element {
 
 class GraphProcessor;
 class MidiPipe;
 
-class AudioProcessorNode : public GraphNode
+class AudioProcessorNode : public NodeObject
 {
 public:
     AudioProcessorNode (uint32 nodeId, AudioProcessor* processor);

@@ -39,7 +39,7 @@ public:
         ioButton->onClick = [this]()
         { 
             auto node = getNode();
-            GraphNodePtr obj = node.getGraphNode();
+            NodeObjectPtr obj = node.getGraphNode();
             auto* proc = (obj) ? obj->getAudioProcessor() : 0;
             if (! proc) return;
 

@@ -60,7 +60,7 @@ public:
                 proc->producesMidi() == true);
 
         beginTest ("Node Ports");
-        GraphNodePtr node = graph->addNode (proc.release(), 0);
+        NodeObjectPtr node = graph->addNode (proc.release(), 0);
         expect (node->getNumPorts() == 1, "Wrong number of ports");
         node = nullptr;
         graph->clear();
@@ -83,7 +83,7 @@ public:
                 break;
             }
         }
-        expect (node != nullptr, "Didn't find GraphNodePtr");
+        expect (node != nullptr, "Didn't find NodeObjectPtr");
         if (node != nullptr)
         {
             expect (node->getNumAudioInputs() == 0, "Audio Ins non-zero");

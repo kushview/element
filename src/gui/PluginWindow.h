@@ -26,7 +26,7 @@ namespace Element {
 
 class ContentComponent;
 class GuiController;
-class GraphNode;
+class NodeObject;
 
 /** A desktop window containing a plugin's UI. */
 class PluginWindow : public DocumentWindow,
@@ -44,7 +44,7 @@ public:
     ContentComponent* getElementContentComponent() const;
     
     Toolbar* getToolbar() const;
-    void updateGraphNode (GraphNode* newNode, Component* newEditor);
+    void updateGraphNode (NodeObject* newNode, Component* newEditor);
     Node getNode() const { return node; }
     void restoreAlwaysOnTopState();
     void moved() override;
@@ -66,7 +66,7 @@ protected:
 private:
     GuiController& gui;
     friend class WindowManager;
-    GraphNode* owner;
+    NodeObject* owner;
     Node node;
     Value name;
 

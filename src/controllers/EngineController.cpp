@@ -65,7 +65,7 @@ struct RootGraphHolder
         if (attached())
             return true;
         
-        node = GraphNode::createForRoot (new RootGraph ());
+        node = NodeObject::createForRoot (new RootGraph ());
         
         if (auto* root = getRootGraph())
         {
@@ -124,7 +124,7 @@ struct RootGraphHolder
         for (int i = nodes.getNumChildren(); --i >= 0;)
         {
             Node model (nodes.getChild (i), false);
-            GraphNodePtr node = model.getGraphNode();
+            NodeObjectPtr node = model.getGraphNode();
             if (node && (node->isAudioIONode() || node->isMidiIONode()))
                 model.resetPorts();
         }
@@ -137,7 +137,7 @@ private:
     DeviceManager&                      devices;
     ScopedPointer<RootGraphManager>  controller;
     Node                                model;
-    GraphNodePtr                        node;
+    NodeObjectPtr                        node;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(RootGraphHolder);
 };
@@ -165,7 +165,7 @@ public:
     {
         for (int i = parent->getNumNodes(); --i >= 0;)
         {
-            if (GraphNodePtr node = parent->getNode (i))
+            if (NodeObjectPtr node = parent->getNode (i))
             {
                 if (auto* sub = node->processor<SubGraphProcessor>())
                 {
@@ -191,7 +191,7 @@ public:
             {
                 for (int i = controller->getNumNodes(); --i >= 0;)
                 {
-                    if (GraphNodePtr node = controller->getNode (i))
+                    if (NodeObjectPtr node = controller->getNode (i))
                         if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
                             if (sub->getController().isControlling (n))
                                 return &sub->getController();
@@ -757,7 +757,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
             for (int i = nodes.getNumChildren(); --i >= 0;)
             {
                 Node model (nodes.getChild (i), false);
-                if (GraphNodePtr node = model.getGraphNode())
+                if (NodeObjectPtr node = model.getGraphNode())
                     if (node && (node->isAudioIONode() || node->isMidiIONode()))
                         model.resetPorts();
             }
@@ -894,7 +894,7 @@ Node EngineController::addPlugin (GraphManager& c, const PluginDescription& desc
 
 void EngineController::addMidiDeviceNode (const String& device, const bool isInput)
 {
-    GraphNodePtr ptr;
+    NodeObjectPtr ptr;
     Node graph;
     if (auto s = getWorld().getSession())
         graph = s->getActiveGraph();
@@ -933,14 +933,14 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
 {
     Node node  = n;
     Node graph = node.getParentGraph();
-    GraphNodePtr ptr = node.getGraphNode();
+    NodeObjectPtr ptr = node.getGraphNode();
     auto* controller = graphs->findGraphManagerFor (graph);
     if (! controller)
         return;
     
     if (AudioProcessor* proc = ptr ? ptr->getAudioProcessor () : nullptr)
     {
-        GraphNodePtr ptr2 = graph.getGraphNode();
+        NodeObjectPtr ptr2 = graph.getGraphNode();
         if (auto* gp = dynamic_cast<GraphProcessor*> (ptr2->getAudioProcessor()))
         {
             if (proc->checkBusesLayoutSupported (layout))
@@ -983,8 +983,8 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
         const auto nodeId = ctl->addNode (&desc, x, y);
         if (nodeId != KV_INVALID_NODE)
         {
-            GraphNodePtr newptr = ctl->getNodeForId (nodeId);
-            const GraphNodePtr oldptr = node.getGraphNode();
+            NodeObjectPtr newptr = ctl->getNodeForId (nodeId);
+            const NodeObjectPtr oldptr = node.getGraphNode();
             jassert(newptr && oldptr);
             // attempt to retain connections from the replaced node
             for (int i = ctl->getNumConnections(); --i >= 0;)

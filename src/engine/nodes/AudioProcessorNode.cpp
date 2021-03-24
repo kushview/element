@@ -142,7 +142,7 @@ void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 }
 
 AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor)
-    : GraphNode (nodeId),
+    : NodeObject (nodeId),
       enablement (*this)
 {
     proc.reset (processor);
@@ -167,7 +167,7 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
 AudioProcessorNode::~AudioProcessorNode()
 {
     params.clear();
-    GraphNode::clearParameters();
+    NodeObject::clearParameters();
     enablement.cancelPendingUpdate();
     pluginState.reset();
     proc = nullptr;

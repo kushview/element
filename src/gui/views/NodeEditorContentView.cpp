@@ -359,7 +359,7 @@ void NodeEditorContentView::clearEditor()
 {
     if (editor == nullptr)
         return;
-    GraphNodePtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getGraphNode();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (auto* aped = dynamic_cast<AudioProcessorEditor*> (editor.get()))
     {
@@ -440,7 +440,7 @@ Component* NodeEditorContentView::createEmbededEditor()
         }
     }
 
-    GraphNodePtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getGraphNode();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (proc != nullptr)
     {

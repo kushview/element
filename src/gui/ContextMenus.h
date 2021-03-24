@@ -200,7 +200,7 @@ public:
     {
         PopupMenu menu;
         int index = 30000;
-        GraphNodePtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getGraphNode();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
 
         addOversamplingSubmenu (menu);
@@ -212,7 +212,7 @@ public:
     {
         PopupMenu osMenu;
         int index = 40000;
-        GraphNodePtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getGraphNode();
 
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
             return;
@@ -422,7 +422,7 @@ private:
         bool isTicked() override { return false; }
         bool perform() override
         {
-            if (GraphNodePtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getGraphNode())
             {
                 ptr->setEnabled (! ptr->isEnabled());
                 auto data = node.getValueTree();

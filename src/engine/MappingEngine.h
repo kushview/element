@@ -27,7 +27,7 @@ namespace Element {
 
 class ControllerMapHandler;
 class ControllerMapInput;
-class GraphNode;
+class NodeObject;
 class MidiEngine;
 
 class MappingEngine

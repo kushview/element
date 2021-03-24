@@ -128,9 +128,9 @@ public:
                 text = "Parameter ";
                 text << mapp.getParameterIndex();
                 
-                if (GraphNode::isSpecialParameter (mapp.getParameterIndex()))
+                if (NodeObject::isSpecialParameter (mapp.getParameterIndex()))
                 {
-                    text = GraphNode::getSpecialParameterName (mapp.getParameterIndex());
+                    text = NodeObject::getSpecialParameterName (mapp.getParameterIndex());
                 }
                 else if (auto* obj = node.getGraphNode())
                 {

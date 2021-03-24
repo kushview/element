@@ -24,7 +24,7 @@
 #include "Commands.h"
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/GraphProcessor.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "engine/nodes/MidiMonitorNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
@@ -125,7 +125,7 @@ public:
                         { deletePluginWindow (j, windowVisible); break; }
     }
     
-    inline void closeOpenPluginWindowsFor (GraphNode* const node, const bool windowVisible)
+    inline void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible)
     {
         if (! node)
             return;
@@ -163,7 +163,7 @@ public:
         deletePluginWindow (win, false);
     }
     
-    inline PluginWindow* getPluginWindowFor (GraphNode* node)
+    inline PluginWindow* getPluginWindowFor (NodeObject* node)
     {
         for (auto* const window : activePluginWindows)
             if (window->owner == node)

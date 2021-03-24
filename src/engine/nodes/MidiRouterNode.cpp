@@ -26,7 +26,7 @@
 namespace Element {
 
 MidiRouterNode::MidiRouterNode (int ins, int outs)
-    : GraphNode (0),
+    : NodeObject (0),
       numSources (ins),
       numDestinations (outs),
       state (ins, outs),
