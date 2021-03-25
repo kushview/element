@@ -464,8 +464,8 @@ void GraphEditorComponent::mouseDown (const MouseEvent& e)
         
         menu.addSeparator();
         PopupMenu zoomMenu;
-        zoomMenu.addItem (50, "25%",  true, getZoomScale() == 0.25);
-        zoomMenu.addItem (51, "50%",  true, getZoomScale() == 0.50);
+        // zoomMenu.addItem (50, "25%",  true, getZoomScale() == 0.25);
+        // zoomMenu.addItem (51, "50%",  true, getZoomScale() == 0.50);
         zoomMenu.addItem (52, "75%",  true, getZoomScale() == 0.75);
         zoomMenu.addItem (53, "100%", true, getZoomScale() == 1.00);
         zoomMenu.addItem (54, "125%", true, getZoomScale() == 1.25);
