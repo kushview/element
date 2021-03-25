@@ -20,6 +20,7 @@
 #include "session/PluginManager.h"
 #include "session/Node.h"
 #include "engine/nodes/BaseProcessor.h"
+#include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/LuaNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
@@ -751,23 +752,17 @@ AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& 
         desc, priv->sampleRate, priv->blockSize, errorMsg).release();
 }
 
-Processor* PluginManager::createPlugin (const PluginDescription &desc, String &errorMsg)
-{
-    jassertfalse; // deprecated
-    if (AudioPluginInstance* instance = createAudioPlugin (desc, errorMsg))
-        return dynamic_cast<Processor*> (instance);
-    return nullptr;
-}
-
 NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
 {
+    if (auto* const plugin = createAudioPlugin (desc, errorMsg))
+        return new AudioProcessorNode (0, plugin);
+
     if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
     {
         errorMsg = "Invalid format";
         return nullptr;
     }
 
-   #if defined (EL_PRO) || defined (EL_SOLO)
     if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
     {
         return new MidiChannelSplitterNode();
@@ -804,7 +799,6 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
     {
         return new ScriptNode();
     }
-   #endif
 
     errorMsg = desc.name;
     errorMsg << " not found.";
