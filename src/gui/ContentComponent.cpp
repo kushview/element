@@ -203,8 +203,8 @@ public:
         
         if (menuBtn.isVisible())
         {
-            menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3.6)
-                   .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3)
+                   .withSizeKeepingCentre (tempoBarHeight * 3, tempoBarHeight));
             r.removeFromRight (4);
         }
         
