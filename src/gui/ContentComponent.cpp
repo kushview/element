@@ -116,8 +116,11 @@ public:
        #endif
 
         if (isPluginVersion())
+        {
             addAndMakeVisible (menuBtn);
-
+            menuBtn.setButtonText ("settings");
+        }
+        
         for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
             b->addListener (this);
         addAndMakeVisible (tempoBar);
@@ -207,8 +210,8 @@ public:
         
         if (menuBtn.isVisible())
         {
-            menuBtn.setBounds (r.removeFromRight(tempoBarHeight)
-                   .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
+            menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3)
+                   .withSizeKeepingCentre (tempoBarHeight * 3, tempoBarHeight));
             r.removeFromRight (4);
         }
         
