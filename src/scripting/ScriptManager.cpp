@@ -165,6 +165,8 @@ File ScriptManager::getHomeScriptsDir()
     return File::getSpecialLocation (File::userHomeDirectory)
         .getChildFile (".local/share/element/scripts")
         .getFullPathName();
+   #else
+    return {};
    #endif
 }
 
