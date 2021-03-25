@@ -114,7 +114,7 @@ Result ScriptNode::loadScript (const String& newCode)
     return Result::ok();
 }
 
-void ScriptNode::fillInPluginDescription (PluginDescription& desc)
+void ScriptNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Script";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_SCRIPT;

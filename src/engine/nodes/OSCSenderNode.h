@@ -35,7 +35,7 @@ public:
     OSCSenderNode();
     virtual ~OSCSenderNode();
 
-    void fillInPluginDescription (PluginDescription& desc)
+    void getPluginDescription (PluginDescription& desc) const override
     {
         desc.name               = "OSC Sender";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_SENDER;

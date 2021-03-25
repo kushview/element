@@ -343,30 +343,30 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
     else if (fileOrId == EL_INTERNAL_ID_MIDI_MONITOR)
     {
         auto* const desc = ds.add (new PluginDescription());
-        MidiMonitorNode().fillInPluginDescription (*desc);
+        MidiMonitorNode().getPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_OSC_RECEIVER)
     {
         auto* const desc = ds.add (new PluginDescription());
-        OSCReceiverNode().fillInPluginDescription (*desc);
+        OSCReceiverNode().getPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_OSC_SENDER)
     {
         auto* const desc = ds.add (new PluginDescription());
-        OSCSenderNode().fillInPluginDescription (*desc);
+        OSCSenderNode().getPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_LUA)
     {
        #if EL_USE_LUA
         auto* const desc = ds.add (new PluginDescription());
-        LuaNode().fillInPluginDescription (*desc);
+        LuaNode().getPluginDescription (*desc);
        #endif
     }
     else if (fileOrId == EL_INTERNAL_ID_SCRIPT)
     {
        #if EL_USE_LUA
         auto* const desc = ds.add (new PluginDescription());
-        ScriptNode().fillInPluginDescription (*desc);
+        ScriptNode().getPluginDescription (*desc);
        #endif
     }
 }

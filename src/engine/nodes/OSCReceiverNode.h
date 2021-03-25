@@ -35,7 +35,7 @@ public:
     OSCReceiverNode();
     virtual ~OSCReceiverNode();
 
-    void fillInPluginDescription (PluginDescription& desc)
+    void getPluginDescription (PluginDescription& desc) const override
     {
         desc.name               = "OSC Receiver";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_RECEIVER;
