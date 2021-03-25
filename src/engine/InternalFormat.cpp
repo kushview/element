@@ -254,7 +254,6 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         CompressorProcessor().fillInPluginDescription (*desc);
     }
 
-   #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
     {
         auto* const desc = ds.add (new PluginDescription());
@@ -290,9 +289,7 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         desc->pluginFormatName   = "Element";
         desc->version            = "1.0.0";
     }
-   #endif
 
-   #if defined (EL_SOLO) || defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
@@ -372,7 +369,6 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         ScriptNode().fillInPluginDescription (*desc);
        #endif
     }
-   #endif
 }
 
 StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -382,12 +378,11 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_COMPRESSOR);
     results.add (EL_INTERNAL_ID_EQ_FILTER);
     results.add (EL_INTERNAL_ID_FREQ_SPLITTER);
-    results.add ("element.allPass");
-    results.add ("element.volume");
+    results.add (EL_INTERNAL_ID_ALLPASS_FILTER);
+    results.add (EL_INTERNAL_ID_VOLUME);
     results.add (EL_INTERNAL_ID_WET_DRY);
     results.add (EL_INTERNAL_ID_REVERB);
 
-   #if defined EL_PRO
     results.add (EL_INTERNAL_ID_AUDIO_MIXER);
     results.add (EL_INTERNAL_ID_CHANNELIZE);
     results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
@@ -397,9 +392,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
    #if EL_USE_MIDI_SEQUENCER
     results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
    #endif
-   #endif
 
-   #if defined (EL_SOLO) || defined (EL_PRO)
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
     results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
     results.add (EL_INTERNAL_ID_MIDI_ROUTER);
@@ -412,7 +405,7 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_SCRIPT);
    #endif
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
-   #endif // product enablements
+
     return results;
 }
 
