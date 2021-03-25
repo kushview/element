@@ -118,6 +118,7 @@ public:
        #endif
        #if EL_RUNNING_AS_PLUGIN
         addAndMakeVisible (menuBtn);
+        menuBtn.setButtonText ("settings");
        #endif
         for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
             b->addListener (this);
@@ -202,7 +203,7 @@ public:
         
         if (menuBtn.isVisible())
         {
-            menuBtn.setBounds (r.removeFromRight(tempoBarHeight)
+            menuBtn.setBounds (r.removeFromRight (tempoBarHeight * 3.6)
                    .withSizeKeepingCentre(tempoBarHeight, tempoBarHeight));
             r.removeFromRight (4);
         }
