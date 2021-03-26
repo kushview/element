@@ -250,8 +250,6 @@
         <FILE id="LZHNs0" name="AudioEngine.h" compile="0" resource="0" file="../../../src/engine/AudioEngine.h"/>
         <FILE id="y1uMVj" name="DataType.h" compile="0" resource="0" file="../../../src/engine/DataType.h"/>
         <FILE id="vpZkXR" name="Engine.h" compile="0" resource="0" file="../../../src/engine/Engine.h"/>
-        <FILE id="RSClPA" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
-        <FILE id="UDxJOY" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
         <FILE id="PMPIc6" name="GraphPort.cpp" compile="1" resource="0" file="../../../src/engine/GraphPort.cpp"/>
         <FILE id="iPvYNe" name="GraphPort.h" compile="0" resource="0" file="../../../src/engine/GraphPort.h"/>
         <FILE id="Clvv6i" name="GraphProcessor.cpp" compile="1" resource="0"
@@ -276,6 +274,10 @@
         <FILE id="PF1eQJ" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
         <FILE id="xT8jup" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
         <FILE id="R9ftq9" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
+        <FILE id="maZkqh" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
+        <FILE id="J7vsXm" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
+        <FILE id="RSClPA" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
+        <FILE id="UDxJOY" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
         <FILE id="SeGr3b" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
         <FILE id="AbhrKu" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
         <FILE id="iqqhMY" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>

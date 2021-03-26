@@ -770,7 +770,7 @@ Result LuaNode::loadScript (const String& newScript)
     return result;
 }
 
-void LuaNode::fillInPluginDescription (PluginDescription& desc)
+void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Lua";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;

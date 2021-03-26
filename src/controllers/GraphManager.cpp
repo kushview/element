@@ -215,38 +215,22 @@ bool GraphManager::contains (const uint32 nodeId) const {
 NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
     String errorMessage;
-
-    if (desc->pluginFormatName == "Element")
-    {
-        if (auto* const object = pluginManager.createGraphNode (*desc, errorMessage))
-        {
-            return processor.addNode (object, nodeId);
-        }
-    }
-
-    errorMessage.clear();
-    auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
-    NodeObject* node = nullptr;
-    
-    if (instance != nullptr)
-    {
-        if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
-            sub->initController (pluginManager);
-        instance->enableAllBuses();
-        node = processor.addNode (instance, nodeId);
-    }
-    
-    if (node != nullptr)
-    {
-        // noop
-    }
+    auto node = std::unique_ptr<NodeObject> (
+        pluginManager.createGraphNode (*desc, errorMessage));
 
     if (errorMessage.isNotEmpty())
     {
         DBG("[EL] error creating audio plugin: " << errorMessage);
+        jassert (node == nullptr);
     }
     
-    return node;
+    if (node == nullptr && errorMessage.isEmpty())
+    {
+        jassertfalse;
+        errorMessage = "Could not find node";
+    }
+ 
+    return node != nullptr ? processor.addNode (node.release(), nodeId) : nullptr;
 }
 
 NodeObject* GraphManager::createPlaceholder (const Node& node)

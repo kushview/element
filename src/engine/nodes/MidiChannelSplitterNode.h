@@ -90,7 +90,7 @@ public:
         desc.hasSharedContainer = false;
         desc.isInstrument       = false;
         desc.manufacturerName   = "Element";
-        desc.pluginFormatName   = "Element";
+        desc.pluginFormatName   = EL_INTERNAL_FORMAT_NAME;
         desc.version            = "1.0.0";
         desc.uid                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
     }

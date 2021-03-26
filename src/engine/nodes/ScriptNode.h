@@ -38,7 +38,7 @@ public:
 
     struct Context;
 
-    void fillInPluginDescription (PluginDescription& desc);
+    void getPluginDescription (PluginDescription& desc) const override;
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;

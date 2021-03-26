@@ -29,8 +29,9 @@ class Globals;
 
 /** Manages the internal plugin types.
     @warning Usage of this format before AudioEngine is added to Globals
-    will yield unexpected results */
-class InternalFormat   : public AudioPluginFormat
+    will yield unexpected results
+*/
+class InternalFormat : public AudioPluginFormat
 {
 public:
     enum ID

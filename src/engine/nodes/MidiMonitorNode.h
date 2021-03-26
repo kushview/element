@@ -34,7 +34,7 @@ public:
     MidiMonitorNode();
     virtual ~MidiMonitorNode();
 
-    void fillInPluginDescription (PluginDescription& desc)
+    void getPluginDescription (PluginDescription& desc) const override
     {
         desc.name = "MIDI Monitor";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;

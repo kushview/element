@@ -103,7 +103,6 @@ public:
     void restoreUserPlugins (const XmlElement& xml);
 
     AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
-    Processor *createPlugin (const PluginDescription& desc, String& errorMsg);
     NodeObject* createGraphNode (const PluginDescription& desc, String& errorMsg);
 
     /** Set the play config used when instantiating plugins */
