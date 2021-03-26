@@ -17,19 +17,19 @@
 */
 
 #include "Tests.h"
-#include "NodeManager.h"
+#include "engine/NodeFactory.h"
 
 using namespace Element;
 
-class NodeManagerTests : public UnitTest
+class NodeFactoryTests : public UnitTest
 {
 public:
-    NodeManagerTests() : UnitTest ("NodeManager", "NodeManager") { }
-    virtual ~NodeManagerTests() { }
+    NodeFactoryTests() : UnitTest ("NodeFactory", "NodeFactory") { }
+    virtual ~NodeFactoryTests() {}
 
     void runTest()
     {
-        NodeManager nodes;
+        NodeFactory nodes;
         const StringArray expectedIDs (
             EL_INTERNAL_ID_AUDIO_ROUTER,             
             EL_INTERNAL_ID_LUA,                      
@@ -48,7 +48,7 @@ public:
         {
             beginTest (ID);
             expect (nodes.getKnownIDs().contains (ID));
-            expect (nullptr != nodes.instantiate (ID));
+            expect (nullptr != std::unique_ptr<NodeObject> (nodes.instantiate (ID)));
             nodes.getPluginDescriptions (types, ID);
         }
 
@@ -66,4 +66,4 @@ public:
     }
 };
 
-static NodeManagerTests sNodeManagerTests;
+static NodeFactoryTests sNodeFactoryTests;

@@ -32,26 +32,27 @@ public:
     virtual StringArray findTypes() =0;
 };
 
-class NodeManager final
+class NodeFactory final
 {
 public:
-    NodeManager();
-    ~NodeManager();
+    NodeFactory();
+    ~NodeFactory();
 
     void getPluginDescriptions (OwnedArray<PluginDescription>& out, const String& identifier);
 
     const StringArray& getKnownIDs() const { return knownIDs; }
 
-    NodeManager& add (NodeProvider* f);
+    NodeFactory& add (NodeProvider* f);
 
     template<class NT>
-    NodeManager& add (const String& identifier)
+    NodeFactory& add (const String& identifier)
     {
         return add (new Single<NT> (identifier));
     }
 
-    NodeObjectPtr instantiate (const PluginDescription&);
-    NodeObjectPtr instantiate (const String& identifier);
+    NodeObject* instantiate (const PluginDescription&);
+    NodeObject* instantiate (const String& identifier);
+    NodeObject* wrap (AudioProcessor*);
 
 private:
     OwnedArray<NodeProvider> providers;
@@ -75,7 +76,7 @@ private:
         }
     };
     
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeManager)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeFactory)
 };
 
 }
