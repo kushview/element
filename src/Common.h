@@ -33,6 +33,8 @@
 #include "controllers/ScriptingController.h"
 #include "controllers/WorkspacesController.h"
 
+#include "engine/nodes/NodeTypes.h"
+
 #include "session/Node.h"
 #include "session/Session.h"
 

@@ -23,6 +23,8 @@
 #include "engine/NodeObject.h"
 #include "session/Node.h"
 
+#define EL_NODE_EDITOR_DEFAULT_ID       "el.DefaultNodeEditor"
+
 namespace Element {
 
 class NodeEditorComponent : public Component

@@ -42,8 +42,8 @@ NodeFactory::NodeFactory()
     add<MidiProgramMapNode> (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
     add<MidiRouterNode> (EL_INTERNAL_ID_MIDI_ROUTER);
     // add<AudioRouterNode> (EL_INTERNAL_ID_MIDI_SEQUENCER);
-    add<OSCSenderNode> (EL_INTERNAL_ID_OSC_RECEIVER);
-    add<OSCReceiverNode> (EL_INTERNAL_ID_OSC_SENDER);
+    add<OSCSenderNode> (EL_INTERNAL_ID_OSC_SENDER);
+    add<OSCReceiverNode> (EL_INTERNAL_ID_OSC_RECEIVER);
     add<ScriptNode> (EL_INTERNAL_ID_SCRIPT);
 }
 

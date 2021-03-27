@@ -23,6 +23,9 @@
 
 namespace Element {
 
+class GuiController;
+class Node;
+
 class NodeProvider
 {
 public:
@@ -54,6 +57,8 @@ public:
     NodeObject* instantiate (const String& identifier);
     NodeObject* wrap (AudioProcessor*);
 
+    const OwnedArray<NodeProvider>& getNodeProviders() const { return providers; }
+
 private:
     OwnedArray<NodeProvider> providers;
     StringArray knownIDs;
@@ -62,9 +67,11 @@ private:
     struct Single : public NodeProvider
     {
         const String ID;
+        const String UI;
 
         Single() = delete;
-        Single (const String& inID) : ID (inID) {}
+        Single (const String& inID)
+            : ID (inID) { }
         ~Single() = default;
         
         StringArray findTypes() override {

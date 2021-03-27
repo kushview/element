@@ -29,7 +29,6 @@ OSCReceiverNode::OSCReceiverNode()
     jassert (metadata.hasType (Tags::node));
     metadata.setProperty (Tags::format, "Element", nullptr);
     metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_OSC_RECEIVER, nullptr);
-
     oscReceiver.addListener (this);
 }
 

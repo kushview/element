@@ -19,6 +19,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiRouterNode.h"
+#include "engine/MidiPipe.h"
 #include "Common.h"
 
 #define TRACE_MIDI_ROUTER(output) 

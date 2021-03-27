@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
     - Author Michael Fisher <mfisher@kushview.net>
 
     This program is free software; you can redistribute it and/or modify
@@ -21,23 +21,10 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "Commands.h"
-#include "engine/nodes/BaseProcessor.h"
-#include "engine/GraphProcessor.h"
-#include "engine/NodeObject.h"
-#include "engine/nodes/MidiMonitorNode.h"
 #include "gui/Window.h"
 #include "gui/PluginWindow.h"
-#include "gui/nodes/AudioRouterEditor.h"
-#include "gui/nodes/LuaNodeEditor.h"
-#include "gui/nodes/ScriptNodeEditor.h"
-#include "gui/nodes/MidiMonitorNodeEditor.h"
-#include "gui/nodes/MidiProgramMapEditor.h"
-#include "gui/nodes/MidiRouterEditor.h"
-#include "gui/nodes/OSCReceiverNodeEditor.h"
-#include "gui/nodes/OSCSenderNodeEditor.h"
-#include "gui/nodes/VolumeNodeEditor.h"
 #include "session/Node.h"
+#include "Commands.h"
 
 namespace Element {
 
@@ -116,23 +103,9 @@ public:
         return activePluginWindows [window];
     }
     
-    inline void closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible)
-    {
-        for (int i = 0; i < proc.getNumNodes(); ++i)
-            if (auto node = proc.getNode (i))
-                for (int j = activePluginWindows.size(); --j >= 0;)
-                    if (activePluginWindows.getUnchecked(j)->owner == node)
-                        { deletePluginWindow (j, windowVisible); break; }
-    }
+    void closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible);
     
-    inline void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible)
-    {
-        if (! node)
-            return;
-        for (int i = activePluginWindows.size(); --i >= 0;)
-            if (activePluginWindows.getUnchecked(i)->owner == node)
-                { deletePluginWindow (i, windowVisible); break; }
-    }
+    void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible);
     
     inline void closeOpenPluginWindowsFor (const uint32 nodeId, const bool windowVisible)
     {

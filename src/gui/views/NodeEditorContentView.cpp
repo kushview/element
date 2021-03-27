@@ -33,7 +33,7 @@
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
-
+#include "gui/NodeEditorFactory.h"
 #include "session/DeviceManager.h"
 #include "Globals.h"
 
@@ -415,30 +415,9 @@ Component* NodeEditorContentView::createEmbededEditor()
         return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
     }
 
-    if (node.isMidiInputNode())
-    {
-        if (node.isChildOfRootGraph())
-        {
-            return new MidiIONodeEditor (node, world->getMidiEngine(), true, false);
-
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    if (node.isMidiOutputNode())
-    {
-        if (node.isChildOfRootGraph())
-        {
-            return new MidiIONodeEditor (node, world->getMidiEngine(), false, true);
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
+    NodeEditorFactory factory (*app.findChild<GuiController>());
+    if (auto editor = factory.instantiate (node, NodeEditorType::NavigationPanel))
+        return editor.release();
 
     NodeObjectPtr object = node.getGraphNode();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
@@ -446,30 +425,6 @@ Component* NodeEditorContentView::createEmbededEditor()
     {
         if (node.getFormat() == "Element" && proc->hasEditor())
             return proc->createEditor();
-        return new GenericNodeEditor (node);
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
-    {
-        auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
-        programChangeMapEditor->setStoreSize (false);
-        programChangeMapEditor->setFontSize (programChangeMapEditor->getDefaultFontSize(), false);
-        programChangeMapEditor->setFontControlsVisible (false);
-        return programChangeMapEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_MONITOR)
-    {
-        auto* const midiMonitorEditor = new MidiMonitorNodeEditor (node);
-        return midiMonitorEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        auto* const audioRouterEditor = new AudioRouterEditor (node);
-        return audioRouterEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_ROUTER)
-    {
-        auto* const midiRouterEditor = new MidiRouterEditor (node);
-        return midiRouterEditor;
     }
 
     return nullptr;

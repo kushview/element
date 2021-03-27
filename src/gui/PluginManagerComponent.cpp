@@ -22,6 +22,7 @@
 #include "session/PluginManager.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "Utils.h"
 
 namespace Element {
 

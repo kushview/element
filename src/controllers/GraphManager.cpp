@@ -449,14 +449,14 @@ const GraphProcessor::Connection* GraphManager::getConnectionBetween (uint32 sou
 }
 
 bool GraphManager::canConnect (uint32 sourceFilterUID, int sourceFilterChannel,
-                                  uint32 destFilterUID, int destFilterChannel) const noexcept
+                               uint32 destFilterUID, int destFilterChannel) const noexcept
 {
     return processor.canConnect (sourceFilterUID, sourceFilterChannel,
                                  destFilterUID, destFilterChannel);
 }
 
 bool GraphManager::addConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                     uint32 destFilterUID, int destFilterChannel)
+                                  uint32 destFilterUID, int destFilterChannel)
 {
     const bool result = processor.addConnection (sourceFilterUID, (uint32)sourceFilterChannel,
                                                  destFilterUID, (uint32)destFilterChannel);

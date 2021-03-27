@@ -20,6 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "engine/MidiPipe.h"
 #include "engine/Parameter.h"
 
 namespace Element {
@@ -30,7 +31,6 @@ class ProcessBufferOp;
 }
 
 class GraphProcessor;
-class MidiPipe;
 
 class NodeObject : public ReferenceCountedObject
 {
@@ -195,8 +195,9 @@ public:
     bool isMidiIONode() const;
     bool isMidiDeviceNode() const;
 
-    /* returns the parent graph. If one has not been set, then
-       this will return nullptr */
+    /* Returns the parent graph.
+       If one has not been set, then this will return nullptr.
+     */
     GraphProcessor* getParentGraph() const;
 
     void setInputRMS (int chan, float val);
