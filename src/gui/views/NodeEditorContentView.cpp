@@ -379,7 +379,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     
     if (node.isAudioInputNode())
     {
-        if (app.getRunMode() == RunMode::STANDALONE)
+        if (app.getRunMode() == RunMode::Standalone)
         {
             if (node.isChildOfRootGraph())
             {
@@ -398,7 +398,7 @@ Component* NodeEditorContentView::createEmbededEditor()
 
     if (node.isAudioOutputNode())
     {
-        if (app.getRunMode() == RunMode::STANDALONE)
+        if (app.getRunMode() == RunMode::Standalone)
         {
             if (node.isChildOfRootGraph())
             {

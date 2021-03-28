@@ -739,7 +739,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
     using IOP = GraphProcessor::AudioGraphIOProcessor;
 
-    if (getRunMode() == RunMode::PLUGIN)
+    if (getRunMode() == RunMode::Plugin)
         return;
 
     auto session = getWorld().getSession();

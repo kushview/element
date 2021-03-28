@@ -36,7 +36,7 @@ class AppController :  public Controller,
                        protected ApplicationCommandTarget
 {
 public:
-    AppController (Globals&, RunMode mode = RunMode::STANDALONE);
+    AppController (Globals&, RunMode mode = RunMode::Standalone);
     ~AppController();
 
     /** Returns the running mode of this instance */

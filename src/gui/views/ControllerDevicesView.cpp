@@ -815,7 +815,7 @@ public:
 
         StringArray keys;
         Array<var> values;
-        if (app.getRunMode() == RunMode::STANDALONE)
+        if (app.getRunMode() == RunMode::Standalone)
         {
             keys.addArray (MidiInput::getDevices());
             for (const auto& d : keys)
@@ -842,7 +842,7 @@ public:
 
         props.add (new ChoicePropertyComponent (inputDevice, "Input Device", keys, values));
 
-        if (app.getRunMode() == RunMode::PLUGIN)
+        if (app.getRunMode() == RunMode::Plugin)
         {
             if (auto* inputDeviceProp = dynamic_cast<ChoicePropertyComponent*> (props.getLast()))
             {

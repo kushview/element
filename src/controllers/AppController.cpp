@@ -570,7 +570,7 @@ bool AppController::perform (const InvocationInfo& info)
 
 void AppController::checkForegroundStatus()
 {
-    if (runMode != RunMode::STANDALONE)
+    if (runMode != RunMode::Standalone)
         return;
 
     class CheckForeground : public CallbackMessage

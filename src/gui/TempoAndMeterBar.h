@@ -175,7 +175,7 @@ private:
             // MIDI clock doesn't change the meter, only disable user
             // interaction in the plugin.
             if (auto* cc = ViewHelpers::findContentComponent (this))
-                if (cc->getAppController().getRunMode() == RunMode::PLUGIN)
+                if (cc->getAppController().getRunMode() == RunMode::Plugin)
                     meter->setEnabled (false);
         }
         else

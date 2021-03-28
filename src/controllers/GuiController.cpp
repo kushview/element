@@ -321,7 +321,7 @@ void GuiController::presentPluginWindow (const Node& node, const bool focus)
     {
         window->setName (String());
 
-        if (getRunMode() == RunMode::PLUGIN)
+        if (getRunMode() == RunMode::Plugin)
         {
             // This makes plugin window handling more like the standalone
             // we don't want to modify the existing standalone behavior
@@ -906,7 +906,7 @@ void GuiController::toggleAboutScreen()
         about->centreWithSize (about->getWidth(), about->getHeight());
         about->setVisible (true);
         about->toFront (true);
-        if (getRunMode() == RunMode::PLUGIN)
+        if (getRunMode() == RunMode::Plugin)
             about->setAlwaysOnTop (true);
     }
 }

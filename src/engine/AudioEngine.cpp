@@ -591,7 +591,7 @@ public:
     
     bool isTimeMaster() const
     {
-        if (engine.getRunMode() == RunMode::PLUGIN)
+        if (engine.getRunMode() == RunMode::Plugin)
             return sessionWantsExternalClock.get() == 0;
         return processMidiClock.get() == 0 && sessionWantsExternalClock.get() == 0;
     }
@@ -762,7 +762,7 @@ public:
     
     bool isUsingExternalClock() const
     {
-        if (engine.getRunMode() == RunMode::PLUGIN)
+        if (engine.getRunMode() == RunMode::Plugin)
             return sessionWantsExternalClock.get() > 0;
         return sessionWantsExternalClock.get() > 0 && processMidiClock.get() > 0;
     }
@@ -852,7 +852,7 @@ AudioEngine::~AudioEngine() noexcept
 
 void AudioEngine::activate()
 {
-    if (getRunMode() == RunMode::STANDALONE)
+    if (getRunMode() == RunMode::Standalone)
     {
         auto& midi (world.getMidiEngine());
         midi.addMidiInputCallback (String(), &getMidiInputCallback());
@@ -861,7 +861,7 @@ void AudioEngine::activate()
 
 void AudioEngine::deactivate()
 {
-    if (getRunMode() == RunMode::STANDALONE)
+    if (getRunMode() == RunMode::Standalone)
     {
         auto& midi (world.getMidiEngine());
         midi.removeMidiInputCallback (String(), &getMidiInputCallback());
@@ -987,7 +987,7 @@ void AudioEngine::processExternalBuffers (AudioBuffer<float>& buffer, MidiBuffer
 {
     if (priv)
     {
-        if (getRunMode() == RunMode::PLUGIN)
+        if (getRunMode() == RunMode::Plugin)
             world.getMidiEngine().processMidiBuffer (midi, buffer.getNumSamples(), priv->sampleRate);
         priv->processCurrentGraph (buffer, midi);
     }

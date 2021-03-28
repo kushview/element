@@ -129,7 +129,7 @@ class AudioEngine : public Engine
 {
 public:
     Signal<void()> sampleLatencyChanged;
-    AudioEngine (Globals&, RunMode mode = RunMode::STANDALONE);
+    AudioEngine (Globals&, RunMode mode = RunMode::Standalone);
     virtual ~AudioEngine() noexcept;
 
     //==========================================================================

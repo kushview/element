@@ -893,7 +893,7 @@ void PluginListComponent::scanWithBackgroundScanner()
 bool PluginListComponent::isPluginVersion()
 {
     if (auto* cc = ViewHelpers::findContentComponent (this))
-        return cc->getAppController().getRunMode() == RunMode::PLUGIN;
+        return cc->getAppController().getRunMode() == RunMode::Plugin;
     return false;
 }
 

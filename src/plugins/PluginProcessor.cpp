@@ -76,7 +76,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
 
     prepared = controllerActive = false;
     world.reset (new Globals());
-    world->setEngine (new AudioEngine (*world, RunMode::PLUGIN));
+    world->setEngine (new AudioEngine (*world, RunMode::Plugin));
     engine = world->getAudioEngine();
     SessionPtr session = world->getSession();
     Settings& settings (world->getSettings());
@@ -106,7 +106,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
         PLUGIN_DBG("[EL] couldn't create default graph");
     }
 
-    controller.reset (new AppController (*world, RunMode::PLUGIN));
+    controller.reset (new AppController (*world, RunMode::Plugin));
     controller->activate();
     controllerActive = true;
 

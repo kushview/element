@@ -23,9 +23,9 @@ namespace Element {
 /** The runtime mode of Element */
 enum struct RunMode : int {
     /** Running as standalone application */
-    STANDALONE = 0,
+    Standalone = 0,
     /** Running as an audio plugin */
-    PLUGIN     = 1
+    Plugin     = 1
 };
 
 }
