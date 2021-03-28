@@ -27,7 +27,7 @@ namespace Element {
 class GuiController;
 class Node;
 
-enum struct NodeEditorType : uint32_t {
+enum struct NodeEditorPlacement : uint32_t {
     PluginWindow    = 1 << 0,
     NavigationPanel = 1 << 1
 };
@@ -35,7 +35,7 @@ enum struct NodeEditorType : uint32_t {
 struct NodeEditorDescription
 {
     String                  ID;
-    NodeEditorType          kind;
+    NodeEditorPlacement     placement;
     StringArray             nodes;
 };
 
@@ -45,7 +45,7 @@ public:
     NodeEditorSource() = default;
     virtual ~NodeEditorSource() = default;
     virtual NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                              NodeEditorType placement) =0;
+                                              NodeEditorPlacement placement) =0;
     virtual void findEditors (Array<NodeEditorDescription>&) =0;
 };
 
@@ -67,20 +67,20 @@ public:
 
     /** Register an explicit editor for the given node and editor types */
     template<class ET>
-    void add (const String& editorType, const String& nodeType, NodeEditorType placement = NodeEditorType::PluginWindow)
+    void add (const String& editorType, const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (editorType, nodeType, placement));
     }
 
     /** Register a default editor for the given node and editor types */
     template<class ET>
-    void add (const String& nodeType, NodeEditorType placement = NodeEditorType::PluginWindow)
+    void add (const String& nodeType, NodeEditorPlacement placement = NodeEditorPlacement::PluginWindow)
     {
         add (new Single<ET> (EL_NODE_EDITOR_DEFAULT_ID, nodeType, placement));
     }
 
     /** Create the active or default editor for the given node and placement */
-    std::unique_ptr<NodeEditorComponent> instantiate (const Node& node, NodeEditorType placement)
+    std::unique_ptr<NodeEditorComponent> instantiate (const Node& node, NodeEditorPlacement placement)
     {
         std::unique_ptr<NodeEditorComponent> ed;
         for (auto* s : sources)
@@ -108,17 +108,17 @@ private:
     {
     public:
         Single (const String& inID, const String& nodeID, 
-                NodeEditorType placement)
+                NodeEditorPlacement placement)
         {
             desc.ID     = inID;
-            desc.kind   = placement;
+            desc.placement   = placement;
             desc.nodes.add (nodeID);
         }
 
         NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                          NodeEditorType placement) override 
+                                          NodeEditorPlacement placement) override 
         {
-            if (desc.kind == placement &&
+            if (desc.placement == placement &&
                 desc.ID == identifier && 
                 desc.nodes.contains (node.getIdentifier().toString()))
             {

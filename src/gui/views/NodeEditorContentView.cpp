@@ -416,7 +416,7 @@ Component* NodeEditorContentView::createEmbededEditor()
     }
 
     NodeEditorFactory factory (*app.findChild<GuiController>());
-    if (auto editor = factory.instantiate (node, NodeEditorType::NavigationPanel))
+    if (auto editor = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
         return editor.release();
 
     NodeObjectPtr object = node.getGraphNode();

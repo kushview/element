@@ -82,7 +82,7 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
 PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
 {
     NodeEditorFactory factory (gui);
-    if (auto e = factory.instantiate (node, NodeEditorType::PluginWindow))
+    if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
         return createPluginWindowFor (node, e.release());
     auto editor = NodeEditorFactory::createAudioProcessorEditor (node);
     return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;

@@ -32,7 +32,7 @@ public:
     void findEditors (Array<NodeEditorDescription>&) override {}
 
     NodeEditorComponent* instantiate (const String& identifier, const Node& node,
-                                      NodeEditorType placement) override
+                                      NodeEditorPlacement placement) override
 
     {
         if (node.getFormat() != EL_INTERNAL_FORMAT_NAME || identifier != EL_NODE_EDITOR_DEFAULT_ID) {
@@ -41,10 +41,10 @@ public:
         
         switch (placement)
         {
-            case NodeEditorType::PluginWindow:
+            case NodeEditorPlacement::PluginWindow:
                 return instantiateForPluginWindow (node);
                 break;
-            case NodeEditorType::NavigationPanel:
+            case NodeEditorPlacement::NavigationPanel:
                 return instantiateForNavigationPanel (node);
                 break;
             default: break;
@@ -167,7 +167,7 @@ private:
 
 NodeEditorFactory::NodeEditorFactory()
 {
-    add<AudioRouterEditor> (EL_INTERNAL_ID_AUDIO_ROUTER, NodeEditorType::PluginWindow);
+    add<AudioRouterEditor> (EL_INTERNAL_ID_AUDIO_ROUTER, NodeEditorPlacement::PluginWindow);
 }
 
 NodeEditorFactory::NodeEditorFactory (GuiController& g)
