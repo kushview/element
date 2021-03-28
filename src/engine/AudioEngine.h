@@ -103,7 +103,8 @@ public:
     const String getAudioOutputDeviceName() const       { return audioOutName; }
     
     /** the index in the audio engine.  if less than 0 then the graph
-        is not attached */
+        is not attached
+     */
     int getEngineIndex()    const { return engineIndex; }
 
 private:

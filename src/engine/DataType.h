@@ -17,27 +17,25 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#ifndef ELEMENT_DATATYPE_H
-#define ELEMENT_DATATYPE_H
+#pragma once
 
-    class DataType {
-    public:
-
-        enum ID {
-            Audio,
-            MIDI,
-            Unknown
-        };
-
-        inline static int32 numTypes() { return Unknown; }
-
-        inline DataType() : type (Unknown) { }
-        inline DataType (const ID& i) : type (i) { }
-        inline DataType (const int32& i) : type (isPositiveAndBelow (i, (int)Unknown) ? (ID)i : Unknown) { }
-        inline DataType& operator= (const DataType& other) { type = other.type; return *this; }
-
-    private:
-        ID type;
+class DataType {
+public:
+    enum ID {
+        Audio,
+        MIDI,
+        Unknown
     };
 
-#endif // ELEMENT_DATATYPE_H
+    inline static int32 numTypes() { return Unknown; }
+
+    inline DataType() : type (Unknown) {}
+    inline DataType (const ID& i) : type (i) {}
+    template<typename INT> inline
+    DataType (const INT& i)
+        : type (isPositiveAndBelow (i, static_cast<INT> (Unknown)) ? static_cast<ID> (i) : Unknown) {}
+    inline DataType& operator= (const DataType& other) { type = other.type; return *this; }
+
+private:
+    ID type;
+};
