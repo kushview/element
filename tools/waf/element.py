@@ -30,6 +30,7 @@ def check_common (self):
     self.check (lib='curl', mandatory=False)
     self.check (header_name='stdbool.h', mandatory=True)
     self.check (header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
+    self.check (header_name='boost/test/unit_test.hpp', mandatory=False, uselib_store="BOOST_TEST")
 
     # Web Browser
     self.define ('JUCE_WEB_BROWSER', 0)

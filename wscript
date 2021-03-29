@@ -461,15 +461,27 @@ def build (bld):
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
-        bld.recurse ('tests')
+        bld.recurse ('test')
 
 def check (ctx):
-    if not os.path.exists('build/bin/test-element'):
-        ctx.fatal ("Tests not compiled")
+    if not os.path.exists('build/bin/test_juce'):
+        ctx.fatal ("JUCE tests not compiled")
+        return
+    if not os.path.exists('build/bin/test_element'):
+        ctx.fatal ("Test suite not compiled")
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
-    if 0 != call (["build/bin/test-element"]):
-        ctx.fatal ("Tests failed")
+    failed = 0
+    print ("JUCE Tests")
+    if 0 != call (["build/bin/test_juce"]):
+        failed += 1
+    print ("Done!\n")
+
+    print ("Element Test Suite")
+    if 0 != call (["build/bin/test_element"]):
+        failed += 1
+    if (failed > 0):
+        ctx.fatal ("Test suite exited with fails")
 
 def dist (ctx):
     z = ctx.options.ziptype

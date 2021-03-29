@@ -52,10 +52,10 @@
             },
         },
         {
-            "name": "Test Suite",
+            "name": "JUCE Unit Tests",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceRoot}/build/bin/test-element",
+            "program": "${workspaceRoot}/build/bin/test_juce",
             "args": [],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Waf Build",

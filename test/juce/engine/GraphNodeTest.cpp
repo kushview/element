@@ -24,7 +24,7 @@ namespace Element {
 class GraphProcessorTest : public UnitTestBase
 {
 public:
-    GraphProcessorTest() : UnitTestBase ("Graph Processor", "graphProc1", "processor") { }
+    GraphProcessorTest() : UnitTestBase ("GraphProcessor", "GraphProcessor", "processor") { }
 
     void initialise() override
     {
@@ -207,7 +207,7 @@ static GetMidiInputPort sGetMidiInputPort;
 class EnablementTest : public GraphNodeTest
 {
 public:
-    EnablementTest() : GraphNodeTest ("Node Enablement") { }
+    EnablementTest() : GraphNodeTest ("Node Enablement", "Enablement", "GraphProcessor") { }
     void runTest() override
     {
         checkNode ("audio processor", graph->addNode (new PlaceholderProcessor (2, 2, false, false)));
