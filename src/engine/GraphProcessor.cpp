@@ -871,7 +871,7 @@ GraphProcessor::Connection::Connection (const uint32 sourceNode_, const uint32 s
        .setProperty (Tags::destNode, (int) destNode, nullptr)
        .setProperty (Tags::destPort, (int) destPort, nullptr);
 }
-    
+
 GraphProcessor::GraphProcessor()
     : lastNodeId (0),
       renderingBuffers (1, 1),
