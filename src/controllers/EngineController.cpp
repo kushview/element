@@ -55,7 +55,8 @@ struct RootGraphHolder
 
     /** This will create a root graph processor/controller and load it if not
         done already. Properties are set from the model, so make sure they are
-        correct before calling this */
+        correct before calling this 
+     */
     bool attach (AudioEnginePtr engine)
     {
         jassert (engine);
@@ -304,7 +305,7 @@ private:
 EngineController::EngineController()
     : AppController::Child()
 {
-    graphs = new RootGraphs (*this);
+    graphs = std::make_unique<RootGraphs> (*this);
 }
 
 EngineController::~EngineController()
