@@ -55,6 +55,9 @@ public:
     /** Returns the audio plugin format manager */
     AudioPluginFormatManager& getAudioPluginFormats();
 
+    /** Returns true if an audio plugin format is supported */
+    bool isAudioPluginFormatSupported (const String&) const;
+    
     /** Returns an audio plugin format by name */
     AudioPluginFormat* getAudioPluginFormat (const String& formatName) const;
     

@@ -787,6 +787,15 @@ AudioPluginFormatManager& PluginManager::getAudioPluginFormats()
     return priv->formats;
 }
 
+bool PluginManager::isAudioPluginFormatSupported (const String& name) const
+{
+    auto& fmts = priv->formats;
+    for (int i = 0; i < fmts.getNumFormats(); ++i)
+        if (fmts.getFormat(i)->getName() == name)
+            return true;
+    return false;
+}
+
 AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name) const
 {
     auto& manager = priv->formats;
