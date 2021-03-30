@@ -14,6 +14,9 @@ def call_git (ctx, args):
     P.wait()
     return (r, err)
 
+def is_repo():
+    return os.path.exists ('.git')
+
 @conf
 def find_git (self, **kw):
     kw['var'] = 'GIT'
@@ -21,18 +24,21 @@ def find_git (self, **kw):
 
 @conf
 def git_hash (self, what='HEAD'):
+    if not is_repo(): return ''
     cmd = 'rev-parse %s' % what
     (r, e) = call_git (self, cmd.strip().split())
     return r.strip()
 
 @conf
 def git_short_hash (ctx):
-    githash = 'Na'
+    if not is_repo(): return ''
+    githash = 'NA'
     (githash, err) = call_git (ctx, 'rev-parse --short HEAD'.split())
     return githash.strip()
 
 @conf
 def git_n_changes (self):
+    if not is_repo(): return 0
     (out, err) = call_git (self, 'status --porcelain --untracked-files=no'.split())
     if isinstance (out, str):
         return len(out.splitlines())
@@ -40,15 +46,18 @@ def git_n_changes (self):
 
 @conf 
 def git_is_dirty (self):
+    if not is_repo(): return False
     return self.git_n_changes() > 0
 
 @conf
 def git_last_tag (self):
+    if not is_repo(): return ''
     (tag, e) = call_git (self, 'describe --abbrev=0'.split())
     return tag.strip()
 
 @conf
 def git_update_env (conf, e=None):
+    if not is_repo(): return
     if not conf.env.GIT: return
     if not e: e = conf.env
     e.GIT_TAG = None

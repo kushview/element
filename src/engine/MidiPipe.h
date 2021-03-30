@@ -83,6 +83,7 @@ public:
     static int get (lua_State* L);
     static int resize (lua_State* L);
     static int size (lua_State* L);
+    static int clear (lua_State* L);
 
 private:
     lua_State* state = nullptr;

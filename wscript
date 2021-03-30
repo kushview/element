@@ -5,7 +5,7 @@ from waflib import Utils
 import os, sys
 import string
 sys.path.append (os.path.join (os.getcwd(), 'tools/waf'))
-import cross, element, juce
+import cross, element, juce, git
 
 APPNAME         = element.APPNAME
 VERSION         = element.VERSION
@@ -436,7 +436,7 @@ def build (bld):
         if juce.is_mac(): bld.fatal ("waf install not supported on OSX")
         if bld.options.minimal: return
 
-    if bld.cmd == 'build':
+    if bld.cmd == 'build' and git.is_repo():
         bld.add_pre_fun (bld.git_update_env)
 
     bld.template (

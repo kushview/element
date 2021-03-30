@@ -316,7 +316,7 @@ struct LuaNode::Context
 
                     local a = AudioBuffer (__ln_validate_nchans, __ln_validate_nframes)
                     local m = MidiPipe (__ln_validate_nmidi)
-                    
+
                     for _ = 1,4 do
                         for i = 0,m:size() - 1 do
                             local b = m:get(i)
