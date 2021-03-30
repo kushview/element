@@ -8,10 +8,10 @@ import juce
 # Package name
 APPNAME="element"
 # Version number
-VERSION="0.46.0rc1"
+VERSION="0.46.0"
 # plugin version is +1 that of standalone. VSTSDK isn't smart enough to 
 # deal with < 1.0 versions
-PLUGIN_VERSION="1.46.0rc1"
+PLUGIN_VERSION="1.46.0"
 
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
