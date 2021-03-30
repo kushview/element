@@ -16,6 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// FIXME: Local lua paths in release build
+#if JUCE_DEBUG
+
 #include "Tests.h"
 #include "scripting/ScriptManager.h"
 #include "scripting/LuaBindings.h"
@@ -41,3 +44,4 @@ public:
 };
 
 static ScriptManagerTest sScriptManagerTest;
+#endif

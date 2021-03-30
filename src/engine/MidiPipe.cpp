@@ -169,6 +169,14 @@ int LuaMidiPipe::size (lua_State* L)
     return 1;
 }
 
+int LuaMidiPipe::clear (lua_State* L)
+{
+    auto* pipe = *(LuaMidiPipe**) lua_touserdata (L, 1);
+    for (int i = pipe->buffers.size(); --i >= 0;)
+        (**pipe->buffers.getUnchecked(i)).buffer.clear();
+    return 0;
+}
+
 }
 
 static int midipipe_new (lua_State* L)
@@ -191,6 +199,7 @@ static const luaL_Reg methods[] = {
     { "get",        Element::LuaMidiPipe::get },
     { "resize",     Element::LuaMidiPipe::resize },
     { "size",       Element::LuaMidiPipe::size },
+    { "clear",      Element::LuaMidiPipe::clear },
     { nullptr, nullptr }
 };
 
