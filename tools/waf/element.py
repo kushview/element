@@ -31,7 +31,7 @@ def check_common (self):
     self.check (header_name='stdbool.h', mandatory=True)
     self.check (header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
     self.check_cxx (
-        msg = "Checking for header boost/test/unit_test.hpp",
+        msg = "Checking for Boost.Test",
         fragment = '''
             #define BOOST_TEST_MODULE ElementConfigure
             #include <boost/test/included/unit_test.hpp>
@@ -71,9 +71,11 @@ def check_common (self):
     self.env.VST3 = not bool (self.options.no_vst3)
     self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
     if self.env.VST3:
+        line_just = self.line_just
         self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', uselib_store='VSTFXSTORE_H', mandatory=False)
         self.define ('JUCE_VST3_CAN_REPLACE_VST2', bool (self.env.HAVE_VSTFXSTORE_H))
-    
+        self.line_just = line_just
+
     # LV2 Support
     self.env.LV2 = not bool(self.options.no_lv2)
     if self.env.LV2:

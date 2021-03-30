@@ -416,10 +416,15 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addSeparator();
         
         PopupMenu paths;
-        paths.addItem (100, TRANS("VST Path"));
-        paths.addItem (101, TRANS("VST3 Path"));
-        menu.addSubMenu ("Search Paths", paths);
-        menu.addSeparator();
+        if (plugins.isAudioPluginFormatSupported ("VST"))
+            paths.addItem (100, TRANS("VST Path"));
+        if (plugins.isAudioPluginFormatSupported ("VST3"))
+            paths.addItem (101, TRANS("VST3 Path"));
+        if (paths.getNumItems() > 0)
+        {
+            menu.addSubMenu ("Search Paths", paths);
+            menu.addSeparator();
+        }
         
         menu.addItem (2, TRANS("Remove selected plug-in from list"), !isPluginVersion() && table.getNumSelectedRows() > 0);
         menu.addItem (3, TRANS("Show folder containing selected plug-in"), !isPluginVersion() && canShowSelectedFolder());
