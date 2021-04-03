@@ -9,20 +9,7 @@
 
 namespace Element {
 
-class Task
-{
-public:
-    Task() { }
-    virtual ~Task()  { }
-
-    virtual void perform (AudioSampleBuffer& sharedBufferChans,
-                          const OwnedArray <MidiBuffer>& sharedMidiBuffers,
-                          const int numSamples) = 0;
-
-    JUCE_LEAK_DETECTOR (Task);
-};
-
-class ClearChannelOp : public Task
+class ClearChannelOp : public GraphOp
 {
 public:
     ClearChannelOp (const int channelNum_)
@@ -40,7 +27,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ClearChannelOp)
 };
 
-class CopyChannelOp : public Task
+class CopyChannelOp : public GraphOp
 {
 public:
     CopyChannelOp (const int srcChannelNum_, const int dstChannelNum_)
@@ -59,7 +46,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (CopyChannelOp)
 };
 
-class AddChannelOp : public Task
+class AddChannelOp : public GraphOp
 {
 public:
     AddChannelOp (const int srcChannelNum_, const int dstChannelNum_)
@@ -78,7 +65,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (AddChannelOp)
 };
 
-class ClearMidiBufferOp : public Task
+class ClearMidiBufferOp : public GraphOp
 {
 public:
     ClearMidiBufferOp (const int bufferNum_)
@@ -96,7 +83,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ClearMidiBufferOp)
 };
 
-class CopyMidiBufferOp : public Task
+class CopyMidiBufferOp : public GraphOp
 {
 public:
     CopyMidiBufferOp (const int srcBufferNum_, const int dstBufferNum_)
@@ -115,7 +102,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (CopyMidiBufferOp)
 };
 
-class AddMidiBufferOp : public Task
+class AddMidiBufferOp : public GraphOp
 {
 public:
     AddMidiBufferOp (const int srcBufferNum_, const int dstBufferNum_)
@@ -135,7 +122,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (AddMidiBufferOp)
 };
 
-class DelayChannelOp : public Task
+class DelayChannelOp : public GraphOp
 {
 public:
     DelayChannelOp (const int channel_, const int numSamplesDelay_)
@@ -168,7 +155,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (DelayChannelOp)
 };
 
-class ProcessBufferOp : public Task
+class ProcessBufferOp : public GraphOp
 {
 public:
     ProcessBufferOp (const NodeObjectPtr& node_,
@@ -403,7 +390,7 @@ private:
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)
 };
 
-GraphBuilder::GraphBuilder (GraphProcessor& graph_, 
+GraphBuilder::GraphBuilder (GraphNode& graph_, 
                             const Array<void*>& orderedNodes_,
                             Array<void*>& renderingOps)
     : graph (graph_),
@@ -423,7 +410,8 @@ GraphBuilder::GraphBuilder (GraphProcessor& graph_,
         markUnusedBuffersFree (i);
     }
 
-    graph.setLatencySamples (totalLatency);
+    // FIXME
+    // graph.setLatencySamples (totalLatency);
 }
 
 int GraphBuilder::buffersNeeded (PortType type)             { return allNodes[type.id()].size(); }
@@ -518,8 +506,7 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
         Array <uint32> sourcePorts;
         for (int i = graph.getNumConnections(); --i >= 0;)
         {
-            const GraphProcessor::Connection* const c = graph.getConnection (i);
-
+            const auto* const c = graph.getConnection (i);
             if (c->destNode == node->nodeId && c->destPort == port)
             {
                 sourceNodes.add (c->sourceNode);

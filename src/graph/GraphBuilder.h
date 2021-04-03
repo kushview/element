@@ -5,15 +5,28 @@
 
 namespace Element {
 
-class GraphProcessor;
+class GraphNode;
 class NodeObject;
+
+class GraphOp
+{
+public:
+    GraphOp() { }
+    virtual ~GraphOp()  { }
+
+    virtual void perform (AudioSampleBuffer& sharedBufferChans,
+                          const OwnedArray <MidiBuffer>& sharedMidiBuffers,
+                          const int numSamples) = 0;
+
+    JUCE_LEAK_DETECTOR (GraphOp);
+};
 
 /** Used to calculate the correct sequence of rendering ops needed, based on
     the best re-use of shared buffers at each stage. */
 class GraphBuilder
 {
 public:
-    GraphBuilder (GraphProcessor& graph_, 
+    GraphBuilder (GraphNode& graph_, 
                   const Array<void*>& orderedNodes_,
                   Array<void*>& renderingOps);
 
@@ -21,7 +34,7 @@ public:
 
 private:
     //==============================================================================
-    GraphProcessor& graph;
+    GraphNode& graph;
     const Array<void*>& orderedNodes;
     Array <uint32> allNodes [PortType::Unknown];
     Array <uint32> allPorts [PortType::Unknown];
