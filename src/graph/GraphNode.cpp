@@ -523,10 +523,10 @@ void GraphNode::reset()
 
 // MARK: Process Graph
 
-void GraphNode::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
 {
     const int32 numSamples = buffer.getNumSamples();
-
+    auto& midiMessages = *midi.getWriteBuffer (0);
     currentAudioInputBuffer = &buffer;
     currentAudioOutputBuffer.setSize (jmax (1, buffer.getNumChannels()), numSamples);
     currentAudioOutputBuffer.clear();

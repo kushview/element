@@ -178,13 +178,9 @@ public:
     //==========================================================================
     void prepareToRender (double sampleRate, int estimatedBlockSize) override;
     void releaseResources() override;
-    
-    bool wantsMidiPipe() const override { return true; }
-    void render (AudioSampleBuffer& audio, MidiPipe& midi) override {
-        processBlock (audio, *midi.getWriteBuffer (0));
-    }
 
-    void processBlock (AudioSampleBuffer&, MidiBuffer&);
+    bool wantsMidiPipe() const override { return true; }
+    void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void renderBypassed (AudioSampleBuffer&, MidiPipe&) override {}
 
     int getNumPrograms() const override { return 1; }
