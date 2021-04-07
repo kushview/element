@@ -26,9 +26,9 @@
 #include "engine/nodes/SubGraphProcessor.h"
 
 #include "engine/AudioEngine.h"
-#include "engine/NodeObject.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
+#include "engine/NodeObject.h"
 
 #include "session/Node.h"
 
@@ -45,6 +45,7 @@ NodeObject::NodeObject (const uint32 nodeId_) noexcept
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
+    oversampler = std::make_unique<Oversampler<float>>();
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Slugs::type, getTypeString(), nullptr);
 }
@@ -307,11 +308,10 @@ void NodeObject::prepare (const double newSampleRate, const int blockSize,
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
 
-        initOversampling (jmax (getNumPorts (PortType::Audio, true), 
-                                getNumPorts (PortType::Audio, false)), 
-                                blockSize);
-
-        const int osFactor = getOversamplingFactor();
+        oversampler->prepare (jmax (getNumPorts (PortType::Audio, true), 
+                                    getNumPorts (PortType::Audio, false)), 
+                                    blockSize);
+        const int osFactor = jmax (1, getOversamplingFactor());
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         // TODO: move model code out of engine code
@@ -348,7 +348,7 @@ void NodeObject::unprepare()
     {
         isPrepared = false;
         releaseResources();
-        resetOversampling();
+        oversampler->reset();
         inRMS.clear (true);
         outRMS.clear (true);
     }
@@ -618,7 +618,6 @@ void NodeObject::setMidiProgramsState (const String& state)
 }
 
 //=============================================================================
-
 void NodeObject::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     audio.clear (0, audio.getNumSamples());
@@ -711,47 +710,45 @@ void NodeObject::setMuted (bool muted)
         muteChanged (this);
 }
 
-void NodeObject::initOversampling (int numChannels, int blockSize)
-{
-    osProcessors.clear();
-    numChannels = jmax (1, numChannels); // avoid assertion on nodes that don't have audio
-    for (int p = 1; p <= maxOsPow; ++p)
-        osProcessors.add (new dsp::Oversampling<float> (numChannels, 
-            p, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
-
-    prepareOversampling (blockSize);
-}
-
-void NodeObject::prepareOversampling (int blockSize)
-{
-    for (auto* osProcessor : osProcessors)
-        osProcessor->initProcessing (blockSize);
-}
-
-void NodeObject::resetOversampling()
-{
-    for (auto* osProcessor : osProcessors)
-        osProcessor->reset();
-}
-
 dsp::Oversampling<float>* NodeObject::getOversamplingProcessor()
 {
-    return osProcessors[osPow-1];
+    return oversampler->getProcessor (osPow - 1);
 }
 
 void NodeObject::setOversamplingFactor (int osFactor)
 {
-    osPow = (int) log2f ((float) osFactor);
-    if (auto* osProc = getOversamplingProcessor())
-        osLatency = osProc->getLatencyInSamples();
+    const auto newOsPow = (int) log2f ((float) osFactor);
+
+    {
+        ScopedLock sl (getPropertyLock());
+        if (newOsPow == osPow)
+            return;
+
+        if (osFactor > 1)
+        {
+            osPow = (int) log2f ((float) osFactor);
+            if (auto* const osProc = getOversamplingProcessor())
+                osLatency = osProc->getLatencyInSamples();
+        }
+        else
+        {
+            osPow = 0;
+            osLatency = 0.0;
+        }
+    }
+
+    if (auto* g = getParentGraph())
+        g->triggerAsyncUpdate();
 }
 
 int NodeObject::getOversamplingFactor()
 {
     if (osPow > 0)
+    {
         if (auto* osProc = getOversamplingProcessor())
             return static_cast<int> (osProc->getOversamplingFactor());
-
+    }
+    
     return 1;
 }
 

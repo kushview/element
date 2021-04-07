@@ -21,6 +21,7 @@
 
 #include "ElementApp.h"
 #include "engine/MidiPipe.h"
+#include "engine/Oversampler.h"
 #include "engine/Parameter.h"
 
 namespace Element {
@@ -471,17 +472,13 @@ private:
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
-    void initOversampling (int numChannels, int blockSize);
-    void prepareOversampling (int blockSize);
-    void resetOversampling();
+
+    std::unique_ptr<Oversampler<float>> oversampler;
+    int osPow = 0;
+    float osLatency = 0.0f;
     dsp::Oversampling<float>* getOversamplingProcessor();
 
     Parameter::Ptr getOrCreateParameter (const PortDescription&);
-
-    int osPow = 0;
-    float osLatency = 0.0f;
-    OwnedArray<dsp::Oversampling<float>> osProcessors;
-    const int maxOsPow = 3;
 
     double delayCompMillis = 0.0;
     int delayCompSamples = 0;
