@@ -219,9 +219,11 @@ public:
         while (audioChannelsToUse.size() < totalChans)
             audioChannelsToUse.add (0);
 
-        if (chans[PortType::Midi].size() > 0)
-            midiBufferToUse = chans[PortType::Midi].getFirst();
-
+        if (midiChannelsToUse.size() > 0)
+            midiBufferToUse = midiChannelsToUse.getFirst();
+        else
+            midiChannelsToUse.add (midiBufferToUse);
+        
         lastMute = node->isMuted();
 
         osChanSize = totalChans;
