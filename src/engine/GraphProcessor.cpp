@@ -397,7 +397,7 @@ public:
                 tempMidi.clear();
             }
 
-            pluginProcessBlock (osBuffer, midiPipe, processor->isSuspended());
+            pluginProcessBlock (osBuffer, midiPipe, node->isSuspended());
             osProcessor->processSamplesDown (block);
 
             tempMidi.clear();
