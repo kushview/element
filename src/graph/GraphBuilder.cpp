@@ -184,6 +184,7 @@ public:
 
         osChanSize = totalChans;
         osChans.reset (new float* [osChanSize]);
+        tempMidi.ensureSize (128);
     }
 
     void perform (AudioSampleBuffer& sharedBufferChans, const OwnedArray <MidiBuffer>& sharedMidiBuffers, const int numSamples)
@@ -193,7 +194,8 @@ public:
         }
 
         AudioSampleBuffer buffer (channels, totalChans, numSamples);
-        
+        MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
+
         if (! node->isEnabled())
         {
             for (int ch = numAudioIns; ch < numAudioOuts; ++ch)
@@ -246,97 +248,133 @@ public:
  
             if (keyRange.getLength() > 0 || !midiChans.isOmni() || useMidiProgram)
             {
-                auto& midi = *sharedMidiBuffers.getUnchecked (midiBufferToUse);
-                MidiBuffer::Iterator iter (midi);
-                int frame = 0; MidiMessage msg;
-                while (iter.getNextEvent (msg, frame))
+                for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
                 {
-                    if (msg.isNoteOnOrOff())
+                    auto& midi = *midiPipe.getWriteBuffer (i);
+                    MidiBuffer::Iterator iter (midi);
+                    int frame = 0; MidiMessage msg;
+                    while (iter.getNextEvent (msg, frame))
                     {
-                        // out of range 
-                        if (keyRange.getLength() > 0 && (msg.getNoteNumber() < keyRange.getStart() || msg.getNoteNumber() > keyRange.getEnd()))
+                        if (msg.isNoteOnOrOff())
+                        {
+                            // out of range 
+                            if (keyRange.getLength() > 0 && (msg.getNoteNumber() < keyRange.getStart() || msg.getNoteNumber() > keyRange.getEnd()))
+                                continue;
+                        }
+
+                        if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
                             continue;
+
+                        if (useMidiProgram && msg.isProgramChange())
+                        {
+                            node->setMidiProgram (msg.getProgramChangeNumber());
+                            node->reloadMidiProgram();
+                            continue;
+                        }
+
+                        transpose.process (msg);
+                        tempMidi.addEvent (msg, frame);
                     }
 
-                    if (msg.getChannel() > 0 && midiChans.isOff (msg.getChannel()))
-                        continue;
-
-                    if (useMidiProgram && msg.isProgramChange())
-                    {
-                        node->setMidiProgram (msg.getProgramChangeNumber());
-                        node->reloadMidiProgram();
-                        continue;
-                    }
-
-                    transpose.process (msg);
-                    tempMidi.addEvent (msg, frame);
+                    midi.swapWith (tempMidi);
+                    tempMidi.clear();
                 }
-
-                midi.swapWith (tempMidi);
             }
             else
             {
-                transpose.process (*sharedMidiBuffers.getUnchecked (midiBufferToUse), numSamples);
+                for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+                    transpose.process (*midiPipe.getWriteBuffer (i), numSamples);
             }
         }
+
         tempMidi.clear();
         // End MIDI filters
        #endif
         
-        if (node->wantsMidiPipe())
+        auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, MidiPipe& midiPipe, bool isSuspended)
         {
-            MidiPipe midiPipe (sharedMidiBuffers, midiChannelsToUse);
-            if (! node->isSuspended())
-                node->render (buffer, midiPipe);
+            if (node->wantsMidiPipe())
+            {
+                if (! node->isSuspended())
+                    node->render (buffer, midiPipe);
+                else
+                    node->renderBypassed (buffer, midiPipe);
+            }
             else
-                node->renderBypassed (buffer, midiPipe);
-        }
-        else
-        {
-            auto pluginProcessBlock = [=, &sharedMidiBuffers] (AudioSampleBuffer& buffer, bool isSuspended)
             {
                 if (! isSuspended)
                 {
-                    processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                    processor->processBlock (buffer, *midiPipe.getWriteBuffer (0));
+                    // processor->processBlock (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
                 }
                 else
                 {
-                    processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
+                    processor->processBlockBypassed (buffer, *midiPipe.getWriteBuffer (0));
+                    // processor->processBlockBypassed (buffer, *sharedMidiBuffers.getUnchecked (midiBufferToUse));
                 }
-            };
-
-            // if (node->getOversamplingFactor() > 1)
-            if (false)
-            {
-                #if 0
-                auto osProcessor = node->getOversamplingProcessor();
-
-                dsp::AudioBlock<float> block (buffer);
-                dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
-
-                if (buffer.getNumChannels() > osChanSize)
-                {
-                    osChanSize = buffer.getNumChannels();
-                    osChans.reset (new float* [osChanSize]);
-                }
-
-                float** osData = osChans.get();
-                for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
-                    osData[ch] = osBlock.getChannelPointer (ch);
-                
-                AudioSampleBuffer osBuffer (osData, 
-                    buffer.getNumChannels(),
-                    static_cast<int> (osBlock.getNumSamples()));
-                pluginProcessBlock (osBuffer, processor->isSuspended());
-
-                osProcessor->processSamplesDown (block);
-                #endif
             }
-            else
+        };
+
+        const auto osFactor = node->getOversamplingFactor();
+        if (osFactor > 1)
+        {
+            auto osProcessor = node->getOversamplingProcessor();
+
+            dsp::AudioBlock<float> block (buffer);
+            dsp::AudioBlock<float> osBlock = osProcessor->processSamplesUp (block);
+
+            if (buffer.getNumChannels() > osChanSize)
             {
-                pluginProcessBlock (buffer, processor->isSuspended());
+                osChanSize = buffer.getNumChannels();
+                osChans.reset (new float* [osChanSize]);
             }
+
+            float** osData = osChans.get();
+            for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+                osData[ch] = osBlock.getChannelPointer (ch);
             
+            AudioSampleBuffer osBuffer (osData, 
+                buffer.getNumChannels(),
+                static_cast<int> (osBlock.getNumSamples()));
+            
+            tempMidi.clear();
+            for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+            {
+                auto& mb = *midiPipe.getWriteBuffer (i);
+                for (const auto& msg : mb) 
+                {
+                    tempMidi.addEvent (
+                        msg.data, 
+                        msg.numBytes, 
+                        msg.samplePosition * osFactor
+                    );
+                }
+                mb.swapWith (tempMidi);
+                tempMidi.clear();
+            }
+
+            pluginProcessBlock (osBuffer, midiPipe, processor->isSuspended());
+            osProcessor->processSamplesDown (block);
+
+            tempMidi.clear();
+            for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
+            {
+                auto& mb = *midiPipe.getWriteBuffer (i);
+                for (const auto& msg : mb)
+                {
+                    tempMidi.addEvent (
+                        msg.data,
+                        msg.numBytes,
+                        msg.samplePosition / osFactor
+                    );
+                }
+                mb.swapWith (tempMidi);
+                tempMidi.clear();
+            }
+        }
+        else
+        {
+            pluginProcessBlock (buffer, midiPipe, node->isSuspended());
         }
         
         if (muted && !muteInput)
@@ -385,6 +423,7 @@ private:
     bool lastMute = false;
     MidiTranspose transpose;
     MidiBuffer tempMidi;
+
     std::unique_ptr<float*> osChans;
     int osChanSize = 0;
     JUCE_DECLARE_NON_COPYABLE (ProcessBufferOp)

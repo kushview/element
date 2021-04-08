@@ -32,6 +32,7 @@ class ProcessBufferOp;
 }
 
 class GraphProcessor;
+class ProcessBufferOp;
 
 class NodeObject : public ReferenceCountedObject
 {
@@ -402,6 +403,7 @@ protected:
 private:
     friend class GraphProcessor;
     friend class GraphRender::ProcessBufferOp;
+    friend class ProcessBufferOp;
     friend class GraphManager;
     friend class EngineController;
     friend class Node;
