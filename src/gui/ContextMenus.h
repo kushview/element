@@ -217,7 +217,8 @@ public:
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
             return;
 
-        osMenu.addItem (index++, "1x", true, ptr->getOversamplingFactor() == 1);
+        osMenu.addItem (index++, "Off", true, ptr->getOversamplingFactor() == 1);
+        osMenu.addSeparator();
         osMenu.addItem (index++, "2x", true, ptr->getOversamplingFactor() == 2);
         osMenu.addItem (index++, "4x", true, ptr->getOversamplingFactor() == 4);
         osMenu.addItem (index++, "8x", true, ptr->getOversamplingFactor() == 8);
