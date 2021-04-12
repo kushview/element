@@ -23,6 +23,7 @@
 #include "engine/MidiPipe.h"
 #include "engine/Oversampler.h"
 #include "engine/Parameter.h"
+#include "PortCount.h"
 
 namespace Element {
 
@@ -31,7 +32,7 @@ namespace GraphRender {
 class ProcessBufferOp;
 }
 
-class GraphProcessor;
+class GraphNode;
 class ProcessBufferOp;
 
 class NodeObject : public ReferenceCountedObject
@@ -54,9 +55,6 @@ public:
 
     virtual ~NodeObject();
     
-    /** Create a node suitable for binding to a root graph */
-    static NodeObject* createForRoot (GraphProcessor*);
-    
     /** Returns true if a parameter index is special */
     static bool isSpecialParameter (int parameter);
 
@@ -70,9 +68,14 @@ public:
     /** Returns the name of this node */
     String getName() const { return name; }
     
-    //=========================================================================
-    double getSamleRate() const { return sampleRate; }
+    /** Returns true if this is a T type node */
+    template<class T> bool isA() const { return nullptr != dynamic_cast<const T*> (this); }
 
+    //=========================================================================
+    void setRenderDetails (double newSampleRate, int newBlockSize);
+    double getSampleRate() const noexcept { return sampleRate; }
+    int getBlockSize() const noexcept { return blockSize; }
+    
     //=========================================================================
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
@@ -139,7 +142,11 @@ public:
 
     /** Returns true if an output port */
     bool isPortOutput (const uint32 port) const;
+
+    //==========================================================================
+    virtual void refreshPorts() {}
     
+    //==========================================================================
     /** Returns true if the underyling processor is a SubGraph or Graph */
     bool isGraph() const noexcept;
 
@@ -190,6 +197,7 @@ public:
     }
 
     ValueTree getMetadata() const { return metadata; }
+    ValueTree createPortsData() const;
 
     bool isAudioIONode() const;
     bool isAudioInputNode() const;
@@ -200,7 +208,7 @@ public:
     /* Returns the parent graph.
        If one has not been set, then this will return nullptr.
      */
-    GraphProcessor* getParentGraph() const;
+    GraphNode* getParentGraph() const;
 
     void setInputRMS (int chan, float val);
     float getInputRMS(int chan) const { return (chan < inRMS.size()) ? inRMS.getUnchecked(chan)->get() : 0.0f; }
@@ -370,12 +378,15 @@ public:
 
 protected:
     NodeObject (uint32 nodeId) noexcept;
-    virtual void createPorts() = 0;
+    NodeObject (const PortList& ports);
+
+    void setPorts (const PortList&);
     virtual void initialize() {}
 
     /** Clear the top level referenced parameters. Some node types
         can use this in their destructor if deletion order is important
-        for processors/parameters */
+        for processors/parameters
+     */
     void clearParameters();
 
     void setName (const String& newName)
@@ -397,18 +408,18 @@ protected:
     //==========================================================================
     void triggerPortReset();
 
-    kv::PortList ports;
     ValueTree metadata;
 
 private:
-    friend class GraphProcessor;
+    friend class EngineController;
     friend class GraphRender::ProcessBufferOp;
     friend class ProcessBufferOp;
     friend class GraphManager;
-    friend class EngineController;
+    friend class GraphNode;
     friend class Node;
     
-    GraphProcessor* parent = nullptr;
+    kv::PortList ports;
+    GraphNode* parent = nullptr;
     bool isPrepared = false;
     
     Atomic<int> enabled { 1 };
@@ -417,6 +428,7 @@ private:
     Atomic<int> muteInput { 0 };
 
     double sampleRate = 0.0;
+    int blockSize = 0;
     int latencySamples = 0;
     String name;
 
@@ -470,8 +482,8 @@ private:
     mutable OwnedArray<MidiProgram> midiPrograms;
     MidiProgram* getMidiProgram (int) const;
 
-    void setParentGraph (GraphProcessor*);
-    void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
+    void setParentGraph (GraphNode*);
+    void prepare (double sampleRate, int blockSize, GraphNode*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
 

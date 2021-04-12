@@ -132,15 +132,15 @@ void OSCSenderNode::stop ()
 
 /** MIDI */
 
-inline void OSCSenderNode::createPorts()
+inline void OSCSenderNode::refreshPorts()
 {
     if (createdPorts)
         return;
 
-    ports.clearQuick();
-
-    ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+    PortList newPorts;
+    newPorts.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
     createdPorts = true;
+    setPorts (newPorts);
 }
 
 void OSCSenderNode::prepareToRender (double sampleRate, int maxBufferSize) {

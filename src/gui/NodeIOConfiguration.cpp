@@ -17,6 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#include "graph/GraphNode.h"
 #include "gui/GuiCommon.h"
 #include "gui/NodeIOConfiguration.h"
 #include "gui/MainWindow.h"
@@ -567,13 +568,13 @@ GraphEditorComponent* NodeAudioBusesComponent::getGraphEditor() const
     return nullptr;
 }
 
-GraphProcessor* NodeAudioBusesComponent::getGraph() const
+GraphNode* NodeAudioBusesComponent::getGraph() const
 {
     const Node graph (node.getParentGraph());
     if (auto* gn = graph.getGraphNode())
-        return dynamic_cast<GraphProcessor*> (gn->getAudioProcessor());
+        return dynamic_cast<GraphNode*> (gn);
     return nullptr;
 }
-    
+
 }
 

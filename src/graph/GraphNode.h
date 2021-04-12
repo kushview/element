@@ -186,131 +186,37 @@ public:
     int getNumPrograms() const override { return 1; }
     int getCurrentProgram() const override { return 0; }
     const String getProgramName (int index) const override { return "program"; }
-    void setCurrentProgram (int index) override {}
+    void setCurrentProgram (int index) override { }
 
-    void getState (MemoryBlock&) override {}
+    void getState (MemoryBlock&) override { }
     void setState (const void*, int sizeInBytes) override {}
     
     void getPluginDescription (PluginDescription& desc) const override;
 
-    //==========================================================================
-    /** A special type of Processor that can live inside an ProcessorGraph
-        in order to use the audio that comes into and out of the graph itself.
-
-        If you create an AudioGraphIOProcessor in "input" mode, it will act as a
-        node in the graph which delivers the audio that is coming into the parent
-        graph. This allows you to stream the data to other nodes and process the
-        incoming audio.
-
-        Likewise, one of these in "output" mode can be sent data which it will add to
-        the sum of data being sent to the graph's output.
-
-        @see GraphNode
-    */
-    class AudioGraphIOProcessor : public Processor
-    {
-    public:
-        /** Specifies the mode in which this processor will operate.
-        */
-        enum IODeviceType
-        {
-            audioInputNode = 0, /**< In this mode, the processor has output channels
-                                     representing all the audio input channels that are
-                                     coming into its parent audio graph. */
-            audioOutputNode,    /**< In this mode, the processor has input channels
-                                     representing all the audio output channels that are
-                                     going out of its parent audio graph. */
-            midiInputNode,      /**< In this mode, the processor has a midi output which
-                                     delivers the same midi data that is arriving at its
-                                     parent graph. */
-            midiOutputNode,     /**< In this mode, the processor has a midi input and
-                                     any data sent to it will be passed out of the parent
-                                     graph. */
-            numDeviceTypes
-        };
-
-        //==============================================================================
-        /** Returns the mode of this processor. */
-        IODeviceType getType() const                                { return type; }
-
-        /** Returns the parent graph to which this processor belongs, or nullptr if it
-            hasn't yet been added to one. */
-        GraphNode* getParentGraph() const                 { return graph; }
-
-        /** True if this is an audio or midi input. */
-        bool isInput() const;
-        /** True if this is an audio or midi output. */
-        bool isOutput() const;
-
-        //==============================================================================
-        AudioGraphIOProcessor (const IODeviceType type);
-        ~AudioGraphIOProcessor();
-
-        void fillInPluginDescription (PluginDescription& d) const;
-
-        const String getName() const;
-        const String getInputChannelName (int channelIndex) const;
-        const String getOutputChannelName (int channelIndex) const;
-        
-        void prepareToPlay (double sampleRate, int estimatedSamplesPerBlock);
-        void releaseResources();
-        void processBlock (AudioSampleBuffer&, MidiBuffer&);
-
-        bool isInputChannelStereoPair (int index) const;
-        bool isOutputChannelStereoPair (int index) const;
-        bool silenceInProducesSilenceOut() const;
-        double getTailLengthSeconds() const;
-        bool acceptsMidi() const;
-        bool producesMidi() const;
-        bool hasEditor() const;
-        AudioProcessorEditor* createEditor();
-        int getNumParameters();
-        const String getParameterName (int);
-        float getParameter (int);
-        const String getParameterText (int);
-        void setParameter (int, float);
-
-        int getNumPrograms();
-        int getCurrentProgram();
-        void setCurrentProgram (int);
-        const String getProgramName (int);
-        void changeProgramName (int, const String&);
-
-        void getStateInformation (MemoryBlock& destData);
-        void setStateInformation (const void* data, int sizeInBytes);
-
-        /** @internal */
-        void setParentGraph (GraphNode*);
-
-    private:
-        const IODeviceType type;
-        GraphNode* graph;
-
-        JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioGraphIOProcessor)
-    };
+    void refreshPorts() override {}
 
 protected:
     //==========================================================================
-    virtual void preRenderNodes() { }
-    virtual void postRenderNodes() { }
+    virtual void preRenderNodes() {}
+    virtual void postRenderNodes() {}
     
-    //==========================================================================
-    void createPorts() override {}
+    //==========================================================================    
     void initialize() override {}
 
 private:
+    friend class GraphNode;
+    friend class GraphPort;
+    friend class IONode;
+
     typedef ArcTable<Connection> LookupTable;
     ReferenceCountedArray<NodeObject> nodes;
     OwnedArray<Connection> connections;
-    uint32 ioNodes [AudioGraphIOProcessor::numDeviceTypes];
+    uint32 ioNodes [10];
     
     uint32 lastNodeId;
     AudioSampleBuffer renderingBuffers;
     OwnedArray <MidiBuffer> midiBuffers;
     Array<void*> renderingOps;
-
-    friend class AudioGraphIOProcessor;
-    friend class GraphPort;
 
     AudioSampleBuffer* currentAudioInputBuffer;
     AudioSampleBuffer currentAudioOutputBuffer;

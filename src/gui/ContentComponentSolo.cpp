@@ -20,11 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/MappingController.h"
 #include "controllers/SessionController.h"
-
-#include "engine/GraphProcessor.h"
-
 #include "gui/views/EmptyContentView.h"
-
 #include "gui/AudioIOPanelView.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/ConnectionGrid.h"

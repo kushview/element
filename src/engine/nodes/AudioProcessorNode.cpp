@@ -19,7 +19,6 @@
 
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/BaseProcessor.h"
-#include "engine/GraphProcessor.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
 #include "ScopedFlag.h"
 
@@ -185,7 +184,7 @@ void AudioProcessorNode::setState (const void* data, int size)
         proc->setStateInformation (data, size);
 }
 
-void AudioProcessorNode::createPorts()
+void AudioProcessorNode::refreshPorts()
 {
     kv::PortList newPorts;
 
@@ -266,8 +265,7 @@ void AudioProcessorNode::createPorts()
     }
 
     jassert (index == newPorts.size());
-    
-    ports.swapWith (newPorts);
+    setPorts (newPorts);
 }
 
 Parameter::Ptr AudioProcessorNode::getParameter (const PortDescription& port)

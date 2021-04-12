@@ -20,7 +20,6 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/GraphProcessor.h"
 
 namespace Element {
 

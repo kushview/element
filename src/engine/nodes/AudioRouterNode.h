@@ -82,18 +82,17 @@ public:
         desc.uid                = EL_INTERNAL_UID_AUDIO_ROUTER;
     }
 
-protected:
-    inline void createPorts() override
+    inline void refreshPorts() override
     {
-        if (ports.size() > 0 && !rebuildPorts)
+        if (getNumPorts() > 0 && !rebuildPorts)
             return;
         
+        PortList newPorts;
         int index = 0;
         int channel = 0;
-        ports.clearQuick();
         for (int i = 0; i < numSources; ++i)
         {
-            ports.add (PortType::Audio, index++, channel++,
+            newPorts.add (PortType::Audio, index++, channel++,
                        String ("audio_in_XX").replace ("XX", String(i)),
                        String ("Input XX").replace ("XX", String (i + 1)),
                        true);
@@ -102,14 +101,15 @@ protected:
         channel = 0;
         for (int i = 0; i < numSources; ++i)
         {
-            ports.add (PortType::Audio, index++, channel++,
+            newPorts.add (PortType::Audio, index++, channel++,
                        String ("audio_out_XX").replace("XX", String(i)),
                        String ("Output XX").replace("XX", String (i +1)), 
                        false);
         }
 
-        ports.add (PortType::Midi, index++, 0, "midi_in",  "MIDI In",  true);
+        newPorts.add (PortType::Midi, index++, 0, "midi_in",  "MIDI In",  true);
         rebuildPorts = false;
+        setPorts (newPorts);
     }
 
 private:

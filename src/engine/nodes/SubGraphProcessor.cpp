@@ -17,6 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
+
 #include "controllers/GraphManager.h"
 #include "engine/nodes/SubGraphProcessor.h"
 #include "Globals.h"
@@ -39,7 +41,7 @@ void SubGraphProcessor::initController (PluginManager& plugins)
 {
     if (controller != nullptr)
         return;
-    controller = new GraphManager (*this, plugins);
+    // controller = new GraphManager (*this, plugins);
 }
 
 void SubGraphProcessor::createAllIONodes() { }
@@ -61,3 +63,4 @@ void SubGraphProcessor::fillInPluginDescription (PluginDescription& d) const
 }
 
 }
+#endif

@@ -46,7 +46,7 @@ public:
 private:
     friend class World;
     class Private;
-    Scoped<Private> impl;
+    std::unique_ptr<Private> impl;
 };
 
 }

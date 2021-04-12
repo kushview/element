@@ -35,6 +35,7 @@ public:
     
     struct Context;
 
+    void refreshPorts() override;
     void getPluginDescription (PluginDescription& desc) const override;
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
@@ -58,7 +59,6 @@ public:
 
 protected:
     inline bool wantsMidiPipe() const override { return true; }
-    void createPorts() override;
     Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:

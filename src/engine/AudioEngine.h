@@ -21,7 +21,6 @@
 
 #include "ElementApp.h"
 #include "engine/Engine.h"
-#include "engine/GraphProcessor.h"
 #include "engine/MidiIOMonitor.h"
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
@@ -30,101 +29,11 @@
 
 namespace Element {
 
-class Globals;
 class ClipFactory;
 class EngineControl;
+class Globals;
 class Settings;
-
-typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-
-class RootGraph : public GraphProcessor
-{
-public:
-    RootGraph();
-    ~RootGraph() { }
-    
-    enum RenderMode
-    {
-        SingleGraph     = 0,
-        Parallel        = (1 << 0)
-    };
-
-    inline void setLocked (const var&)
-    {
-        const bool isNowLocked = false;
-        ScopedLock sl (getCallbackLock());
-        locked = isNowLocked;
-    }
-
-    inline static bool renderModeValid (const int mode) {
-        return mode == SingleGraph || mode == Parallel;
-    }
-
-    inline static String getSlugForRenderMode (const RenderMode mode)
-    {
-        switch (mode)
-        {
-            case SingleGraph: return "single"; break;
-            case Parallel:    return "parallel"; break;
-        }
-        return String();
-    }
-
-    void setValueTree (const ValueTree& tree);
-    void setPlayConfigFor (AudioIODevice* device);
-    void setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup);
-    void setPlayConfigFor (DeviceManager&);
-    
-    inline RenderMode getRenderMode() const { return renderMode; }
-    inline String getRenderModeSlug() const { return getSlugForRenderMode (renderMode); }
-    inline bool isSingle() const { return getRenderMode() == SingleGraph; }
-    
-    inline void setRenderMode (const RenderMode mode)
-    {
-        // TODO: don't use a lock
-        if (! locked && renderMode == static_cast<int> (mode))
-            return;
-        ScopedLock sl (getCallbackLock());
-        renderMode = locked ? SingleGraph : mode;
-    }
-
-    inline void setMidiProgram (const int program)
-    {
-        if (program == midiProgram)
-            return;
-        ScopedLock sl (getCallbackLock());
-        midiProgram = program;
-    }
-    
-    const String getName() const override;
-    const String getInputChannelName (int channelIndex) const override;
-    const String getOutputChannelName (int channelIndex) const override;
-    const String getAudioInputDeviceName() const        { return audioInName; }
-    const String getAudioOutputDeviceName() const       { return audioOutName; }
-    
-    /** the index in the audio engine.  if less than 0 then the graph
-        is not attached
-     */
-    int getEngineIndex()    const { return engineIndex; }
-
-private:
-    friend class AudioEngine;
-    friend struct RootGraphRender;
-
-    NodeObjectPtr ioNodes [IOProcessor::numDeviceTypes];
-    String graphName = "Device";
-    String audioInName, audioOutName;
-    StringArray audioInputNames;
-    StringArray audioOutputNames;
-    int midiChannel = 0;
-    int midiProgram = -1;
-    int engineIndex = -1;
-    RenderMode renderMode = Parallel;
-    
-    bool locked = true;
-
-    void updateChannelNames (AudioIODevice* device);
-};
+class RootGraph;
 
 class AudioEngine : public Engine
 {

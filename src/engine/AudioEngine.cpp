@@ -18,73 +18,17 @@
 */
 
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
 #include "engine/MidiClock.h"
 #include "engine/MidiChannelMap.h"
 #include "engine/MidiEngine.h"
 #include "engine/MidiTranspose.h"
 #include "engine/Transport.h"
+#include "graph/RootGraph.h"
 #include "Globals.h"
 #include "Settings.h"
 
 namespace Element {
-
-RootGraph::RootGraph() { }
-
-void RootGraph::setPlayConfigFor (DeviceManager& devices)
-{
-    if (auto* device = devices.getCurrentAudioDevice())
-        setPlayConfigFor (device);
-    DeviceManager::AudioSettings setup;
-    devices.getAudioDeviceSetup (setup);
-    audioInName     = setup.inputDeviceName;
-    audioOutName    = setup.outputDeviceName;
-}
-
-void RootGraph::setPlayConfigFor (AudioIODevice *device)
-{
-    jassert (device);
-    
-    const int numIns        = device->getActiveInputChannels().countNumberOfSetBits();
-    const int numOuts       = device->getActiveOutputChannels().countNumberOfSetBits();
-    const int bufferSize    = device->getCurrentBufferSizeSamples();
-    const double sampleRate = device->getCurrentSampleRate();
-    setPlayConfigDetails (numIns, numOuts, sampleRate, bufferSize);
-    updateChannelNames (device);
-    graphName = device->getName();
-    if (graphName.isEmpty())
-        graphName = "Device";
-}
-
-void RootGraph::setPlayConfigFor (const DeviceManager::AudioDeviceSetup& setup)
-{
-    setPlayConfigDetails (setup.inputChannels.countNumberOfSetBits(),
-                          setup.outputChannels.countNumberOfSetBits(),
-                          setup.sampleRate, setup.bufferSize);
-}
-
-const String RootGraph::getName() const { return graphName; }
-    
-const String RootGraph::getInputChannelName (int c) const { return audioInputNames[c]; }
-    
-const String RootGraph::getOutputChannelName (int c) const { return audioOutputNames[c]; }
-
-void RootGraph::updateChannelNames (AudioIODevice* device)
-{
-    auto activeIn  = device->getActiveInputChannels();
-    auto namesIn   = device->getInputChannelNames();
-    auto activeOut = device->getActiveOutputChannels();
-    auto namesOut  = device->getOutputChannelNames();
-    audioOutputNames.clear();
-    audioInputNames.clear();
-    for (int i = 0; i < namesIn.size(); ++i)
-        if (activeIn[i] == true)
-            audioInputNames.add(namesIn[i]);
-    for (int i = 0; i < namesOut.size(); ++i)
-        if (activeOut[i] == true)
-            audioOutputNames.add(namesOut[i]);
-}
 
 struct RootGraphRender : public AsyncUpdater
 {
@@ -134,31 +78,20 @@ struct RootGraphRender : public AsyncUpdater
         audioTemp.setSize (1, 1);
         audioOut.setSize (1, 1);
     }
+    
     void dumpGraphs() {
         
     }
 
     void renderGraphs (AudioSampleBuffer& buffer, MidiBuffer& midi)
     {
-       #if defined (EL_PRO)
         if (program.wasRequested())
         {
-            if (! locked)
-            {
-                const int nextGraph = findGraphForProgram (program);
-                if (nextGraph != currentGraph)
-                {
-                    setCurrentGraph (nextGraph);
-                }
-            }
-            else
-            {
-                DBG("[EL] program change not handled: product locked");
-            }
-
+            const int nextGraph = findGraphForProgram (program);
+            if (nextGraph != currentGraph)
+                setCurrentGraph (nextGraph);
             program.reset();
         }
-       #endif
 
         auto* const current  = getCurrentGraph();
         auto* const last     = (lastGraph >= 0 && lastGraph < graphs.size()) ? getGraph(lastGraph) : nullptr;
@@ -226,14 +159,17 @@ struct RootGraphRender : public AsyncUpdater
                 }
 
                 {
-                    const ScopedLock sl (graph->getCallbackLock());
+                    MidiBuffer* tmpArray[] = { &midiTemp };
+                    MidiPipe midiPipe (tmpArray, 1);
+
+                    const ScopedLock sl (graph->getPropertyLock());
                     if (graph->isSuspended())
                     {
-                        graph->processBlockBypassed (audioTemp, midiTemp);
+                        graph->renderBypassed (audioTemp, midiPipe);
                     }
                     else
                     {
-                        graph->processBlock (audioTemp, midiTemp);
+                        graph->render (audioTemp, midiPipe);
                     }
                 }
                 
@@ -275,7 +211,6 @@ struct RootGraphRender : public AsyncUpdater
             MidiMessage msg; int frame = 0;
             
             // setup a program change if present
-           #if defined (EL_PRO)
             while (iter.getNextEvent (msg, frame) && frame < numSamples)
             {
                 if (! msg.isProgramChange())
@@ -283,7 +218,6 @@ struct RootGraphRender : public AsyncUpdater
                 program.program = msg.getProgramChangeNumber();
                 program.channel = msg.getChannel();
             }
-           #endif // EL_PRO
 
             // done with input, swap it with the rendered output
             midi.swapWith (midiOut);
@@ -299,10 +233,8 @@ struct RootGraphRender : public AsyncUpdater
     }
     
     /** not realtime safe! */
-
     bool addGraph (RootGraph* graph)
     {
-        graph->setLocked (locked);
         graphs.add (graph);
         graph->engineIndex = graphs.size() - 1;
 
@@ -333,18 +265,9 @@ struct RootGraphRender : public AsyncUpdater
     RootGraph* getGraph (const int i) const { return graphs.getUnchecked (i); }
     int getGraphIndex() const { return currentGraph; }
     const Array<RootGraph*>& getGraphs() const { return graphs; }
-    
-    /** passing in true turns off all rendering features in the paid version */
-    void setLocked (const bool l)
-    {
-        locked = l;
-        for (auto* g : graphs)
-            g->setLocked (locked);
-    }
 
 private:
     Array<RootGraph*> graphs;
-    bool locked             = false;
     int currentGraph        = -1;
     int lastGraph           = -1;
 
@@ -397,8 +320,12 @@ class AudioEngine::Private : public AudioIODeviceCallback,
 {
 public:
     Private (AudioEngine& e)
-        : engine (e),sampleRate (0), blockSize (0), isPrepared (false),
-          numInputChans (0), numOutputChans (0),
+        : engine (e), 
+          sampleRate (0), 
+          blockSize (0), 
+          isPrepared (false),
+          numInputChans (0), 
+          numOutputChans (0),
           tempBuffer (1, 1)
     {
         tempoValue.addListener (this);
@@ -815,10 +742,10 @@ private:
 
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
-        graph->setPlayConfigDetails (numInputChans, numOutputChans,
-                                     sampleRate, blockSize);
-        graph->setPlayHead (&transport);
-        graph->prepareToPlay (sampleRate, estimatedBlockSize);
+        graph->setRenderDetails (sampleRate, blockSize);
+        // FIXME:
+        // graph->setPlayHead (&transport);
+        graph->prepareToRender (sampleRate, estimatedBlockSize);
     }
     
     void prepareToPlay (double sampleRate, int estimatedBlockSize)

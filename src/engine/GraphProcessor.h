@@ -63,8 +63,8 @@ public:
         Connection (uint32 sourceNode, uint32 sourcePort,
                     uint32 destNode, uint32 destPort) noexcept;
         Connection (const ValueTree props);
+
     private:
-        friend class GraphProcessor;
         ValueTree arc;
         JUCE_LEAK_DETECTOR (Connection)
     };

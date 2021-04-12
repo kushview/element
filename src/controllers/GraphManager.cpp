@@ -18,13 +18,12 @@
 */
 
 #include "controllers/GraphManager.h"
-
+#include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/AudioRouterNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 #include "engine/nodes/MidiProgramMapNode.h"
 #include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/nodes/SubGraphProcessor.h"
-
+#include "graph/RootGraph.h"
 #include "session/PluginManager.h"
 #include "Globals.h"
 #include "Utils.h"
@@ -66,12 +65,18 @@ private:
 
     void onPortsChanged()
     {
-        const auto newPorts = object->getMetadata().getChildWithName (Tags::ports);
+        const auto newPorts = object->createPortsData();
         int index = data.indexOf (data.getChildWithName (Tags::ports));
-        if (index > 0 && newPorts.isValid())
+        if (newPorts.isValid())
         {
-            data.removeChild (index, nullptr);
-            data.addChild (newPorts.createCopy(), index, nullptr);
+            DBG("onPortsChanged(): " << object->getName() 
+                << " - " << data.getProperty (Tags::name).toString());
+            if (index >= 0)
+                data.removeChild (index, nullptr);
+            else
+                index = -1;
+            
+            data.addChild (newPorts, index, nullptr);
             manager.removeIllegalConnections();
         }
 
@@ -106,61 +111,61 @@ private:
         auto& proc (root->getGraph());
         const Node graph (root->getGraphModel());
 
-        const bool wantsAudioIn   = graph.hasAudioInputNode()  && proc.getTotalNumInputChannels() > 0;
-        const bool wantsAudioOut  = graph.hasAudioOutputNode() && proc.getTotalNumOutputChannels() > 0;
-        const bool wantsMidiIn    = graph.hasMidiInputNode()   && proc.acceptsMidi();
-        const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.producesMidi();
+        const bool wantsAudioIn   = graph.hasAudioInputNode()  && proc.getNumPorts (PortType::Audio, true) > 0;
+        const bool wantsAudioOut  = graph.hasAudioOutputNode() && proc.getNumPorts (PortType::Audio, false) > 0;
+        const bool wantsMidiIn    = graph.hasMidiInputNode()   && proc.getNumPorts (PortType::Midi, true) > 0;
+        const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.getNumPorts (PortType::Midi, false) > 0;
         
-        NodeObjectPtr ioNodes [IOProcessor::numDeviceTypes];
+        NodeObjectPtr ioNodes [IONode::numDeviceTypes];
         for (int i = 0; i < root->getNumNodes(); ++i)
         {
             NodeObjectPtr node = root->getNode (i);
             if (node->isMidiIONode() || node->isAudioIONode())
             {
-                auto* ioProc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
-                ioNodes [ioProc->getType()] = node;
+                if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
+                    ioNodes [ioProc->getType()] = node;
             }
         }
         
         Array<uint32> nodesToRemove;
 
-        for (int t = 0; t < IOProcessor::numDeviceTypes; ++t)
+        for (int t = 0; t < IONode::numDeviceTypes; ++t)
         {
             if (nullptr != ioNodes [t])
             {
-                if (t == IOProcessor::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
-                if (t == IOProcessor::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IOProcessor::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IOProcessor::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
+                if (t == IONode::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
                 continue;
             }
 
-            if (t == IOProcessor::audioInputNode    && !wantsAudioIn)   continue;
-            if (t == IOProcessor::audioOutputNode   && !wantsAudioOut)  continue;
-            if (t == IOProcessor::midiInputNode     && !wantsMidiIn)    continue;
-            if (t == IOProcessor::midiOutputNode    && !wantsMidiOut)   continue;
+            if (t == IONode::audioInputNode    && !wantsAudioIn)   continue;
+            if (t == IONode::audioOutputNode   && !wantsAudioOut)  continue;
+            if (t == IONode::midiInputNode     && !wantsMidiIn)    continue;
+            if (t == IONode::midiOutputNode    && !wantsMidiOut)   continue;
 
             PluginDescription desc;
             desc.pluginFormatName = "Internal";
             double rx = 0.5f, ry = 0.5f;
             switch (t)
             {
-                case IOProcessor::audioInputNode:
+                case IONode::audioInputNode:
                     desc.fileOrIdentifier = "audio.input";
                     rx = .25;
                     ry = .25;
                     break;
-                case IOProcessor::audioOutputNode:
+                case IONode::audioOutputNode:
                     desc.fileOrIdentifier = "audio.output";
                     rx = .25;
                     ry = .75;
                     break;
-                case IOProcessor::midiInputNode:
+                case IONode::midiInputNode:
                     desc.fileOrIdentifier = "midi.input";
                     rx = .75;
                     ry = .25;
                     break;
-                case IOProcessor::midiOutputNode:
+                case IONode::midiOutputNode:
                     desc.fileOrIdentifier = "midi.output";
                     rx = .75;
                     ry = .75;
@@ -177,7 +182,7 @@ private:
     }
 };
 
-GraphManager::GraphManager (GraphProcessor& pg, PluginManager& pm)
+GraphManager::GraphManager (GraphNode& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
 { }
 
@@ -235,10 +240,9 @@ NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x,
 
 NodeObject* GraphManager::createPlaceholder (const Node& node)
 {
-    PluginDescription desc; node.getPluginDescription (desc);
-    auto* ph = new PlaceholderProcessor ();
+    auto* ph = new PlaceholderProcessor();
     ph->setupFor (node, processor.getSampleRate(), processor.getBlockSize());
-    return processor.addNode (ph, node.getNodeId());
+    return processor.addNode (new AudioProcessorNode (node.getNodeId(), ph), node.getNodeId());
 }
 
 uint32 GraphManager::addNode (const Node& newNode)
@@ -250,6 +254,10 @@ uint32 GraphManager::addNode (const Node& newNode)
         return KV_INVALID_NODE;
     }
     
+    DBG("GraphManager::addNode (const Node&):");
+    DBG("  name=" << newNode.getName());
+    DBG("  identifier=" << newNode.getIdentifier().toString());
+
     uint32 nodeId = KV_INVALID_NODE;
     const PluginDescription desc (pluginManager.findDescriptionFor (newNode));
     if (auto* node = createFilter (&desc, 0, 0,
@@ -293,28 +301,33 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
         return KV_INVALID_NODE;
     }
 
-    if (auto* node = createFilter (desc, rx, ry, nodeId))
+    if (auto* object = createFilter (desc, rx, ry, nodeId))
     {
-        nodeId = node->nodeId;
-        ValueTree model = node->getMetadata().createCopy();
-        model.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
-             .setProperty (Tags::name,   desc->name, nullptr)
-             .setProperty (Tags::object, node, nullptr)
-             .setProperty (Tags::updater,    new NodeModelUpdater (*this, model, node), nullptr)
-             .setProperty (Tags::relativeX, rx, nullptr)
-             .setProperty (Tags::relativeY, ry, nullptr)
-             .setProperty (Tags::pluginIdentifierString, 
+        nodeId = object->nodeId;
+        ValueTree data (Tags::node);
+        data .setProperty (Tags::id,            static_cast<int64> (nodeId), nullptr)
+             .setProperty (Tags::format,        desc->pluginFormatName, nullptr)
+             .setProperty (Tags::identifier,    desc->fileOrIdentifier, nullptr)
+             .setProperty (Tags::name,          desc->name, nullptr)
+             .setProperty (Tags::object,        object, nullptr)
+             .setProperty (Tags::updater,       new NodeModelUpdater (*this, data, object), nullptr)
+             .setProperty (Tags::relativeX,     rx, nullptr)
+             .setProperty (Tags::relativeY,     ry, nullptr)
+             .setProperty (Tags::pluginIdentifierString,
                            desc->createIdentifierString(), nullptr);
         
-        Node n (model, true);
+        Node node (data, true);
+        jassert (node.getFormat().toString().isNotEmpty());
+        jassert (node.getIdentifier().toString().isNotEmpty());
 
-        if (auto* sub = node->processor<SubGraphProcessor>())
+        if (object->isSubGraph())
         {
-            sub->getController().setNodeModel (n);
-            IONodeEnforcer enforceIONodes (sub->getController());
+            // FIXME:
+            // sub->getController().setNodeModel (n);
+            // IONodeEnforcer enforceIONodes (sub->getController());
         }
         
-        if (auto* const proc = node->getAudioProcessor())
+        if (auto* const proc = object->getAudioProcessor())
         {
             // try to use stereo by default on newly added plugins
             AudioProcessor::BusesLayout stereoInOut;
@@ -346,15 +359,15 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
                 if (! proc->setBusesLayout (*tryStereo))
                     proc->setBusesLayout (oldLayout);
 
-                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                // FIXME:
+                // proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
                 proc->suspendProcessing (false);
             }
         }
 
         // make sure the model ports are correct with the actual processor
-        n.resetPorts();
-
-        nodes.addChild (model, -1, nullptr);
+        node.resetPorts();
+        nodes.addChild (data, -1, nullptr);
         changed();
     }
     else
@@ -436,12 +449,12 @@ int GraphManager::getNumConnections() const noexcept
     return processor.getNumConnections();
 }
 
-const GraphProcessor::Connection* GraphManager::getConnection (const int index) const noexcept
+const GraphNode::Connection* GraphManager::getConnection (const int index) const noexcept
 {
     return processor.getConnection (index);
 }
 
-const GraphProcessor::Connection* GraphManager::getConnectionBetween (uint32 sourceFilterUID, int sourceFilterChannel,
+const GraphNode::Connection* GraphManager::getConnectionBetween (uint32 sourceFilterUID, int sourceFilterChannel,
                                                                           uint32 destFilterUID, int destFilterChannel) const noexcept
 {
     return processor.getConnectionBetween (sourceFilterUID, sourceFilterChannel,
@@ -523,8 +536,9 @@ void GraphManager::setNodeModel (const Node& node)
     jassert (nodes.getNumChildren() == processor.getNumNodes());
     
     // Cheap way to refresh engine-side nodes
-    processor.triggerAsyncUpdate();
-    processor.handleUpdateNowIfNeeded();
+    // FIXME:
+    // processor.triggerAsyncUpdate();
+    // processor.buildRenderingSequence();
 
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {
@@ -665,9 +679,10 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
         }
     }
     
-    if (auto* sub = obj->processor<SubGraphProcessor>())
+    if (obj->isSubGraph())
     {
-        sub->getController().setNodeModel (node);
+        // FIXME:
+        // sub->getController().setNodeModel (node);
         resetPorts = true;
     }
 
@@ -680,6 +695,13 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 }
 
 // MARK: Root Graph Controller
+RootGraphManager::RootGraphManager (RootGraph& graph, PluginManager& plugins)
+    : GraphManager (graph, plugins),
+        root (graph)
+{ }
+
+RootGraphManager::~RootGraphManager() { }
+
 void RootGraphManager::unloadGraph()
 {
     getRootGraph().clear();

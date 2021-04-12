@@ -39,12 +39,11 @@
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ReverbProcessor.h"
 #include "engine/nodes/ScriptNode.h"
-#include "engine/nodes/SubGraphProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
 #include "engine/nodes/WetDryProcessor.h"
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
 #include "engine/InternalFormat.h"
+#include "graph/IONode.h"
 
 #include "session/Session.h"
 #include "../experimental/MidiSequenceProcessor.h"
@@ -53,28 +52,28 @@
 
 namespace Element {
 
-typedef GraphProcessor::AudioGraphIOProcessor IOP;
+typedef IONode IONode;
 
 InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
     : engine (e), midi (me)
 {
     {
-        IOP p (IOP::audioOutputNode);
+        IONode p (IONode::audioOutputNode);
         p.fillInPluginDescription (audioOutDesc);
     }
 
     {
-        IOP p (IOP::audioInputNode);
+        IONode p (IONode::audioInputNode);
         p.fillInPluginDescription (audioInDesc);
     }
 
     {
-        IOP p (IOP::midiOutputNode);
+        IONode p (IONode::midiOutputNode);
         p.fillInPluginDescription (midiOutDesc);
     }
     
     {
-        IOP p (IOP::midiInputNode);
+        IONode p (IONode::midiInputNode);
         p.fillInPluginDescription (midiInDesc);
     }
     #if defined (EL_PRO) || defined (EL_SOLO)
@@ -95,19 +94,23 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
 {
     if (desc.fileOrIdentifier == audioOutDesc.fileOrIdentifier)
     {
-        return new IOP (IOP::audioOutputNode);
+        // FIXME
+        // return new IONode (IONode::audioOutputNode);
     }
     else if (desc.fileOrIdentifier == audioInDesc.fileOrIdentifier)
     {
-        return new IOP (IOP::audioInputNode);
+        // FIXME
+        // return new IONode (IONode::audioInputNode);
     }
     else if (desc.fileOrIdentifier == midiInDesc.fileOrIdentifier)
     {
-        return new IOP (IOP::midiInputNode);
+        // FIXME
+        // return new IONode (IONode::midiInputNode);
     }
     else if (desc.fileOrIdentifier == midiOutDesc.fileOrIdentifier)
     {
-        return new IOP (IOP::midiOutputNode);
+        // FIXME
+        // return new IONode (IONode::midiOutputNode);
     }
 
    #if defined (EL_PRO) || defined (EL_SOLO)
@@ -161,6 +164,8 @@ void InternalFormat::createPluginInstance (const PluginDescription& d, double in
 {
     if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
         callback (std::unique_ptr<AudioPluginInstance> (i), String());
+    else 
+        callback (nullptr, String ("Could not instantiate ") + d.name);
 }
 
 bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
@@ -256,8 +261,9 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
 
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
     {
-        auto* const desc = ds.add (new PluginDescription());
-        SubGraphProcessor().fillInPluginDescription (*desc);
+        // auto* const desc = ds.add (new PluginDescription());
+        // FIXME:
+        // GraphNode().fillInPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_MIXER)
     {
@@ -342,7 +348,7 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
 
    #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
-        base = new SubGraphProcessor();
+        base = nullptr;
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
         base = new AudioMixerProcessor (4, sampleRate, blockSize);
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_CHANNELIZE)

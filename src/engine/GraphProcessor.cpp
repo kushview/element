@@ -17,12 +17,14 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+#if 0
+
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
 #include "engine/nodes/SubGraphProcessor.h"
+#include "graph/RootGraph.h"
 #include "session/Node.h"
 
 namespace Element {
@@ -1547,17 +1549,17 @@ GraphProcessor::AudioGraphIOProcessor::~AudioGraphIOProcessor()
 
 const String GraphProcessor::AudioGraphIOProcessor::getName() const
 {
-    if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
-    {
-        switch (type)
-        {
-            case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
-            case audioInputNode:    return root->getAudioInputDeviceName();  break;
-            case midiOutputNode:    return "MIDI Out"; break;
-            case midiInputNode:     return "MIDI In"; break;
-            default:                break;
-        }
-    }
+    // if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
+    // {
+    //     switch (type)
+    //     {
+    //         case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
+    //         case audioInputNode:    return root->getAudioInputDeviceName();  break;
+    //         case midiOutputNode:    return "MIDI Out"; break;
+    //         case midiInputNode:     return "MIDI In"; break;
+    //         default:                break;
+    //     }
+    // }
 
     switch (type)
     {
@@ -1742,3 +1744,5 @@ void GraphProcessor::AudioGraphIOProcessor::setParentGraph (GraphProcessor* cons
 }
 
 }
+
+#endif

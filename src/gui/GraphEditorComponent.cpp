@@ -33,7 +33,6 @@
 #include "gui/views/PluginsPanelView.h"
 #include "gui/NavigationConcertinaPanel.h"
 #include "gui/NodeIOConfiguration.h"
-#include "engine/nodes/SubGraphProcessor.h"
 #include "engine/nodes/BaseProcessor.h"
 
 #include "session/PluginManager.h"

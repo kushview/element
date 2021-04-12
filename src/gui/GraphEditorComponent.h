@@ -20,7 +20,6 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/GraphProcessor.h"
 #include "gui/ViewHelpers.h"
 
 namespace Element {
@@ -31,7 +30,7 @@ class ConnectorComponent;
 class PortComponent;
 class PluginWindow;
 
-/** A panel that displays and edits a GraphProcessor. */
+/** A panel that displays and edits a Graph. */
 class GraphEditorComponent   : public Component,
                                public ChangeListener,
                                public DragAndDropTarget,

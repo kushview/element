@@ -529,17 +529,18 @@ void Node::resetPorts()
 {
     if (NodeObjectPtr ptr = getGraphNode())
     {
+        // FIXME: REMOVE: MOVE
         // workaround to keep IO node names correct. note that
         // setParentGraph may or may not call reset ports
-        if (auto* parent = ptr->getParentGraph())
-        {
-            ptr->setParentGraph (parent);
-            if (ptr->isMidiIONode() || ptr->isAudioIONode())
-                setProperty (Tags::name, ptr->getAudioProcessor()->getName());
-        }
+        // if (auto* parent = ptr->getParentGraph())
+        // {
+        //     ptr->setParentGraph (parent);
+        //     if (ptr->isMidiIONode() || ptr->isAudioIONode())
+        //         setProperty (Tags::name, ptr->getAudioProcessor()->getName());
+        // }
         
-        ptr->resetPorts();
-        ValueTree newPorts = ptr->getMetadata().getChildWithName(Tags::ports).createCopy();
+        ptr->refreshPorts();
+        ValueTree newPorts = ptr->createPortsData();
         ValueTree ports = getPortsValueTree();
         objectData.removeChild (ports, nullptr);
         objectData.addChild (newPorts, -1, nullptr);
@@ -1159,8 +1160,9 @@ void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier
         obj->setDelayCompensation (tree.getProperty (property, obj->getDelayCompensation()));
         if (auto* const g = obj->getParentGraph())
         {
-            g->cancelPendingUpdate();
-            g->triggerAsyncUpdate();
+            // FIXME:
+            // g->cancelPendingUpdate();
+            // g->triggerAsyncUpdate();
         }
     }
 }

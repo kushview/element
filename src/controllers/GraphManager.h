@@ -21,12 +21,13 @@
 
 #include "controllers/Controller.h"
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
+#include "graph/GraphNode.h"
 #include "session/Node.h"
 
 namespace Element {
 
 class PluginManager;
+class RootGraph;
 
 class GraphManager : public ChangeBroadcaster,
                      public Controller
@@ -35,11 +36,11 @@ public:
     static const uint32 invalidNodeId   = KV_INVALID_PORT;
     static const int invalidChannel     = -1;
 
-    GraphManager (GraphProcessor&, PluginManager&);
+    GraphManager (GraphNode&, PluginManager&);
     ~GraphManager();
 
     /** Returns the controlled graph */
-    GraphProcessor& getGraph() noexcept { return processor; }
+    GraphNode& getGraph() noexcept { return processor; }
 
     /** Returns true if controlling the given graph model */
     bool isControlling (const Node& model) const { return graph == model.getValueTree(); }
@@ -76,9 +77,9 @@ public:
         DOES NOT include connections tagged as "missing"
      */
     int getNumConnections() const noexcept;
-    const GraphProcessor::Connection* getConnection (const int index) const noexcept;
+    const GraphNode::Connection* getConnection (const int index) const noexcept;
 
-    const GraphProcessor::Connection*
+    const GraphNode::Connection*
     getConnectionBetween (uint32 sourceNode, int sourcePort,
                           uint32 destNode, int destPort) const noexcept;
 
@@ -102,7 +103,7 @@ public:
     
     void savePluginStates();
     
-    /** Rebuilds the arcs model according to the GraphProcessor */
+    /** Rebuilds the arcs model according to the GraphNode */
     inline void syncArcsModel()
     {
         processor.removeIllegalConnections();
@@ -113,7 +114,7 @@ public:
 
 private:
     PluginManager& pluginManager;
-    GraphProcessor& processor;
+    GraphNode& processor;
     ValueTree graph, arcs, nodes;
     bool loaded = false;
     
@@ -132,12 +133,8 @@ private:
     
 class RootGraphManager : public GraphManager {
 public:
-    RootGraphManager (RootGraph& graph, PluginManager& plugins)
-        : GraphManager (graph, plugins),
-          root (graph)
-    { }
-    
-    ~RootGraphManager() { }
+    RootGraphManager (RootGraph& graph, PluginManager& plugins);
+    ~RootGraphManager();
     
     /** REturn the underlying RootGraph processor */
     RootGraph& getRootGraph() const { return root; }

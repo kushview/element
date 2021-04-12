@@ -24,9 +24,9 @@
 
 namespace Element {
 
+class GraphNode;
 class ContentComponent;
 class GraphEditorComponent;
-class GraphProcessor;
 
 class NodeAudioBusesComponent : public AudioProcessorEditor,
                                 public Button::Listener
@@ -49,7 +49,7 @@ private:
     ContentComponent* content = nullptr;
     ContentComponent* getContentComponent();
     GraphEditorComponent* getGraphEditor() const;
-    GraphProcessor* getGraph() const;
+    GraphNode* getGraph() const;
     int32 getNodeId() const;
 
     friend class InputOutputConfig;

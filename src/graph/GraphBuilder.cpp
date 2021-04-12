@@ -1,11 +1,10 @@
 
-#include "engine/GraphProcessor.h"
 #include "engine/NodeObject.h"
 #include "engine/MidiTranspose.h"
-
 #include "graph/BaseNode.h"
 #include "graph/GraphNode.h"
 #include "graph/GraphBuilder.h"
+#include "graph/IONode.h"
 
 namespace Element {
 
@@ -304,6 +303,7 @@ public:
             }
             else
             {
+                jassert (processor != nullptr);
                 if (! isSuspended)
                 {
                     processor->processBlock (buffer, *midiPipe.getWriteBuffer (0));
@@ -494,14 +494,13 @@ void GraphBuilder::createRenderingOpsForNode (NodeObject* const node,
     AudioProcessor* const proc (node->getAudioProcessor());
 
     // don't add IONodes that cannot process
-    typedef GraphProcessor::AudioGraphIOProcessor IOProc;
-    if (IOProc* ioproc = dynamic_cast<IOProc*> (proc))
+    if (IONode* ioproc = dynamic_cast<IONode*> (proc))
     {
         const uint32 numOuts = node->getNumPorts (PortType::Audio, false);
-        if (IOProc::audioInputNode == ioproc->getType() && numOuts <= 0)
+        if (IONode::audioInputNode == ioproc->getType() && numOuts <= 0)
             return;
         const uint32 numIns = node->getNumPorts (PortType::Audio, true);
-        if (IOProc::audioOutputNode == ioproc->getType() && numIns <= 0)
+        if (IONode::audioOutputNode == ioproc->getType() && numIns <= 0)
             return;
     }
     

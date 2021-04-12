@@ -37,7 +37,7 @@ public:
 
 DeviceManager::DeviceManager()
 {
-    impl = new Private();
+    impl = std::make_unique<Private>();
 }
 
 DeviceManager::~DeviceManager()

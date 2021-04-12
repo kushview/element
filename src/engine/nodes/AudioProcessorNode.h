@@ -23,7 +23,6 @@
 
 namespace Element {
 
-class GraphProcessor;
 class MidiPipe;
 
 class AudioProcessorNode : public NodeObject
@@ -40,9 +39,9 @@ public:
     
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
+    void refreshPorts() override;
 
 protected:
-    void createPorts() override;
     Parameter::Ptr getParameter (const PortDescription& port) override;
     
 private:

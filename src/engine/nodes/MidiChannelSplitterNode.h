@@ -101,20 +101,21 @@ protected:
     MidiBuffer* buffers [16];
     MidiBuffer tempMidi;
 
-    inline void createPorts() override
+    inline void refreshPorts() override
     {
         if (createdPorts)
             return;
 
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+        PortList newPorts;
+        newPorts.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
         for (int ch = 1; ch <= 16; ++ch)
         {
             String symbol = "midi_out_"; symbol << ch;
             String name = "Ch. "; name << ch;
-            ports.add (PortType::Midi, ch, ch - 1, symbol, name, false);
+            newPorts.add (PortType::Midi, ch, ch - 1, symbol, name, false);
         }
         createdPorts = true;
+        setPorts (newPorts);
     }
 };
 

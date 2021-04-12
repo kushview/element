@@ -71,22 +71,22 @@ public:
         desc.version            = "1.0.0";
     }
 
-protected:
-    inline void createPorts() override
+    void refreshPorts() override
     {
-        if (ports.size() > 0)
+        if (getNumPorts() > 0)
             return;
         int index = 0;
+        PortList newPorts;
+        newPorts.add (PortType::Midi, index++, 0, "midi_in_0", "Input 1", true);
+        newPorts.add (PortType::Midi, index++, 1, "midi_in_1", "Input 2", true);
+        newPorts.add (PortType::Midi, index++, 2, "midi_in_2", "Input 3", true);
+        newPorts.add (PortType::Midi, index++, 3, "midi_in_3", "Input 4", true);
 
-        ports.add (PortType::Midi, index++, 0, "midi_in_0", "Input 1", true);
-        ports.add (PortType::Midi, index++, 1, "midi_in_1", "Input 2", true);
-        ports.add (PortType::Midi, index++, 2, "midi_in_2", "Input 3", true);
-        ports.add (PortType::Midi, index++, 3, "midi_in_3", "Input 4", true);
-
-        ports.add (PortType::Midi, index++, 0, "midi_out_0", "Output 1", false);
-        ports.add (PortType::Midi, index++, 1, "midi_out_1", "Output 2", false);
-        ports.add (PortType::Midi, index++, 2, "midi_out_2", "Output 3", false);
-        ports.add (PortType::Midi, index++, 3, "midi_out_3", "Output 4", false);
+        newPorts.add (PortType::Midi, index++, 0, "midi_out_0", "Output 1", false);
+        newPorts.add (PortType::Midi, index++, 1, "midi_out_1", "Output 2", false);
+        newPorts.add (PortType::Midi, index++, 2, "midi_out_2", "Output 3", false);
+        newPorts.add (PortType::Midi, index++, 3, "midi_out_3", "Output 4", false);
+        setPorts (newPorts);
     }
 
 private:

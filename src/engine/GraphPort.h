@@ -19,8 +19,6 @@
 
 #pragma once
 
-class GraphProcessor;
-
 /** A special type of Processor that can live inside an ProcessorGraph
     in order to use the audio that comes into and out of the graph itself.
 

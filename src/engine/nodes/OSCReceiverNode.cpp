@@ -80,16 +80,16 @@ void OSCReceiverNode::getState (MemoryBlock& block)
 
 /** MIDI */
 
-inline void OSCReceiverNode::createPorts()
+inline void OSCReceiverNode::refreshPorts()
 {
     if (createdPorts)
         return;
 
-    ports.clearQuick();
-
-    ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-    ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
+    PortList newPorts;
+    newPorts.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+    newPorts.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
     createdPorts = true;
+    setPorts (newPorts);
 }
 
 void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)

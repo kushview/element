@@ -18,12 +18,13 @@
 */
 
 #include "graph/GraphBuilder.h"
+#include "graph/IONode.h"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
-#include "engine/nodes/SubGraphProcessor.h"
 #include "session/Node.h"
+#include "PortCount.h"
 
 #include "graph/GraphNode.h"
 
@@ -34,14 +35,17 @@ GraphNode::Connection::Connection (const uint32 sourceNode_, const uint32 source
     : Arc (sourceNode_, sourcePort_, destNode_, destPort_) {}
 
 GraphNode::GraphNode()
-    : NodeObject (0),
+    : NodeObject (PortCount()
+        .with (PortType::Audio, 2, 2)
+        .with (PortType::Midi, 1, 1)
+        .toPortList()),
       lastNodeId (0),
       renderingBuffers (1, 1),
       currentAudioInputBuffer (nullptr),
       currentAudioOutputBuffer (1, 1),
       currentMidiInputBuffer (nullptr)
 {
-    for (int i = 0; i < AudioGraphIOProcessor::numDeviceTypes; ++i)
+    for (int i = 0; i < IONode::numDeviceTypes; ++i)
         ioNodes[i] = KV_INVALID_PORT;
 }
 
@@ -56,8 +60,7 @@ void GraphNode::clear()
 {
     nodes.clear();
     connections.clear();
-    //triggerAsyncUpdate();
-    handleAsyncUpdate();
+    clearRenderingSequence();
 }
 
 NodeObject* GraphNode::getNodeForId (const uint32 nodeId) const
@@ -106,12 +109,11 @@ NodeObject* GraphNode::addNode (NodeObject* newNode, uint32 nodeId)
             lastNodeId = nodeId;
     }
 
-    // TODO: playhead in Graph Node base
+    // FIXME: playhead in Graph Node base
     // newNode->setPlayHead (getPlayHead());
-    // FIXME:
-    // newNode->setParentGraph (this);
-    // newNode->resetPorts();
-    // newNode->prepare (getSampleRate(), getBlockSize(), this);
+    newNode->setParentGraph (this);
+    newNode->resetPorts();
+    newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
     return nodes.add (newNode);
 }
@@ -122,7 +124,7 @@ bool GraphNode::removeNode (const uint32 nodeId)
     for (int i = nodes.size(); --i >= 0;)
     {
         NodeObjectPtr n = nodes.getUnchecked (i);
-        if (nodes.getUnchecked(i)->nodeId == nodeId)
+        if (n->nodeId == nodeId)
         {
             nodes.remove (i);
          
@@ -130,9 +132,9 @@ bool GraphNode::removeNode (const uint32 nodeId)
             // do this syncronoously so it wont try processing with a null graph
             handleAsyncUpdate();
             // FIXME
-            // n->setParentGraph (nullptr);
+            n->setParentGraph (nullptr);
 
-            if (auto* sub = dynamic_cast<SubGraphProcessor*> (n->getAudioProcessor()))
+            if (n->isSubGraph())
             {
                 DBG("[EL] sub graph removed");
             }
@@ -589,213 +591,6 @@ void GraphNode::getPluginDescription (PluginDescription& d) const
     // d.numOutputChannels = getTotalNumOutputChannels();
 }
     
-// MARK: AudioGraphIOProcessor
-    
-GraphNode::AudioGraphIOProcessor::AudioGraphIOProcessor (const IODeviceType type_)
-    : type (type_), graph (nullptr)
-{
-}
 
-GraphNode::AudioGraphIOProcessor::~AudioGraphIOProcessor()
-{
-}
-
-const String GraphNode::AudioGraphIOProcessor::getName() const
-{
-    if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
-    {
-        switch (type)
-        {
-            case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
-            case audioInputNode:    return root->getAudioInputDeviceName();  break;
-            case midiOutputNode:    return "MIDI Out"; break;
-            case midiInputNode:     return "MIDI In"; break;
-            default:                break;
-        }
-    }
-
-    switch (type)
-    {
-        case audioOutputNode:   return "Audio Output"; break;
-        case audioInputNode:    return "Audio Input"; break;
-        case midiOutputNode:    return "Midi Output"; break;
-        case midiInputNode:     return "Midi Input"; break;
-        default:                break;
-    }
-
-    return String();
-}
-
-void GraphNode::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
-{
-    d.name = getName();
-    d.uid = d.name.hashCode();
-    d.category = "I/O Devices";
-    d.pluginFormatName = "Internal";
-    d.manufacturerName = "Element";
-    d.version = "1.0";
-    d.isInstrument = false;
-    
-    switch (static_cast<int> (this->type)) {
-        case audioInputNode:  d.fileOrIdentifier = "audio.input"; break;
-        case audioOutputNode: d.fileOrIdentifier = "audio.output"; break;
-        case midiInputNode:   d.fileOrIdentifier = "midi.input"; break;
-        case midiOutputNode:  d.fileOrIdentifier = "midi.output"; break;
-    }
-    
-    // FIXME
-    // d.numInputChannels = getTotalNumInputChannels();
-    // if (type == audioOutputNode && graph != nullptr)
-    //     d.numInputChannels = graph->getTotalNumInputChannels();
-
-    // d.numOutputChannels = getTotalNumOutputChannels();
-    // if (type == audioInputNode && graph != nullptr)
-    //     d.numOutputChannels = graph->getTotalNumOutputChannels();
-}
-
-void GraphNode::AudioGraphIOProcessor::prepareToPlay (double, int)
-{
-    jassert (graph != nullptr);
-}
-
-void GraphNode::AudioGraphIOProcessor::releaseResources()
-{
-}
-
-void GraphNode::AudioGraphIOProcessor::processBlock (AudioSampleBuffer& buffer,
-                                                     MidiBuffer& midiMessages)
-{
-    jassert (graph != nullptr);
-
-    switch (type)
-    {
-        case audioOutputNode:
-        {
-            for (int i = jmin (graph->currentAudioOutputBuffer.getNumChannels(),
-                               buffer.getNumChannels()); --i >= 0;)
-            {
-                graph->currentAudioOutputBuffer.addFrom (i, 0, buffer, i, 0, buffer.getNumSamples());
-            }
-
-            break;
-        }
-
-        case audioInputNode:
-        {
-            for (int i = jmin (graph->currentAudioInputBuffer->getNumChannels(),
-                               buffer.getNumChannels()); --i >= 0;)
-            {
-                buffer.copyFrom (i, 0, *graph->currentAudioInputBuffer, i, 0, buffer.getNumSamples());
-            }
-
-            break;
-        }
-
-        case midiOutputNode:
-            graph->currentMidiOutputBuffer.clear();
-            graph->currentMidiOutputBuffer.addEvents (midiMessages, 0, buffer.getNumSamples(), 0);
-            midiMessages.clear();
-            break;
-
-        case midiInputNode:
-            midiMessages.clear();
-            midiMessages.addEvents (*graph->currentMidiInputBuffer, 0, buffer.getNumSamples(), 0);
-            graph->currentMidiInputBuffer->clear();
-            break;
-
-        default:
-            break;
-    }
-}
-
-bool GraphNode::AudioGraphIOProcessor::silenceInProducesSilenceOut() const
-{
-    return isOutput();
-}
-
-double GraphNode::AudioGraphIOProcessor::getTailLengthSeconds() const
-{
-    return 0;
-}
-
-bool GraphNode::AudioGraphIOProcessor::acceptsMidi() const
-{
-    return type == midiOutputNode;
-}
-
-bool GraphNode::AudioGraphIOProcessor::producesMidi() const
-{
-    return type == midiInputNode;
-}
-
-const String GraphNode::AudioGraphIOProcessor::getInputChannelName (int channelIndex) const
-{
-    switch (type)
-    {
-        case audioOutputNode:   return "Output " + String (channelIndex + 1);
-        case midiOutputNode:    return "Midi Output";
-        default:                break;
-    }
-
-    return String();
-}
-
-const String GraphNode::AudioGraphIOProcessor::getOutputChannelName (int channelIndex) const
-{
-    switch (type)
-    {
-        case audioInputNode:    return "Input " + String (channelIndex + 1);
-        case midiInputNode:     return "Midi Input";
-        default:                break;
-    }
-
-    return String();
-}
-
-bool GraphNode::AudioGraphIOProcessor::isInputChannelStereoPair (int /*index*/) const
-{
-    return type == audioInputNode || type == audioOutputNode;
-}
-
-bool GraphNode::AudioGraphIOProcessor::isOutputChannelStereoPair (int index) const
-{
-    return isInputChannelStereoPair (index);
-}
-
-bool GraphNode::AudioGraphIOProcessor::isInput() const   { return type == audioInputNode  || type == midiInputNode; }
-bool GraphNode::AudioGraphIOProcessor::isOutput() const  { return type == audioOutputNode || type == midiOutputNode; }
-#if 1
-bool GraphNode::AudioGraphIOProcessor::hasEditor() const                  { return false; }
-AudioProcessorEditor* GraphNode::AudioGraphIOProcessor::createEditor()    { return nullptr; }
-#endif
-int GraphNode::AudioGraphIOProcessor::getNumParameters()                  { return 0; }
-const String GraphNode::AudioGraphIOProcessor::getParameterName (int)     { return String(); }
-
-float GraphNode::AudioGraphIOProcessor::getParameter (int)                { return 0.0f; }
-const String GraphNode::AudioGraphIOProcessor::getParameterText (int)     { return String(); }
-void GraphNode::AudioGraphIOProcessor::setParameter (int, float)          { }
-
-int GraphNode::AudioGraphIOProcessor::getNumPrograms()                    { return 0; }
-int GraphNode::AudioGraphIOProcessor::getCurrentProgram()                 { return 0; }
-void GraphNode::AudioGraphIOProcessor::setCurrentProgram (int)            { }
-
-const String GraphNode::AudioGraphIOProcessor::getProgramName (int)       { return String(); }
-void GraphNode::AudioGraphIOProcessor::changeProgramName (int, const String&) { }
-
-void GraphNode::AudioGraphIOProcessor::getStateInformation (MemoryBlock&) { }
-void GraphNode::AudioGraphIOProcessor::setStateInformation (const void*, int) { }
-
-void GraphNode::AudioGraphIOProcessor::setParentGraph (GraphNode* const newGraph)
-{
-    graph = newGraph;
-    // FIXME
-    // if (graph != nullptr)
-    // {
-    //     setPlayConfigDetails (type == audioOutputNode ? graph->getTotalNumOutputChannels() : 0,
-    //                           type == audioInputNode ? graph->getTotalNumInputChannels() : 0,
-    //                           graph->getSampleRate(), graph->getBlockSize());
-    //     updateHostDisplay();
-    // }
-}
 
 }

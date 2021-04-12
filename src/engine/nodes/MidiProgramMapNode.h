@@ -162,15 +162,16 @@ protected:
     float fontSize = 15.f;
     int lastProgram = -1;
 
-    inline void createPorts() override
+    inline void refreshPorts() override
     {
         if (createdPorts)
             return;
 
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
+        PortList newPorts;
+        newPorts.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+        newPorts.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
         createdPorts = true;
+        setPorts (newPorts);
     }
 };
 

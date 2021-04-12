@@ -22,8 +22,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
-
-#include "engine/nodes/SubGraphProcessor.h"
+#include "graph/RootGraph.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"
@@ -66,7 +65,7 @@ struct RootGraphHolder
         if (attached())
             return true;
         
-        node = NodeObject::createForRoot (new RootGraph ());
+        node = new RootGraph();
         
         if (auto* root = getRootGraph())
         {
@@ -75,7 +74,6 @@ struct RootGraphHolder
             const auto channels = model.getMidiChannels();
             const auto program = (int) model.getProperty ("midiProgram", -1);
 
-            root->setLocked (false);
             root->setPlayConfigFor (devices);
             root->setRenderMode (mode);
             root->setMidiChannels (channels);
@@ -115,7 +113,7 @@ struct RootGraphHolder
     }
     
     RootGraphManager* getController() const { return controller; }
-    RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node->getAudioProcessor() : nullptr); }
+    RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node.get() : nullptr); }
     
     bool hasController()    const { return nullptr != controller; }
 
@@ -168,12 +166,13 @@ public:
         {
             if (NodeObjectPtr node = parent->getNode (i))
             {
-                if (auto* sub = node->processor<SubGraphProcessor>())
+                if (node->isSubGraph())
                 {
-                    if (sub->getController().isControlling (n))
-                        return &sub->getController();
-                    else if (auto* sub2 = findSubGraphManager (&sub->getController(), n))
-                        return sub2;
+                    // FIXME:
+                    // if (sub->getController().isControlling (n))
+                    //     return &sub->getController();
+                    // else if (auto* sub2 = findSubGraphManager (&sub->getController(), n))
+                    //     return sub2;
                 }
             }
         }
@@ -192,10 +191,10 @@ public:
             {
                 for (int i = controller->getNumNodes(); --i >= 0;)
                 {
-                    if (NodeObjectPtr node = controller->getNode (i))
-                        if (auto* sub = dynamic_cast<SubGraphProcessor*> (node->getAudioProcessor()))
-                            if (sub->getController().isControlling (n))
-                                return &sub->getController();
+                    // if (NodeObjectPtr node = controller->getNode (i))
+                    //     if (auto* sub = dynamic_cast<GraphNode*> (node.get()))
+                    //         if (sub->getController().isControlling (n))
+                    //             return &sub->getController();
                 }
             }
         }
@@ -738,35 +737,43 @@ void EngineController::setRootNode (const Node& newRootNode)
 
 void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 {
-    using IOP = GraphProcessor::AudioGraphIOProcessor;
+    using IOP = IONode;
 
     if (getRunMode() == RunMode::Plugin)
         return;
 
+#if 1
     auto session = getWorld().getSession();
     auto* const root = graphs->findActiveRootGraphManager();
     auto& devices (getWorld().getDeviceManager());
     if (cb == &devices && root != nullptr)
     {
-        auto& processor (root->getRootGraph());
-        if (auto* device = devices.getCurrentAudioDevice())
+        for (auto* const root : graphs->getGraphs())
         {
-            auto nodes = session->getActiveGraph().getValueTree().getChildWithName (Tags::nodes);
-            processor.suspendProcessing (true);
-            processor.setPlayConfigFor (devices);
-            
-            for (int i = nodes.getNumChildren(); --i >= 0;)
+            auto* manager = root->getController();
+            auto* processor = root->getRootGraph();
+            if (!processor || !manager)
+                continue;
+
+            if (auto* device = devices.getCurrentAudioDevice())
             {
-                Node model (nodes.getChild (i), false);
-                if (NodeObjectPtr node = model.getGraphNode())
-                    if (node && (node->isAudioIONode() || node->isMidiIONode()))
-                        model.resetPorts();
+                auto nodes = session->getActiveGraph().getValueTree().getChildWithName (Tags::nodes);
+                processor->suspendProcessing (true);
+                processor->setPlayConfigFor (devices);
+                
+                for (int i = processor->getNumNodes(); --i >= 0;)
+                {
+                    auto node = processor->getNode (i);
+                    if (node->isAudioIONode() || node->isMidiIONode())
+                        node->refreshPorts();
+                }
+                
+                manager->syncArcsModel();
+                processor->suspendProcessing (false);
             }
-            
-            root->syncArcsModel();
-            processor.suspendProcessing (false);
         }
     }
+#endif
 }
 
 void EngineController::syncModels()
@@ -942,28 +949,29 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
     if (AudioProcessor* proc = ptr ? ptr->getAudioProcessor () : nullptr)
     {
         NodeObjectPtr ptr2 = graph.getGraphNode();
-        if (auto* gp = dynamic_cast<GraphProcessor*> (ptr2->getAudioProcessor()))
+        if (auto* gp = dynamic_cast<GraphNode*> (ptr2.get()))
         {
             if (proc->checkBusesLayoutSupported (layout))
             {
-                gp->suspendProcessing (true);
-                gp->releaseResources();
+                // FIXME:
+                // gp->suspendProcessing (true);
+                // gp->releaseResources();
                 
-                const bool wasNotSuspended = ! proc->isSuspended();
-                proc->suspendProcessing (true);
-                proc->releaseResources();
-                proc->setBusesLayoutWithoutEnabling (layout);
-                node.resetPorts();
-                if (wasNotSuspended)
-                    proc->suspendProcessing (false);
+                // const bool wasNotSuspended = ! proc->isSuspended();
+                // proc->suspendProcessing (true);
+                // proc->releaseResources();
+                // proc->setBusesLayoutWithoutEnabling (layout);
+                // node.resetPorts();
+                // if (wasNotSuspended)
+                //     proc->suspendProcessing (false);
                 
-                gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
-                gp->suspendProcessing (false);
+                // gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
+                // gp->suspendProcessing (false);
 
-                controller->removeIllegalConnections();
-                controller->syncArcsModel();
+                // controller->removeIllegalConnections();
+                // controller->syncArcsModel();
 
-                findSibling<GuiController>()->stabilizeViews();
+                // findSibling<GuiController>()->stabilizeViews();
             }
         }
     }

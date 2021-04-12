@@ -49,7 +49,19 @@ public:
         desc.version            = "1.0.0";
     }
 
-    void clear() {};
+    inline void refreshPorts() override
+    {
+        if (createdPorts)
+            return;
+
+        PortList newPorts;
+        newPorts.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
+        newPorts.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
+        createdPorts = true;
+        setPorts (newPorts);
+    }
+
+    void clear() {}
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
@@ -77,16 +89,7 @@ private:
     int maxLoggedMessages { 100 };
     float refreshRateHz { 60.0 };
 
-    inline void createPorts() override
-    {
-        if (createdPorts)
-            return;
-
-        ports.clearQuick();
-        ports.add (PortType::Midi, 0, 0, "midi_in", "MIDI In", true);
-        ports.add (PortType::Midi, 1, 0, "midi_out", "MIDI Out", false);
-        createdPorts = true;
-    }
+    
 
     void getMessages (MidiBuffer &destBuffer);
     void timerCallback() override;

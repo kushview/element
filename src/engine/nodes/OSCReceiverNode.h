@@ -31,7 +31,6 @@ class OSCReceiverNode : public MidiFilterNode,
                         public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
-
     OSCReceiverNode();
     virtual ~OSCReceiverNode();
 
@@ -50,17 +49,15 @@ public:
         desc.version            = "1.0.0";
     }
 
-    /** MIDI */
+    void refreshPorts() override;
 
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override {};
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void setState (const void* data, int size) override;
     void getState (MemoryBlock& block) override;
-    inline void createPorts() override;
-
+    
     /** For node editor */
-
     bool connect (int portNumber);
     bool disconnect ();
     bool isConnected ();

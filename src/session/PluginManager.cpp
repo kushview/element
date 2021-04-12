@@ -20,8 +20,8 @@
 #include "session/PluginManager.h"
 #include "session/Node.h"
 #include "engine/nodes/NodeTypes.h"
-#include "engine/nodes/SubGraphProcessor.h"
 #include "engine/NodeFactory.h"
+#include "graph/IONode.h"
 #include "DataPath.h"
 #include "Settings.h"
 #include "Utils.h"
@@ -753,10 +753,22 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
 {
     errorMsg.clear();
     
+    if (desc.pluginFormatName == "Internal")
+    {
+        if (desc.fileOrIdentifier == "audio.input")
+            return new IONode (IONode::audioInputNode);
+        else if (desc.fileOrIdentifier == "audio.output")
+            return new IONode (IONode::audioOutputNode);
+        else if (desc.fileOrIdentifier == "midi.input")
+            return new IONode (IONode::midiInputNode);
+        else if (desc.fileOrIdentifier == "midi.output")
+            return new IONode (IONode::midiOutputNode);
+        else 
+            { errorMsg = "Could not create internal node"; return nullptr;}
+    }
+
     if (auto* const plugin = createAudioPlugin (desc, errorMsg))
     {
-        if (auto* const sub = dynamic_cast<SubGraphProcessor*> (plugin))
-            sub->initController (*this);
         plugin->enableAllBuses();
         return priv->nodes.wrap (plugin);
     }

@@ -20,7 +20,6 @@
 #include "gui/GuiCommon.h"
 #include "gui/widgets/BreadCrumbComponent.h"
 #include "gui/ContextMenus.h"
-#include "engine/GraphProcessor.h"
 #include "gui/widgets/HorizontalListBox.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"

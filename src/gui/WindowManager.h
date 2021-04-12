@@ -103,7 +103,7 @@ public:
         return activePluginWindows [window];
     }
     
-    void closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible);
+    void closeOpenPluginWindowsFor (GraphNode& proc, const bool windowVisible);
     
     void closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible);
     

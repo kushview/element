@@ -19,8 +19,8 @@
 
 #include "Globals.h"
 #include "controllers/GuiController.h"
-#include "engine/GraphProcessor.h"
 #include "engine/NodeObject.h"
+#include "graph/GraphNode.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
@@ -36,7 +36,7 @@ void WindowManager::onWindowClosed (Window* c)
     activeWindows.removeObject (c, true);
 }
 
-void WindowManager::closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible)
+void WindowManager::closeOpenPluginWindowsFor (GraphNode& proc, const bool windowVisible)
 {
     for (int i = 0; i < proc.getNumNodes(); ++i)
         if (auto node = proc.getNode (i))

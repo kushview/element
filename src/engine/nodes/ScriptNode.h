@@ -55,10 +55,11 @@ public:
         @param value    The value to set
     */
     void setParameter (int index, float value);
+    
+    void refreshPorts() override;
 
 protected:
     inline bool wantsMidiPipe() const override { return true; }
-    void createPorts() override;
     Parameter::Ptr getParameter (const PortDescription& port) override;
 
 private:

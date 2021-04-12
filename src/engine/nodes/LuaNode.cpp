@@ -727,12 +727,13 @@ LuaNode::~LuaNode()
     context.reset();
 }
 
-void LuaNode::createPorts()
+void LuaNode::refreshPorts()
 {
     if (context == nullptr)
         return;
-    ports.clearQuick();
-    context->getPorts (ports);
+    PortList newPorts;
+    context->getPorts (newPorts);
+    setPorts (newPorts);
 }
 
 Parameter::Ptr LuaNode::getParameter (const PortDescription& port)

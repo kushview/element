@@ -31,7 +31,6 @@ class OSCSenderNode   : public MidiFilterNode,
                         public Thread
 {
 public:
-
     OSCSenderNode();
     virtual ~OSCSenderNode();
 
@@ -64,7 +63,7 @@ public:
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;
     void releaseResources() override {};
 
-    inline void createPorts() override;
+    void refreshPorts() override;
 
     /** GUI */
 

@@ -62,12 +62,13 @@ ScriptNode::~ScriptNode()
     script.reset();
 }
 
-void ScriptNode::createPorts()
+void ScriptNode::refreshPorts()
 {
     if (script == nullptr)
         return;
-    ports.clearQuick();
-    script->getPorts (ports);
+    PortList newPorts;
+    script->getPorts (newPorts);
+    setPorts (newPorts);
 }
 
 Parameter::Ptr ScriptNode::getParameter (const PortDescription& port)

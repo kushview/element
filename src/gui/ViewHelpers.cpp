@@ -20,20 +20,14 @@
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
-
-#include "engine/nodes/SubGraphProcessor.h"
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
-
 #include "gui/ContentComponent.h"
 #include "gui/LookAndFeel.h"
 #include "gui/MainWindow.h"
 #include "gui/PluginWindow.h"
 #include "gui/ViewHelpers.h"
-
 #include "session/Node.h"
 #include "session/CommandManager.h"
-
 #include "Globals.h"
 #include "Messages.h"
 
