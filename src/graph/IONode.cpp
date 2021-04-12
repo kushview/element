@@ -60,22 +60,17 @@ PortType IONode::getPortType() const noexcept
 
 void IONode::refreshPorts()
 {
+    PortCount count;
+    
     if (auto* const graph = getParentGraph())
     {
-        PortCount count;
         count.set (getPortType(), 
             graph->getNumPorts (getPortType(), isInput()), 
             !isInput()
         );
-
-        if (type == midiOutputNode)
-        {
-            DBG("MIDI Output Node:");
-            DBG(" Num IO Node MIDI IN = " << count.get (PortType::Midi, true));
-        }
-
-        setPorts (count.toPortList());
     }
+
+    setPorts (count.toPortList());
 }
 
 void IONode::fillInPluginDescription (PluginDescription& d) const
@@ -103,9 +98,7 @@ void IONode::prepareToRender (double r, int b)
     jassert (graph != nullptr);
 }
 
-void IONode::releaseResources()
-{
-}
+void IONode::releaseResources() {}
 
 void IONode::render (AudioSampleBuffer& buffer, MidiPipe& midiPipe) 
 {
@@ -177,21 +170,13 @@ const String IONode::getOutputChannelName (int channelIndex) const
     return String();
 }
 
-
 bool IONode::isInput() const   { return type == audioInputNode  || type == midiInputNode; }
 bool IONode::isOutput() const  { return type == audioOutputNode || type == midiOutputNode; }
 
 void IONode::setParentGraph (GraphNode* const newGraph)
 {
     graph = newGraph;
-    // FIXME
-    // if (graph != nullptr)
-    // {
-    //     setPlayConfigDetails (type == audioOutputNode ? graph->getTotalNumOutputChannels() : 0,
-    //                           type == audioInputNode ? graph->getTotalNumInputChannels() : 0,
-    //                           graph->getSampleRate(), graph->getBlockSize());
-    //     updateHostDisplay();
-    // }
+    refreshPorts();
 }
 
 }

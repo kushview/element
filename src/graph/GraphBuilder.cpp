@@ -450,9 +450,6 @@ GraphBuilder::GraphBuilder (GraphNode& graph_,
                                     renderingOps, i);
         markUnusedBuffersFree (i);
     }
-
-    // FIXME
-    // graph.setLatencySamples (totalLatency);
 }
 
 int GraphBuilder::buffersNeeded (PortType type)             { return allNodes[type.id()].size(); }

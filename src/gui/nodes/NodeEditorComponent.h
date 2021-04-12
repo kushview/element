@@ -39,7 +39,7 @@ public:
     bool isRunningInPluginWindow() const;
 
 protected:
-    inline NodeObject* getNodeObject() const { return node.getGraphNode(); }
+    inline NodeObject* getNodeObject() const { return node.getObject(); }
     template<class T> inline T* getNodeObjectOfType() const { return dynamic_cast<T*> (getNodeObject()); }
 
 private:

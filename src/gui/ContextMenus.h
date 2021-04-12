@@ -200,7 +200,7 @@ public:
     {
         PopupMenu menu;
         int index = 30000;
-        NodeObjectPtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getObject();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
 
         addOversamplingSubmenu (menu);
@@ -212,7 +212,7 @@ public:
     {
         PopupMenu osMenu;
         int index = 40000;
-        NodeObjectPtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getObject();
 
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
             return;
@@ -359,7 +359,7 @@ public:
         else if (result >= 40000 && result < 50000)
         {
             const int osFactor = (int) powf(2, float (result - 40000));
-            if (auto gNode = node.getGraphNode())
+            if (auto gNode = node.getObject())
             {
                 // FIXME:
                 // auto* graph = gNode->getParentGraph();
@@ -424,7 +424,7 @@ private:
         bool isTicked() override { return false; }
         bool perform() override
         {
-            if (NodeObjectPtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getObject())
             {
                 ptr->setEnabled (! ptr->isEnabled());
                 auto data = node.getValueTree();
@@ -483,7 +483,7 @@ private:
             if (format != "VST")
                 return false;
             
-            auto gn = node.getGraphNode();
+            auto gn = node.getObject();
             auto* const proc = (gn) ? gn->getAudioPluginInstance() : nullptr;
 
             if (! proc)

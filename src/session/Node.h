@@ -265,10 +265,10 @@ public:
     
     //=========================================================================
     /** Returns the engine-side graphnode implementation */
-    NodeObject* getGraphNode() const;
+    NodeObject* getObject() const;
     
     /** Returns a child graph node object by id */
-    NodeObject* getGraphNodeForId (const uint32) const;
+    NodeObject* getObjectForId (const uint32) const;
 
     /** Returns true if this node can connect to another in any capacity */
     const bool canConnectTo (const Node& o) const;

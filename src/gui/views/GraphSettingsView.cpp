@@ -84,23 +84,16 @@ namespace Element {
         
         inline void setIndex (const int index) override
         {
-            if (! locked)
-            {
-                RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
-                graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
-                if (auto* node = graph.getGraphNode ())
-                    if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
-                        root->setRenderMode (mode);
-            }
-            else
-            {
-                refresh();
-            }
+            RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
+            graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
+            if (auto* root = dynamic_cast<RootGraph*> (graph.getObject()))
+                root->setRenderMode (mode);
+
+            refresh();
         }
         
     protected:
         Node graph;
-        bool locked = false;
     };
 
     class VelocityCurvePropertyComponent : public ChoicePropertyComponent
@@ -126,7 +119,7 @@ namespace Element {
             
             graph.setProperty ("velocityCurveMode", i);
             
-            if (auto* obj = graph.getGraphNode())
+            if (auto* obj = graph.getObject())
                 if (auto* proc = dynamic_cast<RootGraph*> (obj->getAudioProcessor()))
                     proc->setVelocityCurveMode ((VelocityCurve::Mode) i);
         }
@@ -155,7 +148,7 @@ namespace Element {
         void onChannelsChanged()
         {
             if (graph.isRootGraph())
-                if (auto* node = graph.getGraphNode())
+                if (auto* node = graph.getObject())
                     if (auto *proc = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
                     { 
                         proc->setMidiChannels (getChannels());
@@ -181,7 +174,7 @@ namespace Element {
         {
             auto session = ViewHelpers::getSession (this);
             node.setProperty (Tags::midiChannel, getMidiChannel());
-            if (NodeObjectPtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getObject())
                 if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                     root->setMidiChannel (getMidiChannel());
         }
@@ -231,7 +224,7 @@ namespace Element {
             if (! locked)
             {
                 node.setProperty (Tags::midiProgram, roundToInt (v));
-                if (NodeObjectPtr ptr = node.getGraphNode())
+                if (NodeObjectPtr ptr = node.getObject())
                     if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                         root->setMidiProgram ((int) node.getProperty (Tags::midiProgram));
             }

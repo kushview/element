@@ -1,7 +1,4 @@
 
-// FIXME
-#if 0
-
 #include "engine/nodes/LuaNode.h"
 #include "LuaUnitTest.h"
 
@@ -174,8 +171,8 @@ public:
     {
         char* oldPath = getenv("LUA_PATH");
         setenv("LUA_PATH", getPath().toRawUTF8(), 1);
-        auto graph = std::make_unique<GraphProcessor>();
-        graph->prepareToPlay (44100.0, 1024);
+        auto graph = std::make_unique<GraphNode>();
+        graph->prepareToRender (44100.0, 1024);
         auto* node = new LuaNode();
         
         beginTest ("validate");
@@ -255,5 +252,3 @@ private:
 };
 
 static LuaNodeValidateTest sLuaNodeValidateTest;
-
-#endif

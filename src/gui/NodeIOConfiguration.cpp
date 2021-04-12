@@ -452,8 +452,8 @@ NodeAudioBusesComponent::NodeAudioBusesComponent (const Node& n, AudioProcessor*
       title ("title", p->getName())
 {
     jassert (p != nullptr);
-    jassert (nullptr != n.getGraphNode());
-    jassert (p == n.getGraphNode()->getAudioProcessor());
+    jassert (nullptr != n.getObject());
+    jassert (p == n.getObject()->getAudioProcessor());
     currentLayout = p->getBusesLayout();
     
     setOpaque (true);
@@ -571,7 +571,7 @@ GraphEditorComponent* NodeAudioBusesComponent::getGraphEditor() const
 GraphNode* NodeAudioBusesComponent::getGraph() const
 {
     const Node graph (node.getParentGraph());
-    if (auto* gn = graph.getGraphNode())
+    if (auto* gn = graph.getObject())
         return dynamic_cast<GraphNode*> (gn);
     return nullptr;
 }

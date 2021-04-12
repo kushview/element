@@ -29,6 +29,8 @@ class AudioProcessorNode : public NodeObject
 {
 public:
     AudioProcessorNode (uint32 nodeId, AudioProcessor* processor);
+    AudioProcessorNode (AudioProcessor*);
+    
     virtual ~AudioProcessorNode();
 
     /** Returns the processor as an AudioProcessor */

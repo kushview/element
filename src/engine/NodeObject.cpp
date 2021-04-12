@@ -382,8 +382,7 @@ void NodeObject::setEnabled (const bool shouldBeEnabled)
     {
         if (parent)
         {
-            // FIXME
-            // prepare (parent->getSampleRate(), parent->getBlockSize(), parent, true);
+            prepare (parent->getSampleRate(), parent->getBlockSize(), parent, true);
             enabled.set (1);
         }
         else
@@ -673,97 +672,22 @@ void NodeObject::setPorts (const PortList& newPorts)
 ValueTree NodeObject::createPortsData() const
 {
     ValueTree portList (Tags::ports);
+    
     for (int i = 0; i < ports.size(); ++i)
     {
         ValueTree port = ports.createValueTree (i);
         port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
         port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
-        
-        // FIXME:
-        // if (auto* root = dynamic_cast<RootGraph*> (getParentGraph()))
-        // {
-        //     if (isAudioInputNode() && ports.getType(i) == PortType::Audio && ports.isOutput (i))
-        //     {
-        //         port.setProperty (Tags::name, root->getInputChannelName (ports.getChannelForPort (i)), nullptr);
-        //     }
-        //     else if (isAudioOutputNode() && ports.getType(i) == PortType::Audio && ports.isInput (i))
-        //     {
-        //         port.setProperty (Tags::name, root->getOutputChannelName (ports.getChannelForPort (i)), nullptr);
-        //     }
-        // }
-
         portList.addChild (port, -1, 0);
         jassert (isPositiveAndBelow ((int)port.getProperty(Tags::index), ports.size()));
     }
+    
     return portList;
 }
 
 void NodeObject::resetPorts()
 {
     refreshPorts();
-
-#if 0
-    ValueTree portList (metadata.getOrCreateChildWithName (Tags::ports, nullptr));
-    ValueTree nodeList (metadata.getOrCreateChildWithName (Tags::nodes, nullptr));
-    metadata.removeChild (portList, nullptr);
-    metadata.removeChild (nodeList, nullptr);
-    portList.removeAllChildren (nullptr);
-    
-    if (ports.size (PortType::Midi, true) <= 0 &&
-        !isMidiIONode() && !isAudioIONode() && !isMidiDeviceNode())
-    {
-        ports.add (PortType::Midi, ports.size(), 0, "element_midi_input", "MIDI In", true);
-    }
-
-    for (int i = 0; i < ports.size(); ++i)
-    {
-        ValueTree port = ports.createValueTree (i);
-        port.setProperty (Tags::flow, ports.isInput(i) ? "input" : "output", nullptr);
-        port.removeProperty (Tags::input, nullptr); // added by KV modules, not needed yet
-        
-        // FIXME:
-        // if (auto* root = dynamic_cast<RootGraph*> (getParentGraph()))
-        // {
-        //     if (isAudioInputNode() && ports.getType(i) == PortType::Audio && ports.isOutput (i))
-        //     {
-        //         port.setProperty (Tags::name, root->getInputChannelName (ports.getChannelForPort (i)), nullptr);
-        //     }
-        //     else if (isAudioOutputNode() && ports.getType(i) == PortType::Audio && ports.isInput (i))
-        //     {
-        //         port.setProperty (Tags::name, root->getOutputChannelName (ports.getChannelForPort (i)), nullptr);
-        //     }
-        // }
-
-        portList.addChild (port, -1, 0);
-        jassert (isPositiveAndBelow ((int)port.getProperty(Tags::index), ports.size()));
-    }
-
-    metadata.addChild (nodeList, 0, nullptr);
-    metadata.addChild (portList, 1, nullptr);
-    jassert (metadata.getChildWithName(Tags::ports).getNumChildren() == ports.size());
-    
-    parameters.clear();
-    for (int i = 0; i < ports.size(); ++i)
-    {
-        const auto port = ports.getPort (i);
-        if (port.input && port.type == PortType::Control)
-            parameters.add (getOrCreateParameter (port));
-    }
-    
-    struct ParamSorter
-    {
-        int compareElements (Parameter* lhs, Parameter* rhs)
-        {
-            return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
-        }
-    } sorter;
-    parameters.sort (sorter, true);
-
-    // FIXME:
-    // if (auto* sub = dynamic_cast<GraphNode*> (this))
-    //     for (int i = 0; i < sub->getNumNodes(); ++i)
-    //         sub->getNode(i)->resetPorts();
-#endif
 }
 
 GraphNode* NodeObject::getParentGraph() const { return parent; }
@@ -814,9 +738,8 @@ void NodeObject::setOversamplingFactor (int osFactor)
         }
     }
 
-    // FIXME:
-    // if (auto* g = getParentGraph())
-    //     g->triggerAsyncUpdate();
+    if (auto* g = getParentGraph())
+        g->triggerAsyncUpdate();
 }
 
 int NodeObject::getOversamplingFactor()

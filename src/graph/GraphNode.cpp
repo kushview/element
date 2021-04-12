@@ -112,7 +112,7 @@ NodeObject* GraphNode::addNode (NodeObject* newNode, uint32 nodeId)
     // FIXME: playhead in Graph Node base
     // newNode->setPlayHead (getPlayHead());
     newNode->setParentGraph (this);
-    newNode->resetPorts();
+    newNode->refreshPorts();
     newNode->prepare (getSampleRate(), getBlockSize(), this);
     triggerAsyncUpdate();
     return nodes.add (newNode);
@@ -128,10 +128,8 @@ bool GraphNode::removeNode (const uint32 nodeId)
         {
             nodes.remove (i);
          
-            // triggerAsyncUpdate();
             // do this syncronoously so it wont try processing with a null graph
             handleAsyncUpdate();
-            // FIXME
             n->setParentGraph (nullptr);
 
             if (n->isSubGraph())
@@ -333,29 +331,25 @@ void GraphNode::setMidiChannel (const int channel) noexcept
 
 void GraphNode::setMidiChannels (const BigInteger channels) noexcept
 {
-    // FIXME:
-    // ScopedLock sl (getCallbackLock());
+    ScopedLock sl (getPropertyLock());
     midiChannels.setChannels (channels);
 }
 
 void GraphNode::setMidiChannels (const kv::MidiChannels channels) noexcept
 {
-    // FIXME
-    // ScopedLock sl (getCallbackLock());
+    ScopedLock sl (getPropertyLock());
     midiChannels = channels;
 }
 
 bool GraphNode::acceptsMidiChannel (const int channel) const noexcept
 {
-    // FIXME
-    // ScopedLock sl (getCallbackLock());
+    ScopedLock sl (getPropertyLock());
     return midiChannels.isOn (channel);
 }
 
 void GraphNode::setVelocityCurveMode (const VelocityCurve::Mode mode) noexcept
 {
-    // FIXME
-    // ScopedLock sl (getCallbackLock());
+    ScopedLock sl (getPropertyLock());
     velocityCurve.setMode (mode);
 }
 
@@ -371,8 +365,7 @@ void GraphNode::clearRenderingSequence()
     Array<void*> oldOps;
 
     {
-        // FIXME
-        // const ScopedLock sl (getCallbackLock());
+        const ScopedLock sl (getPropertyLock());
         renderingOps.swapWith (oldOps);
     }
 
@@ -417,8 +410,8 @@ void GraphNode::buildRenderingSequence()
             for (int i = 0; i < nodes.size(); ++i)
             {
                 NodeObject* const node = nodes.getUnchecked(i);
-                // FIXME
-                // node->prepare (getSampleRate(), getBlockSize(), this);
+                // TODO: necessary?
+                node->prepare (getSampleRate(), getBlockSize(), this);
 
                 int j = 0;
                 for (; j < orderedNodes.size(); ++j)
@@ -432,12 +425,12 @@ void GraphNode::buildRenderingSequence()
         GraphBuilder builder (*this, orderedNodes, newRenderingOps);
         numRenderingBuffersNeeded = builder.buffersNeeded (PortType::Audio);
         numMidiBuffersNeeded      = builder.buffersNeeded (PortType::Midi);
+        setLatencySamples (builder.getTotalLatencySamples());
     }
 
     {
         // swap over to the new rendering sequence..
         // const ScopedLock sl (getCallbackLock());
-
         renderingBuffers.setSize (numRenderingBuffersNeeded, 4096);
         renderingBuffers.clear();
 
@@ -480,31 +473,24 @@ void GraphNode::handleAsyncUpdate()
 void GraphNode::prepareToRender (double sampleRate, int estimatedSamplesPerBlock)
 {
     currentAudioInputBuffer = nullptr;
-    // FIXME
-    // currentAudioOutputBuffer.setSize (jmax (1, getTotalNumOutputChannels()), estimatedSamplesPerBlock);
+    currentAudioOutputBuffer.setSize (jmax (1, getNumAudioOutputs()), estimatedSamplesPerBlock);
     currentMidiInputBuffer = nullptr;
     currentMidiOutputBuffer.clear();
     clearRenderingSequence();
 
-    // FIXME
-    // if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
-    // {
-    //     setPlayConfigDetails (getTotalNumInputChannels(), getTotalNumOutputChannels(),
-    //         sampleRate, estimatedSamplesPerBlock);
-    // }
+    if (getSampleRate() != sampleRate || getBlockSize() != estimatedSamplesPerBlock)
+        setRenderDetails (sampleRate, estimatedSamplesPerBlock);
 
-    // FIXME
-    // for (int i = 0; i < nodes.size(); ++i)
-    //     nodes.getUnchecked(i)->prepare (sampleRate, estimatedSamplesPerBlock, this);
+    for (int i = 0; i < nodes.size(); ++i)
+        nodes.getUnchecked(i)->prepare (sampleRate, estimatedSamplesPerBlock, this);
 
     buildRenderingSequence();
 }
 
 void GraphNode::releaseResources()
 {
-    // FIXME
-    // for (int i = 0; i < nodes.size(); ++i)
-    //     nodes.getUnchecked(i)->unprepare();
+    for (int i = 0; i < nodes.size(); ++i)
+        nodes.getUnchecked(i)->unprepare();
 
     renderingBuffers.setSize (1, 1);
     midiBuffers.clear();
@@ -517,7 +503,7 @@ void GraphNode::releaseResources()
 
 void GraphNode::reset()
 {
-    // const ScopedLock sl (getCallbackLock());
+    const ScopedLock sl (getPropertyLock());
     for (auto node : nodes)
         if (auto* const proc = node->getAudioProcessor())
             proc->reset();
@@ -582,15 +568,12 @@ void GraphNode::getPluginDescription (PluginDescription& d) const
     d.name = getName();
     d.uid = d.name.hashCode();
     d.category = "Graphs";
-    d.pluginFormatName = "Internal";
-    d.manufacturerName = "Kushview, LLC";
+    d.pluginFormatName = "Element";
+    d.manufacturerName = "Element";
     d.version = "1.0";
     d.isInstrument = false;
-    // FIXME:
-    // d.numInputChannels = getTotalNumInputChannels();
-    // d.numOutputChannels = getTotalNumOutputChannels();
+    d.numInputChannels  = getNumAudioInputs();
+    d.numOutputChannels = getNumAudioOutputs();
 }
-    
-
 
 }

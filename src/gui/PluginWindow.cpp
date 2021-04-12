@@ -45,7 +45,7 @@ class PluginWindowContent : public Component,
 {
 public:
     PluginWindowContent (Component* const _editor, const Node& _node)
-        : editor (_editor), object(_node.getGraphNode()), node(_node)
+        : editor (_editor), object(_node.getObject()), node(_node)
     {
         nativeEditor = nullptr != dynamic_cast<AudioProcessorEditor*> (_editor) &&
             nullptr == dynamic_cast<GenericAudioProcessorEditor*> (_editor);
@@ -238,7 +238,7 @@ private:
 PluginWindow::PluginWindow (GuiController& g, Component* const ui, const Node& n)
     : DocumentWindow (n.getName(), LookAndFeel::backgroundColor,
                       DocumentWindow::minimiseButton | DocumentWindow::closeButton, false),
-      gui (g), owner (n.getGraphNode()), node (n)
+      gui (g), owner (n.getObject()), node (n)
 {
     setLookAndFeel (&g.getLookAndFeel());
     setUsingNativeTitleBar (true);

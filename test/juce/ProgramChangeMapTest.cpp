@@ -16,11 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// FIXME
-#if 0
-
 #include "Tests.h"
 #include "engine/nodes/MidiProgramMapNode.h"
+#include "graph/GraphNode.h"
 
 namespace Element {
 
@@ -32,7 +30,7 @@ public:
     void shutdown() override { }
     void runTest() override
     {
-        GraphProcessor graph;
+        GraphNode graph;
         NodeObjectPtr node = graph.addNode (new MidiProgramMapNode());
         auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
 
@@ -125,5 +123,3 @@ private:
 static ProgramChangeMapTest sProgramChangeMapTest;
 
 }
-
-#endif

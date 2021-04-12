@@ -140,6 +140,9 @@ void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
     node.setEnabled (! node.isEnabled());
 }
 
+AudioProcessorNode::AudioProcessorNode (AudioProcessor* processor)
+    : AudioProcessorNode (0, processor) {}
+    
 AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor)
     : NodeObject (nodeId),
       enablement (*this)

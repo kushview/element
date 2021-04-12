@@ -16,10 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// FIXME
-#if 0
-
 #include "Tests.h"
+#include "engine/nodes/AudioProcessorNode.h"
+#include "graph/IONode.h"
 #include "engine/MidiChannelMap.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 
@@ -97,14 +96,14 @@ private:
     void testPortConfig()
     {
         beginTest ("port config");
-        GraphProcessor proc;
-        proc.setPlayConfigDetails (2, 2, 44100.f, 1024);
-        proc.prepareToPlay (44100.0, 512);
+        GraphNode proc;
+        proc.setRenderDetails (44100.f, 512);
+        proc.prepareToRender (44100.0, 512);
         auto* processor = new MidiChannelMapProcessor();
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
         
-        NodeObjectPtr node = proc.addNode (processor, 0);
+        NodeObjectPtr node = proc.addNode (new AudioProcessorNode (processor));
         MessageManager::getInstance()->runDispatchLoopUntil (10);
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
@@ -136,8 +135,7 @@ private:
 
         expect (node->getPortType (18) == PortType::Unknown);
 
-        NodeObjectPtr midiIn = proc.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
-            GraphProcessor::AudioGraphIOProcessor::midiInputNode));
+        NodeObjectPtr midiIn = proc.addNode (new Element::IONode (Element::IONode::midiInputNode));
 
         beginTest ("connectivity");
         expect (midiIn->getNumPorts() == 1);
@@ -156,5 +154,3 @@ private:
 static MidiChannelMapTest sMidiChannelMapTest;
 
 }
-
-#endif

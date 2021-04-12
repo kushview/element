@@ -207,6 +207,10 @@ private:
     friend class GraphNode;
     friend class GraphPort;
     friend class IONode;
+    friend class GraphManager;
+    friend class NodeObject;
+    friend class NodeObjectSync;
+    friend class Node;
 
     typedef ArcTable<Connection> LookupTable;
     ReferenceCountedArray<NodeObject> nodes;

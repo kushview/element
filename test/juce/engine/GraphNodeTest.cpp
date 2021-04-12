@@ -16,10 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// FIXME:
-#if 0
-
 #include "Tests.h"
+#include "engine/nodes/AudioProcessorNode.h"
 #include "engine/nodes/MidiChannelSplitterNode.h"
 
 namespace Element {
@@ -27,7 +25,7 @@ namespace Element {
 class GraphProcessorTest : public UnitTestBase
 {
 public:
-    GraphProcessorTest() : UnitTestBase ("GraphProcessor", "GraphProcessor", "processor") { }
+    GraphProcessorTest() : UnitTestBase ("GraphNode", "GraphNode", "processor") { }
 
     void initialise() override
     {
@@ -44,19 +42,16 @@ public:
 
     void runTest() override
     {
-        if (auto* const plugin = createPluginProcessor())
+        if (auto plugin = createPluginProcessor())
         {
-            GraphProcessor graph;
-            graph.prepareToPlay (44100.0, 512);
-
+            GraphNode graph;
+            graph.prepareToRender (44100.0, 512);
             beginTest ("adds/removes node");
             NodeObjectPtr node = graph.addNode (plugin);
             MessageManager::getInstance()->runDispatchLoopUntil (10);
             expect (graph.getNumNodes() == 1, "node wasn't added");
             expect (node != nullptr);
-            expect (node->getAudioProcessor() == plugin);
             expect (graph.removeNode (node->nodeId), "node wasn't removed");
-
             graph.releaseResources();
             graph.clear();
         }
@@ -66,15 +61,13 @@ public:
             const int procLatencySamples = 100;
             const double delayComp = 10.0;
 
-            GraphProcessor graph;
-            graph.setPlayConfigDetails (0, 2, sampleRate, 512);
-            graph.prepareToPlay (44100.0, 512);
+            GraphNode graph;
+            graph.setRenderDetails (sampleRate, 512);
+            graph.prepareToRender (sampleRate, 512);
             
-            
-            auto* const plugin1 = createPluginProcessor();
-            plugin1->setLatencySamples (procLatencySamples);
-            auto* const plugin2 = new Element::GraphProcessor::AudioGraphIOProcessor (
-                GraphProcessor::AudioGraphIOProcessor::audioOutputNode);
+            auto plugin1 = createPluginProcessor();
+            // plugin1->setLatencySamples (procLatencySamples);
+            auto* const plugin2 = new IONode (IONode::audioOutputNode);
             
             NodeObjectPtr node1 = graph.addNode (plugin1);
             node1->setDelayCompensation (delayComp);
@@ -83,7 +76,7 @@ public:
             expect (node1->getDelayCompensationSamples() == roundToInt (sampleRate * delayComp * 0.001));
             NodeObjectPtr node2 = graph.addNode (plugin2);
             node1->connectAudioTo (node2);
-            graph.handleUpdateNowIfNeeded();
+            MessageManager::getInstance()->runDispatchLoopUntil (14);
 
             auto nc = graph.getNumConnections();
             auto ls = graph.getLatencySamples();
@@ -97,16 +90,16 @@ public:
         }
 
         {
-            GraphProcessor graph;
-            graph.setPlayConfigDetails (0, 2, 44100.0, 512);
-            graph.prepareToPlay (44100.0, 512);
+            GraphNode graph;
+            graph.setRenderDetails (44100.0, 512);
+            graph.prepareToRender (44100.0, 512);
            
-            NodeObjectPtr midiIn = graph.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
-                GraphProcessor::AudioGraphIOProcessor::midiInputNode));
-            NodeObjectPtr midiOut = graph.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
-                GraphProcessor::AudioGraphIOProcessor::midiOutputNode));
+            NodeObjectPtr midiIn = graph.addNode (new Element::IONode (
+                IONode::midiInputNode));
+            NodeObjectPtr midiOut = graph.addNode (new Element::IONode (
+                IONode::midiOutputNode));
             NodeObjectPtr filter = graph.addNode (new MidiChannelSplitterNode());
-            graph.handleUpdateNowIfNeeded();
+            MessageManager::getInstance()->runDispatchLoopUntil (14);
 
             beginTest ("port/channel mappings");
             expect (filter->getNumPorts() == 17);
@@ -129,7 +122,7 @@ public:
             for (int ch = 0; ch < 16; ++ch)
                 expect (graph.connectChannels (PortType::Midi, filter->nodeId, ch, midiOut->nodeId, 0));
             
-            graph.handleUpdateNowIfNeeded();
+            MessageManager::getInstance()->runDispatchLoopUntil (14);
             graph.releaseResources();
             graph.clear();
         }
@@ -137,7 +130,7 @@ public:
 
 private:
     std::unique_ptr<Globals> globals;
-    AudioProcessor* createPluginProcessor()
+    NodeObjectPtr createPluginProcessor()
     {
         auto& plugins (globals->getPluginManager());
 
@@ -146,7 +139,7 @@ private:
         desc.fileOrIdentifier = "element.volume.stereo";
         String msg;
 
-        return plugins.createAudioPlugin (desc, msg);
+        return plugins.createGraphNode (desc, msg);
     }
 };
 
@@ -163,8 +156,8 @@ public:
 
     void initialise() override
     {
-        graph.reset (new GraphProcessor());
-        graph->prepareToPlay (44100.f, 1024);
+        graph.reset (new GraphNode());
+        graph->prepareToRender (44100.f, 1024);
     }
 
     void shutdown() override
@@ -174,7 +167,7 @@ public:
     }
 
 protected:
-    std::unique_ptr<GraphProcessor> graph;
+    std::unique_ptr<GraphNode> graph;
 };
 
 namespace GraphNodeTests {
@@ -210,10 +203,11 @@ static GetMidiInputPort sGetMidiInputPort;
 class EnablementTest : public GraphNodeTest
 {
 public:
-    EnablementTest() : GraphNodeTest ("Node Enablement", "Enablement", "GraphProcessor") { }
+    EnablementTest() : GraphNodeTest ("Node Enablement", "Enablement", "GraphNode") { }
     void runTest() override
     {
-        checkNode ("audio processor", graph->addNode (new PlaceholderProcessor (2, 2, false, false)));
+        checkNode ("audio processor", graph->addNode (new AudioProcessorNode (
+            new PlaceholderProcessor (2, 2, false, false))));
     }
 
     void checkNode (const String& testName, NodeObjectPtr node)
@@ -236,8 +230,8 @@ public:
     GetTypeStringTest() : GraphNodeTest ("Node Type") { }
     void runTest() override
     {
-        checkNode ("plugin", graph->addNode (new PlaceholderProcessor (2, 2, false, false)), Tags::plugin);
-        checkNode ("graph", graph->addNode (new SubGraphProcessor()), Tags::graph);
+        // checkNode ("plugin", graph->addNode (new PlaceholderProcessor (2, 2, false, false)), Tags::plugin);
+        // checkNode ("graph", graph->addNode (new SubGraphProcessor()), Tags::graph);
     }
 
     void checkNode (const String& testName, NodeObjectPtr node, const Identifier& expectedType)
@@ -254,5 +248,3 @@ static GetTypeStringTest sGetTypeStringTest;
 }
 
 }
-
-#endif

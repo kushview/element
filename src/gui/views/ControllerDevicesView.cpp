@@ -132,7 +132,7 @@ public:
                 {
                     text = NodeObject::getSpecialParameterName (mapp.getParameterIndex());
                 }
-                else if (auto* obj = node.getGraphNode())
+                else if (auto* obj = node.getObject())
                 {
                     if (auto* proc = obj->getAudioProcessor())
                         if (auto* param = proc->getParameters()[mapp.getParameterIndex()])

@@ -31,6 +31,7 @@ public:
                   Array<void*>& renderingOps);
 
     int buffersNeeded (PortType type);
+    int getTotalLatencySamples() const { return totalLatency; }
 
 private:
     //==============================================================================

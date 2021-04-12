@@ -359,8 +359,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
                 if (! proc->setBusesLayout (*tryStereo))
                     proc->setBusesLayout (oldLayout);
 
-                // FIXME:
-                // proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
+                proc->prepareToPlay (processor.getSampleRate(), processor.getBlockSize());
                 proc->suspendProcessing (false);
             }
         }
@@ -389,7 +388,7 @@ void GraphManager::removeNode (const uint32 uid)
         if (node.getNodeId() == uid)
         {
             // the model was probably referencing the node ptr
-            NodeObjectPtr obj = node.getGraphNode();
+            NodeObjectPtr obj = node.getObject();
             if (obj)
             {
                 obj->willBeRemoved();
@@ -536,9 +535,8 @@ void GraphManager::setNodeModel (const Node& node)
     jassert (nodes.getNumChildren() == processor.getNumNodes());
     
     // Cheap way to refresh engine-side nodes
-    // FIXME:
-    // processor.triggerAsyncUpdate();
-    // processor.buildRenderingSequence();
+    processor.triggerAsyncUpdate();
+    processor.handleUpdateNowIfNeeded();
 
     for (int i = 0; i < arcs.getNumChildren(); ++i)
     {

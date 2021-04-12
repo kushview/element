@@ -30,7 +30,6 @@
 #define EL_INTERNAL_ID_COMPRESSOR               "element.compressor"
 #define EL_INTERNAL_ID_EQ_FILTER                "element.eqfilt"
 #define EL_INTERNAL_ID_FREQ_SPLITTER            "element.freqsplit"
-#define EL_INTERNAL_ID_GRAPH                    "element.graph"
 #define EL_INTERNAL_ID_MEDIA_PLAYER             "element.mediaPlayer"
 #define EL_INTERNAL_ID_MIDI_CHANNEL_MAP         "element.midiChannelMap"
 #define EL_INTERNAL_ID_MIDI_INPUT_DEVICE        "element.midiInputDevice"
@@ -42,6 +41,7 @@
 
 // NodeObject subclass
 #define EL_INTERNAL_ID_AUDIO_ROUTER             "element.audioRouter"
+#define EL_INTERNAL_ID_GRAPH                    "element.graph"
 #define EL_INTERNAL_ID_LUA                      "element.lua"
 #define EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER    "element.midiChannelSplitter"
 #define EL_INTERNAL_ID_MIDI_MONITOR             "element.midiMonitor"

@@ -124,7 +124,7 @@ public:
     inline void timerCallback() override
     {
         auto& meter = channelStrip.getDigitalMeter();
-        if (NodeObjectPtr ptr = node.getGraphNode())
+        if (NodeObjectPtr ptr = node.getObject())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
             if (ptr->getNumAudioOutputs() == 1)
@@ -173,7 +173,7 @@ public:
 
     inline void updateChannelStrip()
     {
-        if (NodeObjectPtr object = node.getGraphNode())
+        if (NodeObjectPtr object = node.getObject())
         {
             SharedConnectionBlock b1 (volumeChangedConnection);
             SharedConnectionBlock b2 (powerChangedConnection);
@@ -239,7 +239,7 @@ protected:
         default returns either the input or output gain of the node */
     virtual float getCurrentVolume()
     {
-        NodeObjectPtr object = node.getGraphNode();
+        NodeObjectPtr object = node.getObject();
         if (object == nullptr)
             return 0.f;
 
@@ -363,7 +363,7 @@ private:
     {
         if (node.isValid())
             node.setProperty (Tags::bypass, ! channelStrip.isPowerOn());
-        if (auto* obj = node.getGraphNode())
+        if (auto* obj = node.getObject())
             obj->suspendProcessing (! channelStrip.isPowerOn());
     }
 
@@ -372,7 +372,7 @@ private:
         if (onVolumeChanged != nullptr)
             return onVolumeChanged (value);
         
-        if (NodeObjectPtr object = node.getGraphNode())
+        if (NodeObjectPtr object = node.getObject())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
             if (isAudioOutNode || isMonitoringInputs())
@@ -400,7 +400,7 @@ private:
     {
         if (node.isValid())
             node.setProperty (Tags::mute, channelStrip.isMuted());
-        if (auto* obj = node.getGraphNode())
+        if (auto* obj = node.getObject())
             obj->setMuted (channelStrip.isMuted());
     }
 

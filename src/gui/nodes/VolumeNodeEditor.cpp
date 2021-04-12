@@ -39,7 +39,7 @@ public:
         ioButton->onClick = [this]()
         { 
             auto node = getNode();
-            NodeObjectPtr obj = node.getGraphNode();
+            NodeObjectPtr obj = node.getObject();
             auto* proc = (obj) ? obj->getAudioProcessor() : 0;
             if (! proc) return;
 
@@ -106,7 +106,7 @@ public:
             param = nullptr;
         }
 
-        if (auto object = getNode().getGraphNode())
+        if (auto object = getNode().getObject())
             if (auto* proc = dynamic_cast<VolumeProcessor*> (object->getAudioProcessor()))
                 param = dynamic_cast<AudioParameterFloat*> (proc->getParameters()[0]);
         

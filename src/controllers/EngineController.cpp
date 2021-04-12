@@ -123,7 +123,7 @@ struct RootGraphHolder
         for (int i = nodes.getNumChildren(); --i >= 0;)
         {
             Node model (nodes.getChild (i), false);
-            NodeObjectPtr node = model.getGraphNode();
+            NodeObjectPtr node = model.getObject();
             if (node && (node->isAudioIONode() || node->isMidiIONode()))
                 model.resetPorts();
         }
@@ -923,7 +923,7 @@ void EngineController::addMidiDeviceNode (const String& device, const bool isInp
         for (int i = 0; i < graph.getNumNodes(); ++i)
         {
             auto node (graph.getNode (i));
-            if (node.getGraphNode() == ptr.get())
+            if (node.getObject() == ptr.get())
             {
                 node.setProperty (Tags::name, proc->getCurrentDevice());
                 node.resetPorts();
@@ -941,37 +941,36 @@ void EngineController::changeBusesLayout (const Node& n, const AudioProcessor::B
 {
     Node node  = n;
     Node graph = node.getParentGraph();
-    NodeObjectPtr ptr = node.getGraphNode();
+    NodeObjectPtr ptr = node.getObject();
     auto* controller = graphs->findGraphManagerFor (graph);
     if (! controller)
         return;
     
     if (AudioProcessor* proc = ptr ? ptr->getAudioProcessor () : nullptr)
     {
-        NodeObjectPtr ptr2 = graph.getGraphNode();
+        NodeObjectPtr ptr2 = graph.getObject();
         if (auto* gp = dynamic_cast<GraphNode*> (ptr2.get()))
         {
             if (proc->checkBusesLayoutSupported (layout))
             {
-                // FIXME:
-                // gp->suspendProcessing (true);
-                // gp->releaseResources();
+                gp->suspendProcessing (true);
+                gp->releaseResources();
                 
-                // const bool wasNotSuspended = ! proc->isSuspended();
-                // proc->suspendProcessing (true);
-                // proc->releaseResources();
-                // proc->setBusesLayoutWithoutEnabling (layout);
-                // node.resetPorts();
-                // if (wasNotSuspended)
-                //     proc->suspendProcessing (false);
+                const bool wasNotSuspended = ! proc->isSuspended();
+                proc->suspendProcessing (true);
+                proc->releaseResources();
+                proc->setBusesLayoutWithoutEnabling (layout);
+                node.resetPorts();
+                if (wasNotSuspended)
+                    proc->suspendProcessing (false);
                 
-                // gp->prepareToPlay (gp->getSampleRate(), gp->getBlockSize());
-                // gp->suspendProcessing (false);
+                gp->prepareToRender (gp->getSampleRate(), gp->getBlockSize());
+                gp->suspendProcessing (false);
 
-                // controller->removeIllegalConnections();
-                // controller->syncArcsModel();
+                controller->removeIllegalConnections();
+                controller->syncArcsModel();
 
-                // findSibling<GuiController>()->stabilizeViews();
+                findSibling<GuiController>()->stabilizeViews();
             }
         }
     }
@@ -993,7 +992,7 @@ void EngineController::replace (const Node& node, const PluginDescription& desc)
         if (nodeId != KV_INVALID_NODE)
         {
             NodeObjectPtr newptr = ctl->getNodeForId (nodeId);
-            const NodeObjectPtr oldptr = node.getGraphNode();
+            const NodeObjectPtr oldptr = node.getObject();
             jassert(newptr && oldptr);
             // attempt to retain connections from the replaced node
             for (int i = ctl->getNumConnections(); --i >= 0;)

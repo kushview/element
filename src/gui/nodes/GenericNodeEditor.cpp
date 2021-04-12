@@ -26,7 +26,7 @@ namespace GenericEditorHelpers {
 
 static AudioProcessor* getAudioProcessor (const Node& node)
 {
-    if (auto* obj = node.getGraphNode())
+    if (auto* obj = node.getObject())
         return obj->getAudioProcessor();
     return nullptr;
 }

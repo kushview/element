@@ -24,15 +24,16 @@
 #include "controllers/SessionController.h"
 
 #include "engine/AudioEngine.h"
-#include "engine/GraphProcessor.h"
 #include "engine/MappingEngine.h"
 #include "engine/InternalFormat.h"
 #include "engine/LinearFade.h"
 #include "engine/VelocityCurve.h"
 #include "engine/ToggleGrid.h"
 #include "engine/nodes/PlaceholderProcessor.h"
-#include "engine/nodes/SubGraphProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
+
+#include "graph/GraphNode.h"
+#include "graph/IONode.h"
 
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"

@@ -471,7 +471,7 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
         {
             PopupMenu submenu;
             auto node = graph.getNode (j);
-            NodeObjectPtr ptr = node.getGraphNode();
+            NodeObjectPtr ptr = node.getObject();
             if (ptr == nullptr)
                 continue;
             auto* proc = ptr->getAudioProcessor();

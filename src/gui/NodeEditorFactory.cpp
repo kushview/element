@@ -87,7 +87,7 @@ private:
         else if (NID == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
         {
             auto* const pgced = new MidiProgramMapEditor (node);
-            if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getGraphNode()))
+            if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getObject()))
                 pgced->setSize (object->getWidth(), object->getHeight());
 
             return pgced;
@@ -153,7 +153,7 @@ private:
             return midiRouterEditor;
         }
 
-        NodeObjectPtr object = node.getGraphNode();
+        NodeObjectPtr object = node.getObject();
         auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
         if (proc != nullptr)
         {
@@ -184,7 +184,7 @@ NodeEditorFactory::~NodeEditorFactory()
 std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEditor (const Node& node)
 {
     std::unique_ptr<AudioProcessorEditor> editor = nullptr;
-    NodeObjectPtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getObject();
     AudioProcessor* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
 
     editor.reset (proc != nullptr && proc->hasEditor() 

@@ -41,7 +41,7 @@ PortComponent::PortComponent (const Node& g, const Node& n,
     : graph (g), node (n), nodeID (nid), port (i), 
       type (t), input (dir), vertical (v)
 {
-    if (const NodeObjectPtr obj = node.getGraphNode())
+    if (const NodeObjectPtr obj = node.getObject())
     {
         const Port p (node.getPort ((int) port));
         String tip = p.getName();
@@ -207,7 +207,7 @@ void BlockComponent::buttonClicked (Button* b)
     if (! isEnabled())
         return;
 
-    NodeObjectPtr obj = node.getGraphNode();
+    NodeObjectPtr obj = node.getObject();
     auto* proc = (obj) ? obj->getAudioProcessor() : 0;
     if (! proc) return;
 

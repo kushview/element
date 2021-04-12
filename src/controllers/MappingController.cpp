@@ -67,7 +67,7 @@ public:
             parameter   = NodeObject::NoParameter;
         }
 
-        if (capturedObject != nullptr && capturedObject.get() == capturedNode.getGraphNode())
+        if (capturedObject != nullptr && capturedObject.get() == capturedNode.getObject())
         {
             if (capturedParameter == NodeObject::EnabledParameter ||
                 capturedParameter == NodeObject::BypassParameter ||
@@ -117,7 +117,7 @@ private:
     {
     public:
         Mappable (AudioProcessorParameterCapture& c, const Node& n)
-            : capture (c), node (n), object (n.getGraphNode())
+            : capture (c), node (n), object (n.getObject())
         {
             connect();
         }
@@ -219,7 +219,7 @@ private:
         for (int j = 0; j < node.getNumNodes(); ++j)
         {
             const auto child (node.getNode (j));
-            if (NodeObject* const object = child.getGraphNode())
+            if (NodeObject* const object = child.getObject())
                 mappables.add (new Mappable (*this, child));
             if (child.getNumChildren() > 0)
                 addNodesRecursive (child);
@@ -238,7 +238,7 @@ public:
 
     bool isCaptureComplete() const
     {
-        NodeObjectPtr object = node.getGraphNode();
+        NodeObjectPtr object = node.getObject();
         return object != nullptr && 
             (parameter == NodeObject::EnabledParameter || 
              parameter == NodeObject::BypassParameter || 

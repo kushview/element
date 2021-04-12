@@ -44,7 +44,7 @@ struct MidiNoteControllerMap : public ControllerMapHandler,
                            const int _parameter)
         : control (ctl),
           model (_node), 
-          node (_node.getGraphNode()),
+          node (_node.getObject()),
           parameter (nullptr),
           parameterIndex (_parameter),
           noteNumber (message.getNoteNumber())
@@ -219,7 +219,7 @@ struct MidiCCControllerMapHandler : public ControllerMapHandler,
                                 const MidiMessage& message,
                                 const Node& _node,
                                 const int _parameter)
-        : control (ctl), model (_node), node (_node.getGraphNode()),
+        : control (ctl), model (_node), node (_node.getObject()),
           parameter (nullptr),
           controllerNumber (message.getControllerNumber()),
           parameterIndex (_parameter)
@@ -627,7 +627,7 @@ bool MappingEngine::addHandler (const ControllerDevice::Control& control,
 {
     if (! control.isValid() || ! node.isValid())
         return false;
-    auto* const object = node.getGraphNode();
+    auto* const object = node.getObject();
     if (nullptr == object)
         return false;
     if (object->containsParameter (parameter))

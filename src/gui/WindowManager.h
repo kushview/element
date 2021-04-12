@@ -146,7 +146,7 @@ public:
     
     inline PluginWindow* getPluginWindowFor (const Node& node)
     {
-        return getPluginWindowFor (node.getGraphNode());
+        return getPluginWindowFor (node.getObject());
     }
 
     PluginWindow* createPluginWindowFor (const Node& node);

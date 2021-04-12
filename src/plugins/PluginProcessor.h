@@ -87,7 +87,7 @@ public:
             return;
         
         model = newNode;
-        NodeObjectPtr newNodeObj = model.getGraphNode();
+        NodeObjectPtr newNodeObj = model.getObject();
         
         {
             SpinLock::ScopedLockType sl (lock);
