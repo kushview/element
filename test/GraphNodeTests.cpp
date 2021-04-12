@@ -16,7 +16,7 @@ public:
           numMidiIns (midiIns),
           numMidiOuts (midiOuts)
     {
-
+        TestNode::refreshPorts();
     }
 
     void prepareToRender (double newSampleRate, int newBlockSize) override
@@ -50,9 +50,43 @@ public:
         desc.manufacturerName = "Element";
     }
 
-    void resetTestPorts()
+    virtual void refreshPorts() override
     {
-        createPorts();
+        PortList newPorts;
+        uint32 port = 0;
+        for (int c = 0; c < numAudioIns; c++)
+        {
+            newPorts.add (PortType::Audio, port++, c,
+                       String ("audio_in_") + String (c + 1),  
+                       String ("In ") + String (c + 1), 
+                       true);
+        }
+
+        for (int c = 0; c < numMidiIns; c++)
+        {
+            newPorts.add (PortType::Midi, port++, c,
+                       String ("midi_in_") + String (c + 1),  
+                       String ("MIDI In ") + String (c + 1), 
+                       true);
+        }
+
+        for (int c = 0; c < numAudioOuts; c++)
+        {
+            newPorts.add (PortType::Audio, port++, c,
+                       String ("audio_out_") + String (c + 1),  
+                       String ("Out ") + String (c + 1), 
+                       false);
+        }
+
+        for (int c = 0; c < numMidiOuts; c++)
+        {
+            newPorts.add (PortType::Midi, port++, c,
+                       String ("midi_out_") + String (c + 1),  
+                       String ("MIDI Out ") + String (c + 1), 
+                       false);
+        }
+
+        setPorts (newPorts);
     }
 
 protected:
@@ -65,59 +99,28 @@ protected:
     double sampleRate;
     int bufferSize;
 
-    virtual void createPorts() override
-    {
-        ports.clear();
-        uint32 port = 0;
-        for (int c = 0; c < numAudioIns; c++)
-        {
-            ports.add (PortType::Audio, port++, c,
-                       String ("audio_in_") + String (c + 1),  
-                       String ("In ") + String (c + 1), 
-                       true);
-        }
-
-        for (int c = 0; c < numMidiIns; c++)
-        {
-            ports.add (PortType::Midi, port++, c,
-                       String ("midi_in_") + String (c + 1),  
-                       String ("MIDI In ") + String (c + 1), 
-                       true);
-        }
-
-        for (int c = 0; c < numAudioOuts; c++)
-        {
-            ports.add (PortType::Audio, port++, c,
-                       String ("audio_out_") + String (c + 1),  
-                       String ("Out ") + String (c + 1), 
-                       false);
-        }
-
-        for (int c = 0; c < numMidiOuts; c++)
-        {
-            ports.add (PortType::Midi, port++, c,
-                       String ("midi_out_") + String (c + 1),  
-                       String ("MIDI Out ") + String (c + 1), 
-                       false);
-        }
-    }
-
     void initialize() override {}
 };
 
 BOOST_AUTO_TEST_SUITE (GraphNodeTests)
+
+BOOST_AUTO_TEST_CASE (IO)
+{
+    GraphNode graph;
+    BOOST_REQUIRE_EQUAL (graph.getNumAudioInputs(), 2);
+    BOOST_REQUIRE_EQUAL (graph.getNumAudioOutputs(), 2);
+    graph.clear();
+}
 
 BOOST_AUTO_TEST_CASE (Connections)
 {
     GraphNode graph;
     {
         auto* node1 = new TestNode();
-        node1->resetTestPorts();
         graph.addNode (node1);
         BOOST_REQUIRE ((void*)node1 == (void*)graph.getNodeForId (node1->nodeId));
 
         auto* node2 = new TestNode();
-        node2->resetTestPorts();
         graph.addNode (node2);
         BOOST_REQUIRE ((void*)node2 == (void*)graph.getNodeForId (node2->nodeId));
 
