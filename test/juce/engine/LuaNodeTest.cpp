@@ -1,4 +1,7 @@
 
+// FIXME
+#if 0
+
 #include "engine/nodes/LuaNode.h"
 #include "LuaUnitTest.h"
 
@@ -252,3 +255,5 @@ private:
 };
 
 static LuaNodeValidateTest sLuaNodeValidateTest;
+
+#endif

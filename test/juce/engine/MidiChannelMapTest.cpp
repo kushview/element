@@ -16,6 +16,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// FIXME
+#if 0
+
 #include "Tests.h"
 #include "engine/MidiChannelMap.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
@@ -153,3 +156,5 @@ private:
 static MidiChannelMapTest sMidiChannelMapTest;
 
 }
+
+#endif

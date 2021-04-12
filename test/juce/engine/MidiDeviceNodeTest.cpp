@@ -16,6 +16,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+#if 0
+
 #include "Tests.h"
 #include "controllers/GraphManager.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
@@ -105,3 +107,4 @@ static MidiInputDeviceNodeTest sMidiInputDeviceTest;
 #endif
 
 }
+#endif
