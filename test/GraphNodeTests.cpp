@@ -1,106 +1,10 @@
 #include <boost/test/unit_test.hpp>
+#include "fixture/PreparedGraph.h"
+#include "fixture/TestNode.h"
 #include "graph/GraphNode.h"
 #include "Utils.h"
 
 using namespace Element;
-
-class TestNode : public NodeObject
-{
-public:
-    TestNode() : NodeObject (0) {}
-
-    TestNode (int audioIns, int audioOuts, int midiIns, int midiOuts) 
-        : NodeObject (0),
-          numAudioIns (audioIns),
-          numAudioOuts (audioOuts),
-          numMidiIns (midiIns),
-          numMidiOuts (midiOuts)
-    {
-        TestNode::refreshPorts();
-    }
-
-    void prepareToRender (double newSampleRate, int newBlockSize) override
-    {
-        sampleRate = newSampleRate;
-        bufferSize = newBlockSize;
-    }
-
-    void releaseResources() override
-    {
-
-    }
-    
-    bool wantsMidiPipe() const override { return true; }
-
-    void render (AudioSampleBuffer&, MidiPipe&) override { }
-
-    void renderBypassed (AudioSampleBuffer&, MidiPipe&) override {}
-
-    int getNumPrograms() const override { return 1; }
-    int getCurrentProgram() const override { return 0; }
-    const String getProgramName (int index) const override { return "program"; }
-    void setCurrentProgram (int index) override {}
-
-    void getState (MemoryBlock&) override {}
-    void setState (const void*, int sizeInBytes) override {}
-    
-    void getPluginDescription (PluginDescription& desc) const override
-    {
-        desc.fileOrIdentifier = "element.testNode";
-        desc.manufacturerName = "Element";
-    }
-
-    virtual void refreshPorts() override
-    {
-        PortList newPorts;
-        uint32 port = 0;
-        for (int c = 0; c < numAudioIns; c++)
-        {
-            newPorts.add (PortType::Audio, port++, c,
-                       String ("audio_in_") + String (c + 1),  
-                       String ("In ") + String (c + 1), 
-                       true);
-        }
-
-        for (int c = 0; c < numMidiIns; c++)
-        {
-            newPorts.add (PortType::Midi, port++, c,
-                       String ("midi_in_") + String (c + 1),  
-                       String ("MIDI In ") + String (c + 1), 
-                       true);
-        }
-
-        for (int c = 0; c < numAudioOuts; c++)
-        {
-            newPorts.add (PortType::Audio, port++, c,
-                       String ("audio_out_") + String (c + 1),  
-                       String ("Out ") + String (c + 1), 
-                       false);
-        }
-
-        for (int c = 0; c < numMidiOuts; c++)
-        {
-            newPorts.add (PortType::Midi, port++, c,
-                       String ("midi_out_") + String (c + 1),  
-                       String ("MIDI Out ") + String (c + 1), 
-                       false);
-        }
-
-        setPorts (newPorts);
-    }
-
-protected:
-    int numAudioIns     = 2,
-        numAudioOuts    = 2,
-        numMidiIns      = 1,
-        numMidiOuts     = 1;
-
-    bool prepared;
-    double sampleRate;
-    int bufferSize;
-
-    void initialize() override {}
-};
 
 BOOST_AUTO_TEST_SUITE (GraphNodeTests)
 
@@ -157,6 +61,17 @@ BOOST_AUTO_TEST_CASE (Connections)
         BOOST_REQUIRE_EQUAL (graph.getNumNodes(), 0);
     }
     graph.clear();
+}
+
+BOOST_AUTO_TEST_CASE (AddRemove)
+{
+    PreparedGraph fix;
+    GraphNode& graph = fix.graph;
+    NodeObjectPtr node = graph.addNode (new TestNode());
+    MessageManager::getInstance()->runDispatchLoopUntil (10);
+    BOOST_REQUIRE (graph.getNumNodes() == 1);
+    BOOST_REQUIRE (node != nullptr);
+    BOOST_REQUIRE (graph.removeNode (node->nodeId));
 }
 
 BOOST_AUTO_TEST_SUITE_END()
