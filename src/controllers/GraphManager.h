@@ -43,7 +43,7 @@ public:
     GraphNode& getGraph() noexcept { return processor; }
 
     /** Returns true if controlling the given graph model */
-    bool isControlling (const Node& model) const { return graph == model.getValueTree(); }
+    bool isManaging (const Node& model) const { return graph == model.getValueTree(); }
 
     /** Returns the number of nodes on the controlled graph */
     int getNumNodes() const noexcept;
@@ -57,6 +57,9 @@ public:
     /** Returns a node model by Node ID */
     const Node getNodeModelForId (const uint32 nodeId) const noexcept;
     
+    /** Find a graph manager (recursive) */
+    GraphManager* findGraphManagerForGraph (const Node& graph) const noexcept;
+
     /** Returns true if this manager contains a node by ID */
     bool contains (const uint32 nodeId) const;
 
@@ -119,11 +122,16 @@ private:
     bool loaded = false;
     
     uint32 lastUID;
+
+    class Binding; friend class Binding;
+    OwnedArray<Binding> bindings;
+
     uint32 getNextUID() noexcept;
     inline void changed() { sendChangeMessage(); }
     NodeObject* createFilter (const PluginDescription* desc, double x = 0.0f, double y = 0.0f,
                              uint32 nodeId = 0);
     NodeObject* createPlaceholder (const Node& node);
+
     void setupNode (const ValueTree& data, NodeObjectPtr object);
     
     void processorArcsChanged();

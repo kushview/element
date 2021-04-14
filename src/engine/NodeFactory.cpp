@@ -30,6 +30,7 @@
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ScriptNode.h"
 #include "engine/NodeFactory.h"
+#include "graph/GraphNode.h"
 
 namespace Element {
 
@@ -45,6 +46,7 @@ NodeFactory::NodeFactory()
     add<OSCSenderNode> (EL_INTERNAL_ID_OSC_SENDER);
     add<OSCReceiverNode> (EL_INTERNAL_ID_OSC_RECEIVER);
     add<ScriptNode> (EL_INTERNAL_ID_SCRIPT);
+    add<GraphNode> (EL_INTERNAL_ID_GRAPH);
 }
 
 NodeFactory::~NodeFactory() 

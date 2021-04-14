@@ -743,8 +743,7 @@ private:
     void prepareGraph (RootGraph* graph, double sampleRate, int estimatedBlockSize)
     {
         graph->setRenderDetails (sampleRate, blockSize);
-        // FIXME:
-        // graph->setPlayHead (&transport);
+        graph->setPlayHead (&transport);
         graph->prepareToRender (sampleRate, estimatedBlockSize);
     }
     

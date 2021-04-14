@@ -81,7 +81,7 @@ struct RootGraphHolder
 
             if (engine->addGraph (root))
             {
-                controller = new RootGraphManager (*root, plugins);
+                controller = std::make_unique<RootGraphManager> (*root, plugins);
                 model.setProperty (Tags::object, node.get());
                 controller->setNodeModel (model);
                 resetIONodePorts();
@@ -112,7 +112,7 @@ struct RootGraphHolder
         return wasRemoved;
     }
     
-    RootGraphManager* getController() const { return controller; }
+    RootGraphManager* getController() const { return controller.get(); }
     RootGraph* getRootGraph() const { return dynamic_cast<RootGraph*> (node ? node.get() : nullptr); }
     
     bool hasController()    const { return nullptr != controller; }
@@ -134,7 +134,7 @@ private:
     friend class EngineController::RootGraphs;
     PluginManager&                      plugins;
     DeviceManager&                      devices;
-    ScopedPointer<RootGraphManager>  controller;
+    std::unique_ptr<RootGraphManager>   controller;
     Node                                model;
     NodeObjectPtr                        node;
 
@@ -159,49 +159,6 @@ public:
         graphs.clear();
     }
     
-    /** This is recursive! */
-    GraphManager* findSubGraphManager (GraphManager* parent, const Node& n)
-    {
-        for (int i = parent->getNumNodes(); --i >= 0;)
-        {
-            if (NodeObjectPtr node = parent->getNode (i))
-            {
-                if (node->isSubGraph())
-                {
-                    // FIXME:
-                    // if (sub->getController().isControlling (n))
-                    //     return &sub->getController();
-                    // else if (auto* sub2 = findSubGraphManager (&sub->getController(), n))
-                    //     return sub2;
-                }
-            }
-        }
-        
-        return nullptr;
-    }
-
-    GraphManager* findSubGraphManager (const Node& n)
-    {
-        if (n.isRootGraph() || !n.isGraph())
-            return nullptr;
-        
-        for (auto* const h : graphs)
-        {
-            if (auto* controller = h->getController())
-            {
-                for (int i = controller->getNumNodes(); --i >= 0;)
-                {
-                    // if (NodeObjectPtr node = controller->getNode (i))
-                    //     if (auto* sub = dynamic_cast<GraphNode*> (node.get()))
-                    //         if (sub->getController().isControlling (n))
-                    //             return &sub->getController();
-                }
-            }
-        }
-        
-        return nullptr;
-    }
-
     RootGraphHolder* findByEngineIndex (const int index) const
     {
         if (index >= 0)
@@ -217,7 +174,7 @@ public:
         for (auto* const n : graphs)
             if (n->model == node)
                 return n;
-        return 0;
+        return nullptr;
     }
     
     /** Returns the active graph according to the engine */
@@ -253,13 +210,9 @@ public:
     {
         for (const auto* h : graphs)
         {
-            if (auto* controller = h->controller.get())
-            {
-                if (controller->isControlling (graph))
-                    return controller;
-                else if (auto* subController = findSubGraphManager (controller, graph))
-                    return subController;
-            }
+            if (auto* m1 = h->controller.get())
+                if (auto* m2 = m1->findGraphManagerForGraph (graph))
+                    return m2;
         }
 
         return nullptr;

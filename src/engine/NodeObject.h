@@ -61,9 +61,6 @@ public:
     /** Returns the name of a special parameter */
     static String getSpecialParameterName (int parameter);
 
-    /** Returns an audio processor if available */
-    JUCE_DEPRECATED_WITH_BODY(virtual AudioProcessor* getAudioProcessor() const noexcept, { return nullptr; })
-    
     //=========================================================================
     /** Returns the name of this node */
     String getName() const { return name; }
@@ -77,12 +74,19 @@ public:
     int getBlockSize() const noexcept { return blockSize; }
     
     //=========================================================================
+    /** Returns an audio processor if available */
+    virtual AudioProcessor* getAudioProcessor() const noexcept { return nullptr; }
+
     /** The actual processor object dynamic_cast'd to T */
     template<class T> inline T* processor() const noexcept { return dynamic_cast<T*> (getAudioProcessor()); }
 
     /** Returns the processor as an Audio Plugin Instance */
     AudioPluginInstance* getAudioPluginInstance() const noexcept { return processor<AudioPluginInstance>(); }
 
+    /** Set the audio play head */
+    virtual void setPlayHead (AudioPlayHead*) {}
+
+    //==========================================================================
     virtual void prepareToRender (double sampleRate, int maxBufferSize) = 0;
     virtual void releaseResources() = 0;
 

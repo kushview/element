@@ -30,6 +30,7 @@
 
 namespace Element {
 
+//==============================================================================
 static void showFailedInstantiationAlert (const PluginDescription& desc, const bool async = false)
 {
     String header = "Plugin Instantiation Failed";
@@ -42,6 +43,21 @@ static void showFailedInstantiationAlert (const PluginDescription& desc, const b
         AlertWindow::showMessageBox (AlertWindow::WarningIcon, header, message);
 }
 
+//==============================================================================
+static void removeCoordinatesProperties (ValueTree data)
+{
+    data.removeProperty (Tags::relativeX, nullptr);
+    data.removeProperty (Tags::relativeY, nullptr);
+}
+
+static void removeWindowProperties (ValueTree data)
+{
+    data.removeProperty (Tags::windowX, nullptr);
+    data.removeProperty (Tags::windowY, nullptr);
+    data.removeProperty (Tags::windowVisible, nullptr);
+}
+
+//==============================================================================
 class NodeModelUpdater : public ReferenceCountedObject
 {
 public:
@@ -84,6 +100,67 @@ private:
     }
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeModelUpdater);
+};
+
+//==============================================================================
+class GraphManager::Binding
+{
+public:
+    Binding() = delete;
+    Binding (GraphManager& g, NodeObjectPtr o, const Node& n)
+        : owner (g),
+          object (o),
+          node (n)
+    {
+        data = node.getValueTree();
+        setDataProperties();
+        
+        if (node.getNodeType() == Tags::graph && object && object->isGraph())
+        {
+            auto sub = dynamic_cast<GraphNode*> (object.get());
+            jassert (sub);
+            manager = std::make_unique<GraphManager> (*sub, owner.pluginManager);
+            manager->setNodeModel (node);
+        }
+        else
+        {
+            if (node.getNodeType() != Tags::graph)
+                { DBG("data type is not a graph"); }
+            if (object && !object->isGraph())
+                { DBG("object is not a graph type"); }
+        }
+    }
+
+    ~Binding()
+    {
+        if (manager != nullptr)
+        {
+            manager.reset();
+        }
+
+        Node::sanitizeRuntimeProperties (data);
+        data = ValueTree();
+    }
+
+    GraphManager* getSubGraphManager() const { return manager.get(); }
+
+    void setDataProperties()
+    {
+        if (! data.isValid() || object == nullptr)
+            return;
+        data.setProperty (Tags::id, static_cast<int64> (object->nodeId), nullptr)
+            .setProperty (Tags::object, object.get(), nullptr)
+            .setProperty (Tags::name, object->getName(), nullptr);
+    }
+
+private:
+    friend class GraphManager;
+    GraphManager& owner;
+    NodeObjectPtr object;
+    Node node;
+    ValueTree data;
+    std::unique_ptr<GraphManager> manager;
+    UndoManager* undo = nullptr;
 };
 
 /** This enforces correct IO nodes based on the graph processor's settings
@@ -209,10 +286,26 @@ const NodeObjectPtr GraphManager::getNodeForId (const uint32 uid) const noexcept
     return processor.getNodeForId (uid);
 }
 
-const Node GraphManager::getNodeModelForId (const uint32 nodeId) const noexcept {
+const Node GraphManager::getNodeModelForId (const uint32 nodeId) const noexcept
+{
     return Node (nodes.getChildWithProperty (Tags::id, static_cast<int64> (nodeId)), false);
 }
-    
+
+GraphManager* GraphManager::findGraphManagerForGraph (const Node& graph) const noexcept
+{
+    if (isManaging (graph))
+        return const_cast<GraphManager*> (this);
+
+    for (auto* binding : bindings)
+    {
+        if (auto* m1 = binding->getSubGraphManager())
+            if (auto* m2 = m1->findGraphManagerForGraph (graph))
+                return m2;
+    }
+
+    return nullptr;
+}
+
 bool GraphManager::contains (const uint32 nodeId) const {
     return processor.getNodeForId (nodeId) != nullptr;
 }
@@ -245,6 +338,7 @@ NodeObject* GraphManager::createPlaceholder (const Node& node)
     return processor.addNode (new AudioProcessorNode (node.getNodeId(), ph), node.getNodeId());
 }
 
+//==============================================================================
 uint32 GraphManager::addNode (const Node& newNode)
 {
     if (! newNode.isValid())
@@ -265,17 +359,14 @@ uint32 GraphManager::addNode (const Node& newNode)
     {
         nodeId = node->nodeId;
         ValueTree data = newNode.getValueTree().createCopy();
+        removeCoordinatesProperties (data);
+        removeWindowProperties (data);
+
         data.setProperty (Tags::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Tags::object, node, nullptr)
             .setProperty (Tags::type, node->getTypeString(), nullptr)
             .setProperty (Tags::pluginIdentifierString, desc.createIdentifierString(), nullptr);
         
-        data.removeProperty (Tags::relativeX, nullptr);
-        data.removeProperty (Tags::relativeY, nullptr);
-        data.removeProperty (Tags::windowX, nullptr);
-        data.removeProperty (Tags::windowY, nullptr);
-        data.removeProperty (Tags::windowVisible, nullptr);
-
         setupNode (data, node);
 
         nodes.addChild (data, -1, nullptr);
@@ -305,9 +396,11 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
     {
         nodeId = object->nodeId;
         ValueTree data (Tags::node);
+        
         data .setProperty (Tags::id,            static_cast<int64> (nodeId), nullptr)
              .setProperty (Tags::format,        desc->pluginFormatName, nullptr)
              .setProperty (Tags::identifier,    desc->fileOrIdentifier, nullptr)
+             .setProperty (Tags::type,          object->getTypeString(), nullptr)
              .setProperty (Tags::name,          desc->name, nullptr)
              .setProperty (Tags::object,        object, nullptr)
              .setProperty (Tags::updater,       new NodeModelUpdater (*this, data, object), nullptr)
@@ -322,9 +415,7 @@ uint32 GraphManager::addNode (const PluginDescription* desc, double rx, double r
 
         if (object->isSubGraph())
         {
-            // FIXME:
-            // sub->getController().setNodeModel (n);
-            // IONodeEnforcer enforceIONodes (sub->getController());
+            bindings.add (new Binding (*this, object, node));
         }
         
         if (auto* const proc = object->getAudioProcessor())
@@ -395,6 +486,13 @@ void GraphManager::removeNode (const uint32 uid)
                 obj->releaseResources();
             }
 
+            for (int i = bindings.size(); --i >= 0;)
+            {
+                auto binding = bindings.getUnchecked (i);
+                if (binding->object == obj)
+                    bindings.remove (i, true);
+            }
+
             auto data = node.getValueTree();
             nodes.removeChild (data, nullptr);
             // clear all referecnce counted objects
@@ -408,6 +506,7 @@ void GraphManager::removeNode (const uint32 uid)
     processorArcsChanged();
 }
 
+//==============================================================================
 void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const bool outputs,
                                                              const bool audio, const bool midi)
 {
@@ -679,16 +778,12 @@ void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
     
     if (obj->isSubGraph())
     {
-        // FIXME:
-        // sub->getController().setNodeModel (node);
+        bindings.add (new Binding (*this, obj, node));
         resetPorts = true;
     }
 
     node.restorePluginState();
-
-    if (resetPorts || node.getNumPorts() != static_cast<int> (obj->getNumPorts()))
-        node.resetPorts();
-    
+    node.resetPorts();
     jassert (node.getNumPorts() == static_cast<int> (obj->getNumPorts()));
 }
 

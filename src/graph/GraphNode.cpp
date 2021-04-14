@@ -23,6 +23,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
+#include "engine/nodes/NodeTypes.h"
 #include "session/Node.h"
 #include "PortCount.h"
 
@@ -47,6 +48,7 @@ GraphNode::GraphNode()
 {
     for (int i = 0; i < IONode::numDeviceTypes; ++i)
         ioNodes[i] = KV_INVALID_PORT;
+    setName ("Graph");
 }
 
 GraphNode::~GraphNode()
@@ -109,8 +111,7 @@ NodeObject* GraphNode::addNode (NodeObject* newNode, uint32 nodeId)
             lastNodeId = nodeId;
     }
 
-    // FIXME: playhead in Graph Node base
-    // newNode->setPlayHead (getPlayHead());
+    newNode->setPlayHead (playhead);
     newNode->setParentGraph (this);
     newNode->refreshPorts();
     newNode->prepare (getSampleRate(), getBlockSize(), this);
@@ -128,9 +129,9 @@ bool GraphNode::removeNode (const uint32 nodeId)
         {
             nodes.remove (i);
          
-            // do this syncronoously so it wont try processing with a null graph
             handleAsyncUpdate();
             n->setParentGraph (nullptr);
+            n->setPlayHead (nullptr);
 
             if (n->isSubGraph())
             {
@@ -568,12 +569,20 @@ void GraphNode::getPluginDescription (PluginDescription& d) const
     d.name = getName();
     d.uid = d.name.hashCode();
     d.category = "Graphs";
-    d.pluginFormatName = "Element";
+    d.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
+    d.fileOrIdentifier = EL_INTERNAL_ID_GRAPH;
     d.manufacturerName = "Element";
-    d.version = "1.0";
+    d.version = "1.0.0";
     d.isInstrument = false;
     d.numInputChannels  = getNumAudioInputs();
     d.numOutputChannels = getNumAudioOutputs();
+}
+
+void GraphNode::setPlayHead (AudioPlayHead* newPlayHead)
+{
+    playhead = newPlayHead;
+    for (auto* const node : nodes)
+        node->setPlayHead (playhead);
 }
 
 }

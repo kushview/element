@@ -189,11 +189,13 @@ public:
     void setCurrentProgram (int index) override { }
 
     void getState (MemoryBlock&) override { }
-    void setState (const void*, int sizeInBytes) override {}
+    void setState (const void*, int sizeInBytes) override { }
     
     void getPluginDescription (PluginDescription& desc) const override;
 
     void refreshPorts() override {}
+
+    void setPlayHead (AudioPlayHead*) override;
 
 protected:
     //==========================================================================
@@ -231,6 +233,8 @@ private:
     VelocityCurve velocityCurve;
     MidiBuffer filteredMidi;
     
+    std::atomic<AudioPlayHead*> playhead { nullptr };
+
     void handleAsyncUpdate() override;
     void clearRenderingSequence();
     void buildRenderingSequence();
