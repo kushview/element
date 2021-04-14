@@ -710,7 +710,7 @@ void EngineController::changeListenerCallback (ChangeBroadcaster* cb)
 
             if (auto* device = devices.getCurrentAudioDevice())
             {
-                auto nodes = session->getActiveGraph().getValueTree().getChildWithName (Tags::nodes);
+                auto nodes = session->getActiveGraph().getNodesValueTree();
                 processor->suspendProcessing (true);
                 processor->setPlayConfigFor (devices);
                 
