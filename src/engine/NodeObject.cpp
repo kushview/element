@@ -665,8 +665,6 @@ void NodeObject::setPorts (const PortList& newPorts)
         }
     } sorter;
     parameters.sort (sorter, true);
-
-
 }
 
 ValueTree NodeObject::createPortsData() const
@@ -806,7 +804,7 @@ void NodeObject::PortResetter::handleAsyncUpdate()
         }
     }
 
-    node.resetPorts();
+    node.refreshPorts();
 
     // Re-apply connections by channel
     for (const auto* ccs : sources) {
