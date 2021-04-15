@@ -58,13 +58,102 @@ static void removeWindowProperties (ValueTree data)
 }
 
 //==============================================================================
+/** This enforces correct IO nodes based on the graph processor's settings
+    in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
+    It uses the controller for all node operations so the model will
+    stay in sync.
+  */
+struct IONodeEnforcer
+{
+    IONodeEnforcer (GraphManager& m)
+        : manager (m)
+    {
+        addMissingIONodes(); 
+    }
+    
+private:
+    GraphManager& manager;
+    void addMissingIONodes()
+    {
+        auto& graph (manager.getGraph());
+        const Node model (manager.getGraphModel());
+
+        const bool wantsAudioIn   = graph.getNumPorts (PortType::Audio, true) > 0;
+        const bool wantsAudioOut  = graph.getNumPorts (PortType::Audio, false) > 0;
+        const bool wantsMidiIn    = graph.getNumPorts (PortType::Midi, true) > 0;
+        const bool wantsMidiOut   = graph.getNumPorts (PortType::Midi, false) > 0;
+        
+        NodeObjectPtr ioNodes [IONode::numDeviceTypes];
+        for (int i = 0; i < manager.getNumNodes(); ++i)
+        {
+            NodeObjectPtr node = manager.getNode (i);
+            if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
+                ioNodes [ioProc->getType()] = node;
+        }
+        
+        Array<uint32> nodesToRemove;
+
+        for (int t = 0; t < IONode::numDeviceTypes; ++t)
+        {
+            if (nullptr != ioNodes [t])
+            {
+                if (t == IONode::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
+                if (t == IONode::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
+                if (t == IONode::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
+                continue;
+            }
+
+            if (t == IONode::audioInputNode    && !wantsAudioIn)   continue;
+            if (t == IONode::audioOutputNode   && !wantsAudioOut)  continue;
+            if (t == IONode::midiInputNode     && !wantsMidiIn)    continue;
+            if (t == IONode::midiOutputNode    && !wantsMidiOut)   continue;
+
+            PluginDescription desc;
+            desc.pluginFormatName = "Internal";
+            double rx = 0.5f, ry = 0.5f;
+            switch (t)
+            {
+                case IONode::audioInputNode:
+                    desc.fileOrIdentifier = "audio.input";
+                    rx = .25;
+                    ry = .25;
+                    break;
+                case IONode::audioOutputNode:
+                    desc.fileOrIdentifier = "audio.output";
+                    rx = .25;
+                    ry = .75;
+                    break;
+                case IONode::midiInputNode:
+                    desc.fileOrIdentifier = "midi.input";
+                    rx = .75;
+                    ry = .25;
+                    break;
+                case IONode::midiOutputNode:
+                    desc.fileOrIdentifier = "midi.output";
+                    rx = .75;
+                    ry = .75;
+                    break;
+            }
+            
+            auto nodeId = manager.addNode (&desc, rx, ry);
+            ioNodes[t] = manager.getNodeForId (nodeId);
+            jassert(ioNodes[t] != nullptr);
+        }
+
+        for (const auto& nodeId : nodesToRemove)
+            manager.removeNode (nodeId);
+    }
+};
+
+//==============================================================================
 class NodeModelUpdater : public ReferenceCountedObject
 {
 public:
     NodeModelUpdater (GraphManager& m, const ValueTree& d, NodeObject* o)
         : manager (m), data (d), object (o)
     {
-        portsChangedConnection = object->portsChanged.connect ( 
+        portsChangedConnection = object->portsChanged.connect (
             std::bind (&NodeModelUpdater::onPortsChanged, this));
     }
 
@@ -121,6 +210,7 @@ public:
             jassert (sub);
             manager = std::make_unique<GraphManager> (*sub, owner.pluginManager);
             manager->setNodeModel (node);
+            IONodeEnforcer addIO (*manager);
         }
         else
         {
@@ -138,8 +228,10 @@ public:
             manager.reset();
         }
 
+        node = Node();
         Node::sanitizeRuntimeProperties (data);
         data = ValueTree();
+        object = nullptr;
     }
 
     GraphManager* getSubGraphManager() const { return manager.get(); }
@@ -163,102 +255,7 @@ private:
     UndoManager* undo = nullptr;
 };
 
-/** This enforces correct IO nodes based on the graph processor's settings
-    in virtual methods like 'acceptsMidi' and 'getTotalNumInputChannels'
-    It uses the controller for all node operations so the model will
-    stay in sync.
-  */
-struct IONodeEnforcer
-{
-    IONodeEnforcer (GraphManager& c)
-        : controller (c)
-    {
-        addMissingIONodes(); 
-        controller.syncArcsModel();
-    }
-    
-    GraphManager* getController() const { return &controller; }
-
-private:
-    GraphManager& controller;
-    void addMissingIONodes()
-    {
-        auto* root = getController();
-        if (! root) return;
-        auto& proc (root->getGraph());
-        const Node graph (root->getGraphModel());
-
-        const bool wantsAudioIn   = graph.hasAudioInputNode()  && proc.getNumPorts (PortType::Audio, true) > 0;
-        const bool wantsAudioOut  = graph.hasAudioOutputNode() && proc.getNumPorts (PortType::Audio, false) > 0;
-        const bool wantsMidiIn    = graph.hasMidiInputNode()   && proc.getNumPorts (PortType::Midi, true) > 0;
-        const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.getNumPorts (PortType::Midi, false) > 0;
-        
-        NodeObjectPtr ioNodes [IONode::numDeviceTypes];
-        for (int i = 0; i < root->getNumNodes(); ++i)
-        {
-            NodeObjectPtr node = root->getNode (i);
-            if (node->isMidiIONode() || node->isAudioIONode())
-            {
-                if (auto* ioProc = dynamic_cast<IONode*> (node.get()))
-                    ioNodes [ioProc->getType()] = node;
-            }
-        }
-        
-        Array<uint32> nodesToRemove;
-
-        for (int t = 0; t < IONode::numDeviceTypes; ++t)
-        {
-            if (nullptr != ioNodes [t])
-            {
-                if (t == IONode::audioInputNode    && !wantsAudioIn)   nodesToRemove.add (ioNodes[t]->nodeId);
-                if (t == IONode::audioOutputNode   && !wantsAudioOut)  nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IONode::midiInputNode     && !wantsMidiIn)    nodesToRemove.add (ioNodes[t]->nodeId);;
-                if (t == IONode::midiOutputNode    && !wantsMidiOut)   nodesToRemove.add (ioNodes[t]->nodeId);;
-                continue;
-            }
-
-            if (t == IONode::audioInputNode    && !wantsAudioIn)   continue;
-            if (t == IONode::audioOutputNode   && !wantsAudioOut)  continue;
-            if (t == IONode::midiInputNode     && !wantsMidiIn)    continue;
-            if (t == IONode::midiOutputNode    && !wantsMidiOut)   continue;
-
-            PluginDescription desc;
-            desc.pluginFormatName = "Internal";
-            double rx = 0.5f, ry = 0.5f;
-            switch (t)
-            {
-                case IONode::audioInputNode:
-                    desc.fileOrIdentifier = "audio.input";
-                    rx = .25;
-                    ry = .25;
-                    break;
-                case IONode::audioOutputNode:
-                    desc.fileOrIdentifier = "audio.output";
-                    rx = .25;
-                    ry = .75;
-                    break;
-                case IONode::midiInputNode:
-                    desc.fileOrIdentifier = "midi.input";
-                    rx = .75;
-                    ry = .25;
-                    break;
-                case IONode::midiOutputNode:
-                    desc.fileOrIdentifier = "midi.output";
-                    rx = .75;
-                    ry = .75;
-                    break;
-            }
-            
-            auto nodeId = root->addNode (&desc, rx, ry);
-            ioNodes[t] = root->getNodeForId (nodeId);
-            jassert(ioNodes[t] != nullptr);
-        }
-
-        for (const auto& nodeId : nodesToRemove)
-            root->removeNode (nodeId);
-    }
-};
-
+//==============================================================================
 GraphManager::GraphManager (GraphNode& pg, PluginManager& pm)
     : pluginManager (pm), processor (pg), lastUID (0)
 { }

@@ -696,7 +696,6 @@ void NodeObject::setParentGraph (GraphNode* const graph)
     if (IONode* const iop = dynamic_cast<IONode*> (this))
     {
         iop->setParentGraph (parent);
-        metadata.setProperty (Slugs::name, iop->getName(), nullptr);
         refreshPorts();
     }
 }
