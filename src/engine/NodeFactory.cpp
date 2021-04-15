@@ -30,7 +30,7 @@
 #include "engine/nodes/OSCSenderNode.h"
 #include "engine/nodes/ScriptNode.h"
 #include "engine/NodeFactory.h"
-#include "graph/GraphNode.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 

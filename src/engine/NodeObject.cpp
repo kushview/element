@@ -26,7 +26,7 @@
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
 #include "engine/NodeObject.h"
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "session/Node.h"
 
 namespace Element {

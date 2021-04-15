@@ -1,5 +1,5 @@
 #include <boost/test/unit_test.hpp>
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "Utils.h"
 
 using namespace Element;

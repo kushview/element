@@ -18,7 +18,7 @@
 
 #include "Tests.h"
 #include "engine/nodes/MidiProgramMapNode.h"
-#include "graph/GraphNode.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 

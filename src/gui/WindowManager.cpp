@@ -20,7 +20,7 @@
 #include "Globals.h"
 #include "controllers/GuiController.h"
 #include "engine/NodeObject.h"
-#include "graph/GraphNode.h"
+#include "engine///GraphNode.h"
 #include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"

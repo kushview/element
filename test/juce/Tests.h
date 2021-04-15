@@ -32,8 +32,8 @@
 #include "engine/nodes/PlaceholderProcessor.h"
 #include "engine/nodes/VolumeProcessor.h"
 
-#include "graph/GraphNode.h"
-#include "graph/IONode.h"
+#include "engine/GraphNode.h"
+#include "engine/IONode.h"
 
 #include "session/PluginManager.h"
 #include "session/PluginManager.h"

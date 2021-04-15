@@ -24,7 +24,7 @@
 #include "engine/MidiEngine.h"
 #include "engine/MidiTranspose.h"
 #include "engine/Transport.h"
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "Globals.h"
 #include "Settings.h"
 

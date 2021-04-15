@@ -1,5 +1,5 @@
 #pragma once
-#include "graph/GraphNode.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 

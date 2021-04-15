@@ -22,7 +22,7 @@
 #include "controllers/GuiController.h"
 #include "controllers/GraphManager.h"
 #include "engine/nodes/MidiDeviceProcessor.h"
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "session/DeviceManager.h"
 #include "session/PluginManager.h"
 #include "session/Node.h"

@@ -18,7 +18,7 @@
 
 #include "Tests.h"
 #include "engine/nodes/AudioProcessorNode.h"
-#include "graph/IONode.h"
+#include "engine/IONode.h"
 #include "engine/MidiChannelMap.h"
 #include "engine/nodes/MidiChannelMapProcessor.h"
 

@@ -21,7 +21,7 @@
 
 #include "controllers/Controller.h"
 #include "engine/AudioEngine.h"
-#include "graph/GraphNode.h"
+#include "engine/GraphNode.h"
 #include "session/Node.h"
 
 namespace Element {

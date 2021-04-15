@@ -1,7 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include "fixture/PreparedGraph.h"
 #include "fixture/TestNode.h"
-#include "graph/IONode.h"
+#include "engine/IONode.h"
 #include "engine/NodeObject.h"
 
 using namespace Element;

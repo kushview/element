@@ -17,8 +17,8 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#include "graph/GraphBuilder.h"
-#include "graph/IONode.h"
+#include "engine/GraphBuilder.h"
+#include "engine/IONode.h"
 #include "engine/nodes/AudioProcessorNode.h"
 #include "engine/AudioEngine.h"
 #include "engine/MidiPipe.h"
@@ -27,7 +27,7 @@
 #include "session/Node.h"
 #include "PortCount.h"
 
-#include "graph/GraphNode.h"
+#include "engine/GraphNode.h"
 
 namespace Element {
 

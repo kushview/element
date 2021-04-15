@@ -101,615 +101,642 @@
       </GROUP>
     </GROUP>
     <GROUP id="{A6208D82-F1C5-B816-540F-C5F3211C35F2}" name="src">
-      <GROUP id="{CEE476E2-0782-5AC6-3CCF-057E207FB0F7}" name="controllers">
-        <FILE id="m8bTH6" name="AppController.cpp" compile="1" resource="0"
+      <GROUP id="{BD04B679-EAA2-9191-AC78-F713C107C159}" name="controllers">
+        <FILE id="NhhJSW" name="AppController.cpp" compile="1" resource="0"
               file="../../../src/controllers/AppController.cpp"/>
-        <FILE id="jC5hCL" name="AppController.h" compile="0" resource="0" file="../../../src/controllers/AppController.h"/>
-        <FILE id="viW522" name="Controller.cpp" compile="1" resource="0" file="../../../src/controllers/Controller.cpp"/>
-        <FILE id="DIJXBU" name="Controller.h" compile="0" resource="0" file="../../../src/controllers/Controller.h"/>
-        <FILE id="suTwdG" name="DevicesController.cpp" compile="1" resource="0"
+        <FILE id="jblNr8" name="AppController.h" compile="0" resource="0" file="../../../src/controllers/AppController.h"/>
+        <FILE id="oVVCXK" name="Controller.cpp" compile="1" resource="0" file="../../../src/controllers/Controller.cpp"/>
+        <FILE id="KUbO0s" name="Controller.h" compile="0" resource="0" file="../../../src/controllers/Controller.h"/>
+        <FILE id="WnUuui" name="DevicesController.cpp" compile="1" resource="0"
               file="../../../src/controllers/DevicesController.cpp"/>
-        <FILE id="VqZDwB" name="DevicesController.h" compile="0" resource="0"
+        <FILE id="G0kHAk" name="DevicesController.h" compile="0" resource="0"
               file="../../../src/controllers/DevicesController.h"/>
-        <FILE id="VzO68t" name="EngineController.cpp" compile="1" resource="0"
+        <FILE id="CAKj6U" name="EngineController.cpp" compile="1" resource="0"
               file="../../../src/controllers/EngineController.cpp"/>
-        <FILE id="Oj49CA" name="EngineController.h" compile="0" resource="0"
+        <FILE id="q3MJWK" name="EngineController.h" compile="0" resource="0"
               file="../../../src/controllers/EngineController.h"/>
-        <FILE id="Bt9NWW" name="GraphController.cpp" compile="1" resource="0"
+        <FILE id="tZ8CSW" name="GraphController.cpp" compile="1" resource="0"
               file="../../../src/controllers/GraphController.cpp"/>
-        <FILE id="NSxYq1" name="GraphController.h" compile="0" resource="0"
+        <FILE id="rmu73T" name="GraphController.h" compile="0" resource="0"
               file="../../../src/controllers/GraphController.h"/>
-        <FILE id="rdvlgl" name="GraphManager.cpp" compile="1" resource="0"
+        <FILE id="Ed0Ie2" name="GraphManager.cpp" compile="1" resource="0"
               file="../../../src/controllers/GraphManager.cpp"/>
-        <FILE id="eui4cP" name="GraphManager.h" compile="0" resource="0" file="../../../src/controllers/GraphManager.h"/>
-        <FILE id="kxYPXC" name="GuiController.cpp" compile="1" resource="0"
+        <FILE id="LWxOig" name="GraphManager.h" compile="0" resource="0" file="../../../src/controllers/GraphManager.h"/>
+        <FILE id="VtgE6S" name="GuiController.cpp" compile="1" resource="0"
               file="../../../src/controllers/GuiController.cpp"/>
-        <FILE id="iJwdY4" name="GuiController.h" compile="0" resource="0" file="../../../src/controllers/GuiController.h"/>
-        <FILE id="j6Gp4y" name="MappingController.cpp" compile="1" resource="0"
+        <FILE id="YSl3ZZ" name="GuiController.h" compile="0" resource="0" file="../../../src/controllers/GuiController.h"/>
+        <FILE id="vgv41Z" name="MappingController.cpp" compile="1" resource="0"
               file="../../../src/controllers/MappingController.cpp"/>
-        <FILE id="t503Fh" name="MappingController.h" compile="0" resource="0"
+        <FILE id="Z3IEw0" name="MappingController.h" compile="0" resource="0"
               file="../../../src/controllers/MappingController.h"/>
-        <FILE id="GXN3Rx" name="OSCController.cpp" compile="1" resource="0"
+        <FILE id="RyWy2e" name="OSCController.cpp" compile="1" resource="0"
               file="../../../src/controllers/OSCController.cpp"/>
-        <FILE id="IxeHRQ" name="OSCController.h" compile="0" resource="0" file="../../../src/controllers/OSCController.h"/>
-        <FILE id="uo2OnK" name="PresetsController.cpp" compile="1" resource="0"
+        <FILE id="UJlnwF" name="OSCController.h" compile="0" resource="0" file="../../../src/controllers/OSCController.h"/>
+        <FILE id="GFOne7" name="PresetsController.cpp" compile="1" resource="0"
               file="../../../src/controllers/PresetsController.cpp"/>
-        <FILE id="vzvCRP" name="PresetsController.h" compile="0" resource="0"
+        <FILE id="H0Qzko" name="PresetsController.h" compile="0" resource="0"
               file="../../../src/controllers/PresetsController.h"/>
-        <FILE id="O7Iw1m" name="ScriptingController.cpp" compile="1" resource="0"
+        <FILE id="xsjUZf" name="ScriptingController.cpp" compile="1" resource="0"
               file="../../../src/controllers/ScriptingController.cpp"/>
-        <FILE id="nHrR8m" name="ScriptingController.h" compile="0" resource="0"
+        <FILE id="TpMjvh" name="ScriptingController.h" compile="0" resource="0"
               file="../../../src/controllers/ScriptingController.h"/>
-        <FILE id="uBtqwn" name="SessionController.cpp" compile="1" resource="0"
+        <FILE id="rOkcWh" name="SessionController.cpp" compile="1" resource="0"
               file="../../../src/controllers/SessionController.cpp"/>
-        <FILE id="TAvpig" name="SessionController.h" compile="0" resource="0"
+        <FILE id="W1eyY3" name="SessionController.h" compile="0" resource="0"
               file="../../../src/controllers/SessionController.h"/>
-        <FILE id="qyHiO2" name="WorkspacesController.cpp" compile="1" resource="0"
+        <FILE id="qSqvYo" name="WorkspacesController.cpp" compile="1" resource="0"
               file="../../../src/controllers/WorkspacesController.cpp"/>
-        <FILE id="e5Qlb6" name="WorkspacesController.h" compile="0" resource="0"
+        <FILE id="mv7PiN" name="WorkspacesController.h" compile="0" resource="0"
               file="../../../src/controllers/WorkspacesController.h"/>
       </GROUP>
-      <GROUP id="{F2321464-3A93-D930-0C93-A8B9DAE4639A}" name="db">
-        <FILE id="HQKA8u" name="Database.cpp" compile="1" resource="0" file="../../../src/db/Database.cpp"/>
-        <FILE id="YNritE" name="Database.h" compile="0" resource="0" file="../../../src/db/Database.h"/>
+      <GROUP id="{A7EBF782-264B-EEC6-ECDC-29B858FD8515}" name="db">
+        <FILE id="hQDQuK" name="Database.cpp" compile="1" resource="0" file="../../../src/db/Database.cpp"/>
+        <FILE id="dfWLCs" name="Database.h" compile="0" resource="0" file="../../../src/db/Database.h"/>
       </GROUP>
-      <GROUP id="{12D19668-700D-A000-A742-CD5A10845BEE}" name="documents">
-        <FILE id="kra7nY" name="GraphDocument.cpp" compile="1" resource="0"
+      <GROUP id="{E49BC79E-80E9-1F82-25F8-4E89C8A9578E}" name="documents">
+        <FILE id="WhBQkT" name="GraphDocument.cpp" compile="1" resource="0"
               file="../../../src/documents/GraphDocument.cpp"/>
-        <FILE id="bjEhkZ" name="GraphDocument.h" compile="0" resource="0" file="../../../src/documents/GraphDocument.h"/>
-        <FILE id="kPfDxu" name="SessionDocument.cpp" compile="1" resource="0"
+        <FILE id="x1oWxw" name="GraphDocument.h" compile="0" resource="0" file="../../../src/documents/GraphDocument.h"/>
+        <FILE id="CNHPxs" name="SessionDocument.cpp" compile="1" resource="0"
               file="../../../src/documents/SessionDocument.cpp"/>
-        <FILE id="pRo7Cq" name="SessionDocument.h" compile="0" resource="0"
+        <FILE id="thFTLB" name="SessionDocument.h" compile="0" resource="0"
               file="../../../src/documents/SessionDocument.h"/>
       </GROUP>
-      <GROUP id="{B18A3CED-45E2-5C4B-614F-44829676EFD0}" name="engine">
-        <GROUP id="{378EBD0F-7287-8460-85C3-C856531AB069}" name="nodes">
-          <FILE id="EbfxEI" name="AllPassFilterNode.h" compile="0" resource="0"
+      <GROUP id="{746C4B19-BDE9-3EE7-C030-F2D0FD54D26A}" name="engine">
+        <GROUP id="{AC856C7C-B80D-AE33-B683-5A05A2330066}" name="nodes">
+          <FILE id="rzJDD2" name="AllPassFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/AllPassFilterNode.h"/>
-          <FILE id="Rjzcy6" name="AudioFilePlayerNode.cpp" compile="1" resource="0"
+          <FILE id="Xq3A9f" name="AudioFilePlayerNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/AudioFilePlayerNode.cpp"/>
-          <FILE id="ahgm9u" name="AudioFilePlayerNode.h" compile="0" resource="0"
+          <FILE id="KvOgmh" name="AudioFilePlayerNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/AudioFilePlayerNode.h"/>
-          <FILE id="blNKfG" name="AudioMixerProcessor.cpp" compile="1" resource="0"
+          <FILE id="fr3Hlw" name="AudioMixerProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/AudioMixerProcessor.cpp"/>
-          <FILE id="cY9R6x" name="AudioMixerProcessor.h" compile="0" resource="0"
+          <FILE id="qwQgAb" name="AudioMixerProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/AudioMixerProcessor.h"/>
-          <FILE id="OK4pVH" name="AudioProcessorNode.cpp" compile="1" resource="0"
+          <FILE id="Nydaih" name="AudioProcessorNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/AudioProcessorNode.cpp"/>
-          <FILE id="GczpJ0" name="AudioProcessorNode.h" compile="0" resource="0"
+          <FILE id="A2sFQb" name="AudioProcessorNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/AudioProcessorNode.h"/>
-          <FILE id="yW0hxb" name="AudioRouterNode.cpp" compile="1" resource="0"
+          <FILE id="uPB2pR" name="AudioRouterNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/AudioRouterNode.cpp"/>
-          <FILE id="JheW8q" name="AudioRouterNode.h" compile="0" resource="0"
+          <FILE id="RIRWxH" name="AudioRouterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/AudioRouterNode.h"/>
-          <FILE id="Jk8OvS" name="BaseProcessor.h" compile="0" resource="0" file="../../../src/engine/nodes/BaseProcessor.h"/>
-          <FILE id="FjBlKb" name="ChannelizeProcessor.h" compile="0" resource="0"
+          <FILE id="RYqk2Q" name="BaseProcessor.h" compile="0" resource="0" file="../../../src/engine/nodes/BaseProcessor.h"/>
+          <FILE id="CKM9K5" name="ChannelizeProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/ChannelizeProcessor.h"/>
-          <FILE id="yJy44Z" name="CombFilterProcessor.h" compile="0" resource="0"
+          <FILE id="dKYv9Z" name="CombFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CombFilterProcessor.h"/>
-          <FILE id="POuPTB" name="CompressorProcessor.cpp" compile="1" resource="0"
+          <FILE id="MGqi4T" name="CompressorProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/CompressorProcessor.cpp"/>
-          <FILE id="QAsGRG" name="CompressorProcessor.h" compile="0" resource="0"
+          <FILE id="yD374N" name="CompressorProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/CompressorProcessor.h"/>
-          <FILE id="uU7N3K" name="EQFilterProcessor.cpp" compile="1" resource="0"
+          <FILE id="u13LaY" name="EQFilterProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.cpp"/>
-          <FILE id="EaC1mf" name="EQFilterProcessor.h" compile="0" resource="0"
+          <FILE id="DzhWVM" name="EQFilterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/EQFilterProcessor.h"/>
-          <FILE id="I9i3k6" name="FreqSplitterProcessor.h" compile="0" resource="0"
+          <FILE id="E2lrg8" name="FreqSplitterProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/FreqSplitterProcessor.h"/>
-          <FILE id="ISlA2d" name="LuaNode.cpp" compile="1" resource="0" file="../../../src/engine/nodes/LuaNode.cpp"/>
-          <FILE id="gAYbMr" name="LuaNode.h" compile="0" resource="0" file="../../../src/engine/nodes/LuaNode.h"/>
-          <FILE id="IbtbWc" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
+          <FILE id="vRl0hC" name="LuaNode.cpp" compile="1" resource="0" file="../../../src/engine/nodes/LuaNode.cpp"/>
+          <FILE id="penLbr" name="LuaNode.h" compile="0" resource="0" file="../../../src/engine/nodes/LuaNode.h"/>
+          <FILE id="QqlcwF" name="MediaPlayerProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MediaPlayerProcessor.cpp"/>
-          <FILE id="zuxcuF" name="MediaPlayerProcessor.h" compile="0" resource="0"
+          <FILE id="SA9Acu" name="MediaPlayerProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MediaPlayerProcessor.h"/>
-          <FILE id="R7tLgJ" name="MidiChannelMapProcessor.h" compile="0" resource="0"
+          <FILE id="fNHxl4" name="MidiChannelMapProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiChannelMapProcessor.h"/>
-          <FILE id="IUieoJ" name="MidiChannelSplitterNode.cpp" compile="1" resource="0"
+          <FILE id="uC9u0i" name="MidiChannelSplitterNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiChannelSplitterNode.cpp"/>
-          <FILE id="yVqyDy" name="MidiChannelSplitterNode.h" compile="0" resource="0"
+          <FILE id="RBxSAr" name="MidiChannelSplitterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiChannelSplitterNode.h"/>
-          <FILE id="Mr6NVP" name="MidiDeviceProcessor.cpp" compile="1" resource="0"
+          <FILE id="kmAz0s" name="MidiDeviceProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiDeviceProcessor.cpp"/>
-          <FILE id="I2ibG5" name="MidiDeviceProcessor.h" compile="0" resource="0"
+          <FILE id="md32lB" name="MidiDeviceProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiDeviceProcessor.h"/>
-          <FILE id="dNYlmo" name="MidiFilterNode.cpp" compile="1" resource="0"
+          <FILE id="KPQelJ" name="MidiFilterNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.cpp"/>
-          <FILE id="QSNG7U" name="MidiFilterNode.h" compile="0" resource="0"
+          <FILE id="zuVCzv" name="MidiFilterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiFilterNode.h"/>
-          <FILE id="yfSURX" name="MidiMonitorNode.cpp" compile="1" resource="0"
+          <FILE id="tFVK53" name="MidiMonitorNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiMonitorNode.cpp"/>
-          <FILE id="OYRWAT" name="MidiMonitorNode.h" compile="0" resource="0"
+          <FILE id="z11plc" name="MidiMonitorNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiMonitorNode.h"/>
-          <FILE id="M5XcF3" name="MidiProgramMapNode.cpp" compile="1" resource="0"
+          <FILE id="mWuwx8" name="MidiProgramMapNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.cpp"/>
-          <FILE id="slDbcH" name="MidiProgramMapNode.h" compile="0" resource="0"
+          <FILE id="KCAfWN" name="MidiProgramMapNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiProgramMapNode.h"/>
-          <FILE id="T07z5s" name="MidiRouterNode.cpp" compile="1" resource="0"
+          <FILE id="UympsA" name="MidiRouterNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/MidiRouterNode.cpp"/>
-          <FILE id="UhNWUN" name="MidiRouterNode.h" compile="0" resource="0"
+          <FILE id="ys7LPP" name="MidiRouterNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/MidiRouterNode.h"/>
-          <FILE id="Y90biG" name="OSCReceiverNode.cpp" compile="1" resource="0"
+          <FILE id="mFRqBI" name="NodeTypes.h" compile="0" resource="0" file="../../../src/engine/nodes/NodeTypes.h"/>
+          <FILE id="nji9pS" name="OSCReceiverNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/OSCReceiverNode.cpp"/>
-          <FILE id="RMrhCV" name="OSCReceiverNode.h" compile="0" resource="0"
+          <FILE id="FG9CnW" name="OSCReceiverNode.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/OSCReceiverNode.h"/>
-          <FILE id="igXGDa" name="OSCSenderNode.cpp" compile="1" resource="0"
+          <FILE id="nXZJgm" name="OSCSenderNode.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/OSCSenderNode.cpp"/>
-          <FILE id="ZInxjL" name="OSCSenderNode.h" compile="0" resource="0" file="../../../src/engine/nodes/OSCSenderNode.h"/>
-          <FILE id="rQ8jqT" name="PlaceholderProcessor.h" compile="0" resource="0"
+          <FILE id="cEjLGG" name="OSCSenderNode.h" compile="0" resource="0" file="../../../src/engine/nodes/OSCSenderNode.h"/>
+          <FILE id="cm4JSw" name="PlaceholderProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/PlaceholderProcessor.h"/>
-          <FILE id="p7e9tQ" name="ReverbProcessor.h" compile="0" resource="0"
+          <FILE id="nTSq6b" name="ReverbProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/ReverbProcessor.h"/>
-          <FILE id="PZPfph" name="ScriptNode.cpp" compile="1" resource="0" file="../../../src/engine/nodes/ScriptNode.cpp"/>
-          <FILE id="tLS8Gt" name="ScriptNode.h" compile="0" resource="0" file="../../../src/engine/nodes/ScriptNode.h"/>
-          <FILE id="A92vK7" name="SubGraphProcessor.cpp" compile="1" resource="0"
+          <FILE id="RsngsU" name="ScriptNode.cpp" compile="1" resource="0" file="../../../src/engine/nodes/ScriptNode.cpp"/>
+          <FILE id="CLz7vo" name="ScriptNode.h" compile="0" resource="0" file="../../../src/engine/nodes/ScriptNode.h"/>
+          <FILE id="wzPAou" name="SubGraphProcessor.cpp" compile="1" resource="0"
                 file="../../../src/engine/nodes/SubGraphProcessor.cpp"/>
-          <FILE id="AOOVur" name="SubGraphProcessor.h" compile="0" resource="0"
+          <FILE id="Et3ucA" name="SubGraphProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/SubGraphProcessor.h"/>
-          <FILE id="ofsdSx" name="VolumeProcessor.h" compile="0" resource="0"
+          <FILE id="tMlVa0" name="VolumeProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/VolumeProcessor.h"/>
-          <FILE id="KuWQNz" name="WetDryProcessor.h" compile="0" resource="0"
+          <FILE id="pGV8t1" name="WetDryProcessor.h" compile="0" resource="0"
                 file="../../../src/engine/nodes/WetDryProcessor.h"/>
         </GROUP>
-        <FILE id="ZBlDNA" name="AudioEngine.cpp" compile="1" resource="0" file="../../../src/engine/AudioEngine.cpp"/>
-        <FILE id="LfIbjJ" name="AudioEngine.h" compile="0" resource="0" file="../../../src/engine/AudioEngine.h"/>
-        <FILE id="g5Dz9Y" name="DataType.h" compile="0" resource="0" file="../../../src/engine/DataType.h"/>
-        <FILE id="DvILr0" name="Engine.h" compile="0" resource="0" file="../../../src/engine/Engine.h"/>
-        <FILE id="h6fJbN" name="GraphPort.cpp" compile="1" resource="0" file="../../../src/engine/GraphPort.cpp"/>
-        <FILE id="w8uE0a" name="GraphPort.h" compile="0" resource="0" file="../../../src/engine/GraphPort.h"/>
-        <FILE id="BB46nT" name="GraphProcessor.cpp" compile="1" resource="0"
+        <FILE id="mQAeu1" name="AudioEngine.cpp" compile="1" resource="0" file="../../../src/engine/AudioEngine.cpp"/>
+        <FILE id="uz7wSP" name="AudioEngine.h" compile="0" resource="0" file="../../../src/engine/AudioEngine.h"/>
+        <FILE id="SpIXGt" name="BaseNode.h" compile="0" resource="0" file="../../../src/engine/BaseNode.h"/>
+        <FILE id="X5TAKZ" name="DataType.h" compile="0" resource="0" file="../../../src/engine/DataType.h"/>
+        <FILE id="v5AJ2H" name="Engine.h" compile="0" resource="0" file="../../../src/engine/Engine.h"/>
+        <FILE id="Neku5C" name="GraphBuilder.cpp" compile="1" resource="0"
+              file="../../../src/engine/GraphBuilder.cpp"/>
+        <FILE id="ES6jYB" name="GraphBuilder.h" compile="0" resource="0" file="../../../src/engine/GraphBuilder.h"/>
+        <FILE id="IxGqxX" name="GraphNode.cpp" compile="1" resource="0" file="../../../src/engine/GraphNode.cpp"/>
+        <FILE id="CqUPxY" name="GraphNode.h" compile="0" resource="0" file="../../../src/engine/GraphNode.h"/>
+        <FILE id="tYnmsJ" name="GraphPort.cpp" compile="1" resource="0" file="../../../src/engine/GraphPort.cpp"/>
+        <FILE id="ZasHSm" name="GraphPort.h" compile="0" resource="0" file="../../../src/engine/GraphPort.h"/>
+        <FILE id="rIhofw" name="GraphProcessor.cpp" compile="1" resource="0"
               file="../../../src/engine/GraphProcessor.cpp"/>
-        <FILE id="FlZOiu" name="GraphProcessor.h" compile="0" resource="0"
+        <FILE id="IOTwAU" name="GraphProcessor.h" compile="0" resource="0"
               file="../../../src/engine/GraphProcessor.h"/>
-        <FILE id="H2iC2I" name="InternalFormat.cpp" compile="1" resource="0"
+        <FILE id="q8rxGv" name="InternalFormat.cpp" compile="1" resource="0"
               file="../../../src/engine/InternalFormat.cpp"/>
-        <FILE id="gvQPm5" name="InternalFormat.h" compile="0" resource="0"
+        <FILE id="uqUZb3" name="InternalFormat.h" compile="0" resource="0"
               file="../../../src/engine/InternalFormat.h"/>
-        <FILE id="CFelvK" name="LinearFade.h" compile="0" resource="0" file="../../../src/engine/LinearFade.h"/>
-        <FILE id="kaAcPz" name="MappingEngine.cpp" compile="1" resource="0"
+        <FILE id="IsgMeq" name="IONode.cpp" compile="1" resource="0" file="../../../src/engine/IONode.cpp"/>
+        <FILE id="a7bvRF" name="IONode.h" compile="0" resource="0" file="../../../src/engine/IONode.h"/>
+        <FILE id="z7fzqR" name="LinearFade.h" compile="0" resource="0" file="../../../src/engine/LinearFade.h"/>
+        <FILE id="XcI9Rc" name="MappingEngine.cpp" compile="1" resource="0"
               file="../../../src/engine/MappingEngine.cpp"/>
-        <FILE id="W2mK2P" name="MappingEngine.h" compile="0" resource="0" file="../../../src/engine/MappingEngine.h"/>
-        <FILE id="fvi0yf" name="MidiChannelMap.h" compile="0" resource="0"
+        <FILE id="bWXtRM" name="MappingEngine.h" compile="0" resource="0" file="../../../src/engine/MappingEngine.h"/>
+        <FILE id="qdTWSd" name="MidiChannelMap.h" compile="0" resource="0"
               file="../../../src/engine/MidiChannelMap.h"/>
-        <FILE id="z8y1qt" name="MidiClock.cpp" compile="1" resource="0" file="../../../src/engine/MidiClock.cpp"/>
-        <FILE id="GwOD5I" name="MidiClock.h" compile="0" resource="0" file="../../../src/engine/MidiClock.h"/>
-        <FILE id="oN5Xza" name="MidiEngine.cpp" compile="1" resource="0" file="../../../src/engine/MidiEngine.cpp"/>
-        <FILE id="Rv01FW" name="MidiEngine.h" compile="0" resource="0" file="../../../src/engine/MidiEngine.h"/>
-        <FILE id="VVzUXN" name="MidiIOMonitor.h" compile="0" resource="0" file="../../../src/engine/MidiIOMonitor.h"/>
-        <FILE id="ei6mAR" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
-        <FILE id="sgv8Da" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
-        <FILE id="ROaeDY" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
-        <FILE id="nKZbJt" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
-        <FILE id="mp37Uw" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
-        <FILE id="g6HGUg" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
-        <FILE id="Pi5GfU" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
-        <FILE id="fyQU7p" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
-        <FILE id="y5AVmw" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
-        <FILE id="fnnmX6" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>
-        <FILE id="dcQSg1" name="Transport.cpp" compile="1" resource="0" file="../../../src/engine/Transport.cpp"/>
-        <FILE id="pY1xwP" name="Transport.h" compile="0" resource="0" file="../../../src/engine/Transport.h"/>
-        <FILE id="u0IZj3" name="VelocityCurve.h" compile="0" resource="0" file="../../../src/engine/VelocityCurve.h"/>
+        <FILE id="yDQKdT" name="MidiClock.cpp" compile="1" resource="0" file="../../../src/engine/MidiClock.cpp"/>
+        <FILE id="ekL0ST" name="MidiClock.h" compile="0" resource="0" file="../../../src/engine/MidiClock.h"/>
+        <FILE id="V7LEZw" name="MidiEngine.cpp" compile="1" resource="0" file="../../../src/engine/MidiEngine.cpp"/>
+        <FILE id="v2BAPm" name="MidiEngine.h" compile="0" resource="0" file="../../../src/engine/MidiEngine.h"/>
+        <FILE id="DBlHH4" name="MidiIOMonitor.h" compile="0" resource="0" file="../../../src/engine/MidiIOMonitor.h"/>
+        <FILE id="xxzNiP" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
+        <FILE id="NM83ml" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
+        <FILE id="CkuusZ" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
+        <FILE id="tMVrEY" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
+        <FILE id="aXhM33" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
+        <FILE id="ZrPd8E" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
+        <FILE id="iNDwHQ" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
+        <FILE id="vkRlGO" name="Oversampler.cpp" compile="1" resource="0" file="../../../src/engine/Oversampler.cpp"/>
+        <FILE id="cbBKb4" name="Oversampler.h" compile="0" resource="0" file="../../../src/engine/Oversampler.h"/>
+        <FILE id="gg5rti" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
+        <FILE id="xYshP3" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
+        <FILE id="lGYUAz" name="RootGraph.cpp" compile="1" resource="0" file="../../../src/engine/RootGraph.cpp"/>
+        <FILE id="qiFAIv" name="RootGraph.h" compile="0" resource="0" file="../../../src/engine/RootGraph.h"/>
+        <FILE id="M6K2U8" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>
+        <FILE id="WmhXP7" name="Transport.cpp" compile="1" resource="0" file="../../../src/engine/Transport.cpp"/>
+        <FILE id="TTGZ0J" name="Transport.h" compile="0" resource="0" file="../../../src/engine/Transport.h"/>
+        <FILE id="ZcWP72" name="VelocityCurve.h" compile="0" resource="0" file="../../../src/engine/VelocityCurve.h"/>
       </GROUP>
       <GROUP id="{982D006F-6443-91A9-9E3F-7ED3734B082A}" name="gui">
-        <GROUP id="{68459AB5-C696-7E16-78B5-2A3391B85822}" name="nodes">
-          <FILE id="GI45Et" name="AudioIONodeEditor.h" compile="0" resource="0"
+        <GROUP id="{7D1CF093-FFA2-FE1B-6CEE-8048DF5EBB42}" name="nodes">
+          <FILE id="vZOkmj" name="AudioIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/AudioIONodeEditor.h"/>
-          <FILE id="Tq9KQB" name="AudioRouterEditor.cpp" compile="1" resource="0"
+          <FILE id="JnCGli" name="AudioRouterEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/AudioRouterEditor.cpp"/>
-          <FILE id="leiN8X" name="AudioRouterEditor.h" compile="0" resource="0"
+          <FILE id="fxMVTD" name="AudioRouterEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/AudioRouterEditor.h"/>
-          <FILE id="TY9cYU" name="CompressorNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="X05ci3" name="CompressorNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/CompressorNodeEditor.cpp"/>
-          <FILE id="XqgRVm" name="CompressorNodeEditor.h" compile="0" resource="0"
+          <FILE id="PFPn7n" name="CompressorNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/CompressorNodeEditor.h"/>
-          <FILE id="BbxDQW" name="EQFilterNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="tlNW17" name="EQFilterNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/EQFilterNodeEditor.cpp"/>
-          <FILE id="Zki1qZ" name="EQFilterNodeEditor.h" compile="0" resource="0"
+          <FILE id="UctKOY" name="EQFilterNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/EQFilterNodeEditor.h"/>
-          <FILE id="YCOXGY" name="GenericNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="dWQ69L" name="GenericNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/GenericNodeEditor.cpp"/>
-          <FILE id="otqGHk" name="GenericNodeEditor.h" compile="0" resource="0"
+          <FILE id="wXL9Kh" name="GenericNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/GenericNodeEditor.h"/>
-          <FILE id="HEhCYJ" name="KnobsComponent.cpp" compile="1" resource="0"
+          <FILE id="Fk6GMs" name="KnobsComponent.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/KnobsComponent.cpp"/>
-          <FILE id="XFv7wW" name="KnobsComponent.h" compile="0" resource="0"
+          <FILE id="qMBn4G" name="KnobsComponent.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/KnobsComponent.h"/>
-          <FILE id="pEobr9" name="LuaNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="Ie7Cvz" name="LuaNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/LuaNodeEditor.cpp"/>
-          <FILE id="BaxZ5E" name="LuaNodeEditor.h" compile="0" resource="0" file="../../../src/gui/nodes/LuaNodeEditor.h"/>
-          <FILE id="BJw2jz" name="MidiIONodeEditor.h" compile="0" resource="0"
+          <FILE id="gv8oqn" name="LuaNodeEditor.h" compile="0" resource="0" file="../../../src/gui/nodes/LuaNodeEditor.h"/>
+          <FILE id="rgrLxK" name="MidiIONodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiIONodeEditor.h"/>
-          <FILE id="wEX5Vm" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="jq6fvc" name="MidiMonitorNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiMonitorNodeEditor.cpp"/>
-          <FILE id="jLEFbY" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
+          <FILE id="tqUAGr" name="MidiMonitorNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiMonitorNodeEditor.h"/>
-          <FILE id="j4v4N7" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
+          <FILE id="qDOd36" name="MidiProgramMapEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.cpp"/>
-          <FILE id="Z1mbh6" name="MidiProgramMapEditor.h" compile="0" resource="0"
+          <FILE id="J7NS4O" name="MidiProgramMapEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiProgramMapEditor.h"/>
-          <FILE id="kG2DSN" name="MidiRouterEditor.cpp" compile="1" resource="0"
+          <FILE id="l0APp2" name="MidiRouterEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/MidiRouterEditor.cpp"/>
-          <FILE id="PTi32n" name="MidiRouterEditor.h" compile="0" resource="0"
+          <FILE id="aXfkvf" name="MidiRouterEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/MidiRouterEditor.h"/>
-          <FILE id="mmKmAo" name="NodeEditorComponent.cpp" compile="1" resource="0"
+          <FILE id="f7ToOr" name="NodeEditorComponent.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/NodeEditorComponent.cpp"/>
-          <FILE id="mH15wf" name="NodeEditorComponent.h" compile="0" resource="0"
+          <FILE id="CGfBFg" name="NodeEditorComponent.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/NodeEditorComponent.h"/>
-          <FILE id="hFMzjA" name="OSCReceiverNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="nAjgkz" name="OSCReceiverNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.cpp"/>
-          <FILE id="wtfsMj" name="OSCReceiverNodeEditor.h" compile="0" resource="0"
+          <FILE id="d6Dokl" name="OSCReceiverNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.h"/>
-          <FILE id="r6tIjb" name="OSCSenderNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="ielpq9" name="OSCSenderNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/OSCSenderNodeEditor.cpp"/>
-          <FILE id="VyM0zC" name="OSCSenderNodeEditor.h" compile="0" resource="0"
+          <FILE id="tqQ2gA" name="OSCSenderNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/OSCSenderNodeEditor.h"/>
-          <FILE id="qxlwm5" name="ScriptNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="EwGVYA" name="ScriptNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/ScriptNodeEditor.cpp"/>
-          <FILE id="IxBnKr" name="ScriptNodeEditor.h" compile="0" resource="0"
+          <FILE id="BON5Ev" name="ScriptNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/ScriptNodeEditor.h"/>
-          <FILE id="RVbvjx" name="VolumeNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="iJ308S" name="VolumeNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/VolumeNodeEditor.cpp"/>
-          <FILE id="lqqJj5" name="VolumeNodeEditor.h" compile="0" resource="0"
+          <FILE id="dVWPr5" name="VolumeNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/VolumeNodeEditor.h"/>
         </GROUP>
-        <GROUP id="{5A381665-FBCB-094C-92CD-F3B8E6F19307}" name="properties">
-          <FILE id="BOUSLe" name="MidiMultiChannelPropertyComponent.h" compile="0"
+        <GROUP id="{012E108F-5511-CDF0-ECE9-5AD175C2FF18}" name="properties">
+          <FILE id="P3XUyl" name="MidiMultiChannelPropertyComponent.h" compile="0"
                 resource="0" file="../../../src/gui/properties/MidiMultiChannelPropertyComponent.h"/>
-          <FILE id="XOvWno" name="NodeProperties.cpp" compile="1" resource="0"
+          <FILE id="fsF7qu" name="NodeProperties.cpp" compile="1" resource="0"
                 file="../../../src/gui/properties/NodeProperties.cpp"/>
-          <FILE id="ifEk58" name="NodeProperties.h" compile="0" resource="0"
+          <FILE id="HYM0J5" name="NodeProperties.h" compile="0" resource="0"
                 file="../../../src/gui/properties/NodeProperties.h"/>
-          <FILE id="nA48dr" name="NodePropertyPanel.cpp" compile="1" resource="0"
+          <FILE id="P6lQfI" name="NodePropertyPanel.cpp" compile="1" resource="0"
                 file="../../../src/gui/properties/NodePropertyPanel.cpp"/>
-          <FILE id="B25zlw" name="NodePropertyPanel.h" compile="0" resource="0"
+          <FILE id="AUnhZ3" name="NodePropertyPanel.h" compile="0" resource="0"
                 file="../../../src/gui/properties/NodePropertyPanel.h"/>
         </GROUP>
-        <GROUP id="{F9E24913-E0C1-0169-D5D6-448ED71D2439}" name="scripting"/>
-        <GROUP id="{A1821B1E-A115-809D-7493-A2A90CC7AEA7}" name="views">
-          <FILE id="NJCBew" name="ContentView.cpp" compile="1" resource="0" file="../../../src/gui/views/ContentView.cpp"/>
-          <FILE id="cyV6me" name="ContentView.h" compile="0" resource="0" file="../../../src/gui/views/ContentView.h"/>
-          <FILE id="azdVBk" name="ControllerDevicesView.cpp" compile="1" resource="0"
+        <GROUP id="{4B9AF08F-940A-DD53-562B-E1EE40790746}" name="views">
+          <FILE id="VzhGSQ" name="ContentView.cpp" compile="1" resource="0" file="../../../src/gui/views/ContentView.cpp"/>
+          <FILE id="sk2qOl" name="ContentView.h" compile="0" resource="0" file="../../../src/gui/views/ContentView.h"/>
+          <FILE id="d5wCpA" name="ControllerDevicesView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/ControllerDevicesView.cpp"/>
-          <FILE id="Dadyhe" name="ControllerDevicesView.h" compile="0" resource="0"
+          <FILE id="MXBQSL" name="ControllerDevicesView.h" compile="0" resource="0"
                 file="../../../src/gui/views/ControllerDevicesView.h"/>
-          <FILE id="QpFl4o" name="ControllerMapsView.cpp" compile="1" resource="0"
+          <FILE id="g75KSl" name="ControllerMapsView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/ControllerMapsView.cpp"/>
-          <FILE id="HG7zRV" name="ControllerMapsView.h" compile="0" resource="0"
+          <FILE id="znzMq7" name="ControllerMapsView.h" compile="0" resource="0"
                 file="../../../src/gui/views/ControllerMapsView.h"/>
-          <FILE id="s6UOJu" name="EmptyContentView.h" compile="0" resource="0"
+          <FILE id="aB9LLb" name="EmptyContentView.h" compile="0" resource="0"
                 file="../../../src/gui/views/EmptyContentView.h"/>
-          <FILE id="C5cG4X" name="GraphDisplayView.h" compile="0" resource="0"
+          <FILE id="zKzqQy" name="GraphDisplayView.h" compile="0" resource="0"
                 file="../../../src/gui/views/GraphDisplayView.h"/>
-          <FILE id="eYFmGC" name="GraphEditorView.cpp" compile="1" resource="0"
+          <FILE id="AWImtm" name="GraphEditorView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/GraphEditorView.cpp"/>
-          <FILE id="SdQlvP" name="GraphEditorView.h" compile="0" resource="0"
+          <FILE id="RDFbHW" name="GraphEditorView.h" compile="0" resource="0"
                 file="../../../src/gui/views/GraphEditorView.h"/>
-          <FILE id="zgIwnJ" name="GraphMixerView.cpp" compile="1" resource="0"
+          <FILE id="wLETdd" name="GraphMixerView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/GraphMixerView.cpp"/>
-          <FILE id="iBiK8s" name="GraphMixerView.h" compile="0" resource="0"
+          <FILE id="Rob91m" name="GraphMixerView.h" compile="0" resource="0"
                 file="../../../src/gui/views/GraphMixerView.h"/>
-          <FILE id="xxSy0Y" name="GraphSettingsView.cpp" compile="1" resource="0"
+          <FILE id="Xjy316" name="GraphSettingsView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/GraphSettingsView.cpp"/>
-          <FILE id="kgERNm" name="GraphSettingsView.h" compile="0" resource="0"
+          <FILE id="vMazS4" name="GraphSettingsView.h" compile="0" resource="0"
                 file="../../../src/gui/views/GraphSettingsView.h"/>
-          <FILE id="dmzBVt" name="KeymapEditorView.cpp" compile="1" resource="0"
+          <FILE id="FAi4MW" name="KeymapEditorView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/KeymapEditorView.cpp"/>
-          <FILE id="Ly02qA" name="KeymapEditorView.h" compile="0" resource="0"
+          <FILE id="JfFw4Y" name="KeymapEditorView.h" compile="0" resource="0"
                 file="../../../src/gui/views/KeymapEditorView.h"/>
-          <FILE id="klHOqk" name="LuaConsoleView.cpp" compile="1" resource="0"
+          <FILE id="litjj4" name="LuaConsoleView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/LuaConsoleView.cpp"/>
-          <FILE id="AzpkoM" name="LuaConsoleView.h" compile="0" resource="0"
+          <FILE id="zg53kv" name="LuaConsoleView.h" compile="0" resource="0"
                 file="../../../src/gui/views/LuaConsoleView.h"/>
-          <FILE id="gRlMH2" name="NavigationView.cpp" compile="1" resource="0"
+          <FILE id="Lc25hO" name="NavigationView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/NavigationView.cpp"/>
-          <FILE id="lmOOBS" name="NavigationView.h" compile="0" resource="0"
+          <FILE id="IfxPtT" name="NavigationView.h" compile="0" resource="0"
                 file="../../../src/gui/views/NavigationView.h"/>
-          <FILE id="oWz0xx" name="NodeChannelStripView.cpp" compile="1" resource="0"
+          <FILE id="hJCZT0" name="NodeChannelStripView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/NodeChannelStripView.cpp"/>
-          <FILE id="HInGWr" name="NodeChannelStripView.h" compile="0" resource="0"
+          <FILE id="IYVkKl" name="NodeChannelStripView.h" compile="0" resource="0"
                 file="../../../src/gui/views/NodeChannelStripView.h"/>
-          <FILE id="q3kDww" name="NodeEditorContentView.cpp" compile="1" resource="0"
+          <FILE id="doxqc6" name="NodeEditorContentView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/NodeEditorContentView.cpp"/>
-          <FILE id="wM8dqL" name="NodeEditorContentView.h" compile="0" resource="0"
+          <FILE id="lX2eTx" name="NodeEditorContentView.h" compile="0" resource="0"
                 file="../../../src/gui/views/NodeEditorContentView.h"/>
-          <FILE id="kE73vQ" name="NodeMidiContentView.cpp" compile="1" resource="0"
+          <FILE id="kxUV8p" name="NodeMidiContentView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/NodeMidiContentView.cpp"/>
-          <FILE id="oq9ekj" name="NodeMidiContentView.h" compile="0" resource="0"
+          <FILE id="eTbJzm" name="NodeMidiContentView.h" compile="0" resource="0"
                 file="../../../src/gui/views/NodeMidiContentView.h"/>
-          <FILE id="yEAHfl" name="NodePortsTableView.cpp" compile="1" resource="0"
+          <FILE id="OaPjkX" name="NodePortsTableView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/NodePortsTableView.cpp"/>
-          <FILE id="Mghcf0" name="NodePortsTableView.h" compile="0" resource="0"
+          <FILE id="tm1OdH" name="NodePortsTableView.h" compile="0" resource="0"
                 file="../../../src/gui/views/NodePortsTableView.h"/>
-          <FILE id="pwY8ZR" name="PluginsPanelView.cpp" compile="1" resource="0"
+          <FILE id="RK4ljj" name="PluginsPanelView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/PluginsPanelView.cpp"/>
-          <FILE id="Uvt2cU" name="PluginsPanelView.h" compile="0" resource="0"
+          <FILE id="NeSz8E" name="PluginsPanelView.h" compile="0" resource="0"
                 file="../../../src/gui/views/PluginsPanelView.h"/>
-          <FILE id="xMF84P" name="SessionSettingsView.cpp" compile="1" resource="0"
+          <FILE id="RQaHJm" name="SessionSettingsView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/SessionSettingsView.cpp"/>
-          <FILE id="UL6xvy" name="SessionSettingsView.h" compile="0" resource="0"
+          <FILE id="bDWOJD" name="SessionSettingsView.h" compile="0" resource="0"
                 file="../../../src/gui/views/SessionSettingsView.h"/>
-          <FILE id="QEgCO5" name="SessionTreeContentView.cpp" compile="1" resource="0"
+          <FILE id="DajJFi" name="SessionTreeContentView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/SessionTreeContentView.cpp"/>
-          <FILE id="oozmjZ" name="SessionTreeContentView.h" compile="0" resource="0"
+          <FILE id="Y479eV" name="SessionTreeContentView.h" compile="0" resource="0"
                 file="../../../src/gui/views/SessionTreeContentView.h"/>
-          <FILE id="mgNhJU" name="VirtualKeyboardView.cpp" compile="1" resource="0"
+          <FILE id="yWgczB" name="VirtualKeyboardView.cpp" compile="1" resource="0"
                 file="../../../src/gui/views/VirtualKeyboardView.cpp"/>
-          <FILE id="CsqvJu" name="VirtualKeyboardView.h" compile="0" resource="0"
+          <FILE id="eTzKSR" name="VirtualKeyboardView.h" compile="0" resource="0"
                 file="../../../src/gui/views/VirtualKeyboardView.h"/>
         </GROUP>
-        <GROUP id="{4252D7DA-E577-A4CC-E4B3-BF63474D3ED8}" name="widgets">
-          <FILE id="SIEfme" name="AudioDeviceSelectorComponent.cpp" compile="1"
+        <GROUP id="{3716847B-E00F-DEB5-9306-C16F72361113}" name="widgets">
+          <FILE id="Xunv4h" name="AudioDeviceSelectorComponent.cpp" compile="1"
                 resource="0" file="../../../src/gui/widgets/AudioDeviceSelectorComponent.cpp"/>
-          <FILE id="OOTi9J" name="AudioDeviceSelectorComponent.h" compile="0"
+          <FILE id="sLwncx" name="AudioDeviceSelectorComponent.h" compile="0"
                 resource="0" file="../../../src/gui/widgets/AudioDeviceSelectorComponent.h"/>
-          <FILE id="oDXVU8" name="BreadCrumbComponent.h" compile="0" resource="0"
+          <FILE id="YzyhLh" name="BreadCrumbComponent.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/BreadCrumbComponent.h"/>
-          <FILE id="uzbsBL" name="Console.cpp" compile="1" resource="0" file="../../../src/gui/widgets/Console.cpp"/>
-          <FILE id="GBxiMf" name="Console.h" compile="0" resource="0" file="../../../src/gui/widgets/Console.h"/>
-          <FILE id="K4YDSK" name="HorizontalListBox.cpp" compile="1" resource="0"
+          <FILE id="JWXU2U" name="Console.cpp" compile="1" resource="0" file="../../../src/gui/widgets/Console.cpp"/>
+          <FILE id="f5jF8J" name="Console.h" compile="0" resource="0" file="../../../src/gui/widgets/Console.h"/>
+          <FILE id="DNNUs7" name="HorizontalListBox.cpp" compile="1" resource="0"
                 file="../../../src/gui/widgets/HorizontalListBox.cpp"/>
-          <FILE id="usK5NC" name="HorizontalListBox.h" compile="0" resource="0"
+          <FILE id="z95bzN" name="HorizontalListBox.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/HorizontalListBox.h"/>
-          <FILE id="aiiETC" name="LogListBox.h" compile="0" resource="0" file="../../../src/gui/widgets/LogListBox.h"/>
-          <FILE id="zLUJae" name="LuaConsole.cpp" compile="1" resource="0" file="../../../src/gui/widgets/LuaConsole.cpp"/>
-          <FILE id="XQuyba" name="LuaConsole.h" compile="0" resource="0" file="../../../src/gui/widgets/LuaConsole.h"/>
-          <FILE id="awro9M" name="MidiBlinker.cpp" compile="1" resource="0" file="../../../src/gui/widgets/MidiBlinker.cpp"/>
-          <FILE id="UH6mJU" name="MidiBlinker.h" compile="0" resource="0" file="../../../src/gui/widgets/MidiBlinker.h"/>
-          <FILE id="VtYq94" name="MidiChannelSelectComponent.h" compile="0" resource="0"
+          <FILE id="DvNFUV" name="LogListBox.h" compile="0" resource="0" file="../../../src/gui/widgets/LogListBox.h"/>
+          <FILE id="HwGg0R" name="LuaConsole.cpp" compile="1" resource="0" file="../../../src/gui/widgets/LuaConsole.cpp"/>
+          <FILE id="uXfvLt" name="LuaConsole.h" compile="0" resource="0" file="../../../src/gui/widgets/LuaConsole.h"/>
+          <FILE id="vZhE0q" name="MidiBlinker.cpp" compile="1" resource="0" file="../../../src/gui/widgets/MidiBlinker.cpp"/>
+          <FILE id="wqGybf" name="MidiBlinker.h" compile="0" resource="0" file="../../../src/gui/widgets/MidiBlinker.h"/>
+          <FILE id="QlMHrW" name="MidiChannelSelectComponent.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/MidiChannelSelectComponent.h"/>
-          <FILE id="jpdcC3" name="NodeListComboBox.h" compile="0" resource="0"
+          <FILE id="p6o9lt" name="NodeListComboBox.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/NodeListComboBox.h"/>
-          <FILE id="rosjS4" name="NodeMidiProgramComponent.cpp" compile="1" resource="0"
+          <FILE id="sktPQO" name="NodeMidiProgramComponent.cpp" compile="1" resource="0"
                 file="../../../src/gui/widgets/NodeMidiProgramComponent.cpp"/>
-          <FILE id="EbN9Hm" name="NodeMidiProgramComponent.h" compile="0" resource="0"
+          <FILE id="Gpv7Fc" name="NodeMidiProgramComponent.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/NodeMidiProgramComponent.h"/>
-          <FILE id="bF3n2h" name="SessionGraphsListBox.cpp" compile="1" resource="0"
+          <FILE id="BHuKIw" name="SessionGraphsListBox.cpp" compile="1" resource="0"
                 file="../../../src/gui/widgets/SessionGraphsListBox.cpp"/>
-          <FILE id="hpuu2N" name="SessionGraphsListBox.h" compile="0" resource="0"
+          <FILE id="xrSXgM" name="SessionGraphsListBox.h" compile="0" resource="0"
                 file="../../../src/gui/widgets/SessionGraphsListBox.h"/>
-          <FILE id="pRkO6L" name="Spinner.h" compile="0" resource="0" file="../../../src/gui/widgets/Spinner.h"/>
+          <FILE id="smwI9t" name="Spinner.h" compile="0" resource="0" file="../../../src/gui/widgets/Spinner.h"/>
         </GROUP>
         <GROUP id="{9C2C9577-5998-2497-46E5-6C7A8E59097A}" name="workspace">
-          <FILE id="WX8pNi" name="ContentViewPanel.h" compile="0" resource="0"
+          <FILE id="l3pbsD" name="ContentViewPanel.h" compile="0" resource="0"
                 file="../../../src/gui/workspace/ContentViewPanel.h"/>
-          <FILE id="I8u85k" name="GraphEditorPanel.h" compile="0" resource="0"
+          <FILE id="Ov3rvU" name="GraphEditorPanel.h" compile="0" resource="0"
                 file="../../../src/gui/workspace/GraphEditorPanel.h"/>
-          <FILE id="R5xRDP" name="GraphMixerPanel.h" compile="0" resource="0"
+          <FILE id="JIVbhy" name="GraphMixerPanel.h" compile="0" resource="0"
                 file="../../../src/gui/workspace/GraphMixerPanel.h"/>
-          <FILE id="fJfSXu" name="PanelTypes.cpp" compile="1" resource="0" file="../../../src/gui/workspace/PanelTypes.cpp"/>
-          <FILE id="q8WLYD" name="PanelTypes.h" compile="0" resource="0" file="../../../src/gui/workspace/PanelTypes.h"/>
-          <FILE id="fhfsMk" name="PluginsPanel.cpp" compile="1" resource="0"
+          <FILE id="zHlUis" name="PanelTypes.cpp" compile="1" resource="0" file="../../../src/gui/workspace/PanelTypes.cpp"/>
+          <FILE id="rUNck3" name="PanelTypes.h" compile="0" resource="0" file="../../../src/gui/workspace/PanelTypes.h"/>
+          <FILE id="FY4zYt" name="PluginsPanel.cpp" compile="1" resource="0"
                 file="../../../src/gui/workspace/PluginsPanel.cpp"/>
-          <FILE id="k7ih56" name="PluginsPanel.h" compile="0" resource="0" file="../../../src/gui/workspace/PluginsPanel.h"/>
-          <FILE id="ZCiqDF" name="VirtualKeyboardPanel.h" compile="0" resource="0"
+          <FILE id="Ren9LI" name="PluginsPanel.h" compile="0" resource="0" file="../../../src/gui/workspace/PluginsPanel.h"/>
+          <FILE id="p0wRdD" name="VirtualKeyboardPanel.h" compile="0" resource="0"
                 file="../../../src/gui/workspace/VirtualKeyboardPanel.h"/>
-          <FILE id="IQOSua" name="WorkspacePanel.h" compile="0" resource="0"
+          <FILE id="IBzB9V" name="WorkspacePanel.h" compile="0" resource="0"
                 file="../../../src/gui/workspace/WorkspacePanel.h"/>
         </GROUP>
-        <FILE id="uaoFoa" name="AboutComponent.cpp" compile="1" resource="0"
+        <FILE id="clrSFy" name="AboutComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/AboutComponent.cpp"/>
-        <FILE id="RwsgRn" name="AboutComponent.h" compile="0" resource="0"
+        <FILE id="QPcaa6" name="AboutComponent.h" compile="0" resource="0"
               file="../../../src/gui/AboutComponent.h"/>
-        <FILE id="GxYJE9" name="Artist.h" compile="0" resource="0" file="../../../src/gui/Artist.h"/>
-        <FILE id="QuAplc" name="AssetTreeView.cpp" compile="1" resource="0"
+        <FILE id="I2hc6U" name="Artist.h" compile="0" resource="0" file="../../../src/gui/Artist.h"/>
+        <FILE id="sB6sZk" name="AssetTreeView.cpp" compile="1" resource="0"
               file="../../../src/gui/AssetTreeView.cpp"/>
-        <FILE id="eT3u7D" name="AssetTreeView.h" compile="0" resource="0" file="../../../src/gui/AssetTreeView.h"/>
-        <FILE id="zdno91" name="AudioIOPanelView.cpp" compile="1" resource="0"
+        <FILE id="igVWHU" name="AssetTreeView.h" compile="0" resource="0" file="../../../src/gui/AssetTreeView.h"/>
+        <FILE id="EufysJ" name="AudioIOPanelView.cpp" compile="1" resource="0"
               file="../../../src/gui/AudioIOPanelView.cpp"/>
-        <FILE id="TjivTo" name="AudioIOPanelView.h" compile="0" resource="0"
+        <FILE id="KZZTVg" name="AudioIOPanelView.h" compile="0" resource="0"
               file="../../../src/gui/AudioIOPanelView.h"/>
-        <FILE id="Y3FWQA" name="BlockComponent.cpp" compile="1" resource="0"
+        <FILE id="x4G3hO" name="BlockComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/BlockComponent.cpp"/>
-        <FILE id="NhhizW" name="BlockComponent.h" compile="0" resource="0"
+        <FILE id="iSVEJE" name="BlockComponent.h" compile="0" resource="0"
               file="../../../src/gui/BlockComponent.h"/>
-        <FILE id="UIEEAC" name="Buttons.cpp" compile="1" resource="0" file="../../../src/gui/Buttons.cpp"/>
-        <FILE id="RtmmTo" name="Buttons.h" compile="0" resource="0" file="../../../src/gui/Buttons.h"/>
-        <FILE id="FOvfpe" name="ChannelStripComponent.cpp" compile="1" resource="0"
+        <FILE id="uIv2f1" name="Buttons.cpp" compile="1" resource="0" file="../../../src/gui/Buttons.cpp"/>
+        <FILE id="rsO8Os" name="Buttons.h" compile="0" resource="0" file="../../../src/gui/Buttons.h"/>
+        <FILE id="DwHN7o" name="ChannelStripComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/ChannelStripComponent.cpp"/>
-        <FILE id="WtePxX" name="ChannelStripComponent.h" compile="0" resource="0"
+        <FILE id="FCVgPb" name="ChannelStripComponent.h" compile="0" resource="0"
               file="../../../src/gui/ChannelStripComponent.h"/>
-        <FILE id="IcqMo7" name="ConnectionGrid.cpp" compile="1" resource="0"
+        <FILE id="rP16bJ" name="ConnectionGrid.cpp" compile="1" resource="0"
               file="../../../src/gui/ConnectionGrid.cpp"/>
-        <FILE id="FfejWh" name="ConnectionGrid.h" compile="0" resource="0"
+        <FILE id="LT5VXJ" name="ConnectionGrid.h" compile="0" resource="0"
               file="../../../src/gui/ConnectionGrid.h"/>
-        <FILE id="T4AVKa" name="ContentComponent.cpp" compile="1" resource="0"
+        <FILE id="sqMyhJ" name="ContentComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/ContentComponent.cpp"/>
-        <FILE id="TPPfAK" name="ContentComponent.h" compile="0" resource="0"
+        <FILE id="H1YxnA" name="ContentComponent.h" compile="0" resource="0"
               file="../../../src/gui/ContentComponent.h"/>
-        <FILE id="yno3MS" name="ContentComponentPro.cpp" compile="1" resource="0"
+        <FILE id="DZ3woU" name="ContentComponentPro.cpp" compile="1" resource="0"
               file="../../../src/gui/ContentComponentPro.cpp"/>
-        <FILE id="JkD3Ka" name="ContentComponentPro.h" compile="0" resource="0"
+        <FILE id="biYLNO" name="ContentComponentPro.h" compile="0" resource="0"
               file="../../../src/gui/ContentComponentPro.h"/>
-        <FILE id="nZ2q5B" name="ContentComponentSolo.cpp" compile="1" resource="0"
+        <FILE id="MIAzs2" name="ContentComponentSolo.cpp" compile="1" resource="0"
               file="../../../src/gui/ContentComponentSolo.cpp"/>
-        <FILE id="SGOXZu" name="ContentComponentSolo.h" compile="0" resource="0"
+        <FILE id="J8QuaK" name="ContentComponentSolo.h" compile="0" resource="0"
               file="../../../src/gui/ContentComponentSolo.h"/>
-        <FILE id="FdAMfY" name="ContextMenus.cpp" compile="1" resource="0"
+        <FILE id="E90eJ5" name="ContextMenus.cpp" compile="1" resource="0"
               file="../../../src/gui/ContextMenus.cpp"/>
-        <FILE id="P3u3Qi" name="ContextMenus.h" compile="0" resource="0" file="../../../src/gui/ContextMenus.h"/>
-        <FILE id="GWEwPv" name="GraphEditorComponent.cpp" compile="1" resource="0"
+        <FILE id="zowpXD" name="ContextMenus.h" compile="0" resource="0" file="../../../src/gui/ContextMenus.h"/>
+        <FILE id="qzzFS7" name="GraphEditorComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/GraphEditorComponent.cpp"/>
-        <FILE id="w3wxNL" name="GraphEditorComponent.h" compile="0" resource="0"
+        <FILE id="V5k7ih" name="GraphEditorComponent.h" compile="0" resource="0"
               file="../../../src/gui/GraphEditorComponent.h"/>
-        <FILE id="Pl0odO" name="GuiCommon.h" compile="0" resource="0" file="../../../src/gui/GuiCommon.h"/>
-        <FILE id="IvgSIp" name="Icons.cpp" compile="1" resource="0" file="../../../src/gui/Icons.cpp"/>
-        <FILE id="yw3Y26" name="Icons.h" compile="0" resource="0" file="../../../src/gui/Icons.h"/>
-        <FILE id="PRjOsz" name="LookAndFeel.cpp" compile="1" resource="0" file="../../../src/gui/LookAndFeel.cpp"/>
-        <FILE id="pAbA9Y" name="LookAndFeel.h" compile="0" resource="0" file="../../../src/gui/LookAndFeel.h"/>
-        <FILE id="pDuuXw" name="LuaTokeniser.cpp" compile="1" resource="0"
+        <FILE id="CKrHGK" name="GuiCommon.h" compile="0" resource="0" file="../../../src/gui/GuiCommon.h"/>
+        <FILE id="kLrWiF" name="Icons.cpp" compile="1" resource="0" file="../../../src/gui/Icons.cpp"/>
+        <FILE id="F8wuhO" name="Icons.h" compile="0" resource="0" file="../../../src/gui/Icons.h"/>
+        <FILE id="nqcw35" name="LookAndFeel.cpp" compile="1" resource="0" file="../../../src/gui/LookAndFeel.cpp"/>
+        <FILE id="DkqIsM" name="LookAndFeel.h" compile="0" resource="0" file="../../../src/gui/LookAndFeel.h"/>
+        <FILE id="HM2eQO" name="LuaTokeniser.cpp" compile="1" resource="0"
               file="../../../src/gui/LuaTokeniser.cpp"/>
-        <FILE id="h7Iq7M" name="LuaTokeniser.h" compile="0" resource="0" file="../../../src/gui/LuaTokeniser.h"/>
-        <FILE id="hW8Xso" name="MainMenu.cpp" compile="1" resource="0" file="../../../src/gui/MainMenu.cpp"/>
-        <FILE id="FEx29c" name="MainMenu.h" compile="0" resource="0" file="../../../src/gui/MainMenu.h"/>
-        <FILE id="Vsr0lH" name="MainWindow.cpp" compile="1" resource="0" file="../../../src/gui/MainWindow.cpp"/>
-        <FILE id="IxZ3oh" name="MainWindow.h" compile="0" resource="0" file="../../../src/gui/MainWindow.h"/>
-        <FILE id="zJtq0L" name="NavigationConcertinaPanel.cpp" compile="1"
+        <FILE id="OQ8NWC" name="LuaTokeniser.h" compile="0" resource="0" file="../../../src/gui/LuaTokeniser.h"/>
+        <FILE id="e76Kkc" name="MainMenu.cpp" compile="1" resource="0" file="../../../src/gui/MainMenu.cpp"/>
+        <FILE id="ZkHiKT" name="MainMenu.h" compile="0" resource="0" file="../../../src/gui/MainMenu.h"/>
+        <FILE id="Ovis1v" name="MainWindow.cpp" compile="1" resource="0" file="../../../src/gui/MainWindow.cpp"/>
+        <FILE id="EYplHf" name="MainWindow.h" compile="0" resource="0" file="../../../src/gui/MainWindow.h"/>
+        <FILE id="W201dr" name="NavigationConcertinaPanel.cpp" compile="1"
               resource="0" file="../../../src/gui/NavigationConcertinaPanel.cpp"/>
-        <FILE id="olLMbU" name="NavigationConcertinaPanel.h" compile="0" resource="0"
+        <FILE id="Z9gQyA" name="NavigationConcertinaPanel.h" compile="0" resource="0"
               file="../../../src/gui/NavigationConcertinaPanel.h"/>
-        <FILE id="hMasPB" name="NodeChannelStripComponent.h" compile="0" resource="0"
+        <FILE id="PiAKmd" name="NodeChannelStripComponent.h" compile="0" resource="0"
               file="../../../src/gui/NodeChannelStripComponent.h"/>
-        <FILE id="S1zk7o" name="NodeIOConfiguration.cpp" compile="1" resource="0"
+        <FILE id="L7qyJM" name="NodeEditorFactory.cpp" compile="1" resource="0"
+              file="../../../src/gui/NodeEditorFactory.cpp"/>
+        <FILE id="h180LC" name="NodeEditorFactory.h" compile="0" resource="0"
+              file="../../../src/gui/NodeEditorFactory.h"/>
+        <FILE id="dXgK4k" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../../../src/gui/NodeIOConfiguration.cpp"/>
-        <FILE id="SOoOTI" name="NodeIOConfiguration.h" compile="0" resource="0"
+        <FILE id="BqrNSE" name="NodeIOConfiguration.h" compile="0" resource="0"
               file="../../../src/gui/NodeIOConfiguration.h"/>
-        <FILE id="AVChVQ" name="NoteClipItem.h" compile="0" resource="0" file="../../../src/gui/NoteClipItem.h"/>
-        <FILE id="eruKGx" name="PluginManagerComponent.cpp" compile="1" resource="0"
+        <FILE id="nWtZ6d" name="NoteClipItem.h" compile="0" resource="0" file="../../../src/gui/NoteClipItem.h"/>
+        <FILE id="yHBcL9" name="PluginManagerComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/PluginManagerComponent.cpp"/>
-        <FILE id="BsMAnD" name="PluginManagerComponent.h" compile="0" resource="0"
+        <FILE id="im2849" name="PluginManagerComponent.h" compile="0" resource="0"
               file="../../../src/gui/PluginManagerComponent.h"/>
-        <FILE id="C5hjIB" name="PluginWindow.cpp" compile="1" resource="0"
+        <FILE id="gTgxcu" name="PluginWindow.cpp" compile="1" resource="0"
               file="../../../src/gui/PluginWindow.cpp"/>
-        <FILE id="gH7k2E" name="PluginWindow.h" compile="0" resource="0" file="../../../src/gui/PluginWindow.h"/>
-        <FILE id="oLoqz1" name="PreferencesComponent.cpp" compile="1" resource="0"
+        <FILE id="aFxgrL" name="PluginWindow.h" compile="0" resource="0" file="../../../src/gui/PluginWindow.h"/>
+        <FILE id="dNz59e" name="PreferencesComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/PreferencesComponent.cpp"/>
-        <FILE id="rOc26J" name="PreferencesComponent.h" compile="0" resource="0"
+        <FILE id="rim8Tk" name="PreferencesComponent.h" compile="0" resource="0"
               file="../../../src/gui/PreferencesComponent.h"/>
-        <FILE id="PyYqAo" name="RackContentView.cpp" compile="1" resource="0"
+        <FILE id="qvgxzi" name="RackContentView.cpp" compile="1" resource="0"
               file="../../../src/gui/RackContentView.cpp"/>
-        <FILE id="DaGTji" name="RackContentView.h" compile="0" resource="0"
+        <FILE id="uoD68t" name="RackContentView.h" compile="0" resource="0"
               file="../../../src/gui/RackContentView.h"/>
-        <FILE id="e5ed4H" name="SequencerClipItem.cpp" compile="1" resource="0"
+        <FILE id="vPyAQK" name="SequencerClipItem.cpp" compile="1" resource="0"
               file="../../../src/gui/SequencerClipItem.cpp"/>
-        <FILE id="Oa5iUE" name="SequencerClipItem.h" compile="0" resource="0"
+        <FILE id="y3e01c" name="SequencerClipItem.h" compile="0" resource="0"
               file="../../../src/gui/SequencerClipItem.h"/>
-        <FILE id="AwpBT0" name="SequencerComponent.cpp" compile="1" resource="0"
+        <FILE id="stBVcD" name="SequencerComponent.cpp" compile="1" resource="0"
               file="../../../src/gui/SequencerComponent.cpp"/>
-        <FILE id="frMRlM" name="SequencerComponent.h" compile="0" resource="0"
+        <FILE id="t7N0R2" name="SequencerComponent.h" compile="0" resource="0"
               file="../../../src/gui/SequencerComponent.h"/>
-        <FILE id="tc48Ov" name="SessionImportWizard.cpp" compile="1" resource="0"
+        <FILE id="gRSruf" name="SessionImportWizard.cpp" compile="1" resource="0"
               file="../../../src/gui/SessionImportWizard.cpp"/>
-        <FILE id="oaB1ap" name="SessionImportWizard.h" compile="0" resource="0"
+        <FILE id="b8KjmH" name="SessionImportWizard.h" compile="0" resource="0"
               file="../../../src/gui/SessionImportWizard.h"/>
-        <FILE id="wiJXfN" name="SessionTreePanel.cpp" compile="1" resource="0"
+        <FILE id="jjlZ2I" name="SessionTreePanel.cpp" compile="1" resource="0"
               file="../../../src/gui/SessionTreePanel.cpp"/>
-        <FILE id="CZrkTS" name="SessionTreePanel.h" compile="0" resource="0"
+        <FILE id="jXsjJy" name="SessionTreePanel.h" compile="0" resource="0"
               file="../../../src/gui/SessionTreePanel.h"/>
-        <FILE id="SzHZ2T" name="SystemTray.cpp" compile="1" resource="0" file="../../../src/gui/SystemTray.cpp"/>
-        <FILE id="DS3owR" name="SystemTray.h" compile="0" resource="0" file="../../../src/gui/SystemTray.h"/>
-        <FILE id="iCicoS" name="TempoAndMeterBar.h" compile="0" resource="0"
+        <FILE id="LO61D8" name="SystemTray.cpp" compile="1" resource="0" file="../../../src/gui/SystemTray.cpp"/>
+        <FILE id="VexhSw" name="SystemTray.h" compile="0" resource="0" file="../../../src/gui/SystemTray.h"/>
+        <FILE id="xhdsdi" name="TempoAndMeterBar.h" compile="0" resource="0"
               file="../../../src/gui/TempoAndMeterBar.h"/>
-        <FILE id="epSTBN" name="Timeline.h" compile="0" resource="0" file="../../../src/gui/Timeline.h"/>
-        <FILE id="NZRmjb" name="TransportBar.cpp" compile="1" resource="0"
+        <FILE id="oiuJzl" name="Timeline.h" compile="0" resource="0" file="../../../src/gui/Timeline.h"/>
+        <FILE id="quQBi3" name="TransportBar.cpp" compile="1" resource="0"
               file="../../../src/gui/TransportBar.cpp"/>
-        <FILE id="Pw81ci" name="TransportBar.h" compile="0" resource="0" file="../../../src/gui/TransportBar.h"/>
-        <FILE id="zWNnFe" name="TreeviewBase.cpp" compile="1" resource="0"
+        <FILE id="nD3tY3" name="TransportBar.h" compile="0" resource="0" file="../../../src/gui/TransportBar.h"/>
+        <FILE id="ojDy79" name="TreeviewBase.cpp" compile="1" resource="0"
               file="../../../src/gui/TreeviewBase.cpp"/>
-        <FILE id="cQpHS3" name="TreeviewBase.h" compile="0" resource="0" file="../../../src/gui/TreeviewBase.h"/>
-        <FILE id="m8eExU" name="ViewHelpers.cpp" compile="1" resource="0" file="../../../src/gui/ViewHelpers.cpp"/>
-        <FILE id="XUvKOU" name="ViewHelpers.h" compile="0" resource="0" file="../../../src/gui/ViewHelpers.h"/>
-        <FILE id="K0WfGB" name="Window.cpp" compile="1" resource="0" file="../../../src/gui/Window.cpp"/>
-        <FILE id="xBoo8b" name="Window.h" compile="0" resource="0" file="../../../src/gui/Window.h"/>
-        <FILE id="hUxJYu" name="WindowManager.cpp" compile="1" resource="0"
+        <FILE id="bONbUz" name="TreeviewBase.h" compile="0" resource="0" file="../../../src/gui/TreeviewBase.h"/>
+        <FILE id="q18dqa" name="ViewHelpers.cpp" compile="1" resource="0" file="../../../src/gui/ViewHelpers.cpp"/>
+        <FILE id="olxq6b" name="ViewHelpers.h" compile="0" resource="0" file="../../../src/gui/ViewHelpers.h"/>
+        <FILE id="zxtbgU" name="Window.cpp" compile="1" resource="0" file="../../../src/gui/Window.cpp"/>
+        <FILE id="kUaM4A" name="Window.h" compile="0" resource="0" file="../../../src/gui/Window.h"/>
+        <FILE id="eFrdue" name="WindowManager.cpp" compile="1" resource="0"
               file="../../../src/gui/WindowManager.cpp"/>
-        <FILE id="YQS5XG" name="WindowManager.h" compile="0" resource="0" file="../../../src/gui/WindowManager.h"/>
-        <FILE id="yeRct2" name="Workspace.cpp" compile="1" resource="0" file="../../../src/gui/Workspace.cpp"/>
-        <FILE id="shamiX" name="Workspace.h" compile="0" resource="0" file="../../../src/gui/Workspace.h"/>
+        <FILE id="oYLAVu" name="WindowManager.h" compile="0" resource="0" file="../../../src/gui/WindowManager.h"/>
+        <FILE id="faaBwx" name="Workspace.cpp" compile="1" resource="0" file="../../../src/gui/Workspace.cpp"/>
+        <FILE id="WBofDh" name="Workspace.h" compile="0" resource="0" file="../../../src/gui/Workspace.h"/>
       </GROUP>
-      <GROUP id="{A073F397-FC53-5911-2533-2620F45711C3}" name="messages">
-        <FILE id="Hzz2DV" name="ControllerDeviceMessages.h" compile="0" resource="0"
+      <GROUP id="{3230533E-E2F2-8908-234F-A791029DD9A7}" name="messages">
+        <FILE id="tWCrgB" name="ControllerDeviceMessages.h" compile="0" resource="0"
               file="../../../src/messages/ControllerDeviceMessages.h"/>
-        <FILE id="TG3qi8" name="GuiMessages.h" compile="0" resource="0" file="../../../src/messages/GuiMessages.h"/>
+        <FILE id="NBoCqs" name="GuiMessages.h" compile="0" resource="0" file="../../../src/messages/GuiMessages.h"/>
       </GROUP>
-      <GROUP id="{25B22726-1F35-EDB9-5F31-15CE636820BD}" name="scripting">
-        <FILE id="CDUji2" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>
-        <FILE id="sKaZnz" name="DSPScript.h" compile="0" resource="0" file="../../../src/scripting/DSPScript.h"/>
-        <FILE id="OPxJOP" name="DSPUIScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPUIScript.cpp"/>
-        <FILE id="MILe2u" name="DSPUIScript.h" compile="0" resource="0" file="../../../src/scripting/DSPUIScript.h"/>
-        <FILE id="DK6Cw9" name="JuceBindings.cpp" compile="1" resource="0"
+      <GROUP id="{6B13EB0C-80CA-7B34-203B-72708FA90BCA}" name="plugins">
+        <FILE id="qczX4R" name="PluginEditor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginEditor.cpp"/>
+        <FILE id="rCfCGN" name="PluginEditor.h" compile="0" resource="0" file="../../../src/plugins/PluginEditor.h"/>
+        <FILE id="SwpS7b" name="PluginProcessor.cpp" compile="1" resource="0"
+              file="../../../src/plugins/PluginProcessor.cpp"/>
+        <FILE id="e0ZNd4" name="PluginProcessor.h" compile="0" resource="0"
+              file="../../../src/plugins/PluginProcessor.h"/>
+      </GROUP>
+      <GROUP id="{D42C7360-8232-1EAA-E326-405EBD16BA1C}" name="scripting">
+        <FILE id="rS3V6H" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>
+        <FILE id="lE6yOZ" name="DSPScript.h" compile="0" resource="0" file="../../../src/scripting/DSPScript.h"/>
+        <FILE id="rlSRhD" name="DSPUIScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPUIScript.cpp"/>
+        <FILE id="c8ZUn4" name="DSPUIScript.h" compile="0" resource="0" file="../../../src/scripting/DSPUIScript.h"/>
+        <FILE id="MuftG8" name="JuceBindings.cpp" compile="1" resource="0"
               file="../../../src/scripting/JuceBindings.cpp"/>
-        <FILE id="J7VreA" name="LuaBindings.cpp" compile="1" resource="0" file="../../../src/scripting/LuaBindings.cpp"/>
-        <FILE id="hAc9Y6" name="LuaBindings.h" compile="0" resource="0" file="../../../src/scripting/LuaBindings.h"/>
-        <FILE id="ASM40K" name="LuaLib.cpp" compile="1" resource="0" file="../../../src/scripting/LuaLib.cpp"/>
-        <FILE id="UgCAWO" name="Script.cpp" compile="1" resource="0" file="../../../src/scripting/Script.cpp"/>
-        <FILE id="UcAfp2" name="Script.h" compile="0" resource="0" file="../../../src/scripting/Script.h"/>
-        <FILE id="Z1hMvN" name="ScriptDescription.cpp" compile="1" resource="0"
+        <FILE id="pt8UOD" name="LuaBindings.cpp" compile="1" resource="0" file="../../../src/scripting/LuaBindings.cpp"/>
+        <FILE id="vEXuWs" name="LuaBindings.h" compile="0" resource="0" file="../../../src/scripting/LuaBindings.h"/>
+        <FILE id="OgdUsn" name="LuaLib.cpp" compile="1" resource="0" file="../../../src/scripting/LuaLib.cpp"/>
+        <FILE id="gb1Oz7" name="Script.cpp" compile="1" resource="0" file="../../../src/scripting/Script.cpp"/>
+        <FILE id="Oj5nz8" name="Script.h" compile="0" resource="0" file="../../../src/scripting/Script.h"/>
+        <FILE id="XDAcAZ" name="ScriptDescription.cpp" compile="1" resource="0"
               file="../../../src/scripting/ScriptDescription.cpp"/>
-        <FILE id="kO5pqE" name="ScriptDescription.h" compile="0" resource="0"
+        <FILE id="mr46gH" name="ScriptDescription.h" compile="0" resource="0"
               file="../../../src/scripting/ScriptDescription.h"/>
-        <FILE id="NF0RA7" name="ScriptingEngine.cpp" compile="1" resource="0"
+        <FILE id="O0mfIa" name="ScriptingEngine.cpp" compile="1" resource="0"
               file="../../../src/scripting/ScriptingEngine.cpp"/>
-        <FILE id="WHxCCT" name="ScriptingEngine.h" compile="0" resource="0"
+        <FILE id="hU26fF" name="ScriptingEngine.h" compile="0" resource="0"
               file="../../../src/scripting/ScriptingEngine.h"/>
-        <FILE id="pTFpPz" name="ScriptInstance.h" compile="0" resource="0"
+        <FILE id="SPQMrY" name="ScriptInstance.h" compile="0" resource="0"
               file="../../../src/scripting/ScriptInstance.h"/>
-        <FILE id="KF5hZP" name="ScriptManager.cpp" compile="1" resource="0"
+        <FILE id="qkRE6D" name="ScriptManager.cpp" compile="1" resource="0"
               file="../../../src/scripting/ScriptManager.cpp"/>
-        <FILE id="fv1ua2" name="ScriptManager.h" compile="0" resource="0" file="../../../src/scripting/ScriptManager.h"/>
+        <FILE id="ZjFKn7" name="ScriptManager.h" compile="0" resource="0" file="../../../src/scripting/ScriptManager.h"/>
       </GROUP>
-      <GROUP id="{00FB9BB4-1431-B794-DF89-2408E43A08BB}" name="session">
-        <FILE id="TsTidS" name="Asset.cpp" compile="1" resource="0" file="../../../src/session/Asset.cpp"/>
-        <FILE id="Qnjrr5" name="Asset.h" compile="0" resource="0" file="../../../src/session/Asset.h"/>
-        <FILE id="umLkeG" name="AssetTree.cpp" compile="1" resource="0" file="../../../src/session/AssetTree.cpp"/>
-        <FILE id="Vjtwcu" name="AssetTree.h" compile="0" resource="0" file="../../../src/session/AssetTree.h"/>
-        <FILE id="M4FN7F" name="AssetType.h" compile="0" resource="0" file="../../../src/session/AssetType.h"/>
-        <FILE id="le2UCI" name="ClipModel.h" compile="0" resource="0" file="../../../src/session/ClipModel.h"/>
-        <FILE id="JMqfbF" name="CommandManager.h" compile="0" resource="0"
+      <GROUP id="{27C6DB6D-FE23-66FA-7DE8-6D9FA9B6E946}" name="session">
+        <FILE id="SD5t9W" name="Asset.cpp" compile="1" resource="0" file="../../../src/session/Asset.cpp"/>
+        <FILE id="yh3uWu" name="Asset.h" compile="0" resource="0" file="../../../src/session/Asset.h"/>
+        <FILE id="dREIEC" name="AssetTree.cpp" compile="1" resource="0" file="../../../src/session/AssetTree.cpp"/>
+        <FILE id="Vc09on" name="AssetTree.h" compile="0" resource="0" file="../../../src/session/AssetTree.h"/>
+        <FILE id="bXPmVZ" name="AssetType.h" compile="0" resource="0" file="../../../src/session/AssetType.h"/>
+        <FILE id="ZJfcFF" name="ClipModel.h" compile="0" resource="0" file="../../../src/session/ClipModel.h"/>
+        <FILE id="WK4Pp7" name="CommandManager.h" compile="0" resource="0"
               file="../../../src/session/CommandManager.h"/>
-        <FILE id="t4ZGDJ" name="ControllerDevice.cpp" compile="1" resource="0"
+        <FILE id="HvgRas" name="ControllerDevice.cpp" compile="1" resource="0"
               file="../../../src/session/ControllerDevice.cpp"/>
-        <FILE id="c3Lz7q" name="ControllerDevice.h" compile="0" resource="0"
+        <FILE id="aTeAUT" name="ControllerDevice.h" compile="0" resource="0"
               file="../../../src/session/ControllerDevice.h"/>
-        <FILE id="a9O8GY" name="DeviceManager.cpp" compile="1" resource="0"
+        <FILE id="vfpMM8" name="DeviceManager.cpp" compile="1" resource="0"
               file="../../../src/session/DeviceManager.cpp"/>
-        <FILE id="NPJLDb" name="DeviceManager.h" compile="0" resource="0" file="../../../src/session/DeviceManager.h"/>
-        <FILE id="JKSeo1" name="Graph.cpp" compile="1" resource="0" file="../../../src/session/Graph.cpp"/>
-        <FILE id="GcbLG9" name="Graph.h" compile="0" resource="0" file="../../../src/session/Graph.h"/>
-        <FILE id="L92aum" name="MediaManager.cpp" compile="1" resource="0"
+        <FILE id="IrxnnD" name="DeviceManager.h" compile="0" resource="0" file="../../../src/session/DeviceManager.h"/>
+        <FILE id="m9yhf7" name="Graph.cpp" compile="1" resource="0" file="../../../src/session/Graph.cpp"/>
+        <FILE id="uJ3Ecg" name="Graph.h" compile="0" resource="0" file="../../../src/session/Graph.h"/>
+        <FILE id="BAP7vC" name="MediaManager.cpp" compile="1" resource="0"
               file="../../../src/session/MediaManager.cpp"/>
-        <FILE id="ztmhSm" name="MediaManager.h" compile="0" resource="0" file="../../../src/session/MediaManager.h"/>
-        <FILE id="LNW7bT" name="MediaModel.h" compile="0" resource="0" file="../../../src/session/MediaModel.h"/>
-        <FILE id="Cs283l" name="MediaStorage.h" compile="0" resource="0" file="../../../src/session/MediaStorage.h"/>
-        <FILE id="sUW0OD" name="MidiClip.cpp" compile="1" resource="0" file="../../../src/session/MidiClip.cpp"/>
-        <FILE id="nRy0EF" name="MidiClip.h" compile="0" resource="0" file="../../../src/session/MidiClip.h"/>
-        <FILE id="qdpwOB" name="Module.h" compile="0" resource="0" file="../../../src/session/Module.h"/>
-        <FILE id="DYh1iN" name="Node.cpp" compile="1" resource="0" file="../../../src/session/Node.cpp"/>
-        <FILE id="NyKuTy" name="Node.h" compile="0" resource="0" file="../../../src/session/Node.h"/>
-        <FILE id="dZKn6z" name="Note.cpp" compile="1" resource="0" file="../../../src/session/Note.cpp"/>
-        <FILE id="no56Iq" name="Note.h" compile="0" resource="0" file="../../../src/session/Note.h"/>
-        <FILE id="Ll3OBF" name="NoteSequence.cpp" compile="1" resource="0"
+        <FILE id="pqRroJ" name="MediaManager.h" compile="0" resource="0" file="../../../src/session/MediaManager.h"/>
+        <FILE id="etY7YQ" name="MediaModel.h" compile="0" resource="0" file="../../../src/session/MediaModel.h"/>
+        <FILE id="cYlpC9" name="MediaStorage.h" compile="0" resource="0" file="../../../src/session/MediaStorage.h"/>
+        <FILE id="gpX009" name="MidiClip.cpp" compile="1" resource="0" file="../../../src/session/MidiClip.cpp"/>
+        <FILE id="jByLcy" name="MidiClip.h" compile="0" resource="0" file="../../../src/session/MidiClip.h"/>
+        <FILE id="OrEVNV" name="Module.h" compile="0" resource="0" file="../../../src/session/Module.h"/>
+        <FILE id="jDqT3n" name="Node.cpp" compile="1" resource="0" file="../../../src/session/Node.cpp"/>
+        <FILE id="Gion0s" name="Node.h" compile="0" resource="0" file="../../../src/session/Node.h"/>
+        <FILE id="yhTKme" name="Note.cpp" compile="1" resource="0" file="../../../src/session/Note.cpp"/>
+        <FILE id="ClbLmw" name="Note.h" compile="0" resource="0" file="../../../src/session/Note.h"/>
+        <FILE id="IJTNOC" name="NoteSequence.cpp" compile="1" resource="0"
               file="../../../src/session/NoteSequence.cpp"/>
-        <FILE id="zOvKr3" name="NoteSequence.h" compile="0" resource="0" file="../../../src/session/NoteSequence.h"/>
-        <FILE id="G0YRcT" name="PluginManager.cpp" compile="1" resource="0"
+        <FILE id="FXTcIh" name="NoteSequence.h" compile="0" resource="0" file="../../../src/session/NoteSequence.h"/>
+        <FILE id="SDcIUb" name="PluginManager.cpp" compile="1" resource="0"
               file="../../../src/session/PluginManager.cpp"/>
-        <FILE id="URgLB5" name="PluginManager.h" compile="0" resource="0" file="../../../src/session/PluginManager.h"/>
-        <FILE id="oM0aND" name="Presets.h" compile="0" resource="0" file="../../../src/session/Presets.h"/>
-        <FILE id="KL4JNn" name="Sequence.cpp" compile="1" resource="0" file="../../../src/session/Sequence.cpp"/>
-        <FILE id="c0g2F3" name="Sequence.h" compile="0" resource="0" file="../../../src/session/Sequence.h"/>
-        <FILE id="Yk3oVB" name="Session.cpp" compile="1" resource="0" file="../../../src/session/Session.cpp"/>
-        <FILE id="i0aFTr" name="Session.h" compile="0" resource="0" file="../../../src/session/Session.h"/>
-        <FILE id="nWNUHa" name="SessionTrack.cpp" compile="1" resource="0"
+        <FILE id="cqjp7K" name="PluginManager.h" compile="0" resource="0" file="../../../src/session/PluginManager.h"/>
+        <FILE id="FC0yKd" name="Presets.h" compile="0" resource="0" file="../../../src/session/Presets.h"/>
+        <FILE id="siJ6QZ" name="Sequence.cpp" compile="1" resource="0" file="../../../src/session/Sequence.cpp"/>
+        <FILE id="tYIlaO" name="Sequence.h" compile="0" resource="0" file="../../../src/session/Sequence.h"/>
+        <FILE id="jNScsz" name="Session.cpp" compile="1" resource="0" file="../../../src/session/Session.cpp"/>
+        <FILE id="wTgH9Y" name="Session.h" compile="0" resource="0" file="../../../src/session/Session.h"/>
+        <FILE id="lW9y84" name="SessionTrack.cpp" compile="1" resource="0"
               file="../../../src/session/SessionTrack.cpp"/>
-        <FILE id="YDBYze" name="TempoMap.h" compile="0" resource="0" file="../../../src/session/TempoMap.h"/>
-        <FILE id="bGc6Gm" name="TrackModel.h" compile="0" resource="0" file="../../../src/session/TrackModel.h"/>
+        <FILE id="ylIFst" name="TempoMap.h" compile="0" resource="0" file="../../../src/session/TempoMap.h"/>
+        <FILE id="snIA8c" name="TrackModel.h" compile="0" resource="0" file="../../../src/session/TrackModel.h"/>
       </GROUP>
-      <FILE id="YYqEfa" name="CapsLock.cpp" compile="1" resource="0" file="../../../src/CapsLock.cpp"/>
-      <FILE id="hAEmpB" name="CapsLock.h" compile="0" resource="0" file="../../../src/CapsLock.h"/>
-      <FILE id="CqUwPX" name="Commands.cpp" compile="1" resource="0" file="../../../src/Commands.cpp"/>
-      <FILE id="rFGvMq" name="Commands.h" compile="0" resource="0" file="../../../src/Commands.h"/>
-      <FILE id="YlCgcZ" name="Common.h" compile="0" resource="0" file="../../../src/Common.h"/>
-      <FILE id="mKjzvm" name="CommonConfig.h" compile="0" resource="0" file="../../../src/CommonConfig.h"/>
-      <FILE id="jR5x7A" name="DataPath.cpp" compile="1" resource="0" file="../../../src/DataPath.cpp"/>
-      <FILE id="MVHx4v" name="DataPath.h" compile="0" resource="0" file="../../../src/DataPath.h"/>
-      <FILE id="qUgpST" name="ScopedCallback.h" compile="0" resource="0"
+      <FILE id="gihj5D" name="CapsLock.cpp" compile="1" resource="0" file="../../../src/CapsLock.cpp"/>
+      <FILE id="OakOyi" name="CapsLock.h" compile="0" resource="0" file="../../../src/CapsLock.h"/>
+      <FILE id="RWxjtp" name="Commands.cpp" compile="1" resource="0" file="../../../src/Commands.cpp"/>
+      <FILE id="AejX3P" name="Commands.h" compile="0" resource="0" file="../../../src/Commands.h"/>
+      <FILE id="T2dWkD" name="Common.h" compile="0" resource="0" file="../../../src/Common.h"/>
+      <FILE id="AVXGKk" name="CommonConfig.h" compile="0" resource="0" file="../../../src/CommonConfig.h"/>
+      <FILE id="HqLIbg" name="DataPath.cpp" compile="1" resource="0" file="../../../src/DataPath.cpp"/>
+      <FILE id="Hxsb59" name="DataPath.h" compile="0" resource="0" file="../../../src/DataPath.h"/>
+      <FILE id="bVTU1x" name="ElementApp.h" compile="0" resource="0" file="../../../src/ElementApp.h"/>
+      <FILE id="NODng6" name="Globals.cpp" compile="1" resource="0" file="../../../src/Globals.cpp"/>
+      <FILE id="Lpe9nn" name="Globals.h" compile="0" resource="0" file="../../../src/Globals.h"/>
+      <FILE id="M9u3vr" name="Main.cc" compile="1" resource="0" file="../../../src/Main.cc"/>
+      <FILE id="it7Vwj" name="Messages.cpp" compile="1" resource="0" file="../../../src/Messages.cpp"/>
+      <FILE id="rPOeYY" name="Messages.h" compile="0" resource="0" file="../../../src/Messages.h"/>
+      <FILE id="CA51Nj" name="Module.h" compile="0" resource="0" file="../../../src/Module.h"/>
+      <FILE id="Ka9Y3A" name="PortCount.h" compile="0" resource="0" file="../../../src/PortCount.h"/>
+      <FILE id="ktufUf" name="RunMode.h" compile="0" resource="0" file="../../../src/RunMode.h"/>
+      <FILE id="CLJU4U" name="ScopedCallback.h" compile="0" resource="0"
             file="../../../src/ScopedCallback.h"/>
-      <FILE id="I7TUit" name="ElementApp.h" compile="0" resource="0" file="../../../src/ElementApp.h"/>
-      <FILE id="zqPFJd" name="Globals.cpp" compile="1" resource="0" file="../../../src/Globals.cpp"/>
-      <FILE id="jCV85f" name="Globals.h" compile="0" resource="0" file="../../../src/Globals.h"/>
-      <FILE id="jyZ1L0" name="Main.cc" compile="1" resource="0" file="../../../src/Main.cc"/>
-      <FILE id="TOw0jB" name="Messages.cpp" compile="1" resource="0" file="../../../src/Messages.cpp"/>
-      <FILE id="CgxPEi" name="Messages.h" compile="0" resource="0" file="../../../src/Messages.h"/>
-      <FILE id="lbUZkY" name="Module.h" compile="0" resource="0" file="../../../src/Module.h"/>
-      <FILE id="oxZqk6" name="ScopedFlag.h" compile="0" resource="0" file="../../../src/ScopedFlag.h"/>
-      <FILE id="mWN01d" name="Settings.cpp" compile="1" resource="0" file="../../../src/Settings.cpp"/>
-      <FILE id="sjUy2P" name="Settings.h" compile="0" resource="0" file="../../../src/Settings.h"/>
-      <FILE id="g1QV6a" name="Signals.h" compile="0" resource="0" file="../../../src/Signals.h"/>
-      <FILE id="XphKFN" name="URIs.h" compile="0" resource="0" file="../../../src/URIs.h"/>
-      <FILE id="w53qp6" name="URLs.h" compile="0" resource="0" file="../../../src/URLs.h"/>
-      <FILE id="BCXepS" name="Utils.cpp" compile="1" resource="0" file="../../../src/Utils.cpp"/>
-      <FILE id="a2apNX" name="Utils.h" compile="0" resource="0" file="../../../src/Utils.h"/>
-      <FILE id="zn8Tq3" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
-      <FILE id="lyaEpM" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
+      <FILE id="UkQf9q" name="ScopedFlag.h" compile="0" resource="0" file="../../../src/ScopedFlag.h"/>
+      <FILE id="St0uxN" name="Settings.cpp" compile="1" resource="0" file="../../../src/Settings.cpp"/>
+      <FILE id="qPqGKq" name="Settings.h" compile="0" resource="0" file="../../../src/Settings.h"/>
+      <FILE id="GaZCMT" name="Signals.h" compile="0" resource="0" file="../../../src/Signals.h"/>
+      <FILE id="aPRFKN" name="URIs.h" compile="0" resource="0" file="../../../src/URIs.h"/>
+      <FILE id="mMvhUG" name="URLs.h" compile="0" resource="0" file="../../../src/URLs.h"/>
+      <FILE id="VD3Ywe" name="Utils.cpp" compile="1" resource="0" file="../../../src/Utils.cpp"/>
+      <FILE id="Cu3721" name="Utils.h" compile="0" resource="0" file="../../../src/Utils.h"/>
+      <FILE id="nGeHDd" name="Version.cpp" compile="1" resource="0" file="../../../src/Version.cpp"/>
+      <FILE id="SFn2CJ" name="Version.h" compile="0" resource="0" file="../../../src/Version.h"/>
     </GROUP>
     <GROUP id="{4C0CA2D9-7E14-3C17-C3F1-4FF581D4DAE9}" name="Templates">
       <FILE id="qrZXVE" name="ElementTemplate.cpp" compile="0" resource="0"

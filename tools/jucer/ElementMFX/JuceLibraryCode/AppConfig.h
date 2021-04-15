@@ -15,9 +15,8 @@
 
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
-
 #include "CommonConfig.h"
-
+#include "../../Standalone/JuceLibraryCode/BinaryData.h"
 // [END_USER_CODE_SECTION]
 
 #include "JucePluginDefines.h"
@@ -188,6 +187,10 @@
 
 #ifndef    JUCE_CUSTOM_VST3_SDK
  //#define JUCE_CUSTOM_VST3_SDK 0
+#endif
+
+#ifndef    JUCE_VST3_HOST_CROSS_PLATFORM_UID
+ //#define JUCE_VST3_HOST_CROSS_PLATFORM_UID 0
 #endif
 
 //==============================================================================

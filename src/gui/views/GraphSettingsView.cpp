@@ -20,7 +20,7 @@
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
 #include "engine/VelocityCurve.h"
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"

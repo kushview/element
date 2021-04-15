@@ -24,7 +24,7 @@
 #include "engine/MidiPipe.h"
 #include "engine/MidiTranspose.h"
 #include "engine/nodes/SubGraphProcessor.h"
-#include "graph/RootGraph.h"
+#include "engine/RootGraph.h"
 #include "session/Node.h"
 
 namespace Element {
