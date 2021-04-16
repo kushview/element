@@ -52,9 +52,6 @@ ScriptNode::ScriptNode() noexcept
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
-    jassert (metadata.hasType (Tags::node));
-    metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_SCRIPT, nullptr);
 }
 
 ScriptNode::~ScriptNode()

@@ -200,7 +200,6 @@ public:
             lastInputGain = inputGain;
     }
 
-    ValueTree getMetadata() const { return metadata; }
     ValueTree createPortsData() const;
 
     bool isAudioIONode() const;
@@ -411,8 +410,6 @@ protected:
 
     //==========================================================================
     void triggerPortReset();
-
-    ValueTree metadata;
 
 private:
     friend class EngineController;

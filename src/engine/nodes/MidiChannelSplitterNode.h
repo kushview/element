@@ -29,12 +29,7 @@ class MidiChannelSplitterNode : public MidiFilterNode
 {
 public:
     MidiChannelSplitterNode() 
-        : MidiFilterNode (0)
-    {
-        jassert (metadata.hasType (Tags::node));
-        metadata.setProperty (Tags::format, "Element", nullptr);
-        metadata.setProperty (Tags::identifier, "element.midiChannelSplitter", nullptr);
-    }
+        : MidiFilterNode (0) {}
 
     ~MidiChannelSplitterNode() { }
 

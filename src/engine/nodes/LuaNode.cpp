@@ -716,9 +716,6 @@ LuaNode::LuaNode() noexcept
     : NodeObject (0)
 {
     context = std::make_unique<Context>();
-    jassert (metadata.hasType (Tags::node));
-    metadata.setProperty (Tags::format, EL_INTERNAL_FORMAT_NAME, nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_LUA, nullptr);
     loadScript (stereoAmpScript);
 }
 

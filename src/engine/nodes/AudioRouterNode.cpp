@@ -32,11 +32,7 @@ AudioRouterNode::AudioRouterNode (int ins, int outs)
       state (ins, outs),
       toggles (ins, outs),
       nextToggles (ins, outs)
-{
-    jassert (metadata.hasType (Tags::node));
-    metadata.setProperty (Tags::format, "Element", nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_AUDIO_ROUTER, nullptr);
-    
+{    
     fadeIn.setFadesIn (true);
     fadeIn.setLength (fadeLengthSeconds);
     fadeOut.setFadesIn (false);

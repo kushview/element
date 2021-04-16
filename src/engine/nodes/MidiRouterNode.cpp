@@ -34,10 +34,6 @@ MidiRouterNode::MidiRouterNode (int ins, int outs)
       toggles (ins, outs),
       nextToggles (ins, outs)
 {
-    jassert (metadata.hasType (Tags::node));
-    metadata.setProperty (Tags::format, "Element", nullptr);
-    metadata.setProperty (Tags::identifier, EL_INTERNAL_ID_MIDI_ROUTER, nullptr);
-
     clearPatches();
     initMidiOuts (midiOuts);
 

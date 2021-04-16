@@ -33,7 +33,6 @@ namespace Element {
 
 NodeObject::NodeObject (const PortList& portList)
     : nodeId (0),
-      metadata (Tags::node),
       isPrepared (false),
       enablement (*this),
       midiProgramLoader (*this),
@@ -50,7 +49,6 @@ NodeObject::NodeObject (const PortList& portList)
 
 NodeObject::NodeObject (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
-      metadata (Tags::node),
       isPrepared (false),
       enablement (*this),
       midiProgramLoader (*this),
@@ -60,8 +58,6 @@ NodeObject::NodeObject (const uint32 nodeId_) noexcept
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
     oversampler = std::make_unique<Oversampler<float>>();
-    metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
-            .setProperty (Slugs::type, getTypeString(), nullptr);
 }
 
 NodeObject::~NodeObject()
@@ -326,15 +322,11 @@ void NodeObject::prepare (const double newSampleRate,
         const int osFactor = jmax (1, getOversamplingFactor());
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
-        // TODO: move model code out of engine code
+        // FIXME: REMOVE: TODO: move model code out of engine code
         // VERIFY: this portion is actually needed. This was here to ensure
         // port information is available before setting up the RMS buffers
-        if (! isAudioIONode() && ! isMidiIONode())
-            resetPorts();
-
-        // VERIFY: this is needed.  GraphManager should be setting this
-        if (metadata.getProperty (Tags::bypass, false))
-            suspendProcessing (true);
+        // if (! isAudioIONode() && ! isMidiIONode())
+        //     refreshPorts();
 
         inRMS.clearQuick (true);
         for (int i = 0; i < getNumAudioInputs(); ++i)

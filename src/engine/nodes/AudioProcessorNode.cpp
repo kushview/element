@@ -24,16 +24,7 @@
 
 namespace Element {
 
-static void setAudioProcessorNodePropertiesFrom (const PluginDescription& pd, ValueTree& p)
-{
-    p.setProperty (Tags::format,        pd.pluginFormatName, nullptr);
-    p.setProperty (Tags::identifier,    pd.fileOrIdentifier, nullptr);
-    if (pd.pluginFormatName == "Element" && pd.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
-        p.setProperty (Tags::type, Tags::graph.toString(), nullptr);
-}
-
 //=============================================================================
-
 class AudioProcessorNodeParameter : public Parameter,
                                     private AudioProcessorParameter::Listener,
                                     private Parameter::Listener
@@ -111,7 +102,6 @@ private:
 };
 
 //=============================================================================
-
 void AudioProcessorNode::prepareToRender (double sampleRate, int maxBufferSize) 
 { 
     if (! proc)
@@ -141,8 +131,8 @@ void AudioProcessorNode::EnablementUpdater::handleAsyncUpdate()
 }
 
 AudioProcessorNode::AudioProcessorNode (AudioProcessor* processor)
-    : AudioProcessorNode (0, processor) {}
-    
+    : AudioProcessorNode (0, processor) { }
+
 AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor)
     : NodeObject (nodeId),
       enablement (*this)
@@ -155,15 +145,6 @@ AudioProcessorNode::AudioProcessorNode (uint32 nodeId, AudioProcessor* processor
     
     for (auto* param : proc->getParameters())
         params.add (new AudioProcessorNodeParameter (*param));
-    
-    if (auto* instance = dynamic_cast<AudioPluginInstance*> (proc.get()))
-    {
-        setAudioProcessorNodePropertiesFrom (instance->getPluginDescription(), metadata);
-    }
-    else
-    {
-        jassertfalse; // need a way to identify normal audio processors
-    }
 }
 
 AudioProcessorNode::~AudioProcessorNode()
