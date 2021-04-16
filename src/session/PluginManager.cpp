@@ -753,6 +753,12 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
 {
     errorMsg.clear();
     
+    if (auto* const plugin = createAudioPlugin (desc, errorMsg))
+    {
+        plugin->enableAllBuses();
+        return priv->nodes.wrap (plugin);
+    }
+
     if (desc.pluginFormatName == "Internal")
     {
         if (desc.fileOrIdentifier == "audio.input")
@@ -765,12 +771,6 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
             return new IONode (IONode::midiOutputNode);
         else 
             { errorMsg = "Could not create internal node"; return nullptr;}
-    }
-
-    if (auto* const plugin = createAudioPlugin (desc, errorMsg))
-    {
-        plugin->enableAllBuses();
-        return priv->nodes.wrap (plugin);
     }
 
     if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
