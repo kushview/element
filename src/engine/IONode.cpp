@@ -8,36 +8,18 @@ IONode::IONode (const IODeviceType type_)
     : NodeObject(0),
       type (type_),
       graph (nullptr)
-{ }
+{
+    updateName();
+}
 
 IONode::~IONode()
 { }
 
-const String IONode::getName() const
+void IONode::updateName()
 {
-    // FIXME:
-    // if (auto* const root = dynamic_cast<RootGraph*> (getParentGraph()))
-    // {
-    //     switch (type)
-    //     {
-    //         case audioOutputNode:   return root->getAudioOutputDeviceName(); break;
-    //         case audioInputNode:    return root->getAudioInputDeviceName();  break;
-    //         case midiOutputNode:    return "MIDI Out"; break;
-    //         case midiInputNode:     return "MIDI In"; break;
-    //         default:                break;
-    //     }
-    // }
-
-    switch (type)
-    {
-        case audioOutputNode:   return "Audio Output"; break;
-        case audioInputNode:    return "Audio Input"; break;
-        case midiOutputNode:    return "Midi Output"; break;
-        case midiInputNode:     return "Midi Input"; break;
-        default:                break;
-    }
-
-    return String();
+    String name = getPortType().getName();
+    name << " " << String (isInput() ? "In" : "Out");
+    setName (name);
 }
 
 PortType IONode::getPortType() const noexcept

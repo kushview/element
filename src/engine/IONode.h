@@ -44,6 +44,10 @@ public:
     };
 
     //==============================================================================
+    IONode (const IODeviceType type);
+    ~IONode();
+
+    //==============================================================================
     /** Returns the mode of this processor. */
     IODeviceType getType() const                      { return type; }
     PortType getPortType() const noexcept;
@@ -57,13 +61,8 @@ public:
     /** True if this is an audio or midi output. */
     bool isOutput() const;
 
-    //==============================================================================
-    IONode (const IODeviceType type);
-    ~IONode();
-
     void fillInPluginDescription (PluginDescription& d) const;
 
-    const String getName() const;
     const String getInputChannelName (int channelIndex) const;
     const String getOutputChannelName (int channelIndex) const;
     
@@ -83,7 +82,7 @@ public:
 private:
     const IODeviceType type;
     GraphNode* graph;
-
+    void updateName();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IONode)
 };
 
