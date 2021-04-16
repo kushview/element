@@ -34,34 +34,9 @@ class Globals;
 class InternalFormat : public AudioPluginFormat
 {
 public:
-    enum ID
-    {
-        audioInputDevice = 0,
-        audioOutputDevice,
-        midiInputDevice,
-        midiOutputDevice,
-        midiSequence,
-        audioInputPort,
-        audioOutputPort,
-        atomInputPort,
-        atomOutputPort,
-        controlInputPort,
-        controlOutputPort,
-        cvOutPort,
-        cvInPort,
-        midiInputPort,
-        midiOutputPort,
-        metronomeProcessor,
-        patternProcessor,
-        samplerProcessor,
-        sequenceProcessor,
-        internalTypesEnd
-    };
-
     InternalFormat (AudioEngine&, MidiEngine&);
     ~InternalFormat() { }
 
-    const PluginDescription* description (const InternalFormat::ID type);
     void getAllTypes (OwnedArray <PluginDescription>& results);
 
     // AudioPluginFormat

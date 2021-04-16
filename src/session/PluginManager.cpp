@@ -761,6 +761,7 @@ NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, Strin
 
     if (desc.pluginFormatName == "Internal")
     {
+        errorMsg.clear();
         if (desc.fileOrIdentifier == "audio.input")
             return new IONode (IONode::audioInputNode);
         else if (desc.fileOrIdentifier == "audio.output")

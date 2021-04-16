@@ -58,26 +58,6 @@ InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
     : engine (e), midi (me)
 {
     {
-        IONode p (IONode::audioOutputNode);
-        p.fillInPluginDescription (audioOutDesc);
-    }
-
-    {
-        IONode p (IONode::audioInputNode);
-        p.fillInPluginDescription (audioInDesc);
-    }
-
-    {
-        IONode p (IONode::midiOutputNode);
-        p.fillInPluginDescription (midiOutDesc);
-    }
-    
-    {
-        IONode p (IONode::midiInputNode);
-        p.fillInPluginDescription (midiInDesc);
-    }
-    #if defined (EL_PRO) || defined (EL_SOLO)
-    {
         PlaceholderProcessor p;
         p.fillInPluginDescription (placeholderDesc);
     }
@@ -87,7 +67,6 @@ InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
         MidiDeviceProcessor out (false, midi);
         out.fillInPluginDescription (midiOutputDeviceDesc);
     }
-    #endif
 }
 
 AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
@@ -108,41 +87,24 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
     return nullptr;
 }
 
-const PluginDescription* InternalFormat::description (const InternalFormat::ID type)
-{
-    switch (type)
-    {
-        case audioInputDevice:      return &audioInDesc;
-        case audioOutputDevice:     return &audioOutDesc;
-        case midiInputDevice:       return &midiInDesc;
-        case midiOutputDevice:      return &midiOutDesc;
-        case samplerProcessor:      return &samplerDesc;
-        case sequenceProcessor:     return &sequencerDesc;
-        case patternProcessor:      return &patternDesc;
-        case midiSequence:          return &metroDesc;
-        default:                    break;
-    }
-
-    return nullptr;
-}
-
 void InternalFormat::getAllTypes (OwnedArray <PluginDescription>& results)
 {
-    for (int i = 0; i < (int) audioOutputPort; ++i)
-        results.add (new PluginDescription (*description ((InternalFormat::ID) i)));
     results.add (new PluginDescription (placeholderDesc));
     results.add (new PluginDescription (midiInputDeviceDesc));
     results.add (new PluginDescription (midiOutputDeviceDesc));
 }
 
 void InternalFormat::createPluginInstance (const PluginDescription& d, double initialSampleRate,
-                                           int initialBufferSize,
-                                           PluginCreationCallback callback)
+                                           int initialBufferSize, PluginCreationCallback callback)
 {
     if (auto* i = instantiatePlugin (d, initialSampleRate, initialBufferSize))
+    {
         callback (std::unique_ptr<AudioPluginInstance> (i), String());
-    else 
+    }
+    else
+    {
         callback (nullptr, String ("Could not instantiate ") + d.name);
+    }
 }
 
 bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginDescription&) const noexcept
@@ -150,9 +112,7 @@ bool InternalFormat::requiresUnblockedMessageThreadDuringCreation (const PluginD
     return false;
 }
 
-
 // MARK: Element Format
-
 ElementAudioPluginFormat::ElementAudioPluginFormat (Globals& g)
     : world (g) { }
 
