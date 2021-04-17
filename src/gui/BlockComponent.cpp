@@ -552,14 +552,13 @@ void BlockComponent::paint (Graphics& g)
     {
         if (node.isAudioIONode())
         {
-            // FIXME: uniform way to refresh node names
-            //        see https://github.com/kushview/Element/issues/109
             subName = String();
         }
         else if (node.isMidiInputNode())
         {
+            auto mode = ViewHelpers::getGuiController(this)->getRunMode();
             auto& midi = ViewHelpers::getGlobals(this)->getMidiEngine();
-            if (midi.getNumActiveMidiInputs() <= 0)
+            if (mode != RunMode::Plugin && midi.getNumActiveMidiInputs() <= 0)
                 subName = "(no device)";
         }
     }
