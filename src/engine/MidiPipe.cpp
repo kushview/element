@@ -17,6 +17,12 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+/// An array of MIDI buffers.
+// Designed for real time performance, therefore does virtually no type
+// checking in method calls.
+// @classmod el.MidiPipe
+// @pragma nostrip
+
 #include "lua.hpp"
 #include "kv/lua/midi_buffer.hpp"
 #include "kv/lua/factories.hpp"
@@ -194,12 +200,40 @@ static int midipipe_gc (lua_State* L) {
     return 0;
 }
 
+/// Create a new MIDI Pipe.
+// @int nbuffers Number of buffers
+// @return A new MIDI Pipe
+// @within Constructors
+// @function MidiPipe.new
+
 static const luaL_Reg methods[] = {
     { "__gc",       midipipe_gc },
+
+    /// Get a MidiBuffer from the pipe.
+    // @int index Index of the buffer
+    // @treturn kv.MidiBuffer A midi buffer
+    // @within Methods
+    // @function MidiPipe:get
     { "get",        Element::LuaMidiPipe::get },
+
+    /// Get a MidiBuffer from the pipe.
+    // @int nbuffers New number of buffers to store
+    // @within Methods
+    // @function MidiPipe:resize
     { "resize",     Element::LuaMidiPipe::resize },
+    
+    /// Returns the number of buffers in this pipe.
+    // @treturn int The number of buffers
+    // @within Methods
+    // @function MidiPipe:size
     { "size",       Element::LuaMidiPipe::size },
+
+    /// Clears all buffers in the pipe.
+    // Note this doesn't remove buffers, it just clears their contents.
+    // @within Methods
+    // @function MidiPipe:clear
     { "clear",      Element::LuaMidiPipe::clear },
+
     { nullptr, nullptr }
 };
 
@@ -220,5 +254,7 @@ int luaopen_el_MidiPipe (lua_State* L)
 
     lua_newtable (L);
     luaL_setmetatable (L, "el.MidiPipeClass");
+    lua_pushcfunction (L, midipipe_new);
+    lua_setfield (L, -2, "new");
     return 1;
 }

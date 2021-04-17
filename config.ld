@@ -7,6 +7,7 @@ file = {
     'libs/lua-kv/kv/lua/widget.hpp',
     'libs/element/lua',
     'scripts',
+    'src/engine/MidiPipe.cpp',
     exclude = {
         'libs/element/lua/element.lua',
         'libs/lua-kv/src/lua-kv.h',
