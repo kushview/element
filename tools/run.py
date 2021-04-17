@@ -1,7 +1,17 @@
 #!/usr/bin/env python
 from subprocess import call
 from optparse import OptionParser
-import os
+import os, platform
+
+def element_binary():
+    binary = ''
+    if 'Darwin' in platform.system():
+        binary = 'build/Applications/Element.app/Contents/MacOS/Element'
+    elif 'Linux' in platform.system():
+        binary = 'build/bin/element'
+    if not os.path.exists (binary):
+        raise Exception ("Element binary not found: " + binary)
+    return binary
 
 def set_local_lua_paths():
     os.environ ['LUA_PATH']             = "libs/lua-kv/src/?.lua;libs/element/lua/?.lua"
@@ -21,7 +31,7 @@ def main():
     if opts.local_lua:
         set_local_lua_paths()
 
-    cmd = ['build/bin/element']
+    cmd = [element_binary()]
     call (cmd)
 
 if __name__ == '__main__':
