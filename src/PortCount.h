@@ -70,7 +70,7 @@ struct PortCount
     {
         PortList ports;
         getPorts (ports);
-        return std::move (ports);
+        return ports;
     }
 
     void getPorts (kv::PortList& ports) const
