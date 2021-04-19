@@ -36,7 +36,7 @@
 // BEGIN SECTION A
 
 #ifndef JUCE_DISPLAY_SPLASH_SCREEN
- #define JUCE_DISPLAY_SPLASH_SCREEN 0
+ #define JUCE_DISPLAY_SPLASH_SCREEN 1
 #endif
 
 // END SECTION A
@@ -170,6 +170,10 @@
 
 #ifndef    JUCE_CUSTOM_VST3_SDK
  //#define JUCE_CUSTOM_VST3_SDK 0
+#endif
+
+#ifndef    JUCE_VST3_HOST_CROSS_PLATFORM_UID
+ //#define JUCE_VST3_HOST_CROSS_PLATFORM_UID 0
 #endif
 
 //==============================================================================
