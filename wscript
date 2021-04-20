@@ -14,7 +14,7 @@ PLUGIN_VERSION  = element.PLUGIN_VERSION
 VST3_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
-    opt.load ("scripting compiler_c compiler_cxx ccache cross juce")
+    opt.load ("scripting compiler_c compiler_cxx ccache cross juce depends")
 
     opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
         help="Disable LADSPA plugin hosting")
@@ -74,6 +74,8 @@ def configure (conf):
 
     conf.find_projucer (mandatory=False)
     conf.find_program ('convert', mandatory=False)
+    
+    conf.load ('depends')
     
     conf.check_common()
     if cross.is_mingw (conf): conf.check_mingw()
