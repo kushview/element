@@ -84,6 +84,7 @@
                 "${workspaceRoot}/.vscode/vscode.h"
             ],
             "includePath": [
+                "/opt/kushview/include",
                 "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "${workspaceRoot}/libs/JUCE/modules/*",
                 "${workspaceRoot}/libs/kv/modules/*",
@@ -92,7 +93,7 @@
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/lua/src/*",
                 "${workspaceRoot}/src/*",
-                "${workspaceRoot}/tests/*"
+                "${workspaceRoot}/test/*"
             ]
         },
         {

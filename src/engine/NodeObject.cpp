@@ -628,6 +628,7 @@ void NodeObject::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
     midi.clear();
 }
 
+//=============================================================================
 void NodeObject::setPorts (const PortList& newPorts)
 {
     ports = newPorts;
@@ -635,28 +636,28 @@ void NodeObject::setPorts (const PortList& newPorts)
     if (ports.size (PortType::Midi, true) <= 0 &&
         !isMidiIONode() && !isAudioIONode() && !isMidiDeviceNode())
     {
-        ports.add (PortType::Midi, ports.size(), 0, 
-                   "element_midi_input", 
-                   "MIDI In", 
+        ports.add (PortType::Midi, ports.size(), 0,
+                   "element_midi_input",
+                   "MIDI In",
                    true);
     }
 
-    parameters.clear();
-    for (int i = 0; i < ports.size(); ++i)
+    ParameterArray newParams;
+    for (const auto* port : ports)
     {
-        const auto port = ports.getPort (i);
-        if (port.input && port.type == PortType::Control)
-            parameters.add (getOrCreateParameter (port));
+        if (port->input && port->type == PortType::Control)
+            newParams.add (getOrCreateParameter (*port));
     }
     
-    struct ParamSorter
-    {
-        int compareElements (Parameter* lhs, Parameter* rhs)
-        {
+    struct SortByArrayIndex {
+        int compareElements (Parameter* lhs, Parameter* rhs) {
             return lhs->getParameterIndex() < rhs->getParameterIndex() ? -1 : 1;
         }
-    } sorter;
-    parameters.sort (sorter, true);
+    };
+
+    SortByArrayIndex sorter;
+    newParams.sort (sorter, true);
+    parameters.swapWith (newParams);
 }
 
 ValueTree NodeObject::createPortsData() const
