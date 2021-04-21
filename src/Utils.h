@@ -190,7 +190,7 @@ inline static String getOscMessageAsString (const OSCMessage& message)
 
 inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
 {
-    std::vector<std::string> paths = parseOscAddressPaths(message);
+    std::vector<std::string> paths = parseOscAddressPaths (message);
 
     if (paths[0] != "midi")
     {
@@ -235,7 +235,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         }
         else
         {
-            values[i] = getOscArgumentAsPrimitiveValue(arg);
+            values[i] = getOscArgumentAsPrimitiveValue (arg);
         }
         i++;
     }
@@ -271,15 +271,15 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 2)
         {
             /** channel, programNumber */
-            return MidiMessage::noteOff((int) values[0], (int) values[1]);
+            return MidiMessage::programChange ((int) values[0], (int) values[1]);
         }
     }
-    else if (command == "pitchBend")
+    else if (command == "pitchBend" || command == "pitchWheel")
     {
         if (numArgs >= 2)
         {
             /** channel, position */
-            return MidiMessage::pitchWheel((int) values[0], (int) values[1]);
+            return MidiMessage::pitchWheel ((int) values[0], (int) values[1]);
         }
     }
     else if (command == "afterTouch")
@@ -303,7 +303,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 3)
         {
             /** channel, controllerType, value */
-            return MidiMessage::controllerEvent((int) values[0], (int) values[1], (int) values[2]);
+            return MidiMessage::controllerEvent ((int) values[0], (int) values[1], (int) values[2]);
         }
     }
     else if (command == "allNotesOff")
@@ -311,7 +311,7 @@ inline static MidiMessage processOscToMidiMessage (const OSCMessage& message)
         if (numArgs >= 1)
         {
             /** channel */
-            return MidiMessage::allNotesOff((int) values[0]);
+            return MidiMessage::allNotesOff ((int) values[0]);
         }
     }
     else if (command == "allSoundOff")

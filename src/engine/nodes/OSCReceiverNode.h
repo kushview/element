@@ -31,7 +31,6 @@ class OSCReceiverNode : public MidiFilterNode,
                         public OSCReceiver::Listener<OSCReceiver::RealtimeCallback>
 {
 public:
-
     OSCReceiverNode();
     virtual ~OSCReceiverNode();
 

@@ -105,11 +105,11 @@ void OSCReceiverNode::prepareToRender (double sampleRate, int maxBufferSize)
 void OSCReceiverNode::render (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     const auto nframes = audio.getNumSamples();
-    if (nframes == 0) {
+    if (nframes == 0)
         return;
-    }
 
-    outputMidiMessages.removeNextBlockOfMessages ( *midi.getWriteBuffer (0), nframes );
+    midi.clear();
+    outputMidiMessages.removeNextBlockOfMessages (*midi.getWriteBuffer (0), nframes);
 }
 
 /** OSCReceiver real-time callbacks */
@@ -124,7 +124,7 @@ void OSCReceiverNode::oscMessageReceived (const OSCMessage& message)
     MidiMessage midiMsg = Util::processOscToMidiMessage (message);
     midiMsg.setTimeStamp (timestamp);
 
-    outputMidiMessages.addMessageToQueue( midiMsg );
+    outputMidiMessages.addMessageToQueue (midiMsg);
 };
 
 void OSCReceiverNode::oscBundleReceived(const OSCBundle& bundle)
