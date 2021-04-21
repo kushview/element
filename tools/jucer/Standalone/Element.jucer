@@ -3,7 +3,7 @@
 <JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.0"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="suport@kushview.net" displaySplashScreen="1" reportAppUsage="0"
+              companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2021 Kushview, LLC"
               defines="EL_USE_LUA=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
@@ -797,21 +797,21 @@
                        isDebug="1" optimisation="1" targetName="Element" binaryPath="../../../build/Win32/Debug"
                        useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
-                       headerPath="V:\WorkArea\Pa-current\WorkArea (W)\OTKTools\SDKs\boost_1_73_0&#10;D:\251\SDKs\vstsdk2.4"/>
+                       headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"/>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="Element" headerPath="V:\WorkArea\Pa-current\WorkArea (W)\OTKTools\SDKs\boost_1_73_0&#10;D:\251\SDKs\vstsdk2.4"
+                       isDebug="1" optimisation="1" targetName="Element" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        binaryPath="../../../build/x64/Debug" characterSet="MultiByte"
                        useRuntimeLibDLL="1" defines="EL_USE_LOCAL_AUTH=0&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../../../build/x64/Release"
-                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="V:\WorkArea\Pa-current\WorkArea (W)\OTKTools\SDKs\boost_1_73_0&#10;D:\251\SDKs\vstsdk2.4"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="32-bit"
                        isDebug="0" optimisation="3" targetName="Element" binaryPath="../../../build/Win32/Release"
-                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="V:\WorkArea\Pa-current\WorkArea (W)\OTKTools\SDKs\boost_1_73_0&#10;D:\251\SDKs\vstsdk2.4"
+                       useRuntimeLibDLL="0" characterSet="MultiByte" headerPath="C:\SDKs\boost_1_71_0&#10;C:\SDKs\ASIOSDK2.3\common"
                        defines="EL_USE_LOCAL_AUTH=0&#10;EL_SAVE_BINARY_FORMAT=1&#10;JLV2_PLUGINHOST_LV2=0"
                        debugInformationFormat="ProgramDatabase" enablePluginBinaryCopyStep="0"
                        linkTimeOptimisation="1"/>
