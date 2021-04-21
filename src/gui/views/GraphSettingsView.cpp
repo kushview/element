@@ -86,23 +86,15 @@ namespace Element {
         
         inline void setIndex (const int index) override
         {
-            if (! locked)
-            {
-                RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
-                graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
-                if (auto* node = graph.getGraphNode ())
-                    if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
-                        root->setRenderMode (mode);
-            }
-            else
-            {
-                refresh();
-            }
+            RootGraph::RenderMode mode = index == 0 ? RootGraph::SingleGraph : RootGraph::Parallel;
+            graph.setProperty (Tags::renderMode, RootGraph::getSlugForRenderMode (mode));
+            if (auto* node = graph.getGraphNode ())
+                if (auto* root = dynamic_cast<RootGraph*> (node->getAudioProcessor()))
+                    root->setRenderMode (mode);
         }
         
     protected:
         Node graph;
-        bool locked = false;
     };
 
     class VelocityCurvePropertyComponent : public ChoicePropertyComponent
@@ -191,8 +183,8 @@ namespace Element {
         Node node;
     };
     
-    class MidiProgramPropertyComponent : public SliderPropertyComponent
-
+    class MidiProgramPropertyComponent : public SliderPropertyComponent,
+                                         private Value::Listener
     {
     public:
         MidiProgramPropertyComponent (const Node& n)
@@ -214,56 +206,49 @@ namespace Element {
 
             // needed to ensure proper display when first loaded
             slider.updateText();
+
+            programValue = node.getPropertyAsValue (Tags::midiProgram);
+            programValue.addListener (this);
         }
 
         virtual ~MidiProgramPropertyComponent()
         {
+            programValue.removeListener (this);
             slider.textFromValueFunction = nullptr;
             slider.valueFromTextFunction = nullptr;
         }
 
-        void setLocked (const var& isLocked)
-        {
-            locked = isLocked;
-            refresh();
-        }
-
         void setValue (double v) override
         {
-            if (! locked)
-            {
-                node.setProperty (Tags::midiProgram, roundToInt (v));
-                if (GraphNodePtr ptr = node.getGraphNode())
-                    if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
-                        root->setMidiProgram ((int) node.getProperty (Tags::midiProgram));
-            }
-            else
-            {
-                refresh();
-            }
+            programValue.setValue (roundToInt (v));
+            if (GraphNodePtr ptr = node.getGraphNode())
+                if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
+                    root->setMidiProgram ((int) programValue.getValue());
         }
         
         double getValue() const override 
         {
             return (double) node.getProperty (Tags::midiProgram, -1);
         }
-        
+
+    private:
         Node node;
-        bool locked;
+        Value programValue;
+
+        void valueChanged (Value& value) override
+        {
+            if (value.refersToSameSourceAs (programValue))
+                slider.setValue ((double) programValue.getValue(), dontSendNotification);
+        }
     };
 
     class GraphPropertyPanel : public PropertyPanel
     {
     public:
-        GraphPropertyPanel() : locked (var (true)) { }
+        GraphPropertyPanel() { }
         ~GraphPropertyPanel()
         {
             clear();
-        }
-        
-        void setLocked (const bool isLocked)
-        {
-            locked = isLocked;
         }
 
         void setNode (const Node& newNode)
@@ -291,13 +276,7 @@ namespace Element {
 
     private:
         Node graph;
-        var locked;
         bool useHeader = true;
-
-        static void maybeLockObject (PropertyComponent* p, const var& locked)
-        {
-            ignoreUnused (p, locked);
-        }
 
         void getSessionProperties (PropertyArray& props, Node g)
         {
@@ -317,9 +296,6 @@ namespace Element {
            #if defined (EL_PRO)
             props.add (new MidiProgramPropertyComponent (g));
            #endif
-
-            for (auto* const p : props)
-                maybeLockObject (p, locked);
             
             // props.add (new BooleanPropertyComponent (g.getPropertyAsValue (Tags::persistent),
             //                                          TRANS("Persistent"),

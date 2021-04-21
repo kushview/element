@@ -363,13 +363,15 @@ public:
         if (! node.isRootGraph())
             return;
        
-       #ifndef EL_FREE
         // Paint the program number if it is enabled
         const auto h = area.getHeight(); const auto w = h;
         const int p = (int) node.getProperty (Tags::midiProgram, -1);
         if (p >= 0)
-            g.drawText (String (1 + p), area.getWidth() - h, 0, w, h, Justification::centred);
-       #endif
+        {
+            const auto txt = String (1 + p);
+            const auto txtW = g.getCurrentFont().getStringWidth (txt) + 2;
+            g.drawText (txt, area.getWidth() - txtW, 0, txtW, h, Justification::centredRight);
+        }
     }
 
     void showSettings()
