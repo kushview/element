@@ -55,7 +55,7 @@ void SubGraphProcessor::fillInPluginDescription (PluginDescription& d) const
     d.manufacturerName    = "Element";
     d.version             = ProjectInfo::versionString;
     d.fileOrIdentifier    = "element.graph";
-    d.uid                 = (d.name + d.fileOrIdentifier).getHexValue32();
+    d.uniqueId            = (d.name + d.fileOrIdentifier).getHexValue32();
     d.isInstrument        = false;
     d.numInputChannels    = getTotalNumInputChannels();
     d.numOutputChannels   = getTotalNumOutputChannels();

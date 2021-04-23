@@ -38,7 +38,7 @@ public:
     {
         desc.name = "MIDI Monitor";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_MONITOR;
-        desc.uid                = EL_INTERNAL_UID_MIDI_MONITOR;
+        desc.uniqueId                = EL_INTERNAL_UID_MIDI_MONITOR;
         desc.descriptiveName    = "MIDI Monitor";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;

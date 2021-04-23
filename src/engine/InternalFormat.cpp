@@ -43,7 +43,7 @@
 #include "engine/nodes/WetDryProcessor.h"
 #include "engine/AudioEngine.h"
 #include "engine/InternalFormat.h"
-#include "engine//IONode.h"
+#include "engine/IONode.h"
 
 #include "session/Session.h"
 #include "../experimental/MidiSequenceProcessor.h"

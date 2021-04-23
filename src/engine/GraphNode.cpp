@@ -567,7 +567,7 @@ void GraphNode::render (AudioSampleBuffer& buffer, MidiPipe& midi)
 void GraphNode::getPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
-    d.uid = d.name.hashCode();
+    d.uniqueId = d.name.hashCode();
     d.category = "Graphs";
     d.pluginFormatName = EL_INTERNAL_FORMAT_NAME;
     d.fileOrIdentifier = EL_INTERNAL_ID_GRAPH;

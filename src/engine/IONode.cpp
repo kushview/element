@@ -58,7 +58,7 @@ void IONode::refreshPorts()
 void IONode::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
-    d.uid = d.name.hashCode();
+    d.uniqueId = d.name.hashCode();
     d.category = "I/O Devices";
     d.pluginFormatName = "Internal";
     d.manufacturerName = "Element";

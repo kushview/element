@@ -772,7 +772,7 @@ void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Lua";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
-    desc.uid                = EL_INTERNAL_UID_LUA;
+    desc.uniqueId                = EL_INTERNAL_UID_LUA;
     desc.descriptiveName    = "A user scriptable Element node";
     desc.numInputChannels   = 0;
     desc.numOutputChannels  = 0;

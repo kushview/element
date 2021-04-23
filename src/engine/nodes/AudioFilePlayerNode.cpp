@@ -378,7 +378,7 @@ void AudioFilePlayerNode::fillInPluginDescription (PluginDescription& desc) cons
     desc.manufacturerName   = "Element";
     desc.pluginFormatName   = "Element";
     desc.version            = "1.0.0";
-    desc.uid                = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
+    desc.uniqueId                = EL_INTERNAL_UID_AUDIO_FILE_PLAYER;
 }
 
 void AudioFilePlayerNode::clearPlayer()

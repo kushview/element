@@ -60,7 +60,7 @@ namespace Element {
             desc.manufacturerName   = "Element";
             desc.pluginFormatName   = "Element";
             desc.version            = "1.0.0";
-            desc.uid                = EL_INTERNAL_UID_FREQ_SPLITTER;
+            desc.uniqueId           = EL_INTERNAL_UID_FREQ_SPLITTER;
         }
 
         void prepareToPlay (double sampleRate, int maximumExpectedSamplesPerBlock) override

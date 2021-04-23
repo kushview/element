@@ -79,7 +79,7 @@ public:
         desc.manufacturerName   = "Element";
         desc.pluginFormatName   = "Element";
         desc.version            = "1.0.0";
-        desc.uid                = EL_INTERNAL_UID_AUDIO_ROUTER;
+        desc.uniqueId                = EL_INTERNAL_UID_AUDIO_ROUTER;
     }
 
     inline void refreshPorts() override

@@ -87,7 +87,7 @@ public:
         desc.manufacturerName   = "Element";
         desc.pluginFormatName   = EL_INTERNAL_FORMAT_NAME;
         desc.version            = "1.0.0";
-        desc.uid                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
+        desc.uniqueId                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
     }
 
 protected:
