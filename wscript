@@ -4,7 +4,7 @@ from subprocess import call, Popen, PIPE
 from waflib import Utils
 import os, sys
 import string
-sys.path.append (os.path.join (os.getcwd(), 'tools/waf'))
+sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
 import cross, element, juce, git
 
 APPNAME         = element.APPNAME
