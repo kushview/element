@@ -42,9 +42,7 @@
 
 #include "gui/ContentComponent.h"
 
-#if EL_RUNNING_AS_PLUGIN
- #include "plugins/PluginEditor.h"
-#endif
+#include "plugins/PluginEditor.h"
 
 #ifndef EL_USE_ACCESSORY_BUTTONS
  #define EL_USE_ACCESSORY_BUTTONS 0
@@ -112,14 +110,17 @@ public:
     {
         addAndMakeVisible (viewBtn);
         viewBtn.setButtonText ("view");
+
        #if EL_USE_ACCESSORY_BUTTONS
-        
         addAndMakeVisible (panicBtn);
        #endif
-       #if EL_RUNNING_AS_PLUGIN
-        addAndMakeVisible (menuBtn);
-        menuBtn.setButtonText ("settings");
-       #endif
+
+        if (isPluginVersion())
+        {
+            addAndMakeVisible (menuBtn);
+            menuBtn.setButtonText ("settings");
+        }
+        
         for (auto* b : { (Button*)&viewBtn, (Button*)&panicBtn, (Button*)&menuBtn })
             b->addListener (this);
         addAndMakeVisible (tempoBar);
@@ -166,16 +167,22 @@ public:
 
         auto* props = settings.getUserSettings();
         
-       #if EL_RUNNING_AS_PLUGIN
-        // Plugin always has host sync option
-        const bool showExt = true;
-        ignoreUnused (props);
-       #elif defined (EL_PRO)
-        const bool showExt = props->getValue ("clockSource") == "midiClock";
-       #else
-        const bool showExt = false;
-        ignoreUnused (props);
-       #endif
+        bool showExt = false;
+        if (isPluginVersion())
+        {
+            // Plugin always has host sync option
+            showExt = true;
+            ignoreUnused (props);
+        }
+        else
+        {
+           #if defined (EL_PRO)
+            showExt = props->getValue ("clockSource") == "midiClock";
+           #else
+            showExt = false;
+            ignoreUnused (props);
+           #endif
+        }
        
         if (session)
         {
@@ -267,13 +274,14 @@ public:
             if (auto* cc = ViewHelpers::findContentComponent (this))
                 MainMenu::buildPluginMainMenu (cc->getGlobals().getCommandManager(), menu);
 
-           #if EL_RUNNING_AS_PLUGIN
-            if (auto* pe = findParentComponentOfClass<PluginEditor>())
+            if (isPluginVersion())
             {
-                menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
-                menu.addItem (99997,  "Report zero latency", true, pe->isReportingZeroLatency());
+                if (auto* pe = findParentComponentOfClass<PluginEditor>())
+                {
+                    menu.addItem (99998, "Grab keyboard focus", true, pe->getWantsPluginKeyboardFocus());
+                    menu.addItem (99997,  "Report zero latency", true, pe->isReportingZeroLatency());
+                }
             }
-           #endif
 
             auto result = menu.show();
 
@@ -283,43 +291,37 @@ public:
             }
             else if (99998 == result)
             {
-               #if EL_RUNNING_AS_PLUGIN
-                if (auto* pe = findParentComponentOfClass<PluginEditor>())
-                    pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
-               #endif
+                if (isPluginVersion())
+                    if (auto* pe = findParentComponentOfClass<PluginEditor>())
+                        pe->setWantsPluginKeyboardFocus (! pe->getWantsPluginKeyboardFocus());
             }
             else if (99997 == result)
             {
-               #if EL_RUNNING_AS_PLUGIN
-                if (auto* pe = findParentComponentOfClass<PluginEditor>())
+                if (isPluginVersion())
                 {
-                    pe->setReportZeroLatency (!pe->isReportingZeroLatency());
-                    owner.refreshStatusBar();
+                    if (auto* pe = findParentComponentOfClass<PluginEditor>())
+                    {
+                        pe->setReportZeroLatency (!pe->isReportingZeroLatency());
+                        owner.refreshStatusBar();
+                    }
                 }
-               #endif
             }
         }
         else if (btn == &mapButton)
         {
-           #if defined (EL_PRO) || defined (EL_SOLO)
-            if (true)
+            if (auto* mapping = owner.getAppController().findChild<MappingController>())
             {
-                if (auto* mapping = owner.getAppController().findChild<MappingController>())
-                {
-                    mapping->learn (! mapButton.getToggleState());
-                    mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
-                    if (mapping->isLearning()) {
-                        startTimer (600);
-                    }
+                mapping->learn (! mapButton.getToggleState());
+                mapButton.setToggleState (mapping->isLearning(), dontSendNotification);
+                if (mapping->isLearning()) {
+                    startTimer (600);
                 }
             }
-           #endif
         }
     }
 
     void timerCallback() override
     {
-       #if defined (EL_PRO) || defined (EL_SOLO)
         if (auto* mapping = owner.getAppController().findChild<MappingController>())
         {
             if (! mapping->isLearning())
@@ -328,9 +330,6 @@ public:
                 stopTimer();
             }
         }
-       #else
-        stopTimer();
-       #endif
     }
 
 private:
@@ -345,6 +344,10 @@ private:
     TransportBar     transport;
     MidiBlinker      midiBlinker;
     Array<SignalConnection> connections;
+    bool isPluginVersion() const
+    {
+        return owner.getAppController().getRunMode() == RunMode::Plugin;
+    }
 };
 
 class ContentComponent::StatusBar : public Component,
@@ -419,58 +422,60 @@ public:
     void updateLabels()
     {
         auto engine = world.getAudioEngine();
-       #if EL_RUNNING_AS_PLUGIN
-        String text = "Latency: ";
+        if (isPluginVersion())
+        {
+            String text = "Latency: ";
 
-        if (auto* pe = findParentComponentOfClass<PluginEditor>())
-        {
-            const int latencySamples = pe->getLatencySamples();
-            text << latencySamples << " samples";
-        }
-        else
-        {
-            text << "unknown";
-        }
+            if (auto* pe = findParentComponentOfClass<PluginEditor>())
+            {
+                const int latencySamples = pe->getLatencySamples();
+                text << latencySamples << " samples";
+            }
+            else
+            {
+                text << "unknown";
+            }
 
-        sampleRateLabel.setText (text, dontSendNotification);
-        streamingStatusLabel.setText ("", dontSendNotification);
-        statusLabel.setText ("Plugin", dontSendNotification);
-        
-       #else
-        if (auto* dev = devices.getCurrentAudioDevice())
-        {
-            String text = "Sample Rate: ";
-            text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
-            text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
             sampleRateLabel.setText (text, dontSendNotification);
-            
-            text.clear();
-            String strText = streamingStatus.getValue().toString();
-            if (strText.isEmpty())
-                strText = "Running";
-            text << "Engine: " << strText << ":  CPU: " << String(devices.getCpuUsage() * 100.f, 1) << "%";
-            streamingStatusLabel.setText (text, dontSendNotification);
-            
-            statusLabel.setText (String("Device: ") + dev->getName(), dontSendNotification);
+            streamingStatusLabel.setText ("", dontSendNotification);
+            statusLabel.setText ("Plugin", dontSendNotification);
         }
         else
         {
-            sampleRateLabel.setText ("", dontSendNotification);
-            streamingStatusLabel.setText ("", dontSendNotification);
-            statusLabel.setText ("No Device", dontSendNotification);
+            if (auto* dev = devices.getCurrentAudioDevice())
+            {
+                String text = "Sample Rate: ";
+                text << String (dev->getCurrentSampleRate() * 0.001, 1) << " KHz";
+                text << ":  Buffer: " << dev->getCurrentBufferSizeSamples();
+                sampleRateLabel.setText (text, dontSendNotification);
+                
+                text.clear();
+                String strText = streamingStatus.getValue().toString();
+                if (strText.isEmpty())
+                    strText = "Running";
+                text << "Engine: " << strText << ":  CPU: " << String(devices.getCpuUsage() * 100.f, 1) << "%";
+                streamingStatusLabel.setText (text, dontSendNotification);
+                
+                statusLabel.setText (String("Device: ") + dev->getName(), dontSendNotification);
+            }
+            else
+            {
+                sampleRateLabel.setText ("", dontSendNotification);
+                streamingStatusLabel.setText ("", dontSendNotification);
+                statusLabel.setText ("No Device", dontSendNotification);
+            }
+
+            if (plugins.isScanningAudioPlugins())
+            {
+                auto text = streamingStatusLabel.getText();
+                auto name = plugins.getCurrentlyScannedPluginName();
+                name = File::createFileWithoutCheckingPath(name).getFileName();
+
+                text << " - Scanning: " << name;
+                if (name.isNotEmpty())
+                    streamingStatusLabel.setText(text, dontSendNotification);
+            }
         }
-
-		if (plugins.isScanningAudioPlugins())
-		{
-			auto text = streamingStatusLabel.getText();
-			auto name = plugins.getCurrentlyScannedPluginName();
-			name = File::createFileWithoutCheckingPath(name).getFileName();
-
-			text << " - Scanning: " << name;
-			if (name.isNotEmpty())
-				streamingStatusLabel.setText(text, dontSendNotification);
-		}
-       #endif
     }
     
 private:
@@ -485,6 +490,12 @@ private:
     friend class Timer;
     void timerCallback() override {
         updateLabels();
+    }
+    bool isPluginVersion()
+    {
+        if (auto* cc = ViewHelpers::findContentComponent (this))
+            return cc->getAppController().getRunMode() == RunMode::Plugin;
+        return false;
     }
 };
 

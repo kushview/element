@@ -21,7 +21,7 @@
 
 #include "ElementApp.h"
 #include "controllers/GuiController.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "gui/ChannelStripComponent.h"
 #include "Signals.h"
 
@@ -124,7 +124,7 @@ public:
     inline void timerCallback() override
     {
         auto& meter = channelStrip.getDigitalMeter();
-        if (GraphNodePtr ptr = node.getGraphNode())
+        if (NodeObjectPtr ptr = node.getGraphNode())
         {
             const int startChannel = jmax (0, channelBox.getSelectedId() - 1);
             if (ptr->getNumAudioOutputs() == 1)
@@ -173,7 +173,7 @@ public:
 
     inline void updateChannelStrip()
     {
-        if (GraphNodePtr object = node.getGraphNode())
+        if (NodeObjectPtr object = node.getGraphNode())
         {
             SharedConnectionBlock b1 (volumeChangedConnection);
             SharedConnectionBlock b2 (powerChangedConnection);
@@ -239,7 +239,7 @@ protected:
         default returns either the input or output gain of the node */
     virtual float getCurrentVolume()
     {
-        GraphNodePtr object = node.getGraphNode();
+        NodeObjectPtr object = node.getGraphNode();
         if (object == nullptr)
             return 0.f;
 
@@ -372,7 +372,7 @@ private:
         if (onVolumeChanged != nullptr)
             return onVolumeChanged (value);
         
-        if (GraphNodePtr object = node.getGraphNode())
+        if (NodeObjectPtr object = node.getGraphNode())
         {
             auto gain = Decibels::decibelsToGain (value, -60.0);
             if (isAudioOutNode || isMonitoringInputs())

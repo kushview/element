@@ -12,7 +12,7 @@
               pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="ElementAU"
               pluginRTASCategory="2048" aaxIdentifier="net.kushview.Element"
               pluginAAXCategory="2048" companyName="Kushview" companyWebsite="https://kushview.net"
-              companyEmail="support@kushview.net" defines="EL_RUNNING_AS_PLUGIN=1&#10;EL_USE_LUA=1"
+              companyEmail="support@kushview.net" defines="EL_USE_LUA=1&#10;"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
               headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
@@ -247,8 +247,6 @@
         <FILE id="vwP6NB" name="AudioEngine.h" compile="0" resource="0" file="../../../src/engine/AudioEngine.h"/>
         <FILE id="hWyf2g" name="DataType.h" compile="0" resource="0" file="../../../src/engine/DataType.h"/>
         <FILE id="JWecee" name="Engine.h" compile="0" resource="0" file="../../../src/engine/Engine.h"/>
-        <FILE id="FhVRAg" name="GraphNode.cpp" compile="1" resource="0" file="../../../src/engine/GraphNode.cpp"/>
-        <FILE id="ZyP9rw" name="GraphNode.h" compile="0" resource="0" file="../../../src/engine/GraphNode.h"/>
         <FILE id="FIHpPl" name="GraphPort.cpp" compile="1" resource="0" file="../../../src/engine/GraphPort.cpp"/>
         <FILE id="xeLWOO" name="GraphPort.h" compile="0" resource="0" file="../../../src/engine/GraphPort.h"/>
         <FILE id="MWhdG7" name="GraphProcessor.cpp" compile="1" resource="0"
@@ -273,6 +271,10 @@
         <FILE id="BSnRAJ" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
         <FILE id="mKmgFy" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
         <FILE id="JcHreo" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
+        <FILE id="n40CWG" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
+        <FILE id="Q0mQbp" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
+        <FILE id="FhVRAg" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
+        <FILE id="ZyP9rw" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
         <FILE id="aOcpmT" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
         <FILE id="I3yiAv" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
         <FILE id="cdpHbo" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>

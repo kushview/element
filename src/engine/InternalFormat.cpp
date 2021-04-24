@@ -254,7 +254,6 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         CompressorProcessor().fillInPluginDescription (*desc);
     }
 
-   #if defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_GRAPH)
     {
         auto* const desc = ds.add (new PluginDescription());
@@ -275,104 +274,21 @@ void ElementAudioPluginFormat::findAllTypesForFile (OwnedArray <PluginDescriptio
         auto* const desc = ds.add (new PluginDescription());
         MidiChannelMapProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER;
-        desc->uid                = EL_INTERNAL_UID_MIDI_CHANNEL_SPLITTER;
-        desc->name               = "MIDI Channel Splitter";
-        desc->descriptiveName    = "MIDI Channel Splitter";
-        desc->numInputChannels   = 0;
-        desc->numOutputChannels  = 0;
-        desc->hasSharedContainer = false;
-        desc->isInstrument       = false;
-        desc->manufacturerName   = "Element";
-        desc->pluginFormatName   = "Element";
-        desc->version            = "1.0.0";
-    }
-   #endif
-
-   #if defined (EL_SOLO) || defined (EL_PRO)
     else if (fileOrId == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
         AudioFilePlayerNode().fillInPluginDescription (*desc);
-    }
-    else if (fileOrId == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        desc->fileOrIdentifier   = EL_INTERNAL_ID_AUDIO_ROUTER;
-        desc->uid                = EL_INTERNAL_UID_AUDIO_ROUTER;
-        desc->name               = "Audio Router";
-        desc->descriptiveName    = "An Audio Patch Grid";
-        desc->numInputChannels   = 4;
-        desc->numOutputChannels  = 4;
-        desc->hasSharedContainer = false;
-        desc->isInstrument       = false;
-        desc->manufacturerName   = "Element";
-        desc->pluginFormatName   = "Element";
-        desc->version            = "1.0.0";
-    }
-    else if (fileOrId == EL_INTERNAL_ID_MIDI_ROUTER)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        MidiRouterNode(4,4).getPluginDescription (*desc);
     }
     else if (fileOrId == EL_INTERNAL_ID_MEDIA_PLAYER)
     {
         auto* const desc = ds.add (new PluginDescription());
         MediaPlayerProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        desc->fileOrIdentifier   = EL_INTERNAL_ID_MIDI_PROGRAM_MAP;
-        desc->uid                = EL_INTERNAL_UID_MIDI_PROGRAM_MAP;
-        desc->name               = "MIDI Program Map";
-        desc->descriptiveName    = "Filter MIDI Program Changes";
-        desc->numInputChannels   = 0;
-        desc->numOutputChannels  = 0;
-        desc->hasSharedContainer = false;
-        desc->isInstrument       = false;
-        desc->manufacturerName   = "Element";
-        desc->pluginFormatName   = "Element";
-        desc->version            = "1.0.0";
-    }
     else if (fileOrId == EL_INTERNAL_ID_PLACEHOLDER)
     {
         auto* const desc = ds.add (new PluginDescription());
         PlaceholderProcessor().fillInPluginDescription (*desc);
     }
-    else if (fileOrId == EL_INTERNAL_ID_MIDI_MONITOR)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        MidiMonitorNode().fillInPluginDescription (*desc);
-    }
-    else if (fileOrId == EL_INTERNAL_ID_OSC_RECEIVER)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        OSCReceiverNode().fillInPluginDescription (*desc);
-    }
-    else if (fileOrId == EL_INTERNAL_ID_OSC_SENDER)
-    {
-        auto* const desc = ds.add (new PluginDescription());
-        OSCSenderNode().fillInPluginDescription (*desc);
-    }
-    else if (fileOrId == EL_INTERNAL_ID_LUA)
-    {
-       #if EL_USE_LUA
-        auto* const desc = ds.add (new PluginDescription());
-        LuaNode().fillInPluginDescription (*desc);
-       #endif
-    }
-    else if (fileOrId == EL_INTERNAL_ID_SCRIPT)
-    {
-       #if EL_USE_LUA
-        auto* const desc = ds.add (new PluginDescription());
-        ScriptNode().fillInPluginDescription (*desc);
-       #endif
-    }
-   #endif
 }
 
 StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPath&, bool /*recursive*/, bool /*allowAsync*/)
@@ -382,37 +298,17 @@ StringArray ElementAudioPluginFormat::searchPathsForPlugins (const FileSearchPat
     results.add (EL_INTERNAL_ID_COMPRESSOR);
     results.add (EL_INTERNAL_ID_EQ_FILTER);
     results.add (EL_INTERNAL_ID_FREQ_SPLITTER);
-    results.add ("element.allPass");
-    results.add ("element.volume");
+    results.add (EL_INTERNAL_ID_ALLPASS_FILTER);
+    results.add (EL_INTERNAL_ID_VOLUME);
     results.add (EL_INTERNAL_ID_WET_DRY);
     results.add (EL_INTERNAL_ID_REVERB);
-
-   #if defined EL_PRO
     results.add (EL_INTERNAL_ID_AUDIO_MIXER);
     results.add (EL_INTERNAL_ID_CHANNELIZE);
     results.add (EL_INTERNAL_ID_MEDIA_PLAYER);
     results.add (EL_INTERNAL_ID_MIDI_CHANNEL_MAP);
-    results.add (EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER);
     results.add (EL_INTERNAL_ID_GRAPH);
-   #if EL_USE_MIDI_SEQUENCER
-    results.add (EL_INTERNAL_ID_MIDI_SEQUENCER);
-   #endif
-   #endif
-
-   #if defined (EL_SOLO) || defined (EL_PRO)
     results.add (EL_INTERNAL_ID_AUDIO_FILE_PLAYER);
-    results.add (EL_INTERNAL_ID_AUDIO_ROUTER);
-    results.add (EL_INTERNAL_ID_MIDI_ROUTER);
-    results.add (EL_INTERNAL_ID_MIDI_PROGRAM_MAP);
-    results.add (EL_INTERNAL_ID_MIDI_MONITOR);
-    results.add (EL_INTERNAL_ID_OSC_RECEIVER);
-    results.add (EL_INTERNAL_ID_OSC_SENDER);
-   #if EL_USE_LUA
-    results.add (EL_INTERNAL_ID_LUA);
-    results.add (EL_INTERNAL_ID_SCRIPT);
-   #endif
     results.add (EL_INTERNAL_ID_PLACEHOLDER);
-   #endif // product enablements
     return results;
 }
 

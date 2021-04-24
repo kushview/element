@@ -443,7 +443,7 @@ struct GenericNodeEditor::Pimpl
     Pimpl (GenericNodeEditor& parent)
         : owner (parent)
     {
-        GraphNodePtr ptr = parent.getNodeObject();
+        NodeObjectPtr ptr = parent.getNodeObject();
         jassert (ptr != nullptr);
         owner.setOpaque (true);
         view.setViewedComponent (new ParametersPanel (ptr->getParameters()));

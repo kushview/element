@@ -46,7 +46,7 @@ static void showFailedInstantiationAlert (const PluginDescription& desc, const b
 class NodeModelUpdater : public ReferenceCountedObject
 {
 public:
-    NodeModelUpdater (GraphManager& m, const ValueTree& d, GraphNode* o)
+    NodeModelUpdater (GraphManager& m, const ValueTree& d, NodeObject* o)
         : manager (m), data (d), object (o)
     {
         portsChangedConnection = object->portsChanged.connect ( 
@@ -61,7 +61,7 @@ public:
 private:
     GraphManager& manager;
     ValueTree data;
-    GraphNodePtr object;
+    NodeObjectPtr object;
     SignalConnection portsChangedConnection;
 
     void onPortsChanged()
@@ -111,10 +111,10 @@ private:
         const bool wantsMidiIn    = graph.hasMidiInputNode()   && proc.acceptsMidi();
         const bool wantsMidiOut   = graph.hasMidiOutputNode()  && proc.producesMidi();
         
-        GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+        NodeObjectPtr ioNodes [IOProcessor::numDeviceTypes];
         for (int i = 0; i < root->getNumNodes(); ++i)
         {
-            GraphNodePtr node = root->getNode (i);
+            NodeObjectPtr node = root->getNode (i);
             if (node->isMidiIONode() || node->isAudioIONode())
             {
                 auto* ioProc = dynamic_cast<IOProcessor*> (node->getAudioProcessor());
@@ -183,7 +183,7 @@ GraphManager::GraphManager (GraphProcessor& pg, PluginManager& pm)
 
 GraphManager::~GraphManager()
 {
-    // Make sure to dereference GraphNode's so we don't leak memory
+    // Make sure to dereference NodeObject's so we don't leak memory
     // If you get warnings by juce's leak detector about graph related
     // objects, then there's probably "object" properties lingering that
     // are referenced in the model;
@@ -197,9 +197,9 @@ uint32 GraphManager::getNextUID() noexcept
 }
 
 int GraphManager::getNumNodes() const noexcept { return processor.getNumNodes(); }
-const GraphNodePtr GraphManager::getNode (const int index) const noexcept { return processor.getNode (index); }
+const NodeObjectPtr GraphManager::getNode (const int index) const noexcept { return processor.getNode (index); }
 
-const GraphNodePtr GraphManager::getNodeForId (const uint32 uid) const noexcept
+const NodeObjectPtr GraphManager::getNodeForId (const uint32 uid) const noexcept
 {
     return processor.getNodeForId (uid);
 }
@@ -212,44 +212,28 @@ bool GraphManager::contains (const uint32 nodeId) const {
     return processor.getNodeForId (nodeId) != nullptr;
 }
 
-GraphNode* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
+NodeObject* GraphManager::createFilter (const PluginDescription* desc, double x, double y, uint32 nodeId)
 {
     String errorMessage;
-
-    if (desc->pluginFormatName == "Element")
-    {
-        if (auto* const object = pluginManager.createGraphNode (*desc, errorMessage))
-        {
-            return processor.addNode (object, nodeId);
-        }
-    }
-
-    errorMessage.clear();
-    auto* instance = pluginManager.createAudioPlugin (*desc, errorMessage);
-    GraphNode* node = nullptr;
-    
-    if (instance != nullptr)
-    {
-        if (auto* sub = dynamic_cast<SubGraphProcessor*> (instance))
-            sub->initController (pluginManager);
-        instance->enableAllBuses();
-        node = processor.addNode (instance, nodeId);
-    }
-    
-    if (node != nullptr)
-    {
-        // noop
-    }
+    auto node = std::unique_ptr<NodeObject> (
+        pluginManager.createGraphNode (*desc, errorMessage));
 
     if (errorMessage.isNotEmpty())
     {
         DBG("[EL] error creating audio plugin: " << errorMessage);
+        jassert (node == nullptr);
     }
     
-    return node;
+    if (node == nullptr && errorMessage.isEmpty())
+    {
+        jassertfalse;
+        errorMessage = "Could not find node";
+    }
+ 
+    return node != nullptr ? processor.addNode (node.release(), nodeId) : nullptr;
 }
 
-GraphNode* GraphManager::createPlaceholder (const Node& node)
+NodeObject* GraphManager::createPlaceholder (const Node& node)
 {
     PluginDescription desc; node.getPluginDescription (desc);
     auto* ph = new PlaceholderProcessor ();
@@ -392,7 +376,7 @@ void GraphManager::removeNode (const uint32 uid)
         if (node.getNodeId() == uid)
         {
             // the model was probably referencing the node ptr
-            GraphNodePtr obj = node.getGraphNode();
+            NodeObjectPtr obj = node.getGraphNode();
             if (obj)
             {
                 obj->willBeRemoved();
@@ -424,8 +408,8 @@ void GraphManager::disconnectNode (const uint32 nodeId, const bool inputs, const
         if ((outputs && c->sourceNode == nodeId) || 
             (inputs && c->destNode == nodeId))
         {
-            GraphNodePtr src = processor.getNodeForId (c->sourceNode);
-            GraphNodePtr dst = processor.getNodeForId (c->destNode);
+            NodeObjectPtr src = processor.getNodeForId (c->sourceNode);
+            NodeObjectPtr dst = processor.getNodeForId (c->destNode);
 
             if ((audio && src->getPortType(c->sourcePort) == PortType::Audio && dst->getPortType(c->destPort) == PortType::Audio) ||
                 (midi && src->getPortType(c->sourcePort) == PortType::Midi && dst->getPortType(c->destPort) == PortType::Midi))
@@ -465,14 +449,14 @@ const GraphProcessor::Connection* GraphManager::getConnectionBetween (uint32 sou
 }
 
 bool GraphManager::canConnect (uint32 sourceFilterUID, int sourceFilterChannel,
-                                  uint32 destFilterUID, int destFilterChannel) const noexcept
+                               uint32 destFilterUID, int destFilterChannel) const noexcept
 {
     return processor.canConnect (sourceFilterUID, sourceFilterChannel,
                                  destFilterUID, destFilterChannel);
 }
 
 bool GraphManager::addConnection (uint32 sourceFilterUID, int sourceFilterChannel,
-                                     uint32 destFilterUID, int destFilterChannel)
+                                  uint32 destFilterUID, int destFilterChannel)
 {
     const bool result = processor.addConnection (sourceFilterUID, (uint32)sourceFilterChannel,
                                                  destFilterUID, (uint32)destFilterChannel);
@@ -509,13 +493,13 @@ void GraphManager::setNodeModel (const Node& node)
     {
         Node node (nodes.getChild (i), false);
         const PluginDescription desc (pluginManager.findDescriptionFor (node));
-        if (GraphNodePtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
+        if (NodeObjectPtr obj = createFilter (&desc, 0.0, 0.0, node.getNodeId()))
         {
             setupNode (node.getValueTree(), obj);
             obj->setEnabled (node.isEnabled());
             node.setProperty (Tags::enabled, obj->isEnabled());
         }
-        else if (GraphNodePtr ph = createPlaceholder (node))
+        else if (NodeObjectPtr ph = createPlaceholder (node))
         {
             DBG("[EL] couldn't create node: " << node.getName() << ". Creating offline placeholder");
             node.getValueTree().setProperty (Tags::object, ph.get(), nullptr);
@@ -647,7 +631,7 @@ void GraphManager::processorArcsChanged()
     changed();
 }
 
-void GraphManager::setupNode (const ValueTree& data, GraphNodePtr obj)
+void GraphManager::setupNode (const ValueTree& data, NodeObjectPtr obj)
 {
     jassert (obj && data.hasType (Tags::node));
     Node node (data, false);

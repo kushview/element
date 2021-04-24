@@ -25,7 +25,7 @@
 
 namespace Element {
 
-class GraphNode;
+class NodeObject;
 class Node;
 class PluginScannerMaster;
 class PluginScanner;
@@ -55,6 +55,9 @@ public:
     /** Returns the audio plugin format manager */
     AudioPluginFormatManager& getAudioPluginFormats();
 
+    /** Returns true if an audio plugin format is supported */
+    bool isAudioPluginFormatSupported (const String&) const;
+    
     /** Returns an audio plugin format by name */
     AudioPluginFormat* getAudioPluginFormat (const String& formatName) const;
     
@@ -103,8 +106,7 @@ public:
     void restoreUserPlugins (const XmlElement& xml);
 
     AudioPluginInstance* createAudioPlugin (const PluginDescription& desc, String& errorMsg);
-    Processor *createPlugin (const PluginDescription& desc, String& errorMsg);
-    GraphNode* createGraphNode (const PluginDescription& desc, String& errorMsg);
+    NodeObject* createGraphNode (const PluginDescription& desc, String& errorMsg);
 
     /** Set the play config used when instantiating plugins */
     void setPlayConfig (double sampleRate, int blockSize);

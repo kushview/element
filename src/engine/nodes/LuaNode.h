@@ -20,11 +20,11 @@
 #pragma once
 
 #include "engine/nodes/BaseProcessor.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 
 namespace Element {
 
-class LuaNode : public GraphNode,
+class LuaNode : public NodeObject,
                 public ChangeBroadcaster
 {
 public:
@@ -35,7 +35,7 @@ public:
     
     struct Context;
 
-    void fillInPluginDescription (PluginDescription& desc);
+    void getPluginDescription (PluginDescription& desc) const override;
     void prepareToRender (double sampleRate, int maxBufferSize) override;
     void releaseResources() override;
     void render (AudioSampleBuffer& audio, MidiPipe& midi) override;

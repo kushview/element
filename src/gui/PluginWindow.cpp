@@ -18,7 +18,7 @@
 */
 
 #include "controllers/GuiController.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "gui/GuiCommon.h"
 #include "gui/PluginWindow.h"
 #include "gui/ContextMenus.h"
@@ -212,7 +212,7 @@ private:
     Value bypassValue;
     bool nativeEditor = false;
     ScopedPointer<Component> editor, leftPanel, rightPanel;
-    GraphNodePtr object;
+    NodeObjectPtr object;
     Node node;
 
     class MenuCallback : public ModalComponentManager::Callback {
@@ -333,7 +333,7 @@ void PluginWindow::activeWindowStatusChanged()
         app->checkForegroundStatus();
 }
 
-void PluginWindow::updateGraphNode (GraphNode *newNode, Component *newEditor)
+void PluginWindow::updateGraphNode (NodeObject *newNode, Component *newEditor)
 {
     jassert(nullptr != newNode && nullptr != newEditor);
     owner = newNode;

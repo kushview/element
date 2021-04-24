@@ -32,29 +32,24 @@ public:
     MidiIONodeEditor (const Node& node, MidiEngine& engine, bool ins = true, bool outs = true)
         : NodeEditorComponent (node), midi (engine), showIns (ins), showOuts (outs)
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         content.reset (new Content (*this));
         view.setViewedComponent (content.get(), false);
         view.setScrollBarsShown (true, false);
         addAndMakeVisible (view);
         midi.addChangeListener (this);
         startTimer (1.5 * 1000);
-       #endif
     }
 
     ~MidiIONodeEditor()
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         stopTimer();
         midi.removeChangeListener (this);
         view.setViewedComponent (nullptr, false);
         content.reset();
-       #endif
     }
     
     void paint (Graphics& g) override
     {
-       #if EL_RUNNING_AS_PLUGIN
         g.setFont (13.f);
         g.setColour (LookAndFeel::textColor);
         String text = "Host MIDI ";
@@ -64,7 +59,7 @@ public:
             text << "Output";
         g.drawText (text, getLocalBounds(), Justification::centred);
 
-        #if 0
+#if 0
         String text;
         PortArray ins, outs;
         getNode().getPorts (ins, outs, PortType::Audio);
@@ -83,24 +78,19 @@ public:
         
         if (text.isNotEmpty())
             g.drawText (text, getLocalBounds(), Justification::centred);
-       #endif
-       #endif
+#endif
     }
 
     void changeListenerCallback (ChangeBroadcaster*) override
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         content->updateDevices();
         content->updateSize();
-       #endif
     }
 
     void resized() override
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         view.setBounds (getLocalBounds());
         content->setSize (view.getWidth(), content->getHeight());
-       #endif
     }
 
 private:
@@ -258,7 +248,6 @@ private:
 
     void timerCallback() override
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         if (! content)
             return;
         bool didAnything = false;
@@ -269,7 +258,6 @@ private:
 
         if (didAnything)
             content->updateSize();
-       #endif
     }
 };
 

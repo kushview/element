@@ -19,11 +19,11 @@
 
 #pragma once
 
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 
 namespace Element {
 
-class MidiFilterNode : public GraphNode
+class MidiFilterNode : public NodeObject
 {
 public:
     virtual ~MidiFilterNode();

@@ -37,9 +37,7 @@
 #include "Globals.h"
 #include "Messages.h"
 
-#if EL_RUNNING_AS_PLUGIN
- #include "plugins/PluginEditor.h"
-#endif
+#include "plugins/PluginEditor.h"
 
 namespace Element {
 namespace ViewHelpers {
@@ -104,10 +102,8 @@ ContentComponent* findContentComponent (Component* c)
     if (auto* pw = c->findParentComponentOfClass<PluginWindow>())
         return pw->getElementContentComponent();
 
-   #if EL_RUNNING_AS_PLUGIN
     if (auto* ed = c->findParentComponentOfClass<PluginEditor>())
         return ed->getContentComponent();
-   #endif
     
     if (auto* const contentComponent = findContentComponent())
         return contentComponent;
@@ -149,9 +145,9 @@ bool invokeDirectly (Component* c, const int commandID, bool async) {
     return false;
 }
 
-GraphNodePtr findGraphNodeFor (Component* c, const Node& node)
+NodeObjectPtr findGraphNodeFor (Component* c, const Node& node)
 {
-    GraphNodePtr obj = node.getGraphNode();
+    NodeObjectPtr obj = node.getGraphNode();
     
     if (nullptr == obj)
     {

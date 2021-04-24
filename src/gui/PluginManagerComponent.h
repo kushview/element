@@ -129,6 +129,7 @@ private:
     
     void editPluginPath (const String& format);
     void saveListToSettings();
+    bool isPluginVersion();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PluginListComponent)
 };

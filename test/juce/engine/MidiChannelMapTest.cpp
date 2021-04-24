@@ -101,7 +101,7 @@ private:
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
         
-        GraphNodePtr node = proc.addNode (processor, 0);
+        NodeObjectPtr node = proc.addNode (processor, 0);
         MessageManager::getInstance()->runDispatchLoopUntil (10);
         expect (processor->getTotalNumInputChannels() == 0);
         expect (processor->getTotalNumOutputChannels() == 0);
@@ -133,7 +133,7 @@ private:
 
         expect (node->getPortType (18) == PortType::Unknown);
 
-        GraphNodePtr midiIn = proc.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
+        NodeObjectPtr midiIn = proc.addNode (new Element::GraphProcessor::AudioGraphIOProcessor (
             GraphProcessor::AudioGraphIOProcessor::midiInputNode));
 
         beginTest ("connectivity");

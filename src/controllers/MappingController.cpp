@@ -50,9 +50,9 @@ public:
     void handleAsyncUpdate() override 
     {
         AudioProcessor* capturedProcessor = nullptr;
-        GraphNodePtr capturedObject = nullptr;
+        NodeObjectPtr capturedObject = nullptr;
         Node capturedNode = Node();
-        int capturedParameter = GraphNode::NoParameter;
+        int capturedParameter = NodeObject::NoParameter;
 
         {
             ScopedLock sl (lock);
@@ -64,14 +64,14 @@ public:
             node        = Node();
             object      = nullptr;
             processor   = nullptr;
-            parameter   = GraphNode::NoParameter;
+            parameter   = NodeObject::NoParameter;
         }
 
         if (capturedObject != nullptr && capturedObject.get() == capturedNode.getGraphNode())
         {
-            if (capturedParameter == GraphNode::EnabledParameter ||
-                capturedParameter == GraphNode::BypassParameter ||
-                capturedParameter == GraphNode::MuteParameter ||
+            if (capturedParameter == NodeObject::EnabledParameter ||
+                capturedParameter == NodeObject::BypassParameter ||
+                capturedParameter == NodeObject::MuteParameter ||
                 isPositiveAndBelow (capturedParameter, capturedObject->getParameters().size()))
             {
                 callback (capturedNode, capturedParameter);
@@ -108,7 +108,7 @@ public:
     Signal<void(const Node&, int)> callback;
     Atomic<bool> capture        = false;
     Node node;
-    GraphNodePtr object         = nullptr;
+    NodeObjectPtr object         = nullptr;
     AudioProcessor* processor   = nullptr;
     int parameter               = -1;
 
@@ -166,7 +166,7 @@ private:
 
         void controlTouched (int, bool) override {}
 
-        void onEnablementChanged (GraphNode*)
+        void onEnablementChanged (NodeObject*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -175,11 +175,11 @@ private:
             capture.node      = node;
             capture.object    = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = GraphNode::EnabledParameter;
+            capture.parameter = NodeObject::EnabledParameter;
             capture.triggerAsyncUpdate();
         }
 
-        void onBypassChanged (GraphNode*)
+        void onBypassChanged (NodeObject*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -188,11 +188,11 @@ private:
             capture.node      = node;
             capture.object    = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = GraphNode::BypassParameter;
+            capture.parameter = NodeObject::BypassParameter;
             capture.triggerAsyncUpdate();
         }
 
-        void onMuteChanged (GraphNode*)
+        void onMuteChanged (NodeObject*)
         {
             if (capture.capture.get() == false)
                 return;
@@ -201,14 +201,14 @@ private:
             capture.node      = node;
             capture.object    = object;
             capture.processor = object->getAudioProcessor();
-            capture.parameter = GraphNode::MuteParameter;
+            capture.parameter = NodeObject::MuteParameter;
             capture.triggerAsyncUpdate();
         }
 
     private:
         AudioProcessorParameterCapture& capture;
         Node node;
-        GraphNodePtr object;
+        NodeObjectPtr object;
         Array<SignalConnection> connections;
     };
 
@@ -219,7 +219,7 @@ private:
         for (int j = 0; j < node.getNumNodes(); ++j)
         {
             const auto child (node.getNode (j));
-            if (GraphNode* const object = child.getGraphNode())
+            if (NodeObject* const object = child.getGraphNode())
                 mappables.add (new Mappable (*this, child));
             if (child.getNumChildren() > 0)
                 addNodesRecursive (child);
@@ -238,11 +238,11 @@ public:
 
     bool isCaptureComplete() const
     {
-        GraphNodePtr object = node.getGraphNode();
+        NodeObjectPtr object = node.getGraphNode();
         return object != nullptr && 
-            (parameter == GraphNode::EnabledParameter || 
-             parameter == GraphNode::BypassParameter || 
-             parameter == GraphNode::MuteParameter ||
+            (parameter == NodeObject::EnabledParameter || 
+             parameter == NodeObject::BypassParameter || 
+             parameter == NodeObject::MuteParameter ||
              isPositiveAndBelow (parameter, object->getParameters().size())) &&
             (message.isController() || message.isNoteOn()) && 
             control.getValueTree().isValid();

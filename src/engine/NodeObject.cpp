@@ -26,15 +26,15 @@
 #include "engine/nodes/SubGraphProcessor.h"
 
 #include "engine/AudioEngine.h"
-#include "engine/GraphNode.h"
 #include "engine/GraphProcessor.h"
 #include "engine/MidiPipe.h"
+#include "engine/NodeObject.h"
 
 #include "session/Node.h"
 
 namespace Element {
 
-GraphNode::GraphNode (const uint32 nodeId_) noexcept
+NodeObject::NodeObject (const uint32 nodeId_) noexcept
     : nodeId (nodeId_),
       metadata (Tags::node),
       isPrepared (false),
@@ -45,18 +45,19 @@ GraphNode::GraphNode (const uint32 nodeId_) noexcept
     parent = nullptr;
     gain.set(1.0f); lastGain.set (1.0f);
     inputGain.set(1.0f); lastInputGain.set (1.0f);
+    oversampler = std::make_unique<Oversampler<float>>();
     metadata.setProperty (Slugs::id, static_cast<int64> (nodeId), nullptr)
             .setProperty (Slugs::type, getTypeString(), nullptr);
 }
 
-GraphNode::~GraphNode()
+NodeObject::~NodeObject()
 {
     clearParameters();
     enablement.cancelPendingUpdate();
     parent = nullptr;
 }
 
-void GraphNode::clearParameters()
+void NodeObject::clearParameters()
 {
    #if JUCE_DEBUG
     for (const auto* param : parameters)
@@ -65,12 +66,12 @@ void GraphNode::clearParameters()
     parameters.clear();
 }
 
-bool GraphNode::isSpecialParameter (int parameter)
+bool NodeObject::isSpecialParameter (int parameter)
 {
     return parameter >= SpecialParameterBegin && parameter < SpecialParameterEnd;
 }
 
-String GraphNode::getSpecialParameterName (int parameter)
+String NodeObject::getSpecialParameterName (int parameter)
 {
     String name = "N/A";
 
@@ -85,34 +86,34 @@ String GraphNode::getSpecialParameterName (int parameter)
     return name;
 }
 
-const String& GraphNode::getTypeString() const
+const String& NodeObject::getTypeString() const
 { 
     return (nullptr == processor<GraphProcessor>())
         ? Tags::plugin.toString() : Tags::graph.toString();
 }
 
-bool GraphNode::containsParameter (const int index) const
+bool NodeObject::containsParameter (const int index) const
 {
     const auto numParams = getNumPorts (PortType::Control, true);
     return (index >= SpecialParameterBegin && index < SpecialParameterEnd) ||
         (isPositiveAndBelow (index, numParams));
 }
 
-GraphNode* GraphNode::createForRoot (GraphProcessor* g)
+NodeObject* NodeObject::createForRoot (GraphProcessor* g)
 {
     auto* node = new AudioProcessorNode (0, g);
     return node;
 }
 
-void GraphNode::setInputGain (const float f) {
+void NodeObject::setInputGain (const float f) {
     inputGain.set(f);
 }
 
-void GraphNode::setGain (const float f) {
+void NodeObject::setGain (const float f) {
     gain.set(f);
 }
 
-void GraphNode::getPluginDescription (PluginDescription& desc) const
+void NodeObject::getPluginDescription (PluginDescription& desc) const
 {
     if (AudioPluginInstance* i = getAudioPluginInstance())
     {
@@ -125,7 +126,7 @@ void GraphNode::getPluginDescription (PluginDescription& desc) const
     }
 }
 
-void GraphNode::connectAudioTo (const GraphNode* other)
+void NodeObject::connectAudioTo (const NodeObject* other)
 {
     jassert (getParentGraph());
     jassert (getParentGraph() == other->getParentGraph());
@@ -153,7 +154,7 @@ void GraphNode::connectAudioTo (const GraphNode* other)
     }
 }
 
-bool GraphNode::isAudioInputNode() const
+bool NodeObject::isAudioInputNode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     if (IOP* iop = processor<IOP>())
@@ -161,7 +162,7 @@ bool GraphNode::isAudioInputNode() const
     return false;
 }
 
-bool GraphNode::isAudioOutputNode() const
+bool NodeObject::isAudioOutputNode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     if (IOP* iop = processor<IOP>())
@@ -169,12 +170,12 @@ bool GraphNode::isAudioOutputNode() const
     return false;
 }
 
-bool GraphNode::isAudioIONode() const
+bool NodeObject::isAudioIONode() const
 {
     return isAudioInputNode() || isAudioOutputNode();
 }
 
-bool GraphNode::isMidiIONode() const
+bool NodeObject::isMidiIONode() const
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     if (IOP* iop = dynamic_cast<IOP*> (getAudioProcessor()))
@@ -182,32 +183,32 @@ bool GraphNode::isMidiIONode() const
     return false;
 }
 
-bool GraphNode::isMidiDeviceNode() const
+bool NodeObject::isMidiDeviceNode() const
 {
     return nullptr != dynamic_cast<MidiDeviceProcessor*> (getAudioProcessor());
 }
 
-int GraphNode::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
-int GraphNode::getNumAudioOutputs()     const { return ports.size (PortType::Audio, false); }
+int NodeObject::getNumAudioInputs()      const { return ports.size (PortType::Audio, true); }
+int NodeObject::getNumAudioOutputs()     const { return ports.size (PortType::Audio, false); }
 
-void GraphNode::setInputRMS (int chan, float val)
+void NodeObject::setInputRMS (int chan, float val)
 {
     if (chan < inRMS.size())
         inRMS.getUnchecked(chan)->set(val);
 }
 
-void GraphNode::setOutputRMS (int chan, float val)
+void NodeObject::setOutputRMS (int chan, float val)
 {
     if (chan < outRMS.size())
         outRMS.getUnchecked(chan)->set(val);
 }
 
-bool GraphNode::isSuspended() const
+bool NodeObject::isSuspended() const
 {
     return bypassed.get() == 1;
 }
 
-void GraphNode::suspendProcessing (const bool shouldBeSuspended)
+void NodeObject::suspendProcessing (const bool shouldBeSuspended)
 {
     const bool wasSuspeneded = isSuspended();
     const int iShouldBeSuspended = static_cast<int> (shouldBeSuspended);
@@ -229,49 +230,49 @@ void GraphNode::suspendProcessing (const bool shouldBeSuspended)
         bypassChanged (this);
 }
 
-bool GraphNode::isGraph() const noexcept        { return nullptr != dynamic_cast<GraphProcessor*> (getAudioProcessor()); }
-bool GraphNode::isSubGraph() const noexcept     { return nullptr != dynamic_cast<SubGraphProcessor*> (getAudioProcessor()); }
-bool GraphNode::isRootGraph() const noexcept    { return nullptr != dynamic_cast<RootGraph*> (getAudioProcessor()); }
+bool NodeObject::isGraph() const noexcept        { return nullptr != dynamic_cast<GraphProcessor*> (getAudioProcessor()); }
+bool NodeObject::isSubGraph() const noexcept     { return nullptr != dynamic_cast<SubGraphProcessor*> (getAudioProcessor()); }
+bool NodeObject::isRootGraph() const noexcept    { return nullptr != dynamic_cast<RootGraph*> (getAudioProcessor()); }
 
-PortType GraphNode::getPortType (const uint32 port) const
+PortType NodeObject::getPortType (const uint32 port) const
 {
     const PortType t (ports.getType (static_cast<int> (port)));
     return t;
 }
 
-int GraphNode::getNumPorts (const PortType type, const bool isInput) const { return ports.size (type, isInput); }
-uint32 GraphNode::getNumPorts() const { return (uint32) ports.size(); }
+int NodeObject::getNumPorts (const PortType type, const bool isInput) const { return ports.size (type, isInput); }
+uint32 NodeObject::getNumPorts() const { return (uint32) ports.size(); }
 
-PortDescription GraphNode::getPort (int index) const
+PortDescription NodeObject::getPort (int index) const
 {
     auto port = ports.getPort (index);
     jassert (index == port.index);
     return port;
 }
 
-bool GraphNode::isPortInput (const uint32 port)  const 
+bool NodeObject::isPortInput (const uint32 port)  const 
 {
     jassert (port < getNumPorts());
     return ports.isInput (static_cast<int> (port), false); 
 }
 
-bool GraphNode::isPortOutput (const uint32 port) const
+bool NodeObject::isPortOutput (const uint32 port) const
 {
     jassert (port < getNumPorts());
     return ports.isOutput (static_cast<int> (port), true);
 }
 
-uint32 GraphNode::getPortForChannel (const PortType type, const int channel, const bool isInput) const
+uint32 NodeObject::getPortForChannel (const PortType type, const int channel, const bool isInput) const
 {
     return static_cast<uint32> (ports.getPortForChannel (type, channel, isInput));
 }
 
-int GraphNode::getChannelPort (const uint32 port) const
+int NodeObject::getChannelPort (const uint32 port) const
 {
     return ports.getChannelForPort (static_cast<int> (port));
 }
 
-int GraphNode::getNthPort (const PortType type, const int index, bool isInput, bool oneBased) const
+int NodeObject::getNthPort (const PortType type, const int index, bool isInput, bool oneBased) const
 {
     int count = oneBased ? 0 : -1;
     
@@ -292,10 +293,10 @@ int GraphNode::getNthPort (const PortType type, const int index, bool isInput, b
     return KV_INVALID_PORT;
 }
 
-uint32 GraphNode::getMidiInputPort()  const { return getPortForChannel (PortType::Midi, 0, true); }
-uint32 GraphNode::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
+uint32 NodeObject::getMidiInputPort()  const { return getPortForChannel (PortType::Midi, 0, true); }
+uint32 NodeObject::getMidiOutputPort() const { return getPortForChannel (PortType::Midi, 0, false); }
 
-void GraphNode::prepare (const double newSampleRate, const int blockSize,
+void NodeObject::prepare (const double newSampleRate, const int blockSize,
                          GraphProcessor* const parentGraph,
                          bool willBeEnabled)
 {
@@ -307,11 +308,10 @@ void GraphNode::prepare (const double newSampleRate, const int blockSize,
         isPrepared = true;
         setParentGraph (parentGraph); //<< ensures io nodes get setup
 
-        initOversampling (jmax (getNumPorts (PortType::Audio, true), 
-                                getNumPorts (PortType::Audio, false)), 
-                                blockSize);
-
-        const int osFactor = getOversamplingFactor();
+        oversampler->prepare (jmax (getNumPorts (PortType::Audio, true), 
+                                    getNumPorts (PortType::Audio, false)), 
+                                    blockSize);
+        const int osFactor = jmax (1, getOversamplingFactor());
         prepareToRender (sampleRate * osFactor, blockSize * osFactor);
 
         // TODO: move model code out of engine code
@@ -342,19 +342,19 @@ void GraphNode::prepare (const double newSampleRate, const int blockSize,
     }
 }
 
-void GraphNode::unprepare()
+void NodeObject::unprepare()
 {
     if (isPrepared)
     {
         isPrepared = false;
         releaseResources();
-        resetOversampling();
+        oversampler->reset();
         inRMS.clear (true);
         outRMS.clear (true);
     }
 }
 
-void GraphNode::setEnabled (const bool shouldBeEnabled)
+void NodeObject::setEnabled (const bool shouldBeEnabled)
 {
     if (shouldBeEnabled == isEnabled())
         return;
@@ -387,19 +387,19 @@ void GraphNode::setEnabled (const bool shouldBeEnabled)
     enablementChanged (this);
 }
 
-void GraphNode::EnablementUpdater::handleAsyncUpdate()
+void NodeObject::EnablementUpdater::handleAsyncUpdate()
 {
     graph.setEnabled (! graph.isEnabled());
 }
 
 //=============================================================================
 
-void GraphNode::reloadMidiProgram()
+void NodeObject::reloadMidiProgram()
 {
     midiProgramLoader.triggerAsyncUpdate();
 }
 
-File GraphNode::getMidiProgramFile (int program) const
+File NodeObject::getMidiProgramFile (int program) const
 {
     PluginDescription desc;
     getPluginDescription (desc);
@@ -428,7 +428,7 @@ File GraphNode::getMidiProgramFile (int program) const
     return file;
 }
 
-void GraphNode::saveMidiProgram()
+void NodeObject::saveMidiProgram()
 {
     if (useGlobalMidiPrograms())
         return; // don't save global programs here.
@@ -443,7 +443,7 @@ void GraphNode::saveMidiProgram()
     }
 }
 
-void GraphNode::removeMidiProgram (int program, bool global)
+void NodeObject::removeMidiProgram (int program, bool global)
 {
     if (! isPositiveAndBelow (program, 128))
         return;
@@ -465,19 +465,19 @@ void GraphNode::removeMidiProgram (int program, bool global)
     }
 }
 
-GraphNode::MidiProgram* GraphNode::getMidiProgram (int program) const
+NodeObject::MidiProgram* NodeObject::getMidiProgram (int program) const
 {
     if (! isPositiveAndBelow (program, 128))
         return nullptr;
     for (auto* const p : midiPrograms)
         if (p->program == program)
             return p;
-    auto* const ret = midiPrograms.add (new GraphNode::MidiProgram ());
+    auto* const ret = midiPrograms.add (new NodeObject::MidiProgram ());
     ret->program = program;
     return ret;
 }
 
-void GraphNode::MidiProgramLoader::handleAsyncUpdate()
+void NodeObject::MidiProgramLoader::handleAsyncUpdate()
 {
     const File programFile = node.getMidiProgramFile();
     const bool globalPrograms = node.useGlobalMidiPrograms();
@@ -531,7 +531,7 @@ void GraphNode::MidiProgramLoader::handleAsyncUpdate()
                                // the property is still relavent.
 }
 
-void GraphNode::setMidiProgram (const int program)
+void NodeObject::setMidiProgram (const int program)
 {
     if (program < 0 || program > 127)
     {
@@ -542,7 +542,7 @@ void GraphNode::setMidiProgram (const int program)
     midiProgram.set (program);
 }
 
-void GraphNode::setMidiProgramName (const int program, const String& name) 
+void NodeObject::setMidiProgramName (const int program, const String& name) 
 {
     if (useGlobalMidiPrograms())
         return; // names not supported with global programs yet.
@@ -551,7 +551,7 @@ void GraphNode::setMidiProgramName (const int program, const String& name)
         pr->name = name;
 }
 
-String GraphNode::getMidiProgramName (const int program) const
+String NodeObject::getMidiProgramName (const int program) const
 {
     if (useGlobalMidiPrograms())
     {
@@ -565,7 +565,7 @@ String GraphNode::getMidiProgramName (const int program) const
     return {};
 }
 
-void GraphNode::getMidiProgramsState (String& state) const
+void NodeObject::getMidiProgramsState (String& state) const
 {
     state = String();
     if (midiPrograms.size() <= 0)
@@ -590,7 +590,7 @@ void GraphNode::getMidiProgramsState (String& state) const
     state = mo.getMemoryBlock().toBase64Encoding();
 }
 
-void GraphNode::setMidiProgramsState (const String& state)
+void NodeObject::setMidiProgramsState (const String& state)
 {
     midiPrograms.clearQuick (true);
     if (state.isEmpty())
@@ -604,8 +604,8 @@ void GraphNode::setMidiProgramsState (const String& state)
     for (int i = 0; i < tree.getNumChildren(); ++i)
     {
         const auto data = tree.getChild (i);
-        std::unique_ptr<GraphNode::MidiProgram> program;
-        program.reset (new GraphNode::MidiProgram());
+        std::unique_ptr<NodeObject::MidiProgram> program;
+        program.reset (new NodeObject::MidiProgram());
         program->program = (int) data [Tags::program];
         program->name = data[Tags::name].toString();
         const auto state = data.getProperty (Tags::state).toString().trim();
@@ -618,14 +618,13 @@ void GraphNode::setMidiProgramsState (const String& state)
 }
 
 //=============================================================================
-
-void GraphNode::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
+void NodeObject::renderBypassed (AudioSampleBuffer& audio, MidiPipe& midi)
 {
     audio.clear (0, audio.getNumSamples());
     midi.clear();
 }
 
-void GraphNode::resetPorts()
+void NodeObject::resetPorts()
 {
     createPorts(); // TODO: should be a standalone operation
 
@@ -689,9 +688,9 @@ void GraphNode::resetPorts()
             sub->getNode(i)->resetPorts();
 }
 
-GraphProcessor* GraphNode::getParentGraph() const { return parent; }
+GraphProcessor* NodeObject::getParentGraph() const { return parent; }
 
-void GraphNode::setParentGraph (GraphProcessor* const graph)
+void NodeObject::setParentGraph (GraphProcessor* const graph)
 {
     typedef GraphProcessor::AudioGraphIOProcessor IOP;
     parent = graph;
@@ -703,7 +702,7 @@ void GraphNode::setParentGraph (GraphProcessor* const graph)
     }
 }
 
-void GraphNode::setMuted (bool muted)
+void NodeObject::setMuted (bool muted)
 {
     bool wasMuted = isMuted();
     mute.set (muted ? 1 : 0);
@@ -711,52 +710,50 @@ void GraphNode::setMuted (bool muted)
         muteChanged (this);
 }
 
-void GraphNode::initOversampling (int numChannels, int blockSize)
+dsp::Oversampling<float>* NodeObject::getOversamplingProcessor()
 {
-    osProcessors.clear();
-    numChannels = jmax (1, numChannels); // avoid assertion on nodes that don't have audio
-    for (int p = 1; p <= maxOsPow; ++p)
-        osProcessors.add (new dsp::Oversampling<float> (numChannels, 
-            p, dsp::Oversampling<float>::FilterType::filterHalfBandPolyphaseIIR));
-
-    prepareOversampling (blockSize);
+    return oversampler->getProcessor (osPow - 1);
 }
 
-void GraphNode::prepareOversampling (int blockSize)
+void NodeObject::setOversamplingFactor (int osFactor)
 {
-    for (auto* osProcessor : osProcessors)
-        osProcessor->initProcessing (blockSize);
+    const auto newOsPow = (int) log2f ((float) osFactor);
+
+    {
+        ScopedLock sl (getPropertyLock());
+        if (newOsPow == osPow)
+            return;
+
+        if (osFactor > 1)
+        {
+            osPow = (int) log2f ((float) osFactor);
+            if (auto* const osProc = getOversamplingProcessor())
+                osLatency = osProc->getLatencyInSamples();
+        }
+        else
+        {
+            osPow = 0;
+            osLatency = 0.0;
+        }
+    }
+
+    if (auto* g = getParentGraph())
+        g->triggerAsyncUpdate();
 }
 
-void GraphNode::resetOversampling()
-{
-    for (auto* osProcessor : osProcessors)
-        osProcessor->reset();
-}
-
-dsp::Oversampling<float>* GraphNode::getOversamplingProcessor()
-{
-    return osProcessors[osPow-1];
-}
-
-void GraphNode::setOversamplingFactor (int osFactor)
-{
-    osPow = (int) log2f ((float) osFactor);
-    if (auto* osProc = getOversamplingProcessor())
-        osLatency = osProc->getLatencyInSamples();
-}
-
-int GraphNode::getOversamplingFactor()
+int NodeObject::getOversamplingFactor()
 {
     if (osPow > 0)
+    {
         if (auto* osProc = getOversamplingProcessor())
             return static_cast<int> (osProc->getOversamplingFactor());
-
+    }
+    
     return 1;
 }
 
 //=========================================================================
-void GraphNode::setDelayCompensation (double delayMs)
+void NodeObject::setDelayCompensation (double delayMs)
 {
     if (delayCompMillis == delayMs)
         return;
@@ -765,8 +762,8 @@ void GraphNode::setDelayCompensation (double delayMs)
     delayCompSamples = roundToInt (delayCompMillis * 0.001 * sampleRate);
 }
 
-double GraphNode::getDelayCompensation()        const { return delayCompMillis; }
-int GraphNode::getDelayCompensationSamples()    const { return delayCompSamples; }
+double NodeObject::getDelayCompensation()        const { return delayCompMillis; }
+int NodeObject::getDelayCompensationSamples()    const { return delayCompSamples; }
 
 //=========================================================================
 struct ChannelConnectionMap
@@ -780,7 +777,7 @@ struct ChannelConnectionMap
     uint32 otherNodePort;
 };
 
-void GraphNode::PortResetter::handleAsyncUpdate()
+void NodeObject::PortResetter::handleAsyncUpdate()
 {
     auto* const graph = node.getParentGraph();
     jassert (graph != nullptr);
@@ -826,19 +823,19 @@ void GraphNode::PortResetter::handleAsyncUpdate()
     node.portsChanged();
 }
 
-void GraphNode::triggerPortReset()
+void NodeObject::triggerPortReset()
 {
     portResetter.cancelPendingUpdate();
     portResetter.triggerAsyncUpdate();
 }
 
 //=========================================================================
-int GraphNode::getLatencySamples() const
+int NodeObject::getLatencySamples() const
 {
     return latencySamples + delayCompSamples + roundFloatToInt (osLatency);
 }
 
-void GraphNode::setLatencySamples (int latency)
+void NodeObject::setLatencySamples (int latency)
 {
     if (latency == latencySamples)
         return;
@@ -846,7 +843,7 @@ void GraphNode::setLatencySamples (int latency)
 }
 
 //=========================================================================
-Parameter::Ptr GraphNode::getOrCreateParameter (const PortDescription& port)
+Parameter::Ptr NodeObject::getOrCreateParameter (const PortDescription& port)
 {
     jassert (port.type == PortType::Control && port.input == true);
     if (port.type != PortType::Control && port.input != true)

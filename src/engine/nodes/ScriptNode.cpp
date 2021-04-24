@@ -48,7 +48,7 @@ namespace Element {
 
 //=============================================================================
 ScriptNode::ScriptNode() noexcept
-    : GraphNode (0)
+    : NodeObject (0)
 {
     Lua::initializeState (lua);
     script.reset (new DSPScript (lua.create_table()));
@@ -114,7 +114,7 @@ Result ScriptNode::loadScript (const String& newCode)
     return Result::ok();
 }
 
-void ScriptNode::fillInPluginDescription (PluginDescription& desc)
+void ScriptNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Script";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_SCRIPT;

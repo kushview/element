@@ -22,6 +22,7 @@
 #include "gui/GuiCommon.h"
 #include "session/PluginManager.h"
 #include "session/Presets.h"
+#include "Utils.h"
 
 namespace Element {
 
@@ -83,19 +84,11 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
-        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByManufacturer);
-    
+        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByCategory);
+
         PopupMenu unvMenu;
-       #if JUCE_MAC
-        StringArray unvFormats = { "AudioUnit", "VST", "VST3", "LV2" };
-       #elif JUCE_WINDOWS
-        StringArray unvFormats = { "VST", "VST3" };
-       #else
-        StringArray unvFormats = { "VST", "VST3", "LADSPA", "LV2" };
-       #endif
-        
         unverified.clearQuick (true);
-        for (const auto& name : unvFormats)
+        for (const auto& name : Util::getSupportedAudioPluginFormats())
         {
             PopupMenu menu;
             const int lastSize = unverified.size();
@@ -207,7 +200,7 @@ public:
     {
         PopupMenu menu;
         int index = 30000;
-        GraphNodePtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getGraphNode();
         menu.addItem (index++, "Mute input ports", ptr != nullptr, ptr && ptr->isMutingInputs());
 
         addOversamplingSubmenu (menu);
@@ -219,12 +212,13 @@ public:
     {
         PopupMenu osMenu;
         int index = 40000;
-        GraphNodePtr ptr = node.getGraphNode();
+        NodeObjectPtr ptr = node.getGraphNode();
 
         if (ptr == nullptr || ptr->isAudioIONode() || ptr->isMidiIONode()) // not the right type of node
             return;
 
-        osMenu.addItem (index++, "1x", true, ptr->getOversamplingFactor() == 1);
+        osMenu.addItem (index++, "Off", true, ptr->getOversamplingFactor() == 1);
+        osMenu.addSeparator();
         osMenu.addItem (index++, "2x", true, ptr->getOversamplingFactor() == 2);
         osMenu.addItem (index++, "4x", true, ptr->getOversamplingFactor() == 4);
         osMenu.addItem (index++, "8x", true, ptr->getOversamplingFactor() == 8);
@@ -429,7 +423,7 @@ private:
         bool isTicked() override { return false; }
         bool perform() override
         {
-            if (GraphNodePtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getGraphNode())
             {
                 ptr->setEnabled (! ptr->isEnabled());
                 auto data = node.getValueTree();

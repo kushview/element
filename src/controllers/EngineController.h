@@ -126,7 +126,7 @@ public:
 private:
     friend struct RootGraphHolder;
     class RootGraphs; friend class RootGraphs;
-    ScopedPointer<RootGraphs> graphs;
+    std::unique_ptr<RootGraphs> graphs;
     
     friend class ChangeBroadcaster;
     void changeListenerCallback (ChangeBroadcaster*) override;

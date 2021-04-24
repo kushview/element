@@ -4,7 +4,7 @@ from subprocess import call, Popen, PIPE
 from waflib import Utils
 import os, sys
 import string
-sys.path.append (os.path.join (os.getcwd(), 'tools/waf'))
+sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
 import cross, element, juce, git
 
 APPNAME         = element.APPNAME
@@ -60,6 +60,7 @@ def configure (conf):
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
     
+    conf.load ('bundle')
     conf.load ('templates')
     conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
@@ -193,7 +194,14 @@ def build_lua_docs (bld):
         call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
 def build_lua_lib (bld):
+    luaEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        luaEnv.append_unique (k, [ '-fPIC' ])
     lua = bld (
+        name     = 'LUA',
+        target   = 'lib/lua',
+        env      = luaEnv,
+        install_path = None,
         features = 'cxx cxxstlib',
         includes = [
             'libs/lua',
@@ -234,16 +242,37 @@ def build_lua_lib (bld):
             libs/lua/src/llex.c
             libs/lua/src/ltm.c
             libs/lua/src/ldo.c
-        '''.split(),
-        target  = 'lib/lua',
-        name    = 'LUA',
-        install_path = None
+        '''.split()
     )
     lua.export_includes = lua.includes
-    bld.add_group()
     return lua
 
-def build_vst_linux (bld):
+def add_scripts_to (bld, builddir, instdir, 
+                    modsdir='Modules', 
+                    scriptsdir='Scripts'):
+    for node in bld.path.ant_glob ('libs/element/lua/el/*.lua'):
+        s = bld (
+            features    ='subst', 
+            source      = node,
+            target      = '%s/%s/el/%s' % (builddir, modsdir, node.name),
+            install_path= '%s/%s/el' % (instdir, modsdir) if instdir else None
+        )
+    for node in bld.path.ant_glob ('libs/lua-kv/src/kv/*.lua'):
+        bld (
+            features    ='subst',
+            source      = node,
+            target      = '%s/%s/kv/%s' % (builddir, modsdir, node.name),
+            install_path= '%s/%s/kv' % (instdir, modsdir) if instdir else None
+        )
+    for node in bld.path.ant_glob ('scripts/**/*.lua'):
+        bld (
+            features    ='subst',
+            source      = node,
+            target      = '%s/%s/%s' % (builddir, scriptsdir, node.name),
+            install_path= '%s/%s' % (instdir, scriptsdir) if instdir else None
+        )
+
+def build_vst_linux (bld, plugin):
     vstEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         vstEnv.append_unique (k, [ '-fPIC' ])
@@ -251,22 +280,67 @@ def build_vst_linux (bld):
     vst = bld (
         features        = 'cxx cxxshlib',
         source          = [
-            'tools/jucer/Element/Source/Element.cpp',
+            'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
             'libs/compat/include_juce_audio_plugin_client_VST2.cpp'
         ],
         includes        = common_includes(),
-        target          = 'lib/vst/Element',
+        target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
         use             = [ 'ELEMENT', 'LUA' ],
-        install_path    = bld.env.VSTDIR,
+        install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
-    bld.add_group()
 
 def build_vst (bld):
     if not bld.env.VST:
         return
-    if juce.is_linux(): build_vst_linux (bld)
+    if juce.is_linux():
+        for plugin in 'Element ElementFX'.split():
+            build_vst_linux (bld, plugin)
+
+def vst3_bundle_arch():
+    if juce.is_mac():
+        return 'MacOS'
+    if juce.is_linux():
+        return 'x86_64-linux'
+    return ''
+
+def build_vst3_linux (bld, plugin):
+    if not bld.env.VST:
+        return
+
+    vstEnv = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        vstEnv.append_unique (k, [ '-fPIC' ])
+    
+    vstEnv.cxxshlib_PATTERN = bld.env.plugin_PATTERN
+    vst3 = bld.bundle (
+        name            = '%s_BUNDLE_VST3' % plugin,
+        target          = 'plugins/VST3/%s.vst3' % plugin,
+        install_path    = '%s/Kushview' % (bld.env.VST3DIR)
+    )
+
+    binary = vst3.bundle_create_child ('Contents/%s/%s' % (vst3_bundle_arch(), plugin),
+        features        = 'cxx cxxshlib',
+        name            = '%s_VST3' % plugin,        
+        source          = [
+            'tools/jucer/%s/Source/%s.cpp' % (plugin, plugin),
+            'libs/compat/include_juce_audio_plugin_client_VST3.cpp'
+        ],
+        includes        = common_includes(),
+        env             = vstEnv,
+        use             = [ 'ELEMENT', 'LUA', vst3.name ]
+    )
+
+    add_scripts_to (bld,
+        '%s/Contents/Resources' % vst3.bundle_node(),
+        '%s/Contents/Resources' % vst3.bundle_install_path()
+    )
+
+def build_vst3 (bld):
+    if juce.is_linux():
+        for plugin in 'Element ElementFX'.split():
+            build_vst3_linux (bld, plugin)
 
 def copy_app_bundle_lua_files(ctx):
     if not juce.is_mac():
@@ -291,9 +365,6 @@ def build_app (bld):
     )
     library.export_includes = library.includes
     
-
-    bld.add_group()
-
     appEnv = bld.env.derive()
     app = bld.program (
         source      = [ 'src/Main.cc' ],
@@ -304,8 +375,6 @@ def build_app (bld):
         use         = [ 'LUA', 'ELEMENT' ],
         linkflags   = []
     )
-
-    bld.add_group()
 
     if bld.env.LUA:     library.use += [ 'LUA' ]
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
@@ -323,15 +392,16 @@ def build_app (bld):
         ]
 
     elif juce.is_mac():
-        library.use += [ 'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
-                         'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
-                         'TEMPLATES' ]
-        app.target      = 'Applications/Element'
-        app.mac_app     = True
-        app.mac_plist   = 'data/Info.plist'
-        app.mac_files   = [ 'data/Icon.icns' ]
-
-        bld.add_post_fun (copy_app_bundle_lua_files)
+        library.use += [
+            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
+            'TEMPLATES'
+        ]
+        app.target       = 'Applications/Element'
+        app.mac_app      = True
+        app.mac_plist    = 'data/Info.plist'
+        app.mac_files    = [ 'data/Icon.icns' ]
+        add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     else:
         pass
@@ -385,20 +455,33 @@ def build (bld):
     build_lua_lib (bld)
     install_lua_files (bld)
     build_app (bld)
-    # build_vst (bld)
+    build_vst (bld)
+    build_vst3 (bld)
 
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
     if bld.env.TEST:
-        bld.recurse ('tests')
+        bld.recurse ('test')
 
 def check (ctx):
-    if not os.path.exists('build/bin/test-element'):
-        ctx.fatal ("Tests not compiled")
+    if not os.path.exists('build/bin/test_juce'):
+        ctx.fatal ("JUCE tests not compiled")
+        return
+    if not os.path.exists('build/bin/test_element'):
+        ctx.fatal ("Test suite not compiled")
         return
     os.environ["LD_LIBRARY_PATH"] = "build/lib"
-    if 0 != call (["build/bin/test-element"]):
-        ctx.fatal ("Tests failed")
+    failed = 0
+    print ("JUCE Tests")
+    if 0 != call (["build/bin/test_juce"]):
+        failed += 1
+    print ("Done!\n")
+
+    print ("Element Test Suite")
+    if 0 != call (["build/bin/test_element"]):
+        failed += 1
+    if (failed > 0):
+        ctx.fatal ("Test suite exited with fails")
 
 def dist (ctx):
     z = ctx.options.ziptype

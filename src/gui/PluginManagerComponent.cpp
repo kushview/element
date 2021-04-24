@@ -22,18 +22,11 @@
 #include "session/PluginManager.h"
 #include "Globals.h"
 #include "Settings.h"
+#include "Utils.h"
 
 namespace Element {
 
 static void removeNonElementPlugins (KnownPluginList& list);
-static bool isPluginVersion()
-{
-    #if EL_RUNNING_AS_PLUGIN
-    return true;
-    #else
-    return false;
-    #endif
-}
 
 class PluginListComponent::TableModel  : public TableListBoxModel
 {
@@ -124,12 +117,11 @@ public:
     
     void cellClicked (int row, int col, const MouseEvent& ev) override
     {
-        
         if (ev.mods.isPopupMenu())
         {
             PopupMenu menu;
-            menu.addItem (1, "Clear list", ! isPluginVersion());
-            menu.addItem (2, "Remove selected", ! isPluginVersion());
+            menu.addItem (1, "Clear list", ! owner.isPluginVersion());
+            menu.addItem (2, "Remove selected", ! owner.isPluginVersion());
             cellPopup (menu.show());
         }
     }
@@ -424,10 +416,15 @@ void PluginListComponent::buttonClicked (Button* button)
         menu.addSeparator();
         
         PopupMenu paths;
-        paths.addItem (100, TRANS("VST Path"));
-        paths.addItem (101, TRANS("VST3 Path"));
-        menu.addSubMenu ("Search Paths", paths);
-        menu.addSeparator();
+        if (plugins.isAudioPluginFormatSupported ("VST"))
+            paths.addItem (100, TRANS("VST Path"));
+        if (plugins.isAudioPluginFormatSupported ("VST3"))
+            paths.addItem (101, TRANS("VST3 Path"));
+        if (paths.getNumItems() > 0)
+        {
+            menu.addSubMenu ("Search Paths", paths);
+            menu.addSeparator();
+        }
         
         menu.addItem (2, TRANS("Remove selected plug-in from list"), !isPluginVersion() && table.getNumSelectedRows() > 0);
         menu.addItem (3, TRANS("Show folder containing selected plug-in"), !isPluginVersion() && canShowSelectedFolder());
@@ -767,7 +764,7 @@ private:
 
 static StringArray scanAllFormats (PluginManager& p)
 {
-    const StringArray supported ({ "AudioUnit", "VST", "VST3", "LV2", "LADSPA" });
+    const StringArray supported (Util::getSupportedAudioPluginFormats());
     StringArray filtered;
     for (int i = 0; i < p.getAudioPluginFormats().getNumFormats (); ++i)
     {
@@ -783,17 +780,20 @@ void PluginListComponent::scanAll()
 {
     plugins.scanInternalPlugins();
     
-   #if EL_RUNNING_AS_PLUGIN
-    ignoreUnused (scanAllFormats);
-    AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Plugin Scanner",
-                                     "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
-   #else
-    if (auto* world = ViewHelpers::getGlobals (this))
-        plugins.saveUserPlugins (world->getSettings());
-    currentScanner = new Scanner (*this, plugins, scanAllFormats (plugins),
-                                  TRANS("Scanning for plug-ins..."),
-                                  TRANS("Searching for all possible plug-in files..."));
-   #endif
+    if (isPluginVersion())
+    {
+        ignoreUnused (scanAllFormats);
+        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, "Plugin Scanner",
+                                        "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
+    }
+    else
+    {
+        if (auto* world = ViewHelpers::getGlobals (this))
+            plugins.saveUserPlugins (world->getSettings());
+        currentScanner = new Scanner (*this, plugins, scanAllFormats (plugins),
+                                      TRANS("Scanning for plug-ins..."),
+                                      TRANS("Searching for all possible plug-in files..."));
+    }
 }
 
 void PluginListComponent::scanFor (AudioPluginFormat& format)
@@ -803,16 +803,22 @@ void PluginListComponent::scanFor (AudioPluginFormat& format)
         return;
     }
     
-   #if EL_RUNNING_AS_PLUGIN
-    AlertWindow::showMessageBoxAsync(AlertWindow::NoIcon, "Plugin Scanner",
-                                     "Scanning for plugins is currently not possible in the plugin version.\n\nPlease scan plugins in the application first.");
-   #else
-    if (auto* world = ViewHelpers::getGlobals (this))
-        plugins.saveUserPlugins (world->getSettings());
-    currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads,
-                                  dialogTitle.isNotEmpty() ? dialogTitle : TRANS("Scanning for plug-ins..."),
-                                  dialogText.isNotEmpty()  ? dialogText  : TRANS("Searching for all possible plug-in files..."));
-   #endif
+    if (isPluginVersion())
+    {
+        AlertWindow::showMessageBoxAsync (AlertWindow::NoIcon, 
+            "Plugin Scanner",
+            "Scanning for plugins is currently not possible in the plugin version.\n\n" \
+            "Please scan plugins in the application first."
+        );
+    }
+    else
+    {
+        if (auto* world = ViewHelpers::getGlobals (this))
+            plugins.saveUserPlugins (world->getSettings());
+        currentScanner = new Scanner (*this, format, propertiesToUse, allowAsync, numThreads,
+                                        dialogTitle.isNotEmpty() ? dialogTitle : TRANS("Scanning for plug-ins..."),
+                                        dialogText.isNotEmpty()  ? dialogText  : TRANS("Searching for all possible plug-in files..."));
+    }
 }
 
 bool PluginListComponent::isScanning() const noexcept
@@ -825,7 +831,7 @@ void PluginListComponent::saveListToSettings()
     if (auto* world = ViewHelpers::getGlobals (this))
         plugins.saveUserPlugins (world->getSettings());
 }
-    
+
 void PluginListComponent::scanFinished (const StringArray& failedFiles)
 {
     StringArray shortNames;
@@ -887,6 +893,13 @@ void PluginListComponent::scanWithBackgroundScanner()
         currentScanner = nullptr;
     }
     currentScanner = new Scanner (*this, plugins, "Scanning for plugins", "Looking for new or updated plugins");
+}
+
+bool PluginListComponent::isPluginVersion()
+{
+    if (auto* cc = ViewHelpers::findContentComponent (this))
+        return cc->getAppController().getRunMode() == RunMode::Plugin;
+    return false;
 }
 
 }

@@ -1,0 +1,18 @@
+#!/usr/bin/env python
+# Build the unit tests
+
+bld.program (
+    source = bld.path.ant_glob ("juce/**/*.cpp"),
+    includes = [ 'juce' ],
+    target = '../bin/test_juce',
+    use = [ 'ELEMENT', 'LUA' ],
+    install_path = None
+)
+
+bld.program (
+    source = bld.path.ant_glob ("*.cpp"),
+    includes = [ '.' ],
+    target = '../bin/test_element',
+    use = [ 'ELEMENT', 'LUA', 'BOOST_TEST' ],
+    install_path = None
+)

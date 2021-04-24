@@ -33,7 +33,7 @@
 #include "gui/ViewHelpers.h"
 #include "gui/LookAndFeel.h"
 #include "gui/ContextMenus.h"
-
+#include "gui/NodeEditorFactory.h"
 #include "session/DeviceManager.h"
 #include "Globals.h"
 
@@ -359,7 +359,7 @@ void NodeEditorContentView::clearEditor()
 {
     if (editor == nullptr)
         return;
-    GraphNodePtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getGraphNode();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (auto* aped = dynamic_cast<AudioProcessorEditor*> (editor.get()))
     {
@@ -374,98 +374,57 @@ void NodeEditorContentView::clearEditor()
 Component* NodeEditorContentView::createEmbededEditor()
 {
     auto* const world = ViewHelpers::getGlobals (this);
+    jassert(world);
+    auto& app   = ViewHelpers::findContentComponent (this)->getAppController();
     
     if (node.isAudioInputNode())
     {
-       #if ! EL_RUNNING_AS_PLUGIN
-        if (node.isChildOfRootGraph())
+        if (app.getRunMode() == RunMode::Standalone)
         {
-            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                1, DeviceManager::maxAudioChannels, 0, 0, 
-                false, false, false, false);
+            if (node.isChildOfRootGraph())
+            {
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                    1, DeviceManager::maxAudioChannels, 0, 0, 
+                    false, false, false, false);
+            }
+            else
+            {
+                return nullptr;
+            }
         }
-        else
-        {
-            return nullptr;
-        }
-       #else
+
         return new AudioIONodeEditor (node, world->getDeviceManager(), true, false);
-       #endif
     }
 
     if (node.isAudioOutputNode())
     {
-       #if ! EL_RUNNING_AS_PLUGIN
-        if (node.isChildOfRootGraph())
+        if (app.getRunMode() == RunMode::Standalone)
         {
-            return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
-                0, 0, 1, DeviceManager::maxAudioChannels, 
-                false, false, false, false);
+            if (node.isChildOfRootGraph())
+            {
+                return new Element::AudioDeviceSelectorComponent (world->getDeviceManager(), 
+                    0, 0, 1, DeviceManager::maxAudioChannels, 
+                    false, false, false, false);
+            }
+            else
+            {
+                return nullptr;
+            }
         }
-        else
-        {
-            return nullptr;
-        }
-       #else
+
         return new AudioIONodeEditor (node, world->getDeviceManager(), false, true);
-       #endif
     }
 
-    if (node.isMidiInputNode())
-    {
-        if (node.isChildOfRootGraph())
-        {
-            return new MidiIONodeEditor (node, world->getMidiEngine(), true, false);
+    NodeEditorFactory factory (*app.findChild<GuiController>());
+    if (auto editor = factory.instantiate (node, NodeEditorPlacement::NavigationPanel))
+        return editor.release();
 
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    if (node.isMidiOutputNode())
-    {
-        if (node.isChildOfRootGraph())
-        {
-            return new MidiIONodeEditor (node, world->getMidiEngine(), false, true);
-        }
-        else
-        {
-            return nullptr;
-        }
-    }
-
-    GraphNodePtr object = node.getGraphNode();
+    NodeObjectPtr object = node.getGraphNode();
     auto* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
     if (proc != nullptr)
     {
         if (node.getFormat() == "Element" && proc->hasEditor())
             return proc->createEditor();
-        return new GenericNodeEditor (node);
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
-    {
-        auto* const programChangeMapEditor = new MidiProgramMapEditor (node);
-        programChangeMapEditor->setStoreSize (false);
-        programChangeMapEditor->setFontSize (programChangeMapEditor->getDefaultFontSize(), false);
-        programChangeMapEditor->setFontControlsVisible (false);
-        return programChangeMapEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_MONITOR)
-    {
-        auto* const midiMonitorEditor = new MidiMonitorNodeEditor (node);
-        return midiMonitorEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        auto* const audioRouterEditor = new AudioRouterEditor (node);
-        return audioRouterEditor;
-    }
-    else if (node.getIdentifier() == EL_INTERNAL_ID_MIDI_ROUTER)
-    {
-        auto* const midiRouterEditor = new MidiRouterEditor (node);
-        return midiRouterEditor;
     }
 
     return nullptr;

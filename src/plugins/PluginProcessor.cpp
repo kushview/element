@@ -58,8 +58,6 @@ static void setPluginMissingNodeProperties (const ValueTree& tree)
 #define mapsctl controller->findChild<MappingController>()
 #define devsctl controller->findChild<DevicesController>()
 
-
-
 //=============================================================================
 PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
     : AudioProcessor (createDefaultBuses (instanceType, jmax (0, numBuses))),
@@ -78,7 +76,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
 
     prepared = controllerActive = false;
     world.reset (new Globals());
-    world->setEngine (new AudioEngine (*world));
+    world->setEngine (new AudioEngine (*world, RunMode::Plugin));
     engine = world->getAudioEngine();
     SessionPtr session = world->getSession();
     Settings& settings (world->getSettings());
@@ -108,7 +106,7 @@ PluginProcessor::PluginProcessor (Variant instanceType, int numBuses)
         PLUGIN_DBG("[EL] couldn't create default graph");
     }
 
-    controller.reset (new AppController (*world));   
+    controller.reset (new AppController (*world, RunMode::Plugin));
     controller->activate();
     controllerActive = true;
 
@@ -447,7 +445,7 @@ void PluginProcessor::handleAsyncUpdate()
 
 bool PluginProcessor::isNodeBoundToAnyPerformanceParameter (const Node& boundNode, int boundParam) const
 {
-    if (! boundNode.isValid() || boundParam == GraphNode::NoParameter)
+    if (! boundNode.isValid() || boundParam == NodeObject::NoParameter)
         return false;
     for (auto* const pp : perfparams)
         if (boundNode == pp->getNode() && boundParam == pp->getBoundParameter())
@@ -473,7 +471,7 @@ PopupMenu PluginProcessor::getPerformanceParameterMenu (int perfParam)
         {
             PopupMenu submenu;
             auto node = graph.getNode (j);
-            GraphNodePtr ptr = node.getGraphNode();
+            NodeObjectPtr ptr = node.getGraphNode();
             if (ptr == nullptr)
                 continue;
             auto* proc = ptr->getAudioProcessor();

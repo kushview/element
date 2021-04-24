@@ -42,7 +42,7 @@ class ScriptTest : public LuaUnitTest
 {
 public:
     ScriptTest()
-        : LuaUnitTest ("Script", "Script", "basics") {}
+        : LuaUnitTest ("ScriptTest", "ScriptTest", "basics") {}
     
     void runTest() override
     {

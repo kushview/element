@@ -45,8 +45,8 @@ namespace Element {
 Globals& AppController::Child::getWorld()               { return getAppController().getWorld(); }
 Settings& AppController::Child::getSettings()           { return getWorld().getSettings(); }
 
-AppController::AppController (Globals& g)
-    : world (g)
+AppController::AppController (Globals& g, RunMode m)
+    : world (g), runMode (m)
 {
     addChild (new GuiController (g, *this));
     addChild (new DevicesController());
@@ -570,7 +570,9 @@ bool AppController::perform (const InvocationInfo& info)
 
 void AppController::checkForegroundStatus()
 {
-   #if ! EL_RUNNING_AS_PLUGIN
+    if (runMode != RunMode::Standalone)
+        return;
+
     class CheckForeground : public CallbackMessage
     {
     public:
@@ -607,7 +609,6 @@ void AppController::checkForegroundStatus()
     };
 
     (new CheckForeground(*this))->post();
-   #endif
 }
 
 }

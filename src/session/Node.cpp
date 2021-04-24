@@ -245,7 +245,7 @@ Node Node::createDefaultGraph (const String& name)
 
 const String Node::getPluginName() const
 {
-    if (GraphNodePtr object = getGraphNode())
+    if (NodeObjectPtr object = getGraphNode())
         return object->getName();
     return {};
 }
@@ -468,12 +468,12 @@ void Node::setMissingProperties()
     objectData.getOrCreateChildWithName (Tags::ui, nullptr);
 }
 
-GraphNode* Node::getGraphNode() const
+NodeObject* Node::getGraphNode() const
 {
-    return dynamic_cast<GraphNode*> (objectData.getProperty (Tags::object, var()).getObject());
+    return dynamic_cast<NodeObject*> (objectData.getProperty (Tags::object, var()).getObject());
 }
 
-GraphNode* Node::getGraphNodeForId (const uint32 nodeId) const
+NodeObject* Node::getGraphNodeForId (const uint32 nodeId) const
 {
     const Node node (getNodeById (nodeId));
     return node.isValid() ? node.getGraphNode() : nullptr;
@@ -527,7 +527,7 @@ bool Node::isMidiOutputDevice() const
 //==============================================================================
 void Node::resetPorts()
 {
-    if (GraphNodePtr ptr = getGraphNode())
+    if (NodeObjectPtr ptr = getGraphNode())
     {
         // workaround to keep IO node names correct. note that
         // setParentGraph may or may not call reset ports
@@ -759,7 +759,7 @@ void Node::restorePluginState()
     if (! isValid())
         return;
     
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
     {
         if (auto* const proc = obj->getAudioProcessor())
         {
@@ -874,7 +874,7 @@ void Node::savePluginState()
     if (! isValid())
         return;
     
-    GraphNodePtr obj = getGraphNode();
+    NodeObjectPtr obj = getGraphNode();
     if (obj && obj->isPrepared)
     {
         MemoryBlock state;
@@ -979,13 +979,13 @@ bool Node::hasEditor() const
 
 void ConnectionBuilder::addConnections (GraphManager& controller, const uint32 targetNodeId) const
 {
-    GraphNodePtr tgt = controller.getNodeForId (targetNodeId);
+    NodeObjectPtr tgt = controller.getNodeForId (targetNodeId);
     if (tgt)
     {
         bool anythingAdded = false;
         for (const auto* pc : portChannelMap)
         {
-            GraphNodePtr ptr = controller.getNodeForId (pc->nodeId);
+            NodeObjectPtr ptr = controller.getNodeForId (pc->nodeId);
             if (! ptr)
                 continue;
 
@@ -1038,11 +1038,11 @@ void Node::forEach (const ValueTree tree, std::function<void(const ValueTree& tr
         forEach (tree.getChild (i), handler);
 }
 
-// default value here must match that as defined in GraphNode.h
+// default value here must match that as defined in NodeObject.h
 bool Node::useGlobalMidiPrograms() const    { return (bool) getProperty (Tags::globalMidiPrograms, false); }
 void Node::setUseGlobalMidiPrograms (bool useGlobal)
 {
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
     {
         if (obj->useGlobalMidiPrograms() == useGlobal)
             return;
@@ -1051,11 +1051,11 @@ void Node::setUseGlobalMidiPrograms (bool useGlobal)
     }
 }
 
-// default value here must match that as defined in GraphNode.h
+// default value here must match that as defined in NodeObject.h
 bool Node::areMidiProgramsEnabled() const   { return (bool) getProperty (Tags::midiProgramsEnabled, false); }
 void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 {
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
     {
         if (obj->areMidiProgramsEnabled() == useMidiPrograms)
             return;
@@ -1067,7 +1067,7 @@ void Node::setMidiProgramsEnabled (bool useMidiPrograms)
 int Node::getMidiProgram() const { return (int) getProperty (Tags::midiProgram, 0); }
 void Node::setMidiProgram (int program)
 {
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
     {
         if (obj->getMidiProgram() == program)
             return;
@@ -1078,14 +1078,14 @@ void Node::setMidiProgram (int program)
 
 String Node::getMidiProgramName (int program) const
 {
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
         return obj->getMidiProgramName (program);
     return {};
 }
 
 void Node::setMidiProgramName (int program, const String& name)
 {
-    if (GraphNodePtr obj = getGraphNode())
+    if (NodeObjectPtr obj = getGraphNode())
         obj->setMidiProgramName (program, name);
     // setProperty (Tags::midiProgram, obj->areMidiProgramsEnabled());
 }
@@ -1116,7 +1116,7 @@ void NodeObjectSync::setNode (const Node& n)
 
 void NodeObjectSync::valueTreePropertyChanged (ValueTree& tree, const Identifier& property)
 {
-    GraphNodePtr obj = node.getGraphNode();
+    NodeObjectPtr obj = node.getGraphNode();
     if (tree != data || frozen || obj == nullptr)
         return;
         

@@ -73,7 +73,7 @@ void NodeMidiContentView::stabilizeContent()
         setEnabled (true);
         updateProperties();
 
-        if (GraphNodePtr ptr = node.getGraphNode())
+        if (NodeObjectPtr ptr = node.getGraphNode())
         {
            #if defined (EL_PRO) || defined (EL_SOLO)
             midiProgramChangedConnection = ptr->midiProgramChanged.connect (

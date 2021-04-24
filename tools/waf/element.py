@@ -30,6 +30,17 @@ def check_common (self):
     self.check (lib='curl', mandatory=False)
     self.check (header_name='stdbool.h', mandatory=True)
     self.check (header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
+    self.check_cxx (
+        msg = "Checking for Boost.Test",
+        fragment = '''
+            #define BOOST_TEST_MODULE ElementConfigure
+            #include <boost/test/included/unit_test.hpp>
+        ''',
+        execute = False,
+        uselib_store = 'BOOST_TEST',
+        define_name = 'HAVE_BOOST_TEST',
+        mandatory = False
+    )
 
     # Web Browser
     self.define ('JUCE_WEB_BROWSER', 0)
@@ -54,12 +65,16 @@ def check_common (self):
             # check for distrho... somehow?
             pass
         self.line_just = line_just
-
     self.define ('JUCE_PLUGINHOST_VST', self.env.VST)
 
     # VST3 hosting
     self.env.VST3 = not bool (self.options.no_vst3)
     self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
+    if self.env.VST3:
+        line_just = self.line_just
+        self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', uselib_store='VSTFXSTORE_H', mandatory=False)
+        self.define ('JUCE_VST3_CAN_REPLACE_VST2', bool (self.env.HAVE_VSTFXSTORE_H))
+        self.line_just = line_just
 
     # LV2 Support
     self.env.LV2 = not bool(self.options.no_lv2)
@@ -68,7 +83,7 @@ def check_common (self):
         self.check_cfg(package='lilv-0', uselib_store="LILV", args='--cflags --libs', mandatory=False)
         self.check_cfg(package='suil-0', uselib_store="SUIL", args='--cflags --libs', mandatory=False)
         if bool(self.env.HAVE_SUIL):
-            self.check_cxx(
+            self.check_cxx (
                 msg = "Checking for suil_init(...)",
                 fragment = '''
                     #include <suil/suil.h>

@@ -73,9 +73,6 @@ SystemTray::SystemTray()
 
 void SystemTray::setEnabled (bool enabled)
 {
-   #if EL_RUNNING_AS_PLUGIN
-    ignoreUnused (enabled);
-   #else
     if (enabled)
     {
         if (instance == nullptr)
@@ -95,7 +92,6 @@ void SystemTray::setEnabled (bool enabled)
             instance = nullptr;
         }
     }
-   #endif
 }
 
 void SystemTray::mouseUp (const MouseEvent& ev)

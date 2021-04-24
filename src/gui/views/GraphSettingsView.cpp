@@ -175,7 +175,7 @@ namespace Element {
         {
             auto session = ViewHelpers::getSession (this);
             node.setProperty (Tags::midiChannel, getMidiChannel());
-            if (GraphNodePtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getGraphNode())
                 if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                     root->setMidiChannel (getMidiChannel());
         }

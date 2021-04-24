@@ -43,7 +43,7 @@
 
 #define JUCE_USE_DARK_SPLASH_SCREEN 1
 
-#define JUCE_PROJUCER_VERSION 0x60007
+#define JUCE_PROJUCER_VERSION 0x60008
 
 //==============================================================================
 #define JUCE_MODULE_AVAILABLE_jlv2_host                  1
@@ -170,6 +170,10 @@
 
 #ifndef    JUCE_CUSTOM_VST3_SDK
  //#define JUCE_CUSTOM_VST3_SDK 0
+#endif
+
+#ifndef    JUCE_VST3_HOST_CROSS_PLATFORM_UID
+ //#define JUCE_VST3_HOST_CROSS_PLATFORM_UID 0
 #endif
 
 //==============================================================================

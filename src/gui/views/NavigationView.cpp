@@ -225,7 +225,7 @@ private:
                 
 //            AudioEnginePtr e = cc->app().globals().getAudioEngine();
 //            GraphProcessor& graph (e->graph());
-            ReferenceCountedArray<Element::GraphNode> nodes;
+            ReferenceCountedArray<Element::NodeObject> nodes;
 //            graph.getOrderedNodes (nodes);
             
             for (int i = 0; i < nodes.size(); ++i)
@@ -244,7 +244,7 @@ private:
     class PluginInstanceItem :  public TreeItemBase
     {
     public:
-        PluginInstanceItem (GraphNodePtr n) : node (n)
+        PluginInstanceItem (NodeObjectPtr n) : node (n)
         {
             jassert (node != nullptr);
             instance = node->getAudioPluginInstance();
@@ -271,7 +271,7 @@ private:
 
         }
         
-        GraphNodePtr node;
+        NodeObjectPtr node;
         AudioPluginInstance* instance;
     };
 };

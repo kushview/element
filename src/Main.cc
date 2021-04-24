@@ -16,8 +16,6 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#if ! EL_RUNNING_AS_PLUGIN
-
 #include "ElementApp.h"
 #include "controllers/AppController.h"
 #include "controllers/GraphController.h"
@@ -476,5 +474,3 @@ private:
 }
 
 START_JUCE_APPLICATION (Element::Application)
-
-#endif

@@ -20,6 +20,8 @@
 #pragma once
 
 #include "ElementApp.h"
+#include "engine/MidiPipe.h"
+#include "engine/Oversampler.h"
 #include "engine/Parameter.h"
 
 namespace Element {
@@ -30,9 +32,8 @@ class ProcessBufferOp;
 }
 
 class GraphProcessor;
-class MidiPipe;
 
-class GraphNode : public ReferenceCountedObject
+class NodeObject : public ReferenceCountedObject
 {
 public:
     /** Special parameter indexes when mapping universal node settings */
@@ -50,10 +51,10 @@ public:
         that owns it, and can't be changed. */
     const uint32 nodeId;
 
-    virtual ~GraphNode();
+    virtual ~NodeObject();
     
     /** Create a node suitable for binding to a root graph */
-    static GraphNode* createForRoot (GraphProcessor*);
+    static NodeObject* createForRoot (GraphProcessor*);
     
     /** Returns true if a parameter index is special */
     static bool isSpecialParameter (int parameter);
@@ -195,8 +196,9 @@ public:
     bool isMidiIONode() const;
     bool isMidiDeviceNode() const;
 
-    /* returns the parent graph. If one has not been set, then
-       this will return nullptr */
+    /* Returns the parent graph.
+       If one has not been set, then this will return nullptr.
+     */
     GraphProcessor* getParentGraph() const;
 
     void setInputRMS (int chan, float val);
@@ -206,7 +208,7 @@ public:
 
     //=========================================================================
     /** Connect this node's output audio to another node's input audio */
-    void connectAudioTo (const GraphNode* other);
+    void connectAudioTo (const NodeObject* other);
 
     //=========================================================================
     /** Enable or disable this node */
@@ -345,16 +347,16 @@ public:
 
     //=========================================================================
     /** Triggered when the enabled state changes */
-    Signal<void(GraphNode*)> enablementChanged;
+    Signal<void(NodeObject*)> enablementChanged;
 
     /** Triggered when the bypass state changes */
-    Signal<void(GraphNode*)> bypassChanged;
+    Signal<void(NodeObject*)> bypassChanged;
 
     /** Triggered when the current MIDI program changes */
     Signal<void()> midiProgramChanged;
 
     /** Triggered when the mute state changes */
-    Signal<void(GraphNode*)> muteChanged;
+    Signal<void(NodeObject*)> muteChanged;
 
     /** Triggered immediately before this node is removed from a graph */
     Signal<void()> willBeRemoved;
@@ -366,7 +368,7 @@ public:
     Signal<void()> nameChanged;
 
 protected:
-    GraphNode (uint32 nodeId) noexcept;
+    NodeObject (uint32 nodeId) noexcept;
     virtual void createPorts() = 0;
     virtual void initialize() {}
 
@@ -434,27 +436,27 @@ private:
     CriticalSection propertyLock;
     struct EnablementUpdater : public AsyncUpdater
     {
-        EnablementUpdater (GraphNode& g) : graph (g) { }
+        EnablementUpdater (NodeObject& g) : graph (g) { }
         ~EnablementUpdater() { }
         void handleAsyncUpdate() override;
-        GraphNode& graph;
+        NodeObject& graph;
     } enablement;
 
     struct MidiProgramLoader : public AsyncUpdater
     {
-        MidiProgramLoader (GraphNode& n) : node (n) { }
+        MidiProgramLoader (NodeObject& n) : node (n) { }
         ~MidiProgramLoader() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
-        GraphNode& node;    
+        NodeObject& node;    
     } midiProgramLoader;
 
     friend struct PortResetter;
     struct PortResetter : public AsyncUpdater
     {
-        PortResetter (GraphNode& n) : node (n) {}
+        PortResetter (NodeObject& n) : node (n) {}
         ~PortResetter() { cancelPendingUpdate(); }
         void handleAsyncUpdate() override;
-        GraphNode& node;    
+        NodeObject& node;    
     } portResetter;
 
     struct MidiProgram
@@ -470,25 +472,21 @@ private:
     void prepare (double sampleRate, int blockSize, GraphProcessor*, bool willBeEnabled = false);
     void unprepare();
     void resetPorts();
-    void initOversampling (int numChannels, int blockSize);
-    void prepareOversampling (int blockSize);
-    void resetOversampling();
+
+    std::unique_ptr<Oversampler<float>> oversampler;
+    int osPow = 0;
+    float osLatency = 0.0f;
     dsp::Oversampling<float>* getOversamplingProcessor();
 
     Parameter::Ptr getOrCreateParameter (const PortDescription&);
 
-    int osPow = 0;
-    float osLatency = 0.0f;
-    OwnedArray<dsp::Oversampling<float>> osProcessors;
-    const int maxOsPow = 3;
-
     double delayCompMillis = 0.0;
     int delayCompSamples = 0;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GraphNode)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (NodeObject)
 };
 
 /** A convenient typedef for referring to a pointer to a node object. */
-typedef ReferenceCountedObjectPtr<GraphNode> GraphNodePtr;
+using NodeObjectPtr = ReferenceCountedObjectPtr<NodeObject>;
 
 }

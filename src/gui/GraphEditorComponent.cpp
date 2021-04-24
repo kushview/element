@@ -844,7 +844,7 @@ void GraphEditorComponent::dragConnector (const MouseEvent& e)
     }
 }
 
-Component* GraphEditorComponent::createContainerForNode (GraphNodePtr node, bool useGenericEditor)
+Component* GraphEditorComponent::createContainerForNode (NodeObjectPtr node, bool useGenericEditor)
 {
     if (AudioProcessorEditor* ed = createEditorForNode (node, useGenericEditor))
         if (Component* comp = wrapAudioProcessorEditor (ed, node))
@@ -852,9 +852,9 @@ Component* GraphEditorComponent::createContainerForNode (GraphNodePtr node, bool
     return nullptr;
 }
 
-Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* ed, GraphNodePtr) { return ed; }
+Component* GraphEditorComponent::wrapAudioProcessorEditor(AudioProcessorEditor* ed, NodeObjectPtr) { return ed; }
 
-AudioProcessorEditor* GraphEditorComponent::createEditorForNode (GraphNodePtr node, bool useGenericEditor)
+AudioProcessorEditor* GraphEditorComponent::createEditorForNode (NodeObjectPtr node, bool useGenericEditor)
 {
     std::unique_ptr<AudioProcessorEditor> ui = nullptr;
     

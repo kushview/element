@@ -38,8 +38,9 @@ public:
     
 private:
     typedef GraphProcessor::AudioGraphIOProcessor IOProcessor;
-    GraphNodePtr ioNodes [PortType::Unknown];
+    NodeObjectPtr ioNodes [PortType::Unknown];
     friend class GraphManager;
+    friend class PluginManager;
     ScopedPointer<GraphManager> controller;
     void createAllIONodes();
     void initController (PluginManager& plugins);

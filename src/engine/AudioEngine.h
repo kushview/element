@@ -26,6 +26,7 @@
 #include "engine/Transport.h"
 #include "session/DeviceManager.h"
 #include "session/Session.h"
+#include "RunMode.h"
 
 namespace Element {
 
@@ -102,14 +103,15 @@ public:
     const String getAudioOutputDeviceName() const       { return audioOutName; }
     
     /** the index in the audio engine.  if less than 0 then the graph
-        is not attached */
+        is not attached
+     */
     int getEngineIndex()    const { return engineIndex; }
 
 private:
     friend class AudioEngine;
     friend struct RootGraphRender;
 
-    GraphNodePtr ioNodes [IOProcessor::numDeviceTypes];
+    NodeObjectPtr ioNodes [IOProcessor::numDeviceTypes];
     String graphName = "Device";
     String audioInName, audioOutName;
     StringArray audioInputNames;
@@ -128,10 +130,13 @@ class AudioEngine : public Engine
 {
 public:
     Signal<void()> sampleLatencyChanged;
-
-    AudioEngine (Globals&);
+    AudioEngine (Globals&, RunMode mode = RunMode::Standalone);
     virtual ~AudioEngine() noexcept;
 
+    //==========================================================================
+    RunMode getRunMode() const { return runMode; }
+
+    //==========================================================================
     void activate();
     void deactivate();
     
@@ -191,6 +196,7 @@ private:
     class Private;
     ScopedPointer<Private> priv;
     Globals& world;
+    RunMode runMode;
 };
 
 typedef ReferenceCountedObjectPtr<AudioEngine> AudioEnginePtr;

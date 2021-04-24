@@ -19,6 +19,9 @@
 
 #include "Globals.h"
 #include "controllers/GuiController.h"
+#include "engine/GraphProcessor.h"
+#include "engine/NodeObject.h"
+#include "gui/NodeEditorFactory.h"
 #include "gui/MainWindow.h"
 #include "gui/WindowManager.h"
 
@@ -31,6 +34,24 @@ void WindowManager::onWindowClosed (Window* c)
     jassert (activeWindows.contains (c));
     c->setVisible (false);
     activeWindows.removeObject (c, true);
+}
+
+void WindowManager::closeOpenPluginWindowsFor (GraphProcessor& proc, const bool windowVisible)
+{
+    for (int i = 0; i < proc.getNumNodes(); ++i)
+        if (auto node = proc.getNode (i))
+            for (int j = activePluginWindows.size(); --j >= 0;)
+                if (activePluginWindows.getUnchecked(j)->owner == node)
+                    { deletePluginWindow (j, windowVisible); break; }
+}
+    
+void WindowManager::closeOpenPluginWindowsFor (NodeObject* const node, const bool windowVisible)
+{
+    if (! node)
+        return;
+    for (int i = activePluginWindows.size(); --i >= 0;)
+        if (activePluginWindows.getUnchecked(i)->owner == node)
+            { deletePluginWindow (i, windowVisible); break; }
 }
 
 void WindowManager::deletePluginWindow (PluginWindow* window, const bool windowVisible)
@@ -60,58 +81,11 @@ PluginWindow* WindowManager::createPluginWindowFor (const Node& n, Component* e)
 
 PluginWindow* WindowManager::createPluginWindowFor (const Node& node)
 {
-    if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
-    {
-        auto* const pgced = new MidiProgramMapEditor (node);
-        if (auto* object = dynamic_cast<MidiProgramMapNode*> (node.getGraphNode()))
-            pgced->setSize (object->getWidth(), object->getHeight());
-
-        return createPluginWindowFor (node, pgced);
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        auto* ared = new AudioRouterEditor (node);
-        ared->setAutoResize (true);
-        ared->adjustBoundsToMatrixSize (32);
-        return createPluginWindowFor (node, ared);
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_ROUTER)
-    {
-        return createPluginWindowFor (node, new MidiRouterEditor (node));
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_MIDI_MONITOR)
-    {
-        return createPluginWindowFor (node, new MidiMonitorNodeEditor (node));
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_RECEIVER)
-    {
-        return createPluginWindowFor (node, new OSCReceiverNodeEditor (node));
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_OSC_SENDER)
-    {
-        return createPluginWindowFor (node, new OSCSenderNodeEditor (node));
-    }
-    else if (node.getIdentifier().toString().contains ("element.volume"))
-    {
-        return createPluginWindowFor (node, new VolumeNodeEditor (node, gui));
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_LUA)
-    {
-        return createPluginWindowFor (node, new LuaNodeEditor (node));
-    }
-    else if (node.getIdentifier().toString() == EL_INTERNAL_ID_SCRIPT)
-    {
-        return createPluginWindowFor (node, new ScriptNodeEditor (gui.getWorld().getScriptingEngine(), node));
-    }
-    
-    GraphNodePtr object = node.getGraphNode();
-    AudioProcessor* proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
-    if (! proc)
-        return nullptr;
-    if (! proc->hasEditor())
-        return createPluginWindowFor (node, new GenericAudioProcessorEditor (proc));
-    auto* editor = proc->createEditorIfNeeded();
-    return (editor != nullptr) ? createPluginWindowFor (node, editor) : nullptr;
+    NodeEditorFactory factory (gui);
+    if (auto e = factory.instantiate (node, NodeEditorPlacement::PluginWindow))
+        return createPluginWindowFor (node, e.release());
+    auto editor = NodeEditorFactory::createAudioProcessorEditor (node);
+    return (editor != nullptr) ? createPluginWindowFor (node, editor.release()) : nullptr;
 }
 
 }

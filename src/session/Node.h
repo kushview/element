@@ -20,7 +20,7 @@
 #pragma once
 
 #include "ElementApp.h"
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 
 namespace Element {
 
@@ -265,10 +265,10 @@ public:
     
     //=========================================================================
     /** Returns the engine-side graphnode implementation */
-    GraphNode* getGraphNode() const;
+    NodeObject* getGraphNode() const;
     
     /** Returns a child graph node object by id */
-    GraphNode* getGraphNodeForId (const uint32) const;
+    NodeObject* getGraphNodeForId (const uint32) const;
 
     /** Returns true if this node can connect to another in any capacity */
     const bool canConnectTo (const Node& o) const;
@@ -425,7 +425,7 @@ public:
     Node getNodeByUuid (const Uuid& uuid, const bool recursive = true) const;
 
     //=========================================================================
-    /** Rebuild this node's ports based on it's GraphNode object */
+    /** Rebuild this node's ports based on it's NodeObject object */
     void resetPorts();
 
     /** Get a port by index */
@@ -436,10 +436,10 @@ public:
                      const uint32 destNode, const uint32 destPort) const;
     
     //=========================================================================
-    /** Saves the node state from GraphNode to state property */
+    /** Saves the node state from NodeObject to state property */
     void savePluginState();
     
-    /** Reads state property and applies to GraphNode */
+    /** Reads state property and applies to NodeObject */
     void restorePluginState();
     
     //=========================================================================

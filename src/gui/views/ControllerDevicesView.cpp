@@ -128,9 +128,9 @@ public:
                 text = "Parameter ";
                 text << mapp.getParameterIndex();
                 
-                if (GraphNode::isSpecialParameter (mapp.getParameterIndex()))
+                if (NodeObject::isSpecialParameter (mapp.getParameterIndex()))
                 {
-                    text = GraphNode::getSpecialParameterName (mapp.getParameterIndex());
+                    text = NodeObject::getSpecialParameterName (mapp.getParameterIndex());
                 }
                 else if (auto* obj = node.getGraphNode())
                 {
@@ -810,39 +810,46 @@ public:
         deviceName = editedDevice.getPropertyAsValue (Tags::name);
         props.add (new TextPropertyComponent (deviceName, "Controller Name", 120, false, true));
 
-       #if ! EL_RUNNING_AS_PLUGIN
-        StringArray keys = MidiInput::getDevices();
-        Array<var> values;
-        for (const auto& d : keys)
-            values.add (d);
+        jassert (ViewHelpers::findContentComponent(this) != nullptr);
+        auto& app = ViewHelpers::findContentComponent(this)->getAppController();
 
-        const auto& inputDeviceVar = editedDevice.getInputDevice();
-        if (inputDeviceVar.toString().isNotEmpty() && 
-            ! keys.contains (inputDeviceVar.toString()))
+        StringArray keys;
+        Array<var> values;
+        if (app.getRunMode() == RunMode::Standalone)
         {
-            keys.add (String());
-            values.add (String());
-            keys.add (inputDeviceVar.toString()); 
-            values.add (inputDeviceVar);
+            keys.addArray (MidiInput::getDevices());
+            for (const auto& d : keys)
+                values.add (d);
+
+            const auto& inputDeviceVar = editedDevice.getInputDevice();
+            if (inputDeviceVar.toString().isNotEmpty() && 
+                ! keys.contains (inputDeviceVar.toString()))
+            {
+                keys.add (String());
+                values.add (String());
+                keys.add (inputDeviceVar.toString()); 
+                values.add (inputDeviceVar);
+            }
+            inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
         }
-        inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
-       
-       #else
-        StringArray keys; keys.add ("Host MIDI");
-        Array<var> values; values.add (String ("hostMidi"));
-        inputDevice = Value();
-        inputDevice.setValue ("hostMidi");
-       #endif
-        
+        else
+        {
+            keys.add ("Host MIDI");
+            values.add (String ("hostMidi"));
+            inputDevice = Value();
+            inputDevice.setValue ("hostMidi");
+        }
+
         props.add (new ChoicePropertyComponent (inputDevice, "Input Device", keys, values));
 
-       #if EL_RUNNING_AS_PLUGIN
-        if (auto* inputDeviceProp = dynamic_cast<ChoicePropertyComponent*> (props.getLast()))
+        if (app.getRunMode() == RunMode::Plugin)
         {
-            inputDeviceProp->refresh();
-            inputDeviceProp->setEnabled (false);
+            if (auto* inputDeviceProp = dynamic_cast<ChoicePropertyComponent*> (props.getLast()))
+            {
+                inputDeviceProp->refresh();
+                inputDeviceProp->setEnabled (false);
+            }
         }
-       #endif
 
         auto control = controls.getSelectedControl();
 

@@ -56,7 +56,7 @@ public:
 
     File getSnippetFile (const String& filename) const
     {
-        String path = "tests/scripting/snippets/"; path << filename;
+        String path = "test/snippets/"; path << filename;
         return File::getCurrentWorkingDirectory()
             .getChildFile (path);
     }

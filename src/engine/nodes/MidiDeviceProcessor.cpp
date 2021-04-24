@@ -207,10 +207,8 @@ void MidiDeviceProcessor::prepareToPlay (double sampleRate, int maximumExpectedS
 
     if (inputDevice)
     {
-       #if ! EL_RUNNING_AS_PLUGIN
         if (deviceName.isNotEmpty())
             midi.addMidiInputCallback (deviceName, this, true);
-       #endif
     }
     else
     {

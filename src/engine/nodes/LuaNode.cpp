@@ -713,7 +713,7 @@ void LuaParameter::controlValueChanged (int index, float value)
 void LuaParameter::controlTouched (int, bool) {}
 
 LuaNode::LuaNode() noexcept
-    : GraphNode (0)
+    : NodeObject (0)
 {
     context = std::make_unique<Context>();
     jassert (metadata.hasType (Tags::node));
@@ -770,7 +770,7 @@ Result LuaNode::loadScript (const String& newScript)
     return result;
 }
 
-void LuaNode::fillInPluginDescription (PluginDescription& desc)
+void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Lua";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;

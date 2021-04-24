@@ -19,7 +19,7 @@
 
 #pragma once
 
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "session/Session.h"
 #include "Workspace.h"
 

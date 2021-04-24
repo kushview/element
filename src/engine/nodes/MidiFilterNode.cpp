@@ -22,7 +22,7 @@
 namespace Element {
 
 MidiFilterNode::MidiFilterNode (uint32 nodeId)
-    : GraphNode (nodeId) { }
+    : NodeObject (nodeId) { }
 MidiFilterNode::~MidiFilterNode() { }
 
 }

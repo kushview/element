@@ -320,11 +320,14 @@ void GuiController::presentPluginWindow (const Node& node, const bool focus)
     if (window != nullptr)
     {
         window->setName (String());
-       #if EL_RUNNING_AS_PLUGIN
-        // This makes plugin window handling more like the standalone
-        // we don't want to modify the existing standalone behavior
-        window->setAlwaysOnTop (true);
-       #endif
+
+        if (getRunMode() == RunMode::Plugin)
+        {
+            // This makes plugin window handling more like the standalone
+            // we don't want to modify the existing standalone behavior
+            window->setAlwaysOnTop (true);
+        }
+
         window->setVisible (true);
         window->toFront (focus);
     }
@@ -903,9 +906,8 @@ void GuiController::toggleAboutScreen()
         about->centreWithSize (about->getWidth(), about->getHeight());
         about->setVisible (true);
         about->toFront (true);
-       #if EL_RUNNING_AS_PLUGIN
-        about->setAlwaysOnTop (true);
-       #endif
+        if (getRunMode() == RunMode::Plugin)
+            about->setAlwaysOnTop (true);
     }
 }
 

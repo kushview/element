@@ -12,7 +12,7 @@ using namespace Element;
  #define EL_API_DOCS_URL "http://vscode.API_DOCS_URL.local"
 #endif
 
-namespace kv {
+namespace Element {
 using namespace juce;
 using PortDescription = kv::PortDescription;
 using PortType = kv::PortType;

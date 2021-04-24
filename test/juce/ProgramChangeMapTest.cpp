@@ -30,7 +30,7 @@ public:
     void runTest() override
     {
         GraphProcessor graph;
-        GraphNodePtr node = graph.addNode (new MidiProgramMapNode());
+        NodeObjectPtr node = graph.addNode (new MidiProgramMapNode());
         auto* pgc = dynamic_cast<MidiProgramMapNode*> (node.get());
 
         testMappings (node);
@@ -52,7 +52,7 @@ public:
     }
 
 private:
-    void testMappings (GraphNodePtr node)
+    void testMappings (NodeObjectPtr node)
     {
         beginTest ("port count");
         expect (node->getNumPorts (PortType::Midi, true) == 1);
@@ -83,7 +83,7 @@ private:
         expect (pgc->getNumProgramEntries() == 2);
     }
 
-    void testMidiStream (GraphNodePtr node, const String& name = "Renders mappings")
+    void testMidiStream (NodeObjectPtr node, const String& name = "Renders mappings")
     {
         beginTest (name);
         OwnedArray<MidiBuffer> buffers;

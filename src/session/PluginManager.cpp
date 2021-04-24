@@ -19,18 +19,12 @@
 
 #include "session/PluginManager.h"
 #include "session/Node.h"
-#include "engine/nodes/BaseProcessor.h"
-#include "engine/nodes/AudioRouterNode.h"
-#include "engine/nodes/LuaNode.h"
-#include "engine/nodes/MidiChannelSplitterNode.h"
-#include "engine/nodes/MidiMonitorNode.h"
-#include "engine/nodes/MidiProgramMapNode.h"
-#include "engine/nodes/MidiRouterNode.h"
-#include "engine/nodes/OSCReceiverNode.h"
-#include "engine/nodes/OSCSenderNode.h"
-#include "engine/nodes/ScriptNode.h"
+#include "engine/nodes/NodeTypes.h"
+#include "engine/nodes/SubGraphProcessor.h"
+#include "engine/NodeFactory.h"
 #include "DataPath.h"
 #include "Settings.h"
+#include "Utils.h"
 
 #define EL_DEAD_AUDIO_PLUGINS_FILENAME          "DeadAudioPlugins.txt"
 #define EL_PLUGIN_SCANNER_SLAVE_LIST_PATH       "Temp/SlavePluginList.xml"
@@ -481,8 +475,7 @@ public:
 
         if (props)
         {
-            const StringArray formats = { "AU", "VST", "VST3", "LV2" };
-            for (const auto& f : formats)
+            for (const auto& f : Util::getSupportedAudioPluginFormats())
             {
                 const auto key = String(Settings::lastPluginScanPathPrefix) + f;
                 paths.set (f, FileSearchPath (props->getValue (key)));
@@ -592,9 +585,10 @@ private:
 	KnownPluginList allPlugins;
 	File deadAudioPlugins;
     UnverifiedPlugins unverified;
+    NodeFactory nodes;
 	double sampleRate = 44100.0;
 	int    blockSize = 512;
-	ScopedPointer<PluginScanner> scanner;
+	std::unique_ptr<PluginScanner> scanner;
 
 	void scanAudioPlugins (const StringArray& names)
 	{
@@ -611,7 +605,7 @@ private:
 				if (formats.getFormat(i)->getName() != "Element" && formats.getFormat(i)->canScanForPlugins())
 					formatsToScan.add(formats.getFormat(i)->getName());
 
-		scanner = new PluginScanner (allPlugins);
+		scanner = std::make_unique<PluginScanner> (allPlugins);
 		scanner->addListener (this);
 		scanner->scanForAudioPlugins (formatsToScan);
 	}
@@ -663,10 +657,36 @@ PluginManager::~PluginManager()
 
 void PluginManager::addDefaultFormats()
 {
-    getAudioPluginFormats().addDefaultFormats();
-   #if JLV2_PLUGINHOST_LV2
-    addFormat (new jlv2::LV2PluginFormat());
-   #endif
+    auto& audioPlugs = getAudioPluginFormats();
+    for (const auto& fmt : Util::getSupportedAudioPluginFormats())
+    {
+        if (fmt == "") continue;
+       
+       #if JUCE_MAC && JUCE_PLUGINHOST_AU
+        else if (fmt == "AudioUnit")
+            audioPlugs.addFormat (new AudioUnitPluginFormat());
+       #endif
+
+       #if JUCE_PLUGINHOST_VST
+        else if (fmt == "VST")
+            audioPlugs.addFormat (new VSTPluginFormat());
+       #endif
+       
+       #if JUCE_PLUGINHOST_VST3
+        else if (fmt == "VST3")
+            audioPlugs.addFormat (new VST3PluginFormat());
+       #endif
+       
+       #if JUCE_PLUGINHOST_LADSPA
+        else if (fmt == "LADSPA")
+            audioPlugs.addFormat (new LADSPAPluginFormat());
+       #endif
+       
+       #if JLV2_PLUGINHOST_LV2
+        else if (fmt == "LV2")
+            audioPlugs.addFormat (new jlv2::LV2PluginFormat());
+       #endif
+    }
 }
 
 void PluginManager::addFormat (AudioPluginFormat* fmt)
@@ -705,11 +725,15 @@ PluginScanner* PluginManager::createAudioPluginScanner()
 
 PluginScanner* PluginManager::getBackgroundAudioPluginScanner()
 {
-	if (!priv) return 0;
-	if (!priv->scanner) {
-		priv->scanner = createAudioPluginScanner();
+	if (! priv) 
+        return nullptr;
+
+    if (! priv->scanner)
+    {
+		priv->scanner.reset (createAudioPluginScanner());
 		priv->scanner->addListener (priv.get());
 	}
+
 	return priv->scanner.get();
 }
 
@@ -725,60 +749,33 @@ AudioPluginInstance* PluginManager::createAudioPlugin (const PluginDescription& 
         desc, priv->sampleRate, priv->blockSize, errorMsg).release();
 }
 
-Processor* PluginManager::createPlugin (const PluginDescription &desc, String &errorMsg)
+NodeObject* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
 {
-    jassertfalse; // deprecated
-    if (AudioPluginInstance* instance = createAudioPlugin (desc, errorMsg))
-        return dynamic_cast<Processor*> (instance);
-    return nullptr;
-}
+    errorMsg.clear();
+    
+    if (auto* const plugin = createAudioPlugin (desc, errorMsg))
+    {
+        if (auto* const sub = dynamic_cast<SubGraphProcessor*> (plugin))
+            sub->initController (*this);
+        plugin->enableAllBuses();
+        return priv->nodes.wrap (plugin);
+    }
 
-GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String& errorMsg)
-{
+    if (errorMsg.isNotEmpty() && desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
+    {
+        return nullptr;
+    }
+    
+    errorMsg.clear();
     if (desc.pluginFormatName != EL_INTERNAL_FORMAT_NAME)
     {
-        errorMsg = "Invalid format";
+        errorMsg = desc.name;
+        errorMsg << ": invalid format: " << desc.pluginFormatName;
         return nullptr;
     }
 
-   #if defined (EL_PRO) || defined (EL_SOLO)
-    if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_SPLITTER)
-    {
-        return new MidiChannelSplitterNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_PROGRAM_MAP)
-    {
-        return new MidiProgramMapNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_MONITOR)
-    {
-        return new MidiMonitorNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_OSC_RECEIVER)
-    {
-        return new OSCReceiverNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_OSC_SENDER)
-    {
-        return new OSCSenderNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_ROUTER)
-    {
-        return new AudioRouterNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_ROUTER)
-    {
-        return new MidiRouterNode (4, 4);
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_LUA)
-    {
-        return new LuaNode();
-    }
-    else if (desc.fileOrIdentifier == EL_INTERNAL_ID_SCRIPT)
-    {
-        return new ScriptNode();
-    }
-   #endif
+    if (auto* node = priv->nodes.instantiate (desc))
+        return node;
 
     errorMsg = desc.name;
     errorMsg << " not found.";
@@ -788,6 +785,15 @@ GraphNode* PluginManager::createGraphNode (const PluginDescription& desc, String
 AudioPluginFormatManager& PluginManager::getAudioPluginFormats()
 {
     return priv->formats;
+}
+
+bool PluginManager::isAudioPluginFormatSupported (const String& name) const
+{
+    auto& fmts = priv->formats;
+    for (int i = 0; i < fmts.getNumFormats(); ++i)
+        if (fmts.getFormat(i)->getName() == name)
+            return true;
+    return false;
 }
 
 AudioPluginFormat* PluginManager::getAudioPluginFormat (const String& name) const
@@ -865,11 +871,11 @@ String PluginManager::getCurrentlyScannedPluginName() const
 
 void PluginManager::scanInternalPlugins()
 {
+    auto& nodes = priv->nodes;
     auto& manager = getAudioPluginFormats();
     for (int i = 0; i < manager.getNumFormats(); ++i)
     {
         auto* format = manager.getFormat (i);
-        
         if (format->getName() != "Element")
             continue;
         
@@ -889,6 +895,17 @@ void PluginManager::scanInternalPlugins()
         String name;
         while (scanner.scanNextFile (true, name)) {}
         
+        OwnedArray<PluginDescription> ds;
+        for (const auto& nodeTypeId : nodes.getKnownIDs())
+           nodes.getPluginDescriptions (ds, nodeTypeId);
+        for (const auto* const d : ds)
+        {
+            known.removeType (*d);
+            known.removeFromBlacklist (d->fileOrIdentifier);
+            known.removeFromBlacklist (d->createIdentifierString());
+            known.addType (*d);
+        }
+
         break;
     }
 }

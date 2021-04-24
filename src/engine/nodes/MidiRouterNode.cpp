@@ -19,6 +19,7 @@
 
 #include "engine/nodes/BaseProcessor.h"
 #include "engine/nodes/MidiRouterNode.h"
+#include "engine/MidiPipe.h"
 #include "Common.h"
 
 #define TRACE_MIDI_ROUTER(output) 
@@ -26,7 +27,7 @@
 namespace Element {
 
 MidiRouterNode::MidiRouterNode (int ins, int outs)
-    : GraphNode (0),
+    : NodeObject (0),
       numSources (ins),
       numDestinations (outs),
       state (ins, outs),

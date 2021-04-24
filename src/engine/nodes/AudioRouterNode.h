@@ -19,14 +19,14 @@
 
 #pragma once
 
-#include "engine/GraphNode.h"
+#include "engine/NodeObject.h"
 #include "engine/LinearFade.h"
 #include "engine/ToggleGrid.h"
 #include "engine/nodes/BaseProcessor.h"
 
 namespace Element {
 
-class AudioRouterNode : public GraphNode,
+class AudioRouterNode : public NodeObject,
                         public ChangeBroadcaster
 {
 public:

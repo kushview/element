@@ -21,6 +21,7 @@
 
 #include "controllers/Controller.h"
 #include "session/CommandManager.h"
+#include "RunMode.h"
 
 namespace Element {
 
@@ -31,12 +32,15 @@ class UnlockStatus;
 struct AppMessage;
 
 class AppController :  public Controller,
-                       protected ApplicationCommandTarget,
-                       public MessageListener
+                       public MessageListener,
+                       protected ApplicationCommandTarget
 {
 public:
-    AppController (Globals&);
+    AppController (Globals&, RunMode mode = RunMode::Standalone);
     ~AppController();
+
+    /** Returns the running mode of this instance */
+    RunMode getRunMode() const { return runMode; }
 
     /** Returns the CommandManager */
     inline CommandManager& getCommandManager() { return commands; }
@@ -69,7 +73,7 @@ public:
         Child() { }
         virtual ~Child() { }
         
-        inline AppController& getAppController()
+        inline AppController& getAppController() const
         {
             auto* const app = dynamic_cast<AppController*> (getRoot());
             jassert (app); // if you hit this then you're probably calling 
@@ -79,6 +83,7 @@ public:
 
         Settings& getSettings();
         Globals& getWorld();
+        RunMode getRunMode() const { return getAppController().getRunMode(); }
 
     protected:
         friend class AppController;
@@ -112,6 +117,7 @@ private:
     CommandManager commands;
     RecentlyOpenedFilesList recentFiles;
     UndoManager undo;
+    RunMode runMode;
     void run();
 };
 
