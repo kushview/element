@@ -19,13 +19,11 @@
 
 #include "controllers/AppController.h"
 #include "controllers/EngineController.h"
-
+#include "engine/NodeObject.h"
 #include "engine/VelocityCurve.h"
-
 #include "gui/properties/MidiMultiChannelPropertyComponent.h"
 #include "gui/GuiCommon.h"
 #include "gui/views/GraphSettingsView.h"
-
 #include "ScopedFlag.h"
 
 namespace Element {
@@ -221,7 +219,7 @@ namespace Element {
         void setValue (double v) override
         {
             programValue.setValue (roundToInt (v));
-            if (GraphNodePtr ptr = node.getGraphNode())
+            if (NodeObjectPtr ptr = node.getGraphNode())
                 if (auto* root = dynamic_cast<RootGraph*> (ptr->getAudioProcessor()))
                     root->setMidiProgram ((int) programValue.getValue());
         }
