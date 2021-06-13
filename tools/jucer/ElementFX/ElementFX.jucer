@@ -278,6 +278,8 @@
         <FILE id="n1eUDW" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
         <FILE id="PTqCYn" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
         <FILE id="KfxAUe" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
+        <FILE id="yqB5yT" name="Oversampler.cpp" compile="1" resource="0" file="../../../src/engine/Oversampler.cpp"/>
+        <FILE id="QBrOvw" name="Oversampler.h" compile="0" resource="0" file="../../../src/engine/Oversampler.h"/>
         <FILE id="qPNSG3" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
         <FILE id="dnEBDc" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
         <FILE id="sPcQiL" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>
@@ -544,6 +546,10 @@
               file="../../../src/gui/NavigationConcertinaPanel.h"/>
         <FILE id="agLuEK" name="NodeChannelStripComponent.h" compile="0" resource="0"
               file="../../../src/gui/NodeChannelStripComponent.h"/>
+        <FILE id="o3r9Nz" name="NodeEditorFactory.cpp" compile="1" resource="0"
+              file="../../../src/gui/NodeEditorFactory.cpp"/>
+        <FILE id="TyukW3" name="NodeEditorFactory.h" compile="0" resource="0"
+              file="../../../src/gui/NodeEditorFactory.h"/>
         <FILE id="drs3wX" name="NodeIOConfiguration.cpp" compile="1" resource="0"
               file="../../../src/gui/NodeIOConfiguration.cpp"/>
         <FILE id="LwjZNr" name="NodeIOConfiguration.h" compile="0" resource="0"
