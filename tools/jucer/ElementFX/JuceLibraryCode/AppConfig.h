@@ -15,9 +15,8 @@
 
 //==============================================================================
 // [BEGIN_USER_CODE_SECTION]
-
 #include "CommonConfig.h"
-
+#include "../../Standalone/JuceLibraryCode/BinaryData.h"
 // [END_USER_CODE_SECTION]
 
 #include "JucePluginDefines.h"
