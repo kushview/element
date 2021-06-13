@@ -385,7 +385,7 @@ public:
             for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
             {
                 auto& mb = *midiPipe.getWriteBuffer (i);
-                for (const auto& msg : mb) 
+                for (const auto msg : mb)
                 {
                     tempMidi.addEvent (
                         msg.data, 
@@ -404,7 +404,7 @@ public:
             for (int i = 0; i < midiPipe.getNumBuffers(); ++i)
             {
                 auto& mb = *midiPipe.getWriteBuffer (i);
-                for (const auto& msg : mb)
+                for (const auto msg : mb)
                 {
                     tempMidi.addEvent (
                         msg.data,
