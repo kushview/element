@@ -17,7 +17,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-/// An array of MIDI buffers.
+/// An array of kv.MidiBuffers.
 // Designed for real time performance, therefore does virtually no type
 // checking in method calls.
 // @classmod el.MidiPipe
@@ -157,7 +157,7 @@ int LuaMidiPipe::get (lua_State* L)
 {
     auto* pipe = *(LuaMidiPipe**) lua_touserdata (L, 1);
     lua_rawgeti (L, LUA_REGISTRYINDEX, pipe->refs.getUnchecked (
-        static_cast<int> (lua_tointeger (L, 2))));
+        static_cast<int> (lua_tointeger (L, 2) - 1)));
     return 1;
 }
 
