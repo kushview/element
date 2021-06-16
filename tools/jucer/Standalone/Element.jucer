@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.0"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.1"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
@@ -280,28 +280,26 @@
         <FILE id="bWXtRM" name="MappingEngine.h" compile="0" resource="0" file="../../../src/engine/MappingEngine.h"/>
         <FILE id="qdTWSd" name="MidiChannelMap.h" compile="0" resource="0"
               file="../../../src/engine/MidiChannelMap.h"/>
-        <FILE id="yDQKdT" name="MidiClock.cpp" compile="1" resource="0" file="../../../src/engine/MidiClock.cpp"/>
-        <FILE id="ekL0ST" name="MidiClock.h" compile="0" resource="0" file="../../../src/engine/MidiClock.h"/>
-        <FILE id="V7LEZw" name="MidiEngine.cpp" compile="1" resource="0" file="../../../src/engine/MidiEngine.cpp"/>
-        <FILE id="v2BAPm" name="MidiEngine.h" compile="0" resource="0" file="../../../src/engine/MidiEngine.h"/>
-        <FILE id="DBlHH4" name="MidiIOMonitor.h" compile="0" resource="0" file="../../../src/engine/MidiIOMonitor.h"/>
-        <FILE id="xxzNiP" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
-        <FILE id="NM83ml" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
-        <FILE id="CkuusZ" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
-        <FILE id="tMVrEY" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
-        <FILE id="aXhM33" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
-        <FILE id="ZrPd8E" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
-        <FILE id="iNDwHQ" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
-        <FILE id="vkRlGO" name="Oversampler.cpp" compile="1" resource="0" file="../../../src/engine/Oversampler.cpp"/>
-        <FILE id="cbBKb4" name="Oversampler.h" compile="0" resource="0" file="../../../src/engine/Oversampler.h"/>
-        <FILE id="gg5rti" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
-        <FILE id="xYshP3" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
-        <FILE id="lGYUAz" name="RootGraph.cpp" compile="1" resource="0" file="../../../src/engine/RootGraph.cpp"/>
-        <FILE id="qiFAIv" name="RootGraph.h" compile="0" resource="0" file="../../../src/engine/RootGraph.h"/>
-        <FILE id="M6K2U8" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>
-        <FILE id="WmhXP7" name="Transport.cpp" compile="1" resource="0" file="../../../src/engine/Transport.cpp"/>
-        <FILE id="TTGZ0J" name="Transport.h" compile="0" resource="0" file="../../../src/engine/Transport.h"/>
-        <FILE id="ZcWP72" name="VelocityCurve.h" compile="0" resource="0" file="../../../src/engine/VelocityCurve.h"/>
+        <FILE id="z8y1qt" name="MidiClock.cpp" compile="1" resource="0" file="../../../src/engine/MidiClock.cpp"/>
+        <FILE id="GwOD5I" name="MidiClock.h" compile="0" resource="0" file="../../../src/engine/MidiClock.h"/>
+        <FILE id="oN5Xza" name="MidiEngine.cpp" compile="1" resource="0" file="../../../src/engine/MidiEngine.cpp"/>
+        <FILE id="Rv01FW" name="MidiEngine.h" compile="0" resource="0" file="../../../src/engine/MidiEngine.h"/>
+        <FILE id="VVzUXN" name="MidiIOMonitor.h" compile="0" resource="0" file="../../../src/engine/MidiIOMonitor.h"/>
+        <FILE id="ei6mAR" name="MidiPipe.cpp" compile="1" resource="0" file="../../../src/engine/MidiPipe.cpp"/>
+        <FILE id="sgv8Da" name="MidiPipe.h" compile="0" resource="0" file="../../../src/engine/MidiPipe.h"/>
+        <FILE id="ROaeDY" name="MidiTranspose.h" compile="0" resource="0" file="../../../src/engine/MidiTranspose.h"/>
+        <FILE id="nKZbJt" name="NodeFactory.cpp" compile="1" resource="0" file="../../../src/engine/NodeFactory.cpp"/>
+        <FILE id="mp37Uw" name="NodeFactory.h" compile="0" resource="0" file="../../../src/engine/NodeFactory.h"/>
+        <FILE id="g6HGUg" name="NodeObject.cpp" compile="1" resource="0" file="../../../src/engine/NodeObject.cpp"/>
+        <FILE id="Pi5GfU" name="NodeObject.h" compile="0" resource="0" file="../../../src/engine/NodeObject.h"/>
+        <FILE id="nWebC4" name="Oversampler.cpp" compile="1" resource="0" file="../../../src/engine/Oversampler.cpp"/>
+        <FILE id="m0jcV6" name="Oversampler.h" compile="0" resource="0" file="../../../src/engine/Oversampler.h"/>
+        <FILE id="fyQU7p" name="Parameter.cpp" compile="1" resource="0" file="../../../src/engine/Parameter.cpp"/>
+        <FILE id="y5AVmw" name="Parameter.h" compile="0" resource="0" file="../../../src/engine/Parameter.h"/>
+        <FILE id="fnnmX6" name="ToggleGrid.h" compile="0" resource="0" file="../../../src/engine/ToggleGrid.h"/>
+        <FILE id="dcQSg1" name="Transport.cpp" compile="1" resource="0" file="../../../src/engine/Transport.cpp"/>
+        <FILE id="pY1xwP" name="Transport.h" compile="0" resource="0" file="../../../src/engine/Transport.h"/>
+        <FILE id="u0IZj3" name="VelocityCurve.h" compile="0" resource="0" file="../../../src/engine/VelocityCurve.h"/>
       </GROUP>
       <GROUP id="{982D006F-6443-91A9-9E3F-7ED3734B082A}" name="gui">
         <GROUP id="{7D1CF093-FFA2-FE1B-6CEE-8048DF5EBB42}" name="nodes">
@@ -348,7 +346,11 @@
                 file="../../../src/gui/nodes/NodeEditorComponent.cpp"/>
           <FILE id="CGfBFg" name="NodeEditorComponent.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/NodeEditorComponent.h"/>
-          <FILE id="nAjgkz" name="OSCReceiverNodeEditor.cpp" compile="1" resource="0"
+          <FILE id="t2kxnp" name="NodeEditorFactory.cpp" compile="1" resource="0"
+                file="../../../src/gui/NodeEditorFactory.cpp"/>
+          <FILE id="Js7M6q" name="NodeEditorFactory.h" compile="0" resource="0"
+                file="../../../src/gui/NodeEditorFactory.h"/>
+          <FILE id="hFMzjA" name="OSCReceiverNodeEditor.cpp" compile="1" resource="0"
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.cpp"/>
           <FILE id="d6Dokl" name="OSCReceiverNodeEditor.h" compile="0" resource="0"
                 file="../../../src/gui/nodes/OSCReceiverNodeEditor.h"/>
@@ -627,21 +629,21 @@
               file="../../../src/messages/ControllerDeviceMessages.h"/>
         <FILE id="NBoCqs" name="GuiMessages.h" compile="0" resource="0" file="../../../src/messages/GuiMessages.h"/>
       </GROUP>
-      <GROUP id="{6B13EB0C-80CA-7B34-203B-72708FA90BCA}" name="plugins">
-        <FILE id="qczX4R" name="PluginEditor.cpp" compile="1" resource="0"
+      <GROUP id="{0554C995-E574-CB6C-EB7C-64CF334A136E}" name="plugins">
+        <FILE id="HXnlTw" name="PluginEditor.cpp" compile="1" resource="0"
               file="../../../src/plugins/PluginEditor.cpp"/>
-        <FILE id="rCfCGN" name="PluginEditor.h" compile="0" resource="0" file="../../../src/plugins/PluginEditor.h"/>
-        <FILE id="SwpS7b" name="PluginProcessor.cpp" compile="1" resource="0"
+        <FILE id="pLWZF7" name="PluginEditor.h" compile="0" resource="0" file="../../../src/plugins/PluginEditor.h"/>
+        <FILE id="hh2Z4U" name="PluginProcessor.cpp" compile="1" resource="0"
               file="../../../src/plugins/PluginProcessor.cpp"/>
-        <FILE id="e0ZNd4" name="PluginProcessor.h" compile="0" resource="0"
+        <FILE id="E7cBuk" name="PluginProcessor.h" compile="0" resource="0"
               file="../../../src/plugins/PluginProcessor.h"/>
       </GROUP>
-      <GROUP id="{D42C7360-8232-1EAA-E326-405EBD16BA1C}" name="scripting">
-        <FILE id="rS3V6H" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>
-        <FILE id="lE6yOZ" name="DSPScript.h" compile="0" resource="0" file="../../../src/scripting/DSPScript.h"/>
-        <FILE id="rlSRhD" name="DSPUIScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPUIScript.cpp"/>
-        <FILE id="c8ZUn4" name="DSPUIScript.h" compile="0" resource="0" file="../../../src/scripting/DSPUIScript.h"/>
-        <FILE id="MuftG8" name="JuceBindings.cpp" compile="1" resource="0"
+      <GROUP id="{25B22726-1F35-EDB9-5F31-15CE636820BD}" name="scripting">
+        <FILE id="CDUji2" name="DSPScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPScript.cpp"/>
+        <FILE id="sKaZnz" name="DSPScript.h" compile="0" resource="0" file="../../../src/scripting/DSPScript.h"/>
+        <FILE id="OPxJOP" name="DSPUIScript.cpp" compile="1" resource="0" file="../../../src/scripting/DSPUIScript.cpp"/>
+        <FILE id="MILe2u" name="DSPUIScript.h" compile="0" resource="0" file="../../../src/scripting/DSPUIScript.h"/>
+        <FILE id="DK6Cw9" name="JuceBindings.cpp" compile="1" resource="0"
               file="../../../src/scripting/JuceBindings.cpp"/>
         <FILE id="pt8UOD" name="LuaBindings.cpp" compile="1" resource="0" file="../../../src/scripting/LuaBindings.cpp"/>
         <FILE id="vEXuWs" name="LuaBindings.h" compile="0" resource="0" file="../../../src/scripting/LuaBindings.h"/>
@@ -801,7 +803,7 @@
       </MODULEPATHS>
     </XCODE_MAC>
     <VS2017 targetFolder="Builds/VisualStudio2017" extraDefs="HAVE_LVTK=1&#10;JUCE_PLUGINHOST_VST=1&#10;JUCE_PLUGINHOST_VST3=1&#10;SCL_SECURE_NO_WARNINGS=1&#10;_SCL_SECURE_NO_WARNINGS=1&#10;"
-            smallIcon="zjwu85" bigIcon="zjwu85" toolset="v141_xp" cppLanguageStandard="stdcpp14"
+            smallIcon="zjwu85" bigIcon="zjwu85" cppLanguageStandard="stdcpp14"
             vst3Folder="..\..\..\libs\JUCE\modules\juce_audio_processors\format_types\VST3_SDK"
             extraCompilerFlags="/bigobj">
       <CONFIGURATIONS>
