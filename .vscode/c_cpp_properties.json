@@ -84,16 +84,18 @@
                 "${workspaceRoot}/.vscode/vscode.h"
             ],
             "includePath": [
-                "/opt/kushview/include",
-                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include",
                 "${workspaceRoot}/libs/JUCE/modules/*",
                 "${workspaceRoot}/libs/kv/modules/*",
                 "${workspaceRoot}/libs/jlv2/modules/*",
                 "${workspaceRoot}/libs/compat/*",
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/lua/src/*",
+                "${workspaceRoot}/libs/lua-kv/*",
+                "${workspaceRoot}/libs/lua-kv/src/*",
                 "${workspaceRoot}/src/*",
-                "${workspaceRoot}/test/*"
+                "${workspaceRoot}/test/*",
+                "/opt/kushview/include",
+                "/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include"
             ]
         },
         {
@@ -115,8 +117,8 @@
                 "${workspaceRoot}/libs/lua/src/*",
                 "${workspaceRoot}/src/*",
                 "${workspaceRoot}/tests/*",
-                "${workspaceFolder}/libs/lua-kv/*",
-                "${workspaceFolder}/libs/lua-kv/src/*"
+                "${workspaceRoot}/libs/lua-kv/*",
+                "${workspaceRoot}/libs/lua-kv/src/*"
             ],
             "defines": [
                 "LUA_USE_READLINE=1",
