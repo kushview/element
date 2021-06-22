@@ -59,7 +59,7 @@ struct unique_usertype_traits<ReferenceCountedObjectPtr<T>> {
 
 extern "C" {
 extern int luaopen_kv_audio (lua_State* L);
-extern int luaopen_kv_byte (lua_State*);
+extern int luaopen_kv_bytes (lua_State*);
 extern int luaopen_kv_midi (lua_State*);
 extern int luaopen_kv_round (lua_State*);
 }
@@ -311,9 +311,9 @@ static int searchInternalModules (lua_State* L)
     {
         sol::stack::push (L, luaopen_kv_midi);
     }
-    else if (mod == "kv.byte")
+    else if (mod == "kv.bytes")
     {
-        sol::stack::push (L, luaopen_kv_byte);
+        sol::stack::push (L, luaopen_kv_bytes);
     }
     else if (mod == "kv.round")
     {
