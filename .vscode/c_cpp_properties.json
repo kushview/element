@@ -92,7 +92,7 @@
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/lua/src/*",
                 "${workspaceRoot}/src/*",
-                "${workspaceRoot}/tests/*"
+                "${workspaceRoot}/test/*"
             ]
         },
         {
