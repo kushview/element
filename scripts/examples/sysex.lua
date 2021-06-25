@@ -1,7 +1,10 @@
---- Stereo Amplifier in Lua.
+--- Example - Send MIDI System Exclusive message.
 --
--- The code contained implements a simple stereo amplifier plugin. It does not
--- try to smooth the volume parameter and could cause zipper noise.
+-- This example shows how to use a toggle parameter and button to send a SysEx message
+-- from a byte array.
+--
+-- See also - Companion Arduino Sketch:
+-- https://gist.github.com/mfisher31/83d84cbb62ec38250e5e9cba4ece7296
 --
 -- @script      examples.sysex
 -- @kind        DSP
