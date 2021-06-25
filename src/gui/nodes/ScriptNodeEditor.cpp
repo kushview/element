@@ -333,6 +333,9 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
                 return normal ? self.getValue() : self.getControl();
             }
         ),
+        "get", [](ScriptNodeControlPort& self) -> double { return self.getControl(); },
+        "set", [](ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
+        
         "normalized",   sol::property (&ScriptNodeControlPort::getValue,
                                        [](ScriptNodeControlPort& self, double  value) { self.setValue (value); }),
         "regular",      sol::property (&ScriptNodeControlPort::getControl,
