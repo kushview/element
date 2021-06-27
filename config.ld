@@ -2,22 +2,20 @@ project     = 'Element'
 title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = {
-    'libs/lua-kv/src/kv',
-    'libs/lua-kv/kv/lua/rectangle.hpp',
-    'libs/lua-kv/kv/lua/widget.hpp',
     'libs/element/lua',
     'scripts',
     'src/engine/MidiPipe.cpp',
     exclude = {
-        'libs/element/lua/element.lua',
-        'libs/lua-kv/src/lua-kv.h',
-        'libs/lua-kv/src/kv/vector.c',
-        'libs/lua-kv/src/kv/File.cpp'
+        'scripts/examples',
+        'libs/element/lua/element.lua'
     },
 }
 examples = {
-    'scripts/helloworld.lua',
-    'scripts/amp.lua'
+    'scripts/examples/helloworld.lua',
+    'scripts/examples/sysex.lua',
+    'scripts/examples/sysexui.lua',
+    'scripts/amp.lua',
+    'scripts/ampui.lua'
 }
 dir         = 'build/doc/lua'
 output      = 'index'
@@ -35,10 +33,6 @@ custom_tags = {
         format = function (data)
             return data .. ""
         end
-    } , {
-        "kind",
-        title = "Script Type",
-        hidden = false,
     }
 }
 

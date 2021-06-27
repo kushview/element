@@ -40,7 +40,7 @@
           <FILE id="zPSJ6T" name="AudioBufferImpl.cpp" compile="0" resource="0"
                 file="../../../libs/lua-kv/src/kv/AudioBufferImpl.cpp"/>
           <FILE id="gskVhj" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Bounds.cpp"/>
-          <FILE id="zb95lK" name="byte.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/byte.c"/>
+          <FILE id="zb95lK" name="bytes.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/bytes.c"/>
           <FILE id="GwQJ9n" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Desktop.cpp"/>
           <FILE id="WNXvPx" name="DocumentWindow.cpp" compile="1" resource="0"
                 file="../../../libs/lua-kv/src/kv/DocumentWindow.cpp"/>
