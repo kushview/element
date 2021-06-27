@@ -33,6 +33,10 @@ custom_tags = {
         format = function (data)
             return data .. ""
         end
+    } , {
+        "kind",
+        title = "Script Type",
+        hidden = false,
     }
 }
 
