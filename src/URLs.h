@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,3 +26,14 @@
 #define EL_URL_HELP_ELEMENT             EL_URL_HELP_HOME "/collection/10-element"
 #define EL_URL_HELP_LICENSE_MANAGEMENT  EL_URL_HELP_HOME "/article/35-license-management"
 #define EL_URL_HELP_ACTIVATION          EL_URL_HELP_HOME "/article/61-online-activation"
+
+#define EL_URL_BUG_TRACKER              "https://github.com/kushview/element/issues"
+
+//==============================================================================
+#define EL_URL_API_HOME                 "https://api.kushview.net"
+#ifndef EL_URL_API_LUA_EL
+ #define EL_URL_API_LUA_EL              EL_URL_API_HOME "/lua/el/latest/"
+#endif
+#ifndef EL_URL_API_LUA_KV
+ #define EL_URL_API_LUA_KV               EL_URL_API_HOME "/lua/el/latest/"
+#endif

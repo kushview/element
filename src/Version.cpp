@@ -61,7 +61,6 @@ CurrentVersion::~CurrentVersion()
     signalThreadShouldExit();
     notify();
     waitForThreadToExit (timeout + 1);
-    DBG ("CurrentVersion::~CurrentVersion()");
 }
 
 void CurrentVersion::checkAfterDelay (const int milliseconds, const bool showUpToDate)
