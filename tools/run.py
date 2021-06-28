@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from subprocess import call
 from optparse import OptionParser
-import os
+import os, sys
 
 def set_local_lua_paths():
     os.environ ['LUA_PATH']             = "libs/lua-kv/src/?.lua;libs/element/lua/?.lua"
@@ -22,6 +22,8 @@ def main():
         set_local_lua_paths()
 
     cmd = ['build/bin/element']
+    if 'darwin' in sys.platform:
+        cmd = [ 'build/Applications/Element.app/Contents/MacOS/Element' ]
     call (cmd)
 
 if __name__ == '__main__':
