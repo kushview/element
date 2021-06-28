@@ -39,7 +39,7 @@ end
 
 function Editor:paint (g)
     g:fillall (bgcolor)
-    g:color (fgcolor)
+    g:setcolor (fgcolor)
     g:drawtext ("AMP", 0, 0, self.width, 30)
 end
 

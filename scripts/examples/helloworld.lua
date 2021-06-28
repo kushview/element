@@ -34,7 +34,7 @@ function Label:init()
 end
 
 function Label:paint (g)
-    g:color (colors.text)
+    g:setcolor (colors.text)
     g:drawtext (self.text, 0, 0, self.width, self.height)
 end
 
