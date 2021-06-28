@@ -34,6 +34,7 @@ def resave (ctx):
         print (os.path.basename (project))
         subprocess.call (exe + [project],
             stdout=devnull, stderr=subprocess.STDOUT)
+    print ("Copying generated code")
     call (['bash', 'tools/copybin.sh'],
         stdout=devnull, stderr=subprocess.STDOUT)
     devnull.close()
