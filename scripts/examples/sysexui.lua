@@ -35,10 +35,10 @@ end
 function Editor:stabilize()
     local led = self.ctx.params [1]
     if led:get() == 0 then
-        self.button.togglestate = false
+        self.button:settogglestate (false, false)
         self.button.text = "Off"
     else
-        self.button.togglestate = true
+        self.button:settogglestate (true, false)
         self.button.text = "On"
     end
 end
