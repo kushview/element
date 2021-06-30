@@ -49,6 +49,8 @@ the build system, or the command line options of your compiler.
 
 */
 
+#include <limits>
+
 #define SOL_USING_CXX_LUA 0
 #define SOL_EXCEPTIONS_SAFE_PROPAGATION 1
 

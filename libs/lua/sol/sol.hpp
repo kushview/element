@@ -37,7 +37,6 @@
 #include <sol/config.hpp>
 
 #include <cstdint>
-#include <limits>
 
 #define SOL_VERSION_MAJOR 3
 #define SOL_VERSION_MINOR 5
