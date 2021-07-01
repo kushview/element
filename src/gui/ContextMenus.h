@@ -84,7 +84,7 @@ public:
         if (hasAddedPlugins)
             return;
         hasAddedPlugins = true;
-        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByCategory);
+        plugins->getKnownPlugins().addToMenu (*this, available, KnownPluginList::sortByManufacturer);
 
         PopupMenu unvMenu;
         unverified.clearQuick (true);
