@@ -44,11 +44,13 @@ function Editor:stabilize()
 end
 
 function Editor:paint (g)
-    g:fillall (bgcolor)
+    g:setcolor (bgcolor)
+    g:fillall()
 end
 
 function Editor:resized()
-    self.button.bounds = self.localbounds:reduced (20)
+    local r = self:localbounds()
+    self.button:setbounds (r:reduced (20))
 end
 
 local function create_editor (ctx)

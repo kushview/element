@@ -1,10 +1,4 @@
---- Example - Send MIDI System Exclusive message.
---
--- This example shows how to use a toggle parameter and button to send a SysEx message
--- from a byte array.
---
--- See also - Companion Arduino Sketch:
--- https://gist.github.com/mfisher31/83d84cbb62ec38250e5e9cba4ece7296
+--- SysEx MIDI Example.
 --
 -- @script      examples.sysex
 -- @kind        DSP
@@ -57,7 +51,7 @@ local function process (a, m, p)
         end
         
         -- add sysex to output buffer
-        output:insertbytes (sysex, 4, 1)
+        output:addbytes (sysex, 4, 1)
         laststate = state
     end
 
