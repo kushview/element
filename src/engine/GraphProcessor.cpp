@@ -1046,8 +1046,9 @@ NodeObject* GraphProcessor::addNode (NodeObject* newNode, uint32 nodeId)
             lastNodeId = nodeId;
     }
 
-    // TODO: playhead in Graph Node base
-    // newNode->setPlayHead (getPlayHead());
+    // TODO: playhead in Graph Node base and non-AudioProcessor nodes
+    if (auto* ap = newNode->getAudioProcessor())
+        ap->setPlayHead (getPlayHead());
     
     newNode->setParentGraph (this);
     newNode->resetPorts();
