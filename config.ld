@@ -6,14 +6,14 @@ file = {
     'scripts',
     'src/engine/MidiPipe.cpp',
     exclude = {
-        'scripts/examples',
+        'docs/examples',
         'libs/element/lua/element.lua'
     },
 }
 examples = {
-    'scripts/examples/helloworld.lua',
-    'scripts/examples/sysex.lua',
-    'scripts/examples/sysexui.lua',
+    'docs/examples/helloworld.lua',
+    'docs/examples/sysex.lua',
+    'docs/examples/sysexui.lua',
     'scripts/amp.lua',
     'scripts/ampui.lua'
 }
