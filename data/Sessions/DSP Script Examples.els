@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <session name="" tempo="120.0" notes="" beatsPerBar="4" beatDivisor="2">
-  <graphs active="1">
+  <graphs active="2">
     <node type="graph" uuid="675073adaa08461795cc6cb58b7a3788" name="SysEx Example"
           bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
           transpose="0" delayCompensation="0" vertical="0">
@@ -44,8 +44,8 @@
               name="Script" relativeX="0.1354309165526676" relativeY="0.2697095435684647"
               pluginIdentifierString="Element-Script-9debc3fd-400" uuid="b524e5c5efe641bdbccb4ab544990422"
               bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127.0"
-              transpose="0" delayCompensation="0.0" x="76.0" y="200.0" windowX="752"
-              windowY="231" windowVisible="1" state="1143.3wYkV0saaTDENgphf8BdA3lixMcsj8V6zhZUjrDTBEJpAhTZEWfP3w6dVmoY7NK6LShSKgmDdj30fW.dB3L+ryt1cSILIxd247c9lyb90mk2vq0+fr.2a+6Unp+Z6Sezq+36OYxD3LM1fR3qVWK3kbrA3UvKMrrjISn+gWcNB4Dd5iJMiWgE.mfhqwJsBXfx8Fn7rvhrTKLq3UYvKzPgDUPkTaoS2bMnkfZsTpOGzD4WJEl0HTyZXqQhEfUUPGlQPexLJDdKutl1tRxUXqU8kJ2UBbKbi8XQUl5ZEtwI9BNQRXc7Ym51SvywJhO65aO8kvkOxsMynOW13gdBO+bFJfmyUmiMIIBYNS.KuVSWf10bnA+MCuAgzGbwkYNgOXT.ZeyZannHyKLh8DdA+YlxRrY.Z6DR3CJHM5ZSOx6vjUgWAoyN7oQ6v5I5YxNqzi5wiR7uoPMj5.NFlMFlt44SGAjGwqqRyZzCf7PKxmbrC4Ikqn.7wPI4+vBSNSykULwCKvKQgr1lh.0llZoBUCP0irTM0enKkEW+vKYBCN.vG6rtmzy5vphVuhfozjwpw30bU+yH58JMU4V6iT3ZxSlNJw5ZZPsooBdWRquhYJ3Rhp2ASoSEtYbTxZxcCNIj2ZFbiSvMI8Lk3QDSlU21wz8jcUQn6BVGbp7Jr4fwaAQvVRIlQH0C.YMU41wxzcDx5mOLaagEXIyHzsZFk8AuiMxbTofT1XX8Xn1eQCULlRhm0G4hDy5KoMRUC+7reIwIvmVeTt.YMA2EuL.7Ol2K9RcKphlFkJXpKBaGxJrIQQ.QNlS2nroaqscc6IjQXnPg2Icl0SGxW09beqkUTDLSp+WnTdoq5MhJ3IHj9VN8x+6c.8S3cemzdrtGHNORcEqFR8zMxG8BYf9dPYzPfPJnuZnMuv+lO4nKI1Jo6sfzP32qW3sjaR1CK3ZYieDS88ciX9F2Vt1DK1tY8Ba24Vipei8sgY3cc0IEd8K1smeH47m3E1TtXZ9VsT8BiseeEtQ+LiVKqF.amvHd4x2f42F2dgQr1Fscq4Acs8e+eMmnc9ypboncDks9bSY4W7X6es0jC.vuZoHDA1wffTuOgNoXYsG4Q7JNINWuwm24wk42UghR+11mxHPDizmI8pyEzuSXdTdlK6Q4p4i5sz678nrI8Ppa.UmuezncQmkSSwuvwczhSWpqF0urmNaammzQtR+2uv2JW0qyjq7Y2J8HnoCWZ6LZp7aIWveKF5aEKBcRaPEIhNlmRiRlc3ztayVJ5TZW++tLeW7p+GW8dtQ6MSKWshJfbMRRKYz8eL39ZzPZjoonhcvyOVVdPx64w9PbqaL2QpqNH5EGzoTS+9SJhrxSyJ6I4S7SCkHsBJ4BASHtMmqOvTrkqsoMQz85Roopnc38NWNuLH0xC8idnPRJEaGM3Px7Fj7A+pumXu5oP23t9BPp21FCNLC2x1vCMsC7Mea9sceoIhr81+y+jM+o5S+rEKJF+ci+9+ZR4hh+dwd6u2r+4d+9d+aZh3X5"
+              transpose="0" delayCompensation="0.0" x="76.0" y="200.0" windowX="758"
+              windowY="329" windowVisible="1" state="1143.3wYkV0saaTDENgphf8BdA3lixMcsj8V6zhZUjrDTBEJpAhTZEWfP3w6dVmoY7NK6LShSKgmDdj30fW.dB3L+ryt1cSILIxd247c9lyb90mk2vq0+fr.2a+6Unp+Z6Sezq+36OYxD3LM1fR3qVWK3kbrA3UvKMrrjISn+gWcNB4Dd5iJMiWgE.mfhqwJsBXfx8Fn7rvhrTKLq3UYvKzPgDUPkTaoS2bMnkfZsTpOGzD4WJEl0HTyZXqQhEfUUPGlQPexLJDdKutl1tRxUXqU8kJ2UBbKbi8XQUl5ZEtwI9BNQRXc7Ym51SvywJhO65aO8kvkOxsMynOW13gdBO+bFJfmyUmiMIIBYNS.KuVSWf10bnA+MCuAgzGbwkYNgOXT.ZeyZannHyKLh8DdA+YlxRrY.Z6DR3CJHM5ZSOx6vjUgWAoyN7oQ6v5I5YxNqzi5wiR7uoPMj5.NFlMFlt44SGAjGwqqRyZzCf7PKxmbrC4Ikqn.7wPI4+vBSNSykULwCKvKQgr1lh.0llZoBUCP0irTM0enKkEW+vKYBCN.vG6rtmzy5vphVuhfozjwpw30bU+yH58JMU4V6iT3ZxSlNJw5ZZPsooBdWRquhYJ3Rhp2ASoSEtYbTxZxcCNIj2ZFbiSvMI8Lk3QDSlU21wz8jcUQn6BVGbp7Jr4fwaAQvVRIlQH0C.YMU41wxzcDx5mOLaagEXIyHzsZFk8AuiMxbTofT1XX8Xn1eQCULlRhm0G4hDy5KoMRUC+7reIwIvmVeTt.YMA2EuL.7Ol2K9RcKphlFkJXpKBaGxJrIQQ.QNlS2nroaqscc6IjQXnPg2Icl0SGxW09beqkUTDLSp+WnTdoq5MhJ3IHj9VN8x+6c.8S3cemzdrtGHNORcEqFR8zMxG8BYf9dPYzPfPJnuZnMuv+lO4nKI1Jo6sfzP32qW3sjaR1CK3ZYieDS88ciX9F2Vt1DK1tY8Ba24Vipei8sgY3cc0IEd8K1smeH47m3E1TtXZ9VsT8BiseeEtQ+LiVKqF.amvHd4x2f42F2dgQr1Fscq4Acs8e+eMmnc9ypboncDks9bSY4W7X6es0jC.vuZoHDA1wffTuOgNoXYsG4Q7JNINWuwm24wk42UghR+11mxHPDizmI8pyEzuSXdTdlK6Q4p4i5sz678nrI8Ppa.UmuezncQmkSSwuvwczhSWpqF0urmNaammzQtR+2uv2JW0qyjq7Y2J8HnoCWZ6LZp7aIWveKF5aEKBcRaPEIhNlmRiRlc3ztayVJ5TZW++tLeW7p+GW8dtQ6MSKWshJfbMRRKYz8eL39ZzPZjoonhcvyOVVdPx64w9PbqaL2QpqNH5EGzoTS+9SJhrxSyJ6I4S7SCkHsBJ4BASHtMmqOvTrkqsoMQz85Roopnc38NWNuLH0xC8idnPRJEaGM3Px7Fj7A+pumXu5oP23t9BPp21FCNLC2x1vCMsC7Mea9sceoIhr81+y+jM+o5S+rEKJF+ci+9+ZR4hh+dwd6u2r+4d+9d+aZh3X5"
               midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
               mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
               oversamplingFactor="1" enabled="1">
@@ -221,8 +221,77 @@
         <arc sourceNode="7" sourcePort="1" destNode="6" destPort="1"/>
       </arcs>
     </node>
+    <node type="graph" uuid="e26592cdad234bc1b74ac21c88bf644e" name="MIDI Channelize"
+          bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+          transpose="0" delayCompensation="0">
+      <nodes>
+        <node id="2" type="plugin" format="Internal" identifier="audio.output"
+              name="Mac mini Speakers" relativeX="0.4896265560165975" relativeY="0.6812585499316005"
+              numAudioIns="2" numAudioOuts="0" uuid="b4e87847ca2c44cb8d22cd109874e1f7"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" enabled="1" x="412.0" y="475.0"
+              program="0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1">
+          <nodes/>
+          <ui>
+            <block/>
+          </ui>
+          <ports>
+            <port index="0" channel="0" type="audio" name="1" symbol="audio_in_1"
+                  flow="input"/>
+            <port index="1" channel="1" type="audio" name="Output 2" symbol="audio_in_2"
+                  flow="input"/>
+          </ports>
+        </node>
+        <node id="3" type="plugin" format="Internal" identifier="midi.input"
+              name="MIDI In" relativeX="0.4844398340248963" relativeY="0.240766073871409"
+              numAudioIns="0" numAudioOuts="0" uuid="69a3a87eb44e49f499eb0bfd49ee7138"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127"
+              transpose="0" delayCompensation="0.0" enabled="1" x="407.0" y="153.0"
+              program="0" midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="" oversamplingFactor="1">
+          <nodes/>
+          <ui>
+            <block/>
+          </ui>
+          <ports>
+            <port index="0" channel="0" type="midi" name="MIDI" symbol="midi_out_0"
+                  flow="output"/>
+          </ports>
+        </node>
+        <node id="6" type="plugin" format="Element" identifier="element.script"
+              name="Script" relativeX="0.4906639004149377" relativeY="0.5614678899082569"
+              pluginIdentifierString="Element-Script-9debc3fd-400" uuid="29bb632d93f04827b71c014c55d2e2de"
+              bypass="0" persistent="1" renderMode="single" keyStart="0" keyEnd="127.0"
+              transpose="0" delayCompensation="0.0" x="413.0" y="283.0" windowX="223"
+              windowY="281" windowVisible="1" state="588.3wYeT0sZTCDEd2pKn4BeDjC8llExF1EAQVnhXKpUrRg5chvNMyIaFZxjzYlzsZYAeB7ZQ7Qxq8ZuwW.eB7jYljra8mgbwYNeem+OSNMQIpLutjiCFdKtt5fFoc9zsGMYxD33iN7H3fLlTh4hOfp3fISnO3MYBMPeLGiTQtAUvpLQRFjVpRvFHcElHREHGRbd.Jk.KOGJPslsD0sd6IZaN.1SRWzrPmKjbveN7zSr5xEInTiVcO+jWAW9.qZVsIqT4ndLkILJhOSnyPUPPdYBKmzxEOsNMEsr1GT3E0BEBg6c9kw8f6M1yey7Za9XdrCriqprtOSuousfcTKqMU0a319HGKwUgiaS2zZYhQPMsb16IaHfF9JzTqjv0AsNfUyEkjatFlFASg0QcHEjiAKxrHXFr1BrN.k7+HDULEq.oon9eEldolijX2WA652Q1MZKR4rynYPGoj+JoBgbi11za.xtZCvYObaTNlxpyMsl1g8eKTUIsdpgPVDTDAUtp0Q5r5TxOEyWhFHb1lHsav66lywBoAWRqQgUuc16nAlcNLOIGYJe+yMj2RE8x.JzKifzldMP0MEv4suFBGC7xtRPj1EyGSCUFsaQlN2qi31n0jgxsaWDEMZZsLzKLtiTSGoU1mgLN2mBPXe14Lw1.aDZRT8JVED5rZrq25WRbOEho+d32RbKrsiM2M2nqeOqAo+lG0Obb14uErNX.xElRk8eSC2Yz.NyvFL7924pupu68VrfG8hnW9sIoK3+7y+36W7wgCdzuF8kA+VxR1kp"
+              midiProgram="0" globalMidiPrograms="0" midiProgramsEnabled="0"
+              mute="0" muteInput="0" midiProgramsState="52.3o8Jnn7SunDysXFXfQFK.BaFXjY3rXkQF.BxKwbSkAFYhUFJtjDKAHKVX0.8XfA.h2YCaB"
+              oversamplingFactor="1" enabled="1">
+          <nodes/>
+          <ui>
+            <block/>
+            <ScriptNodeEditor showParams="1" console="1" showDSP="1" showUI="0" preview="0"/>
+          </ui>
+          <ports>
+            <port index="0" channel="0" type="midi" name="MIDI In 1" symbol="midi_in_1"
+                  flow="input"/>
+            <port index="1" channel="0" type="midi" name="MIDI Out 1" symbol="midi_out_1"
+                  flow="output"/>
+            <port index="2" channel="0" type="control" name="Channel" symbol="channel"
+                  flow="input"/>
+          </ports>
+        </node>
+      </nodes>
+      <ports/>
+      <ui>
+        <GraphEditorView width="964" height="545" horizontalRangeStart="0.0" verticalRangeStart="0.0"
+                         zoomScale="1.0" nodePropsVisible="0"/>
+      </ui>
+      <arcs/>
+    </node>
   </graphs>
   <controllers/>
   <maps/>
-  <ui content="128.3ocAAujCBCBE..DV30gMV+szTgH0Fq1nXg3FMEM8AAZzWD5s2Y9hOPKgROF6s79AL9oLFPa.UC1Dgde1xEr4w0UHr6f7pnChqxM7WWpRlVE7zn.yn.7IgAkryRsearqcT3BNA.Edy6B4zojCzY8MYYcd+TMi8aCuoiSH+4j.o.I"/>
+  <ui content="129.3ocAAGrCBBBF..FNzqiWZY0YCVPtxbEgr4AYho.IM6eC7suuuePGXPX70PugzOAgkhvLXlAwjIhvsaxyy1FNvA6oKrmToMrOciL7fGU0d6Whu6My+QORcKLuUWKri2oNMmpFbBIvBJoxuVEc1lTyKVQY57ZYV0N4wJAB8GPlmpxp"/>
 </session>
