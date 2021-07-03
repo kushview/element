@@ -52,6 +52,7 @@
           <FILE id="SJyN5j" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MouseEvent.cpp"/>
           <FILE id="omFMy3" name="object.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/object.lua"/>
           <FILE id="huBTl1" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Point.cpp"/>
+          <FILE id="pNW7K0" name="Range.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Range.cpp"/>
           <FILE id="JyVz3k" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Rectangle.cpp"/>
           <FILE id="kOyNOY" name="round.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/round.c"/>
           <FILE id="ZL4iLT" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Slider.cpp"/>
