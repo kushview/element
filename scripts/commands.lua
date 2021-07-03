@@ -36,7 +36,7 @@ local list = {
 local cmds = {}
 
 -- add standard commands
-for _,cmd in ipairs (CMD.standard()) do
+for _, cmd in ipairs (CMD.standard()) do
     local str = CMD.tostring (cmd)
     if string.len(str) > 0 then
         cmds[str] = cmd        
