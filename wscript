@@ -206,7 +206,7 @@ def build_lua_lib (bld):
         includes = [
             'libs/lua',
             'libs/lua/src',
-            'libs/lua-kv',
+            'libs/lua-kv/include',
             'libs/lua-kv/src',
         ],
         source = '''
