@@ -51,6 +51,7 @@ public:
         if (sol::function f = DSP ["prepare"])
             f (rate, block);
     }
+    
     void release()
     {
         if (sol::function f = DSP ["release"])

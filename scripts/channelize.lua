@@ -34,6 +34,13 @@ local function parameters()
     }
 end
 
+-- prepare for rendering
+local function prepare()
+    -- reserve 128 bytes of memory and clear the output buffer
+    output:reserve (128)
+    output:clear()
+end
+
 local function process (_, m, p)
     -- Get MIDI input buffer fromt the MidiPipe
     local input = m:get (1)
@@ -57,5 +64,7 @@ end
 return script.dsp {
     layout      = layout,
     parameters  = parameters,
-    process     = process
+    prepare     = prepare,
+    process     = process,
+    release     = release
 }
