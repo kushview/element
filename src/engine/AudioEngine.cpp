@@ -913,7 +913,7 @@ void AudioEngine::addMidiMessage (const MidiMessage msg, bool handleOnDeviceQueu
     else
         priv->messageCollector.addMessageToQueue (msg);
 }
-    
+
 void AudioEngine::setActiveGraph (const int index)
 {
     if (priv == nullptr)
