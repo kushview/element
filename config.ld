@@ -15,7 +15,8 @@ examples = {
     'docs/examples/sysex.lua',
     'docs/examples/sysexui.lua',
     'scripts/amp.lua',
-    'scripts/ampui.lua'
+    'scripts/ampui.lua',
+    'scripts/channelize.lua'
 }
 dir         = 'build/doc/lua'
 output      = 'index'

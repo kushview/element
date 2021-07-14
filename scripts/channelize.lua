@@ -11,6 +11,8 @@
 local MidiBuffer    = require ('kv.MidiBuffer')
 local script        = require ('el.script')
 local round         = require ('kv.round')
+
+-- Buffer to render filtered output
 local output        = MidiBuffer.new()
 
 local function layout()
@@ -32,20 +34,24 @@ local function parameters()
     }
 end
 
-local function process (a, m, p)
-    local buf = m:get (1)
+local function process (_, m, p)
+    -- Get MIDI input buffer fromt the MidiPipe
+    local input = m:get (1)
+
+    -- Get the channel number from the parameter array, and round to integer
     local channel = round.integer (p[1])
 
-    a:clear()
+    -- For each input message, set the specified channel
     output:clear()
-    for msg, frame in buf:messages() do
+    for msg, frame in input:messages() do
         if channel > 0 and msg:channel() > 0 then
             msg:setchannel (channel)
         end
         output:addmessage (msg, frame)
     end
 
-    buf:swap (output)
+    -- DSP scripts use replace processing, so swap in the rendered output
+    input:swap (output)
 end
 
 return script.dsp {
