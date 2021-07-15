@@ -48,4 +48,4 @@ node_modules
 
 /*.lua
 
-docs/manual/_build/
+docs/_build/
