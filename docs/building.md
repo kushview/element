@@ -1,5 +1,5 @@
 # Building Element with Waf
-The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](../tools/jucer), if you prefer.
+The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](building-projucer.md), if you prefer.
 
 __Sub Modules__
 This project uses submodules. Be sure to do this on a fresh clone, or when pulling changes.
