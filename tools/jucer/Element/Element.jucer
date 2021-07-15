@@ -15,7 +15,7 @@
               companyEmail="support@kushview.net" defines="EL_USE_LUA=1&#10;"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
-              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/include&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element">
     <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
