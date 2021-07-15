@@ -123,7 +123,7 @@ void MainMenu::menuItemSelected (int index, int menu)
 
     if (index == 6000 && menu == Help)
     {
-        URL(EL_URL_HELP_ELEMENT).launchInDefaultBrowser();
+        URL(EL_URL_MANUAL_HOME).launchInDefaultBrowser();
     }
     else if (index == 6500 && menu == Help)
     {
@@ -366,16 +366,16 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
-    menu.addItem (6000, "Online documentation...");
-    menu.addSeparator();
+    menu.addItem (6000, "User Manual");
+    menu.addSeparator();   
    #ifdef EL_URL_API_LUA_EL
-    menu.addItem (6500, "Element Lua API...");
+    menu.addItem (6500, "Element Lua API");
    #endif
    #ifdef EL_URL_API_LUA_KV
-    menu.addItem (6501, "KV Lua Modules API...");
+    menu.addItem (6501, "KV Lua Modules API");
    #endif
     menu.addSeparator();
-    menu.addItem (7000, "Submit Feedback...");
+    menu.addItem (7000, "Submit Feedback");
    #if ! JUCE_MAC
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");

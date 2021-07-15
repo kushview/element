@@ -31,6 +31,8 @@
 
 //==============================================================================
 #define EL_URL_API_HOME                 "https://api.kushview.net"
+#define EL_URL_MANUAL_HOME              "https://element.readthedocs.io"
+
 #ifndef EL_URL_API_LUA_EL
  #define EL_URL_API_LUA_EL              EL_URL_API_HOME "/lua/el/latest/"
 #endif
