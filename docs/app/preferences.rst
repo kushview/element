@@ -41,4 +41,11 @@ MIDI
 
 OSC
 ---
-soon...
+:OSC Host Enabled?:
+    Whether to use OSC should be used or not
+
+:OSC Host:
+    The host address to serve on
+
+:OSC Host Port:
+    The port to run on

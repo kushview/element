@@ -43,14 +43,14 @@ sudo ./waf install
 sudo ldconfig
 ```
 
-### Arch Linux
+## Arch Linux
 Install these packages, then run the `waf` commands described above.
 
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost
 ```
 
-### Mac OSX
+## Mac OSX
 __Dependencies__
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```
