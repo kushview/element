@@ -1,4 +1,4 @@
-# Element OSC Commands
+# OSC
 Element can be controlled by OSC.
 
 #### Engine Control

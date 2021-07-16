@@ -1,10 +1,10 @@
-# Element Keyboard Commands
+# Keyboard Commands
 _Note: `ctrl` is Command and `alt` is Option on OSX_
 
-#### Application
+## Application
 TODO
 
-#### Virtual Keyboard
+## Virtual Keyboard
 | Command | Description |
 |---------|-------------|
 | `ctrl + +` | MIDI channel up |
