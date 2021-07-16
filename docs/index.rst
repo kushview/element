@@ -8,11 +8,12 @@ Element
 Welcome to the Element user/developer manual.
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
    :caption: Application
 
-   app/midi-mapping
+   app/preferences
    app/keyboard-commands
+   app/midi-mapping
    app/osc
 
 .. toctree::
