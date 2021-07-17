@@ -2,6 +2,8 @@ Keyboard Commands
 ===================
 *Note: ``ctrl`` is Command and ``alt`` is Option on OSX*
 
+.. _virtual-keyboard-key-commands:
+
 Virtual Keyboard
 ----------------
 
