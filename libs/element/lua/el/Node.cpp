@@ -29,11 +29,6 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
         /// Attributes.
         // @section Attributes
 
-        /// True if a valid node (readonly).
-        // @field Node.valid
-        // @within Attributes
-        "valid",                readonly_property (&Node::isValid),
-
         /// Node name.
         // @field Node.name
         // @within Attributes
@@ -42,50 +37,57 @@ LUAMOD_API int luaopen_el_Node (lua_State* L) {
             [](Node* self, const char* name) { self->setProperty (Tags::name, String::fromUTF8 (name)); }
         ),
         
-        /// Is the node missing?.
-        // @field Node.missing
-        // @within Attributes
         "missing",              readonly_property (&Node::isMissing),
-
-        /// True if enabled.
-        // @field Node.enabled
-        // @within Attributes
-        "enabled",              readonly_property (&Node::isEnabled),
-
         "uuid",                 readonly_property (&Node::getUuid),
         "uuidstring",           readonly_property (&Node::getUuidString),
-        
-        "graph",                readonly_property (&Node::isGraph),
-        "root",                 readonly_property (&Node::isRootGraph),
         "nodeid",               readonly_property (&Node::getNodeId),
-        
         "type",                 readonly_property (&Node::getNodeType),
-
-        /// Is muted.
-        // @field Node.muted
-        "muted",                property (&Node::isMuted, &Node::setMuted),
-
-        /// Is bypassed.
-        // @field Node.bypassed
-        "bypassed",             readonly_property (&Node::isBypassed),
-
-        /// Display name.
-        // Will be a user-defined name or name provided by the plugin.
-        // @field Node.displayname
-        "displayname",          [](Node* self) { return self->getDisplayName().toStdString(); },
-
-        /// Plugin name.
-        // Name provided by the plugin.
-        // @field Node.pluginname
-        "pluginname",           [](Node* self) { return self->getPluginName().toStdString(); },
 
         /// Methods.
         // @section methods
 
+        /// Returns true if a valid node.
+        // @function Node:isvalid
+        // @within Methods
+        "isvalid",              &Node::isValid,
+
+        /// True if enabled.
+        // @function Node:isenabled
+        // @within Methods
+        "isenabled",            &Node::isEnabled,
+
+        /// True if bypassed.
+        // @function Node:isbypassed
+        "isbypassed",           &Node::isBypassed,
+
+        /// True if muted.
+        // @function Node:ismuted
+        "ismuted",              &Node::isMuted,
+
+        /// Display name.
+        // Will be a user-defined name or name provided by the plugin.
+        // @function Node:displayname
+        // @treturn string
+        "displayname",          [](Node* self) { return self->getDisplayName().toStdString(); },
+
+        /// Plugin name.
+        // Name provided by the plugin.
+        // @function Node:pluginname
+        // @treturn string
+        "pluginname",           [](Node* self) { return self->getPluginName().toStdString(); },
+
+        /// True if this node is a graph.
+        // @function Node:isgraph
+        "isgraph",              &Node::isGraph,
+
+        /// True if this node is a root graph.
+        // @function Node:isroot
+        "isroot",               &Node::isRootGraph,
+
         /// Has custom editor.
         // @function Node:haseditor
         // @return True if the plugin provides it's own editor
-        "haseditor",           readonly_property (&Node::hasEditor),
+        "haseditor",            &Node::hasEditor,
 
         /// Convert to an XML string.
         // @function Node:toxmlstring
