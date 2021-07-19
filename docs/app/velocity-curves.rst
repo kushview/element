@@ -8,6 +8,7 @@ Use it to adjust the sensitivity of your input device.
     Go to the graph's settings and select the desired mode from the dropdown menu.
 
 **Velocity Curve Modes**
+    
     =========== =====================================
     Mode        Description
     =========== =====================================
