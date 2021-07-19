@@ -11,12 +11,15 @@ it. The header should include a title, description and a list of properties
 encapsulated in a Lua comment section.
 
 **Title**
+
     This should be the first line of the script.
 
 **Description**
+
     Free form text after the first line.
 
 **Properties**
+
     =========== ======================================
     Key         Description
     =========== ======================================
@@ -28,6 +31,7 @@ encapsulated in a Lua comment section.
     =========== ======================================    
 
 **Example**
+    
     .. code-block:: lua
 
         --- Script Title.

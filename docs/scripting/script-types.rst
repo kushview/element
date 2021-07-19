@@ -11,8 +11,6 @@ Anonymous
 ---------
 This type of script's behavior is determined by the script author.
 
-:kind: N/A
-
 **Arguments:**
 
     Defined by the script
@@ -25,8 +23,6 @@ DSP
 ---
 This is a script which executes in a Script Node.  It's purpose is to create custom
 audio and MIDI processing in your Session.
-
-:kind: DSP
 
 **Arguments:**
 
@@ -130,8 +126,6 @@ audio and MIDI processing in your Session.
 DSPUI
 -----
 This is a UI for a DSP script.
-
-:kind: DSPUI
 
 **Arguments:**
 
