@@ -57,6 +57,7 @@ local function create_editor (ctx)
     return object.new (Editor, ctx)
 end
 
-return script.dspui {
-    editor = create_editor
+return {
+    type    = 'DSPUI',
+    editor  = create_editor
 }

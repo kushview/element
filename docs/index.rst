@@ -35,6 +35,9 @@ Welcome to the Element user/developer manual.
    :maxdepth: 1
    :caption: Scripting
 
+   Overview <scripting/overview>
+   scripting/script-types
+   Examples <scripting/examples>
    Element API <https://api.kushview.net/lua/el/latest>
    KV API <https://api.kushview.net/lua/kv/latest>
 

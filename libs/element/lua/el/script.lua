@@ -2,21 +2,6 @@
 -- @module el.script
 local M = {}
 
-local function define (desc, kind)
-    assert (type(desc) == 'table', "Expected table descriptor")
-    desc.type = tostring (kind) or ''
-    return desc
-end
-
---- Define a DSP script.
--- @usage script.dsp {
---     process = process
--- }
-function M.dsp (desc) return define (desc, 'DSP') end
-
---- Define a DSPUI script.
-function M.dspui (desc) return define (desc, 'DSPUI') end
-
 --- Load a known script.
 -- @function load
 -- @string path The script to run
@@ -29,7 +14,7 @@ function M.load (path, env)
     return nil, e
 end
 
---- Run a known script
+--- Run a known script.
 -- @function exec
 -- @string path The script to run
 -- @tparam table env The environment to use or _ENV

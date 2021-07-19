@@ -61,7 +61,8 @@ local function process (_, m, p)
     input:swap (output)
 end
 
-return script.dsp {
+return {
+    type        = 'DSP',
     layout      = layout,
     parameters  = parameters,
     prepare     = prepare,

@@ -316,23 +316,25 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
-        // "value",        sol::overload (
-        //     [](ScriptNodeControlPort& self) -> double {
-        //         return self.getValue();
-        //     },
-        //     [](ScriptNodeControlPort& self, bool normal) -> double {
-        //         return normal ? self.getValue() : self.getControl();
-        //     },
-        //     [](ScriptNodeControlPort& self, double value) -> double {
-        //         self.setValue (static_cast<float> (value));
-        //         return self.getValue();
-        //     },
-        //     [](ScriptNodeControlPort& self, double value, bool normal) -> double {
-        //         if (normal) self.setValue (static_cast<float> (value));
-        //         else        self.setControl (static_cast<float> (value));
-        //         return normal ? self.getValue() : self.getControl();
-        //     }
-        // ),
+       #if 0
+        "value",        sol::overload (
+            [](ScriptNodeControlPort& self) -> double {
+                return self.getValue();
+            },
+            [](ScriptNodeControlPort& self, bool normal) -> double {
+                return normal ? self.getValue() : self.getControl();
+            },
+            [](ScriptNodeControlPort& self, double value) -> double {
+                self.setValue (static_cast<float> (value));
+                return self.getValue();
+            },
+            [](ScriptNodeControlPort& self, double value, bool normal) -> double {
+                if (normal) self.setValue (static_cast<float> (value));
+                else        self.setControl (static_cast<float> (value));
+                return normal ? self.getValue() : self.getControl();
+            }
+        ),
+       #endif
         "get", [](ScriptNodeControlPort& self) -> double { return self.getControl(); },
         "set", [](ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
         

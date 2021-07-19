@@ -58,7 +58,8 @@ local function process (a, m, p)
     buf:swap (output)
 end
 
-return script.dsp {
+return {
+    type        = 'DSP',
     layout      = layout,
     parameters  = parameters,
     process     = process

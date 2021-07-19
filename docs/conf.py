@@ -33,7 +33,15 @@ release = '0.46.2'
 # ones.
 extensions = [
     'myst_parser',
-    'sphinx_rtd_theme'
+    'sphinx_rtd_theme',
+    'sphinxcontrib.luadomain',
+    'sphinx_lua'
+]
+
+# a list of lua source root
+lua_source_path = [ 
+    "../libs/element/lua/el",
+    "../src/engine" 
 ]
 
 # Add any paths that contain templates here, relative to this directory.

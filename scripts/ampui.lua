@@ -10,8 +10,11 @@ local script        = require ('el.script')
 local bgcolor       = 0xff545454
 local fgcolor       = 0xffffffff
 
-local Editor        = object (Widget)
+-- Derive a new widget type for the amp editor.
+local Editor = object (Widget)
+
 function Editor:init (ctx)
+    -- Invoke the parent class' init method
     Widget.init (self)
 
     local volume = ctx.params [1]
@@ -47,10 +50,12 @@ function Editor:resized()
     self.knob:setbounds (r:reduced (20))
 end
 
-local function amp_editor_new (ctx)
+-- Editor factory function.
+local function create_editor (ctx)
     return object.new (Editor, ctx)
 end
 
-return script.dspui {
-    editor = amp_editor_new
+return {
+    type    = 'DSPUI',
+    editor  = create_editor
 }
