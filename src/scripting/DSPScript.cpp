@@ -116,7 +116,7 @@ DSPScript::DSPScript (sol::table tbl)
                     DBG("DSPScript: file error");
                     break;
                 case sol::call_status::gc:
-                   DBG("DSPScript: gc error");
+                    DBG("DSPScript: gc error");
                     break;
                 case sol::call_status::handler:
                     DBG("DSPScript: handler error");
