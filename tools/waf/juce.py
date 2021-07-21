@@ -31,6 +31,7 @@ def find_projucer (self, **k):
     prog = 'Projucer'
     if is_mac():
         prog = '/Applications/Projucer.app/Contents/MacOS/Projucer'
+    k['msg'] = "Checking for program 'Projucer'"
     return self.find_program (prog, **k)
 
 @conf

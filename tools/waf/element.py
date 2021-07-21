@@ -28,7 +28,8 @@ mingw_libs = '''
 def check_common (self):
     self.check (lib='curl', mandatory=False)
     self.check (header_name='stdbool.h', mandatory=True)
-    self.check (header_name='boost/signals2.hpp', mandatory=True, uselib_store="BOOST_SIGNALS")
+    self.check (header_name='boost/signals2.hpp', msg="Checking for Boost.Signals2", 
+                mandatory=True, uselib_store="BOOST_SIGNALS")
     self.check_cxx (
         msg = "Checking for Boost.Test",
         fragment = '''
