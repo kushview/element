@@ -831,6 +831,8 @@ public:
                 values.add (inputDeviceVar);
             }
             inputDevice = editedDevice.getPropertyAsValue ("inputDevice");
+            if (inputDevice.toString().trim().isEmpty())
+                inputDevice.setValue (values.getFirst());
         }
         else
         {

@@ -43,6 +43,7 @@ void ControllerDevice::setMissingProperties()
 {
     stabilizePropertyString (Tags::uuid, Uuid().toString());
     stabilizePropertyString (Tags::name, "New Device");
+    stabilizePropertyString ("inputDevice", "");
 }
 
 }
