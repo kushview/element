@@ -34,7 +34,7 @@ function Label:init()
 end
 
 function Label:paint (g)
-    g:color (colors.text)
+    g:setcolor (colors.text)
     g:drawtext (self.text, 0, 0, self.width, self.height)
 end
 
@@ -61,7 +61,7 @@ function HelloWorld:init()
 end
 
 function HelloWorld:resized()
-    local r = self.localbounds:reduced (8)
+    local r = self.localbounds():reduced (8)
     self.button.bounds = r:slicebottom (30)
                           :sliceright (90)
     self.label.bounds  = r:reduced (20)
@@ -97,8 +97,8 @@ function win:closepressed()
     closewindow()
 end
 
-win.content = new (HelloWorld)
-win.content.button.clicked = closewindow
+local hw = new (HelloWorld)
+hw.button.clicked = closewindow
+win:setcontent (hw)
 win.visible = true
-
 return win

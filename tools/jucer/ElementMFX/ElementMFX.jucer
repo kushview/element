@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="kKApjY" name="Element MFX" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.46.1"
+              splashScreenColour="Dark" projectType="audioplug" version="1.46.2"
               bundleIdentifier="net.kushview.plugins.ElementMFX" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2020 Kushview, LLC"
               buildVST="0" buildVST3="0" buildAU="1" buildAUv3="0" buildRTAS="0"
@@ -13,9 +13,8 @@
               aaxIdentifier="net.kushview.ElementMFX" companyName="Kushview"
               companyWebsite="https://kushview.net" companyEmail="support@kushview.net"
               defines="EL_USE_LUA=1&#10;" pluginVSTCategory="kPlugCategEffect"
-              pluginAUMainType="'aumi'" userNotes="This configuration is for the Instrument version.  &#10;IMPORTANT: ElementFX configs are overridden in ElementFXConfig.h not this project file"
-              pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
-              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              pluginAUMainType="'aumi'" pluginFormats="buildAU" pluginCharacteristicsValue="pluginWantsMidiIn,pluginProducesMidiOut,pluginIsMidiEffectPlugin"
+              pluginAAXCategory="8192" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/include&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               pluginRTASDisableBypass="0" pluginRTASDisableMultiMono="0" pluginAAXDisableBypass="0"
               pluginAAXDisableMultiMono="0" jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element MFX">
@@ -42,7 +41,7 @@
             <FILE id="RR3l8D" name="AudioBufferImpl.cpp" compile="0" resource="0"
                   file="../../../libs/lua-kv/src/kv/AudioBufferImpl.cpp"/>
             <FILE id="rXL0rx" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Bounds.cpp"/>
-            <FILE id="Ve18Mg" name="byte.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/byte.c"/>
+            <FILE id="Ve18Mg" name="bytes.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/bytes.c"/>
             <FILE id="CVPSA7" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Desktop.cpp"/>
             <FILE id="M0I7bd" name="DocumentWindow.cpp" compile="1" resource="0"
                   file="../../../libs/lua-kv/src/kv/DocumentWindow.cpp"/>
@@ -54,6 +53,7 @@
             <FILE id="kDUUNi" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MouseEvent.cpp"/>
             <FILE id="ho546p" name="object.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/object.lua"/>
             <FILE id="IcCFFq" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Point.cpp"/>
+            <FILE id="L5pYfd" name="Range.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Range.cpp"/>
             <FILE id="SbYo06" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Rectangle.cpp"/>
             <FILE id="erJygp" name="round.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/round.c"/>
             <FILE id="YBis52" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Slider.cpp"/>

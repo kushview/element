@@ -1,5 +1,5 @@
 # Building Element with Waf
-The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](../tools/jucer), if you prefer.
+The instructions below are for *nix based system such as Ubuntu. Usage of `sudo` is optional depending on your system. There are also [projucer projects](building-projucer.md), if you prefer.
 
 __Sub Modules__
 This project uses submodules. Be sure to do this on a fresh clone, or when pulling changes.
@@ -43,14 +43,14 @@ sudo ./waf install
 sudo ldconfig
 ```
 
-### Arch Linux
+## Arch Linux
 Install these packages, then run the `waf` commands described above.
 
 ```
 sudo pacman -S git lilv suil lv2 ladspa boost
 ```
 
-### Mac OSX
+## Mac OSX
 __Dependencies__
 Install [Boost](https://www.boost.org/) using [Homebrew](https://docs.brew.sh/).
 ```

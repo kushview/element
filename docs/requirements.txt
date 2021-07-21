@@ -1,0 +1,4 @@
+sphinx_rtd_theme
+myst-parser
+sphinxcontrib-luadomain==1.1.2
+sphinx-lua==1.1.3

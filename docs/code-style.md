@@ -1,12 +1,12 @@
-# Element Coding Standard
+# C++ Style Guide
 _Adapted from [JUCE](https://juce.com/discover/stories/coding-standards). Please try to follow these guidelines as much as possible._
 
 If you're writing Lua code, please also see the [Lua Style Guide](lua-style.md), in addition to this document.
 
-### Don't Repeat Yourself!
+## Don't Repeat Yourself!
 This principle pretty much summarises the essence of what it means to write good code, in all languages, at all levels. Other people have explained it better than we can do here – google for D.R.Y. and you’ll find many tutorials. If you only pay attention to one piece of advice in this document, make it this one!
 
-### Superficial things – layout and whitespace
+## Layout & Whitespace
 The following rules won't make any difference at all to what the code actually does, but aesthetics and consistency are really important in making your code understandable.
 
 * No tab characters!
@@ -59,10 +59,10 @@ foo (x, y);  // Yes
 * In general, leave a blank line after a closing brace } (unless the next line is just another close-brace)
 * Do not write if statements all-on-one-line…
 * ...unless! If you have a set of consecutive if statements which are similar, and by aligning them up vertically it makes it clear to see the pattern of similarities and differences, e.g.
-```
-if (x == 1) return “one”;
-if (x == 2) return “two”;
-if (x == 3) return “three”;
+```c++
+if (x == 1) return "one";
+if (x == 2) return "two";
+if (x == 3) return "three";
 ```
 * Some people mandate using braces around if-statements, even very short, simple ones. Our rule is to omit them for trivially simple one-line statements where braces would add visual clutter without making things any clearer. However, if there are multiple lines, or if the expressions involved are very long, do add braces.
 * In an if-else statement where there is more than one branch, all branches should be formatted the same way, i.e. either all of them use braces, or none of them use braces.
@@ -157,14 +157,14 @@ auto t = AffineTransform::translation (x, y).
 ```
 * String concatenation: Please avoid overusing the typename String! For some reason I seem to constantly see this kind of bloat in people’s code, but can’t understand the reason.. e.g.
 ```c++
-String w = String (“World”);       // Why say it twice!??
-auto w = String (“World”);         // This is OK, but still longer than needed
-String w (“World”);                // This is the most compact way to write it
+String w = String ("World");       // Why say it twice!??
+auto w = String ("World");         // This is OK, but still longer than needed
+String w ("World");                // This is the most compact way to write it
 
-auto b = String (“Hello “) + w;    // NO! This is a waste of typing!
-auto b = “Hello “ + w;             // This does exactly the same thing (given that w is a String, not a char*)
+auto b = String ("Hello ") + w;    // NO! This is a waste of typing!
+auto b = "Hello " + w;             // This does exactly the same thing (given that w is a String, not a char*)
 ```
-### Naming conventions
+## Naming Conventions
 * Variable and method names are written with camel-case, and always begin with a lower-case letter, e.g. myVariableName
 * Class names are also written in camel-case, but always begin with a capital letter, e.g. MyClassName
 * Hungarian notation is not allowed. The internet already contains lots of arguments for/against this style, so we won't add to that debate here. But the majority of other coding standards, including the standard library itself, have moved on from mixing the type and the name together. The type may change due to templates or use of ‘auto’, and the name should reflect the purpose of the variable, not its type.
@@ -198,7 +198,7 @@ if (myPointer != nullptr)
 ```
 if (myPointer == nullptr)
 ```
-* The reasoning here is that it’s more readable because it matches the way you’d read out the expression in English - i.e. “if the variable myPointer is null”.
+* The reasoning here is that it’s more readable because it matches the way you’d read out the expression in English - i.e. "if the variable myPointer is null".
 * Avoid C-style casts except when converting between obviously primitive numeric types. Some people would say "avoid C-style casts altogether", but writing static_casts can be a bit long-winded when you just want to trivially cast an int to a float. But whenever a pointer or template or non-primitive type is involved, always use modern casts. And when you're reinterpreting data, always use reinterpret_cast.
 * For 64-bit integer types: in JUCE we declare juce::int64 (and other types) but this was added before C++11 introduced int64_t. We’d encourage using either of these in preference to long long.
 * Object lifetime and ownership
@@ -226,7 +226,7 @@ if (myPointer == nullptr)
 * If the function is only going to read the string, and if you don’t need all methods that String provides, then prefer to pass it as a StringRef. That way a string literal can be passed in without the overhead of creating a String object at all.
 * If the function is just going to read the string but you need more String methods than StringRef provides, then just pass it as a const String&.
 
-### Classes
+## Classes
 * Declare a class's public section first, and put its constructors and destructor first. Any protected items come next, and then private ones. The order of items should roughly correspond to how likely a reader is to be interested in them, so the private implementation details come last.
 * For simple, short inline classes, especially ones inside a cpp file that are only used locally for a limited purpose, they should probably use struct rather than class since you’re generally going to have all public members, and this will save a line of code doing the initial public:
 * The layout for inherited classes is to put them to the right of the class name, vertically aligned. We leave a single space before the class name, and 2-3 spaces after the class name before the colon, e.g.
@@ -244,7 +244,7 @@ class Thing  : public Foo,
 * Do NOT use NULL, null, or 0 for a null-pointer! (And for god's sake don't be tempted to use 0L, which is the worst of the lot!) Always use nullptr!
 * All the C++ 'guru' books and articles are full of excellent and detailed advice on when it's best to use inheritance vs composition. If you're not already familiar with the received wisdom in these matters, then do some reading!
 
-### Miscellaneous
+## Miscellaneous
 * Never put an else statement after a return! The LLVM coding standards give a good explanation of this, but once you think about it, it's basic common sense. Since I first noticed this one, it has become one of my pet-hates when I see it done in other people's code!
 ```c++
 if (foobar())
@@ -286,7 +286,7 @@ When passing small, POD objects into functions, you should always pass them by v
 * We never use unsigned as a type on its own - always write unsigned int if that’s what you mean. The adjective on its own just seems like an unfinished sentence.
 * JUCE has always defined a set of basic types int8, uint8, int16, uint16, int32, uint32, int64, uint64 - these are what we suggest using when a specific bit size is needed. Since the standard library has introduced std::uint32_t etc we also sometimes use those, but the juce ones are slightly shorter and have never caused problems with name clashes.
 * Always prefer a range-based for-loop to iterate containers instead of a raw for-loop! Using STL algorithms and iterators is great, but we try not to use them religiously as in many simple cases a more straightforward approach ends up being more readable and more easily debugged.
-* We do like the “almost-always-auto” style but there are some cases where it’s better to avoid:
+* We do like the "almost-always-auto" style but there are some cases where it’s better to avoid:
 ```c++
     auto x = 0.0f; // OK: obviously a float
     auto x = 0.0;  // OK: obviously a double

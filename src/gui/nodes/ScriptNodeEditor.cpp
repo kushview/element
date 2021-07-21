@@ -316,6 +316,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
 
     auto M = state.create_table();
     M.new_usertype<ScriptNodeControlPort> ("ControlPort", sol::no_constructor,
+       #if 0
         "value",        sol::overload (
             [](ScriptNodeControlPort& self) -> double {
                 return self.getValue();
@@ -333,10 +334,10 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
                 return normal ? self.getValue() : self.getControl();
             }
         ),
-        "normalized",   sol::property (&ScriptNodeControlPort::getValue,
-                                       [](ScriptNodeControlPort& self, double  value) { self.setValue (value); }),
-        "regular",      sol::property (&ScriptNodeControlPort::getControl,
-                                       [](ScriptNodeControlPort& self, double  value) { self.setControl (value); }),
+       #endif
+        "get", [](ScriptNodeControlPort& self) -> double { return self.getControl(); },
+        "set", [](ScriptNodeControlPort& self, double value) -> void { self.setControl (static_cast<float> (value)); },
+        
         "valuechanged", sol::property (&ScriptNodeControlPort::getChangedFunction,
                                        &ScriptNodeControlPort::setChangedFunction)
     );

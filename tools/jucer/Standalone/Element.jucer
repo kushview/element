@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.1"
+<JUCERPROJECT id="UNteAW" name="Element" projectType="guiapp" version="0.46.2"
               bundleIdentifier="net.kushview.Element" includeBinaryInAppConfig="1"
               companyName="Kushview" companyWebsite="https://kushview.net"
               companyEmail="suport@kushview.net" displaySplashScreen="0" reportAppUsage="0"
               splashScreenColour="Dark" cppLanguageStandard="17" companyCopyright="Copyright (c) 2014-2021 Kushview, LLC"
-              defines="EL_USE_LUA=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              defines="EL_USE_LUA=1&#10;" headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/include&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="z1aYPy" name="Element">
     <GROUP id="{3CCE6B3C-053A-2E63-C5DE-8501E7DC8970}" name="data">
@@ -47,7 +47,7 @@
             <FILE id="M1Tdtl" name="AudioBufferImpl.cpp" compile="0" resource="0"
                   file="../../../libs/lua-kv/src/kv/AudioBufferImpl.cpp"/>
             <FILE id="XmhuZ7" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Bounds.cpp"/>
-            <FILE id="kd0uAR" name="byte.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/byte.c"/>
+            <FILE id="kd0uAR" name="bytes.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/bytes.c"/>
             <FILE id="bahxnr" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Desktop.cpp"/>
             <FILE id="oWyYUH" name="DocumentWindow.cpp" compile="1" resource="0"
                   file="../../../libs/lua-kv/src/kv/DocumentWindow.cpp"/>
@@ -59,6 +59,7 @@
             <FILE id="k58Sjb" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MouseEvent.cpp"/>
             <FILE id="hO0e7q" name="object.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/object.lua"/>
             <FILE id="Kp5oDg" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Point.cpp"/>
+            <FILE id="Nt2lco" name="Range.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Range.cpp"/>
             <FILE id="qlD49G" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Rectangle.cpp"/>
             <FILE id="reqORw" name="round.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/round.c"/>
             <FILE id="eEsFDQ" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Slider.cpp"/>

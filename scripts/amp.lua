@@ -9,7 +9,6 @@
 -- @author      Michael Fisher
 
 local audio  = require ('kv.audio')
-local script = require ('el.script')
 
 --- Gain parameters.
 -- Used for fading between changes in volume
@@ -49,8 +48,8 @@ local function amp_process (a, m, params)
     gain1 = gain2
 end
 
-return script.dsp {
-    ui          = 'ampui',
+return {
+    type        = 'DSP',
     layout      = amp_layout,
     parameters  = amp_parameters,
     process     = amp_process

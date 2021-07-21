@@ -35,6 +35,7 @@
 #include "Globals.h"
 #include "Settings.h"
 #include "Utils.h"
+#include "URLs.h"
 
 #include "gui/MainMenu.h"
 
@@ -122,33 +123,23 @@ void MainMenu::menuItemSelected (int index, int menu)
 
     if (index == 6000 && menu == Help)
     {
-        URL ("https://help.kushview.net/collection/10-element").launchInDefaultBrowser();
+        URL(EL_URL_MANUAL_HOME).launchInDefaultBrowser();
     }
     else if (index == 6500 && menu == Help)
     {
-       #ifdef EL_API_DOCS_URL
-        String urlStr (EL_API_DOCS_URL);
-        if (URL::isProbablyAWebsiteURL (urlStr) ||
-            urlStr.startsWithIgnoreCase ("file:/"))
-        {
-            auto url = URL (urlStr);
-            if (url.isLocalFile() ? url.getLocalFile().existsAsFile()
-                                  : true)
-            {
-                url.launchInDefaultBrowser();
-            }
-        }
-        else if (File::isAbsolutePath (urlStr))
-        {
-            juce::File file (urlStr);
-            if (file.existsAsFile())
-                URL(file).launchInDefaultBrowser();
-        }
+       #ifdef EL_URL_API_LUA_EL
+        URL(EL_URL_API_LUA_EL).launchInDefaultBrowser();
+       #endif
+    }
+    else if (index == 6501 && menu == Help)
+    {
+       #ifdef EL_URL_API_LUA_KV
+        URL(EL_URL_API_LUA_KV).launchInDefaultBrowser();
        #endif
     }
     else if (index == 7000 && menu == Help)
     {
-        URL ("https://github.com/kushview/element/issues").launchInDefaultBrowser();
+        URL(EL_URL_BUG_TRACKER).launchInDefaultBrowser();
     }
     else if (index == 2000 && menu == Window)
     {
@@ -375,11 +366,16 @@ void MainMenu::buildDebugMenu (PopupMenu& menu)
     
 void MainMenu::buildHelpMenu (PopupMenu& menu)
 {
-    menu.addItem (6000, "Online documentation...");
-   #ifdef EL_API_DOCS_URL
-    menu.addItem (6500, "API documentation...");
+    menu.addItem (6000, "User Manual");
+    menu.addSeparator();   
+   #ifdef EL_URL_API_LUA_EL
+    menu.addItem (6500, "Element Lua API");
    #endif
-    menu.addItem (7000, "Submit Feedback...");
+   #ifdef EL_URL_API_LUA_KV
+    menu.addItem (6501, "KV Lua Modules API");
+   #endif
+    menu.addSeparator();
+    menu.addItem (7000, "Submit Feedback");
    #if ! JUCE_MAC
     menu.addSeparator();
     menu.addCommandItem (&cmd, Commands::showAbout, "About Element");

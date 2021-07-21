@@ -77,6 +77,7 @@ extern int luaopen_kv_MidiBuffer (lua_State*);
 extern int luaopen_kv_MidiMessage (lua_State*);
 extern int luaopen_kv_MouseEvent (lua_State*);
 extern int luaopen_kv_Point (lua_State*);
+extern int luaopen_kv_Range (lua_State*);
 extern int luaopen_kv_Rectangle (lua_State*);
 extern int luaopen_kv_Slider (lua_State*);
 extern int luaopen_el_MidiPipe (lua_State*);
@@ -342,6 +343,10 @@ static int searchInternalModules (lua_State* L)
     else if (mod == "kv.Point")
     {
         sol::stack::push (L, luaopen_kv_Point);
+    }
+    else if (mod == "kv.Range")
+    {
+        sol::stack::push (L, luaopen_kv_Range);
     }
     else if (mod == "kv.Rectangle")
     {

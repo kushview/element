@@ -47,3 +47,5 @@ node_modules
 /dist/
 
 /*.lua
+
+docs/_build/

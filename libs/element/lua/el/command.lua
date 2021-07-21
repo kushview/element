@@ -58,8 +58,8 @@ function M.closure (cmd, async)
     return function() return M.invoke (c, a) end
 end
 
--- Define standard commands as constants. e.g. Commands::showAbout in C++ 
--- becomes command.SHOW_ABOUT
+-- Define standard commands as constants. 
+-- e.g. Commands::showAbout in C++ becomes command.SHOW_ABOUT
 for _,cmd in ipairs (CommandManager.standard()) do
     local slug = require ('kv.slug')
     local s = CommandManager.tostring (cmd)

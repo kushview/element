@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.46.1"
+              splashScreenColour="Dark" projectType="audioplug" version="1.46.2"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2021 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
@@ -15,7 +15,7 @@
               companyEmail="support@kushview.net" defines="EL_USE_LUA=1&#10;"
               pluginVSTCategory="kPlugCategSynth" pluginAUMainType="'aumu'"
               pluginFormats="buildAAX,buildAU,buildVST,buildVST3" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn,pluginProducesMidiOut"
-              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
+              headerPath="../../../../../src&#10;../../../../../libs/jlv2/modules&#10;../../../../../libs/kv/modules&#10;../../../../../libs/lua/src&#10;../../../../../libs/lua&#10;../../../../../libs/lua-kv/include&#10;../../../../../libs/lua-kv/src&#10;../../../../../build/include"
               jucerFormatVersion="1">
   <MAINGROUP id="SKUipM" name="Element">
     <GROUP id="{B9B38E28-65D9-4832-6C01-CBF57DBDA57B}" name="lua-kv">
@@ -40,7 +40,7 @@
           <FILE id="zPSJ6T" name="AudioBufferImpl.cpp" compile="0" resource="0"
                 file="../../../libs/lua-kv/src/kv/AudioBufferImpl.cpp"/>
           <FILE id="gskVhj" name="Bounds.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Bounds.cpp"/>
-          <FILE id="zb95lK" name="byte.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/byte.c"/>
+          <FILE id="zb95lK" name="bytes.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/bytes.c"/>
           <FILE id="GwQJ9n" name="Desktop.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Desktop.cpp"/>
           <FILE id="WNXvPx" name="DocumentWindow.cpp" compile="1" resource="0"
                 file="../../../libs/lua-kv/src/kv/DocumentWindow.cpp"/>
@@ -52,6 +52,7 @@
           <FILE id="SJyN5j" name="MouseEvent.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/MouseEvent.cpp"/>
           <FILE id="omFMy3" name="object.lua" compile="0" resource="0" file="../../../libs/lua-kv/src/kv/object.lua"/>
           <FILE id="huBTl1" name="Point.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Point.cpp"/>
+          <FILE id="pNW7K0" name="Range.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Range.cpp"/>
           <FILE id="JyVz3k" name="Rectangle.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Rectangle.cpp"/>
           <FILE id="kOyNOY" name="round.c" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/round.c"/>
           <FILE id="ZL4iLT" name="Slider.cpp" compile="1" resource="0" file="../../../libs/lua-kv/src/kv/Slider.cpp"/>

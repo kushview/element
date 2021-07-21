@@ -2,22 +2,21 @@ project     = 'Element'
 title       = 'Element Lua Documentation'
 description = 'Element Lua Documentation'
 file = {
-    'libs/lua-kv/src/kv',
-    'libs/lua-kv/kv/lua/rectangle.hpp',
-    'libs/lua-kv/kv/lua/widget.hpp',
     'libs/element/lua',
     'scripts',
     'src/engine/MidiPipe.cpp',
     exclude = {
-        'libs/element/lua/element.lua',
-        'libs/lua-kv/src/lua-kv.h',
-        'libs/lua-kv/src/kv/vector.c',
-        'libs/lua-kv/src/kv/File.cpp'
+        'docs/examples',
+        'libs/element/lua/element.lua'
     },
 }
 examples = {
-    'scripts/helloworld.lua',
-    'scripts/amp.lua'
+    'docs/examples/helloworld.lua',
+    'docs/examples/sysex.lua',
+    'docs/examples/sysexui.lua',
+    'scripts/amp.lua',
+    'scripts/ampui.lua',
+    'scripts/channelize.lua'
 }
 dir         = 'build/doc/lua'
 output      = 'index'

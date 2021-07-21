@@ -208,7 +208,7 @@ def build_lua_lib (bld):
         includes = [
             'libs/lua',
             'libs/lua/src',
-            'libs/lua-kv',
+            'libs/lua-kv/include',
             'libs/lua-kv/src',
         ],
         source = '''
@@ -389,8 +389,7 @@ def build_app (bld):
             '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
             '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
             '-DEL_LUADIR="%s"'         % libEnv.LUADIR,
-            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR,
-            '-DEL_API_DOCS_URL="file://%s"' % os.path.join (libEnv.DOCDIR, 'lua', 'index.html')
+            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
         ]
 
     elif juce.is_mac():
