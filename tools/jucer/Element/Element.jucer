@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="jkKYpA" name="Element" displaySplashScreen="0" reportAppUsage="0"
-              splashScreenColour="Dark" projectType="audioplug" version="1.46.2"
+              splashScreenColour="Dark" projectType="audioplug" version="1.46.3"
               bundleIdentifier="net.kushview.plugins.Element" includeBinaryInAppConfig="1"
               cppLanguageStandard="17" companyCopyright="Copyright (c) 2017-2021 Kushview, LLC"
               buildVST="1" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"

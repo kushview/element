@@ -56,7 +56,7 @@ namespace ProjectInfo
 {
     const char* const  projectName    = "Element";
     const char* const  companyName    = "Kushview";
-    const char* const  versionString  = "0.46.2";
-    const int          versionNumber  = 0x2e02;
+    const char* const  versionString  = "0.46.3";
+    const int          versionNumber  = 0x2e03;
 }
 #endif
