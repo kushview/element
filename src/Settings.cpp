@@ -44,6 +44,7 @@ const char* Settings::oscHostEnabledKey         = "oscHostEnabledKey";
 const char* Settings::systrayKey                = "systrayKey";
 const char* Settings::midiOutLatencyKey         = "midiOutLatency";
 const char* Settings::desktopScaleKey           = "desktopScale";
+const char* Settings::mainContentTypeKey        = "mainContentType";
 
 //=============================================================================
 enum OptionsMenuItemId
@@ -407,6 +408,22 @@ void Settings::setDesktopScale (double scale)
     scale = jlimit (0.1, 8.0, scale);
     if (auto* p = getProps())
         p->setValue (desktopScaleKey, scale);
+}
+
+//=============================================================================
+String Settings::getMainContentType() const
+{
+    if (auto* p = getProps())
+        return p->getValue (mainContentTypeKey, "standard");
+    return "standard";
+}
+
+void Settings::setMainContentType (const String& tp)
+{
+    if (getMainContentType() == tp)
+        return;
+    if (auto* p = getProps())
+        p->setValue (mainContentTypeKey, tp);
 }
 
 //=============================================================================

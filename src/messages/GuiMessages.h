@@ -28,4 +28,11 @@ struct WorkspaceOpenFileMessage : public AppMessage
     const File file;
 };
 
+struct ReloadMainContentMessage : public AppMessage
+{
+    explicit ReloadMainContentMessage (const String& t = String())  : type (t) {}
+    ~ReloadMainContentMessage() noexcept { }
+    const String type;
+};
+
 }

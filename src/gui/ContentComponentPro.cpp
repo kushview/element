@@ -17,8 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if EL_DOCKING
-
 #include "controllers/AppController.h"
 #include "controllers/GuiController.h"
 #include "gui/ContentComponentPro.h"
@@ -170,5 +168,3 @@ void ContentComponentPro::applySessionState (const String&)
 }
 
 }
-
-#endif

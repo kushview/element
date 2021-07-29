@@ -206,7 +206,6 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         DBG("no workspace debug window");
     }
-   #if EL_DOCKING && defined (EL_PRO)
     else if (index == 7777)
     {
         cmd.invokeDirectly (Commands::workspaceSave, true);
@@ -215,7 +214,6 @@ void MainMenu::menuItemSelected (int index, int menu)
     {
         cmd.invokeDirectly (Commands::workspaceOpen, true);
     }
-   #endif
     else if (index == 8000)
     {
         
@@ -306,7 +304,6 @@ void MainMenu::buildEditMenu (PopupMenu& menu) { buildEditMenu (cmd, menu); }
 void MainMenu::buildViewMenu (PopupMenu& menu) { buildViewMenu (cmd, menu); }
 void MainMenu::buildWindowMenu (PopupMenu& menu)
 {
-   #if defined (EL_PRO) && EL_DOCKING
     PopupMenu workspace;
     workspace.addCommandItem (&cmd, Commands::workspaceClassic, "Classic");
     workspace.addCommandItem (&cmd, Commands::workspaceEditing, "Editing");
@@ -323,17 +320,15 @@ void MainMenu::buildWindowMenu (PopupMenu& menu)
     menu.addSeparator();
     buildWorkspaceMenu (menu);
     menu.addSeparator();
-   #endif
+
     menu.addCommandItem (&cmd, Commands::hideAllPluginWindows, "Close plugin windows...");
     menu.addCommandItem (&cmd, Commands::showAllPluginWindows, "Show plugin windows...");
 }
 
 void MainMenu::buildWorkspaceMenu (PopupMenu& menu)
 {
-   #if EL_DOCKING && defined (EL_PRO)
     if (auto* const cc = dynamic_cast<ContentComponent*> (owner.getContentComponent()))
         cc->addWorkspaceItemsToMenu (menu);
-   #endif
 }
 
 void MainMenu::buildOptionsMenu (PopupMenu& menu)

@@ -17,8 +17,6 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
-#if EL_DOCKING
-
 #include "controllers/AppController.h"
 #include "gui/views/PluginsPanelView.h"
 #include "gui/workspace/PluginsPanel.h"
@@ -47,5 +45,3 @@ void PluginsPanel::resized()
 }
 
 }
-
-#endif

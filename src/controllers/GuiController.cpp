@@ -151,8 +151,6 @@ void GuiController::saveProperties (PropertiesFile* props)
 void GuiController::activate()
 {
     getWorld().getDeviceManager().addChangeListener (this);
-    // Desktop::getInstance().setGlobalScaleFactor(
-    //     getWorld().getSettings().getDesktopScale());
     Controller::activate();
 }
 
@@ -915,6 +913,30 @@ KeyListener* GuiController::getKeyListener() const { return keys.get(); }
 
 bool GuiController::handleMessage (const AppMessage& msg)
 {
+    if (auto m = dynamic_cast<const ReloadMainContentMessage*> (&msg))
+    {
+        auto& settings = getWorld().getSettings();
+        PropertiesFile* const pf = settings.getUserSettings();
+
+        if (mainWindow && pf != nullptr)
+        {
+            const auto ws = mainWindow->getWindowStateAsString();
+            mainWindow->clearContentComponent();
+            content.reset (nullptr);
+            mainWindow->setContentNonOwned (getContentComponent(), true);
+            mainWindow->restoreWindowStateFromString (ws);
+            
+            const auto stateName = settings.getWorkspace();
+            WorkspaceState state = WorkspaceState::loadByFileOrName (stateName);
+            if (! state.isValid())
+                state = WorkspaceState::loadByName ("Classic");
+            getContentComponent()->applyWorkspaceState (state);
+            stabilizeContent();
+        }
+    
+        return true;
+    }
+
     return false;
 }
 

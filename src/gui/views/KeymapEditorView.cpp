@@ -35,11 +35,9 @@ public:
             Commands::mediaSave, Commands::mediaSaveAs,
             Commands::sessionInsertPlugin,
             Commands::signIn, Commands::signOut,
-           #if defined (EL_PRO) && EL_DOCKING
             Commands::workspaceClassic, Commands::workspaceEditing,
             Commands::workspaceOpen, Commands::workspaceResetActive,
             Commands::workspaceSave, Commands::workspaceSaveActive
-           #endif
         });
 
         readOnly.addArray ({

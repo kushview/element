@@ -53,6 +53,7 @@ public:
     static const char* systrayKey;
     static const char* midiOutLatencyKey;
     static const char* desktopScaleKey;
+    static const char* mainContentTypeKey;
 
     std::unique_ptr<XmlElement> getLastGraph() const;
     void setLastGraph (const ValueTree& data);
@@ -123,6 +124,9 @@ public:
 
     double getDesktopScale() const;
     void setDesktopScale (double);
+
+    String getMainContentType() const;
+    void setMainContentType (const String&);
 
 private:
     PropertiesFile* getProps() const;

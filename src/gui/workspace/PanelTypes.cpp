@@ -71,7 +71,6 @@ DockPanel* GenericPanelType::createPanel (const Identifier& panelType)
 
 DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
 {
-   #if defined (EL_PRO) && EL_DOCKING
     if (panelId == PanelIDs::controllers)
         return new ControllerDevicesPanel();
     if (panelId == PanelIDs::maps)
@@ -105,7 +104,6 @@ DockPanel* ApplicationPanelType::createPanel (const Identifier& panelId)
     if (panelId == PanelIDs::plugins)
         return new PluginsPanel();
 
-   #endif
     return nullptr;
 }
 

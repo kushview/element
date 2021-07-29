@@ -60,7 +60,6 @@ ApplicationCommandTarget* WorkspacesController::getNextCommandTarget() { return 
 
 void WorkspacesController::getAllCommands (Array<CommandID>& commands)
 {
-   #if defined (EL_PRO) && EL_DOCKING
     commands.addArray ({
       
         Commands::workspaceSave,
@@ -70,12 +69,10 @@ void WorkspacesController::getAllCommands (Array<CommandID>& commands)
         Commands::workspaceClassic,
         Commands::workspaceEditing
     });
-   #endif
 }
 
 void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommandInfo& result)
 {
-   #if defined (EL_PRO) && EL_DOCKING
     switch (command)
     {
         case Commands::workspaceSave:
@@ -114,12 +111,10 @@ void WorkspacesController::getCommandInfo (CommandID command, ApplicationCommand
             result.addDefaultKeypress ('@', ModifierKeys::altModifier | ModifierKeys::shiftModifier);
         } break;
     }
-   #endif
 }
 
 bool WorkspacesController::perform (const InvocationInfo& info)
 {
-   #if defined (EL_PRO) && EL_DOCKING
     bool handled = true;
     switch (info.commandID)
     {
@@ -163,10 +158,7 @@ bool WorkspacesController::perform (const InvocationInfo& info)
 
         case Commands::workspaceEditing:
         {
-            saveCurrentWorkspace();
-            auto state = WorkspaceState::loadByFileOrName ("Editing");
-            if (state.isValid() && content)
-                content->applyWorkspaceState (state);
+            saveCurrentAndLoadWorkspace ("Editing");
         } break;
 
         default: 
@@ -178,9 +170,6 @@ bool WorkspacesController::perform (const InvocationInfo& info)
         findSibling<GuiController>()->refreshMainMenu();
 
     return handled;
-   #else
-    return false;
-   #endif
 }
 
 void WorkspacesController::saveCurrentWorkspace()

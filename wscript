@@ -27,9 +27,6 @@ def options (opt):
     opt.add_option ('--disable-vst3', default=False, action='store_true', dest='no_vst3', \
         help="Disable VST3 plugin hosting")
     
-    opt.add_option ('--enable-docking', default=False, action='store_true', dest='enable_docking', \
-        help="Build with docking window support")
-    
     opt.add_option ('--without-alsa', default=False, action='store_true', dest='no_alsa', \
         help="Build without ALSA support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
@@ -85,7 +82,6 @@ def configure (conf):
     conf.env.TEST = bool(conf.options.test)
     conf.env.DEBUG = conf.options.debug
     
-    conf.define ('EL_DOCKING', True if conf.options.enable_docking else False)
     conf.define ('KV_DOCKING_WINDOWS', 1)
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
@@ -97,9 +93,6 @@ def configure (conf):
     print
     juce.display_header ("Element")
     conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
-    conf.message ("Workspaces", conf.options.enable_docking)
-    conf.message ("Scripting",  bool(conf.env.LUA))
-    conf.message ("Workspaces", conf.options.enable_docking)
     print
     juce.display_header ("Audio Devices")
     conf.message ("Alsa",       conf.env.ALSA)

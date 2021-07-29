@@ -103,7 +103,6 @@ enum AppCommands
     graphSave,
     graphSaveAs,
 
-   #if EL_DOCKING
     workspaceSave          = 0x0800,
     workspaceOpen,
     workspaceResetActive,
@@ -111,7 +110,6 @@ enum AppCommands
 
     workspaceClassic       = 0x0900,
     workspaceEditing,
-   #endif
 
     recentsClear           = 0x1000
 };
@@ -185,14 +183,12 @@ inline static Array<CommandID> getAllCommands()
         graphSave,
         graphSaveAs,
 
-       #if EL_DOCKING
         workspaceSave,
         workspaceOpen,
         workspaceResetActive,
         workspaceSaveActive,
         workspaceClassic,
         workspaceEditing,
-       #endif
 
         recentsClear,
     };
@@ -229,8 +225,6 @@ inline static String toString (CommandID command)
         case Commands::graphOpen:               return "graphOpen"; break;
         case Commands::graphSave:               return "graphSave"; break;
         case Commands::graphSaveAs:             return "graphSaveAs"; break;
-       #if EL_DOCKING
-       #endif
         case Commands::recentsClear:            return "recentsClear"; break;
         default: break;
     }
@@ -271,8 +265,6 @@ inline static CommandID fromString (const String& str)
     if (str == "graphSave")             return Commands::graphSave;
     if (str == "graphSaveAs")           return Commands::graphSaveAs;
 
-   #if EL_DOCKING
-   #endif
     if (str == "recentsClear")          return Commands::recentsClear;
     return Commands::invalid;
 }

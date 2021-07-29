@@ -64,15 +64,16 @@ ContentView::~ContentView()
 
 ContentComponent* ContentComponent::create (AppController& controller)
 {
-   #if defined (EL_PRO)
-    #if EL_DOCKING
-     return new ContentComponentPro (controller);
-    #else
-     return new ContentComponentSolo (controller);
-    #endif
-   #else
+    auto& s = controller.getGlobals().getSettings();
+    
+    if (s.getMainContentType() == "workspace")
+        return new ContentComponentPro (controller);
+    if (s.getMainContentType() == "standard")
+        return new ContentComponentSolo (controller);
+    if (s.getMainContentType() == "compact")
+        return new ContentComponentSolo (controller);
+    
     return new ContentComponentSolo (controller);
-   #endif
 }
 
 void ContentView::paint (Graphics& g)

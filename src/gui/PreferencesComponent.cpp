@@ -489,11 +489,25 @@ namespace Element {
             clockSource.setValue ((int) ClockSourceInternal);
             clockSourceBox.setEnabled (false);
            #endif
+
+            addAndMakeVisible (mainContentLabel);
+            mainContentLabel.setText ("UI Type", dontSendNotification);
+            mainContentLabel.setFont (Font (12.0, Font::bold));
+            addAndMakeVisible (mainContentBox);
+            mainContentBox.addItem ("Standard", 1);
+            mainContentBox.addItem ("Workspace", 2);
+            if (settings.getMainContentType() == "standard")
+                mainContentBox.setSelectedId (1);
+            else if (settings.getMainContentType() == "workspace")
+                mainContentBox.setSelectedId (2);
+            else { jassertfalse; } // invalid content type
+            mainContentBox.getSelectedIdAsValue().addListener (this);
         }
 
         virtual ~GeneralSettingsPage() noexcept
         {
             clockSource.removeListener (this);
+            mainContentBox.getSelectedIdAsValue().removeListener (this);
         }
 
         void filenameComponentChanged (FilenameComponent* f) override
@@ -544,6 +558,12 @@ namespace Element {
             layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
             layoutSetting (r, openLastSessionLabel, openLastSession);
             layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
+            
+            r.removeFromTop (spacingBetweenSections);
+            r2 = r.removeFromTop (settingHeight);
+            mainContentLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
+            mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+
             layoutSetting (r, systrayLabel, systray);
             layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
            #ifdef EL_PRO
@@ -606,6 +626,15 @@ namespace Element {
                 settings.setSystrayEnabled (systray.getToggleState());
                 gui.refreshSystemTray();
             }
+            else if (value.refersToSameSourceAs (mainContentBox.getSelectedIdAsValue()))
+            {
+                if (1 == mainContentBox.getSelectedId())
+                    settings.setMainContentType ("standard");
+                else if (2 == mainContentBox.getSelectedId())
+                    settings.setMainContentType ("workspace");
+                
+                ViewHelpers::postMessageFor (this, new ReloadMainContentMessage());
+            }
 
             settings.saveIfNeeded();
             gui.stabilizeViews();
@@ -649,6 +678,9 @@ namespace Element {
 
         Label desktopScaleLabel;
         Slider desktopScale;
+
+        Label mainContentLabel;
+        ComboBox mainContentBox;
 
         Settings& settings;
         AudioEnginePtr engine;
