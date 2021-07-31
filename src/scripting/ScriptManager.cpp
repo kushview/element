@@ -47,11 +47,7 @@ static void scanForScripts (File dir, Array<ScriptDescription>& results, bool re
 
 static File getDefaultScriptsDir()
 {
-   #if JUCE_DEBUG
-    return File::getCurrentWorkingDirectory().getChildFile ("scripts");
-   #else
-    return {};
-   #endif
+   return ScriptManager::getSystemScriptsDir();
 }
 
 //==============================================================================
@@ -63,8 +59,16 @@ public:
 
     void scanDefaults()
     {
+        scanDirectory (getDefaultScriptsDir());
+    }
+    
+    void scanDirectory (const File& dir)
+    {
+        if (! dir.isDirectory())
+            return;
+        
         Array<ScriptDescription> results;
-        scanForScripts (getDefaultScriptsDir(), results);
+        scanForScripts (dir, results);
         Array<ScriptDescription> newDSP;
         Array<ScriptDescription> newDSPUI;
         
@@ -106,6 +110,11 @@ void ScriptManager::scanDefaultLocation()
     registry->scanDefaults();
 }
 
+void ScriptManager::scanDirectory (const File& d)
+{
+    registry->scanDirectory (d);
+}
+
 int ScriptManager::getNumScripts() const
 {
     return registry->scripts.size();
@@ -120,7 +129,6 @@ const ScriptArray& ScriptManager::getScriptsDSP() const
 {
     return registry->dsp;
 }
-
 
 //==============================================================================
 File ScriptManager::getApplicationScriptsDir()

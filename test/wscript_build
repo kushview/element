@@ -10,7 +10,8 @@ bld.program (
 )
 
 bld.program (
-    source = bld.path.ant_glob ("*.cpp"),
+    source = bld.path.ant_glob ("*.cpp") + \
+             bld.path.ant_glob ("scripting/*.cpp"),
     includes = [ '.' ],
     target = '../bin/test_element',
     use = [ 'ELEMENT', 'LUA', 'BOOST_TEST' ],

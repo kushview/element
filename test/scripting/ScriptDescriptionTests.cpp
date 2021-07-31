@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-#include "LuaUnitTest.h"
+#include <boost/test/unit_test.hpp>
 #include "scripting/ScriptDescription.h"
 
 using namespace Element;
@@ -59,46 +59,41 @@ static void print (const ScriptDescription& desc) {
     DBG (toString (desc));
 }
 
-//=============================================================================
-class ScriptDescriptionTest : public UnitTestBase
-{
-public:
-    ScriptDescriptionTest ()
-        : UnitTestBase ("Script Description", "ScriptDescription", "parse") { }
+BOOST_AUTO_TEST_SUITE(ScriptDescriptionTests)
 
-    void runTest() override
-    {
-        beginTest ("parse buffer");
-        auto info = ScriptDescription::parse (sDummyScript
-            .replace ("%NAME%", "Dummy")
-            .replace ("%KIND%", "el.DSP")
-            .replace ("%AUTHOR%", "Michael R. Fisher"));
+BOOST_AUTO_TEST_CASE (ParseBuffer) {
+    auto info = ScriptDescription::parse (sDummyScript
+        .replace ("%NAME%", "Dummy")
+        .replace ("%KIND%", "el.DSP")
+        .replace ("%AUTHOR%", "Michael R. Fisher"));
 
-        expect (info.isValid(), "Script description not valid");
-        expect (info.name   == "Dummy");
-        expect (info.type   == "DSP");
-        expect (info.author == "Michael R. Fisher");
-        expect (info.source.isEmpty());
-        expect (info.description.isNotEmpty());
+    BOOST_REQUIRE (info.isValid());
+    BOOST_REQUIRE (info.name   == "Dummy");
+    BOOST_REQUIRE (info.type   == "DSP");
+    BOOST_REQUIRE (info.author == "Michael R. Fisher");
+    BOOST_REQUIRE (info.source.isEmpty());
+    BOOST_REQUIRE (info.description.isNotEmpty());
+}
 
-        beginTest ("parse file");
-        const auto sfile = File::getCurrentWorkingDirectory().getChildFile ("scripts/amp.lua");
-        info = ScriptDescription::parse (sfile);
-        expect (info.isValid());
-        expect (info.name   == "amp", toString (info));
-        expect (info.type   == "DSP", toString (info));
-        expect (info.author == "Michael Fisher", toString (info));
-        expect (URL(info.source).getLocalFile() == sfile, toString(info));
-        expect (info.description.isEmpty(), toString (info));
+BOOST_AUTO_TEST_CASE (ParseFile) {
+    const auto sfile = File::getCurrentWorkingDirectory().getChildFile ("scripts/amp.lua");
+    auto info = ScriptDescription::parse (sfile);
+    BOOST_REQUIRE (info.isValid());
+    BOOST_REQUIRE (info.name   == "amp");
+    BOOST_REQUIRE (info.type   == "DSP");
+    BOOST_REQUIRE (info.author == "Michael Fisher");
+    BOOST_REQUIRE (URL(info.source).getLocalFile() == sfile);
+    BOOST_REQUIRE (info.description.isEmpty());
+}
 
-        beginTest ("script error");
-        info = ScriptDescription::parse (sErrorScript);
-        expect (! info.isValid(), "Script should be invalid");
+BOOST_AUTO_TEST_CASE (ScriptError) {
+    auto info = ScriptDescription::parse (sErrorScript);
+    BOOST_REQUIRE (! info.isValid());
+}
 
-        beginTest ("missing details");
-        info = ScriptDescription::parse (sMissingInfo);
-        expect (! info.isValid(), "Script should be invalid");
-    }
-};
+BOOST_AUTO_TEST_CASE (MissingDetails) {
+    auto info = ScriptDescription::parse (sMissingInfo);
+    BOOST_REQUIRE (! info.isValid());
+}
 
-static ScriptDescriptionTest sScriptDescriptionTest;
+BOOST_AUTO_TEST_SUITE_END()

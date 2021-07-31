@@ -16,32 +16,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-// FIXME: Local lua paths in release build
-#if JUCE_DEBUG
-
-#include "Tests.h"
+#include <boost/test/unit_test.hpp>
 #include "scripting/ScriptManager.h"
 #include "scripting/LuaBindings.h"
 #include "sol/sol.hpp"
 
-using namespace Element;
+BOOST_AUTO_TEST_SUITE (ScriptManagerTests)
 
-//=============================================================================
-class ScriptManagerTest : public UnitTestBase
-{
-public:
-    ScriptManagerTest ()
-        : UnitTestBase ("Script Manager", "ScriptManager", "manager") { }
+BOOST_AUTO_TEST_CASE (ScanDirectory) {
+    Element::ScriptManager scripts;
+    auto d = File::getCurrentWorkingDirectory().getChildFile ("scripts");
+    scripts.scanDirectory (d);
+    BOOST_REQUIRE_EQUAL (scripts.getNumScripts(), 5);
+}
 
-    void runTest() override
-    {
-        beginTest ("scanDefaultLocation");
-        ScriptManager scripts;
-        scripts.scanDefaultLocation();
-        expect (scripts.getNumScripts() == 6, 
-                String("Wrong number of default scripts: ") + String (scripts.getNumScripts()));
-    }
-};
-
-static ScriptManagerTest sScriptManagerTest;
-#endif
+BOOST_AUTO_TEST_SUITE_END()
