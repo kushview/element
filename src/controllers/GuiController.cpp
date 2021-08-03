@@ -936,6 +936,14 @@ bool GuiController::handleMessage (const AppMessage& msg)
     
         return true;
     }
+    else if (auto m = dynamic_cast<const PresentViewMessage*> (&msg))
+    {
+        if (m->create)
+            if (auto* v = m->create())
+                getContentComponent()->setMainView (v);
+        
+        return true;
+    }
 
     return false;
 }

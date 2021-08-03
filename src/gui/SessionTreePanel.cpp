@@ -19,12 +19,15 @@
 
 #include "controllers/SessionController.h"
 
+#include "engine/nodes/NodeTypes.h"
+
 #include "gui/GuiCommon.h"
 #include "gui/ContextMenus.h"
 #include "gui/ContentComponent.h"
 
 #include "gui/AudioIOPanelView.h"
 #include "gui/views/PluginsPanelView.h"
+#include "gui/views/ScriptEditorView.h"
 #include "gui/SessionTreePanel.h"
 #include "gui/NavigationConcertinaPanel.h"
 
@@ -161,7 +164,16 @@ public:
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
             c->setCurrentNode (graph);
         }
-
+#if 0
+        // Experiment with showing arbitrary view
+        if (node.getFormat().toString()     == EL_INTERNAL_FORMAT_NAME &&
+            node.getIdentifier().toString() == EL_INTERNAL_ID_SCRIPT)
+        {
+            ViewHelpers::postMessageFor (view, new PresentViewMessage ([]() -> ContentView* {
+                return new ScriptEditorView();
+            }));
+        }
+#endif
         if (! node.isRootGraph())
             gui->selectNode (node);
         else if (node.isRootGraph() && node.hasAudioOutputNode())
@@ -460,7 +472,6 @@ public:
             for (int i = 0; i < session->getNumGraphs(); ++i)
                 addSubItem (new SessionRootGraphTreeItem (session->getGraph (i)));
         }
-
     }
 
     virtual bool mightContainSubItems() override { return true; }
