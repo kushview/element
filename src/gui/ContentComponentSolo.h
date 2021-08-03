@@ -71,6 +71,8 @@ public:
     void getSessionState (String&) override;
     void applySessionState (const String&) override;
 
+    void setMainView (ContentView* v) override;
+
     // App commands
     void getAllCommands (Array<CommandID>&) override { }
     void getCommandInfo (CommandID, ApplicationCommandInfo&) override { }

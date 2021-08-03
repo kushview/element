@@ -126,6 +126,11 @@ public:
 
     virtual NavigationConcertinaPanel* getNavigationConcertinaPanel() const { return nullptr; }
     
+    /** Implement if can set a view directly. Subclasses should take ownership
+        of the view.
+    */
+    virtual void setMainView (ContentView* v) { jassertfalse; delete v; }
+
     virtual void setMainView (const String& name);
     virtual void setAccessoryView (const String& name);
     virtual String getMainViewName() const;

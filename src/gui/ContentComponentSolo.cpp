@@ -572,7 +572,7 @@ void ContentComponentSolo::nextMainView()
 void ContentComponentSolo::setContentView (ContentView* view, const bool accessory)
 {
     jassert (view && container);
-    ScopedPointer<ContentView> deleter (view);
+    std::unique_ptr<ContentView> deleter (view);
     if (accessory)
     {
         container->setAccessoryView (deleter.release());
@@ -924,6 +924,12 @@ void ContentComponentSolo::applySessionState (const String& state)
         String nedState = data.getProperty ("NodeEditorContentView").toString();
         ned->setState (nedState);
     }
+}
+
+void ContentComponentSolo::setMainView (ContentView* view)
+{
+    jassert (view != nullptr);
+    setContentView (view, false);
 }
 
 }
