@@ -1,5 +1,5 @@
 /*
-    This file is part of Element
+    This file is part of Element.
     Copyright (C) 2019  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -70,10 +70,11 @@ public:
                                Colour backgroundColour, bool isMouseOver) override;
     #endif
     
+    //=========================================================================
     struct WholeTreeOpennessRestorer : public OpennessRestorer
     {
-    WholeTreeOpennessRestorer (TreeViewItem& item)  : OpennessRestorer (getTopLevelItem (item)) { }
-
+        WholeTreeOpennessRestorer (TreeViewItem& item)
+            : OpennessRestorer (getTopLevelItem (item)) { }
     private:
         static TreeViewItem& getTopLevelItem (TreeViewItem& item)
         {
@@ -84,6 +85,7 @@ public:
         }
     };
 
+    //=========================================================================
     int textX;
 
 protected:
