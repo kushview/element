@@ -959,6 +959,11 @@ int Node::getNumPrograms() const
     return 0;
 }
 
+bool Node::isA (const String& format, const String& identifier) const
+{
+    return getFormat().toString() == format && getIdentifier().toString() == identifier;
+}
+
 bool Node::hasEditor() const
 {
     if (Tags::plugin == getNodeType())

@@ -188,6 +188,9 @@ public:
     /** Returns true if this node is a specific type */
     const bool hasNodeType (const Identifier& t) const { return getNodeType() == t; }
 
+    /** Returns true if this node is of the given format and unique ID */
+    bool isA (const String& format, const String& identifier) const;
+
     //=========================================================================
     /** Returns true if this node has a custom editor */
     bool hasEditor() const;
