@@ -1,6 +1,6 @@
 /*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    This file is part of Element.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,8 +37,59 @@
 
 namespace Element {
 
-class SessionNodeTreeItem : public TreeItemBase
-{  
+//=============================================================================
+class SessionBaseTreeItem : public TreeItemBase
+{
+public:
+    SessionBaseTreeItem() = default;
+    virtual ~SessionBaseTreeItem() = default;
+
+    //=========================================================================
+    ContentComponent* getContentComponent() const noexcept
+    {
+        if (auto* const tv = getOwnerView())
+            return ViewHelpers::findContentComponent (tv);
+        return nullptr;
+    }
+
+    //=========================================================================
+    virtual bool mightContainSubItems() override { return false; }
+
+    /** @internal */
+    String getUniqueName() const override { return uniqueName; }
+
+    /** @internal */
+    void itemOpennessChanged (const bool isOpen) override
+    {
+        if (isOpen)
+            refreshSubItems();
+        else
+            clearSubItems();
+    }
+
+    /** @internal */
+    void itemClicked (const MouseEvent& ev) override
+    {
+        if (ev.x < roundToInt (1.f + getIconSize())) {
+            setOpen (! isOpen());
+        }
+
+        TreeItemBase::itemClicked (ev);
+    }
+
+protected:
+    void setUniqueName (const String& n)
+    {
+        uniqueName = n;
+    }
+
+private:
+    String uniqueName;
+};
+
+//=============================================================================
+class SessionNodeTreeItem : public SessionBaseTreeItem
+{
 public:
     SessionNodeTreeItem (const Node& n)
         : node (n)
@@ -48,43 +99,19 @@ public:
         
         if (parent.isValid())
         {
-            uniqueName = String (parent.indexOf (child));
+            setUniqueName (String (parent.indexOf (child)));
         }
         else
         {
-            uniqueName = String ((int64) node.getNodeId());
+            setUniqueName (String ((int64) node.getNodeId()));
         }
     }
     
-    String getUniqueName() const override { return uniqueName; }
-    
-    void itemOpennessChanged (const bool isOpen) override
-    {
-        if (isOpen)
-            refreshSubItems();
-        else
-            clearSubItems();
-    }
+    //=========================================================================
+    Node getNode() const { return node; }
 
-    void addSubItems() override
-    {
-        const auto nodes (node.getNodesValueTree());
-        for (int i = 0; i < nodes.getNumChildren(); ++i)
-        {
-            const Node c (nodes.getChild (i), false);
-            if (! c.isIONode())
-                addSubItem (new SessionNodeTreeItem (c));
-        }
-    }
-
-    void itemClicked (const MouseEvent& ev) override
-    {
-        if (ev.x < roundToInt (1.f + getIconSize())) {
-            setOpen (! isOpen());
-        }
-
-        TreeItemBase::itemClicked (ev);
-    }
+    /** Returns true if the given node refers to the viewed node */
+    bool refersTo (const Node& o) const { return o.getValueTree() == node.getValueTree(); }
 
     void showPluginWindow (bool showIt = true)
     {
@@ -141,7 +168,7 @@ public:
         SharedConnectionBlock block (tree->nodeSelectedConnection, true);
 
         jassert(session != nullptr && cc != nullptr && gui != nullptr);
-        
+
         auto root = node;
         while (!root.isRootGraph() && root.isValid())
             root = root.getParentGraph();
@@ -164,16 +191,7 @@ public:
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
             c->setCurrentNode (graph);
         }
-#if 0
-        // Experiment with showing arbitrary view
-        if (node.getFormat().toString()     == EL_INTERNAL_FORMAT_NAME &&
-            node.getIdentifier().toString() == EL_INTERNAL_ID_SCRIPT)
-        {
-            ViewHelpers::postMessageFor (view, new PresentViewMessage ([]() -> ContentView* {
-                return new ScriptEditorView();
-            }));
-        }
-#endif
+
         if (! node.isRootGraph())
             gui->selectNode (node);
         else if (node.isRootGraph() && node.hasAudioOutputNode())
@@ -186,11 +204,10 @@ public:
             view->grabKeyboardFocus();
     }
 
-    bool mightContainSubItems() override            { return node.isGraph(); }
     String getRenamingName() const override         { return getDisplayName(); }
-    String getDisplayName() const override          { return node.getDisplayName(); }
+    String getDisplayName()  const override         { return node.getDisplayName(); }
 
-    void setName (const String& newName) override   
+    void setName (const String& newName) override
     {
         node.setProperty (Tags::name, newName);
     }
@@ -339,22 +356,103 @@ public:
         }
     }
 
-    String uniqueName;
     Node node;
     NodePopupMenu menu;
 };
 
-class SessionPluginTreeItem : public SessionNodeTreeItem
+//=============================================================================
+class SessionScriptNodeTreeItem : public SessionNodeTreeItem
 {
 public:
-    SessionPluginTreeItem (const Node& n) 
-        : SessionNodeTreeItem (n) { }
+    SessionScriptNodeTreeItem (const Node& n)
+        : SessionNodeTreeItem (n)
+    {
+        jassert (node.isA (EL_INTERNAL_FORMAT_NAME, EL_INTERNAL_ID_SCRIPT));
+    }
+
+    bool mightContainSubItems() override { return true; }
+
+    void addSubItems() override
+    {
+        addSubItem (new TreeItem (getNode(), false));
+        addSubItem (new TreeItem (getNode(), true));
+    }
+
+private:
+    class TreeItem : public SessionNodeTreeItem
+    {
+    public:
+        Node node;
+        const bool forUI;
+
+        TreeItem() = delete;
+        TreeItem (const Node& n, bool isUI) 
+            : SessionNodeTreeItem (n),
+              node(n), forUI (isUI) {}
+        ~TreeItem() = default;
+
+        SessionScriptNodeTreeItem* getParent() const noexcept
+        {
+            return dynamic_cast<SessionScriptNodeTreeItem*> (getParentItem());
+        }
+
+        void showDocument() override
+        {
+            if (auto* cc = getContentComponent())
+                cc->setMainView (new ScriptNodeScriptEditorView (node, forUI));
+        }
+
+        String getDisplayName()  const override
+        {
+            return String (forUI ? "UI" : "DSP");
+        }
+
+        String getRenamingName() const override { return getDisplayName(); }
+    };
 };
 
-class SessionRootGraphTreeItem : public SessionNodeTreeItem
+//=============================================================================
+class SessionGraphTreeItem : public SessionNodeTreeItem
 {
 public:
-    SessionRootGraphTreeItem (const Node& n) : SessionNodeTreeItem (n) { jassert (n.isRootGraph()); }
+    SessionGraphTreeItem (const Node& n)
+        : SessionNodeTreeItem (n)
+    {
+        jassert (n.isGraph());
+    }
+
+    //=========================================================================
+    bool mightContainSubItems() override { return true; }
+
+    void addSubItems() override
+    {
+        const auto n = getNode();
+        const auto nodes (n.getNodesValueTree());
+        for (int i = 0; i < nodes.getNumChildren(); ++i)
+        {
+            const Node c (nodes.getChild (i), false);
+            if (c.isIONode())
+                continue;
+
+            if (c.isA (EL_INTERNAL_FORMAT_NAME, EL_INTERNAL_ID_SCRIPT))
+                addSubItem (new SessionScriptNodeTreeItem (c));
+            else if (c.isGraph())
+                addSubItem (new SessionGraphTreeItem (c));
+            else
+                addSubItem (new SessionNodeTreeItem (c));
+        }
+    }
+};
+
+//=============================================================================
+class SessionRootGraphTreeItem : public SessionGraphTreeItem
+{
+public:
+    SessionRootGraphTreeItem (const Node& n)
+        : SessionGraphTreeItem (n)
+    { 
+        jassert (n.isRootGraph());
+    }
     
     void deleteItem() override
     {
@@ -453,6 +551,7 @@ public:
     }
 };
 
+//=============================================================================
 class SessionRootTreeItem : public TreeItemBase
 {
 public:
@@ -523,6 +622,7 @@ public:
     SessionTreePanel& panel;
 };
 
+//=============================================================================
 SessionTreePanel::SessionTreePanel()
     : TreePanelBase ("session")
 {

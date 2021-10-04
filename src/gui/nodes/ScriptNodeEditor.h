@@ -1,6 +1,6 @@
 /*
-    This file is part of Element
-    Copyright (C) 2019  Kushview, LLC.  All rights reserved.
+    This file is part of Element.
+    Copyright (C) 2019-2021  Kushview, LLC.  All rights reserved.
     - Author Michael Fisher <mfisher@kushvie.net>
 
     This program is free software; you can redistribute it and/or modify
@@ -47,15 +47,7 @@ private:
     sol::table widget;
     Component* comp = nullptr;
 
-    kv::LuaTokeniser tokens;
-    class CodeEditor; friend class CodeEditor;
-    std::unique_ptr<CodeEditor> editor;
-
-    TextButton compileButton;
     TextButton paramsButton;
-    TextButton dspButton;
-    TextButton uiButton;
-    TextButton previewButton;
 
     PropertyPanel props;
     SignalConnection portsChangedConnection;

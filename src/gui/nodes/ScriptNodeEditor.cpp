@@ -29,32 +29,6 @@
 namespace Element {
 
 //==============================================================================
-static CodeEditorComponent::ColourScheme luaColors()
-{
-    static const CodeEditorComponent::ColourScheme::TokenType types[] =
-    {
-         { "Error",          Colour (0xffcc0000) },
-         { "Comment",        Colour (0xff6a9955) },
-         { "Keyword",        Colour (0xff569cd6) },
-         { "Operator",       Colour (0xffb3b3b3) },
-         { "Identifier",     Colour (0xffc5c5c5) },
-         { "Integer",        Colour (0xffb5cea8) },
-         { "Float",          Colour (0xffb5cea8) },
-         { "String",         Colour (0xffce9178) },
-         { "Bracket",        Colour (0xffd4d4d4) },
-         { "Punctuation",    Colour (0xffb3b3b3) },
-         { "Preprocessor Text", Colour (0xffc586c0) } // used for control statements
-    };
-
-    CodeEditorComponent::ColourScheme cs;
-
-    for (auto& t : types)
-        cs.set (t.name, Colour (t.colour));
-
-    return cs;
-}
-
-//==============================================================================
 class ControlPort : private ParameterListener
 {
 public:
@@ -212,88 +186,6 @@ private:
 };
 
 //==============================================================================
-class ScriptNodeEditor::CodeEditor : public CodeEditorComponent
-{
-public:
-    CodeEditor (ScriptNodeEditor& o, CodeDocument& doc, CodeTokeniser* tokens)
-        : CodeEditorComponent (doc, tokens),
-          owner (o)
-    {
-        setTabSize (4, true);
-        setColourScheme (luaColors());
-        setFont (getFont().withHeight (getDefaultFontHeight()));
-    }
-
-    ~CodeEditor() override {}
-
-    //==========================================================================
-    /** Returns the default font height used by this editor */
-    float getDefaultFontHeight() const { return defaultFontHeight; }
-
-    //==========================================================================
-    void addPopupMenuItems (PopupMenu &menu, const MouseEvent *event) override
-    {
-        menu.addItem (50001, "Open File");
-        menu.addItem (50002, "Save File");
-        menu.addSeparator();
-        CodeEditorComponent::addPopupMenuItems (menu, event);
-    }
-
-    void performPopupMenuAction (int menuItemID) override
-    {
-        switch (menuItemID)
-        {
-            case 50001:
-            {
-                owner.chooser.reset (new FileChooser (
-                    "Open script", ScriptManager::getUserScriptsDir(), 
-                    "*.lua", false, false, &owner));
-
-                FileChooser& fc (*owner.chooser);
-                if (fc.browseForFileToOpen())
-                {
-                    auto& doc = getDocument();
-                    doc.replaceAllContent (
-                        fc.getResult().loadFileAsString());
-                }
-                break;
-            }
-            
-            case 50002:
-            {
-                 owner.chooser.reset (new FileChooser (
-                    "Save script", ScriptManager::getUserScriptsDir(), 
-                    "*.lua", false, false, &owner));
-                FileChooser& fc (*owner.chooser);
-                if (fc.browseForFileToSave (true))
-                {
-                    TemporaryFile tmpFile (fc.getResult());
-                    auto stream = tmpFile.getFile().createOutputStream();
-                    if (getDocument().writeToStream (*stream))                
-                        tmpFile.overwriteTargetFileWithTemporary();
-                }
-                break;
-            }
-
-            default:
-                CodeEditorComponent::performPopupMenuAction (menuItemID);
-                break;
-        }
-    }
-
-private:
-    ScriptNodeEditor& owner;
-   #if JUCE_MAC
-    static constexpr float defaultFontHeight = 14.5f;
-   #elif JUCE_WINDOWS
-    static constexpr float defaultFontHeight = 13.f;
-   #elif JUCE_LINUX
-    static constexpr float defaultFontHeight = 16.f;
-   #else
-    static constexpr float defaultFontHeight = 15.f;
-   #endif
-};
-
 static ValueTree getUIChild (const Node& node, const String& name) {
     auto UI = node.getUIValueTree();
     return UI.getOrCreateChildWithName (name, nullptr);
@@ -349,19 +241,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     chooser.reset (new FileChooser ("Script", ScriptManager::getUserScriptsDir(),
                                     "*.lua", false, false, this));
 
-    addAndMakeVisible (compileButton);
-    compileButton.setButtonText ("Compile");
-    compileButton.onClick = [this]()
-    {
-        const auto script = lua->getCodeDocument(false).getAllContent();
-        auto result = lua->loadScript (script);
-        if (! result.wasOk())
-        {
-            AlertWindow::showMessageBoxAsync (AlertWindow::WarningIcon,
-                "Script Error", result.getErrorMessage());
-        }
-    };
-
     addAndMakeVisible (paramsButton);
     paramsButton.setButtonText ("Params");
     paramsButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
@@ -370,51 +249,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
         paramsButton.setToggleState (! paramsButton.getToggleState(), dontSendNotification);
         props.setVisible (paramsButton.getToggleState());
         resized();
-    };
-
-    addAndMakeVisible (dspButton);
-    dspButton.setButtonText ("DSP");
-    dspButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    dspButton.onClick = [this]()
-    {
-        if (! dspButton.getToggleState())
-        {
-            dspButton.setToggleState (true, dontSendNotification);
-            uiButton.setToggleState (false, dontSendNotification);
-            previewButton.setToggleState (false, dontSendNotification);
-            updatePreview();
-            updateCodeEditor();
-        }
-    };
-
-    addAndMakeVisible (uiButton);
-    uiButton.setButtonText ("UI");
-    uiButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    uiButton.onClick = [this]()
-    {
-        if (! uiButton.getToggleState())
-        {
-            dspButton.setToggleState (false, dontSendNotification);
-            uiButton.setToggleState (true, dontSendNotification);
-            previewButton.setToggleState (false, dontSendNotification);
-            updatePreview();
-            updateCodeEditor();
-        }
-    };
-
-    addAndMakeVisible (previewButton);
-    previewButton.setButtonText ("Preview");
-    previewButton.setColour (TextButton::buttonOnColourId, Colors::toggleBlue);
-    previewButton.onClick = [this]()
-    {
-        if (! previewButton.getToggleState())
-        {
-            dspButton.setToggleState (false, dontSendNotification);
-            uiButton.setToggleState (false, dontSendNotification);
-            previewButton.setToggleState (true, dontSendNotification);
-            updateCodeEditor();
-            updatePreview();
-        }
     };
 
     addAndMakeVisible (props);
@@ -436,15 +270,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
         props.setVisible (true);
     }
 
-    if ((bool) SNE.getProperty ("showDSP", true))
-        dspButton.setToggleState (true, dontSendNotification);
-    else if ((bool) SNE.getProperty ("showUI", false))
-        uiButton.setToggleState (true, dontSendNotification);
-    else if ((bool) SNE.getProperty ("preview", false))
-        previewButton.setToggleState (true, dontSendNotification);
-    else
-        dspButton.setToggleState (true, dontSendNotification);
-
     updateAll();
     updatePreview();
     resized();
@@ -457,12 +282,7 @@ ScriptNodeEditor::~ScriptNodeEditor()
 
     auto SNE = getScriptNodeEditorState (getNode());
     SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr)
-       .setProperty ("console",    console.isVisible(), nullptr)
-       .setProperty ("showDSP",    dspButton.getToggleState(), nullptr)
-       .setProperty ("showUI",     uiButton.getToggleState(), nullptr)
-       .setProperty ("preview",    previewButton.getToggleState(), nullptr);
-
-    editor.reset();
+       .setProperty ("console",    console.isVisible(), nullptr);
 }
 
 //==============================================================================
@@ -491,9 +311,7 @@ void ScriptNodeEditor::updateAll()
 
 void ScriptNodeEditor::updateCodeEditor()
 {
-    editor.reset (new CodeEditor (*this, getActiveDoc(), &tokens));
-    addAndMakeVisible (editor.get());
-    resized();
+    // refresh script editor view(s) if possible
 }
 
 void ScriptNodeEditor::updateProperties()
@@ -511,93 +329,77 @@ void ScriptNodeEditor::updateProperties()
 
 void ScriptNodeEditor::updatePreview()
 {
-    if (previewButton.getToggleState())
-    {
-        try {
-            Script loader (state);
-            if (loader.load (lua->getCodeDocument(true).getAllContent()))
+    try {
+        Script loader (state);
+        if (loader.load (lua->getCodeDocument(true).getAllContent()))
+        {
+            auto f = loader.caller(); env.set_on (f);
+            auto ctx = createContext();
+            sol::protected_function_result instance = f (ctx);
+        
+            if (! instance.valid())
             {
-                auto f = loader.caller(); env.set_on (f);
-                auto ctx = createContext();
-                sol::protected_function_result instance = f (ctx);
+                sol::error e = instance;
+                for (const auto& line : StringArray::fromLines (e.what()))
+                    console.addText (line);
+                return;
+            }
             
-                if (! instance.valid())
-                {
-                    sol::error e = instance;
-                    for (const auto& line : StringArray::fromLines (e.what()))
-                        console.addText (line);
-                    return;
-                }
-                
-                if (instance.get_type() == sol::type::table)
-                {
-                    sol::table DSPUI = instance;
-                    sol::table editor;
-                    
-                    switch (DSPUI["editor"].get_type())
-                    {
-                        case sol::type::function:
-                        {
-                            sol::function instantiate = DSPUI["editor"];
-                            auto editorResult = instantiate (ctx);
-                            if (! editorResult.valid())
-                            {
-                                sol::error e = editorResult;
-                                for (const auto& line : StringArray::fromLines (e.what()))
-                                    console.addText (line);
-                            }
-                            else if (editorResult.get_type() == sol::type::table)
-                            {
-                                editor = editorResult;
-                            }
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-
-                    if (auto* const c = kv::lua::object_userdata<Component> (editor))
-                    {
-                        comp = c;
-                        widget = editor;
-                        addAndMakeVisible (*comp);
-                        comp->setAlwaysOnTop (true);
-                    }
-                    else
-                    {
-                        console.addText ("ScriptNodeEditor: didn't get widget from DSPUI script");
-                    }
-                }
-            }
-            else
+            if (instance.get_type() == sol::type::table)
             {
-                console.addText (loader.getErrorMessage());
+                sol::table DSPUI = instance;
+                sol::table editor;
+                
+                switch (DSPUI["editor"].get_type())
+                {
+                    case sol::type::function:
+                    {
+                        sol::function instantiate = DSPUI["editor"];
+                        auto editorResult = instantiate (ctx);
+                        if (! editorResult.valid())
+                        {
+                            sol::error e = editorResult;
+                            for (const auto& line : StringArray::fromLines (e.what()))
+                                console.addText (line);
+                        }
+                        else if (editorResult.get_type() == sol::type::table)
+                        {
+                            editor = editorResult;
+                        }
+                        break;
+                    }
+                    default:
+                        break;
+                }
+
+                if (auto* const c = kv::lua::object_userdata<Component> (editor))
+                {
+                    comp = c;
+                    widget = editor;
+                    addAndMakeVisible (*comp);
+                    comp->setAlwaysOnTop (true);
+                }
+                else
+                {
+                    console.addText ("ScriptNodeEditor: didn't get widget from DSPUI script");
+                }
             }
         }
-        catch (const std::exception& e)
+        else
         {
-            for (const auto& line : StringArray::fromLines (e.what()))
-                console.addText (line);
+            console.addText (loader.getErrorMessage());
         }
     }
-    else
+    catch (const std::exception& e)
     {
-        if (comp != nullptr)
-        {
-            removeChildComponent (comp);
-            comp = nullptr;
-            widget = sol::lua_nil;
-        }
+        for (const auto& line : StringArray::fromLines (e.what()))
+            console.addText (line);
     }
-
-    editor->setVisible (! previewButton.getToggleState());
+    
     resized();
 }
 
-void ScriptNodeEditor::updateScriptsCombo()
-{
-    // scriptsCombo.clear (dontSendNotification);
-}
+void ScriptNodeEditor::updateScriptsCombo() {}
 
 void ScriptNodeEditor::onPortsChanged()
 {
@@ -606,12 +408,13 @@ void ScriptNodeEditor::onPortsChanged()
 
 CodeDocument& ScriptNodeEditor::getActiveDoc()
 {
-    return lua->getCodeDocument (uiButton.getToggleState());
+    return lua->getCodeDocument (true);
 }
 
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
     updateAll();
+    updatePreview();
     resized();
 }
 
@@ -627,18 +430,6 @@ void ScriptNodeEditor::resized()
     auto r2 = r1.removeFromTop (toolbarSize);
     
     fileBrowser.setBounds (r1.reduced (8));
-
-    dspButton.changeWidthToFitText (r2.getHeight());
-    dspButton.setBounds (r2.removeFromLeft (dspButton.getWidth()));
-    r2.removeFromLeft (2);
-    uiButton.changeWidthToFitText (r2.getHeight());
-    uiButton.setBounds (r2.removeFromLeft (uiButton.getWidth()));
-    r2.removeFromLeft (2);
-    previewButton.changeWidthToFitText (r2.getHeight());
-    previewButton.setBounds (r2.removeFromLeft (previewButton.getWidth()));
-    r2.removeFromLeft (2);
-    compileButton.changeWidthToFitText (r2.getHeight());
-    compileButton.setBounds (r2.removeFromLeft (compileButton.getWidth()));
     
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
@@ -652,14 +443,6 @@ void ScriptNodeEditor::resized()
     }
 
     console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
-    if (editor)
-        editor->setBounds (r1);
-
-    if (previewButton.getToggleState() && comp != nullptr)
-    {
-        auto b = comp->getLocalBounds();
-        comp->setBounds (b.withCentre (r1.getCentre()));
-    }
 }
 
 }

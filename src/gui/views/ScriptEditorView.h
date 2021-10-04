@@ -1,5 +1,5 @@
 /*
-    This file is part of Element
+    This file is part of Element.
     Copyright (C) 2021  Kushview, LLC.  All rights reserved.
 
     This program is free software; you can redistribute it and/or modify
@@ -21,28 +21,42 @@
 
 #include "gui/ContentComponent.h"
 #include "gui/widgets/ScriptEditorComponent.h"
+#include "session/Node.h"
 
 namespace Element {
 
-class ScriptSource;
+class ScriptNode;
 
 class ScriptEditorView : public ContentView
 {
-public:
+protected:
     ScriptEditorView();
-    ~ScriptEditorView();
+
+public:
+    virtual ~ScriptEditorView();
+
+    ScriptEditorComponent& getEditor() { return *editor; }
 
     /** Returns the code document used by this view */
     CodeDocument& getCodeDocument() { return code; }
+
+    /** Returns the code document used by this view */
+    const CodeDocument& getCodeDocument() const { return code; }
+
+    /** Reload the buffer. */
+    void reload();
 
     /** Reset the buffer, undo history, and save point */
     void reset();
 
     /** @internal */
-    void resized() override;
+    virtual void resized() override;
+
+    //=========================================================================
+    /** @internal */
+    void initializeView (AppController&) override;
 
    #if 0
-    virtual void initializeView (AppController&) { }
     virtual void willBeRemoved() { }
     virtual void willBecomeActive() { }
     virtual void didBecomeActive() { }
@@ -61,11 +75,33 @@ public:
     virtual void setState (const String&) {}
    #endif
 
+protected:
+    virtual String getScriptContent() const =0;
+
 private:
     std::unique_ptr<ScriptEditorComponent> editor;
-    std::unique_ptr<ScriptSource> source;
     kv::LuaTokeniser tokens;
-    CodeDocument code;    
+    CodeDocument code;
+};
+
+class ScriptNodeScriptEditorView : public ScriptEditorView
+{
+public:
+    ScriptNodeScriptEditorView (const Node& n, bool editUI);
+    ~ScriptNodeScriptEditorView() = default;
+
+    bool isEditingUI() const { return editingUI; }
+
+    /** @internal */
+    void resized() override;
+
+protected:
+    String getScriptContent() const override;
+
+private:
+    Node node;
+    bool editingUI;
+    TextButton applyButton;
 };
 
 }
