@@ -63,7 +63,6 @@ private:
     void updatePreview();
     void updateCodeEditor();
     void updateProperties();
-    void updateScriptsCombo();
     void onPortsChanged();
     sol::table createContext();
 };

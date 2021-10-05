@@ -307,6 +307,7 @@ void ScriptNodeEditor::updateAll()
 {
     updateCodeEditor();
     updateProperties();
+    updatePreview();
 }
 
 void ScriptNodeEditor::updateCodeEditor()
@@ -329,6 +330,13 @@ void ScriptNodeEditor::updateProperties()
 
 void ScriptNodeEditor::updatePreview()
 {
+    if (comp != nullptr)
+    {
+        removeChildComponent (comp);
+        widget = sol::table();
+        comp = nullptr;
+    }
+
     try {
         Script loader (state);
         if (loader.load (lua->getCodeDocument(true).getAllContent()))
@@ -399,8 +407,6 @@ void ScriptNodeEditor::updatePreview()
     resized();
 }
 
-void ScriptNodeEditor::updateScriptsCombo() {}
-
 void ScriptNodeEditor::onPortsChanged()
 {
     updateProperties();
@@ -414,7 +420,6 @@ CodeDocument& ScriptNodeEditor::getActiveDoc()
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
 {
     updateAll();
-    updatePreview();
     resized();
 }
 

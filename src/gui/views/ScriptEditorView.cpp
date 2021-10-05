@@ -151,7 +151,7 @@ ScriptNodeScriptEditorView::ScriptNodeScriptEditorView (const Node& n, bool edit
 {
     setName ("ScriptNodeScriptEditorView");
 
-    applyButton.setButtonText (editingUI ? "Preview" : "Compile");
+    applyButton.setButtonText (editingUI ? TRANS("Apply") : TRANS("Apply"));
     addAndMakeVisible (applyButton);
     applyButton.onClick = [this]() {
         Result r = Result::ok();
