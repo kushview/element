@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "gui/LuaTokeniser.h"
+
 namespace Element {
 
 /** A juce::CodeEditorComponent that sets some default options and color scheme */
@@ -33,8 +35,8 @@ public:
         : CodeEditorComponent (document, tokens)
     {
         setTabSize (4, true);
-        setColourScheme (getDefaultColorScheme());
         setFont (getFont().withHeight (getDefaultFontHeight()));
+        setColourScheme (kv::LuaTokeniser().getDefaultColourScheme());
     }
 
     virtual ~ScriptEditorComponent() = default;
@@ -42,31 +44,6 @@ public:
     //==============================================================================
     /** Returns a font height that looks 'good' in most systems */
     static float getDefaultFontHeight()     { return defaultFontHeight; }
-    
-    /** Returns the default color scheme used by Element */
-    static CodeEditorComponent::ColourScheme getDefaultColorScheme()
-    {
-        static const CodeEditorComponent::ColourScheme::TokenType types[] = {
-            { "Error",              Colour (0xffcc0000) },
-            { "Comment",            Colour (0xff6a9955) },
-            { "Keyword",            Colour (0xff569cd6) },
-            { "Operator",           Colour (0xffb3b3b3) },
-            { "Identifier",         Colour (0xffc5c5c5) },
-            { "Integer",            Colour (0xffb5cea8) },
-            { "Float",              Colour (0xffb5cea8) },
-            { "String",             Colour (0xffce9178) },
-            { "Bracket",            Colour (0xffd4d4d4) },
-            { "Punctuation",        Colour (0xffb3b3b3) },
-            { "Preprocessor Text",  Colour (0xffc586c0) } // used for control statements
-        };
-
-        CodeEditorComponent::ColourScheme cs;
-
-        for (auto& t : types)
-            cs.set (t.name, Colour (t.colour));
-
-        return cs;
-    }
 
 private:
     #if JUCE_MAC

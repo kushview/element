@@ -307,18 +307,18 @@ int LuaTokeniser::readNextToken (CodeDocument::Iterator& source)
 
 CodeEditorComponent::ColourScheme LuaTokeniser::getDefaultColourScheme()
 {
-    static const CodeEditorComponent::ColourScheme::TokenType types[] =
-    {
-        { "Error",          Colour (0xffcc0000) },
-        { "Comment",        Colour (0xff3c3c3c) },
-        { "Keyword",        Colour (0xff0000cc) },
-        { "Operator",       Colour (0xff225500) },
-        { "Identifier",     Colour (0xff000000) },
-        { "Integer",        Colour (0xff880000) },
-        { "Float",          Colour (0xff885500) },
-        { "String",         Colour (0xff990099) },
-        { "Bracket",        Colour (0xff000055) },
-        { "Punctuation",    Colour (0xff004400) }
+    static const CodeEditorComponent::ColourScheme::TokenType types[] = {
+        { "Error",              Colour (0xffcc0000) },
+        { "Comment",            Colour (0xff6a9955) },
+        { "Keyword",            Colour (0xff569cd6) },
+        { "Operator",           Colour (0xffb3b3b3) },
+        { "Identifier",         Colour (0xffc5c5c5) },
+        { "Integer",            Colour (0xffb5cea8) },
+        { "Float",              Colour (0xffb5cea8) },
+        { "String",             Colour (0xffce9178) },
+        { "Bracket",            Colour (0xffd4d4d4) },
+        { "Punctuation",        Colour (0xffb3b3b3) },
+        { "Preprocessor Text",  Colour (0xffc586c0) } // used for control statements
     };
 
     CodeEditorComponent::ColourScheme cs;
