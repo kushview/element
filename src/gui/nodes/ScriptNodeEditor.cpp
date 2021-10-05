@@ -254,9 +254,6 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     addAndMakeVisible (props);
     props.setVisible (paramsButton.getToggleState());
 
-    addAndMakeVisible (console);
-    console.setEnvironment (env);
-
     lua->addChangeListener (this);
     portsChangedConnection = lua->portsChanged.connect (
         std::bind (&ScriptNodeEditor::onPortsChanged, this));
@@ -281,8 +278,7 @@ ScriptNodeEditor::~ScriptNodeEditor()
     lua->removeChangeListener (this);
 
     auto SNE = getScriptNodeEditorState (getNode());
-    SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr)
-       .setProperty ("console",    console.isVisible(), nullptr);
+    SNE.setProperty ("showParams", paramsButton.getToggleState(), nullptr);
 }
 
 //==============================================================================
@@ -349,7 +345,7 @@ void ScriptNodeEditor::updatePreview()
             {
                 sol::error e = instance;
                 for (const auto& line : StringArray::fromLines (e.what()))
-                    console.addText (line);
+                    log (line);
                 return;
             }
             
@@ -368,7 +364,7 @@ void ScriptNodeEditor::updatePreview()
                         {
                             sol::error e = editorResult;
                             for (const auto& line : StringArray::fromLines (e.what()))
-                                console.addText (line);
+                                log (line);
                         }
                         else if (editorResult.get_type() == sol::type::table)
                         {
@@ -389,19 +385,19 @@ void ScriptNodeEditor::updatePreview()
                 }
                 else
                 {
-                    console.addText ("ScriptNodeEditor: didn't get widget from DSPUI script");
+                    log ("ScriptNodeEditor: didn't get widget from DSPUI script");
                 }
             }
         }
         else
         {
-            console.addText (loader.getErrorMessage());
+            log (loader.getErrorMessage());
         }
     }
     catch (const std::exception& e)
     {
         for (const auto& line : StringArray::fromLines (e.what()))
-            console.addText (line);
+            log (line);
     }
     
     resized();
@@ -410,11 +406,6 @@ void ScriptNodeEditor::updatePreview()
 void ScriptNodeEditor::onPortsChanged()
 {
     updateProperties();
-}
-
-CodeDocument& ScriptNodeEditor::getActiveDoc()
-{
-    return lua->getCodeDocument (true);
 }
 
 void ScriptNodeEditor::changeListenerCallback (ChangeBroadcaster*)
@@ -446,8 +437,6 @@ void ScriptNodeEditor::resized()
         props.setBounds (r1.removeFromRight (220));
         r1.removeFromRight (2);
     }
-
-    console.setBounds (r1.removeFromBottom (roundToInt ((float)getHeight() * (1.0 / 3.0))));
 }
 
 }

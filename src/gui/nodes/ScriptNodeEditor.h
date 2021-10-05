@@ -52,19 +52,17 @@ private:
     PropertyPanel props;
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
-
-    LuaConsole console;
     
     FileBrowserComponent fileBrowser;
     std::unique_ptr<FileChooser> chooser;
     
-    CodeDocument& getActiveDoc();
     void updateAll();
     void updatePreview();
     void updateCodeEditor();
     void updateProperties();
     void onPortsChanged();
     sol::table createContext();
+    void log (const String& txt) { DBG(txt); }
 };
 
 }
