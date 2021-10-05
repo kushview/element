@@ -182,14 +182,15 @@ public:
             graphs.setProperty (Tags::active, graphs.indexOf (root.getValueTree()), 0);
             auto& app (ViewHelpers::findContentComponent(getOwnerView())->getAppController());
             app.findChild<EngineController>()->setRootNode (root);
-            if (auto* g = app.findChild<GuiController>())
-                g->showPluginWindowsFor (root, true, false, false);
+            gui->showPluginWindowsFor (root, true, false, false);
         }
         
         if (auto* c = ViewHelpers::findContentComponent (getOwnerView()))
         {
             auto graph = (node.isGraph()) ? node : node.getParentGraph();
             c->setCurrentNode (graph);
+            if (c->getMainViewName() != "GraphEditor" && c->getMainViewName() != "GraphEditorView")
+                c->setMainView ("GraphEditor");
         }
 
         if (! node.isRootGraph())
@@ -197,6 +198,7 @@ public:
         else if (node.isRootGraph() && node.hasAudioOutputNode())
             gui->selectNode (node.getNodeByFormat ("Internal", "audio.output"));
         
+
         gui->refreshMainMenu();
         gui->stabilizeViews();
 

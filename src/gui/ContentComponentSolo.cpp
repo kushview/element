@@ -526,7 +526,7 @@ void ContentComponentSolo::setMainView (const String& name)
 {
     if (name == "PatchBay") {
         setContentView (new ConnectionGrid());
-    } else if (name == "GraphEditor") {
+    } else if (name == "GraphEditor" || name == "GraphEditorView") {
         setContentView (new GraphEditorView());
     } else if (name == "PluginManager") {
         setContentView (new PluginManagerContentView());
