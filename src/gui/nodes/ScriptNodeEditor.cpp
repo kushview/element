@@ -248,7 +248,7 @@ ScriptNodeEditor::ScriptNodeEditor (ScriptingEngine& scripts, const Node& node)
     {
         paramsButton.setToggleState (! paramsButton.getToggleState(), dontSendNotification);
         props.setVisible (paramsButton.getToggleState());
-        resized();
+        updateSize();
     };
 
     addAndMakeVisible (props);
@@ -324,6 +324,23 @@ void ScriptNodeEditor::updateProperties()
     props.addProperties (pcs);
 }
 
+void ScriptNodeEditor::updateSize()
+{
+    if (comp != nullptr)
+    {
+        int w = comp->getWidth(), h = comp->getHeight();
+        if (props.isVisible())
+        { 
+            w += propsGap;
+            w += propsWidth;
+        }
+
+        h += 22; // toolbarsize
+        setSize (w, h);
+        return;
+    }
+}
+
 void ScriptNodeEditor::updatePreview()
 {
     if (comp != nullptr)
@@ -382,6 +399,7 @@ void ScriptNodeEditor::updatePreview()
                     widget = editor;
                     addAndMakeVisible (*comp);
                     comp->setAlwaysOnTop (true);
+                    updateSize();
                 }
                 else
                 {
@@ -430,12 +448,17 @@ void ScriptNodeEditor::resized()
     paramsButton.changeWidthToFitText (r2.getHeight());
     paramsButton.setBounds (r2.removeFromRight (paramsButton.getWidth()));
 
-    r1.removeFromTop (2);
+    if (comp != nullptr)
+    {
+        comp->setBounds (0, r2.getBottom(), comp->getWidth(), comp->getHeight());
+    }
 
     if (props.isVisible())
     {
-        props.setBounds (r1.removeFromRight (220));
-        r1.removeFromRight (2);
+        props.setBounds (comp != nullptr ? comp->getRight() + propsGap : 0, 
+                         comp != nullptr ? comp->getY() : 0, 
+                         propsWidth, 
+                         getHeight() - (comp != nullptr ? comp->getY() : 0));
     }
 }
 

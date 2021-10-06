@@ -50,6 +50,9 @@ private:
     TextButton paramsButton;
 
     PropertyPanel props;
+    int propsWidth = 220,
+        propsGap   = 2;
+    
     SignalConnection portsChangedConnection;
     ScriptNode::Ptr lua;
     
@@ -60,6 +63,7 @@ private:
     void updatePreview();
     void updateCodeEditor();
     void updateProperties();
+    void updateSize();
     void onPortsChanged();
     sol::table createContext();
     void log (const String& txt) { DBG(txt); }
