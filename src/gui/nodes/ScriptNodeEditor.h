@@ -66,7 +66,7 @@ private:
     void updateSize();
     void onPortsChanged();
     sol::table createContext();
-    void log (const String& txt) { DBG(txt); }
+    void log (const String& txt) { Logger::writeToLog (txt); }
 };
 
 }

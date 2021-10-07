@@ -28,6 +28,7 @@
 #include "URIs.h"
 #include "session/CommandManager.h"
 #include "Globals.h"
+#include "Logs.h"
 
 namespace Element {
 
@@ -55,7 +56,7 @@ public:
     Impl (Globals& g)
         : owner (g) { }
     
-    ~Impl() { }
+    ~Impl() {}
 
     Globals& owner;
     AudioEnginePtr                      engine;
@@ -70,12 +71,14 @@ public:
     std::unique_ptr<PresetCollection>   presets;
     std::unique_ptr<MidiEngine>         midi;
     std::unique_ptr<ScriptingEngine>    lua;
-   
+    std::unique_ptr<Log>                log;
+
 private:
     friend class Globals;
     
     void init()
     {
+        log     .reset (new Log());
         plugins .reset (new PluginManager());
         devices .reset (new DeviceManager());
         media   .reset (new MediaManager());
@@ -102,6 +105,7 @@ private:
         midi     = nullptr;
         presets  = nullptr;
         lua      = nullptr;
+        log      = nullptr;
     }
 };
 
@@ -128,6 +132,12 @@ DeviceManager& Globals::getDeviceManager()
 {
     jassert (impl->devices != nullptr);
     return *impl->devices;
+}
+
+Log& Globals::getLog() 
+{
+    jassert (impl != nullptr && impl->log != nullptr);
+    return *impl->log;
 }
 
 MappingEngine& Globals::getMappingEngine()

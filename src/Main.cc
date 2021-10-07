@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2016-2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2016-2021  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@
 #include "Commands.h"
 #include "DataPath.h"
 #include "Globals.h"
+#include "Logs.h"
 #include "Messages.h"
 #include "Version.h"
 #include "Settings.h"
@@ -139,6 +140,7 @@ private:
         world.setEngine (engine); // this will also instantiate the session
         controller = new AppController (world);
 
+        setupLogging();
         setupPlugins();
         setupKeyMappings();
         setupAudioEngine();
@@ -192,6 +194,11 @@ private:
     {
         auto& scripts = world.getScriptingEngine();
         ignoreUnused (scripts);
+    }
+
+    void setupLogging()
+    {
+        Logger::setCurrentLogger (&world.getLog());
     }
 };
 
@@ -256,6 +263,7 @@ public:
 
         engine = nullptr;
         controller = nullptr;
+        Logger::setCurrentLogger (nullptr);
         world->setEngine (nullptr);
         world = nullptr;
     }

@@ -30,6 +30,7 @@ namespace Element {
 class CommandManager;
 class DeviceManager;
 class ScriptingEngine;
+class Log;
 class MediaManager;
 class PluginManager;
 class PresetCollection;
@@ -56,6 +57,7 @@ public:
     AudioEnginePtr getAudioEngine() const;
     CommandManager& getCommandManager();
     DeviceManager& getDeviceManager();
+    Log& getLog();
     MappingEngine& getMappingEngine();
     MidiEngine& getMidiEngine();
     PluginManager& getPluginManager();
