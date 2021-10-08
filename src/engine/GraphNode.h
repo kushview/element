@@ -206,7 +206,6 @@ protected:
     void initialize() override {}
 
 private:
-    friend class GraphNode;
     friend class GraphPort;
     friend class IONode;
     friend class GraphManager;
