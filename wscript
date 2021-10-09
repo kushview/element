@@ -404,6 +404,8 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     else:
+        app.linkflags += ['-static-libgcc', '-static-libstdc++', 
+                          '-Wl,-Bstatic,--whole-archive', '-lwinpthread', '-Wl,--no-whole-archive' ]
         for l in element.mingw_libs.split():
             library.use.append (l.upper())
 
