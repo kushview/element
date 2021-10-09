@@ -41,8 +41,8 @@ def options (opt):
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
-    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations'])
-    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations'])
+    conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-declarations', '-Wno-attributes'])
+    conf.env.append_unique ('CXXFLAGS', ['-Wno-deprecated-declarations', '-Wno-attributes'])
     
     if 'clang' in conf.env.CXX[0]:
         conf.env.append_unique ('CFLAGS', ['-Wno-deprecated-register'])
@@ -57,11 +57,16 @@ def configure (conf):
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
     
+    conf.env.BUILD_PLATFORM = 'linux'
+    conf.env.HOST_PLATFORM  = 'windows'
+
     conf.load ('bundle')
     conf.load ('templates')
     conf.prefer_clang()
+    
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
+
     conf.load ('ccache')
     conf.load ("git")
     conf.load ("juce")
@@ -75,7 +80,7 @@ def configure (conf):
     conf.load ('depends')
     
     conf.check_common()
-    if cross.is_mingw (conf): conf.check_mingw()
+    if conf.env.HOST_PLATFORM == 'windows': conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
@@ -356,6 +361,7 @@ def build_app (bld):
         env         = libEnv,
         use         = [ 'BOOST_SIGNALS' ],
         cxxflags    = [],
+        linkflags   = [],
         install_path = None
     )
     library.export_includes = library.includes
@@ -374,8 +380,8 @@ def build_app (bld):
     if bld.env.LUA:     library.use += [ 'LUA' ]
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
     if bld.env.JACK:    library.use += [ 'JACK' ]
-    
-    if juce.is_linux():
+
+    if juce.is_linux() and bld.env.HOST_PLATFORM != 'windows':
         build_desktop (bld)
         library.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
         library.cxxflags += [
@@ -385,7 +391,7 @@ def build_app (bld):
             '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
         ]
 
-    elif juce.is_mac():
+    elif juce.is_mac() and not bld.env.HOST_PLATFORM != 'windows':
         library.use += [
             'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
@@ -398,7 +404,8 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     else:
-        pass
+        for l in element.mingw_libs.split():
+            library.use.append (l.upper())
 
 def install_lua_files (bld):
     if not juce.is_linux():

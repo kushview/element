@@ -24,6 +24,14 @@ mingw_libs = '''
     imm32 comdlg32 shlwapi rpcrt4 winmm gdi32
 '''
 
+@conf
+def check_ladspa (self):
+    self.env.LADSPA = not bool(self.options.no_ladspa)
+    if self.env.LADSPA:
+        self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)
+        self.env.LADSPA = bool(self.env.HAVE_LADSPA)
+    self.define('JUCE_PLUGINHOST_LADSPA', self.env.LADSPA)
+
 @conf 
 def check_common (self):
     self.check (lib='curl', mandatory=False)
@@ -112,9 +120,12 @@ def check_common (self):
 def check_mingw (self):
     for l in mingw_libs.split():
         self.check_cxx(lib=l, uselib_store=l.upper())
-    self.define('JUCE_PLUGINHOST_VST3', 0)
-    self.define('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
-    self.define('JUCE_PLUGINHOST_AU', 0)
+    self.check_ladspa()
+    self.define ('JUCE_ASIO', False)
+    self.define ('JUCE_PLUGINHOST_VST3', False)
+    self.define ('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
+    self.define ('JUCE_PLUGINHOST_AU', False)
+    self.define ('JUCE_USE_WINDOWS_MEDIA_FORMAT', False)
     for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
         self.env.append_unique ('CFLAGS', [flag])
         self.env.append_unique ('CXXFLAGS', [flag])
@@ -139,11 +150,7 @@ def check_linux (self):
     self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
     self.check(lib='curl', uselib_store='CURL', mandatory=True)
     
-    self.env.LADSPA = not bool(self.options.no_ladspa)
-    if self.env.LADSPA:
-        self.check(header_name='ladspa.h', uselib_store='LADSPA', mandatory=False)
-        self.env.LADSPA = bool(self.env.HAVE_LADSPA)
-    self.define('JUCE_PLUGINHOST_LADSPA', self.env.LADSPA)
+    self.check_ladspa()
 
     self.env.ALSA = not bool (self.options.no_alsa)
     if self.env.ALSA:
