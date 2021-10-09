@@ -1,9 +1,8 @@
 #!/usr/bin/env python
 
-from subprocess import call, Popen, PIPE
+from subprocess import call
 from waflib import Utils
 import os, sys
-import string
 sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
 import cross, element, juce, git
 
@@ -57,8 +56,8 @@ def configure (conf):
     conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
     
-    conf.env.BUILD_PLATFORM = 'linux'
-    conf.env.HOST_PLATFORM  = 'windows'
+    conf.env.BUILD_PLATFORM = Utils.unversioned_sys_platform()
+    conf.env.HOST_PLATFORM  = conf.env.BUILD_PLATFORM
 
     conf.load ('bundle')
     conf.load ('templates')
@@ -66,6 +65,9 @@ def configure (conf):
     
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
+
+    if 'mingw32' in ' '.join (conf.env.CC) or 'mingw32' in ' '.join (conf.env.CXX):
+        conf.env.HOST_PLATFORM = 'win32'
 
     conf.load ('ccache')
     conf.load ("git")
@@ -80,12 +82,12 @@ def configure (conf):
     conf.load ('depends')
     
     conf.check_common()
-    if conf.env.HOST_PLATFORM == 'windows': conf.check_mingw()
+    if conf.env.HOST_PLATFORM == 'win32': conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
-    conf.env.TEST = bool(conf.options.test)
-    conf.env.DEBUG = conf.options.debug
+    conf.env.TEST  = bool(conf.options.test)
+    conf.env.DEBUG = bool(conf.options.debug)
     
     conf.define ('KV_DOCKING_WINDOWS', 1)
     if len(conf.env.GIT_HASH) > 0:
@@ -381,7 +383,7 @@ def build_app (bld):
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
     if bld.env.JACK:    library.use += [ 'JACK' ]
 
-    if juce.is_linux() and bld.env.HOST_PLATFORM != 'windows':
+    if juce.is_linux() and bld.env.HOST_PLATFORM != 'win32':
         build_desktop (bld)
         library.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
         library.cxxflags += [
@@ -391,7 +393,7 @@ def build_app (bld):
             '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
         ]
 
-    elif juce.is_mac() and not bld.env.HOST_PLATFORM != 'windows':
+    elif juce.is_mac() and not bld.env.HOST_PLATFORM != 'win32':
         library.use += [
             'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
