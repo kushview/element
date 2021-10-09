@@ -17,7 +17,7 @@
 */
 
 #if defined(__MINGW32__) || defined(_MSC_VER)
- #include <Windows.h>
+ #include <windows.h>
 #elif defined(__APPLE__)
  #include <CoreGraphics/CoreGraphics.h>
 #else
