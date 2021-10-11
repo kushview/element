@@ -61,8 +61,12 @@ def configure (conf):
 
     conf.load ('bundle')
     conf.load ('templates')
-    conf.prefer_clang()
-    
+
+    conf.load ('cross')
+    cross.setup_compiler (conf)
+    conf.load ('depends')
+
+    # conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
 
@@ -353,7 +357,7 @@ def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
-    
+
     library = bld (
         features    = 'cxx cxxstlib',
         source      = common_sources (bld),
@@ -361,13 +365,13 @@ def build_app (bld):
         target      = 'lib/element',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS' ],
+        use         = [ 'BOOST_SIGNALS', 'DEPENDS' ],
         cxxflags    = [],
         linkflags   = [],
         install_path = None
     )
     library.export_includes = library.includes
-    
+
     appEnv = bld.env.derive()
     app = bld.program (
         source      = [ 'src/Main.cc' ],
@@ -406,11 +410,25 @@ def build_app (bld):
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
     else:
-        app.linkflags += ['-static-libgcc', '-static-libstdc++', 
-                          '-Wl,-Bstatic,--whole-archive', '-lwinpthread', '-Wl,--no-whole-archive' ]
         for l in element.mingw_libs.split():
             library.use.append (l.upper())
+        if bld.env.DEBUG:
+            library.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
 
+        app.env.append_unique ('LINKFLAGS_STATIC_GCC', [ '-static-libgcc', '-static-libstdc++',
+                                                         '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
+                                                         '-Wl,--no-whole-archive' ])
+        app.use += [ 'STATIC_GCC' ]
+        app.install_path = None
+        if len(bld.env.DEPENDSDIR) > 0:
+            import shutil, depends
+            def copydlls (bld):
+                hp = depends.host_path (bld)
+                for dll in [ 'lib/serd-0.dll', 'lib/sord-0.dll', 'lib/sratom-0.dll', 
+                             'lib/lilv-0.dll', 'lib/suil-0.dll' ]:
+                    shutil.copy (os.path.join (hp, dll), 'build/bin')
+            bld.add_post_fun (copydlls)
+        
 def install_lua_files (bld):
     if not juce.is_linux():
         return

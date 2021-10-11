@@ -32,12 +32,13 @@ def check_ladspa (self):
         self.env.LADSPA = bool(self.env.HAVE_LADSPA)
     self.define('JUCE_PLUGINHOST_LADSPA', self.env.LADSPA)
 
-@conf 
+@conf
 def check_common (self):
-    self.check (lib='curl', mandatory=False)
+    self.check (lib='curl', mandatory=False, use=['DEPENDS'])
     self.check (header_name='stdbool.h', mandatory=True)
     self.check (header_name='boost/signals2.hpp', msg="Checking for Boost.Signals2", 
-                mandatory=True, uselib_store="BOOST_SIGNALS")
+                mandatory=True, uselib_store="BOOST_SIGNALS", use=['DEPENDS'])
+    
     self.check_cxx (
         msg = "Checking for Boost.Test",
         fragment = '''
@@ -47,7 +48,8 @@ def check_common (self):
         execute = False,
         uselib_store = 'BOOST_TEST',
         define_name = 'HAVE_BOOST_TEST',
-        mandatory = False
+        mandatory = False,
+        use = ['DEPENDS']
     )
 
     # Web Browser

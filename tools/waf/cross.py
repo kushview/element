@@ -1,34 +1,29 @@
 #!/usr/bin/env python
 
 def options (opt):
-    opt.add_option ('--cross', default='', type='string', dest="cross", \
+    opt.add_option ('--host', default='', type='string', dest="host", \
                     help="Use a cross compiler [ Default: none ]")
 
 def configure (conf):
     '''cross compiling a a pre-load routine, see setup_compiler
        this block happens after setup_compiler'''
-    cross_compiling = conf.env.CROSS_COMPILING = len(conf.options.cross) > 0
-    conf.env.CROSS = conf.options.cross
+    conf.env.HOST = conf.options.host
 
-    if cross_compiling:
-        pass
-
-def setup_compiler(conf):
+def setup_compiler (conf):
     '''setup the (cross) compiler. This function should be called
        in waf "configure" but before other tools are loaded'''
-    if not len(conf.options.cross) > 0:
+    if not len (conf.env.HOST) > 0:
         return
 
     using_gcc = True # this needs to be detected and/or an option
-
     if using_gcc:
-        conf.env.AR     = '%s-ar' % conf.options.cross
-        conf.env.CC     = '%s-gcc' % conf.options.cross
-        conf.env.CXX    = '%s-g++' % conf.options.cross
-        conf.env.STRIP  = '%s-strip' % conf.options.cross
+        conf.env.AR      = ['%s-ar' % conf.env.HOST]
+        conf.env.CC      = ['%s-gcc' % conf.env.HOST]
+        conf.env.CXX     = ['%s-g++' % conf.env.HOST]
+        conf.env.STRIP   = ['%s-strip' % conf.env.HOST]
 
-def is_mingw (ctx):
-    return 'mingw' in ctx.env.CROSS or 'w64' in ctx.env.CROSS
+def host_is_mingw32 (ctx):
+    return 'mingw32' in ctx.env.HOST or 'w64' in ctx.env.HOST
 
-def is_windows (ctx):
-    return is_mingw (ctx)
+def host_is_windows (ctx):
+    return host_is_mingw32 (ctx)
