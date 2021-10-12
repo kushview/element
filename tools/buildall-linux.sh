@@ -11,17 +11,17 @@ here="`pwd`"
 export CFLAGS="-DEL_APPIMAGE=1"
 export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf configure --prefix=/usr $@
-./waf resave clean build docs --progress
+./waf resave clean build docs
 
-if [ -f "${here}/tools/jucer/Element/Builds/LinuxMakefile" ]; then
-    cd "${here}/tools/jucer/Element/Builds/LinuxMakefile"
-    make clean && rm -rf build && make -j4 CONFIG=Release
-fi
+# if [ -f "${here}/tools/jucer/Element/Builds/LinuxMakefile" ]; then
+#     cd "${here}/tools/jucer/Element/Builds/LinuxMakefile"
+#     make clean && rm -rf build && make -j4 CONFIG=Release
+# fi
 
-if [ -f "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile" ]; then
-    cd "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile"
-    make clean && rm -rf build && make -j4 CONFIG=Release
-fi
+# if [ -f "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile" ]; then
+#     cd "${here}/tools/jucer/ElementFX/Builds/LinuxMakefile"
+#     make clean && rm -rf build && make -j4 CONFIG=Release
+# fi
 
 cd "${here}"
 

@@ -31,8 +31,8 @@ mkdir -p "build/${pkgname}/vst"
 mkdir -p "build/${pkgname}/vst3"
 
 cp -vf build/*.AppImage "${pkgdir}/"
-cp -vrf build/Release/KV_Element*.so "${pkgdir}/vst"
-cp -vrf build/Release/KV_Element*.vst3 "${pkgdir}/vst3"
+# cp -vrf build/Release/KV_Element*.so "${pkgdir}/vst"
+# cp -vrf build/Release/KV_Element*.vst3 "${pkgdir}/vst3"
 cd "${pkgdir}/.." && tar -czvf "${pkgname}.tar.gz" "${pkgname}"
 
 cd "${here}"
