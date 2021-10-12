@@ -1,24 +1,43 @@
-import os
+import json,os
+from waflib.Configure import conf
+from waflib.TaskGen import taskgen_method
+
+CONFIG_KEYS = 'AR CC CXX'.split()
 
 def options (self):
     self.add_option ('--depends', default='', dest='depends', type='string', 
                      help='Where dependency tools and libraries are located')
 
 def configure (self):
-    self.env.DEPENDSDIR = self.options.depends
-    if os.path.exists (self.env.DEPENDSDIR):
-        if not bool (self.env.HOST): 
-            self.fatal ("depends.py: HOST not set.")
-            return
-        os.environ['PKG_CONFIG_PATH'] = '%s/%s/lib/pkgconfig' % (self.env.DEPENDSDIR, self.env.HOST)
-        os.environ['PKG_CONFIG_LIBDIR'] = os.environ['PKG_CONFIG_PATH']
-        self.env.append_unique ('CPPFLAGS_DEPENDS',  ['-I%s/%s/include' % (self.env.DEPENDSDIR, self.env.HOST)])
-        self.env.append_unique ('LINKFLAGS_DEPENDS', ['-L%s/%s/lib' % (self.env.DEPENDSDIR, self.env.HOST)])
+    d = self.env.DEPENDSDIR = '%s'.strip() % self.options.depends
+    if not os.path.exists (d):
+        return
+    try:
+        configfile = open (os.path.join (d, 'config.json'))
+    except:
+        self.fatal ("depends.py: could not read config.json")
+    config = json.load (configfile)
+    
+    self.env.HOST = os.path.basename (d)
 
-def host_path (ctx):
-    if not bool (ctx.env.HOST):
-        ctx.fatal ("depends.py: HOST not set.")
-    return '%s/%s' % (ctx.env.DEPENDSDIR, ctx.env.HOST)
+    os.environ['PKG_CONFIG_PATH'] = '%s/lib/pkgconfig' % d
+    os.environ['PKG_CONFIG_LIBDIR'] = os.environ['PKG_CONFIG_PATH']
+
+    for k in config:
+        if not k in CONFIG_KEYS or len (self.env[k]) > 0:
+            continue
+        if k == 'AR' or k == 'CC' or k == 'CXX':
+            self.env[k] = config[k].split()
+        else:
+            self.fatal ('depends.py: %s config key not handled' % k)
+    
+    self.env.append_unique ('CPPFLAGS_DEPENDS',  ['-I%s/include' % d])
+    self.env.append_unique ('LINKFLAGS_DEPENDS', ['-L%s/lib' % d])
+
+@conf
+@taskgen_method
+def host_path (self):
+    return '%s' % self.env.DEPENDSDIR
 
 # TODO: figure out how to make this work with out-of-tree / absolute
 # resource paths:

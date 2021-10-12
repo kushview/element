@@ -36,21 +36,23 @@ def check_ladspa (self):
 def check_common (self):
     self.check (lib='curl', mandatory=False, use=['DEPENDS'])
     self.check (header_name='stdbool.h', mandatory=True)
+
+    # Boost
     self.check (header_name='boost/signals2.hpp', msg="Checking for Boost.Signals2", 
                 mandatory=True, uselib_store="BOOST_SIGNALS", use=['DEPENDS'])
-    
-    self.check_cxx (
-        msg = "Checking for Boost.Test",
-        fragment = '''
-            #define BOOST_TEST_MODULE ElementConfigure
-            #include <boost/test/included/unit_test.hpp>
-        ''',
-        execute = False,
-        uselib_store = 'BOOST_TEST',
-        define_name = 'HAVE_BOOST_TEST',
-        mandatory = False,
-        use = ['DEPENDS']
-    )
+    if self.env.TEST:
+        self.check_cxx (
+            msg = "Checking for Boost.Test",
+            fragment = '''
+                #define BOOST_TEST_MODULE ElementConfigure
+                #include <boost/test/included/unit_test.hpp>
+            ''',
+            execute = False,
+            uselib_store = 'BOOST_TEST',
+            define_name = 'HAVE_BOOST_TEST',
+            mandatory = False,
+            use = ['DEPENDS']
+        )
 
     # Web Browser
     self.define ('JUCE_WEB_BROWSER', 0)
@@ -121,7 +123,7 @@ def check_common (self):
 @conf
 def check_mingw (self):
     for l in mingw_libs.split():
-        self.check_cxx(lib=l, uselib_store=l.upper())
+        self.env['LIB_%s' % l.upper()] = l
     self.check_ladspa()
     self.define ('JUCE_ASIO', False)
     self.define ('JUCE_PLUGINHOST_VST3', False)

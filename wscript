@@ -4,7 +4,7 @@ from subprocess import call
 from waflib import Utils
 import os, sys
 sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
-import cross, element, juce, git
+import element, juce, git
 
 APPNAME         = element.APPNAME
 VERSION         = element.VERSION
@@ -13,7 +13,7 @@ PLUGIN_VERSION  = element.PLUGIN_VERSION
 VST3_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
-    opt.load ("scripting compiler_c compiler_cxx ccache cross juce depends")
+    opt.load ("scripting compiler_c compiler_cxx ccache compiler juce depends")
 
     opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
         help="Disable LADSPA plugin hosting")
@@ -50,23 +50,18 @@ def silence_warnings (conf):
         conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
 
 def configure (conf):
-    conf.env.DATADIR = os.path.join (conf.env.PREFIX,  'share/element')
-    conf.env.DOCDIR  = os.path.join (conf.env.PREFIX,  'share/doc/element')
-    conf.env.LIBDIR  = os.path.join (conf.env.PREFIX,  'lib')
-    conf.env.VSTDIR  = os.path.join (conf.env.LIBDIR,  'vst')
-    conf.env.VST3DIR = os.path.join (conf.env.LIBDIR,  'vst3')
+    conf.env.TEST       = bool(conf.options.test)
+    conf.env.DEBUG      = bool(conf.options.debug)
+    conf.env.DATADIR    = os.path.join (conf.env.PREFIX,  'share/element')
+    conf.env.DOCDIR     = os.path.join (conf.env.PREFIX,  'share/doc/element')
+    conf.env.LIBDIR     = os.path.join (conf.env.PREFIX,  'lib')
+    conf.env.VSTDIR     = os.path.join (conf.env.LIBDIR,  'vst')
+    conf.env.VST3DIR    = os.path.join (conf.env.LIBDIR,  'vst3')
     
     conf.env.BUILD_PLATFORM = Utils.unversioned_sys_platform()
     conf.env.HOST_PLATFORM  = conf.env.BUILD_PLATFORM
 
-    conf.load ('bundle')
-    conf.load ('templates')
-
-    conf.load ('cross')
-    cross.setup_compiler (conf)
     conf.load ('depends')
-
-    # conf.prefer_clang()
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
 
@@ -77,22 +72,19 @@ def configure (conf):
     conf.load ("git")
     conf.load ("juce")
     conf.load ('scripting')
+    conf.load ('bundle')
+    conf.load ('templates')
 
     silence_warnings (conf)
 
     conf.find_projucer (mandatory=False)
     conf.find_program ('convert', mandatory=False)
     
-    conf.load ('depends')
-    
     conf.check_common()
     if conf.env.HOST_PLATFORM == 'win32': conf.check_mingw()
     elif juce.is_mac(): conf.check_mac()
     else: conf.check_linux()
 
-    conf.env.TEST  = bool(conf.options.test)
-    conf.env.DEBUG = bool(conf.options.debug)
-    
     conf.define ('KV_DOCKING_WINDOWS', 1)
     if len(conf.env.GIT_HASH) > 0:
         conf.define ('EL_GIT_VERSION', conf.env.GIT_HASH)
@@ -421,14 +413,14 @@ def build_app (bld):
         app.use += [ 'STATIC_GCC' ]
         app.install_path = None
         if len(bld.env.DEPENDSDIR) > 0:
-            import shutil, depends
+            import shutil
             def copydlls (bld):
-                hp = depends.host_path (bld)
+                d = bld.env.DEPENDSDIR
                 for dll in [ 'lib/serd-0.dll', 'lib/sord-0.dll', 'lib/sratom-0.dll', 
                              'lib/lilv-0.dll', 'lib/suil-0.dll' ]:
-                    shutil.copy (os.path.join (hp, dll), 'build/bin')
+                    shutil.copy (os.path.join (d, dll), 'build/bin')
             bld.add_post_fun (copydlls)
-        
+
 def install_lua_files (bld):
     if not juce.is_linux():
         return
