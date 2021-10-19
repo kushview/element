@@ -72,6 +72,13 @@ This produces `build/Applications/Element.app`.
 open build/Applications/Element.app
 ```
 
+__Apple Silicon__
+
+Replace the `./waf configure` command above with this:
+```
+./waf configure CPPFLAGS="-I/opt/homebrew/include"
+```
+
 __Test__
 ```
 ./waf check
