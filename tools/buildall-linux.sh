@@ -11,7 +11,8 @@ here="`pwd`"
 export CFLAGS="-DEL_APPIMAGE=1"
 export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf configure --prefix=/usr $@
-./waf resave clean build docs
+#./waf resave clean build docs
+./waf build
 
 # if [ -f "${here}/tools/jucer/Element/Builds/LinuxMakefile" ]; then
 #     cd "${here}/tools/jucer/Element/Builds/LinuxMakefile"

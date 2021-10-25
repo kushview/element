@@ -6,8 +6,8 @@ appdir="build/AppDir"
 ./waf install --destdir="${appdir}"
 
 export VERSION="@PACKAGE_VERSION@"
-export LD_LIBRARY_PATH="build/lib"
-linuxdeploy \
+export LD_LIBRARY_PATH="build/lib:/depends/x86_64-pc-linux-gnu/lib"
+linuxdeploy --appimage-extract-and-run \
     --appdir ${appdir} --output appimage \
     --desktop-file="build/share/applications/net.kushview.element.desktop" \
     --icon-file="build/share/icons/hicolor/16x16/apps/net.kushview.element.png" \
