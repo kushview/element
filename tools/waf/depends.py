@@ -7,13 +7,16 @@ CONFIG_KEYS = 'AR CC CXX'.split()
 def options (self):
     self.add_option ('--depends', default='', dest='depends', type='string', 
                      help='Where dependency tools and libraries are located')
+    self.add_option ('--depends-allow-system', default=False, dest='depends_allow_system', action='store_true',
+                     help='Allow usage of system packages along with those in the depends path.')
 
 def configure (self):
     d = self.env.DEPENDSDIR = '%s'.strip() % self.options.depends
+    allow_system = self.env.DEPENDS_ALLOW_SYSTEM = self.options.depends_allow_system
     if not os.path.exists (d):
         return
     try:
-        configfile = open (os.path.join (d, 'config.json'))
+        configfile = open (os.path.join (d, 'share', 'config.json'))
     except:
         self.fatal ("depends.py: could not read config.json")
     config = json.load (configfile)
@@ -21,7 +24,8 @@ def configure (self):
     self.env.HOST = os.path.basename (d)
 
     os.environ['PKG_CONFIG_PATH'] = '%s/lib/pkgconfig' % d
-    os.environ['PKG_CONFIG_LIBDIR'] = os.environ['PKG_CONFIG_PATH']
+    if not allow_system:
+        os.environ['PKG_CONFIG_LIBDIR'] = os.environ['PKG_CONFIG_PATH']
 
     for k in config:
         if not k in CONFIG_KEYS or len (self.env[k]) > 0:
