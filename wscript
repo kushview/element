@@ -515,6 +515,10 @@ def dist (ctx):
 def docs (ctx):
     ctx.add_pre_fun (build_lua_docs)
 
+def version (ctx):
+    print (element.VERSION)
+    exit(0)
+
 def versionbump (ctx):
     import projects
     ctx.add_pre_fun (projects.update_version)
