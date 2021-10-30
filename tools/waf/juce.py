@@ -74,13 +74,13 @@ def check_rez (self):
 def check_cxx_version (self, required=False):
     line_just = self.line_just
 
-    if is_mac() and len(self.options.cross) <= 0:
+    if self.host_is_mac():
         self.check_cxx (linkflags = [ "-stdlib=libc++", "-lc++" ],
                         cxxflags = [ "-stdlib=libc++", "-std=c++17" ],
                         mandatory = required)
         self.env.append_unique ("CXXFLAGS", ["-stdlib=libc++", "-std=c++17"])
         self.env.append_unique ("LINKFLAGS", ["-stdlib=libc++", "-lc++"])
-    elif is_linux() or len(self.options.cross) > 0:
+    elif is_linux() or self.host_is_mingw32():
         self.check_cxx (cxxflags = [ "-std=c++17" ], mandatory = required)
         self.env.append_unique ("CXXFLAGS", [ "-std=c++17" ])
     else:

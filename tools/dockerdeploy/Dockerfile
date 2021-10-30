@@ -20,5 +20,3 @@ RUN update-alternatives --set x86_64-w64-mingw32-gcc /usr/bin/x86_64-w64-mingw32
 RUN curl -L https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage > /usr/bin/linuxdeploy-x86_64.AppImage && \
     chmod +x /usr/bin/linuxdeploy-x86_64.AppImage && \
     ln -s /usr/bin/linuxdeploy-x86_64.AppImage /usr/bin/linuxdeploy
-
-# ADD . /element/

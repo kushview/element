@@ -7,11 +7,10 @@ mkdir -p dist && cp build/*.AppImage dist/
 ./waf dist && cp -f *.tar.* dist/
 ./waf distclean
 
-./waf configure --depends="/depends/x86_64-w64-mingw32"
-./waf build
-mkdir -p dist/element-win64-`./waf version`
-cp build/bin/* dist/element-win64-`./waf version`
-
+./waf configure --depends="/depends/x86_64-w64-mingw32" build
+win64dir="dist/element-win64-`./waf version`"
+mkdir -p "$win64dir"
+cp build/bin/* "$win64dir"
 ./waf distclean
 rm -rf build/*
 rm -f .lock*

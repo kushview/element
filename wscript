@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from subprocess import call
-from waflib import Utils
 import os, sys
 sys.path.insert (0, os.path.join (os.getcwd(), 'tools/waf'))
 import element, juce, git
@@ -58,10 +57,9 @@ def configure (conf):
     conf.env.VSTDIR     = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR    = os.path.join (conf.env.LIBDIR,  'vst3')
     
-    conf.env.BUILD_PLATFORM = Utils.unversioned_sys_platform()
-    conf.env.HOST_PLATFORM  = conf.env.BUILD_PLATFORM
+    
 
-    conf.load ('depends')
+    conf.load ('host depends')
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
 
@@ -389,7 +387,7 @@ def build_app (bld):
             '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
         ]
 
-    elif juce.is_mac() and not bld.env.HOST_PLATFORM != 'win32':
+    elif juce.is_mac() and bld.env.HOST_PLATFORM != 'win32':
         library.use += [
             'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
             'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
