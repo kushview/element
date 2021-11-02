@@ -12,7 +12,7 @@ PLUGIN_VERSION  = element.PLUGIN_VERSION
 VST3_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
 
 def options (opt):
-    opt.load ("scripting compiler_c compiler_cxx ccache compiler juce depends")
+    opt.load ("scripting compiler_c compiler_cxx ccache compiler juce depends host")
 
     opt.add_option ('--disable-ladspa', default=False, action='store_true', dest='no_ladspa', \
         help="Disable LADSPA plugin hosting")
