@@ -41,3 +41,7 @@ def host_is_windows (self):
 @conf
 def host_is_mac (self):
     return 'apple-darwin' in self.env.HOST
+
+@conf
+def host_is_linux (self):
+    return 'linux' in self.env.HOST

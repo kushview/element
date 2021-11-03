@@ -189,7 +189,7 @@ def build_lua_docs (bld):
     if bool(bld.env.LDOC):
         call ([bld.env.LDOC[0], '-f', 'markdown', '.' ])
 
-def build_lua_lib (bld):
+def build_liblua (bld):
     luaEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         luaEnv.append_unique (k, [ '-fPIC' ])
@@ -241,6 +241,7 @@ def build_lua_lib (bld):
         '''.split()
     )
     lua.export_includes = lua.includes
+    bld.add_group()
     return lua
 
 def add_scripts_to (bld, builddir, instdir, 
@@ -338,11 +339,6 @@ def build_vst3 (bld):
         for plugin in 'Element ElementFX'.split():
             build_vst3_linux (bld, plugin)
 
-def copy_app_bundle_lua_files(ctx):
-    if not juce.is_mac():
-        return
-    call (['bash', 'tools/osx-lua.copy.sh'])
-
 def build_app (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
@@ -361,6 +357,7 @@ def build_app (bld):
         install_path = None
     )
     library.export_includes = library.includes
+    bld.add_group()
 
     appEnv = bld.env.derive()
     app = bld.program (
@@ -465,7 +462,7 @@ def build (bld):
     if bld.options.minimal:
         return
 
-    build_lua_lib (bld)
+    build_liblua (bld)
     install_lua_files (bld)
     build_app (bld)
     build_vst (bld)

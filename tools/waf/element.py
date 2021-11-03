@@ -33,13 +33,20 @@ def check_ladspa (self):
     self.define('JUCE_PLUGINHOST_LADSPA', self.env.LADSPA)
 
 @conf
+def check_curl (self):
+    self.check (header_name='curl/curl.h', uselib_store='CURL', mandatory=self.host_is_linux())
+    self.check (lib='curl', uselib_store='CURL', mandatory=self.host_is_linux())
+    self.define ('JUCE_USE_CURL', bool (self.env.HAVE_CURL))
+
+@conf
 def check_common (self):
-    self.check (lib='curl', mandatory=False, use=['DEPENDS'])
+    self.check_curl()
     self.check (header_name='stdbool.h', mandatory=True)
 
     # Boost
     self.check (header_name='boost/signals2.hpp', msg="Checking for Boost.Signals2", 
                 mandatory=True, uselib_store="BOOST_SIGNALS", use=['DEPENDS'])
+    
     if self.env.TEST:
         self.check_cxx (
             msg = "Checking for Boost.Test",
@@ -150,9 +157,6 @@ def check_linux (self):
     
     self.check_cxx(lib='readline', uselib_store='READLINE', mandatory=False)
     self.define ('LUA_USE_READLINE',  bool(self.env.LIB_READLINE))
-    
-    self.check(header_name='curl/curl.h', uselib_store='CURL', mandatory=True)
-    self.check(lib='curl', uselib_store='CURL', mandatory=True)
     
     self.check_ladspa()
 
