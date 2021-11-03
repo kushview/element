@@ -46,7 +46,6 @@
 #include "engine/IONode.h"
 
 #include "session/Session.h"
-#include "../experimental/MidiSequenceProcessor.h"
 
 #include "Globals.h"
 
