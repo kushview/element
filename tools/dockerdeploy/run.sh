@@ -6,7 +6,7 @@ fi
 
 docker run --rm -it \
     --entrypoint "${entry}" \
-    --volume `pwd`:/element \
+    --volume `pwd`/dist:/dist \
     --workdir /element \
     -u $(id -u ${USER}):$(id -g ${USER}) \
     kushview/element

@@ -12,7 +12,8 @@ here="`pwd`"
 export CFLAGS="-DEL_APPIMAGE=1"
 export CXXFLAGS="-DEL_APPIMAGE=1"
 ./waf configure --prefix=/usr $@
-./waf build docs
+./waf build -j2
+./waf docs
 
 cd "${here}"
 sh build/tools/linuxdeploy.sh
