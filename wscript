@@ -145,9 +145,8 @@ def juce_sources (ctx):
     return element.get_juce_library_code ("libs/compat") + \
            ctx.path.ant_glob ('libs/compat/BinaryData*.cpp')
 
-def common_sources (ctx):
-    return juce_sources (ctx) + lua_kv_sources (ctx) + \
-            ctx.path.ant_glob ('src/**/*.cpp')
+def element_sources (ctx):
+    return ctx.path.ant_glob ('src/**/*.cpp')
 
 def build_desktop (bld, slug='element'):
     if not juce.is_linux():
@@ -201,9 +200,7 @@ def build_liblua (bld):
         features = 'cxx cxxstlib',
         includes = [
             'libs/lua',
-            'libs/lua/src',
-            'libs/lua-kv/include',
-            'libs/lua-kv/src',
+            'libs/lua/src'
         ],
         source = '''
             libs/lua/src/lauxlib.c
@@ -242,7 +239,20 @@ def build_liblua (bld):
     )
     lua.export_includes = lua.includes
     bld.add_group()
-    return lua
+
+    lua_kv = bld (
+        name     = 'LUA_KV',
+        target   = 'lib/lua-kv',
+        env      = luaEnv,
+        install_path = None,
+        features = 'cxx cxxstlib',
+        includes = common_includes() + [ 'libs/lua-kv/include', \
+                                         'libs/lua-kv/src' ],
+        source = lua_kv_sources (bld),
+        use = [ 'LUA' ]
+    )
+    lua_kv.export_includes = lua_kv.includes
+    bld.add_group()
 
 def add_scripts_to (bld, builddir, instdir, 
                     modsdir='Modules', 
@@ -344,14 +354,30 @@ def build_app (bld):
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
 
+    libjuce = bld (
+        features    = 'cxx cxxstlib',
+        source      = juce_sources (bld),
+        includes    = common_includes(),
+        target      = 'lib/juce',
+        name        = 'LIBJUCE',
+        env         = libEnv,
+        use         = [ 'DEPENDS', 'LILV', 'SUIL' ],
+        cxxflags    = [],
+        linkflags   = [],
+        install_path = None
+    )
+    if bld.host_is_linux():
+        libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
+    bld.add_group()
+
     library = bld (
         features    = 'cxx cxxstlib',
-        source      = common_sources (bld),
+        source      = element_sources (bld),
         includes    = common_includes(),
         target      = 'lib/element',
         name        = 'ELEMENT',
         env         = libEnv,
-        use         = [ 'BOOST_SIGNALS', 'DEPENDS' ],
+        use         = [ 'BOOST_SIGNALS', 'LUA', 'LUA_KV', 'DEPENDS' ],
         cxxflags    = [],
         linkflags   = [],
         install_path = None
@@ -366,7 +392,7 @@ def build_app (bld):
         target      = 'bin/element',
         name        = 'ElementApp',
         env         = appEnv,
-        use         = [ 'LUA', 'ELEMENT' ],
+        use         = [ 'LUA', 'ELEMENT', 'LIBJUCE' ],
         linkflags   = []
     )
 
