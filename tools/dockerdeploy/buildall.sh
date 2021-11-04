@@ -21,7 +21,7 @@ deep_clean
 
 ./waf configure --depends="/depends/x86_64-w64-mingw32" 
 ./waf build -j2
-win64dir="dist/element-win64-`./waf version`"
+win64dir="/dist/element-win64-`./waf version`"
 mkdir -p "$win64dir"
 cp build/bin/* "$win64dir"
 deep_clean
