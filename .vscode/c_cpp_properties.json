@@ -107,8 +107,7 @@
                 "/usr/include/suil-0/*",
                 "/usr/include/serd-0/*",
                 "/usr/include/sord-0/*",
-                "/usr/include/sratom-0/*",
-                "/usr/include/gtk-2.0/*",                
+                "/usr/include/sratom-0/*",             
                 "${workspaceRoot}/libs/JUCE/modules/*",
                 "${workspaceRoot}/libs/kv/modules/*",
                 "${workspaceRoot}/libs/jlv2/modules/*",
@@ -116,7 +115,7 @@
                 "${workspaceRoot}/libs/lua/*",
                 "${workspaceRoot}/libs/lua/src/*",
                 "${workspaceRoot}/src/*",
-                "${workspaceRoot}/tests/*",
+                "${workspaceRoot}/test/*",
                 "${workspaceRoot}/libs/lua-kv/*",
                 "${workspaceRoot}/libs/lua-kv/src/*"
             ],
