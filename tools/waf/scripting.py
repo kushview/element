@@ -32,10 +32,20 @@ def make_lua_cpath (paths):
 def options (opt):
     opt.add_option ('--without-lua', default=False, action='store_true', dest='no_lua', \
         help="Build without LUA scripting")
+    opt.add_option ('--luadir', default='', type='string', dest='luadir', \
+        help="Specify path to install Lua modules")
+    opt.add_option ('--scriptsdir', default='', type='string', dest='scriptsdir', \
+        help="Specify path to install Lua scripts")
 
 def configure (self):
-    self.env.LUADIR             = os.path.join (self.env.DATADIR, 'modules')
-    self.env.SCRIPTSDIR         = os.path.join (self.env.DATADIR, 'scripts')
+    self.env.LUADIR = self.options.luadir.strip()
+    if len(self.env.LUADIR) <= 0: 
+        self.env.LUADIR = os.path.join (self.env.DATADIR, 'modules')
+    
+    self.env.SCRIPTSDIR = self.options.scriptsdir.strip()
+    if len(self.env.SCRIPTSDIR) <= 0: 
+        self.env.SCRIPTSDIR = os.path.join (self.env.DATADIR, 'scripts')
+
     self.env.LUA_PATH_DEFAULT   = make_lua_path ([ self.env.LUADIR ])
     self.env.LUA_CPATH_DEFAULT  = make_lua_cpath ([
         os.path.join (self.env.LIBDIR, 'element/lua')

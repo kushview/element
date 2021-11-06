@@ -21,6 +21,7 @@ node_modules
 !/.vscode/vscode.h
 
 /libs/vstsdk2.4/
+/libs/ASIOSDK/
 /libs/eldb/*.dylib
 /libs/eldb/*.dll
 /libs/eldb/*.so

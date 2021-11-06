@@ -1,12 +1,13 @@
 #!/bin/bash
+# generates a linux AppImage and moves to the build directory.
 
 set -ex
 
 appdir="build/AppDir"
 ./waf install --destdir="${appdir}"
 
-export VERSION="@PACKAGE_VERSION@"
-export LD_LIBRARY_PATH="build/lib:/depends/x86_64-pc-linux-gnu/lib"
+export VERSION="`python waf version`"
+export LD_LIBRARY_PATH="build/lib:${LD_LIBRARY_PATH}"
 linuxdeploy --appimage-extract-and-run \
     --appdir ${appdir} --output appimage \
     --desktop-file="build/share/applications/net.kushview.element.desktop" \
@@ -17,22 +18,5 @@ linuxdeploy --appimage-extract-and-run \
     --icon-file="build/share/icons/hicolor/256x256/apps/net.kushview.element.png" \
     --icon-file="build/share/icons/hicolor/512x512/apps/net.kushview.element.png" \
     --executable="build/bin/element"
-
 mv *.AppImage build/
-
-here="`pwd`"
-
-pkgname="element-linux64-${VERSION}"
-pkgdir="build/${pkgname}"
-
-rm -f build/*.tar.gz
-rm -rf "${pkgdir}"
-mkdir -p "build/${pkgname}/vst"
-mkdir -p "build/${pkgname}/vst3"
-
-cp -vf build/*.AppImage "${pkgdir}/"
-# cp -vrf build/Release/KV_Element*.so "${pkgdir}/vst"
-# cp -vrf build/Release/KV_Element*.vst3 "${pkgdir}/vst3"
-cd "${pkgdir}/.." && tar -czvf "${pkgname}.tar.gz" "${pkgname}"
-
-cd "${here}"
+rm -rf "${appdir}"

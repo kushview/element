@@ -30,6 +30,11 @@ def options (opt):
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
     
+    opt.add_option ('--bindir', default='', type='string', dest='bindir', \
+        help="Specify path to install executables")
+    opt.add_option ('--libdir', default='', type='string', dest='libdir', \
+        help="Specify path to install libraries")
+    
     opt.add_option ('--test', default=False, action='store_true', dest='test', \
         help="Build the test suite")
     opt.add_option ('--ziptype', default='gz', dest='ziptype', type='string', 
@@ -48,17 +53,28 @@ def silence_warnings (conf):
         conf.env.append_unique ('CFLAGS', ['-Wno-dynamic-class-memaccess'])
         conf.env.append_unique ('CXXFLAGS', ['-Wno-dynamic-class-memaccess'])
 
+def set_install_dir (conf, key, d1, d2):
+    if not isinstance (d1, str):
+        d1 = ''
+    conf.env[key] = d1.strip()
+    if len(conf.env[key]) <= 0: 
+        conf.env[key] = d2.strip()
+
 def configure (conf):
     conf.env.TEST       = bool(conf.options.test)
     conf.env.DEBUG      = bool(conf.options.debug)
+
+    set_install_dir (conf, 'BINDIR', conf.options.bindir,
+                     os.path.join (conf.env.PREFIX, 'bin'))
+    set_install_dir (conf, 'LIBDIR', conf.options.libdir, 
+                     os.path.join (conf.env.PREFIX, 'lib'))
+
     conf.env.DATADIR    = os.path.join (conf.env.PREFIX,  'share/element')
     conf.env.DOCDIR     = os.path.join (conf.env.PREFIX,  'share/doc/element')
     conf.env.LIBDIR     = os.path.join (conf.env.PREFIX,  'lib')
     conf.env.VSTDIR     = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR    = os.path.join (conf.env.LIBDIR,  'vst3')
     
-    
-
     conf.load ('host depends')
     conf.load ("compiler_c compiler_cxx")
     conf.check_cxx_version()
@@ -111,8 +127,10 @@ def configure (conf):
     print
     juce.display_header ("Paths")
     conf.message ("Prefix",      conf.env.PREFIX)
+    conf.message ("Programs",    conf.env.BINDIR)
+    conf.message ("Libraries",   conf.env.LIBDIR)
     conf.message ("Data",        conf.env.DATADIR)
-    conf.message ("Modules",     conf.env.LUADIR)
+    conf.message ("Lua",         conf.env.LUADIR)
     conf.message ("Scripts",     conf.env.SCRIPTSDIR)
     if conf.env.VST:
         conf.message ("VST",     conf.env.VSTDIR)
@@ -432,7 +450,7 @@ def build_app (bld):
                                                          '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                                                          '-Wl,--no-whole-archive' ])
         app.use += [ 'STATIC_GCC' ]
-        app.install_path = None
+        app.install_path = bld.env.BINDIR
         if len(bld.env.DEPENDSDIR) > 0:
             import shutil
             def copydlls (bld):
@@ -443,7 +461,7 @@ def build_app (bld):
             bld.add_post_fun (copydlls)
 
 def install_lua_files (bld):
-    if not juce.is_linux():
+    if not bld.host_is_linux() and not bld.host_is_mingw32():
         return
     path = bld.path
     join = os.path.join
@@ -455,17 +473,17 @@ def install_lua_files (bld):
     bld.install_files (join (bld.env.DOCDIR, 'lua'),
                        bld.path.ant_glob ("build/doc/lua/**/*.*"),
                        relative_trick=True,
-                       cwd=bld.path.find_dir ('build/doc/lua'))
+                       cwd=path.find_dir ('build/doc/lua'))
 
     bld.install_files (bld.env.LUADIR,
                        bld.path.ant_glob ("libs/lua-kv/src/**/*.lua"),
                        relative_trick=True,
-                       cwd=bld.path.find_dir ('libs/lua-kv/src'))
+                       cwd=path.find_dir ('libs/lua-kv/src'))
 
     bld.install_files (bld.env.LUADIR,
-                       bld.path.ant_glob ("libs/element/lua/**/*.lua"),
+                       path.ant_glob ("libs/element/lua/**/*.lua"),
                        relative_trick=True,
-                       cwd=bld.path.find_dir ('libs/element/lua'))
+                       cwd=path.find_dir ('libs/element/lua'))
 
 def build (bld):
     if bld.is_install:
