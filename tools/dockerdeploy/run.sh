@@ -7,6 +7,11 @@ if [ -z "${entry}" ]; then
     entry="/bin/bash"
 fi
 
+extraopts=""
+if [ -d "$HOME/SDKs" ]; then
+    extraopts="$extraopts --volume ${HOME}/SDKs:/SDKs:ro"
+fi
+
 mkdir -p dist
 
 docker run --rm -it \
@@ -14,5 +19,6 @@ docker run --rm -it \
     --volume `pwd`/dist:/dist \
     --volume `pwd`:/element \
     --workdir /element \
+    $extraopts \
     -u $(id -u ${USER}):$(id -g ${USER}) \
     kushview/element

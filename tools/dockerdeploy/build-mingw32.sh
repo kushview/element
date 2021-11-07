@@ -5,12 +5,14 @@ set -e
 here=`pwd`
 
 ./waf configure --depends="/depends/x86_64-w64-mingw32" \
+    --with-vstsdk24="/SDKs/vstsdk2.4" \
+    --with-asiosdk="/SDKs/asiosdk" \
     --prefix="/" \
     --bindir="/" \
     --libdir="/" \
     --scriptsdir="/scripts" \
     --luadir="/lua"
-./waf build -j4
+./waf build ${WAF_BUILD_OPTIONS}
 
 pkgname="element-win64-mingw32-`./waf version`"
 win64dir="/dist/${pkgname}"
