@@ -29,7 +29,9 @@ def options (opt):
         help="Build without ALSA support")
     opt.add_option ('--without-jack', default=False, action='store_true', dest='no_jack', \
         help="Build without JACK support")
-    
+    opt.add_option ('--with-asiosdk', default='', dest='asiosdk', type='string',
+        help='Path to ASIO SDK sources')
+
     opt.add_option ('--bindir', default='', type='string', dest='bindir', \
         help="Specify path to install executables")
     opt.add_option ('--libdir', default='', type='string', dest='libdir', \
@@ -64,6 +66,10 @@ def configure (conf):
     conf.env.TEST       = bool(conf.options.test)
     conf.env.DEBUG      = bool(conf.options.debug)
 
+    conf.load ('host depends')
+    conf.load ("compiler_c compiler_cxx")
+    conf.check_cxx_version()
+
     set_install_dir (conf, 'BINDIR', conf.options.bindir,
                      os.path.join (conf.env.PREFIX, 'bin'))
     set_install_dir (conf, 'LIBDIR', conf.options.libdir, 
@@ -71,14 +77,9 @@ def configure (conf):
 
     conf.env.DATADIR    = os.path.join (conf.env.PREFIX,  'share/element')
     conf.env.DOCDIR     = os.path.join (conf.env.PREFIX,  'share/doc/element')
-    conf.env.LIBDIR     = os.path.join (conf.env.PREFIX,  'lib')
     conf.env.VSTDIR     = os.path.join (conf.env.LIBDIR,  'vst')
     conf.env.VST3DIR    = os.path.join (conf.env.LIBDIR,  'vst3')
     
-    conf.load ('host depends')
-    conf.load ("compiler_c compiler_cxx")
-    conf.check_cxx_version()
-
     if 'mingw32' in ' '.join (conf.env.CC) or 'mingw32' in ' '.join (conf.env.CXX):
         conf.env.HOST_PLATFORM = 'win32'
 
@@ -110,10 +111,15 @@ def configure (conf):
     print
     juce.display_header ("Element")
     conf.message ("Config", 'Debug' if conf.options.debug else 'Release')
+    
     print
     juce.display_header ("Audio Devices")
-    conf.message ("Alsa",       conf.env.ALSA)
+    if conf.host_is_linux():
+        conf.message ("Alsa",       conf.env.ALSA)
     conf.message ("JACK Audio", conf.env.JACK)
+    if conf.host_is_windows():
+        conf.message ("ASIO",       bool(conf.env.HAVE_ASIO))
+    
     print
     juce.display_header ("Plugin Host")
     conf.message ("AudioUnit",  juce.is_mac())
@@ -122,8 +128,8 @@ def configure (conf):
     conf.message ("LADSPA",     bool(conf.env.LADSPA))
     conf.message ("LV2",        bool(conf.env.LV2))
     print
-    juce.display_header ("Plugin Clients")
-    conf.message ("VST2",       conf.env.VST)
+    # juce.display_header ("Plugin Clients")
+    # conf.message ("VST2",       conf.env.VST)
     print
     juce.display_header ("Paths")
     conf.message ("Prefix",      conf.env.PREFIX)
@@ -312,14 +318,12 @@ def build_vst_linux (bld, plugin):
         target          = 'plugins/VST/%s' % plugin,
         name            = 'ELEMENT_VST',
         env             = vstEnv,
-        use             = [ 'ELEMENT', 'LUA' ],
+        use             = [ 'ELEMENT', 'LUA', 'LIBJUCE' ],
         install_path    = '%s/Kushview' % bld.env.VSTDIR,
     )
 
 def build_vst (bld):
-    if not bld.env.VST:
-        return
-    if juce.is_linux():
+    if bld.env.VST and bld.host_is_linux():
         for plugin in 'Element ElementFX'.split():
             build_vst_linux (bld, plugin)
 
@@ -331,7 +335,7 @@ def vst3_bundle_arch():
     return ''
 
 def build_vst3_linux (bld, plugin):
-    if not bld.env.VST:
+    if not bld.env.VST3:
         return
 
     vstEnv = bld.env.derive()
@@ -379,7 +383,7 @@ def build_app (bld):
         target      = 'lib/juce',
         name        = 'LIBJUCE',
         env         = libEnv,
-        use         = [ 'DEPENDS', 'LILV', 'SUIL' ],
+        use         = [ 'DEPENDS', 'LILV', 'SUIL', 'ASIO' ],
         cxxflags    = [],
         linkflags   = [],
         install_path = None
@@ -509,8 +513,8 @@ def build (bld):
     build_liblua (bld)
     install_lua_files (bld)
     build_app (bld)
-    build_vst (bld)
-    build_vst3 (bld)
+    # build_vst (bld)
+    # build_vst3 (bld)
 
     if bld.env.LUA and bool (bld.env.LIB_READLINE):
         bld.recurse ('tools/lua-el')
