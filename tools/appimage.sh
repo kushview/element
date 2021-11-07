@@ -6,7 +6,10 @@ set -ex
 appdir="build/AppDir"
 ./waf install --destdir="${appdir}"
 
-export VERSION="`python waf version`"
+if [ -z "${VERSION}" ]; then
+    export VERSION="$(python waf version)-$(git rev-parse --short HEAD)"
+fi
+
 export LD_LIBRARY_PATH="build/lib:${LD_LIBRARY_PATH}"
 linuxdeploy --appimage-extract-and-run \
     --appdir ${appdir} --output appimage \
