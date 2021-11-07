@@ -44,8 +44,10 @@ def check_common (self):
     self.check (header_name='stdbool.h', mandatory=True)
 
     # Boost
-    self.check (header_name='boost/signals2.hpp', msg="Checking for Boost.Signals2", 
-                mandatory=True, uselib_store="BOOST_SIGNALS", use=['DEPENDS'])
+    self.check (header_name='boost/signals2.hpp', 
+                msg="Checking for Boost.Signals2", 
+                mandatory=True, uselib_store="BOOST_SIGNALS",
+                use=['DEPENDS'])
     
     if self.env.TEST:
         self.check_cxx (
@@ -128,12 +130,37 @@ def check_common (self):
     self.env.LADSPA = False
 
 @conf
+def check_asio (self):
+    asio_includes = []
+    if len(self.options.asiosdk) > 0:
+        asio_includes.append (os.path.join (self.options.asiosdk, 'common'))
+
+    return self.check_cxx (
+        msg = "Checking for ASIO SDK",
+        fragment = '''
+            #include <windows.h>
+            #include <iasiodrv.h>
+            int main() { return 0; }
+        ''',
+        execute         = False,
+        uselib_store    = 'ASIO',
+        define_name     = 'HAVE_ASIO',
+        mandatory       = False,
+        includes        = asio_includes
+    )
+
+@conf
 def check_mingw (self):
     for l in mingw_libs.split():
         self.env['LIB_%s' % l.upper()] = l
     self.check_ladspa()
-    self.define ('JUCE_ASIO', False)
-    self.define ('JUCE_PLUGINHOST_VST3', False)
+    self.check_asio()
+    self.define ('JUCE_ASIO', bool (self.env.HAVE_ASIO))
+    
+    # VST3 sdk is broken with mingw32 g++
+    self.env.VST3 = False
+    self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
+    
     self.define ('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
     self.define ('JUCE_PLUGINHOST_AU', False)
     self.define ('JUCE_USE_WINDOWS_MEDIA_FORMAT', False)
