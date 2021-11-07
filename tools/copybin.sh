@@ -5,3 +5,4 @@ cp -fv tools/jucer/Standalone/JuceLibraryCode/BinaryData.h libs/compat/BinaryDat
 cp -fv tools/jucer/Standalone/JuceLibraryCode/BinaryData.cpp libs/compat/BinaryData.cpp
 cp -fv tools/jucer/Standalone/JuceLibraryCode/AppConfig.h libs/compat/AppConfig.h
 cp -fv tools/jucer/Standalone/JuceLibraryCode/JuceHeader.h libs/compat/JuceHeader.h
+cp -fv tools/jucer/Element/JuceLibraryCode/JucePluginDefines.h libs/compat/JucePluginDefines.h
