@@ -440,7 +440,7 @@ def build_app (bld):
         ]
         app.target       = 'Applications/Element'
         app.mac_app      = True
-        app.mac_plist    = 'data/Info.plist'
+        app.mac_plist    = 'build/data/Info.plist'
         app.mac_files    = [ 'data/Icon.icns' ]
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 

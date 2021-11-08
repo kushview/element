@@ -1,7 +1,7 @@
 set -e
 here=`pwd`
 
-version=`./waf version`
+version=`./waf version`-`git rev-parse --short HEAD`
 dependsroot=`dirname ${here}`/depends
 dependsdir="${dependsroot}/`sh ./config.guess`"
 ./waf configure --depends="${dependsdir}" build $@
