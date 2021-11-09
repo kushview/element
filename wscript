@@ -371,7 +371,7 @@ def build_vst3 (bld):
         for plugin in 'Element ElementFX'.split():
             build_vst3_linux (bld, plugin)
 
-def build_app (bld):
+def build_libjuce (bld):
     libEnv = bld.env.derive()
     for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
         libEnv.append_unique (k, [ '-fPIC' ])
@@ -392,21 +392,54 @@ def build_app (bld):
         libjuce.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
     bld.add_group()
 
+def build_libelement (bld):
+    env = bld.env.derive()
+    for k in 'CFLAGS CXXFLAGS LINKFLAGS'.split():
+        env.append_unique (k, [ '-fPIC' ])
+    
     library = bld (
         features    = 'cxx cxxstlib',
         source      = element_sources (bld),
         includes    = common_includes(),
         target      = 'lib/element',
         name        = 'ELEMENT',
-        env         = libEnv,
+        env         = env,
         use         = [ 'BOOST_SIGNALS', 'LUA', 'LUA_KV', 'DEPENDS' ],
         cxxflags    = [],
         linkflags   = [],
         install_path = None
     )
+
+    if bld.env.LUA:     library.use += [ 'LUA' ]
+    if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
+    if bld.env.JACK:    library.use += [ 'JACK' ]
+
+    if bld.host_is_linux():
+        library.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
+        library.cxxflags += [
+            '-DLUA_PATH_DEFAULT="%s"'  % env.LUA_PATH_DEFAULT,
+            '-DLUA_CPATH_DEFAULT="%s"' % env.LUA_CPATH_DEFAULT,
+            '-DEL_LUADIR="%s"'         % env.LUADIR,
+            '-DEL_SCRIPTSDIR="%s"'     % env.SCRIPTSDIR
+        ]
+
+    elif bld.host_is_mac():
+        library.use += [
+            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
+            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
+            'TEMPLATES'
+        ]
+
+    elif bld.host_is_mingw32():
+        for l in element.mingw_libs.split():
+            library.use.append (l.upper())
+        if bld.env.DEBUG:
+            library.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
+
     library.export_includes = library.includes
     bld.add_group()
 
+def build_app (bld):
     appEnv = bld.env.derive()
     app = bld.program (
         source      = [ 'src/Main.cc' ],
@@ -418,38 +451,17 @@ def build_app (bld):
         linkflags   = []
     )
 
-    if bld.env.LUA:     library.use += [ 'LUA' ]
-    if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
-    if bld.env.JACK:    library.use += [ 'JACK' ]
-
-    if juce.is_linux() and bld.env.HOST_PLATFORM != 'win32':
+    if bld.host_is_linux():
         build_desktop (bld)
-        library.use += ['FREETYPE2', 'X11', 'DL', 'PTHREAD', 'ALSA', 'XEXT', 'CURL']
-        library.cxxflags += [
-            '-DLUA_PATH_DEFAULT="%s"'  % libEnv.LUA_PATH_DEFAULT,
-            '-DLUA_CPATH_DEFAULT="%s"' % libEnv.LUA_CPATH_DEFAULT,
-            '-DEL_LUADIR="%s"'         % libEnv.LUADIR,
-            '-DEL_SCRIPTSDIR="%s"'     % libEnv.SCRIPTSDIR
-        ]
 
-    elif juce.is_mac() and bld.env.HOST_PLATFORM != 'win32':
-        library.use += [
-            'ACCELERATE', 'AUDIO_TOOLBOX', 'AUDIO_UNIT', 'CORE_AUDIO', 
-            'CORE_AUDIO_KIT', 'COCOA', 'CORE_MIDI', 'IO_KIT', 'QUARTZ_CORE',
-            'TEMPLATES'
-        ]
+    elif bld.host_is_mac():
         app.target       = 'Applications/Element'
         app.mac_app      = True
         app.mac_plist    = 'build/data/Info.plist'
         app.mac_files    = [ 'data/Icon.icns' ]
         add_scripts_to (bld, '%s.app/Contents/Resources' % app.target, None)
 
-    else:
-        for l in element.mingw_libs.split():
-            library.use.append (l.upper())
-        if bld.env.DEBUG:
-            library.env.append_unique ('CXXFLAGS', ['-Wa,-mbig-obj'])
-
+    elif bld.host_is_mingw32():
         app.env.append_unique ('LINKFLAGS_STATIC_GCC', [ '-static-libgcc', '-static-libstdc++',
                                                          '-Wl,-Bstatic,--whole-archive', '-lwinpthread', 
                                                          '-Wl,--no-whole-archive' ])
@@ -512,6 +524,8 @@ def build (bld):
 
     build_liblua (bld)
     install_lua_files (bld)
+    build_libjuce (bld)
+    build_libelement (bld)
     build_app (bld)
     # build_vst (bld)
     # build_vst3 (bld)
