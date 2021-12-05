@@ -145,7 +145,7 @@ void SessionController::openFile (const File& file)
     {
         if (auto* gc = findSibling<GuiController>())
             gc->stabilizeContent();
-        changeResetter->triggerAsyncUpdate();
+        changeResetter->triggerAsyncUpdatePriority (MessagePriority::low);
     }
 }
 
