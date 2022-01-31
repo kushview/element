@@ -25,7 +25,11 @@ namespace Element
     {
         StringArray getSubDirs()
         {
-            return StringArray ({ "Controllers", "Graphs", "Presets", "Templates", "Scripts", "Sessions" });
+            auto dirs = StringArray ({ "Controllers", "Graphs", "Presets", "Scripts" });
+           #if defined(EL_PRO)
+            dirs.add ("Sessions");
+           #endif
+            return dirs;
         }
         
         void initializeUserLibrary (const File& path)
@@ -74,11 +78,13 @@ namespace Element
        #endif
     }
     
-    const File DataPath::defaultLocation()
-    {
-        return defaultUserDataPath();
-    }
+    const File DataPath::defaultLocation()          { return defaultUserDataPath(); }
     
+    const File DataPath::defaultGlobalMidiProgramsDir()
+    {    
+        return defaultUserDataPath().getChildFile ("Cache/MIDI/Programs");
+    }
+
     const File DataPath::defaultScriptsDir()        { return defaultUserDataPath().getChildFile ("Scripts"); }
     const File DataPath::defaultSessionDir()        { return defaultUserDataPath().getChildFile ("Sessions"); }
     const File DataPath::defaultGraphDir()          { return defaultUserDataPath().getChildFile ("Graphs"); }

@@ -81,6 +81,16 @@ AppController::~AppController() { }
 
 void AppController::activate()
 {
+    // migrate global node midi programs.
+    auto progsdir = DataPath::defaultGlobalMidiProgramsDir();
+    auto olddir = DataPath::applicationDataDir().getChildFile ("NodeMidiPrograms");
+    if (! progsdir.exists() && olddir.exists())
+    {
+        progsdir.getParentDirectory().createDirectory();
+        olddir.copyDirectoryTo (progsdir);
+    }
+    
+    // restore recents
     const auto recentList = DataPath::applicationDataDir().getChildFile ("RecentFiles.txt");
     if (recentList.existsAsFile())
     {

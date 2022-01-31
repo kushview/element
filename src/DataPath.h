@@ -1,6 +1,6 @@
 /*
     This file is part of Element
-    Copyright (C) 2014-2019  Kushview, LLC.  All rights reserved.
+    Copyright (C) 2014-2022  Kushview, LLC.  All rights reserved.
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,9 @@ public:
     /** Returns the default user data path */
     static const File defaultLocation();
 
+    /** Returns the default Node MIDI Presets directory */
+    static const File defaultGlobalMidiProgramsDir();
+
     /** Returns the default User data path */
     static const File defaultUserDataPath();
 
@@ -62,6 +65,7 @@ public:
     /** Returns the default Workspaces directory */
     static const File workspacesDir();
 
+    
     /** Returns the installation directory. May return an invalid file,
         especially when in debug mode. Use this sparingly.
       */

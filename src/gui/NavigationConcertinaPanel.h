@@ -231,7 +231,7 @@ public:
           renameWindow ("Rename", "Enter a new file name.", AlertWindow::NoIcon)
     {
         thread.startThread();
-        list.reset (new DirectoryContentsList (0, thread));
+        list.reset (new DirectoryContentsList (&filter, thread));
         list->setDirectory (DataPath::defaultLocation(), true, true);
 
         tree.reset (new FileTreeComponent (*list));
@@ -246,15 +246,15 @@ public:
         
         setSize (300, 800);
     }
-    
+
     ~DataPathTreeComponent()
     {
         tree->removeListener (this);
-		renameWindow.setVisible (false);
-		tree.reset();
-		list.reset();
+        renameWindow.setVisible (false);
+        tree.reset();
+        list.reset();
     }
-    
+
     void resized() override
     {
         tree->setBounds (getLocalBounds().reduced(2));
@@ -304,6 +304,19 @@ public:
     virtual void browserRootChanged (const File& newFile) override { ignoreUnused (newFile); }
     
 private:
+    class Filter : public FileFilter {
+    public:
+        Filter() : FileFilter ("UserDataPath") {}
+
+        bool isFileSuitable (const File& file) const override { return true; }
+        bool isDirectorySuitable (const File& file) const override
+        {
+            if (file.getFileName().toLowerCase() == "cache")
+                return false;
+            return true;
+        }
+    } filter;
+
     std::unique_ptr<FileTreeComponent> tree;
     std::unique_ptr<DirectoryContentsList> list;
     TimeSliceThread thread;
