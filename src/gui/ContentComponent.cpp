@@ -177,12 +177,7 @@ public:
         }
         else
         {
-           #if defined (EL_PRO)
             showExt = props->getValue ("clockSource") == "midiClock";
-           #else
-            showExt = false;
-            ignoreUnused (props);
-           #endif
         }
        
         if (session)
@@ -194,7 +189,6 @@ public:
         }
         
         mapButton.setEnabled (true);
-
         resized();
     }
     

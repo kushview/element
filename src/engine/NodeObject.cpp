@@ -426,7 +426,7 @@ File NodeObject::getMidiProgramFile (int program) const
     std::stringstream stream;
     stream << uids.toStdString() << "_" << std::setfill('0') << std::setw(3) << program << ".eln";
     String fileName = stream.str();
-    const File file (DataPath::applicationDataDir().getChildFile("NodeMidiPrograms").getChildFile(fileName));
+    const File file (DataPath::defaultGlobalMidiProgramsDir().getChildFile (fileName));
     if (! file.getParentDirectory().exists())
         file.getParentDirectory().createDirectory();
     return file;

@@ -219,8 +219,42 @@ private:
     class TempoLabel : public Component
     {
     public:
-        TempoLabel() { tempoValue.setValue (120.0); }
-        ~TempoLabel() { }
+        TempoLabel()
+        { 
+            tempoValue.setValue (120.0);
+            addChildComponent (tempoInput);
+
+            tempoInput.onEscapeKey = [this]() {
+                tempoInput.setVisible (false);
+            };
+
+            tempoInput.onFocusLost = 
+            tempoInput.onReturnKey =[this]() {
+                auto txt = tempoInput.getText().trim();
+                if (txt.isEmpty() || !tempoInput.isShowing())
+                    return;
+
+                const auto charptr = txt.getCharPointer();
+                auto ptr = charptr;
+                auto newTempo = CharacterFunctions::readDoubleValue (ptr);
+
+                if (ptr - charptr == txt.getNumBytesAsUTF8())
+                {
+                    if (newTempo < 20.0)  newTempo = 20.0;
+                    if (newTempo > 999.0) newTempo = 999.0;
+                    tempoValue.setValue (newTempo);
+                }
+
+                tempoInput.setVisible (false);
+                resized();
+                repaint();
+            };
+        }
+
+        ~TempoLabel()
+        {
+            removeChildComponent (&tempoInput);
+        }
         
         void paint (Graphics& g) override
         {
@@ -249,10 +283,27 @@ private:
             g.drawRect (0, 0, getWidth(), getHeight());
         }
         
+        void resized() override
+        {
+            if (tempoInput.isVisible())
+                tempoInput.setBounds (getLocalBounds());
+        }
+
         void mouseDown (const MouseEvent& ev) override
         {
             if (! isEnabled())
                 return;
+            
+            if (ev.getNumberOfClicks() == 2)
+            {
+                tempoInput.setText (tempoValue.getValue().toString(), dontSendNotification);
+                tempoInput.setVisible (true);
+                tempoInput.selectAll();
+                tempoInput.grabKeyboardFocus();
+                resized();
+                return;
+            }
+
             lastY = ev.getDistanceFromDragStartY();
         }
         
@@ -284,8 +335,13 @@ private:
         Value tempoValue;
         float engineTempo = 0.f;
         int lastY = 0;
+
+    private:
+        TextEditor tempoInput;
     } tempoLabel;
     
+    
+
     class TapTempoButton : public Button
     {
     public:

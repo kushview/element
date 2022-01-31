@@ -368,9 +368,7 @@ namespace Element {
             clockSourceLabel.setFont (Font (12.0, Font::bold));
             addAndMakeVisible (clockSourceBox);
             clockSourceBox.addItem ("Internal", ClockSourceInternal);
-           #if defined (EL_PRO)
             clockSourceBox.addItem ("MIDI Clock", ClockSourceMidiClock);
-           #endif
             clockSource.referTo (clockSourceBox.getSelectedIdAsValue());
 
             addAndMakeVisible (checkForUpdatesLabel);
@@ -479,16 +477,11 @@ namespace Element {
             defaultSessionClearButton.addListener (this);
            #endif
 
-           #if defined (EL_PRO)
             const int source = String("internal") == settings.getUserSettings()->getValue("clockSource")
                 ? ClockSourceInternal : ClockSourceMidiClock;
             clockSourceBox.setSelectedId (source, dontSendNotification);
             clockSource.setValue (source);
             clockSource.addListener (this);
-           #else
-            clockSource.setValue ((int) ClockSourceInternal);
-            clockSourceBox.setEnabled (false);
-           #endif
 
             addAndMakeVisible (mainContentLabel);
             mainContentLabel.setText ("UI Type", dontSendNotification);
@@ -756,7 +749,6 @@ namespace Element {
                     e->applySettings (world.getSettings());
             };
 
-           #if defined (EL_PRO)
             addAndMakeVisible (generateClockLabel);
             generateClockLabel.setFont (Font (12.0, Font::bold));
             generateClockLabel.setText ("Generate MIDI Clock", dontSendNotification);
@@ -774,7 +766,6 @@ namespace Element {
             sendClockToInput.setClickingTogglesState (true);
             sendClockToInput.setToggleState (settings.sendMidiClockToInput(), dontSendNotification);
             sendClockToInput.addListener (this);
-           #endif
             
             addAndMakeVisible(midiInputHeader);
             midiInputHeader.setText ("Active MIDI Inputs", dontSendNotification);
@@ -817,10 +808,8 @@ namespace Element {
             midiOutputLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             midiOutput.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
             layoutSetting (r, midiOutLatencyLabel, midiOutLatency, getWidth() / 4);
-           #if defined (EL_PRO)
             layoutSetting (r, generateClockLabel, generateClock);
             layoutSetting (r, sendClockToInputLabel, sendClockToInput);
-           #endif
             r.removeFromTop (roundToInt ((double) spacingBetweenSections * 1.5));
             midiInputHeader.setBounds (r.removeFromTop (24));
 
