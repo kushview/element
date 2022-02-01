@@ -12,6 +12,8 @@ VERSION="0.47.0"
 # plugin version is +1 that of standalone. VST2 has to start at 1.0.0
 PLUGIN_VERSION="1.47.0"
 
+JUCE_VST3SDK_PATH = 'libs/JUCE/modules/juce_audio_processors/format_types/VST3_SDK'
+
 juce_modules = '''
     jlv2_host juce_audio_basics juce_audio_devices juce_audio_formats
     juce_audio_processors juce_audio_utils juce_core juce_cryptography
@@ -91,10 +93,17 @@ def check_common (self):
     # VST3 hosting
     self.env.VST3 = not bool (self.options.no_vst3)
     self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
+    self.define ('JUCE_VST3HEADERS_INCLUDE_HEADERS_ONLY', False)
+    if len (self.options.vst3sdk) > 0:
+        self.env.VST3SDK_PATH = self.options.vst3sdk
+    else:
+        self.env.VST3SDK_PATH = JUCE_VST3SDK_PATH
+
     if self.env.VST3:
         line_just = self.line_just
         self.check(header_name='pluginterfaces/vst2.x/vstfxstore.h', uselib_store='VSTFXSTORE_H', mandatory=False)
         self.define ('JUCE_VST3_CAN_REPLACE_VST2', bool (self.env.HAVE_VSTFXSTORE_H))
+        self.env.INCLUDES_VST3 = [ self.env.VST3SDK_PATH ]
         self.line_just = line_just
 
     # LV2 Support
@@ -158,8 +167,8 @@ def check_mingw (self):
     self.define ('JUCE_ASIO', bool (self.env.HAVE_ASIO))
     
     # VST3 sdk is broken with mingw32 g++
-    self.env.VST3 = False
-    self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
+    # self.env.VST3 = False
+    # self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
     self.define ('JUCE_PLUGINHOST_AU', False)
     self.define ('JUCE_USE_WINDOWS_MEDIA_FORMAT', False)
     for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
