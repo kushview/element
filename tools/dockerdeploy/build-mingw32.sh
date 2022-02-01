@@ -6,6 +6,7 @@ here=`pwd`
 
 ./waf configure --depends="/depends/x86_64-w64-mingw32" \
     --with-vstsdk24="/SDKs/vstsdk2.4" \
+    --with-vst3sdk="/SDKs/vst3sdk" \
     --with-asiosdk="/SDKs/asiosdk" \
     --prefix="/" \
     --bindir="/" \
