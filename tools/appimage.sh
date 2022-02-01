@@ -7,7 +7,7 @@ appdir="build/AppDir"
 ./waf install --destdir="${appdir}"
 
 if [ -z "${VERSION}" ]; then
-    export VERSION="$(python waf version)-$(git rev-parse --short HEAD)"
+    export VERSION="$(python waf version)-$(date +%Y%m%d)"
 fi
 
 export LD_LIBRARY_PATH="build/lib:${LD_LIBRARY_PATH}"
