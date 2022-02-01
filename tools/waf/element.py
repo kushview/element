@@ -160,8 +160,6 @@ def check_mingw (self):
     # VST3 sdk is broken with mingw32 g++
     self.env.VST3 = False
     self.define ('JUCE_PLUGINHOST_VST3', self.env.VST3)
-    
-    self.define ('JUCE_PLUGINHOST_VST', bool(self.env.HAVE_VST))
     self.define ('JUCE_PLUGINHOST_AU', False)
     self.define ('JUCE_USE_WINDOWS_MEDIA_FORMAT', False)
     for flag in '-Wno-multichar -Wno-deprecated-declarations'.split():
