@@ -352,7 +352,7 @@ void AudioRouterNode::setState (const void* data, int sizeInBytes)
 
             rebuildPorts = true;
             sendChangeMessage();
-            triggerPortReset();
+            triggerPortReset (false);
         }
     }
 }

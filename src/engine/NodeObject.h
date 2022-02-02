@@ -395,7 +395,8 @@ protected:
 
     //==========================================================================
     void triggerPortReset();
-
+    void triggerPortReset (bool async);
+    
     kv::PortList ports;
     ValueTree metadata;
 
