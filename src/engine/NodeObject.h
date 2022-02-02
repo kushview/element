@@ -410,6 +410,7 @@ protected:
 
     //==========================================================================
     void triggerPortReset();
+    void triggerPortReset (bool async);
 
 private:
     friend class EngineController;

@@ -1,15 +1,12 @@
 [submodule "libs/kv"]
 	path = libs/kv
 	url = https://github.com/kushview/kv-modules
-	branch = develop
 [submodule "libs/JUCE"]
 	path = libs/JUCE
 	url = https://github.com/kushview/JUCE
 [submodule "libs/jlv2"]
 	path = libs/jlv2
 	url = https://github.com/lvtk/jlv2
-	branch = master
 [submodule "libs/lua-kv"]
 	path = libs/lua-kv
 	url = https://github.com/kushview/lua-kv
-	branch = master
