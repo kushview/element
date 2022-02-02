@@ -98,7 +98,7 @@ private:
     bool showIns = true;
     bool showOuts = true;
     Viewport view;
-    friend class Content;
+    friend struct Content;
 
     struct Content : public Component,
                      public Button::Listener
