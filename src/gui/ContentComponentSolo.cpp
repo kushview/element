@@ -703,10 +703,36 @@ void ContentComponentSolo::filesDropped (const StringArray &files, int x, int y)
         else if ((file.hasFileExtension ("dll") || file.hasFileExtension ("vst") || file.hasFileExtension ("vst3")) &&
                  (getMainViewName() == "GraphEditor" || getMainViewName() == "PatchBay" || getMainViewName() == "PluginManager"))
         {
+            auto s = getSession();
+            auto graph = s->getActiveGraph();
             PluginDescription desc;
-            desc.pluginFormatName = file.hasFileExtension ("vst3") ? "VST3" : "VST";
+            desc.pluginFormatName = file.hasFileExtension("vst3") ? "VST3" : "VST";
             desc.fileOrIdentifier = file.getFullPathName();
-            this->post (new LoadPluginMessage (desc, false));
+#if 0
+            this->post(new LoadPluginMessage(desc, false));
+#endif
+            auto message = std::make_unique<AddPluginMessage>(graph, desc);
+            auto& builder(message->builder);
+
+            if (ModifierKeys::getCurrentModifiersRealtime().isAltDown())
+            {
+                const auto audioInputNode = graph.getIONode(PortType::Audio, true);
+                const auto midiInputNode = graph.getIONode(PortType::Midi, true);
+                builder.addChannel(audioInputNode, PortType::Audio, 0, 0, false);
+                builder.addChannel(audioInputNode, PortType::Audio, 1, 1, false);
+                builder.addChannel(midiInputNode, PortType::Midi, 0, 0, false);
+            }
+
+            if (ModifierKeys::getCurrentModifiersRealtime().isCommandDown())
+            {
+                const auto audioOutputNode = graph.getIONode(PortType::Audio, false);
+                const auto midiOutNode = graph.getIONode(PortType::Midi, false);
+                builder.addChannel(audioOutputNode, PortType::Audio, 0, 0, true);
+                builder.addChannel(audioOutputNode, PortType::Audio, 1, 1, true);
+                builder.addChannel(midiOutNode, PortType::Midi, 0, 0, true);
+            }
+
+            this->post(message.release());
         }
     }
 }
