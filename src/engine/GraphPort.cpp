@@ -55,7 +55,7 @@
     {
         d.name = getName();
         d.fileOrIdentifier = portType.getURI();
-        d.uid  = d.fileOrIdentifier.hashCode();
+        d.uniqueId  = d.fileOrIdentifier.hashCode();
         d.category = "Ports";
         d.pluginFormatName = "Internal";
         d.manufacturerName = "Element Project";

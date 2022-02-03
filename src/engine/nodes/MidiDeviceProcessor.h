@@ -37,7 +37,7 @@ public:
         desc.name = "MIDI I/O Device";
         desc.fileOrIdentifier   = inputDevice ? EL_INTERNAL_ID_MIDI_INPUT_DEVICE 
                                               : EL_INTERNAL_ID_MIDI_OUTPUT_DEVICE;
-        desc.uid                = inputDevice ? EL_INTERNAL_UID_MIDI_INPUT_DEVICE
+        desc.uniqueId                = inputDevice ? EL_INTERNAL_UID_MIDI_INPUT_DEVICE
                                               : EL_INTERNAL_UID_MIDI_OUTPUT_DEVICE;
         desc.descriptiveName    = "MIDI device node";
         desc.numInputChannels   = 0;

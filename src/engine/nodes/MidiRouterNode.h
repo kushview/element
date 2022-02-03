@@ -59,7 +59,7 @@ public:
     void getPluginDescription (PluginDescription& desc) const override
     {
         desc.fileOrIdentifier   = EL_INTERNAL_ID_MIDI_ROUTER;
-        desc.uid                = EL_INTERNAL_UID_MIDI_ROUTER;
+        desc.uniqueId                = EL_INTERNAL_UID_MIDI_ROUTER;
         desc.name               = "MIDI Router";
         desc.descriptiveName    = "A MIDI Patch Grid";
         desc.numInputChannels   = 0;

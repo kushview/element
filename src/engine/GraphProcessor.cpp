@@ -1525,7 +1525,7 @@ void GraphProcessor::setStateInformation (const void* /*data*/, int /*sizeInByte
 void GraphProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
-    d.uid = d.name.hashCode();
+    d.uniqueId = d.name.hashCode();
     d.category = "Graphs";
     d.pluginFormatName = "Internal";
     d.manufacturerName = "Kushview, LLC";
@@ -1575,7 +1575,7 @@ const String GraphProcessor::AudioGraphIOProcessor::getName() const
 void GraphProcessor::AudioGraphIOProcessor::fillInPluginDescription (PluginDescription& d) const
 {
     d.name = getName();
-    d.uid = d.name.hashCode();
+    d.uniqueId = d.name.hashCode();
     d.category = "I/O Devices";
     d.pluginFormatName = "Internal";
     d.manufacturerName = "Element";

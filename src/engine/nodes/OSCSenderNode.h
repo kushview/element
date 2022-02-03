@@ -39,7 +39,7 @@ public:
     {
         desc.name               = "OSC Sender";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_SENDER;
-        desc.uid                = EL_INTERNAL_UID_OSC_SENDER;
+        desc.uniqueId                = EL_INTERNAL_UID_OSC_SENDER;
         desc.descriptiveName    = "OSC Sender";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;

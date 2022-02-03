@@ -56,7 +56,7 @@ void EQFilterProcessor::fillInPluginDescription (PluginDescription &desc) const
     desc.manufacturerName   = "Element";
     desc.pluginFormatName   = "Element";
     desc.version            = "1.0.0";
-    desc.uid                = EL_INTERNAL_UID_EQ_FILTER;
+    desc.uniqueId                = EL_INTERNAL_UID_EQ_FILTER;
 }
 
 void EQFilterProcessor::updateParams()

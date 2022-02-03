@@ -118,7 +118,7 @@ void ScriptNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Script";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_SCRIPT;
-    desc.uid                = EL_INTERNAL_UID_SCRIPT;
+    desc.uniqueId                = EL_INTERNAL_UID_SCRIPT;
     desc.descriptiveName    = "A user scriptable Element node";
     desc.numInputChannels   = 0;
     desc.numOutputChannels  = 0;
