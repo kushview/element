@@ -139,6 +139,8 @@ public:
     
     void resized() override
     {
+        if (content1 == nullptr || content2 == nullptr)
+            return;
         Component* comps[] = { 0, 0, 0 };
         comps[0] = content1.get();
         comps[1] = bar.get();
@@ -193,8 +195,11 @@ public:
             updateLayout();
         }
 
-        content1->didBecomeActive();
-        content1->stabilizeContent();
+        if (content1)
+        {
+            content1->didBecomeActive();
+            content1->stabilizeContent();
+        }
     }
     
     void setAccessoryView (ContentView* view)
@@ -213,8 +218,12 @@ public:
         }
 
         resized();
-        content2->didBecomeActive();
-        content2->stabilizeContent();
+
+        if (content2)
+        {
+            content2->didBecomeActive();
+            content2->stabilizeContent();
+        }
     }
     
     void setShowAccessoryView (const bool show)
@@ -501,6 +510,8 @@ ContentComponentSolo::ContentComponentSolo (AppController& ctl_)
 
 ContentComponentSolo::~ContentComponentSolo() noexcept
 {
+    setContentView (nullptr, false);
+    setContentView (nullptr, true);
 }
 
 String ContentComponentSolo::getMainViewName() const
@@ -571,7 +582,7 @@ void ContentComponentSolo::nextMainView()
 
 void ContentComponentSolo::setContentView (ContentView* view, const bool accessory)
 {
-    jassert (view && container);
+    jassert (container != nullptr);
     std::unique_ptr<ContentView> deleter (view);
     if (accessory)
     {
