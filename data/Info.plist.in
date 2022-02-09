@@ -4,11 +4,11 @@
 <plist>
   <dict>
     <key>CFBundleDisplayName</key>
-    <string>Element</string>
+    <string>@MAC_BUNDLE_DISPLAY_NAME@</string>
     <key>CFBundleIdentifier</key>
-    <string>new.kushview.Element</string>
+    <string>@MAC_BUNDLE_IDENTIFIER@</string>
     <key>CFBundleName</key>
-    <string>Element</string>
+    <string>@MAC_BUNDLE_NAME@</string>
     <key>NSAppTransportSecurity</key>
     <dict>
       <key>NSAllowsArbitraryLoads</key>
@@ -17,7 +17,7 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This app requires audio input. If you do not have an audio interface connected it will use the built-in microphone.</string>
     <key>CFBundleExecutable</key>
-    <string>Element</string>
+    <string>@MAC_BUNDLE_EXECUTABLE@</string>
     <key>CFBundleIconFile</key>
     <string>Icon.icns</string>
     <key>CFBundlePackageType</key>
@@ -29,7 +29,7 @@
     <key>CFBundleVersion</key>
     <string>@PACKAGE_VERSION@</string>
     <key>NSHumanReadableCopyright</key>
-    <string>Copyright (c) 2014-2021 Kushview, LLC</string>
+    <string>Copyright (c) 2014-2022 Kushview, LLC</string>
     <key>NSHighResolutionCapable</key>
     <true/>
     <key>CFBundleDocumentTypes</key>

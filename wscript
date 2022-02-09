@@ -43,6 +43,7 @@ def options (opt):
         help='Zip type for waf dist (gz/bz2/zip) [ Default: gz ]')
 
     opt.add_option ('--minimal', dest='minimal', default=False, action='store_true')
+    opt.add_option ('--se', dest='se', default=False, action='store_true')
 
 def silence_warnings (conf):
     '''TODO: resolve these'''
@@ -65,6 +66,7 @@ def set_install_dir (conf, key, d1, d2):
 def configure (conf):
     conf.env.TEST       = bool(conf.options.test)
     conf.env.DEBUG      = bool(conf.options.debug)
+    conf.env.SE         = bool(conf.options.se)
 
     conf.load ('host depends')
     conf.load ("compiler_c compiler_cxx")
@@ -127,7 +129,6 @@ def configure (conf):
     conf.message ("VST3",       conf.env.VST3)
     conf.message ("LADSPA",     bool(conf.env.LADSPA))
     conf.message ("LV2",        bool(conf.env.LV2))
-    print
     # juce.display_header ("Plugin Clients")
     # conf.message ("VST2",       conf.env.VST)
     print
@@ -406,9 +407,13 @@ def build_libelement (bld):
         use         = [ 'BOOST_SIGNALS', 'LUA', 'LUA_KV', 'DEPENDS' ],
         cxxflags    = [],
         linkflags   = [],
+        defines     = [],
         install_path = None
     )
 
+    if bld.env.SE:
+        library.defines += [ 'EL_SOLO=1' ]
+    
     if bld.env.LUA:     library.use += [ 'LUA' ]
     if bld.env.LV2:     library.use += [ 'SUIL', 'LILV', 'LV2' ]
     if bld.env.JACK:    library.use += [ 'JACK' ]
@@ -446,6 +451,7 @@ def build_app (bld):
         target      = 'bin/element',
         name        = 'ElementApp',
         env         = appEnv,
+        defines     = [],
         use         = [ 'LUA', 'ELEMENT', 'LIBJUCE' ],
         linkflags   = []
     )
@@ -454,7 +460,10 @@ def build_app (bld):
         build_desktop (bld)
 
     elif bld.host_is_mac():
-        app.target       = 'Applications/Element'
+        if bld.env.SE:
+            app.target   = 'Applications/Element SE'
+        else:
+            app.target   = 'Applications/Element'
         app.mac_app      = True
         app.mac_plist    = 'build/data/Info.plist'
         app.mac_files    = [ 'data/Icon.icns' ]
@@ -508,14 +517,24 @@ def build (bld):
     if bld.cmd == 'build' and git.is_repo():
         bld.add_pre_fun (bld.git_update_env)
 
-    bld.template (
-        name = 'TEMPLATES',
+    tps = bld.template (
+        name   = 'TEMPLATES',
         source = bld.path.ant_glob ('src/**/*.h.in') \
                + bld.path.ant_glob ('data/**/*.in') \
                + bld.path.ant_glob ("tools/**/*.in"),
         install_path = None,
-        PACKAGE_VERSION = VERSION
+        PACKAGE_VERSION     = VERSION,
+        MAC_BUNDLE_NAME         = 'Element',
+        MAC_BUNDLE_DISPLAY_NAME = 'Element',
+        MAC_BUNDLE_IDENTIFIER   = 'net.kushview.Element',
+        MAC_BUNDLE_EXECUTABLE   = 'Element'
     )
+
+    if bld.env.SE:
+        tps.MAC_BUNDLE_NAME         = 'Element SE',
+        tps.MAC_BUNDLE_DISPLAY_NAME = 'Element SE',
+        tps.MAC_BUNDLE_IDENTIFIER   = 'net.kushview.ElementSE',
+        tps.MAC_BUNDLE_EXECUTABLE   = 'Element SE'
 
     bld.add_group()
     if bld.options.minimal:
