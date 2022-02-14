@@ -285,21 +285,22 @@ def add_scripts_to (bld, builddir, instdir,
         s = bld (
             features    ='subst', 
             source      = node,
-            target      = '%s/%s/el/%s' % (builddir, modsdir, node.name),
+            name        = node.name,
+            target      = [ '%s/%s/el/%s' % (builddir, modsdir, node.name) ],
             install_path= '%s/%s/el' % (instdir, modsdir) if instdir else None
         )
     for node in bld.path.ant_glob ('libs/lua-kv/src/kv/*.lua'):
         bld (
             features    ='subst',
             source      = node,
-            target      = '%s/%s/kv/%s' % (builddir, modsdir, node.name),
+            target      = [ '%s/%s/kv/%s' % (builddir, modsdir, node.name) ],
             install_path= '%s/%s/kv' % (instdir, modsdir) if instdir else None
         )
     for node in bld.path.ant_glob ('scripts/**/*.lua'):
         bld (
             features    ='subst',
             source      = node,
-            target      = '%s/%s/%s' % (builddir, scriptsdir, node.name),
+            target      = [ '%s/%s/%s' % (builddir, scriptsdir, node.name) ],
             install_path= '%s/%s' % (instdir, scriptsdir) if instdir else None
         )
 
