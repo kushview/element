@@ -752,7 +752,7 @@ Result LuaNode::loadScript (const String& newScript)
         script = draftScript = newScript;
         if (prepared)
             newContext->prepare (sampleRate, blockSize);
-        triggerPortReset (false);
+        triggerPortReset();
         ScopedLock sl (lock);
         if (context != nullptr)
             newContext->copyParameterValues (*context);
