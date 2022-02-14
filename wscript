@@ -456,6 +456,11 @@ def build_app (bld):
         linkflags   = []
     )
 
+    if bld.env.SE:
+        app.defines.append ('EL_SOLO=1')
+    else:
+        app.defines.append ('EL_PRO=1')
+
     if bld.host_is_linux():
         build_desktop (bld)
 

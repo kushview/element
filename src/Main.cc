@@ -312,7 +312,7 @@ public:
             Application::quit();
         }
 
-       #else // lite and solo
+       #else // SE
         auto* gc = controller->findChild<GraphController>();
         if (world->getSettings().askToSaveSession())
         {
@@ -341,7 +341,7 @@ public:
         if (! controller)
             return;
         
-       #if EL_PRO
+       #if defined (EL_PRO)
         if (auto* sc = controller->findChild<SessionController>())
         {
             const auto path = commandLine.unquoted().trim();
