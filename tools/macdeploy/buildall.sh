@@ -1,6 +1,8 @@
 set -e
 here=`pwd`
 
+export ARCHS="x86_64 arm64"
+
 version=`./waf version`-`git rev-parse --short HEAD`
 dependsroot=`dirname ${here}`/depends
 dependsdir="${dependsroot}/`sh ./config.guess`"
