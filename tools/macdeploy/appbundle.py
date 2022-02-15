@@ -702,7 +702,7 @@ if config.sign and 'CODESIGNARGS' not in os.environ:
 elif config.sign:
     if verbose >= 1:
         print("Code-signing app bundle %s"%(target,))
-    subprocess.check_call("codesign --force %s %s"%(os.environ['CODESIGNARGS'], target), shell=True)
+    subprocess.check_call("codesign --force %s \"%s\"" % (os.environ['CODESIGNARGS'], target), shell=True)
 
 # ------------------------------------------------
 
