@@ -450,7 +450,7 @@ def build_app (bld):
         source      = [ 'src/Main.cc' ],
         includes    = common_includes(),
         target      = 'bin/element',
-        name        = 'ElementApp',
+        name        = 'ELEMENT_APP',
         env         = appEnv,
         defines     = [],
         use         = [ 'LUA', 'ELEMENT', 'LIBJUCE' ],
@@ -458,12 +458,13 @@ def build_app (bld):
     )
 
     if bld.env.SE:
+        app.target = app.target + '-se'
         app.defines.append ('EL_SOLO=1')
     else:
         app.defines.append ('EL_PRO=1')
 
     if bld.host_is_linux():
-        build_desktop (bld)
+        build_desktop (bld, os.path.basename (app.target))
 
     elif bld.host_is_mac():
         if bld.env.SE:
