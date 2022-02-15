@@ -413,17 +413,25 @@ void Settings::setDesktopScale (double scale)
 //=============================================================================
 String Settings::getMainContentType() const
 {
+   #if defined (EL_PRO)
     if (auto* p = getProps())
         return p->getValue (mainContentTypeKey, "standard");
     return "standard";
+   #else
+    return "compact";
+   #endif
 }
 
 void Settings::setMainContentType (const String& tp)
 {
+   #if defined (EL_PRO)
     if (getMainContentType() == tp)
         return;
     if (auto* p = getProps())
         p->setValue (mainContentTypeKey, tp);
+   #else
+    ignoreUnused (tp);
+   #endif
 }
 
 //=============================================================================

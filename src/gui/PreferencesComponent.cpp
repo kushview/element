@@ -483,6 +483,7 @@ namespace Element {
             clockSource.setValue (source);
             clockSource.addListener (this);
 
+           #if defined (EL_PRO)
             addAndMakeVisible (mainContentLabel);
             mainContentLabel.setText ("UI Type", dontSendNotification);
             mainContentLabel.setFont (Font (12.0, Font::bold));
@@ -495,6 +496,7 @@ namespace Element {
                 mainContentBox.setSelectedId (2);
             else { jassertfalse; } // invalid content type
             mainContentBox.getSelectedIdAsValue().addListener (this);
+           #endif
         }
 
         virtual ~GeneralSettingsPage() noexcept
@@ -546,25 +548,29 @@ namespace Element {
             scanForPlugins.setBounds (r2.removeFromLeft (toggleWidth)
                                         .withSizeKeepingCentre (toggleWidth, toggleHeight));
 
-            layoutSetting (r, showPluginWindowsLabel, showPluginWindows);
+            layoutSetting (r, showPluginWindowsLabel,  showPluginWindows);
             layoutSetting (r, pluginWindowsOnTopLabel, pluginWindowsOnTop);
-            layoutSetting (r, hidePluginWindowsLabel, hidePluginWindows);
-            layoutSetting (r, openLastSessionLabel, openLastSession);
-            layoutSetting (r, askToSaveSessionLabel, askToSaveSession);
+            layoutSetting (r, hidePluginWindowsLabel,  hidePluginWindows);
+            layoutSetting (r, openLastSessionLabel,    openLastSession);
+            layoutSetting (r, askToSaveSessionLabel,   askToSaveSession);
             
+           #if defined (EL_PRO)
             r.removeFromTop (spacingBetweenSections);
             r2 = r.removeFromTop (settingHeight);
             mainContentLabel.setBounds (r2.removeFromLeft (getWidth() / 2));
             mainContentBox.setBounds (r2.withSizeKeepingCentre (r2.getWidth(), settingHeight));
+           #endif
 
             layoutSetting (r, systrayLabel, systray);
             layoutSetting (r, desktopScaleLabel, desktopScale, getWidth() / 4);
+           
            #ifdef EL_PRO
             layoutSetting (r, defaultSessionFileLabel, defaultSessionFile, 190 - settingHeight);
             defaultSessionClearButton.setBounds (defaultSessionFile.getRight(),
                                                  defaultSessionFile.getY(),
                                                  settingHeight - 2, defaultSessionFile.getHeight());
            #endif
+            
             if (pluginSettings.isVisible())
             {
                 r.removeFromTop (spacingBetweenSections * 2);
