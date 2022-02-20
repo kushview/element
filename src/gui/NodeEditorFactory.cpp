@@ -187,8 +187,10 @@ std::unique_ptr<AudioProcessorEditor> NodeEditorFactory::createAudioProcessorEdi
     NodeObjectPtr object = node.getGraphNode();
     AudioProcessor* const proc = (object != nullptr) ? object->getAudioProcessor() : nullptr;
 
-    editor.reset (proc != nullptr && proc->hasEditor() 
-        ? proc->createEditorIfNeeded() 
+    if (proc == nullptr)
+        return nullptr;
+
+    editor.reset (proc->hasEditor() ? proc->createEditorIfNeeded() 
         : new GenericAudioProcessorEditor (proc));
 
     return editor;

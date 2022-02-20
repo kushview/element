@@ -113,6 +113,9 @@ LookAndFeel::LookAndFeel()
     // rotary
     setColour (Slider::rotarySliderFillColourId, Colors::toggleBlue.darker(0.3));
 
+    // Scrollbar
+    setColour (ScrollBar::thumbColourId, Colour::greyLevel (0.25f));
+
     // code editor. TODO
     setColour (CodeEditorComponent::backgroundColourId,     findColour (Style::widgetBackgroundColorId).darker (0.6));
     setColour (CodeEditorComponent::highlightColourId,      Colour(0xff1b5381));

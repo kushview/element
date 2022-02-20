@@ -64,7 +64,7 @@ void CompressorProcessor::fillInPluginDescription (PluginDescription& desc) cons
     desc.manufacturerName   = "Element";
     desc.pluginFormatName   = "Element";
     desc.version            = "1.0.0";
-    desc.uid                = EL_INTERNAL_UID_COMPRESSOR;
+    desc.uniqueId                = EL_INTERNAL_UID_COMPRESSOR;
 }
 
 void CompressorProcessor::updateParams()

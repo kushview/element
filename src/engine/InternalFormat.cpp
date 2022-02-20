@@ -62,22 +62,18 @@ InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
         IOP p (IOP::audioOutputNode);
         p.fillInPluginDescription (audioOutDesc);
     }
-
     {
         IOP p (IOP::audioInputNode);
         p.fillInPluginDescription (audioInDesc);
     }
-
     {
         IOP p (IOP::midiOutputNode);
         p.fillInPluginDescription (midiOutDesc);
     }
-    
     {
         IOP p (IOP::midiInputNode);
         p.fillInPluginDescription (midiInDesc);
     }
-    #if defined (EL_PRO) || defined (EL_SOLO)
     {
         PlaceholderProcessor p;
         p.fillInPluginDescription (placeholderDesc);
@@ -88,7 +84,6 @@ InternalFormat::InternalFormat (AudioEngine& e, MidiEngine& me)
         MidiDeviceProcessor out (false, midi);
         out.fillInPluginDescription (midiOutputDeviceDesc);
     }
-    #endif
 }
 
 AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription& desc, double, int)
@@ -109,8 +104,6 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
     {
         return new IOP (IOP::midiOutputNode);
     }
-
-   #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == "element.midiInputDevice")
     {
         return new MidiDeviceProcessor (true, midi);
@@ -123,7 +116,6 @@ AudioPluginInstance* InternalFormat::instantiatePlugin (const PluginDescription&
     {
         return new PlaceholderProcessor();
     }
-   #endif // EL_FREE
 
     return nullptr;
 }
@@ -339,8 +331,6 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new FreqSplitterProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_COMPRESSOR)
         base = new CompressorProcessor();
-
-   #if defined (EL_PRO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_GRAPH)
         base = new SubGraphProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_MIXER)
@@ -349,16 +339,12 @@ AudioPluginInstance* ElementAudioPluginFormat::instantiatePlugin (const PluginDe
         base = new ChannelizeProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MIDI_CHANNEL_MAP)
         base = new MidiChannelMapProcessor();
-   #endif // EL_PRO
-
-   #if defined (EL_PRO) || defined (EL_SOLO)
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_AUDIO_FILE_PLAYER)
         base = new AudioFilePlayerNode();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_MEDIA_PLAYER)
         base = new MediaPlayerProcessor();
     else if (desc.fileOrIdentifier == EL_INTERNAL_ID_PLACEHOLDER)
         base = new PlaceholderProcessor();
-   #endif // EL_PRO || EL_SOLO
 
     return base != nullptr ? base.release() : nullptr;
 }

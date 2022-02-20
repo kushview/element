@@ -507,7 +507,6 @@ public:
             ScopedLock lockMidiOut (engine.world.getMidiEngine().getMidiOutputLock());
             if (auto* const midiOut = engine.world.getMidiEngine().getDefaultMidiOutput())
             {
-               #if defined (EL_PRO)
                 if (sendMidiClockToInput.get() != 1 && generateMidiClock.get() == 1)
                 {
                     if (wasPlaying != transport.isPlaying())
@@ -526,7 +525,6 @@ public:
                     midiClockMaster.setTempo (transport.getTempo());
                     midiClockMaster.render (incomingMidi, numSamples);
                 }
-               #endif
 
                 const double delayMs = midiOutLatency.get();
                 if (! incomingMidi.isEmpty())
@@ -552,7 +550,6 @@ public:
 
         if (shouldProcess)
         {
-           #if defined (EL_PRO)
             if (generateMidiClock.get() == 1 && sendMidiClockToInput.get() == 1)
             {
                 if (wasPlaying != transport.isPlaying())
@@ -570,7 +567,6 @@ public:
                 midiClockMaster.setTempo (static_cast<double> (transport.getTempo()));
                 midiClockMaster.render (midi, numSamples);
             }
-           #endif
 
             if (currentGraph.get() != graphs.getCurrentGraphIndex())
                 graphs.setCurrentGraph (currentGraph.get());

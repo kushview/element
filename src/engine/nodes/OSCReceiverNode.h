@@ -38,7 +38,7 @@ public:
     {
         desc.name               = "OSC Receiver";
         desc.fileOrIdentifier   = EL_INTERNAL_ID_OSC_RECEIVER;
-        desc.uid                = EL_INTERNAL_UID_OSC_RECEIVER;
+        desc.uniqueId                = EL_INTERNAL_UID_OSC_RECEIVER;
         desc.descriptiveName    = "OSC Receiver";
         desc.numInputChannels   = 0;
         desc.numOutputChannels  = 0;

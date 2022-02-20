@@ -314,8 +314,8 @@ struct LuaNode::Context
                     local AudioBuffer = require ('kv.AudioBuffer')
                     local MidiPipe    = require ('el.MidiPipe')
 
-                    local a = AudioBuffer (__ln_validate_nchans, __ln_validate_nframes)
-                    local m = MidiPipe (__ln_validate_nmidi)
+                    local a = AudioBuffer.new (__ln_validate_nchans, __ln_validate_nframes)
+                    local m = MidiPipe.new (__ln_validate_nmidi)
 
                     for _ = 1,4 do
                         for i = 0,m:size() - 1 do
@@ -754,7 +754,7 @@ Result LuaNode::loadScript (const String& newScript)
         script = draftScript = newScript;
         if (prepared)
             newContext->prepare (sampleRate, blockSize);
-        triggerPortReset();
+        triggerPortReset (false);
         ScopedLock sl (lock);
         if (context != nullptr)
             newContext->copyParameterValues (*context);
@@ -774,7 +774,7 @@ void LuaNode::getPluginDescription (PluginDescription& desc) const
 {
     desc.name               = "Lua";
     desc.fileOrIdentifier   = EL_INTERNAL_ID_LUA;
-    desc.uid                = EL_INTERNAL_UID_LUA;
+    desc.uniqueId                = EL_INTERNAL_UID_LUA;
     desc.descriptiveName    = "A user scriptable Element node";
     desc.numInputChannels   = 0;
     desc.numOutputChannels  = 0;
