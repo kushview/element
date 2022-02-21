@@ -78,10 +78,10 @@ private:
         auto& graph (manager.getGraph());
         const Node model (manager.getGraphModel());
 
-        const bool wantsAudioIn   = graph.getNumPorts (PortType::Audio, true) > 0;
-        const bool wantsAudioOut  = graph.getNumPorts (PortType::Audio, false) > 0;
-        const bool wantsMidiIn    = graph.getNumPorts (PortType::Midi, true) > 0;
-        const bool wantsMidiOut   = graph.getNumPorts (PortType::Midi, false) > 0;
+        const bool wantsAudioIn  = graph.getNumPorts (PortType::Audio, true) > 0 && model.hasAudioInputNode();
+        const bool wantsAudioOut = graph.getNumPorts (PortType::Audio, false) > 0 && model.hasAudioOutputNode();
+        const bool wantsMidiIn   = graph.getNumPorts (PortType::Midi, true) > 0 && model.hasMidiInputNode();
+        const bool wantsMidiOut  = graph.getNumPorts (PortType::Midi, false) > 0 && model.hasMidiOutputNode();
         
         NodeObjectPtr ioNodes [IONode::numDeviceTypes];
         for (int i = 0; i < manager.getNumNodes(); ++i)
@@ -670,7 +670,6 @@ void GraphManager::setNodeModel (const Node& node)
         for (const auto& n : failed)
             arcs.removeChild (n, nullptr);
 
-    
     loaded = true;
     jassert (arcs.getNumChildren() == processor.getNumConnections());
     failed.clearQuick();

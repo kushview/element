@@ -157,7 +157,7 @@ GraphNode::getConnectionBetween (const uint32 sourceNode,
 }
 
 bool GraphNode::isConnected (const uint32 sourceNode,
-                                  const uint32 destNode) const
+                             const uint32 destNode) const
 {
     for (int i = connections.size(); --i >= 0;)
     {
@@ -235,7 +235,7 @@ bool GraphNode::addConnection (const uint32 sourceNode, const uint32 sourcePort,
 }
 
 bool GraphNode::connectChannels (PortType type, uint32 sourceNode, int32 sourceChannel,
-                                      uint32 destNode, int32 destChannel)
+                                 uint32 destNode, int32 destChannel)
 {
     NodeObject* src = getNodeForId (sourceNode);
     NodeObject* dst = getNodeForId (destNode);
