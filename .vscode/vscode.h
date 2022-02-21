@@ -1,5 +1,6 @@
-#define JUCE_AMALGAMATED_INCLUDE 1
-#define KV_JACK_AUDIO 0
+#define JUCE_AMALGAMATED_INCLUDE    1
+#define KV_JACK_AUDIO               1
+
 #include "JuceHeader.h"
 #include "ElementApp.h"
 #include "Globals.h"
@@ -8,6 +9,7 @@
 
 using namespace juce;
 using namespace Element;
+using namespace kv;
 
 namespace Element {
 using namespace juce;
