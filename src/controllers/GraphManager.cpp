@@ -174,8 +174,6 @@ private:
         int index = data.indexOf (data.getChildWithName (Tags::ports));
         if (newPorts.isValid())
         {
-            DBG("onPortsChanged(): " << object->getName() 
-                << " - " << data.getProperty (Tags::name).toString());
             if (index >= 0)
                 data.removeChild (index, nullptr);
             else
