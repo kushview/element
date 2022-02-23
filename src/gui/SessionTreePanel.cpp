@@ -669,7 +669,6 @@ void SessionTreePanel::setSession (SessionPtr s)
     }
 
     refresh();
-    selectActiveRootGraph();
 }
 
 SessionPtr SessionTreePanel::getSession() const
@@ -718,7 +717,7 @@ void SessionTreePanel::selectActiveRootGraph()
             {
                 if (! item->isSelected())
                 {
-                    item->setSelected (true, true, sendNotificationAsync);
+                    item->setSelected (true, true, dontSendNotification);
                     item->repaintItem();
                 }
                 break;
