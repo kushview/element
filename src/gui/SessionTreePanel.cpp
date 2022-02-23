@@ -649,10 +649,7 @@ void SessionTreePanel::refresh()
         rootItem->refreshSubItems();
 }
 
-void SessionTreePanel::mouseDown (const MouseEvent &ev)
-{
-
-}
+void SessionTreePanel::mouseDown (const MouseEvent &ev) {}
 
 void SessionTreePanel::setSession (SessionPtr s)
 {
