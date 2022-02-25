@@ -19,7 +19,7 @@
 #include "Version.h"
 
 #ifndef TEST_CURRENT_VERSION
-#define TEST_CURRENT_VERSION 0
+ #define TEST_CURRENT_VERSION 0
 #endif
 
 namespace Element {
@@ -78,7 +78,7 @@ bool CurrentVersion::isNewerVersionAvailable()
         return result;
 
 #if TEST_CURRENT_VERSION
-    const URL url ("http://kushview.dev/?edd_action=get_version&item_id=15");
+    const URL url ("https://kushview.local/?edd_action=get_version&item_id=20");
 #else
     const URL url ("https://kushview.net/?edd_action=get_version&item_id=20");
 #endif
